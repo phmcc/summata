@@ -1,0 +1,51 @@
+Package: summata
+Type: Package
+Title: Publication-Ready Regression Tables and Forest Plots
+Version: 0.9.3
+Authors@R: c(
+    person(
+        given = c("Paul", "Hsin-ti"), 
+        family = "McClelland", 
+        role = c("aut", "cre"), 
+        email = "PaulHMcClelland@protonmail.com",
+        comment = c(ORCID = "0000-0002-3119-6531")
+    ))
+Maintainer: Paul H. McClelland <PaulHMcClelland@protonmail.com>
+Description: A comprehensive framework for regression analysis that produces 
+    publication-ready tables and forest plots. Provides a unified interface 
+    from descriptive statistics through multivariable modeling, with support 
+    for linear models, generalized linear models, Cox proportional hazards, 
+    and mixed-effects models. Includes univariable screening, multi-outcome 
+    analysis, model comparison, and export to multiple formats including PDF, 
+    Word, PowerPoint, LaTeX, HTML, and RTF. Built on 'data.table' for 
+    computational efficiency.
+License: GPL (>= 3)
+Encoding: UTF-8
+LazyData: true
+URL: https://phmcc.github.io/summata/
+BugReports: https://codeberg.org/phmcc/summata/issues
+Imports:
+    data.table,
+    ggplot2,
+    stats,
+    grDevices
+RoxygenNote: 7.3.3
+Depends: 
+    R (>= 4.1.0)
+Suggests: 
+    coxme,
+    flextable,
+    knitr,
+    lme4,
+    MuMIn,
+    officer,
+    pROC,
+    ResourceSelection,
+    rmarkdown,
+    stringr,
+    survival,
+    tinytex,
+    utils,
+    withr,
+    xtable
+VignetteBuilder: knitr

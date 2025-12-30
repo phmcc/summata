@@ -1,0 +1,89 @@
+#' Simulated Clinical Trial Dataset
+#'
+#' A simulated dataset from a hypothetical multi-center oncology clinical trial
+#' comparing two experimental drugs against control. Designed to demonstrate
+#' the full capabilities of descriptive and regression analysis functions.
+#'
+#' @format A data frame with 850 observations and 24 variables:
+#' \describe{
+#'   \item{patient_id}{Unique patient identifier (character)}
+#'   \item{age}{Age at enrollment in years (numeric: 18-90)}
+#'   \item{sex}{Biological sex (factor: Female, Male)}
+#'   \item{race}{Self-reported race (factor: White, Black, Asian, Other)}
+#'   \item{ethnicity}{Hispanic ethnicity (factor: Non-Hispanic, Hispanic)}
+#'   \item{bmi}{Body mass index in kg/m² (numeric)}
+#'   \item{smoking}{Smoking history (factor: Never, Former, Current)}
+#'   \item{hypertension}{Hypertension diagnosis (factor: No, Yes)}
+#'   \item{diabetes}{Diabetes diagnosis (factor: No, Yes)}
+#'   \item{ecog}{ECOG performance status (factor: 0, 1, 2, 3)}
+#'   \item{creatinine}{Baseline creatinine in mg/dL (numeric)}
+#'   \item{hemoglobin}{Baseline hemoglobin in g/dL (numeric)}
+#'   \item{biomarker_x}{Serum biomarker A in ng/mL (numeric)}
+#'   \item{biomarker_y}{Serum biomarker B in U/L (numeric)}
+#'   \item{site}{Enrolling site (factor: Site_A through Site_J)}
+#'   \item{grade}{Tumor grade (factor: Well/Moderately/Poorly differentiated)}
+#'   \item{stage}{Disease stage at diagnosis (factor: I, II, III, IV)}
+#'   \item{treatment}{Randomized treatment (factor: Control, Drug A, Drug B)}
+#'   \item{surgery}{Surgical resection (factor: No, Yes)}
+#'   \item{los_days}{Hospital length of stay in days (numeric)}
+#'   \item{pfs_months}{Progression-Free Survival Time (months)}
+#'   \item{pfs_status}{Progression or Death Event}
+#'   \item{os_months}{Overall survival time in months (numeric)}
+#'   \item{os_status}{Death indicator (numeric: 0=censored, 1=death)}
+#' }
+#' 
+#' @details
+#' This dataset includes realistic correlations between variables:
+#' - Survival is worse with higher stage, ECOG, age, and biomarker_x
+#' - Treatment effects show Drug B > Drug A > Control
+#' - Approximately 2\% of values are missing at random
+#' - Median follow-up is approximately 30 months
+#' 
+#' @source Simulated data for demonstration purposes
+#' 
+#' @examples
+#' data(clintrial)
+#' data(clintrial_labels)
+#' 
+#' # Descriptive statistics by treatment arm
+#' desctable(clintrial,
+#'         by = "treatment", 
+#'         variables = c("age", "sex", "stage", "ecog", 
+#'                      "biomarker_x", "Surv(os_months, os_status)"),
+#'         labels = clintrial_labels)
+#' 
+#' # Univariable screening
+#' uniscreen(clintrial,
+#'         outcome = "Surv(os_months, os_status)",
+#'         predictors = c("age", "sex", "stage", "grade", "ecog",
+#'                       "biomarker_x", "treatment"),
+#'         model_type = "coxph",
+#'         labels = clintrial_labels)
+#' 
+#' # Multivariable model
+#' fit(clintrial,
+#'     outcome = "Surv(os_months, os_status)",
+#'     predictors = c("age", "stage", "ecog", "biomarker_x", "treatment"),
+#'     model_type = "coxph",
+#'     labels = clintrial_labels)
+#' 
+#' # Complete analysis pipeline
+#' fullfit(clintrial,
+#'         outcome = "Surv(os_months, os_status)",
+#'         predictors = c("age", "sex", "stage", "grade", "ecog",
+#'                       "smoking", "biomarker_x", "biomarker_y", "treatment"),
+#'         method = "screen",
+#'         p_threshold = 0.20,
+#'         model_type = "coxph",
+#'         labels = clintrial_labels)
+#'         
+"clintrial"
+
+#' Variable Labels for Clinical Trial Dataset  
+#'
+#' A named character vector providing descriptive labels for all variables
+#' in the clinical_trial dataset. Use with labels parameter in functions.
+#'
+#' @format Named character vector with 24 elements
+#' @seealso \code{\link{clintrial}}
+"clintrial_labels"

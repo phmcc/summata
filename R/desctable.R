@@ -1,0 +1,529 @@
+#' Create Publication-Ready Descriptive Statistics Tables
+#'
+#' Generates comprehensive descriptive statistics tables with automatic variable 
+#' type detection, group comparisons, and appropriate statistical testing. This 
+#' function is designed to create "Table 1" style summaries commonly used in 
+#' clinical and epidemiological research, with full support for continuous, 
+#' categorical, and survival variables.
+#'
+#' @param data A data.frame or data.table containing the dataset to summarize.
+#'   The function automatically converts data.frames to data.tables for 
+#'   efficient processing.
+#'   
+#' @param by Character string specifying the column name of the grouping variable 
+#'   for stratified analysis (e.g., treatment arm, exposure status). When 
+#'   \code{NULL} (default), produces overall summaries only without group 
+#'   comparisons or statistical tests.
+#'   
+#' @param variables Character vector of variable names to summarize. Can include:
+#'   \itemize{
+#'     \item Standard column names for continuous or categorical variables
+#'     \item Survival expressions using \code{Surv()} syntax (e.g., 
+#'       \code{"Surv(os_months, os_status)"})
+#'   }
+#'   Variables are processed in the order provided.
+#'   
+#' @param stats_continuous Character vector specifying which statistics to 
+#'   compute for continuous variables. Options include:
+#'   \itemize{
+#'     \item \code{"mean_sd"} - Mean ± standard deviation
+#'     \item \code{"median_iqr"} - Median [interquartile range]
+#'     \item \code{"median_range"} - Median (minimum-maximum)
+#'     \item \code{"range"} - Minimum-maximum only
+#'   }
+#'   Default is \code{c("mean_sd", "median_iqr", "range")}. Multiple statistics 
+#'   create separate rows for each variable.
+#'   
+#' @param stats_categorical Character string specifying the format for 
+#'   categorical variable summaries:
+#'   \itemize{
+#'     \item \code{"n"} - Count only
+#'     \item \code{"percent"} - Percentage only
+#'     \item \code{"n_percent"} - Count (percentage) [default]
+#'   }
+#'   
+#' @param digits Integer specifying the number of decimal places for continuous 
+#'   statistics. Values >= 1000 are automatically formatted with commas 
+#'   regardless of decimal setting. Default is 1.
+#'   
+#' @param p_digits Integer specifying the number of decimal places for p-values. 
+#'   P-values smaller than \code{10^(-p_digits)} are displayed as 
+#'   "< 0.001", "< 0.01", etc. Default is 3.
+#'   
+#' @param na_include Logical. If \code{TRUE}, missing values (NAs) are displayed 
+#'   as a separate category/row for each variable. If \code{FALSE}, missing 
+#'   values are silently excluded from calculations. Default is \code{FALSE}.
+#'   
+#' @param na_label Character string used to label the missing values row when 
+#'   \code{na_include = TRUE}. Default is \code{"Unknown"}.
+#'   
+#' @param na_percent Logical. Controls how percentages are calculated for 
+#'   categorical variables when \code{na_include = TRUE}:
+#'   \itemize{
+#'     \item If \code{TRUE}, percentages include NAs in the denominator (all 
+#'       categories sum to 100\%)
+#'     \item If \code{FALSE}, percentages exclude NAs from the denominator 
+#'       (non-missing categories sum to 100\%, missing shown separately)
+#'   }
+#'   Only affects categorical variables. Default is \code{FALSE}.
+#'   
+#' @param test Logical. If \code{TRUE}, performs appropriate statistical tests 
+#'   for group comparisons and adds a p-value column. Requires \code{by} to be 
+#'   specified. Tests are automatically selected based on variable type and 
+#'   test parameters. Default is \code{TRUE}.
+#'   
+#' @param test_continuous Character string specifying the statistical test for 
+#'   continuous variables:
+#'   \itemize{
+#'     \item \code{"auto"} - Automatic selection: t-test/ANOVA for means, 
+#'       Wilcoxon/Kruskal-Wallis for medians [default]
+#'     \item \code{"t"} - Independent samples t-test (2 groups only)
+#'     \item \code{"aov"} - One-way ANOVA (2+ groups)
+#'     \item \code{"wrs"} - Wilcoxon rank-sum test (2 groups only)
+#'     \item \code{"kwt"} - Kruskal-Wallis test (2+ groups)
+#'   }
+#'   
+#' @param test_categorical Character string specifying the statistical test for 
+#'   categorical variables:
+#'   \itemize{
+#'     \item \code{"auto"} - Automatic selection: Fisher's exact test if any 
+#'       expected cell frequency < 5, otherwise chi-squared [default]
+#'     \item \code{"fisher"} - Fisher's exact test
+#'     \item \code{"chisq"} - Chi-squared test
+#'   }
+#'   
+#' @param total Logical or character string controlling the total column:
+#'   \itemize{
+#'     \item \code{TRUE} or \code{"first"} - Include total column as first 
+#'       column after Variable/Group [default]
+#'     \item \code{"last"} - Include total column as last column before p-value
+#'     \item \code{FALSE} - Exclude total column
+#'   }
+#'   
+#' @param total_label Character string for the total column header. 
+#'   Default is \code{"Total"}.
+#'   
+#' @param labels Named character vector or list providing custom display 
+#'   labels for variables. Names should match variable names (or \code{Surv()} 
+#'   expressions), values are the display labels. Variables not in \code{labels} 
+#'   use their original names. Can also be used to label the grouping variable 
+#'   specified in \code{by}. Default is \code{NULL}.
+#'   
+#' @param ... Additional arguments passed to the underlying statistical test 
+#'   functions (e.g., \code{var.equal = TRUE} for t-tests, 
+#'   \code{simulate.p.value = TRUE} for Fisher's test).
+#'
+#' @return A data.table with S3 class \code{"desctable"} containing formatted 
+#'   descriptive statistics. The table structure includes:
+#'   \describe{
+#'     \item{Variable}{Character. Variable name or label (from \code{labels})}
+#'     \item{Group}{Character. For continuous variables: statistic type 
+#'       (e.g., "Mean ± SD", "Median [IQR]"). For categorical variables: 
+#'       category level. Empty for variable name rows.}
+#'     \item{Total}{Character. Statistics for total sample (if \code{total = TRUE})}
+#'     \item{Group columns}{Character. Statistics for each group level (when 
+#'       \code{by} is specified). Column names match group levels.}
+#'     \item{p-value}{Character. Formatted p-values from statistical tests 
+#'       (when \code{test = TRUE} and \code{by} is specified)}
+#'   }
+#'   
+#'   The first row always shows sample sizes for each column.
+#'   
+#'   Numeric values >= 1000 are formatted with commas for readability 
+#'   (e.g., "1,245" instead of "1245").
+#'   
+#'   The returned object includes the following attributes accessible via 
+#'   \code{attr()}:
+#'   \describe{
+#'     \item{raw_data}{A data.table containing unformatted numeric values 
+#'       suitable for further statistical analysis or custom formatting. 
+#'       Includes additional columns for standard deviations, quartiles, etc.}
+#'     \item{by_variable}{Character. The grouping variable name used (value 
+#'       of \code{by} parameter)}
+#'     \item{variables}{Character vector. The variables analyzed (value of 
+#'       \code{variables} parameter)}
+#'   }
+#'
+#' @details
+#' \strong{Variable Type Detection:}
+#' 
+#' The function automatically detects variable types and applies appropriate 
+#' summaries:
+#' \itemize{
+#'   \item \strong{Continuous}: Numeric variables (integer or double) receive 
+#'     statistics specified in \code{stats_continuous}
+#'   \item \strong{Categorical}: Character, factor, or logical variables receive 
+#'     frequency counts and percentages
+#'   \item \strong{Survival}: Variables specified as \code{Surv(time, event)} 
+#'     display median survival with 95\% confidence intervals
+#' }
+#' 
+#' \strong{Statistical Testing:}
+#' 
+#' When \code{test = TRUE} and \code{by} is specified:
+#' \itemize{
+#'   \item \strong{Continuous with "auto"}: Parametric tests (t-test, ANOVA) 
+#'     for mean-based statistics; non-parametric tests (Wilcoxon, Kruskal-Wallis) 
+#'     for median-based statistics
+#'   \item \strong{Categorical with "auto"}: Fisher's exact test when any 
+#'     expected cell frequency < 5; chi-squared test otherwise
+#'   \item \strong{Survival}: Log-rank test for comparing survival curves
+#'   \item \strong{Range statistics}: No p-value computed (ranges are descriptive)
+#' }
+#' 
+#' \strong{Missing Data Handling:}
+#' 
+#' Missing values are handled differently by variable type:
+#' \itemize{
+#'   \item \strong{Continuous}: NAs excluded from calculations; optionally 
+#'     shown as count when \code{na_include = TRUE}
+#'   \item \strong{Categorical}: NAs can be included as a category when 
+#'     \code{na_include = TRUE}. The \code{na_percent} parameter controls 
+#'     whether percentages are calculated with or without NAs in denominator
+#'   \item \strong{Survival}: NAs in time or event excluded from analysis
+#' }
+#' 
+#' \strong{Formatting Conventions:}
+#' \itemize{
+#'   \item Mean ± SD: "45.2 ± 12.3"
+#'   \item Median [IQR]: "38.0 [28.0-52.0]"
+#'   \item Median (Range): "38.0 (18.0-75.0)"
+#'   \item Range: "18.0-75.0" or "18.0 to 75.0" (for negative numbers)
+#'   \item Survival: "24.5 (21.2-28.9)" months [median (95\% CI)]
+#'   \item Counts >= 1000: Formatted with commas (e.g., "1,234")
+#'   \item P-values: Formatted to specified decimal places; very small values 
+#'     shown as "< 0.001"
+#' }
+#'
+#' @seealso 
+#' \code{\link{fit}} for regression modeling, 
+#' \code{\link{table2pdf}} for exporting to PDF
+#'
+#' @examples
+#' # Load example clinical trial data
+#' data(clintrial)
+#' 
+#' # Example 1: Basic descriptive table without grouping
+#' desctable(clintrial,
+#'         variables = c("age", "sex", "bmi"))
+#' 
+#' # Example 2: Grouped comparison with default tests
+#' desctable(clintrial,
+#'         by = "treatment",
+#'         variables = c("age", "sex", "race", "bmi"))
+#' 
+#' # Example 3: Customize continuous statistics
+#' desctable(clintrial,
+#'         by = "treatment",
+#'         variables = c("age", "bmi", "creatinine"),
+#'         stats_continuous = c("median_iqr", "range"))
+#' 
+#' # Example 4: Change categorical display format
+#' desctable(clintrial,
+#'         by = "treatment",
+#'         variables = c("sex", "race", "smoking"),
+#'         stats_categorical = "n")  # Show counts only
+#' 
+#' # Example 5: Include missing values
+#' desctable(clintrial,
+#'         by = "treatment",
+#'         variables = c("age", "smoking", "hypertension"),
+#'         na_include = TRUE,
+#'         na_label = "Missing")
+#' 
+#' # Example 6: Disable statistical testing
+#' desctable(clintrial,
+#'         by = "treatment",
+#'         variables = c("age", "sex", "bmi"),
+#'         test = FALSE)
+#' 
+#' # Example 7: Force specific tests
+#' desctable(clintrial,
+#'         by = "treatment",
+#'         variables = c("age", "sex"),
+#'         test_continuous = "t",      # t-test instead of auto
+#'         test_categorical = "fisher") # Fisher's test instead of auto
+#' 
+#' # Example 8: Adjust decimal places
+#' desctable(clintrial,
+#'         by = "treatment",
+#'         variables = c("age", "bmi"),
+#'         digits = 2,    # 2 decimals for continuous
+#'         p_digits = 4)  # 4 decimals for p-values
+#' 
+#' # Example 9: Custom variable labels
+#' labels <- c(
+#'     age = "Age (years)",
+#'     sex = "Sex",
+#'     bmi = "Body Mass Index (kg/m²)",
+#'     treatment = "Treatment Arm"
+#' )
+#' 
+#' desctable(clintrial,
+#'         by = "treatment",
+#'         variables = c("age", "sex", "bmi"),
+#'         labels = labels)
+#' 
+#' # Example 10: Position total column last
+#' desctable(clintrial,
+#'         by = "treatment",
+#'         variables = c("age", "sex"),
+#'         total = "last")
+#' 
+#' # Example 11: Exclude total column
+#' desctable(clintrial,
+#'         by = "treatment",
+#'         variables = c("age", "sex"),
+#'         total = FALSE)
+#' 
+#' # Example 12: Survival analysis
+#' desctable(clintrial,
+#'         by = "treatment",
+#'         variables = "Surv(os_months, os_status)")
+#' 
+#' # Example 13: Multiple survival endpoints
+#' desctable(clintrial,
+#'         by = "treatment",
+#'         variables = c(
+#'             "Surv(os_months, os_status)",
+#'             "Surv(pfs_months, pfs_status)"
+#'         ),
+#'         labels = c(
+#'             "Surv(os_months, os_status)" = "Overall Survival",
+#'             "Surv(pfs_months, pfs_status)" = "Progression-Free Survival"
+#'         ))
+#' 
+#' # Example 14: Mixed variable types
+#' desctable(clintrial,
+#'         by = "treatment",
+#'         variables = c(
+#'             "age", "sex", "race",           # Demographics
+#'             "bmi", "creatinine",            # Labs
+#'             "smoking", "hypertension",      # Risk factors
+#'             "Surv(os_months, os_status)"    # Survival
+#'         ))
+#' 
+#' # Example 15: Export table
+#' table1 <- desctable(clintrial,
+#'                   by = "treatment",
+#'                   variables = c("age", "sex", "bmi"))
+#' 
+#' # Can export directly to PDF/LaTeX/HTML for publication
+#' # table2pdf(table1, "table1.pdf")
+#' # table2docx(table1, "table1.docx")
+#' 
+#' # Example 16: Three or more groups
+#' desctable(clintrial,
+#'         by = "stage",  # Assuming stage has 3+ levels
+#'         variables = c("age", "sex", "bmi"))
+#' # Automatically uses ANOVA/Kruskal-Wallis and chi-squared
+#' 
+#' # Example 17: Access raw unformatted data
+#' result <- desctable(clintrial,
+#'                   by = "treatment",
+#'                   variables = c("age", "bmi"))
+#' raw_data <- attr(result, "raw_data")
+#' print(raw_data)
+#' # Raw data includes unformatted numbers, SDs, quartiles, etc.
+#' 
+#' # Example 18: Check which grouping variable was used
+#' result <- desctable(clintrial,
+#'                   by = "treatment",
+#'                   variables = c("age", "sex"))
+#' attr(result, "by_variable")  # "treatment"
+#' 
+#' # Example 19: NA percentage calculation options
+#' # Include NAs in percentage denominator (all sum to 100%)
+#' desctable(clintrial,
+#'         by = "treatment",
+#'         variables = "smoking",
+#'         na_include = TRUE,
+#'         na_percent = TRUE)
+#' 
+#' # Exclude NAs from denominator (non-missing sum to 100%)
+#' desctable(clintrial,
+#'         by = "treatment",
+#'         variables = "smoking",
+#'         na_include = TRUE,
+#'         na_percent = FALSE)
+#' 
+#' # Example 20: Passing additional test arguments
+#' # Equal variance t-test
+#' desctable(clintrial,
+#'         by = "sex",
+#'         variables = "age",
+#'         test_continuous = "t",
+#'         var.equal = TRUE)
+#' 
+#' # Example 21: Complete Table 1 for publication
+#' table1 <- desctable(
+#'     data = clintrial,
+#'     by = "treatment",
+#'     variables = c(
+#'         "age", "sex", "race", "ethnicity", "bmi",
+#'         "smoking", "hypertension", "diabetes",
+#'         "ecog", "creatinine", "hemoglobin",
+#'         "site", "stage", "grade",
+#'         "Surv(os_months, os_status)"
+#'     ),
+#'     labels = clintrial_labels,
+#'     stats_continuous = c("median_iqr", "range"),
+#'     total = TRUE,
+#'     na_include = FALSE
+#' )
+#' print(table1)
+#' @export
+desctable <- function(data,
+                      by = NULL,
+                    variables,
+                    stats_continuous = c("median_iqr"),
+                    stats_categorical = "n_percent",
+                    digits = 1,
+                    p_digits = 3,
+                    p_per_stat = FALSE,
+                    na_include = FALSE,
+                    na_label = "Unknown",
+                    na_percent = FALSE,
+                    test = TRUE,
+                    test_continuous = "auto",
+                    test_categorical = "auto",
+                    total = TRUE,
+                    total_label = "Total",
+                    labels = NULL,
+                    ...) {
+    
+    if (!data.table::is.data.table(data)) {
+        data <- data.table::as.data.table(data)
+    }
+    
+    ## Set group_var from 'by' parameter
+    group_var <- by
+    group_var_label <- NULL
+    
+    ## Apply label to group variable if provided
+    if (!is.null(group_var) && !is.null(labels) && group_var %chin% names(labels)) {
+        group_var_label <- labels[group_var]
+    } else if (!is.null(group_var)) {
+        group_var_label <- group_var
+    }
+    
+    ## Variables are already provided as a vector
+    vars <- variables
+    
+    ## Pre-allocate result lists
+    n_vars <- length(vars)
+    result_list <- vector("list", n_vars)
+    raw_result_list <- vector("list", n_vars)
+    
+    ## Process each variable
+    for (i in seq_along(vars)) {
+        var_data <- process_variable(
+            data = data,
+            var = vars[i],
+            group_var = group_var,
+            stats_continuous = stats_continuous,
+            stats_categorical = stats_categorical,
+            digits = digits,
+            p_digits = p_digits,
+            p_per_stat = p_per_stat,
+            na_include = na_include,
+            na_label = na_label,
+            na_percent = na_percent,
+            test = test,
+            test_continuous = test_continuous,
+            test_categorical = test_categorical,
+            total = total,
+            total_label = total_label,
+            labels = labels,
+            ...
+        )
+        
+        result_list[[i]] <- var_data$formatted
+        raw_result_list[[i]] <- var_data$raw
+    }
+    
+    ## Combine all results using rbindlist
+    result <- data.table::rbindlist(result_list, fill = TRUE)
+    raw_result <- data.table::rbindlist(raw_result_list, fill = TRUE)
+
+    ## Standardize column names
+    old_names <- c("variable", "level")
+    new_names <- c("Variable", "Group")
+    
+    if ("variable" %chin% names(result)) {
+        data.table::setnames(result, old_names, new_names, skip_absent = TRUE)
+        data.table::setnames(raw_result, old_names, new_names, skip_absent = TRUE)
+    }
+
+    ## Add p-value column if tests requested (after standardization)
+    if (test && !is.null(group_var)) {
+        result <- format_pvalues_desctable(result, p_digits)
+    }
+
+    ## Add N row as first row (for both grouped and ungrouped tables)
+    if (!is.null(group_var)) {
+        ## Get the group values in the correct order
+        if (is.factor(data[[group_var]])) {
+            ## Use factor levels for proper ordering
+            groups <- levels(data[[group_var]])
+        } else {
+            ## Fall back to unique values for non-factors
+            groups <- unique(data[[group_var]])
+            groups <- groups[!is.na(groups)]
+        }
+        
+        ## Create N row
+        n_row <- data.table::data.table(
+                                 Variable = "N",
+                                 Group = ""
+                             )
+        
+        ## Calculate and add total if present
+        if (total_label %chin% names(result)) {
+            n_total <- nrow(data)
+            n_row[[total_label]] <- format(n_total, big.mark = ",")
+        }
+        
+        ## Calculate for each group in the correct order
+        for (grp in groups) {
+            grp_col <- as.character(grp)
+            if (grp_col %chin% names(result)) {
+                n_group <- sum(data[[group_var]] == grp, na.rm = TRUE)
+                n_row[[grp_col]] <- format(n_group, big.mark = ",")
+            }
+        }
+        
+        ## Add empty p-value column if it exists
+        if ("p-value" %chin% names(result)) {
+            n_row[["p-value"]] <- ""
+        }
+        
+        ## Prepend N row
+        result <- rbind(n_row, result, fill = TRUE)
+        
+    } else if (total && total_label %chin% names(result)) {
+        ## Add N row for ungrouped tables with Total column
+        n_total <- nrow(data)
+        n_row <- data.table::data.table(
+                                 Variable = "N",
+                                 Group = ""
+                             )
+        n_row[[total_label]] <- format(n_total, big.mark = ",")
+        
+        ## Prepend N row
+        result <- rbind(n_row, result, fill = TRUE)
+    }
+
+    ## Reorder columns if total position specified
+    if (!isFALSE(total) && !is.null(group_var)) {
+        result <- reorder_total_column(result, total, total_label)
+    }
+
+    ## Attach raw data and metadata as attributes
+    data.table::setattr(result, "raw_data", raw_result)
+    data.table::setattr(result, "by_variable", group_var)
+    data.table::setattr(result, "variables", variables)
+
+    result[]
+    return(result)
+}
