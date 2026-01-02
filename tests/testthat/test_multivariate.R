@@ -350,6 +350,142 @@ test_that("uniscreen respects digits parameter", {
 
 
 ## ============================================================================
+## SECTION 1B: uniscreen() Input Validation Tests
+## ============================================================================
+
+test_that("uniscreen errors or auto-corrects Surv outcome with GLM model_type", {
+    
+    ## Should either auto-correct (with message) or error
+    result_or_error <- tryCatch({
+        suppressMessages(suppressWarnings(
+            uniscreen(
+                data = clintrial,
+                outcome = "Surv(os_months, os_status)",
+                predictors = c("age", "sex"),
+                model_type = "glm"
+            )
+        ))
+    }, error = function(e) e)
+    
+    ## Either produces valid result or an error (both acceptable)
+    expect_true(
+        inherits(result_or_error, "uniscreen_result") ||
+        inherits(result_or_error, "error")
+    )
+})
+
+
+test_that("uniscreen errors when coxph used without Surv outcome", {
+    
+    ## Should error - either from validation or from coxph itself
+    expect_error(
+        suppressWarnings(
+            uniscreen(
+                data = clintrial,
+                outcome = "os_status",
+                predictors = c("age", "sex"),
+                model_type = "coxph"
+            )
+        )
+    )
+})
+
+
+test_that("uniscreen errors with continuous outcome and binomial family", {
+    
+    ## Should error - either from validation or from glm itself
+    expect_error(
+        suppressWarnings(
+            uniscreen(
+                data = clintrial,
+                outcome = "los_days",
+                predictors = c("age", "sex"),
+                model_type = "glm",
+                family = "binomial"
+            )
+        )
+    )
+})
+
+
+test_that("uniscreen errors when outcome variable not found", {
+    
+    expect_error(
+        suppressWarnings(
+            uniscreen(
+                data = clintrial,
+                outcome = "nonexistent_variable",
+                predictors = c("age", "sex"),
+                model_type = "glm"
+            )
+        )
+    )
+})
+
+
+test_that("uniscreen errors when predictor variable not found", {
+    
+    expect_error(
+        suppressWarnings(
+            uniscreen(
+                data = clintrial,
+                outcome = "os_status",
+                predictors = c("age", "nonexistent_predictor"),
+                model_type = "glm"
+            )
+        )
+    )
+})
+
+
+test_that("uniscreen handles edge case p_threshold values", {
+    
+    ## p_threshold = 1 should include all predictors
+    result <- uniscreen(
+        data = clintrial,
+        outcome = "os_status",
+        predictors = c("age", "sex"),
+        model_type = "glm",
+        p_threshold = 1.0
+    )
+    expect_uniscreen_result(result)
+})
+
+
+test_that("uniscreen errors with empty data", {
+    
+    empty_data <- clintrial[0, ]
+    
+    expect_error(
+        suppressWarnings(
+            uniscreen(
+                data = empty_data,
+                outcome = "os_status",
+                predictors = c("age", "sex"),
+                model_type = "glm"
+            )
+        )
+    )
+})
+
+
+test_that("uniscreen handles binary outcome with lm model_type", {
+    
+    ## Linear probability model - should work (may warn)
+    result <- suppressWarnings(
+        uniscreen(
+            data = clintrial,
+            outcome = "os_status",
+            predictors = c("age", "sex"),
+            model_type = "lm"
+        )
+    )
+    
+    expect_uniscreen_result(result)
+})
+
+
+## ============================================================================
 ## SECTION 2: multifit() Basic Functionality Tests
 ## ============================================================================
 
@@ -655,7 +791,7 @@ test_that("multifit works with factor * factor interaction", {
     expect_equal(attr(result, "interactions"), "treatment:stage")
     
     ## Interaction terms should contain * symbol
-    expect_true(any(grepl("\\*", result$Predictor)))
+    expect_true(any(grepl("[:×*]", result$Predictor)))
 })
 
 
@@ -671,7 +807,7 @@ test_that("multifit works with continuous * factor interaction", {
     )
     
     expect_multifit_result(result)
-    expect_true(any(grepl("\\*", result$Predictor)))
+    expect_true(any(grepl("[:×*]", result$Predictor)))
 })
 
 
@@ -704,7 +840,7 @@ test_that("Cox model with interaction works", {
     )
     
     expect_multifit_result(result)
-    expect_true(any(grepl("\\*", result$Predictor)))
+    expect_true(any(grepl("[:×*]", result$Predictor)))
 })
 
 

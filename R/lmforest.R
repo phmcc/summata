@@ -3,7 +3,7 @@
 #' Generates a publication-ready forest plot that combines a formatted data table 
 #' with a graphical representation of regression coefficients from a linear model. 
 #' The plot integrates variable names, group levels, sample sizes, coefficients 
-#' with confidence intervals, p-values, and model diagnostics (R^2, F-statistic, 
+#' with confidence intervals, p-values, and model diagnostics (R², F-statistic, 
 #' AIC) in a single comprehensive visualization designed for manuscripts and 
 #' presentations.
 #'
@@ -24,7 +24,7 @@
 #'   
 #' @param effect_label Character string for the effect measure label on the 
 #'   forest plot axis. Default is \code{"Coefficient"}. Could be customized to 
-#'   reflect units (e.g., "Change in BMI (kg/m^2)").
+#'   reflect units (e.g., "Change in BMI (kg/m²)").
 #'   
 #' @param digits Integer specifying the number of decimal places for coefficients 
 #'   and confidence intervals. Default is 2.
@@ -122,7 +122,7 @@
 #'   \item \strong{Reference line}: At coefficient = 0 (not at 1)
 #'   \item \strong{Linear scale}: Forest plot uses linear scale (not log scale)
 #'   \item \strong{No events column}: Only sample sizes shown (no event counts)
-#'   \item \strong{R^2 statistics}: Model fit assessed by R² and adjusted R²
+#'   \item \strong{R² statistics}: Model fit assessed by R² and adjusted R²
 #'   \item \strong{F-test}: Overall model significance from F-statistic
 #' }
 #' 
@@ -147,7 +147,7 @@
 #'   \item \strong{Model Statistics} (footer):
 #'     \itemize{
 #'       \item Observations analyzed (with percentage of total data)
-#'       \item R^2 and adjusted R^2
+#'       \item R² and adjusted R²
 #'       \item F-statistic with degrees of freedom and p-value
 #'       \item AIC
 #'     }
@@ -167,22 +167,22 @@
 #' }
 #' 
 #' Example: If the coefficient for "age" is 0.50 when predicting BMI, 
-#' BMI increases by 0.50 kg/m^2 for each additional year of age.
+#' BMI increases by 0.50 kg/m² for each additional year of age.
 #' 
 #' \strong{Model Fit Statistics:}
 #' 
 #' The footer displays key diagnostics:
 #' \itemize{
-#'   \item \strong{R^2}: Proportion of variance explained (0 to 1)
+#'   \item \strong{R²}: Proportion of variance explained (0 to 1)
 #'     \itemize{
 #'       \item 0.0-0.3: Weak explanatory power
 #'       \item 0.3-0.5: Moderate
 #'       \item 0.5-0.7: Good
 #'       \item >0.7: Strong (rare in social/biological sciences)
 #'     }
-#'   \item \strong{Adjusted R^2}: R^2 penalized for number of predictors
+#'   \item \strong{Adjusted R²}: R² penalized for number of predictors
 #'     \itemize{
-#'       \item Always ≤ R^2
+#'       \item Always ≤ R²
 #'       \item Preferred for model comparison
 #'       \item Accounts for model complexity
 #'     }
@@ -258,7 +258,7 @@
 #'     model = model1,
 #'     data = clintrial,
 #'     title = "Predictors of Body Mass Index",
-#'     effect_label = "Change in BMI (kg/m^2)",
+#'     effect_label = "Change in BMI (kg/m²)",
 #'     labels = clintrial_labels
 #' )
 #' print(plot2)
@@ -417,7 +417,7 @@
 #'     model = final_model,
 #'     data = clintrial,
 #'     title = "Multivariable Linear Regression: Predictors of Body Mass Index",
-#'     effect_label = "Change in BMI (kg/m^2)",
+#'     effect_label = "Change in BMI (kg/m²)",
 #'     labels = clintrial_labels,
 #'     indent_groups = TRUE,
 #'     zebra_stripes = TRUE,
@@ -860,7 +860,7 @@ Received class: ", paste(class(x), collapse = ", "))
                 matched_result
             })
             
-            display_name <- paste(display_parts, collapse = " * ")
+            display_name <- paste(display_parts, collapse = " \u00d7 ")
             
             ## Calculate N for this interaction (observations where both conditions are met)
             int_n <- tryCatch({
@@ -1129,8 +1129,8 @@ Received class: ", paste(class(x), collapse = ", "))
         
         for (v in unique(to_show_exp_clean$var)) {
             if (v != "" && !grepl("^    ", v)) {
-                ## Skip interaction terms (already formatted) - identified by " * " in the name
-                if (grepl(" \\* ", v)) next
+                ## Skip interaction terms (already formatted) - identified by " × " in the name
+                if (grepl(" \u00d7 ", v)) next
                 
                 clean_v <- gsub(" \\(.*\\)", "", v)
 
@@ -1161,8 +1161,8 @@ Received class: ", paste(class(x), collapse = ", "))
     } else {
         for(v in unique(to_show_exp_clean$var)) {
             if(v %in% to_show_exp_clean$var) {
-                ## Skip interaction terms (already formatted) - identified by " * " in the name
-                if (grepl(" \\* ", v)) next
+                ## Skip interaction terms (already formatted) - identified by " × " in the name
+                if (grepl(" \u00d7 ", v)) next
                 
                 if(!is.null(labels) && v %in% names(labels)) {
                     to_show_exp_clean[var == v, var_display := labels[v]]
@@ -1436,7 +1436,7 @@ Received class: ", paste(class(x), collapse = ", "))
         {if (qc_footer) {
              ggplot2::annotate(geom = "text", x = 0.5, y = y_variable,
                                label = paste0("Observations analyzed: ", gmodel$nobs_with_pct,
-                                              "\nR^2: ", round(gmodel$r_squared, 3),
+                                              "\nR\u00b2: ", round(gmodel$r_squared, 3),
                                               " (Adjusted: ", round(gmodel$adj_r_squared, 3), ")",
                                               "\nF-statistic: ", round(gmodel$f_statistic, 2),
                                               " (df1 = ", gmodel$f_df1, ", df2 = ", gmodel$f_df2,

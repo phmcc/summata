@@ -27,7 +27,7 @@ table2pdf(
   zebra_stripes = FALSE,
   stripe_color = "gray!20",
   dark_header = FALSE,
-  show_logs = TRUE,
+  show_logs = FALSE,
   ...
 )
 }
@@ -146,7 +146,7 @@ Default is \code{FALSE}.}
 
 \item{show_logs}{Logical. If \code{TRUE}, retains LaTeX log and auxiliary 
 files after PDF compilation for troubleshooting. If \code{FALSE}, deletes 
-these files. Default is \code{TRUE}.}
+these files. Default is \code{FALSE}.}
 
 \item{...}{Additional arguments passed to \code{\link[xtable]{xtable}} for 
 advanced LaTeX table customization.}
@@ -303,8 +303,7 @@ if (nzchar(Sys.which("pdflatex"))) {
   # Example 4: Multi-line caption with formatting
   table2pdf(results, "formatted_caption.pdf",
           caption = "Table 1: Risk Factors for Mortality\\\\\\\\
-                    aOR = adjusted odds ratio; CI = confidence interval\\\\\\\\
-                    \\\\textsuperscript{a}Adjusted for age, sex, and treatment")
+                    aOR = adjusted odds ratio; CI = confidence interval")
   
   # Example 5: Auto-sized PDF (no fixed page dimensions)
   table2pdf(results, "autosize.pdf",
@@ -368,14 +367,14 @@ if (nzchar(Sys.which("pdflatex"))) {
   # Example 17: Descriptive statistics table
   desc_table <- desctable(
       data = clintrial,
-      strata = "treatment",
-      vars = c("age", "sex", "bmi", "stage"),
+      by = "treatment",
+      variables = c("age", "sex", "bmi", "stage"),
       labels = clintrial_labels
   )
   
   table2pdf(desc_table, "descriptive.pdf",
           caption = "Table 1: Baseline Characteristics by Treatment Group",
-          landscape = TRUE)
+          orientation = "landscape")
   
   # Example 18: Model comparison table
   models <- list(
@@ -418,22 +417,11 @@ if (nzchar(Sys.which("pdflatex"))) {
   table2pdf(results, "debug.pdf",
           show_logs = TRUE)
   # If it fails, check debug.log for error messages
-
-  \dontshow{
-  # Cleanup example files
-  unlink(c("basic_results.pdf", "wide_results.pdf", "captioned.pdf",
-           "formatted_caption.pdf", "autosize.pdf", "a4_custom.pdf",
-           "large_font.pdf", "indented.pdf", "condensed.pdf", "striped.pdf",
-           "dark_header.pdf", "publication_ready.pdf", "relaxed_padding.pdf",
-           "no_scale.pdf", "no_bold.pdf", "custom_align.pdf", "descriptive.pdf",
-           "model_comparison.pdf", "very_wide.pdf", "caption_size.pdf",
-           "debug.pdf", "debug.log", "debug.aux"))
-  }
   } else {
     message("pdflatex not found. Install LaTeX to run these examples.")
     message("Recommended: tinytex::install_tinytex()")
-    }
   }
+}
 
 }
 \seealso{

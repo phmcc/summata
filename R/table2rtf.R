@@ -396,8 +396,8 @@
 #' # Example 16: Descriptive statistics for baseline characteristics
 #' desc <- desctable(
 #'     data = clintrial,
-#'     strata = "treatment",
-#'     vars = c("age", "sex", "bmi", "stage"),
+#'     by = "treatment",
+#'     variables = c("age", "sex", "bmi", "stage"),
 #'     labels = clintrial_labels
 #' )
 #' 
@@ -412,15 +412,6 @@
 #'         paper = "letter",
 #'         orientation = "landscape",
 #'         condense_table = TRUE)
-#'
-#' \dontshow{
-#' # Cleanup example files
-#' unlink(c("results.rtf", "captioned.rtf", "wide.rtf", "custom_font.rtf",
-#'          "indented.rtf", "condensed.rtf", "striped.rtf", "dark.rtf",
-#'          "a4.rtf", "base.rtf", "customized.rtf", "direct.rtf",
-#'          "submission.rtf", "aligned.rtf", "no_bold.rtf", "strict.rtf",
-#'          "baseline.rtf", "efficacy.rtf"))
-#' }
 #' }
 #'
 #' @export

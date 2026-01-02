@@ -91,6 +91,10 @@
 #'   
 #' @param label Character string. LaTeX label for cross-references. 
 #'   Example: \code{"tab:regression"}. Default is \code{NULL}.
+#'
+#' @param show_logs Logical. If \code{TRUE}, displays informational messages 
+#'   about required LaTeX packages and formatting options applied. If 
+#'   \code{FALSE}, suppresses these messages. Default is \code{FALSE}.
 #'   
 #' @param ... Additional arguments passed to \code{\link[xtable]{xtable}}.
 #'
@@ -336,7 +340,6 @@
 #'
 #' # Example 13: With caption size control
 #' table2tex(results, "caption_size.tex",
-#'         font_size = 8,
 #'         caption_size = 6,
 #'         caption = "Table 1 - Results with Compact Caption\\\\
 #'                   Smaller caption fits better on constrained pages")
@@ -354,7 +357,7 @@
 #' # Example 15: Descriptive statistics table
 #' desc_table <- desctable(
 #'     data = clintrial,
-#'     strata = "treatment",
+#'     by = "treatment",
 #'     variables = c("age", "sex", "bmi"),
 #'     labels = clintrial_labels
 #' )
@@ -407,15 +410,6 @@
 #' #     \input{landscape_table.tex}
 #' #   \end{table}
 #' # \end{landscape}
-#'
-#' \dontshow{
-#' # Cleanup example files
-#' unlink(c("basic.tex", "publication.tex", "detailed.tex", "indented.tex",
-#'          "condensed.tex", "striped.tex", "dark_header.tex", "relaxed.tex",
-#'          "custom_align.tex", "raw_headers.tex", "no_bold.tex", "strict_sig.tex",
-#'          "caption_size.tex", "final_table1.tex", "table1_descriptive.tex",
-#'          "model_comparison.tex"))
-#' }
 #' }
 #'
 #' @export
@@ -437,7 +431,8 @@ table2tex <- function (table,
                      dark_header = FALSE,
                      caption = NULL,
                      caption_size = NULL,
-                     label = NULL, 
+                     label = NULL,
+                     show_logs = FALSE,
                      ...) {
     
     if (!requireNamespace("xtable", quietly = TRUE)) {
@@ -807,16 +802,18 @@ table2tex <- function (table,
     }
     
     ## Add a note about required packages if using special features
-    if (dark_header || zebra_stripes) {
-        message("Note: This table requires \\usepackage[table]{xcolor} in your LaTeX preamble")
-    }
-    if (!is.null(array_stretch) && cell_padding != "none") {
-        message(sprintf("Note: Cell padding applied with \\arraystretch{%s}", array_stretch))
-    }
-    if (!is.null(caption_size)) {
-        baseline_skip <- ceiling(caption_size * 1.2)
-        message(sprintf("Note: To use %dpt caption, wrap caption in: {\\fontsize{%d}{%d}\\selectfont ...}", 
-                        caption_size, caption_size, baseline_skip))
+    if (show_logs) {
+        if (dark_header || zebra_stripes) {
+            message("Note: This table requires \\usepackage[table]{xcolor} in your LaTeX preamble")
+        }
+        if (!is.null(array_stretch) && cell_padding != "none") {
+            message(sprintf("Note: Cell padding applied with \\arraystretch{%s}", array_stretch))
+        }
+        if (!is.null(caption_size)) {
+            baseline_skip <- ceiling(caption_size * 1.2)
+            message(sprintf("Note: To use %dpt caption, wrap caption in: {\\fontsize{%d}{%d}\\selectfont ...}", 
+                            caption_size, caption_size, baseline_skip))
+        }
     }
     
     message(sprintf("Table exported to %s", file))

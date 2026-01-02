@@ -29,7 +29,19 @@ format_model_table <- function(data,
                                reference_label = "reference",
                                exponentiate = NULL) {
     
-    result <- data.table::copy(data)
+    ## Determine which columns we actually need to avoid copying everything
+    ## Start with columns that will be in output
+    needed_cols <- c("variable", "group", "n", "n_group", "events", "events_group",
+                     "p_value", "ci_lower", "ci_upper", "reference", "model_type",
+                     "model_scope", "OR", "HR", "RR", "Coefficient",
+                     "coef", "coef_lower", "coef_upper", "exp_coef", "exp_lower", "exp_upper")
+    
+    ## Only copy columns that exist and are needed
+    available_cols <- intersect(needed_cols, names(data))
+    result <- data[, ..available_cols]
+    
+    ## Make a shallow copy to avoid modifying original
+    result <- data.table::copy(result)
 
     ## Disallow "Events" column if linear model 
     if ("model_type" %in% names(result)) {
@@ -148,7 +160,7 @@ format_model_table <- function(data,
                     return(comp)  # No match, keep original
                 }, character(1))
                 
-                paste(labeled_parts, collapse = " * ")
+                paste(labeled_parts, collapse = " \u00d7 ")
             }, character(1))
             
             result$Variable[interaction_mask] <- labeled_interactions
@@ -165,20 +177,16 @@ format_model_table <- function(data,
         has_n_group <- "n_group" %in% names(result)
         
         if (has_n_group) {
-            result[, n := data.table::fcase(
-                                          !is.na(n_group) & n_group >= 1000, format(n_group, big.mark = ","),
-                                          !is.na(n_group), as.character(n_group),
-                                          !is.na(n) & n >= 1000, format(n, big.mark = ","),
-                                          !is.na(n), as.character(n),
-                                          default = NA_character_
-                                      )]
+            ## Use n_group where available, fallback to n
+            n_vals <- data.table::fifelse(!is.na(result$n_group), result$n_group, result$n)
         } else {
-            result[, n := data.table::fcase(
-                                          is.na(n), NA_character_,
-                                          n >= 1000, format(n, big.mark = ","),
-                                          default = as.character(n)
-                                      )]
+            n_vals <- result$n
         }
+        
+        ## Vectorized formatting
+        result[, n := as.character(n_vals)]
+        result[n_vals >= 1000, n := format(n_vals[n_vals >= 1000], big.mark = ",")]
+        result[is.na(n_vals), n := NA_character_]
     }
 
     ## Handle events column
@@ -186,20 +194,21 @@ format_model_table <- function(data,
         has_events_group <- "events_group" %in% names(result)
         
         if (has_events_group) {
-            result[, events := data.table::fcase(
-                                               !is.na(events_group) & events_group >= 1000, format(events_group, big.mark = ","),
-                                               !is.na(events_group), as.character(events_group),
-                                               !is.na(events) & events >= 1000, format(events, big.mark = ","),
-                                               !is.na(events), as.character(events),
-                                               default = NA_character_
-                                           )]
+            ## Use events_group where available, fallback to events
+            ## Ensure both are numeric for comparison
+            events_grp <- as.numeric(result$events_group)
+            events_main <- as.numeric(result$events)
+            event_vals <- data.table::fifelse(!is.na(events_grp), events_grp, events_main)
         } else {
-            result[, events := data.table::fcase(
-                                               is.na(events), NA_character_,
-                                               events >= 1000, format(events, big.mark = ","),
-                                               default = as.character(events)
-                                           )]
+            event_vals <- as.numeric(result$events)
         }
+        
+        ## Vectorized formatting using fifelse to avoid subsetting issues
+        result[, events := data.table::fcase(
+                                           is.na(event_vals), NA_character_,
+                                           event_vals >= 1000, format(round(event_vals), big.mark = ",", scientific = FALSE),
+                                           default = as.character(round(event_vals))
+                                       )]
     }
     
     ## Eliminate repeated variable names
@@ -242,25 +251,22 @@ format_model_table <- function(data,
                         }
         
         effect_vals <- result[[effect_col]]
-        ci_lower <- result$ci_lower
-        ci_upper <- result$ci_upper
+        ci_lower_vals <- result$ci_lower
+        ci_upper_vals <- result$ci_upper
         
-        ## Use different CI format based on effect type
+        ## Pre-compute format string once
         if (effect_col %in% c("OR", "HR", "RR")) {
-            result[, (effect_label) := data.table::fcase(
-                                                       is_reference, reference_label,
-                                                       !is.na(effect_vals), sprintf("%.*f (%.*f-%.*f)", 
-                                                                                    digits, effect_vals, digits, ci_lower, digits, ci_upper),
-                                                       default = ""
-                                                   )]
+            fmt_str <- paste0("%.", digits, "f (%.", digits, "f-%.", digits, "f)")
         } else {
-            result[, (effect_label) := data.table::fcase(
-                                                       is_reference, reference_label,
-                                                       !is.na(effect_vals), sprintf("%.*f (%.*f, %.*f)", 
-                                                                                    digits, effect_vals, digits, ci_lower, digits, ci_upper),
-                                                       default = ""
-                                                   )]
+            fmt_str <- paste0("%.", digits, "f (%.", digits, "f, %.", digits, "f)")
         }
+        
+        ## Vectorized sprintf is faster than per-row fcase with sprintf
+        formatted_effects <- sprintf(fmt_str, effect_vals, ci_lower_vals, ci_upper_vals)
+        formatted_effects[is.na(effect_vals)] <- ""
+        formatted_effects[is_reference] <- reference_label
+        
+        result[, (effect_label) := formatted_effects]
     }
     
     ## Format p-values
@@ -304,13 +310,241 @@ format_model_table <- function(data,
 #' @return Character vector of formatted p-values.
 #' @keywords internal
 format_pvalues_fit <- function(p, digits = 3) {
-    ## Calculate threshold based on digits (e.g., digits=3 -> 0.001, digits=4 -> 0.0001)
+    ## Calculate threshold based on digits
     threshold <- 10^(-digits)
     less_than_string <- paste0("< ", format(threshold, scientific = FALSE))
     
-    data.table::fcase(
-                    is.na(p), "-",
-                    p < threshold, less_than_string,
-                    default = sprintf(paste0("%.", digits, "f"), p)
-                )
+    ## Pre-compute format string
+    fmt_str <- paste0("%.", digits, "f")
+    
+    ## Vectorized formatting (faster than fcase for simple conditions)
+    result <- sprintf(fmt_str, p)
+    result[is.na(p)] <- "-"
+    result[!is.na(p) & p < threshold] <- less_than_string
+    
+    result
+}
+
+
+## ============================================================================
+## INPUT VALIDATION UTILITIES
+## ============================================================================
+
+#' Check if outcome is a Surv() expression
+#' @param outcome Character string of the outcome specification
+#' @return Logical
+#' @keywords internal
+is_surv_outcome <- function(outcome) {
+    grepl("^Surv\\s*\\(", outcome)
+}
+
+#' Detect outcome type from data
+#' @param data Data frame
+#' @param outcome Outcome variable name
+#' @return Character: "binary", "continuous", "count", or "unknown"
+#' @keywords internal
+detect_outcome_type <- function(data, outcome) {
+    if (!outcome %in% names(data)) return("unknown")
+    
+    y <- data[[outcome]]
+    
+    if (is.factor(y) && length(levels(y)) == 2) return("binary")
+    
+    if (is.numeric(y)) {
+        unique_vals <- unique(y[!is.na(y)])
+        if (length(unique_vals) == 2 && all(unique_vals %in% c(0, 1))) {
+            return("binary")
+        }
+        if (all(y[!is.na(y)] >= 0) && 
+            all(y[!is.na(y)] == floor(y[!is.na(y)])) &&
+            max(y, na.rm = TRUE) > 1) {
+            return("count")
+        }
+        return("continuous")
+    }
+    "unknown"
+}
+
+#' Validate model type matches outcome specification
+#'
+#' Checks for mismatches and auto-corrects or errors as appropriate.
+#'
+#' @param outcome Outcome specification string
+#' @param model_type Specified model type
+#' @param family GLM family if applicable
+#' @param data Data for outcome type detection
+#' @param auto_correct Whether to auto-correct fixable mismatches
+#' @return List with model_type, family, messages, auto_corrected
+#' @keywords internal
+validate_model_outcome <- function(outcome, model_type, family = NULL, 
+                                   data = NULL, auto_correct = TRUE) {
+    
+    corrected_type <- model_type
+    is_survival <- is_surv_outcome(outcome)
+    
+    ## coxph and coxme require Surv() syntax
+    ## clogit can work with binary outcome + strata, so don't require Surv()
+    surv_required_models <- c("coxph", "coxme")
+    non_survival_models <- c("glm", "lm", "lmer", "glmer")
+    
+    ## Surv() outcome with non-survival model
+    if (is_survival && model_type %in% non_survival_models) {
+        if (auto_correct) {
+            corrected_type <- "coxph"
+            message(sprintf(
+                "Survival outcome detected but model_type='%s' specified. Switching to 'coxph'.",
+                model_type))
+        } else {
+            stop(sprintf(
+                "Survival outcome detected but model_type='%s' specified. Use 'coxph', 'clogit', or 'coxme'.",
+                model_type), call. = FALSE)
+        }
+    }
+    
+    ## Non-Surv outcome with model that requires Surv()
+    if (!is_survival && model_type %in% surv_required_models) {
+        stop(sprintf(
+            "model_type='%s' requires Surv() syntax.\nExample: outcome = \"Surv(time, status)\"\nGot: \"%s\"",
+            model_type, outcome), call. = FALSE)
+    }
+    
+    ## GLM family checks - only when family is a character string
+    if (!is.null(data) && model_type == "glm" && !is.null(family) && !is_survival) {
+        ## Convert family to string name if it's a family object
+        family_name <- if (is.character(family)) {
+            family
+        } else if (is.function(family)) {
+            ## family is a function like binomial, gaussian, etc.
+            family()$family
+        } else if (is.list(family) && "family" %in% names(family)) {
+            ## family is already evaluated (e.g., Gamma(link="log"))
+            family$family
+        } else {
+            NULL
+        }
+        
+        if (!is.null(family_name)) {
+            outcome_type <- detect_outcome_type(data, outcome)
+            
+            if (outcome_type == "continuous" && family_name == "binomial") {
+                stop(sprintf(
+                    "Continuous outcome '%s' with family='binomial'. Use model_type='lm' or family='gaussian'.",
+                    outcome), call. = FALSE)
+            }
+            if (outcome_type == "binary" && family_name == "gaussian") {
+                warning(sprintf(
+                    "Binary outcome '%s' with family='gaussian'. Consider family='binomial'.",
+                    outcome), call. = FALSE)
+            }
+        }
+    }
+    
+    ## lm with binary outcome
+    if (!is.null(data) && model_type == "lm" && !is_survival) {
+        if (detect_outcome_type(data, outcome) == "binary") {
+            warning(sprintf(
+                "Binary outcome '%s' with model_type='lm'. Consider model_type='glm' with family='binomial'.",
+                outcome), call. = FALSE)
+        }
+    }
+    
+    list(model_type = corrected_type, 
+         family = family,
+         auto_corrected = corrected_type != model_type)
+}
+
+#' Validate outcome exists in data
+#' @param data Data frame
+#' @param outcome Outcome specification
+#' @keywords internal
+validate_outcome_exists <- function(data, outcome) {
+    if (is_surv_outcome(outcome)) {
+        surv_content <- gsub("^Surv\\s*\\((.*)\\)$", "\\1", outcome)
+        surv_vars <- trimws(unlist(strsplit(surv_content, ",")))
+        missing <- surv_vars[!surv_vars %in% names(data)]
+        if (length(missing) > 0) {
+            stop("Survival variable(s) not found: ", paste(missing, collapse = ", "),
+                 call. = FALSE)
+        }
+    } else if (!outcome %in% names(data)) {
+        stop("Outcome '", outcome, "' not found in data.", call. = FALSE)
+    }
+    invisible(TRUE)
+}
+
+#' Validate predictors exist in data
+#' @param data Data frame
+#' @param predictors Predictor names
+#' @keywords internal
+validate_predictors_exist <- function(data, predictors) {
+    ## Remove random effects and extract interaction components
+    fixed <- predictors[!grepl("\\|", predictors)]
+    if (any(grepl(":", fixed))) {
+        interaction_vars <- unlist(strsplit(fixed[grepl(":", fixed)], ":"))
+        fixed <- c(fixed[!grepl(":", fixed)], interaction_vars)
+    }
+    
+    missing <- fixed[!fixed %in% names(data)]
+    if (length(missing) > 0) {
+        stop("Predictor(s) not found: ", paste(missing, collapse = ", "),
+             call. = FALSE)
+    }
+    invisible(TRUE)
+}
+
+#' Complete input validation for fit functions
+#'
+#' Master validation function called by fit(), uniscreen(), fullfit().
+#'
+#' @param data Data frame
+#' @param outcome Outcome specification
+#' @param predictors Predictor names
+#' @param model_type Model type
+#' @param family GLM family
+#' @param conf_level Confidence level
+#' @param digits Effect estimate digits
+#' @param p_digits P-value digits
+#' @param p_threshold P-value threshold
+#' @param auto_correct_model Auto-correct model type mismatches
+#' @return List with validated model_type, family, auto_corrected flag
+#' @keywords internal
+validate_fit_inputs <- function(data, outcome, predictors, model_type,
+                                family = NULL, conf_level = 0.95,
+                                digits = 2, p_digits = 3, p_threshold = NULL,
+                                auto_correct_model = TRUE) {
+    
+    ## Basic data check
+    if (is.null(data) || !is.data.frame(data) || nrow(data) == 0) {
+        stop("'data' must be a non-empty data.frame.", call. = FALSE)
+    }
+    
+    ## Check variables exist
+    validate_outcome_exists(data, outcome)
+    validate_predictors_exist(data, predictors)
+    
+    ## Numeric parameter checks
+    if (conf_level <= 0 || conf_level >= 1) {
+        stop("'conf_level' must be between 0 and 1.", call. = FALSE)
+    }
+    if (digits < 0 || digits != floor(digits)) {
+        stop("'digits' must be a non-negative integer.", call. = FALSE)
+    }
+    if (p_digits < 0 || p_digits != floor(p_digits)) {
+        stop("'p_digits' must be a non-negative integer.", call. = FALSE
+)
+    }
+    if (!is.null(p_threshold) && (p_threshold < 0 || p_threshold > 1)) {
+        stop("'p_threshold' must be between 0 and 1.", call. = FALSE)
+    }
+    
+    ## Model-outcome validation
+    validation <- validate_model_outcome(
+        outcome = outcome,
+        model_type = model_type,
+        family = family,
+        data = data,
+        auto_correct = auto_correct_model
+    )
+    
+    validation
 }

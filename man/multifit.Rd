@@ -272,7 +272,7 @@ When \code{interactions} includes terms involving the predictor:
 \itemize{
   \item Main effect of predictor is always reported
   \item Interaction effects are extracted and displayed with formatted names
-  \item Format: "Variable (Level) * Variable (Level)" using asterisk notation
+  \item Format: "Variable (Level) × Variable (Level)" using multiplication sign notation
   \item Useful for testing effect modification (e.g., does treatment effect 
     differ by sex?)
 }
@@ -439,7 +439,7 @@ result_int <- multifit(
     parallel = FALSE
 )
 print(result_int)
-# Shows main effects and interaction terms with * notation
+# Shows main effects and interaction terms with × notation
 
 # Example 9: Linear model for continuous outcomes
 linear_result <- multifit(

@@ -415,8 +415,8 @@ table2pptx(results, "presentation.pptx",
 # Example 11: Descriptive statistics slide
 desc <- desctable(
     data = clintrial,
-    strata = "treatment",
-    vars = c("age", "sex", "bmi"),
+    by = "treatment",
+    variables = c("age", "sex", "bmi"),
     labels = clintrial_labels
 )
 
@@ -431,13 +431,6 @@ table2pptx(results, "conference.pptx",
          font_size = 14,  # Large for big rooms
          dark_header = TRUE,
          condense_table = TRUE)
-
-\dontshow{
-# Cleanup example files
-unlink(c("results.pptx", "titled.pptx", "large_font.pptx", "condensed.pptx",
-         "dark.pptx", "striped.pptx", "blank.pptx", "branded.pptx",
-         "base.pptx", "presentation.pptx", "baseline.pptx", "conference.pptx"))
-}
 }
 
 }

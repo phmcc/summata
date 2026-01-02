@@ -238,7 +238,7 @@
 #' \itemize{
 #'   \item Main effect of predictor is always reported
 #'   \item Interaction effects are extracted and displayed with formatted names
-#'   \item Format: "Variable (Level) * Variable (Level)" using asterisk notation
+#'   \item Format: "Variable (Level) × Variable (Level)" using multiplication sign notation
 #'   \item Useful for testing effect modification (e.g., does treatment effect 
 #'     differ by sex?)
 #' }
@@ -411,7 +411,7 @@
 #'     parallel = FALSE
 #' )
 #' print(result_int)
-#' # Shows main effects and interaction terms with * notation
+#' # Shows main effects and interaction terms with × notation
 #' 
 #' # Example 9: Linear model for continuous outcomes
 #' linear_result <- multifit(
@@ -663,16 +663,20 @@ multifit <- function(data,
         if (columns %in% c("unadjusted", "both")) {
             unadj_model <- tryCatch({
                 switch(model_type,
-                       "glm" = stats::glm(unadj_formula, data = .data, family = family, ...),
-                       "lm" = stats::lm(unadj_formula, data = .data, ...),
+                       "glm" = stats::glm(unadj_formula, data = .data, family = family,
+                                          model = keep_models, x = FALSE, y = TRUE, ...),
+                       "lm" = stats::lm(unadj_formula, data = .data,
+                                        model = keep_models, x = FALSE, y = TRUE, ...),
                        "coxph" = {
                            if (!requireNamespace("survival", quietly = TRUE)) 
                                stop("Package 'survival' required for Cox models")
                            if (!is.null(cluster)) {
                                survival::coxph(unadj_formula, data = .data, 
-                                               cluster = .data[[cluster]], ...)
+                                               cluster = .data[[cluster]],
+                                               model = keep_models, x = FALSE, y = TRUE, ...)
                            } else {
-                               survival::coxph(unadj_formula, data = .data, ...)
+                               survival::coxph(unadj_formula, data = .data,
+                                               model = keep_models, x = FALSE, y = TRUE, ...)
                            }
                        },
                        "clogit" = {
@@ -760,16 +764,20 @@ multifit <- function(data,
             
             adj_model <- tryCatch({
                 switch(model_type,
-                       "glm" = stats::glm(adj_formula, data = .data, family = family, ...),
-                       "lm" = stats::lm(adj_formula, data = .data, ...),
+                       "glm" = stats::glm(adj_formula, data = .data, family = family,
+                                          model = keep_models, x = FALSE, y = TRUE, ...),
+                       "lm" = stats::lm(adj_formula, data = .data,
+                                        model = keep_models, x = FALSE, y = TRUE, ...),
                        "coxph" = {
                            if (!requireNamespace("survival", quietly = TRUE)) 
                                stop("Package 'survival' required for Cox models")
                            if (!is.null(cluster)) {
                                survival::coxph(adj_formula, data = .data, 
-                                               cluster = .data[[cluster]], ...)
+                                               cluster = .data[[cluster]],
+                                               model = keep_models, x = FALSE, y = TRUE, ...)
                            } else {
-                               survival::coxph(adj_formula, data = .data, ...)
+                               survival::coxph(adj_formula, data = .data,
+                                               model = keep_models, x = FALSE, y = TRUE, ...)
                            }
                        },
                        "clogit" = {
@@ -934,7 +942,7 @@ multifit <- function(data,
 #' Format interaction term for display
 #' 
 #' Converts R's internal interaction term format (e.g., "treatmentDrug A:stageII")
-#' to a more readable format (e.g., "Treatment (Drug A) * Stage (II)").
+#' to a more readable format (e.g., "Treatment (Drug A) × Stage (II)").
 #' 
 #' @param term Character string of the interaction term from model coefficients.
 #' @param labels Optional named vector of labels for variable names.
@@ -990,8 +998,8 @@ format_interaction_term <- function(term, labels = NULL) {
         }
     }, character(1))
     
-    ## Join with asterisk (consistent with other fullfit functions)
-    paste(formatted_parts, collapse = " * ")
+    ## Join with multiplication sign (consistent with other fullfit functions)
+    paste(formatted_parts, collapse = " \u00d7 ")
 }
 
 
@@ -1586,19 +1594,24 @@ format_multifit_table <- function(data,
 #' @return Character vector of formatted p-values.
 #' @keywords internal
 format_pvalues_multifit <- function(p, digits = 3) {
-    ## Calculate threshold based on digits (e.g., digits=3 -> 0.001, digits=4 -> 0.0001)
+    ## Calculate threshold based on digits
     threshold <- 10^(-digits)
     less_than_string <- paste0("< ", format(threshold, scientific = FALSE))
     
-    data.table::fcase(
-                    is.na(p), "-",
-                    p < threshold, less_than_string,
-                    default = sprintf(paste0("%.", digits, "f"), p)
-                )
+    ## Pre-compute format string
+    fmt_str <- paste0("%.", digits, "f")
+    
+    ## Vectorized formatting (faster than fcase for simple conditions)
+    result <- sprintf(fmt_str, p)
+    result[is.na(p)] <- "-"
+    result[!is.na(p) & p < threshold] <- less_than_string
+    
+    result
 }
 
 
 #' Print method for multifit results
+#' @keywords internal
 #' @export
 print.multifit_result <- function(x, ...) {
     cat("\nMultivariate Analysis Results\n")

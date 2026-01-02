@@ -9,3 +9,4 @@
 \description{
 Print method for uniscreen results
 }
+\keyword{internal}

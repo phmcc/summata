@@ -384,6 +384,19 @@ compfit <- function(data,
     ## Calculate scores and sort
     comparison <- calculate_model_scores(comparison, model_type, scoring_weights)
 
+    ## Rename columns from ASCII to Unicode superscripts for display
+    col_renames <- c(
+        "Pseudo-R^2" = "Pseudo-R\u00b2",
+        "Marginal R^2" = "Marginal R\u00b2",
+        "Conditional R^2" = "Conditional R\u00b2",
+        "Adjusted R^2" = "Adjusted R\u00b2"
+    )
+    for (old_name in names(col_renames)) {
+        if (old_name %in% names(comparison)) {
+            data.table::setnames(comparison, old_name, col_renames[[old_name]])
+        }
+    }
+
     ## Format for display (ensure proper column order with Score always last)
     ## Get all current column names
     all_cols <- names(comparison)
@@ -391,18 +404,18 @@ compfit <- function(data,
     ## Define the preferred order for known columns (Score will be moved to end)
     if (model_type == "glm") {
         preferred_order <- c("Model", "N", "Events", "Predictors", "Converged",
-                             "AIC", "BIC", "Pseudo-R^2", "Concordance", "Brier Score",
+                             "AIC", "BIC", "Pseudo-R\u00b2", "Concordance", "Brier Score",
                              "Global p")
     } else if (model_type %in% c("lmer", "glmer")) {
         preferred_order <- c("Model", "N", "Events", "Predictors", "Groups", "Converged",
-                             "AIC", "BIC", "Pseudo-R^2", "Marginal R^2", "Conditional R^2",
+                             "AIC", "BIC", "Pseudo-R\u00b2", "Marginal R\u00b2", "Conditional R\u00b2",
                              "ICC", "Concordance", "Global p")
     } else if (model_type == "coxme") {
         preferred_order <- c("Model", "N", "Events", "Predictors", "Groups", "Converged",
                              "AIC", "BIC", "Concordance", "Global p")
     } else {
         preferred_order <- c("Model", "N", "Events", "Predictors", "Converged",
-                             "AIC", "BIC", "Pseudo-R^2", "Concordance", "Global p")
+                             "AIC", "BIC", "Pseudo-R\u00b2", "Concordance", "Global p")
     }
     
     ## Build final column order: Model, Score, then preferred columns, then extras
@@ -456,13 +469,13 @@ print.compfit_result <- function(x, ...) {
                                    "concordance" = "Concordance",
                                    "c_stat" = "C-statistic",
                                    "c_index" = "C-index",
-                                   "pseudo_r2" = "Pseudo-R^2",
+                                   "pseudo_r2" = "Pseudo-R\u00b2",
                                    "global_p" = "Global p-value",
                                    "rmse" = "RMSE",
                                    "brier" = "Brier score",
-                                   "adj_r2" = "Adjusted R^2",
-                                   "marginal_r2" = "Marginal R^2",
-                                   "conditional_r2" = "Conditional R^2",
+                                   "adj_r2" = "Adjusted R\u00b2",
+                                   "marginal_r2" = "Marginal R\u00b2",
+                                   "conditional_r2" = "Conditional R\u00b2",
                                    "icc" = "ICC",
                                    metric  # Generic fallback
                                    )

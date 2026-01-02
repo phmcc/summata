@@ -9,3 +9,4 @@
 \description{
 Print method for multifit results
 }
+\keyword{internal}

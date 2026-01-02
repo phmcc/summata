@@ -1,16 +1,3 @@
----
-title: "Contributor Covenant Code of Conduct"
-output: rmarkdown::html_vignette
-pkgdown:
-  as_is: true
-vignette: >
-  %\VignetteIndexEntry{Contributor Covenant Code of Conduct}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
----
-
-
-
 # Contributor Covenant Code of Conduct
 
 ## Our Pledge

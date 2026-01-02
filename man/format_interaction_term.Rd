@@ -16,6 +16,6 @@ Formatted interaction term string.
 }
 \description{
 Converts R's internal interaction term format (e.g., "treatmentDrug A:stageII")
-to a more readable format (e.g., "Treatment (Drug A) * Stage (II)").
+to a more readable format (e.g., "Treatment (Drug A) × Stage (II)").
 }
 \keyword{internal}

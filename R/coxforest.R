@@ -858,7 +858,7 @@ Received class: ", paste(class(x), collapse = ", "))
             int_term <- interaction_terms[idx]
             
             ## Parse the interaction term to create a readable label
-            ## e.g., "treatmentDrug A:stageII" -> "Treatment Group (Drug A) * Disease Stage (II)"
+            ## e.g., "treatmentDrug A:stageII" -> "Treatment Group (Drug A) × Disease Stage (II)"
             int_parts <- strsplit(int_term, ":", fixed = TRUE)[[1]]
             
             ## Build readable variable name from parts
@@ -892,7 +892,7 @@ Received class: ", paste(class(x), collapse = ", "))
                 matched_result
             })
             
-            display_name <- paste(display_parts, collapse = " * ")
+            display_name <- paste(display_parts, collapse = " \u00d7 ")
             
             ## Calculate N and Events for this interaction
             int_n <- NA_integer_
@@ -1166,8 +1166,8 @@ Received class: ", paste(class(x), collapse = ", "))
         
         for (v in unique(to_show_exp_clean$var)) {
             if (v != "" && !grepl("^    ", v)) {
-                ## Skip interaction terms (already formatted) - identified by " * " in the name
-                if (grepl(" \\* ", v)) next
+                ## Skip interaction terms (already formatted) - identified by " × " in the name
+                if (grepl(" \u00d7 ", v)) next
                 
                 clean_v <- gsub(" \\(.*\\)", "", v)
 
@@ -1200,8 +1200,8 @@ Received class: ", paste(class(x), collapse = ", "))
         
         for(v in unique(to_show_exp_clean$var)) {
             if(v %in% to_show_exp_clean$var) {
-                ## Skip interaction terms (already formatted) - identified by " * " in the name
-                if (grepl(" \\* ", v)) next
+                ## Skip interaction terms (already formatted) - identified by " × " in the name
+                if (grepl(" \u00d7 ", v)) next
                 
                 if(!is.null(labels) && v %in% names(labels)) {
                     to_show_exp_clean[var == v, var_display := labels[v]]

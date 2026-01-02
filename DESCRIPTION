@@ -1,7 +1,7 @@
 Package: summata
 Type: Package
-Title: Publication-Ready Regression Tables and Forest Plots
-Version: 0.9.3
+Title: Publication-Ready Summary Tables and Forest Plots
+Version: 0.9.4
 Authors@R: c(
     person(
         given = c("Paul", "Hsin-ti"), 
@@ -11,14 +11,14 @@ Authors@R: c(
         comment = c(ORCID = "0000-0002-3119-6531")
     ))
 Maintainer: Paul H. McClelland <PaulHMcClelland@protonmail.com>
-Description: A comprehensive framework for regression analysis that produces 
-    publication-ready tables and forest plots. Provides a unified interface 
-    from descriptive statistics through multivariable modeling, with support 
-    for linear models, generalized linear models, Cox proportional hazards, 
-    and mixed-effects models. Includes univariable screening, multi-outcome 
-    analysis, model comparison, and export to multiple formats including PDF, 
-    Word, PowerPoint, LaTeX, HTML, and RTF. Built on 'data.table' for 
-    computational efficiency.
+Description: A comprehensive framework for descriptive statistics and regression
+    analysis that produces publication-ready tables and forest plots. Provides a
+    unified interface from descriptive statistics through multivariable modeling,
+    with support for linear models, generalized linear models, Cox proportional
+    hazards, and mixed-effects models. Also includes univariable screening, 
+    multivariate analysis, model comparison, and export to multiple formats
+    including PDF, Word, PowerPoint, LaTeX, HTML, and RTF. Built on 'data.table'
+    for computational efficiency.
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
@@ -31,7 +31,7 @@ Imports:
     grDevices
 RoxygenNote: 7.3.3
 Depends: 
-    R (>= 4.1.0)
+    R (>= 4.2.0)
 Suggests: 
     coxme,
     flextable,
@@ -47,5 +47,6 @@ Suggests:
     tinytex,
     utils,
     withr,
-    xtable
+    xtable,
+    ragg
 VignetteBuilder: knitr

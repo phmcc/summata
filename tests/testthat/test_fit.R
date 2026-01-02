@@ -1125,6 +1125,224 @@ test_that("fit handles empty predictors appropriately", {
 })
 
 
+## ============================================================================
+## SECTION 13B: Input Validation Tests
+## ============================================================================
+
+test_that("fit auto-corrects Surv outcome with GLM model_type", {
+    
+    ## Should auto-switch to coxph and emit a message
+    expect_message(
+        result <- fit(
+            data = clintrial,
+            outcome = "Surv(os_months, os_status)",
+            predictors = c("age", "sex"),
+            model_type = "glm"
+        ),
+        regexp = "[Ss]witch|[Ss]urvival"
+    )
+    
+    expect_fit_result(result)
+    ## Model type attribute stores display name ("Cox PH"), not input parameter
+    expect_true(grepl("[Cc]ox", attr(result, "model_type")))
+})
+
+
+test_that("fit auto-corrects Surv outcome with lm model_type", {
+    
+    ## Should auto-switch to coxph and emit a message
+    expect_message(
+        result <- fit(
+            data = clintrial,
+            outcome = "Surv(os_months, os_status)",
+            predictors = c("age", "sex"),
+            model_type = "lm"
+        ),
+        regexp = "[Ss]witch|[Ss]urvival"
+    )
+    
+    expect_fit_result(result)
+    expect_true(grepl("[Cc]ox", attr(result, "model_type")))
+})
+
+
+test_that("fit errors when coxph used without Surv outcome", {
+    
+    expect_error(
+        fit(
+            data = clintrial,
+            outcome = "response",
+            predictors = c("age", "sex"),
+            model_type = "coxph"
+        ),
+        regexp = "[Ss]urv|[Ss]urvival"
+    )
+})
+
+
+test_that("fit errors when coxme used without Surv outcome", {
+    
+    skip_if_not_installed("coxme")
+    
+    expect_error(
+        fit(
+            data = clintrial,
+            outcome = "response",
+            predictors = c("age", "sex", "(1|site)"),
+            model_type = "coxme"
+        ),
+        regexp = "[Ss]urv|[Ss]urvival"
+    )
+})
+
+
+test_that("fit errors with continuous outcome and binomial family", {
+    
+    expect_error(
+        fit(
+            data = clintrial,
+            outcome = "los_days",
+            predictors = c("age", "sex"),
+            model_type = "glm",
+            family = "binomial"
+        ),
+        regexp = "[Cc]ontinuous|binomial"
+    )
+})
+
+
+test_that("fit warns with binary outcome and gaussian family", {
+    
+    expect_warning(
+        result <- fit(
+            data = clintrial,
+            outcome = "response",
+            predictors = c("age", "sex"),
+            model_type = "glm",
+            family = "gaussian"
+        ),
+        regexp = "[Bb]inary|binomial|gaussian"
+    )
+    
+    expect_fit_result(result)
+})
+
+
+test_that("fit warns with binary outcome and lm model_type", {
+    
+    expect_warning(
+        result <- fit(
+            data = clintrial,
+            outcome = "response",
+            predictors = c("age", "sex"),
+            model_type = "lm"
+        ),
+        regexp = "[Bb]inary|logistic|binomial"
+    )
+    
+    expect_fit_result(result)
+})
+
+
+test_that("fit errors when outcome variable not found", {
+    
+    expect_error(
+        fit(
+            data = clintrial,
+            outcome = "nonexistent_variable",
+            predictors = c("age", "sex"),
+            model_type = "glm"
+        ),
+        regexp = "not found|[Oo]utcome"
+    )
+})
+
+
+test_that("fit errors when Surv variables not found", {
+    
+    expect_error(
+        fit(
+            data = clintrial,
+            outcome = "Surv(nonexistent_time, nonexistent_status)",
+            predictors = c("age", "sex"),
+            model_type = "coxph"
+        ),
+        regexp = "not found|[Ss]urvival"
+    )
+})
+
+
+test_that("fit errors when predictor variable not found", {
+    
+    expect_error(
+        fit(
+            data = clintrial,
+            outcome = "response",
+            predictors = c("age", "nonexistent_predictor"),
+            model_type = "glm"
+        ),
+        regexp = "not found|[Pp]redictor"
+    )
+})
+
+
+test_that("fit errors with invalid conf_level", {
+    
+    expect_error(
+        fit(
+            data = clintrial,
+            outcome = "response",
+            predictors = c("age", "sex"),
+            model_type = "glm",
+            conf_level = 1.5
+        ),
+        regexp = "conf_level|between 0 and 1"
+    )
+    
+    expect_error(
+        fit(
+            data = clintrial,
+            outcome = "response",
+            predictors = c("age", "sex"),
+            model_type = "glm",
+            conf_level = 0
+        ),
+        regexp = "conf_level|between 0 and 1"
+    )
+})
+
+
+test_that("fit errors with invalid digits parameter", {
+    
+    expect_error(
+        fit(
+            data = clintrial,
+            outcome = "response",
+            predictors = c("age", "sex"),
+            model_type = "glm",
+            digits = -1
+        ),
+        regexp = "digits|non-negative"
+    )
+})
+
+
+test_that("fit errors with empty data", {
+    
+    empty_data <- clintrial[0, ]
+    
+    expect_error(
+        fit(
+            data = empty_data,
+            outcome = "response",
+            predictors = c("age", "sex"),
+            model_type = "glm"
+        ),
+        regexp = "empty|no rows|non-empty"
+    )
+})
+
+
 test_that("fit handles very long predictor lists", {
     
     ## Test with many predictors

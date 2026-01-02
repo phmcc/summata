@@ -438,6 +438,24 @@ fit <- function(data,
     ## Store original data name for reference
     data_name <- deparse(substitute(data))
     
+    ## Validate inputs and auto-correct model type if needed
+    validation <- validate_fit_inputs(
+        data = data,
+        outcome = outcome,
+        predictors = predictors,
+        model_type = model_type,
+        family = if (model_type %in% c("glm", "glmer")) family else NULL,
+        conf_level = conf_level,
+        digits = digits,
+        p_digits = p_digits,
+        auto_correct_model = TRUE
+    )
+    
+    ## Apply any auto-corrections
+    if (validation$auto_corrected) {
+        model_type <- validation$model_type
+    }
+    
     ## Validate predictors - check for misplaced interaction terms
     ## Interaction terms contain ":" but are not random effects (which contain "|")
     misplaced_interactions <- predictors[grepl(":", predictors) & !grepl("\\|", predictors)]

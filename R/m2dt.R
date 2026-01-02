@@ -220,7 +220,7 @@ m2dt <- function(data,
                               model_type = model_type_name,
                               term = rownames(coef_summary),
                               n = stats::nobs(model),
-                              events = NA_integer_,
+                              events = NA_real_,
                               coefficient = coef_summary[, "Estimate"],
                               se = coef_summary[, "Std. Error"]
                           )
@@ -512,7 +512,7 @@ m2dt <- function(data,
                                   model_type = model_type_name,
                                   term = rownames(coef_summary),
                                   n = stats::nobs(model),
-                                  events = NA_integer_,
+                                  events = NA_real_,
                                   coefficient = coef_summary[, "Estimate"],
                                   se = coef_summary[, "Std. Error"]
                               )
@@ -687,9 +687,12 @@ m2dt <- function(data,
 
     ## Group counts calculation
     all_counts <- NULL
+    data_dt <- NULL
+    event_var <- NULL
+    outcome_var <- NULL
 
     if (!skip_counts) {
-    
+        
         ## Prepare data for group counting
         if (!is.null(xlevels) || model_class == "coxme") {
             data_source <- model_data
@@ -738,18 +741,32 @@ m2dt <- function(data,
                 
                 if (length(factor_vars) > 0) {
                     
+                    ## Use melt for efficient long-format conversion (faster than lapply+rbindlist)
+                    ## Only select the columns we need to minimize memory usage
+                    cols_needed <- factor_vars
                     if (!is.null(event_var) && event_var %in% names(data_dt)) {
-                        ## For survival models: calculate all counts at once
-                        
-                        ## Stack all factor variables into long format
-                        all_counts <- data.table::rbindlist(lapply(factor_vars, function(var) {
-                            data_dt[!is.na(get(var)), .(
-                                                          variable = var,
-                                                          group = as.character(get(var)),
-                                                          n_group = .N,
-                                                          events_group = sum(get(event_var), na.rm = TRUE)
-                                                      ), by = get(var)][, get := NULL]
-                        }))
+                        cols_needed <- c(cols_needed, event_var)
+                    } else if (!is.null(outcome_var) && outcome_var %in% names(data_dt)) {
+                        cols_needed <- c(cols_needed, outcome_var)
+                    }
+                    
+                    ## Melt to long format - much faster than lapply for multiple variables
+                    long_dt <- data.table::melt(
+                                               data_dt[, ..cols_needed],
+                                               measure.vars = factor_vars,
+                                               variable.name = "variable",
+                                               value.name = "group",
+                                               na.rm = TRUE,
+                                               variable.factor = FALSE
+                                           )
+                    long_dt[, group := as.character(group)]
+                    
+                    if (!is.null(event_var) && event_var %in% names(data_dt)) {
+                        ## For survival models
+                        all_counts <- long_dt[, .(
+                            n_group = .N,
+                            events_group = sum(get(event_var), na.rm = TRUE)
+                        ), by = .(variable, group)]
                         
                         ## Single join to update all counts at once
                         dt[all_counts, `:=`(
@@ -758,28 +775,18 @@ m2dt <- function(data,
                                        ), on = .(variable, group)]
                         
                     } else if (!is.null(outcome_var) && outcome_var %in% names(data_dt)) {
-                        ## For GLM/GLMER models: calculate all counts at once
-                        
-                        ## Prepare outcome calculation
-                        outcome_col <- data_dt[[outcome_var]]
+                        ## For GLM/GLMER models
+                        outcome_col <- long_dt[[outcome_var]]
                         if (is.factor(outcome_col)) {
-                            data_dt[, .events_calc := as.numeric(outcome_col) == 2]
+                            long_dt[, .events_calc := as.numeric(outcome_col) == 2]
                         } else {
-                            data_dt[, .events_calc := outcome_col]
+                            long_dt[, .events_calc := outcome_col]
                         }
                         
-                        ## Stack all factor variables into long format
-                        all_counts <- data.table::rbindlist(lapply(factor_vars, function(var) {
-                            data_dt[!is.na(get(var)), .(
-                                                          variable = var,
-                                                          group = as.character(get(var)),
-                                                          n_group = .N,
-                                                          events_group = sum(.events_calc, na.rm = TRUE)
-                                                      ), by = get(var)][, get := NULL]
-                        }))
-                        
-                        ## Clean up temporary column
-                        data_dt[, .events_calc := NULL]
+                        all_counts <- long_dt[, .(
+                            n_group = .N,
+                            events_group = sum(.events_calc, na.rm = TRUE)
+                        ), by = .(variable, group)]
                         
                         ## Single join to update all counts
                         dt[all_counts, `:=`(
@@ -789,13 +796,7 @@ m2dt <- function(data,
                         
                     } else {
                         ## No outcome/event variable: just count n
-                        all_counts <- data.table::rbindlist(lapply(factor_vars, function(var) {
-                            data_dt[!is.na(get(var)), .(
-                                                          variable = var,
-                                                          group = as.character(get(var)),
-                                                          n_group = .N
-                                                      ), by = get(var)][, get := NULL]
-                        }))
+                        all_counts <- long_dt[, .(n_group = .N), by = .(variable, group)]
                         
                         ## Single join to update counts
                         dt[all_counts, n_group := i.n_group, on = .(variable, group)]
@@ -931,123 +932,161 @@ m2dt <- function(data,
             }
         }
     }
-        
+    
     ## Add reference rows for factor variables while maintaining original order
-    xlevels_ref <- xlevels
-
     ## Create all reference rows at once (vectorized approach)
-    if (!is.null(xlevels_ref) && reference_rows) {
+    xlevels_ref <- xlevels
+    
+    if (!is.null(xlevels_ref) && reference_rows && length(xlevels_ref) > 0) {
 
         ## Add reference column to existing data
         dt[, reference := ""]
         
-        ## Calculate all reference level counts at once
-        ref_counts <- list()
-
-        ## Pre-calculate all reference level counts from all_counts
-        ref_counts <- list()
-
-        ## Extract reference level counts from all_counts if it exists
-        if (exists("all_counts") && !is.null(all_counts) && nrow(all_counts) > 0) {
-            for (var in names(xlevels_ref)) {
-                ref_level <- xlevels_ref[[var]][1]
-                ref_row_data <- all_counts[variable == var & group == ref_level]
-                if (nrow(ref_row_data) > 0) {
-                    if ("events_group" %in% names(ref_row_data)) {
-                        ref_counts[[var]] <- ref_row_data[, .(n_group = n_group, events_group = events_group)]
-                    } else {
-                        ref_counts[[var]] <- ref_row_data[, .(n_group = n_group)]
-                    }
-                }
-            }
-        } else if (!skip_counts) {
-            ## Fallback: calculate directly from data if all_counts doesn't exist
-            if (!is.null(data_dt)) {
-                for (var in names(xlevels_ref)) {
-                    if (var %in% names(data_dt)) {
-                        ref_level <- xlevels_ref[[var]][1]
-                        
-                        if (!is.null(event_var) && event_var %in% names(data_dt)) {
-                            ref_counts[[var]] <- data_dt[get(var) == ref_level & !is.na(get(var)), .(
-                                                                                                       n_group = .N,
-                                                                                                       events_group = sum(get(event_var), na.rm = TRUE)
-                                                                                                   )]
-                        } else {
-                            ref_counts[[var]] <- data_dt[get(var) == ref_level & !is.na(get(var)), .(
-                                                                                                       n_group = .N
-                                                                                                   )]
-                        }
-                    }
-                }
-            }
-        }
-
-        ## Build all reference rows in a list
-        ref_rows_list <- lapply(names(xlevels_ref), function(var) {
-            ref_level <- xlevels_ref[[var]][1]
-            
-            ## Get counts for this reference level
-            if (var %in% names(ref_counts) && nrow(ref_counts[[var]]) > 0) {
-                n_val <- ref_counts[[var]]$n_group[1]
-                events_val <- if ("events_group" %in% names(ref_counts[[var]])) {
-                                  ref_counts[[var]]$events_group[1]
-                              } else {
-                                  NA_real_
-                              }
-            } else {
-                n_val <- NA_real_
-                events_val <- NA_real_
-            }
-            
-            ## Find first matching row to use as template
-            template_idx <- which(dt$variable == var)[1]
-            
-            if (!is.na(template_idx)) {
-                ## Copy the template row
-                ref_row <- dt[template_idx, ]
-                
-                ## Update all necessary columns at once
-                ref_row[, `:=`(
-                    term = paste0(var, ref_level),
-                    group = ref_level,
-                    n = ifelse(is.na(n_val), n[1], n_val),
-                    events = ifelse(is.na(events_val), events[1], events_val),
-                    n_group = n_val,
-                    events_group = events_val,
-                    coefficient = 0,
-                    se = NA_real_,
-                    coef = 0,
-                    coef_lower = NA_real_,
-                    coef_upper = NA_real_,
-                    exp_coef = 1,
-                    exp_lower = NA_real_,
-                    exp_upper = NA_real_,
-                    statistic = NA_real_,
-                    p_value = NA_real_,
-                    reference = reference_label
-                )]
-                
-                ## Update model-specific columns
-                if ("HR" %in% names(ref_row)) {
-                    ref_row[, `:=`(HR = 1, ci_lower = NA_real_, ci_upper = NA_real_)]
-                }
-                if ("OR" %in% names(ref_row)) {
-                    ref_row[, `:=`(OR = 1, ci_lower = NA_real_, ci_upper = NA_real_)]
-                }
-                
-                return(ref_row)
-            }
-            return(NULL)
-        })
+        ## Build reference counts data.table from all_counts if available
+        ref_vars <- names(xlevels_ref)
+        ref_levels <- vapply(xlevels_ref, `[`, character(1), 1)
         
-        ## Remove NULL entries and bind all reference rows at once
-        ref_rows_list <- ref_rows_list[!sapply(ref_rows_list, is.null)]
-
-        if (length(ref_rows_list) > 0) {
-            ref_rows_dt <- data.table::rbindlist(ref_rows_list, use.names = TRUE, fill = TRUE)
+        ## Create a lookup table for reference level counts
+        ## Check all_counts more carefully - it may not exist or may be NULL
+        have_all_counts <- !is.null(all_counts) && 
+            inherits(all_counts, "data.table") && 
+            nrow(all_counts) > 0 &&
+            all(c("variable", "group") %in% names(all_counts))
+        
+        if (have_all_counts) {
+            ## Build reference lookup from all_counts in one operation
+            ref_lookup <- data.table::data.table(
+                                          variable = ref_vars,
+                                          group = ref_levels
+                                      )
+            ref_lookup <- all_counts[ref_lookup, on = .(variable, group)]
+        } else if (!skip_counts && !is.null(data_dt) && inherits(data_dt, "data.table")) {
+            ## Fallback: calculate reference counts directly
+            ref_counts_list <- lapply(seq_along(ref_vars), function(i) {
+                var <- ref_vars[i]
+                ref_level <- ref_levels[i]
+                if (var %in% names(data_dt)) {
+                    if (!is.null(event_var) && event_var %in% names(data_dt)) {
+                        data_dt[get(var) == ref_level & !is.na(get(var)), .(
+                                                                              variable = var,
+                                                                              group = ref_level,
+                                                                              n_group = .N,
+                                                                              events_group = sum(get(event_var), na.rm = TRUE)
+                                                                          )]
+                    } else {
+                        data_dt[get(var) == ref_level & !is.na(get(var)), .(
+                                                                              variable = var,
+                                                                              group = ref_level,
+                                                                              n_group = .N
+                                                                          )]
+                    }
+                } else {
+                    NULL
+                }
+            })
+            ref_lookup <- data.table::rbindlist(ref_counts_list[!vapply(ref_counts_list, is.null, logical(1))], fill = TRUE)
+        } else {
+            ref_lookup <- data.table::data.table(
+                                          variable = ref_vars,
+                                          group = ref_levels,
+                                          n_group = NA_real_
+                                      )
+        }
+        
+        ## Ensure ref_lookup has required columns
+        if (!inherits(ref_lookup, "data.table") || nrow(ref_lookup) == 0) {
+            ref_lookup <- data.table::data.table(
+                                          variable = ref_vars,
+                                          group = ref_levels,
+                                          n_group = NA_real_
+                                      )
+        }
+        
+        ## Get the column structure from dt
+        dt_cols <- names(dt)
+        
+        ## Find which variables have matching rows in dt
+        vars_in_dt <- ref_vars[ref_vars %in% unique(dt$variable)]
+        
+        if (length(vars_in_dt) > 0 && nrow(dt) > 0) {
+            ## Get template values from first matching row of each variable
+            template_dt <- dt[, .SD[1], by = variable][variable %in% vars_in_dt]
+            
+            ## Build reference rows data.table directly
+            ref_rows_dt <- data.table::data.table(
+                                           variable = vars_in_dt,
+                                           group = ref_levels[match(vars_in_dt, ref_vars)],
+                                           term = paste0(vars_in_dt, ref_levels[match(vars_in_dt, ref_vars)]),
+                                           coefficient = 0,
+                                           se = NA_real_,
+                                           coef = 0,
+                                           coef_lower = NA_real_,
+                                           coef_upper = NA_real_,
+                                           exp_coef = 1,
+                                           exp_lower = NA_real_,
+                                           exp_upper = NA_real_,
+                                           statistic = NA_real_,
+                                           p_value = NA_real_,
+                                           reference = reference_label
+                                       )
+            
+            ## Add counts from ref_lookup
+            if (nrow(ref_lookup) > 0 && "n_group" %in% names(ref_lookup)) {
+                ref_rows_dt <- ref_lookup[ref_rows_dt, on = .(variable, group)]
+            } else {
+                ref_rows_dt[, n_group := NA_real_]
+                if ("events_group" %in% dt_cols) {
+                    ref_rows_dt[, events_group := NA_real_]
+                }
+            }
+            
+            ## Copy metadata columns from template using a proper join
+            ## This avoids issues with match() returning wrong-length vectors
+            meta_cols <- c("model_scope", "model_type", "n", "events")
+            meta_cols_to_add <- meta_cols[meta_cols %in% dt_cols & !meta_cols %in% names(ref_rows_dt)]
+            
+            if (length(meta_cols_to_add) > 0) {
+                ## Select only the columns we need from template
+                template_subset <- template_dt[, c("variable", meta_cols_to_add), with = FALSE]
+                ## Ensure no duplicates in template
+                template_subset <- unique(template_subset, by = "variable")
+                ## Join to add metadata columns
+                ref_rows_dt <- template_subset[ref_rows_dt, on = "variable"]
+            }
+            
+            ## Update n and events with group-specific values where available
+            if ("n_group" %in% names(ref_rows_dt) && "n" %in% names(ref_rows_dt)) {
+                ref_rows_dt[!is.na(n_group), n := n_group]
+            }
+            if ("events_group" %in% names(ref_rows_dt) && "events" %in% names(ref_rows_dt)) {
+                ref_rows_dt[!is.na(events_group), events := events_group]
+            }
+            
+            ## Add model-specific effect columns
+            if ("HR" %in% dt_cols) {
+                ref_rows_dt[, `:=`(HR = 1, ci_lower = NA_real_, ci_upper = NA_real_)]
+            }
+            if ("OR" %in% dt_cols) {
+                ref_rows_dt[, `:=`(OR = 1, ci_lower = NA_real_, ci_upper = NA_real_)]
+            }
+            if ("RR" %in% dt_cols) {
+                ref_rows_dt[, `:=`(RR = 1, ci_lower = NA_real_, ci_upper = NA_real_)]
+            }
+            if ("Coefficient" %in% dt_cols) {
+                ref_rows_dt[, `:=`(Coefficient = 0, ci_lower = NA_real_, ci_upper = NA_real_)]
+            }
+            
+            ## Add any QC stat columns that exist in dt
+            qc_cols <- intersect(dt_cols, c("AIC", "BIC", "deviance", "null_deviance", 
+                                            "loglik", "c_statistic", "rsq", "rsq_adj"))
+            for (col in qc_cols) {
+                if (!(col %in% names(ref_rows_dt))) {
+                    ref_rows_dt[, (col) := template_dt[[col]][match(variable, template_dt$variable)]]
+                }
+            }
             
             ## Combine main dt and reference rows
-            dt <- rbind(dt, ref_rows_dt, use.names = TRUE, fill = TRUE)
+            dt <- data.table::rbindlist(list(dt, ref_rows_dt), use.names = TRUE, fill = TRUE)
             
             ## Sort to put reference rows in correct positions
             ## Within each variable, reference row comes first
@@ -1085,62 +1124,43 @@ m2dt <- function(data,
     predictors_order <- attr(model, "predictors")
     if (!is.null(predictors_order) && "variable" %in% names(dt)) {
         
-        ## Create order based on predictors
-        ## First, handle regular predictors (may include random effects notation)
-        clean_predictors <- character()
-        for (pred in predictors_order) {
-            ## Remove random effects notation if present
-            if (grepl("\\|", pred)) {
-                next
-            } else {
-                clean_predictors <- c(clean_predictors, pred)
-            }
-        }
+        ## Remove random effects notation - vectorized
+        clean_predictors <- predictors_order[!grepl("\\|", predictors_order)]
         
         ## Get unique variables in dt
         dt_vars <- unique(dt$variable)
         
-        ## Separate into ordered and unordered variables
-        ordered_vars <- character()
-        for (pred in clean_predictors) {
-            ## Check if this predictor appears in dt_vars
-            if (pred %in% dt_vars) {
-                ordered_vars <- c(ordered_vars, pred)
-            } else {
-                ## Check if it's a factor variable (any dt_vars start with this pred)
-                factor_matches <- dt_vars[startsWith(dt_vars, pred)]
-                if (length(factor_matches) > 0) {
-                    ## Add the base variable name
-                    for (match in factor_matches) {
-                        if (!(match %in% ordered_vars)) {
-                            ordered_vars <- c(ordered_vars, match)
-                        }
-                    }
-                }
+        ## Separate interaction terms from main effects
+        interaction_vars <- dt_vars[grepl(":", dt_vars, fixed = TRUE)]
+        main_effect_vars <- setdiff(dt_vars, interaction_vars)
+        
+        ## Build ordered_vars using vectorized matching
+        ## First, direct matches
+        direct_matches <- clean_predictors[clean_predictors %in% main_effect_vars]
+        
+        ## Then, factor variable matches (where dt_vars start with predictor name)
+        remaining_predictors <- setdiff(clean_predictors, direct_matches)
+        factor_matches <- character()
+        if (length(remaining_predictors) > 0) {
+            ## For each remaining predictor, find variables that start with it
+            for (pred in remaining_predictors) {
+                matches <- main_effect_vars[startsWith(main_effect_vars, pred)]
+                factor_matches <- c(factor_matches, setdiff(matches, c(direct_matches, factor_matches)))
             }
         }
         
-        ## Handle interaction terms - they should come after main effects
-        interaction_vars <- dt_vars[grepl(":", dt_vars, fixed = TRUE)]
-        main_effect_vars <- setdiff(dt_vars, interaction_vars)
+        ## Combine: direct matches first, then factor matches, preserving order
+        ordered_vars <- c(direct_matches, factor_matches)
         
         ## Get main effects that aren't already ordered
         unordered_main <- setdiff(main_effect_vars, ordered_vars)
         
         ## Final order: ordered variables, unordered main effects, interactions
-        final_order <- c(ordered_vars, unordered_main, interaction_vars)
+        final_order <- unique(c(ordered_vars, unordered_main, interaction_vars))
         
-        ## Remove any duplicates while preserving order
-        final_order <- final_order[!duplicated(final_order)]
-        
-        ## Create ordering factor
+        ## Use factor levels for efficient sorting
         dt[, variable := factor(variable, levels = final_order)]
-        
-        ## Sort by variable (which now has the correct factor levels)
-        ## Within each variable, maintain the existing group order
         data.table::setkey(dt, variable)
-        
-        ## Convert back to character
         dt[, variable := as.character(variable)]
         
         ## If reference rows exist, ensure they come first within each variable

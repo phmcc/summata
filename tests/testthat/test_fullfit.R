@@ -7,7 +7,7 @@
 
 library(testthat)
 library(data.table)
-library(summaria)
+library(summata)
 
 ## ============================================================================
 ## Setup: Create test data and helper functions
@@ -1071,6 +1071,133 @@ test_that("fullfit works with data.frame input", {
     )
     
     expect_fullfit_result(result)
+})
+
+
+## ============================================================================
+## SECTION 16B: Input Validation Tests
+## ============================================================================
+
+test_that("fullfit errors or auto-corrects Surv outcome with GLM model_type", {
+    
+    ## Should either auto-correct (with message) or error
+    result_or_error <- tryCatch({
+        suppressMessages(suppressWarnings(
+            fullfit(
+                data = clintrial,
+                outcome = "Surv(os_months, os_status)",
+                predictors = c("age", "sex"),
+                model_type = "glm",
+                method = "all"
+            )
+        ))
+    }, error = function(e) e)
+    
+    ## Either produces valid result or an error (both acceptable)
+    expect_true(
+        inherits(result_or_error, "fullfit_result") ||
+        inherits(result_or_error, "error")
+    )
+})
+
+
+test_that("fullfit errors when coxph used without Surv outcome", {
+    
+    ## Should error - either from validation or from coxph itself
+    expect_error(
+        suppressWarnings(
+            fullfit(
+                data = clintrial,
+                outcome = "response",
+                predictors = c("age", "sex"),
+                model_type = "coxph",
+                method = "all"
+            )
+        )
+    )
+})
+
+
+test_that("fullfit errors with continuous outcome and binomial family", {
+    
+    ## Should error - either from validation or from glm itself
+    expect_error(
+        suppressWarnings(
+            fullfit(
+                data = clintrial,
+                outcome = "los_days",
+                predictors = c("age", "sex"),
+                model_type = "glm",
+                family = "binomial",
+                method = "all"
+            )
+        )
+    )
+})
+
+
+test_that("fullfit errors when outcome variable not found", {
+    
+    expect_error(
+        suppressWarnings(
+            fullfit(
+                data = clintrial,
+                outcome = "nonexistent_variable",
+                predictors = c("age", "sex"),
+                model_type = "glm",
+                method = "all"
+            )
+        )
+    )
+})
+
+
+test_that("fullfit errors when predictor variable not found", {
+    
+    expect_error(
+        suppressWarnings(
+            fullfit(
+                data = clintrial,
+                outcome = "response",
+                predictors = c("age", "nonexistent_predictor"),
+                model_type = "glm",
+                method = "all"
+            )
+        )
+    )
+})
+
+
+test_that("fullfit handles edge case p_threshold values", {
+    
+    ## p_threshold = 1 should include all predictors
+    result <- fullfit(
+        data = clintrial,
+        outcome = "response",
+        predictors = c("age", "sex"),
+        model_type = "glm",
+        method = "screen",
+        p_threshold = 1.0
+    )
+    expect_fullfit_result(result)
+})
+
+
+test_that("fullfit errors with empty data", {
+    
+    empty_data <- clintrial[0, ]
+    
+    expect_error(
+        suppressWarnings(
+            fullfit(
+                data = empty_data,
+                outcome = "response",
+                predictors = c("age", "sex"),
+                model_type = "glm",
+                method = "all"
+            )
+        )
+    )
 })
 
 

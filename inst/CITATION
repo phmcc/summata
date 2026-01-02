@@ -2,7 +2,7 @@ citHeader("To cite summata in publications, use:")
 
 bibentry(
     bibtype  = "Manual",
-    title    = "summata: Publication-Ready Regression Tables and Forest Plots",
+    title    = "summata: Publication-Ready Summary Tables and Forest Plots",
     author   = c(person(given = c("Paul", "Hsin-ti"), family = "McClelland")),
     year     = format(Sys.Date(), "%Y"),
     note     = sprintf("R package version %s", meta$Version),

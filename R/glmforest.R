@@ -180,7 +180,7 @@
 #'       \item Observations analyzed (with percentage of total data)
 #'       \item Model family (Binomial, Poisson, etc.)
 #'       \item Deviance statistics
-#'       \item Pseudo-R^2 (McFadden)
+#'       \item Pseudo-R² (McFadden)
 #'       \item AIC
 #'     }
 #' }
@@ -249,7 +249,7 @@
 #'   \item \strong{Observations analyzed}: Total N and percentage of original 
 #'     data (accounting for missing values)
 #'   \item \strong{Null/Residual Deviance}: Model fit improvement
-#'   \item \strong{Pseudo-R^2}: McFadden R^2 = 1 - (log L_1 / log L_2)
+#'   \item \strong{Pseudo-R²}: McFadden R² = 1 - (log L_1 / log L_2)
 #'   \item \strong{AIC}: For model comparison (lower is better)
 #' }
 #' 
@@ -904,7 +904,7 @@ Received class: ", paste(class(x), collapse = ", "))
             int_term <- interaction_terms[idx]
             
             ## Parse the interaction term to create a readable label
-            ## e.g., "treatmentDrug A:stageII" -> "Treatment Group (Drug A) * Disease Stage (II)"
+            ## e.g., "treatmentDrug A:stageII" -> "Treatment Group (Drug A) × Disease Stage (II)"
             int_parts <- strsplit(int_term, ":", fixed = TRUE)[[1]]
             
             ## Build readable variable name from parts
@@ -938,7 +938,7 @@ Received class: ", paste(class(x), collapse = ", "))
                 matched_result
             })
             
-            display_name <- paste(display_parts, collapse = " * ")
+            display_name <- paste(display_parts, collapse = " \u00d7 ")
             
             ## Calculate N for this interaction (observations where both conditions are met)
             int_n <- tryCatch({
@@ -1244,8 +1244,8 @@ Received class: ", paste(class(x), collapse = ", "))
         
         for (v in unique(to_show_exp_clean$var)) {
             if (v != "" && !grepl("^    ", v)) {
-                ## Skip interaction terms (already formatted) - identified by " * " in the name
-                if (grepl(" \\* ", v)) next
+                ## Skip interaction terms (already formatted) - identified by " × " in the name
+                if (grepl(" \u00d7 ", v)) next
                 
                 clean_v <- gsub(" \\(.*\\)", "", v)
                 
@@ -1278,8 +1278,8 @@ Received class: ", paste(class(x), collapse = ", "))
         
         for(v in unique(to_show_exp_clean$var)) {
             if(v %in% to_show_exp_clean$var) {
-                ## Skip interaction terms (already formatted) - identified by " * " in the name
-                if (grepl(" \\* ", v)) next
+                ## Skip interaction terms (already formatted) - identified by " × " in the name
+                if (grepl(" \u00d7 ", v)) next
                 
                 if(!is.null(labels) && v %in% names(labels)) {
                     to_show_exp_clean[var == v, var_display := labels[v]]
@@ -1583,7 +1583,7 @@ Received class: ", paste(class(x), collapse = ", "))
                                    label = paste0("Observations analyzed: ", gmodel$nobs_with_pct,
                                                   "\nModel: ", gmodel$family,
                                                   "\nNull (Residual) Deviance: ", null_dev_formatted, " (", resid_dev_formatted, ")",
-                                                  "\nPseudo R^2: ", pseudo_r2_formatted,
+                                                  "\nPseudo R\u00b2: ", pseudo_r2_formatted,
                                                   "\nAIC: ", gmodel$AIC_formatted),
                                    size = annot_font * 0.8, hjust = 0, vjust = 1.2, fontface = "italic")
             }}
@@ -1728,7 +1728,7 @@ Received class: ", paste(class(x), collapse = ", "))
                                    label = paste0("Observations analyzed: ", gmodel$nobs_with_pct,
                                                   "\nModel: ", gmodel$family,
                                                   "\nNull (Residual) Deviance: ", null_dev_formatted, " (", resid_dev_formatted, ")",
-                                                  "\nPseudo R^2: ", pseudo_r2_formatted,
+                                                  "\nPseudo R\u00b2: ", pseudo_r2_formatted,
                                                   "\nAIC: ", gmodel$AIC_formatted),
                                    size = annot_font * 0.8, hjust = 0, vjust = 1.2, fontface = "italic")
             }}

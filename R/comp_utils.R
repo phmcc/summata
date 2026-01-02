@@ -1,3 +1,10 @@
+# Column name constants for Unicode superscripts
+# These are defined here to ensure consistent column naming throughout
+.pseudo_r2_col <- "Pseudo-R\u00b2"
+.marginal_r2_col <- "Marginal R\u00b2"
+.conditional_r2_col <- "Conditional R\u00b2"
+.adjusted_r2_col <- "Adjusted R\u00b2"
+
 #' Check model convergence
 #' 
 #' Checks convergence status for various model types including standard
@@ -543,55 +550,55 @@ build_comparison_table <- function(comparison, model_type) {
         ## Focus on discrimination, calibration, and information criteria
         key_cols <- c("Model", "N", "Events", "Predictors", "Converged",
                       "AIC", "BIC", "C-statistic", "Brier Score",
-                      "McFadden R^2", "Nagelkerke R^2", 
+                      "McFadden R\u00b2", "Nagelkerke R\u00b2", 
                       "Hoslem p", "Global p")
         
         ## Rename for display
-        old_names <- c("c_statistic", "brier_score", "mcfadden_R^2", 
-                       "nagelkerke_R^2", "hoslem_p", "global_p")
-        new_names <- c("C-statistic", "Brier Score", "McFadden R^2", 
-                       "Nagelkerke R^2", "Hoslem p", "Global p")
+        old_names <- c("c_statistic", "brier_score", "mcfadden_r2", 
+                       "nagelkerke_r2", "hoslem_p", "global_p")
+        new_names <- c("C-statistic", "Brier Score", "McFadden R\u00b2", 
+                       "Nagelkerke R\u00b2", "Hoslem p", "Global p")
         data.table::setnames(comparison, old_names, new_names, skip_absent = TRUE)
         
     } else if (model_type == "coxph") {
         key_cols <- c("Model", "N", "Events", "Predictors", "Converged",
-                      "AIC", "BIC", "C-index", "R^2", "R^2 max",
+                      "AIC", "BIC", "C-index", "R\u00b2", "R\u00b2 max",
                       "PH test p", "Global p")
         
         old_names <- c("c_index", "rsq", "rsq_max", "ph_global_p", "lr_test_p")
-        new_names <- c("C-index", "R^2", "R^2 max", "PH test p", "Global p")
+        new_names <- c("C-index", "R\u00b2", "R\u00b2 max", "PH test p", "Global p")
         data.table::setnames(comparison, old_names, new_names, skip_absent = TRUE)
         
     } else if (model_type == "lm") {
         key_cols <- c("Model", "N", "Predictors", "Converged",
-                      "AIC", "BIC", "R^2", "Adj R^2", "RMSE",
+                      "AIC", "BIC", "R\u00b2", "Adj R\u00b2", "RMSE",
                       "F-stat", "Global p")
         
         old_names <- c("r_squared", "adj_r_squared", "rmse", "f_statistic", "global_p")
-        new_names <- c("R^2", "Adj R^2", "RMSE", "F-stat", "Global p")
+        new_names <- c("R\u00b2", "Adj R\u00b2", "RMSE", "F-stat", "Global p")
         data.table::setnames(comparison, old_names, new_names, skip_absent = TRUE)
         
     } else if (model_type %in% c("lmer", "lmerMod")) {
         key_cols <- c("Model", "N", "Groups", "Predictors", "Converged",
-                      "AIC", "BIC", "Marginal R^2", "Conditional R^2", 
+                      "AIC", "BIC", "Marginal R\u00b2", "Conditional R\u00b2", 
                       "ICC", "RMSE", "Global p")
         
-        old_names <- c("n_groups", "marginal_R^2", "conditional_R^2", "icc", "rmse", "global_p")
-        new_names <- c("Groups", "Marginal R^2", "Conditional R^2", "ICC", "RMSE", "Global p")
+        old_names <- c("n_groups", "marginal_r2", "conditional_r2", "icc", "rmse", "global_p")
+        new_names <- c("Groups", "Marginal R\u00b2", "Conditional R\u00b2", "ICC", "RMSE", "Global p")
         data.table::setnames(comparison, old_names, new_names, skip_absent = TRUE)
         
     } else if (model_type %in% c("glmer", "glmerMod")) {
         key_cols <- c("Model", "N", "Events", "Groups", "Predictors", "Converged",
-                      "AIC", "BIC", "Concordance", "Marginal R^2", "Conditional R^2",
+                      "AIC", "BIC", "Concordance", "Marginal R\u00b2", "Conditional R\u00b2",
                       "ICC", "Brier Score", "Global p")
         
-        old_names <- c("n_groups", "marginal_R^2", "conditional_R^2", "icc", "brier_score", "global_p")
-        new_names <- c("Groups", "Marginal R^2", "Conditional R^2", "ICC", "Brier Score", "Global p")
+        old_names <- c("n_groups", "marginal_r2", "conditional_r2", "icc", "brier_score", "global_p")
+        new_names <- c("Groups", "Marginal R\u00b2", "Conditional R\u00b2", "ICC", "Brier Score", "Global p")
         data.table::setnames(comparison, old_names, new_names, skip_absent = TRUE)
         
     } else if (model_type == "coxme") {
         key_cols <- c("Model", "N", "Events", "Groups", "Predictors", "Converged",
-                      "AIC", "BIC", "Concordance", "Pseudo-R^2", "ICC", "Global p")
+                      "AIC", "BIC", "Concordance", "Pseudo-R\u00b2", "ICC", "Global p")
         
         old_names <- c("n_groups", "icc", "global_p")
         new_names <- c("Groups", "ICC", "Global p")
@@ -625,9 +632,9 @@ format_model_comparison <- function(comparison) {
         if (col %chin% c("AIC", "BIC")) {
             comparison[, (col) := round(get(col), 1)]
         } else if (col %chin% c("C-statistic", "C-index", "Concordance", 
-                                "McFadden R^2", "Nagelkerke R^2", "R^2", "Adj R^2",
-                                "Marginal R^2", "Conditional R^2", "ICC",
-                                "Brier Score", "RMSE", "Pseudo-R^2")) {
+                                "McFadden R\u00b2", "Nagelkerke R\u00b2", "R\u00b2", "Adj R\u00b2",
+                                "Marginal R\u00b2", "Conditional R\u00b2", "ICC",
+                                "Brier Score", "RMSE", "Pseudo-R\u00b2")) {
             comparison[, (col) := round(get(col), 3)]
         }
     }
@@ -750,11 +757,11 @@ calculate_model_scores <- function(comparison, model_type, scoring_weights = NUL
         }
         
         ## Pseudo-R^2
-        if ("Pseudo-R^2" %chin% names(comparison) && !all(is.na(comparison$`Pseudo-R^2`))) {
+        if ("Pseudo-R^2" %chin% names(comparison) && !all(is.na(comparison[["Pseudo-R^2"]]))) {
             ## McFadden's R^2 rarely exceeds 0.4 for good models
             scores$pseudo_r2_score <- data.table::fifelse(
-                                                      is.na(comparison$`Pseudo-R^2`), 0,
-                                                      pmin(100, comparison$`Pseudo-R^2` * 250)  # 0.4 -> 100 points
+                                                      is.na(comparison[["Pseudo-R^2"]]), 0,
+                                                      pmin(100, comparison[["Pseudo-R^2"]] * 250)  # 0.4 -> 100 points
                                                   )
         } else {
             scores$pseudo_r2_score <- rep(50, n_models)
@@ -817,8 +824,8 @@ calculate_model_scores <- function(comparison, model_type, scoring_weights = NUL
         
     } else if (model_type == "lm") {
         ## R^2 scoring
-        if ("Pseudo-R^2" %chin% names(comparison) && !all(is.na(comparison$`Pseudo-R^2`))) {
-            scores$pseudo_r2_score <- comparison$`Pseudo-R^2` * 100
+        if ("Pseudo-R^2" %chin% names(comparison) && !all(is.na(comparison[["Pseudo-R^2"]]))) {
+            scores$pseudo_r2_score <- comparison[["Pseudo-R^2"]] * 100
             scores$pseudo_r2_score[is.na(scores$pseudo_r2_score)] <- 0
         } else {
             scores$pseudo_r2_score <- rep(50, n_models)
@@ -908,10 +915,10 @@ calculate_lmer_scores <- function(comparison, weights, scores, n_models) {
     }
     
     ## Conditional R^2 score (variance explained by full model)
-    if ("Conditional R^2" %chin% names(comparison) && !all(is.na(comparison$`Conditional R^2`))) {
+    if ("Conditional R^2" %chin% names(comparison) && !all(is.na(comparison[["Conditional R^2"]]))) {
         scores$conditional_r2_score <- data.table::fifelse(
-                                                       is.na(comparison$`Conditional R^2`), 0,
-                                                       pmin(100, comparison$`Conditional R^2` * 110)  # 0.9 -> ~100 points
+                                                       is.na(comparison[["Conditional R^2"]]), 0,
+                                                       pmin(100, comparison[["Conditional R^2"]] * 110)  # 0.9 -> ~100 points
                                                    )
     } else {
         scores$conditional_r2_score <- rep(50, n_models)
@@ -1036,10 +1043,10 @@ calculate_coxme_scores <- function(comparison, weights, scores, n_models) {
     }
     
     ## Pseudo-R^2 score
-    if ("Pseudo-R^2" %chin% names(comparison) && !all(is.na(comparison$`Pseudo-R^2`))) {
+    if ("Pseudo-R^2" %chin% names(comparison) && !all(is.na(comparison[["Pseudo-R^2"]]))) {
         scores$pseudo_r2_score <- data.table::fifelse(
-                                                  is.na(comparison$`Pseudo-R^2`), 0,
-                                                  pmin(100, comparison$`Pseudo-R^2` * 250)
+                                                  is.na(comparison[["Pseudo-R^2"]]), 0,
+                                                  pmin(100, comparison[["Pseudo-R^2"]] * 250)
                                               )
     } else {
         scores$pseudo_r2_score <- rep(50, n_models)
@@ -1334,25 +1341,25 @@ order_comparison_columns <- function(comparison, model_type) {
     
     col_order <- switch(model_type,
                         "glm" = c("Model", "N", "Events", "Predictors", "Converged",
-                                  "AIC", "BIC", "Pseudo-R^2", "Concordance", "Brier Score",
+                                  "AIC", "BIC", "Pseudo-R\u00b2", "Concordance", "Brier Score",
                                   "Global p", "Summata Score"),
                         "coxph" = c("Model", "N", "Events", "Predictors", "Converged",
-                                    "AIC", "BIC", "Pseudo-R^2", "Concordance",
+                                    "AIC", "BIC", "Pseudo-R\u00b2", "Concordance",
                                     "Global p", "Summata Score"),
                         "lm" = c("Model", "N", "Predictors", "Converged",
-                                 "AIC", "BIC", "Pseudo-R^2", "Global p", "Summata Score"),
+                                 "AIC", "BIC", "Pseudo-R\u00b2", "Global p", "Summata Score"),
                         "lmer" = c("Model", "N", "Groups", "Predictors", "Converged",
-                                   "AIC", "BIC", "Marginal R^2", "Conditional R^2", "ICC",
+                                   "AIC", "BIC", "Marginal R\u00b2", "Conditional R\u00b2", "ICC",
                                    "RMSE", "Global p", "Summata Score"),
                         "glmer" = c("Model", "N", "Events", "Groups", "Predictors", "Converged",
-                                    "AIC", "BIC", "Concordance", "Marginal R^2", "Conditional R^2",
+                                    "AIC", "BIC", "Concordance", "Marginal R\u00b2", "Conditional R\u00b2",
                                     "ICC", "Brier Score", "Global p", "Summata Score"),
                         "coxme" = c("Model", "N", "Events", "Groups", "Predictors", "Converged",
-                                    "AIC", "BIC", "Concordance", "Pseudo-R^2", "ICC",
+                                    "AIC", "BIC", "Concordance", "Pseudo-R\u00b2", "ICC",
                                     "Global p", "Summata Score"),
                         ## Default fallback
                         c("Model", "N", "Events", "Predictors", "Converged",
-                          "AIC", "BIC", "Pseudo-R^2", "Concordance",
+                          "AIC", "BIC", "Pseudo-R\u00b2", "Concordance",
                           "Global p", "Summata Score")
                         )
     

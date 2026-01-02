@@ -1,14 +1,3 @@
----
-title: "License (GPL-3)"
-output: rmarkdown::html_vignette
-pkgdown:
-  as_is: true
-vignette: >
-  %\VignetteIndexEntry{License (GPL-3)}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
----
-
 # GNU GENERAL PUBLIC LICENSE
 
 **Version 3, 29 June 2007**

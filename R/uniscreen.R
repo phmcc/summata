@@ -471,6 +471,25 @@ uniscreen <- function(data,
         data <- data.table::as.data.table(data)
     }
     
+    ## Validate inputs and auto-correct model type if needed
+    validation <- validate_fit_inputs(
+        data = data,
+        outcome = outcome,
+        predictors = predictors,
+        model_type = model_type,
+        family = if (model_type %in% c("glm", "glmer")) family else NULL,
+        conf_level = conf_level,
+        digits = digits,
+        p_digits = p_digits,
+        p_threshold = p_threshold,
+        auto_correct_model = TRUE
+    )
+    
+    ## Apply any auto-corrections
+    if (validation$auto_corrected) {
+        model_type <- validation$model_type
+    }
+    
     ## Validate random effects for mixed-effects models
     mixed_types <- c("glmer", "lmer", "coxme")
     if (model_type %in% mixed_types && is.null(random)) {
@@ -491,13 +510,17 @@ uniscreen <- function(data,
         formula <- stats::as.formula(formula_str)
         
         ## Fit model based on type
+        ## Use model=FALSE for glm/lm when not keeping models to save memory
         model <- switch(model_type,
-                        "glm" = stats::glm(formula, data = data, family = family, ...),
-                        "lm" = stats::lm(formula, data = data, ...),
+                        "glm" = stats::glm(formula, data = data, family = family, 
+                                           model = keep_models, x = FALSE, y = TRUE, ...),
+                        "lm" = stats::lm(formula, data = data, 
+                                         model = keep_models, x = FALSE, y = TRUE, ...),
                         "coxph" = {
                             if (!requireNamespace("survival", quietly = TRUE)) 
                                 stop("Package 'survival' required for Cox models")
-                            survival::coxph(formula, data = data, ...)
+                            survival::coxph(formula, data = data, 
+                                            model = keep_models, x = FALSE, y = TRUE, ...)
                         },
                         "clogit" = {
                             if (!requireNamespace("survival", quietly = TRUE))
@@ -653,6 +676,7 @@ uniscreen <- function(data,
 
 
 #' Print method for uniscreen results
+#' @keywords internal
 #' @export
 print.uniscreen_result <- function(x, ...) {
     cat("\nUnivariable Screening Results\n")

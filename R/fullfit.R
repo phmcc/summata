@@ -492,6 +492,25 @@ fullfit <- function(data,
     if (!data.table::is.data.table(data)) {
         data <- data.table::as.data.table(data)
     }
+    
+    ## Validate inputs and auto-correct model type if needed
+    validation <- validate_fit_inputs(
+        data = data,
+        outcome = outcome,
+        predictors = predictors,
+        model_type = model_type,
+        family = if (model_type %in% c("glm", "glmer")) family else NULL,
+        conf_level = conf_level,
+        digits = digits,
+        p_digits = p_digits,
+        p_threshold = p_threshold,
+        auto_correct_model = TRUE
+    )
+    
+    ## Apply any auto-corrections
+    if (validation$auto_corrected) {
+        model_type <- validation$model_type
+    }
 
     ## Step 1: Univariable analysis (if needed)
     uni_results <- NULL
@@ -533,9 +552,12 @@ fullfit <- function(data,
             ## Screen based on p-value threshold using raw data
             if (is.null(uni_raw)) {
                 ## Need to run univariable if not already done
+                ## Only need p-values for screening, so skip counts for efficiency
                 uni_temp <- uniscreen(data, outcome, predictors, model_type, 
                                       family, conf_level = conf_level,
-                                      reference_rows = reference_rows,
+                                      reference_rows = FALSE,
+                                      show_n = FALSE,
+                                      show_events = FALSE,
                                       parallel = parallel, n_cores = n_cores,
                                       ...)
                 uni_raw <- attr(uni_temp, "raw_data")

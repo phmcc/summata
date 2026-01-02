@@ -412,14 +412,6 @@
 #' table2docx(results, "strict.docx",
 #'          bold_significant = TRUE,
 #'          p_threshold = 0.01)
-#'
-#' \dontshow{
-#' # Cleanup example files
-#' unlink(c("results.docx", "captioned.docx", "wide.docx", "custom_font.docx",
-#'          "indented.docx", "condensed.docx", "striped.docx", "dark.docx",
-#'          "a4.docx", "base.docx", "direct.docx", "publication.docx",
-#'          "aligned.docx", "no_bold.docx", "strict.docx"))
-#' }
 #' }
 #'
 #' @export

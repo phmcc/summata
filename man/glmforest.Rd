@@ -217,7 +217,7 @@ The forest plot consists of several integrated components:
       \item Observations analyzed (with percentage of total data)
       \item Model family (Binomial, Poisson, etc.)
       \item Deviance statistics
-      \item Pseudo-R^2 (McFadden)
+      \item Pseudo-R² (McFadden)
       \item AIC
     }
 }
@@ -286,7 +286,7 @@ The footer shows key diagnostic information:
   \item \strong{Observations analyzed}: Total N and percentage of original 
     data (accounting for missing values)
   \item \strong{Null/Residual Deviance}: Model fit improvement
-  \item \strong{Pseudo-R^2}: McFadden R^2 = 1 - (log L_1 / log L_2)
+  \item \strong{Pseudo-R²}: McFadden R² = 1 - (log L_1 / log L_2)
   \item \strong{AIC}: For model comparison (lower is better)
 }
 

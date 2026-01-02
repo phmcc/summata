@@ -78,9 +78,11 @@
 #' 
 #' \strong{Key Associations:}
 #' \itemize{
-#'   \item Diabetes is strongly associated with complications and infections
+#'   \item Diabetes is strongly associated with complications, infections, and readmission
 #'   \item Age and ECOG performance status affect most outcomes
 #'   \item Surgery increases complication risk but may improve survival
+#'   \item 30-day readmission is associated with age, sex, diabetes, smoking, 
+#'     ECOG status, disease stage, treatment arm, and surgery
 #'   \item Multiple interaction effects (age × diabetes, treatment × stage, etc.)
 #' }
 #' 
@@ -433,34 +435,50 @@ create_clintrial <- function() {
     
     ## --- BINARY OUTCOME 3: 30-Day Readmission ---
     ## Related to complications but also social/system factors
-    readmit_prob <- plogis(-2.5 +
-                           ## Demographics
-                           (age - 60) * 0.02 +
+    ## NOTE: Strengthened effects to ensure detectable associations in regression
+    readmit_prob <- plogis(-2.8 +
+                           ## Demographics (stronger effects)
+                           (age - 60) * 0.035 +  # Age effect strengthened
+                           (sex == "Male") * 0.35 +  # Male sex increases risk
                            
-                           ## Clinical factors
-                           (diabetes == "Yes") * 0.4 +
-                           (hypertension == "Yes") * 0.2 +
-                           as.numeric(ecog) * 0.3 +
+                           ## Clinical factors (stronger effects)
+                           (diabetes == "Yes") * 0.7 +  # Diabetes strongly predicts readmission
+                           (hypertension == "Yes") * 0.25 +
+                           as.numeric(ecog) * 0.45 +  # ECOG performance status
+                           (smoking == "Current") * 0.5 +  # Current smoking
+                           (smoking == "Former") * 0.15 +
                            
                            ## Prior complications increase readmission
-                           (any_complication == "Yes") * 1.0 +  # Strong predictor
-                           (wound_infection == "Yes") * 0.8 +
+                           (any_complication == "Yes") * 1.2 +  # Strong predictor
+                           (wound_infection == "Yes") * 0.9 +
                            
-                           ## Disease severity
-                           (stage == "III") * 0.3 +
-                           (stage == "IV") * 0.5 +
+                           ## Disease severity (stronger stage effects)
+                           (stage == "II") * 0.2 +
+                           (stage == "III") * 0.5 +
+                           (stage == "IV") * 0.85 +
                            
-                           ## Treatment effects
-                           (treatment == "Drug A") * (-0.2) +  # Drug A patients do better
-                                                   (treatment == "Drug B") * 0.3 +
-                                                   
-                                                   ## LOS effect (very short or very long LOS = readmission risk)
-                                                   ifelse(!is.na(los_days), (abs(los_days - 7) * 0.03), 0) +
-                                                   
-                                                   ## Site clustering (some sites have better discharge planning)
-                                                   site_complication_effect[as.character(site)] * 0.6 +
-                                                   
-                                                   rnorm(n, 0, 0.2))
+                           ## Treatment effects (more differentiated)
+                           (treatment == "Drug A") * (-0.4) +  # Drug A patients do better
+                           (treatment == "Drug B") * 0.5 +  # Drug B increases readmission
+                           
+                           ## Surgery effect
+                           (surgery == "Yes") * 0.6 +  # Surgical patients more likely to be readmitted
+                           
+                           ## Lab values
+                           (creatinine - 1) * 0.4 +  # Renal function matters
+                           (hemoglobin < 10) * 0.35 +  # Anemia
+                           
+                           ## LOS effect (very short or very long LOS = readmission risk)
+                           ifelse(!is.na(los_days), (abs(los_days - 7) * 0.04), 0) +
+                           
+                           ## INTERACTION EFFECTS
+                           ((diabetes == "Yes") & (age > 70)) * 0.4 +  # Elderly diabetics
+                           ((surgery == "Yes") & (stage %in% c("III", "IV"))) * 0.35 +
+                           
+                           ## Site clustering (some sites have better discharge planning)
+                           site_complication_effect[as.character(site)] * 0.7 +
+                           
+                           rnorm(n, 0, 0.15))
     
     readmission_30d <- factor(ifelse(runif(n) < readmit_prob, "Yes", "No"),
                               levels = c("No", "Yes"))
