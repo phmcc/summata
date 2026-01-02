@@ -22,7 +22,7 @@ mixed effects models, stratification, and clustered standard errors."><!-- mathj
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">summata</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.4</span>
       </span>
     </div>
 
@@ -381,7 +381,7 @@ extracts predictor effects:</p><ul><li><p><code>columns = "adjusted"</code>: Rep
 </ul><p><strong>Interaction Terms:</strong></p>
 <p>When <code>interactions</code> includes terms involving the predictor:</p><ul><li><p>Main effect of predictor is always reported</p></li>
 <li><p>Interaction effects are extracted and displayed with formatted names</p></li>
-<li><p>Format: "Variable (Level) * Variable (Level)" using asterisk notation</p></li>
+<li><p>Format: "Variable (Level) × Variable (Level)" using multiplication sign notation</p></li>
 <li><p>Useful for testing effect modification (e.g., does treatment effect
     differ by sex?)</p></li>
 </ul><p><strong>Mixed Effects Models:</strong></p>
@@ -684,12 +684,12 @@ extracts predictor effects:</p><ul><li><p><code>columns = "adjusted"</code>: Rep
 <span class="r-out co"><span class="r-pr">#&gt;</span>                &lt;char&gt;                                &lt;char&gt; &lt;char&gt; &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1: Surgical Resection              Treatment Group (Drug A)    847    369</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2: Surgical Resection              Treatment Group (Drug B)    847    369</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3: Surgical Resection Treatment Group (Drug A) * Sex (Male)    847    369</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4: Surgical Resection Treatment Group (Drug B) * Sex (Male)    847    369</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3: Surgical Resection Treatment Group (Drug A) × Sex (Male)    847    369</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4: Surgical Resection Treatment Group (Drug B) × Sex (Male)    847    369</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5:        Death Event              Treatment Group (Drug A)    847    626</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6:        Death Event              Treatment Group (Drug B)    847    626</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7:        Death Event Treatment Group (Drug A) * Sex (Male)    847    626</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8:        Death Event Treatment Group (Drug B) * Sex (Male)    847    626</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7:        Death Event Treatment Group (Drug A) × Sex (Male)    847    626</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8:        Death Event Treatment Group (Drug B) × Sex (Male)    847    626</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        aOR (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              &lt;char&gt;  &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1: 2.02 (1.17-3.49)   0.012</span>
@@ -700,7 +700,7 @@ extracts predictor effects:</p><ul><li><p><code>columns = "adjusted"</code>: Rep
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6: 0.93 (0.50-1.73)   0.829</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 7: 1.23 (0.51-2.97)   0.652</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8: 0.99 (0.40-2.43)   0.982</span>
-<span class="r-in"><span><span class="co"># Shows main effects and interaction terms with * notation</span></span></span>
+<span class="r-in"><span><span class="co"># Shows main effects and interaction terms with × notation</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 9: Linear model for continuous outcomes</span></span></span>
 <span class="r-in"><span><span class="va">linear_result</span> <span class="op">&lt;-</span> <span class="fu">multifit</span><span class="op">(</span></span></span>
@@ -1594,7 +1594,8 @@ extracts predictor effects:</p><ul><li><p><code>columns = "adjusted"</code>: Rep
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">surgery_model</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> stats::glm(formula = adj_formula, family = family, data = .data)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> stats::glm(formula = adj_formula, family = family, data = .data, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     model = keep_models, x = FALSE, y = TRUE)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                 Estimate Std. Error z value Pr(&gt;|z|)    </span>

@@ -21,7 +21,7 @@ multivariable models automatically."><!-- mathjax --><script src="https://cdnjs.
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">summata</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.4</span>
       </span>
     </div>
 
@@ -439,8 +439,8 @@ parameters.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4:                                         Drug B    362    291</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5:                                    Sex  Female    450    324</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6:                                           Male    400    304</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7: Age (years) * Treatment Group (Drug A)       -    292    183</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8: Age (years) * Treatment Group (Drug B)       -    362    291</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7: Age (years) × Treatment Group (Drug A)       -    292    183</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8: Age (years) × Treatment Group (Drug B)       -    362    291</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         aOR (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               &lt;char&gt;  &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1:  1.04 (1.01-1.08)   0.007</span>
@@ -1266,25 +1266,24 @@ parameters.</p></dd>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>non-integer x = 24.200000</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>non-integer x = 20.200000</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>non-integer x = 20.100000</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>16595.900000 (type 'double') at RHS position 1 out-of-range(NA) or truncated (precision lost) when assigning to type 'integer' (column 5 named 'events')</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">poisson_model</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Poisson Model</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formula: los_days ~ age + treatment + surgery + stage</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> N = 827, Events = 16595</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> N = 827, Events = 16595.9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               Variable   Group      n   Events     aRR (95% CI) p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 &lt;char&gt;  &lt;char&gt; &lt;char&gt;   &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1:        Age (years)       -    827 16,595.0 1.01 (1.01-1.01) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2:    Treatment Group Control    196  3,671.5        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3:                     Drug A    292  5,296.3 0.93 (0.89-0.97)   0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  4:                     Drug B    362  7,678.3 1.15 (1.10-1.20) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  5: Surgical Resection      No    480  9,107.8        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6:                        Yes    370  7,538.3 1.18 (1.14-1.22) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  7:      Disease Stage       I    211  3,830.1        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  8:                         II    264  5,100.3 1.07 (1.03-1.12)   0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  9:                        III    240  4,965.6 1.17 (1.12-1.22) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10:                         IV    132  2,699.9 1.24 (1.18-1.30) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               Variable   Group      n Events     aRR (95% CI) p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1:        Age (years)       -    827 16,596 1.01 (1.01-1.01) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:    Treatment Group Control    196  3,672        reference       -</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:                     Drug A    292  5,296 0.93 (0.89-0.97)   0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:                     Drug B    362  7,678 1.15 (1.10-1.20) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5: Surgical Resection      No    480  9,108        reference       -</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:                        Yes    370  7,538 1.18 (1.14-1.22) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:      Disease Stage       I    211  3,830        reference       -</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:                         II    264  5,100 1.07 (1.03-1.12)   0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:                        III    240  4,966 1.17 (1.12-1.22) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:                         IV    132  2,700 1.24 (1.18-1.30) &lt; 0.001</span>
 <span class="r-in"><span><span class="co"># Returns rate ratios (RR/aRR)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 9: Access the underlying fitted model</span></span></span>
@@ -1354,7 +1353,7 @@ parameters.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    null_deviance df_residual c_statistic hoslem_chi2  hoslem_p variable  group</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            &lt;num&gt;       &lt;int&gt;       &lt;num&gt;       &lt;num&gt;     &lt;num&gt;   &lt;char&gt; &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1:      964.8505         834   0.6444506    12.25408 0.1402226      age       </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:      964.8505         834   0.6444506    12.25408 0.1402226      sex Female</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:      964.8505          NA   0.6444506          NA        NA      sex Female</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3:      964.8505         834   0.6444506    12.25408 0.1402226      sex   Male</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4:      964.8505         834   0.6444506    12.25408 0.1402226      bmi       </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    n_group events_group reference    sig sig_binary</span>
@@ -1388,9 +1387,9 @@ parameters.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  5:                                         Drug A    292    183</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  6:                                         Drug B    362    291</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  7:                Body Mass Index (kg/m²)       -    838    618</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  8: Age (years) * Treatment Group (Drug A)       -    292    183</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  9: Age (years) * Treatment Group (Drug B)       -    362    291</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10:   Sex (Male) * Body Mass Index (kg/m²)       -    400    304</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8: Age (years) × Treatment Group (Drug A)       -    292    183</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9: Age (years) × Treatment Group (Drug B)       -    362    291</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:   Sex (Male) × Body Mass Index (kg/m²)       -    400    304</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          aOR (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                &lt;char&gt;  &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  1:  1.04 (1.01-1.08)   0.006</span>

@@ -6,6 +6,7 @@
 <url><loc>/index.html</loc></url>
 <url><loc>/news/index.html</loc></url>
 <url><loc>/reference/add_header_padding.html</loc></url>
+<url><loc>/reference/add_pvalue_column.html</loc></url>
 <url><loc>/reference/add_raw_stats.html</loc></url>
 <url><loc>/reference/add_variable_padding.html</loc></url>
 <url><loc>/reference/apply_zebra_stripes_ft.html</loc></url>
@@ -38,6 +39,7 @@
 <url><loc>/reference/desctable.html</loc></url>
 <url><loc>/reference/detect_model_type.html</loc></url>
 <url><loc>/reference/detect_model_type_auto.html</loc></url>
+<url><loc>/reference/detect_outcome_type.html</loc></url>
 <url><loc>/reference/determine_alignment.html</loc></url>
 <url><loc>/reference/determine_effect_type.html</loc></url>
 <url><loc>/reference/extract_coxme_metrics.html</loc></url>
@@ -62,11 +64,14 @@
 <url><loc>/reference/format_model_table.html</loc></url>
 <url><loc>/reference/format_multifit_table.html</loc></url>
 <url><loc>/reference/format_num.html</loc></url>
+<url><loc>/reference/format_pvalue_survtable.html</loc></url>
 <url><loc>/reference/format_pvalues_desctable.html</loc></url>
 <url><loc>/reference/format_pvalues_export_html.html</loc></url>
 <url><loc>/reference/format_pvalues_export_tex.html</loc></url>
 <url><loc>/reference/format_pvalues_fit.html</loc></url>
 <url><loc>/reference/format_pvalues_multifit.html</loc></url>
+<url><loc>/reference/format_quantile_cells_vectorized.html</loc></url>
+<url><loc>/reference/format_survival_cells_vectorized.html</loc></url>
 <url><loc>/reference/fullfit.html</loc></url>
 <url><loc>/reference/get_event_variable.html</loc></url>
 <url><loc>/reference/get_model_data.html</loc></url>
@@ -78,6 +83,7 @@
 <url><loc>/reference/identify_variable_groups.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
 <url><loc>/reference/is_multifit_result.html</loc></url>
+<url><loc>/reference/is_surv_outcome.html</loc></url>
 <url><loc>/reference/is_uniscreen_result.html</loc></url>
 <url><loc>/reference/lmforest.html</loc></url>
 <url><loc>/reference/m2dt.html</loc></url>
@@ -88,17 +94,22 @@
 <url><loc>/reference/parse_term.html</loc></url>
 <url><loc>/reference/perform_categorical_test.html</loc></url>
 <url><loc>/reference/perform_continuous_test.html</loc></url>
+<url><loc>/reference/perform_survival_test.html</loc></url>
 <url><loc>/reference/print.compfit_result.html</loc></url>
 <url><loc>/reference/print.fit_result.html</loc></url>
 <url><loc>/reference/print.fullfit_result.html</loc></url>
 <url><loc>/reference/print.multifit_result.html</loc></url>
+<url><loc>/reference/print.survtable.html</loc></url>
 <url><loc>/reference/print.table2docx_result.html</loc></url>
 <url><loc>/reference/print.table2pptx_result.html</loc></url>
 <url><loc>/reference/print.table2rtf_result.html</loc></url>
 <url><loc>/reference/print.uniscreen_result.html</loc></url>
 <url><loc>/reference/process_categorical.html</loc></url>
 <url><loc>/reference/process_continuous.html</loc></url>
+<url><loc>/reference/process_single_outcome.html</loc></url>
 <url><loc>/reference/process_survival.html</loc></url>
+<url><loc>/reference/process_survival_probs.html</loc></url>
+<url><loc>/reference/process_survival_times.html</loc></url>
 <url><loc>/reference/process_table_for_flextable.html</loc></url>
 <url><loc>/reference/process_variable.html</loc></url>
 <url><loc>/reference/reorder_total_column.html</loc></url>
@@ -106,6 +117,7 @@
 <url><loc>/reference/safe_round.html</loc></url>
 <url><loc>/reference/sanitize_for_latex.html</loc></url>
 <url><loc>/reference/summata-imports.html</loc></url>
+<url><loc>/reference/survtable.html</loc></url>
 <url><loc>/reference/table2docx.html</loc></url>
 <url><loc>/reference/table2html.html</loc></url>
 <url><loc>/reference/table2pdf.html</loc></url>
@@ -114,5 +126,9 @@
 <url><loc>/reference/table2tex.html</loc></url>
 <url><loc>/reference/uniforest.html</loc></url>
 <url><loc>/reference/uniscreen.html</loc></url>
+<url><loc>/reference/validate_fit_inputs.html</loc></url>
+<url><loc>/reference/validate_model_outcome.html</loc></url>
+<url><loc>/reference/validate_outcome_exists.html</loc></url>
+<url><loc>/reference/validate_predictors_exist.html</loc></url>
 </urlset>
 

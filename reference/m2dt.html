@@ -20,7 +20,7 @@ function used internally by other fullfit functions."><!-- mathjax --><script sr
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">summata</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.4</span>
       </span>
     </div>
 
@@ -271,9 +271,9 @@ forest plot visualization</p></div>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;num&gt;         &lt;num&gt;       &lt;int&gt;       &lt;num&gt;       &lt;num&gt;      &lt;num&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1: 911.2366      976.2826         845   0.6755824    13.77077 0.08793943</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2: 911.2366      976.2826         845   0.6755824    13.77077 0.08793943</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3: 911.2366      976.2826         845   0.6755824    13.77077 0.08793943</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3: 911.2366      976.2826          NA   0.6755824          NA         NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4: 911.2366      976.2826         845   0.6755824    13.77077 0.08793943</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5: 911.2366      976.2826         845   0.6755824    13.77077 0.08793943</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5: 911.2366      976.2826          NA   0.6755824          NA         NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6: 911.2366      976.2826         845   0.6755824    13.77077 0.08793943</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 7: 911.2366      976.2826         845   0.6755824    13.77077 0.08793943</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       variable   group n_group events_group reference    sig sig_binary</span>
@@ -292,7 +292,7 @@ forest plot visualization</p></div>
 <span class="r-in"><span><span class="va">lm_result</span> <span class="op">&lt;-</span> <span class="fu">m2dt</span><span class="op">(</span><span class="va">clintrial</span>, <span class="va">lm_model</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">lm_result</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      model_scope model_type        term     n events coefficient         se</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           &lt;char&gt;     &lt;char&gt;      &lt;char&gt; &lt;int&gt;  &lt;int&gt;       &lt;num&gt;      &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           &lt;char&gt;     &lt;char&gt;      &lt;char&gt; &lt;int&gt;  &lt;num&gt;       &lt;num&gt;      &lt;num&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1: Multivariable     Linear (Intercept)   830     NA  10.1480443 0.87333008</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2: Multivariable     Linear         age   830     NA   0.1487493 0.01344942</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3: Multivariable     Linear   sexFemale   450     NA   0.0000000         NA</span>
@@ -303,25 +303,25 @@ forest plot visualization</p></div>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         &lt;num&gt;      &lt;num&gt;      &lt;num&gt;      &lt;num&gt;     &lt;num&gt;      &lt;num&gt;       &lt;num&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1: 10.1480443  8.4363488 11.8597399 10.1480443 8.4363488 11.8597399  10.1480443</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2:  0.1487493  0.1223889  0.1751097  0.1487493 0.1223889  0.1751097   0.1487493</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:  0.0000000         NA         NA  1.0000000        NA         NA   0.9071448</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:  0.0000000         NA         NA  1.0000000        NA         NA   0.0000000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4:  0.9071448  0.2927376  1.5215520  0.9071448 0.2927376  1.5215520   0.9071448</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5:  0.0000000         NA         NA  1.0000000        NA         NA   1.3070747</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:  0.0000000         NA         NA  1.0000000        NA         NA   0.0000000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6:  1.3070747  0.6778951  1.9362543  1.3070747 0.6778951  1.9362543   1.3070747</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     ci_lower   ci_upper statistic      p_value        R2    adj_R2      AIC</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;num&gt;      &lt;num&gt;     &lt;num&gt;        &lt;num&gt;     &lt;num&gt;     &lt;num&gt;    &lt;num&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1: 8.4363488 11.8597399 11.619941 5.128976e-29 0.1392244 0.1360981 4859.439</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2: 0.1223889  0.1751097 11.059904 1.302192e-26 0.1392244 0.1360981 4859.439</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3: 0.2927376  1.5215520        NA           NA 0.1392244 0.1360981 4859.439</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:        NA         NA        NA           NA        NA        NA 4859.439</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4: 0.2927376  1.5215520  2.893799 3.906286e-03 0.1392244 0.1360981 4859.439</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5: 0.6778951  1.9362543        NA           NA 0.1392244 0.1360981 4859.439</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:        NA         NA        NA           NA        NA        NA 4859.439</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6: 0.6778951  1.9362543  4.071682 5.116365e-05 0.1392244 0.1360981 4859.439</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         BIC    sigma df_residual    variable  group n_group events_group</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;num&gt;    &lt;num&gt;       &lt;int&gt;      &lt;char&gt; &lt;char&gt;   &lt;num&gt;        &lt;num&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1: 4883.046 4.503368         826 (Intercept)             NA           NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2: 4883.046 4.503368         826         age             NA           NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3: 4883.046 4.503368         826         sex Female     450           NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3: 4883.046       NA          NA         sex Female     450           NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4: 4883.046 4.503368         826         sex   Male     400           NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5: 4883.046 4.503368         826     surgery     No     480           NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5: 4883.046       NA          NA     surgery     No     480           NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6: 4883.046 4.503368         826     surgery    Yes     370           NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    reference    sig sig_binary</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt; &lt;char&gt;     &lt;lgcl&gt;</span>
@@ -360,36 +360,36 @@ forest plot visualization</p></div>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    ci_lower ci_upper statistic      p_value concordance concordance_se</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;num&gt;    &lt;num&gt;     &lt;num&gt;        &lt;num&gt;       &lt;num&gt;          &lt;num&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1: 1.020435 1.034569  7.724146 1.126058e-14   0.6468413     0.01122331</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:       NA       NA        NA           NA   0.6468413     0.01122331</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:       NA       NA        NA           NA          NA             NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3: 1.058481 1.451296  2.665833 7.679794e-03   0.6468413     0.01122331</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:       NA       NA        NA           NA   0.6468413     0.01122331</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:       NA       NA        NA           NA          NA             NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5: 1.030240 1.613450  2.220297 2.639861e-02   0.6468413     0.01122331</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6: 1.489493 2.327257  5.459845 4.765497e-08   0.6468413     0.01122331</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 7: 2.360083 3.914559  8.612114 7.172557e-18   0.6468413     0.01122331</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          rsq   rsq_max likelihood_ratio_test likelihood_ratio_df</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;num&gt;     &lt;num&gt;                 &lt;num&gt;               &lt;num&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1: 0.1518056 0.9998915              139.4547                   5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2: 0.1518056 0.9998915              139.4547                   5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: 0.1518056        NA                    NA                  NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3: 0.1518056 0.9998915              139.4547                   5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4: 0.1518056 0.9998915              139.4547                   5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4: 0.1518056        NA                    NA                  NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5: 0.1518056 0.9998915              139.4547                   5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6: 0.1518056 0.9998915              139.4547                   5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 7: 0.1518056 0.9998915              139.4547                   5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    likelihood_ratio_p wald_test wald_df       wald_p score_test score_df</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                 &lt;num&gt;     &lt;num&gt;   &lt;num&gt;        &lt;num&gt;      &lt;num&gt;    &lt;num&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1:       2.336561e-28    143.13       5 3.872633e-29   147.2262        5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:       2.336561e-28    143.13       5 3.872633e-29   147.2262        5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:                 NA        NA      NA           NA         NA       NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3:       2.336561e-28    143.13       5 3.872633e-29   147.2262        5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:       2.336561e-28    143.13       5 3.872633e-29   147.2262        5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                 NA        NA      NA           NA         NA       NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5:       2.336561e-28    143.13       5 3.872633e-29   147.2262        5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6:       2.336561e-28    143.13       5 3.872633e-29   147.2262        5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 7:       2.336561e-28    143.13       5 3.872633e-29   147.2262        5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         score_p variable  group n_group events_group reference    sig</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           &lt;num&gt;   &lt;char&gt; &lt;char&gt;   &lt;num&gt;        &lt;num&gt;    &lt;char&gt; &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1: 5.198291e-30      age             NA           NA              ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2: 5.198291e-30      sex Female     450          324 reference       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:           NA      sex Female     450          324 reference       </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3: 5.198291e-30      sex   Male     400          304               **</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4: 5.198291e-30    stage      I     211          131 reference       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:           NA    stage      I     211          131 reference       </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5: 5.198291e-30    stage     II     264          184                *</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6: 5.198291e-30    stage    III     240          194              ***</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 7: 5.198291e-30    stage     IV     132          117              ***</span>
@@ -433,9 +433,9 @@ forest plot visualization</p></div>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    deviance null_deviance df_residual c_statistic hoslem_chi2   hoslem_p</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;num&gt;         &lt;num&gt;       &lt;int&gt;       &lt;num&gt;       &lt;num&gt;      &lt;num&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1: 911.2366      976.2826         845   0.6755824    13.77077 0.08793943</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2: 911.2366      976.2826         845   0.6755824    13.77077 0.08793943</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: 911.2366      976.2826          NA   0.6755824          NA         NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3: 911.2366      976.2826         845   0.6755824    13.77077 0.08793943</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4: 911.2366      976.2826         845   0.6755824    13.77077 0.08793943</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4: 911.2366      976.2826          NA   0.6755824          NA         NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5: 911.2366      976.2826         845   0.6755824    13.77077 0.08793943</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6: 911.2366      976.2826         845   0.6755824    13.77077 0.08793943</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     variable   group n_group events_group reference    sig sig_binary</span>
@@ -481,9 +481,9 @@ forest plot visualization</p></div>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;num&gt;         &lt;num&gt;       &lt;int&gt;       &lt;num&gt;       &lt;num&gt;      &lt;num&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1: 911.2366      976.2826         845   0.6755824    13.77077 0.08793943</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2: 911.2366      976.2826         845   0.6755824    13.77077 0.08793943</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3: 911.2366      976.2826         845   0.6755824    13.77077 0.08793943</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3: 911.2366      976.2826          NA   0.6755824          NA         NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4: 911.2366      976.2826         845   0.6755824    13.77077 0.08793943</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5: 911.2366      976.2826         845   0.6755824    13.77077 0.08793943</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5: 911.2366      976.2826          NA   0.6755824          NA         NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6: 911.2366      976.2826         845   0.6755824    13.77077 0.08793943</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 7: 911.2366      976.2826         845   0.6755824    13.77077 0.08793943</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       variable   group n_group events_group reference    sig sig_binary</span>
