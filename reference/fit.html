@@ -21,7 +21,7 @@ multivariable models automatically."><!-- mathjax --><script src="https://cdnjs.
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">summata</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.10.0</span>
       </span>
     </div>
 
@@ -333,7 +333,21 @@ parameters.</p></dd>
 <li><p><strong>Cox</strong> (<code>model_type = "coxph"</code>): Hazard ratios (HR/aHR)</p></li>
 <li><p><strong>Poisson</strong> (<code>family = "poisson"</code>): Rate ratios (RR/aRR)</p></li>
 <li><p><strong>Linear</strong>: Raw coefficient estimates</p></li>
-</ul></div>
+</ul><p><strong>Confidence Intervals:</strong></p>
+<p>Confidence intervals are computed using the Wald method:
+$$\hat{\beta} \pm z_{1-\alpha/2} \times \mathrm{SE}(\hat{\beta})$$</p>
+<p>This is the standard approach for GLM, Cox, and mixed-effects regression,
+and is appropriate for standard sample sizes. The Wald interval is computed
+directly from the coefficient and standard error, avoiding redundant matrix
+operations.</p>
+<p>For small samples, sparse data, or parameters near boundary values, profile
+likelihood confidence intervals may be preferred. These can be obtained from
+the underlying model object:</p>
+<div class="sourceCode"><pre><code><span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span><span class="va">data</span>, <span class="va">outcome</span>, <span class="va">predictors</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">result</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+
+    </div>
     <div id="see-also">
     <h2>See also</h2>
     <div class="dont-index"><p><code><a href="uniscreen.html">uniscreen</a></code> for univariable screening of multiple predictors,

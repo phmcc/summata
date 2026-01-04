@@ -22,7 +22,7 @@ mixed effects models, stratification, and clustered standard errors."><!-- mathj
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">summata</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.10.0</span>
       </span>
     </div>
 
@@ -402,7 +402,24 @@ extracts predictor effects:</p><ul><li><p><code>columns = "adjusted"</code>: Rep
 <li><p>For factor predictors, outcome is kept if any level is significant</p></li>
 <li><p>Useful for focusing on significant associations in exploratory analyses</p></li>
 <li><p>Default is 1 (no filtering) - recommended for confirmatory analyses</p></li>
-</ul><p><strong>Effect Measures by Model Type:</strong></p><ul><li><p><strong>Logistic</strong> (<code>model_type = "glm"</code>, <code>family = "binomial"</code>):
+</ul><p><strong>Outcome Homogeneity:</strong></p>
+<p>All outcomes in a single <code>multifit()</code> call should be of the same type
+(all binary, all continuous, or all survival). Mixing outcome types produces
+tables with incompatible effect measures (e.g., odds ratios alongside regression
+coefficients), which can mislead readers. The function validates outcome
+compatibility and issues a warning when mixed types are detected.</p>
+<p>For analyses involving multiple outcome types, run separate <code>multifit()</code>
+calls for each type:</p>
+<div class="sourceCode"><pre><code><span></span>
+<span><span class="co"># Binary outcomes</span></span>
+<span><span class="va">binary_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/multifit.html">multifit</a></span><span class="op">(</span><span class="va">data</span>, outcomes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"death"</span>, <span class="st">"readmission"</span><span class="op">)</span>,</span>
+<span>                           predictor <span class="op">=</span> <span class="st">"treatment"</span>, model_type <span class="op">=</span> <span class="st">"glm"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Continuous outcomes</span></span>
+<span><span class="va">continuous_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/multifit.html">multifit</a></span><span class="op">(</span><span class="va">data</span>, outcomes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"los_days"</span>, <span class="st">"cost"</span><span class="op">)</span>,</span>
+<span>                               predictor <span class="op">=</span> <span class="st">"treatment"</span>, model_type <span class="op">=</span> <span class="st">"lm"</span><span class="op">)</span></span></code></pre></div>
+
+<p><strong>Effect Measures by Model Type:</strong></p><ul><li><p><strong>Logistic</strong> (<code>model_type = "glm"</code>, <code>family = "binomial"</code>):
     Odds ratios (OR/aOR)</p></li>
 <li><p><strong>Cox</strong> (<code>model_type = "coxph"</code>): Hazard ratios (HR/aHR)</p></li>
 <li><p><strong>Poisson</strong> (<code>model_type = "glm"</code>, <code>family = "poisson"</code>):
@@ -585,12 +602,12 @@ extracts predictor effects:</p><ul><li><p><code>columns = "adjusted"</code>: Rep
 <span class="r-out co"><span class="r-pr">#&gt;</span> Covariates: age, sex, stage</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Display: adjusted</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                      Outcome                Predictor      n Events</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       &lt;char&gt;                   &lt;char&gt; &lt;char&gt; &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: Progression-Free Survival Treatment Group (Drug A)    739    739</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2: Progression-Free Survival Treatment Group (Drug B)    739    739</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:          Overall Survival Treatment Group (Drug A)    626    626</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:          Overall Survival Treatment Group (Drug B)    626    626</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                               Outcome                Predictor      n Events</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                &lt;char&gt;                   &lt;char&gt; &lt;char&gt; &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1: Progression-Free Survival (months) Treatment Group (Drug A)    739    739</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: Progression-Free Survival (months) Treatment Group (Drug B)    739    739</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:          Overall Survival (months) Treatment Group (Drug A)    626    626</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:          Overall Survival (months) Treatment Group (Drug B)    626    626</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        aHR (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              &lt;char&gt;  &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1: 0.59 (0.48-0.71) &lt; 0.001</span>
@@ -620,14 +637,14 @@ extracts predictor effects:</p><ul><li><p><code>columns = "adjusted"</code>: Rep
 <span class="r-out co"><span class="r-pr">#&gt;</span> Strata: site</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Display: adjusted</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             Outcome                Predictor      n Events     aHR (95% CI)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              &lt;char&gt;                   &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: Overall Survival Treatment Group (Drug A)    628    628 0.68 (0.54-0.84)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2: Overall Survival Treatment Group (Drug B)    628    628 1.21 (0.99-1.48)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:   0.057</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                      Outcome                Predictor      n Events</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                       &lt;char&gt;                   &lt;char&gt; &lt;char&gt; &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1: Overall Survival (months) Treatment Group (Drug A)    628    628</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: Overall Survival (months) Treatment Group (Drug B)    628    628</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        aHR (95% CI) p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              &lt;char&gt;  &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1: 0.68 (0.54-0.84) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: 1.21 (0.99-1.48)   0.057</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 7: Cox with clustered standard errors</span></span></span>
 <span class="r-in"><span><span class="va">cox_cluster</span> <span class="op">&lt;-</span> <span class="fu">multifit</span><span class="op">(</span></span></span>
@@ -650,14 +667,14 @@ extracts predictor effects:</p><ul><li><p><code>columns = "adjusted"</code>: Rep
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cluster: site</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Display: adjusted</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             Outcome                Predictor      n Events     aHR (95% CI)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              &lt;char&gt;                   &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: Overall Survival Treatment Group (Drug A)    626    626 0.61 (0.49-0.75)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2: Overall Survival Treatment Group (Drug B)    626    626 1.04 (0.85-1.27)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:   0.004</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:   0.757</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                      Outcome                Predictor      n Events</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                       &lt;char&gt;                   &lt;char&gt; &lt;char&gt; &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1: Overall Survival (months) Treatment Group (Drug A)    626    626</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: Overall Survival (months) Treatment Group (Drug B)    626    626</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        aHR (95% CI) p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              &lt;char&gt;  &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1: 0.61 (0.49-0.75)   0.004</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: 1.04 (0.85-1.27)   0.757</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 8: Interaction between predictor and covariate</span></span></span>
 <span class="r-in"><span><span class="co"># Test if treatment effect differs by sex</span></span></span>

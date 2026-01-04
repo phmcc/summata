@@ -20,7 +20,7 @@ a single outcome."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/aja
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">summata</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.10.0</span>
       </span>
     </div>
 
@@ -76,6 +76,7 @@ a single outcome.</p>
 <span>  show_n <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  show_events <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  indent_groups <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  condense_table <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  bold_variables <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  center_padding <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>  zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -180,6 +181,13 @@ based on model type (TRUE for binomial/survival, FALSE for linear).</p></dd>
 <dd><p>Logical. If <code>TRUE</code>, indents factor levels
 under their parent variable name, creating a hierarchical display. If
 <code>FALSE</code> (default), shows variable and level in separate columns.</p></dd>
+
+
+<dt id="arg-condense-table">condense_table<a class="anchor" aria-label="anchor" href="#arg-condense-table"></a></dt>
+<dd><p>Logical. If <code>TRUE</code>, condenses binary categorical
+variables into single rows by showing only the non-reference category.
+Automatically sets <code>indent_groups = TRUE</code>. Useful for tables with
+many binary variables. Default is <code>FALSE</code>.</p></dd>
 
 
 <dt id="arg-bold-variables">bold_variables<a class="anchor" aria-label="anchor" href="#arg-bold-variables"></a></dt>
