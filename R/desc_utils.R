@@ -381,7 +381,9 @@ format_num <- function(x, fmt_str) {
     if (abs(x) >= 1000) {
         format(round(x, 1), big.mark = ",")
     } else {
-        sprintf(fmt_str, x)
+        result <- sprintf(fmt_str, x)
+        ## Fix negative zero: "-0.0", "-0.00", etc. -> "0.0", "0.00"
+        gsub("(?<![0-9])-0(\\.0+)(?![0-9])", "0\\1", result, perl = TRUE)
     }
 }
 

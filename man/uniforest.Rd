@@ -21,6 +21,7 @@ uniforest(
   show_n = TRUE,
   show_events = NULL,
   indent_groups = FALSE,
+  condense_table = FALSE,
   bold_variables = FALSE,
   center_padding = 4,
   zebra_stripes = TRUE,
@@ -90,6 +91,11 @@ based on model type (TRUE for binomial/survival, FALSE for linear).}
 \item{indent_groups}{Logical. If \code{TRUE}, indents factor levels
 under their parent variable name, creating a hierarchical display. If 
 \code{FALSE} (default), shows variable and level in separate columns.}
+
+\item{condense_table}{Logical. If \code{TRUE}, condenses binary categorical 
+variables into single rows by showing only the non-reference category. 
+Automatically sets \code{indent_groups = TRUE}. Useful for tables with 
+many binary variables. Default is \code{FALSE}.}
 
 \item{bold_variables}{Logical. If \code{TRUE}, variable names are displayed
 in bold. If \code{FALSE} (default), variable names are displayed in plain

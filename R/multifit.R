@@ -276,6 +276,27 @@
 #'   \item Default is 1 (no filtering) - recommended for confirmatory analyses
 #' }
 #' 
+#' \strong{Outcome Homogeneity:}
+#' 
+#' All outcomes in a single \code{multifit()} call should be of the same type
+#' (all binary, all continuous, or all survival). Mixing outcome types produces
+#' tables with incompatible effect measures (e.g., odds ratios alongside regression
+#' coefficients), which can mislead readers. The function validates outcome
+#' compatibility and issues a warning when mixed types are detected.
+#' 
+#' For analyses involving multiple outcome types, run separate \code{multifit()}
+#' calls for each type:
+#' 
+#' \preformatted{
+#' # Binary outcomes
+#' binary_results <- multifit(data, outcomes = c("death", "readmission"),
+#'                            predictor = "treatment", model_type = "glm")
+#' 
+#' # Continuous outcomes
+#' continuous_results <- multifit(data, outcomes = c("los_days", "cost"),
+#'                                predictor = "treatment", model_type = "lm")
+#' }
+#' 
 #' \strong{Effect Measures by Model Type:}
 #' \itemize{
 #'   \item \strong{Logistic} (\code{model_type = "glm"}, \code{family = "binomial"}): 
@@ -629,6 +650,9 @@ multifit <- function(data,
              } else {
                  data.table::as.data.table(data)
              }
+    
+    ## Validate outcome homogeneity
+    validate_outcome_homogeneity(.data, outcomes, model_type, family)
     
     ## Determine if predictor is a factor (for handling multiple levels)
     is_factor_predictor <- is.factor(.data[[predictor]]) || 
@@ -1445,11 +1469,11 @@ format_multifit_table <- function(data,
             unadj_label <- paste0(effect_display, " (95% CI)")
             
             if (effect_type %in% c("OR", "HR", "RR")) {
-                result[, (unadj_label) := sprintf("%.*f (%.*f-%.*f)", 
-                                                  digits, exp_coef_unadj, digits, ci_lower_unadj, digits, ci_upper_unadj)]
+                result[, (unadj_label) := fix_negative_zero_multifit(sprintf("%.*f (%.*f-%.*f)", 
+                                                  digits, exp_coef_unadj, digits, ci_lower_unadj, digits, ci_upper_unadj))]
             } else {
-                result[, (unadj_label) := sprintf("%.*f (%.*f, %.*f)", 
-                                                  digits, exp_coef_unadj, digits, ci_lower_unadj, digits, ci_upper_unadj)]
+                result[, (unadj_label) := fix_negative_zero_multifit(sprintf("%.*f (%.*f, %.*f)", 
+                                                  digits, exp_coef_unadj, digits, ci_lower_unadj, digits, ci_upper_unadj))]
             }
             result[is.na(exp_coef_unadj), (unadj_label) := "-"]
         }
@@ -1470,11 +1494,11 @@ format_multifit_table <- function(data,
             adj_label <- paste0(adj_effect, " (95% CI)")
             
             if (effect_type %in% c("OR", "HR", "RR")) {
-                result[, (adj_label) := sprintf("%.*f (%.*f-%.*f)", 
-                                                digits, exp_coef_adj, digits, ci_lower_adj, digits, ci_upper_adj)]
+                result[, (adj_label) := fix_negative_zero_multifit(sprintf("%.*f (%.*f-%.*f)", 
+                                                digits, exp_coef_adj, digits, ci_lower_adj, digits, ci_upper_adj))]
             } else {
-                result[, (adj_label) := sprintf("%.*f (%.*f, %.*f)", 
-                                                digits, exp_coef_adj, digits, ci_lower_adj, digits, ci_upper_adj)]
+                result[, (adj_label) := fix_negative_zero_multifit(sprintf("%.*f (%.*f, %.*f)", 
+                                                digits, exp_coef_adj, digits, ci_lower_adj, digits, ci_upper_adj))]
             }
             result[is.na(exp_coef_adj), (adj_label) := "-"]
         }
@@ -1512,11 +1536,11 @@ format_multifit_table <- function(data,
         ## Format effect with CI
         if (effect_col %in% names(result)) {
             if (effect_type %in% c("OR", "HR", "RR")) {
-                result[, (effect_label) := sprintf("%.*f (%.*f-%.*f)", 
-                                                   digits, get(effect_col), digits, get(ci_lower_col), digits, get(ci_upper_col))]
+                result[, (effect_label) := fix_negative_zero_multifit(sprintf("%.*f (%.*f-%.*f)", 
+                                                   digits, get(effect_col), digits, get(ci_lower_col), digits, get(ci_upper_col)))]
             } else {
-                result[, (effect_label) := sprintf("%.*f (%.*f, %.*f)", 
-                                                   digits, get(effect_col), digits, get(ci_lower_col), digits, get(ci_upper_col))]
+                result[, (effect_label) := fix_negative_zero_multifit(sprintf("%.*f (%.*f, %.*f)", 
+                                                   digits, get(effect_col), digits, get(ci_lower_col), digits, get(ci_upper_col)))]
             }
             result[is.na(get(effect_col)), (effect_label) := "-"]
         }
@@ -1603,10 +1627,23 @@ format_pvalues_multifit <- function(p, digits = 3) {
     
     ## Vectorized formatting (faster than fcase for simple conditions)
     result <- sprintf(fmt_str, p)
+    result <- fix_negative_zero_multifit(result)
     result[is.na(p)] <- "-"
     result[!is.na(p) & p < threshold] <- less_than_string
     
     result
+}
+
+#' Fix negative zero in formatted strings
+#' 
+#' Corrects floating-point rounding artifacts that produce "-0.00" or similar
+#' negative zero strings, even when embedded within larger strings.
+#' 
+#' @param x Character vector of formatted numbers.
+#' @return Character vector with negative zeros corrected.
+#' @keywords internal
+fix_negative_zero_multifit <- function(x) {
+    gsub("(?<![0-9])-0(\\.0+)(?![0-9])", "0\\1", x, perl = TRUE)
 }
 
 
@@ -1653,4 +1690,113 @@ print.multifit_result <- function(x, ...) {
     cat("\n")
     NextMethod("print", x)
     invisible(x)
+}
+
+
+#' Validate outcome homogeneity for multifit
+#' 
+#' Checks whether all outcomes in a multifit analysis are compatible with the
+#' specified model type. Issues a warning when outcomes appear to be of mixed
+#' types (e.g., binary and continuous outcomes in the same analysis), which
+#' would produce tables with incompatible effect measures.
+#' 
+#' @param data Data.table containing the analysis data.
+#' @param outcomes Character vector of outcome variable names.
+#' @param model_type Character string specifying the model type.
+#' @param family Character string specifying the GLM family (for glm/glmer).
+#' @return Invisible NULL. Issues warnings if problems are detected.
+#' @keywords internal
+validate_outcome_homogeneity <- function(data, outcomes, model_type, family = "binomial") {
+    
+    ## Skip validation for survival outcomes (Surv() syntax)
+    is_surv <- grepl("^Surv\\(", outcomes)
+    if (all(is_surv)) return(invisible(NULL))
+    if (any(is_surv) && !all(is_surv)) {
+        warning("Mixed survival and non-survival outcomes detected. ",
+                "Consider separate multifit() calls for each outcome type.",
+                call. = FALSE)
+        return(invisible(NULL))
+    }
+    
+    ## Classify each outcome
+    outcome_types <- vapply(outcomes, function(out) {
+        if (grepl("^Surv\\(", out)) return("survival")
+        
+        vec <- data[[out]]
+        if (is.null(vec)) return("unknown")
+        
+        if (is.factor(vec) || is.character(vec)) {
+            n_levels <- length(unique(stats::na.omit(vec)))
+            if (n_levels == 2) return("binary")
+            return("categorical")
+        }
+        
+        if (is.logical(vec)) return("binary")
+        
+        if (is.numeric(vec)) {
+            unique_vals <- unique(stats::na.omit(vec))
+            if (length(unique_vals) == 2 && all(unique_vals %in% c(0, 1))) {
+                return("binary")
+            }
+            return("continuous")
+        }
+        
+        return("unknown")
+    }, character(1))
+    
+    ## Check for categorical outcomes with >2 levels (problematic for binomial GLM)
+    if (model_type %in% c("glm", "glmer") && family == "binomial") {
+        categorical_outcomes <- names(outcome_types)[outcome_types == "categorical"]
+        if (length(categorical_outcomes) > 0) {
+            warning("Categorical outcome(s) with more than 2 levels detected: ",
+                    paste(categorical_outcomes, collapse = ", "), ". ",
+                    "Binomial GLM will coerce these to binary (first level vs all others), ",
+                    "which is likely not the intended analysis. ",
+                    "Consider: (1) recoding to a true binary variable, ",
+                    "(2) using multinomial regression (nnet::multinom), ",
+                    "(3) using ordinal regression (MASS::polr) if levels are ordered, or ",
+                    "(4) removing these outcomes from the analysis.",
+                    call. = FALSE)
+        }
+    }
+    
+    ## Check for mixed types
+    known_types <- outcome_types[outcome_types != "unknown"]
+    if (length(unique(known_types)) > 1) {
+        type_summary <- table(known_types)
+        type_str <- paste(names(type_summary), type_summary, sep = ": ", collapse = ", ")
+        
+        warning("Outcomes appear to be of mixed types (", type_str, "). ",
+                "This will produce a table with incompatible effect measures ",
+                "(e.g., odds ratios alongside regression coefficients). ",
+                "Consider separate multifit() calls for each outcome type:\n",
+                "  - Binary outcomes: model_type = 'glm', family = 'binomial'\n",
+                "  - Continuous outcomes: model_type = 'lm'\n",
+                "  - Survival outcomes: model_type = 'coxph'",
+                call. = FALSE)
+    }
+    
+    ## Check for model/outcome mismatch
+    if (model_type %in% c("glm", "glmer") && family == "binomial") {
+        non_binary <- names(outcome_types)[outcome_types == "continuous"]
+        if (length(non_binary) > 0) {
+            warning("Continuous outcome(s) detected with binomial family: ",
+                    paste(non_binary, collapse = ", "), ". ",
+                    "Consider using model_type = 'lm' for continuous outcomes.",
+                    call. = FALSE)
+        }
+    }
+    
+    if (model_type %in% c("lm", "lmer")) {
+        binary_outcomes <- names(outcome_types)[outcome_types == "binary"]
+        if (length(binary_outcomes) > 0) {
+            warning("Binary outcome(s) detected with linear model: ",
+                    paste(binary_outcomes, collapse = ", "), ". ",
+                    "Consider using model_type = 'glm' with family = 'binomial' ",
+                    "for binary outcomes.",
+                    call. = FALSE)
+        }
+    }
+    
+    invisible(NULL)
 }

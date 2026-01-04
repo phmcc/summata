@@ -104,6 +104,10 @@ listing the covariates used in adjusted models. Covariate names are formatted
 using the \code{labels} parameter if provided. Only shown when displaying
 adjusted results.}
 
+\item{indent_predictor}{Logical. If \code{TRUE}, indents predictor levels
+under outcome names, creating a hierarchical display. If \code{FALSE} 
+(default), shows outcome and predictor level in separate columns.}
+
 \item{bold_variables}{Logical. If \code{TRUE}, variable names are displayed
 in bold. If \code{FALSE} (default), variable names are displayed in plain
 text.}

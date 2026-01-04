@@ -310,6 +310,27 @@ The \code{p_threshold} parameter filters results after fitting all models:
   \item Default is 1 (no filtering) - recommended for confirmatory analyses
 }
 
+\strong{Outcome Homogeneity:}
+
+All outcomes in a single \code{multifit()} call should be of the same type
+(all binary, all continuous, or all survival). Mixing outcome types produces
+tables with incompatible effect measures (e.g., odds ratios alongside regression
+coefficients), which can mislead readers. The function validates outcome
+compatibility and issues a warning when mixed types are detected.
+
+For analyses involving multiple outcome types, run separate \code{multifit()}
+calls for each type:
+
+\preformatted{
+# Binary outcomes
+binary_results <- multifit(data, outcomes = c("death", "readmission"),
+                           predictor = "treatment", model_type = "glm")
+
+# Continuous outcomes
+continuous_results <- multifit(data, outcomes = c("los_days", "cost"),
+                               predictor = "treatment", model_type = "lm")
+}
+
 \strong{Effect Measures by Model Type:}
 \itemize{
   \item \strong{Logistic} (\code{model_type = "glm"}, \code{family = "binomial"}): 

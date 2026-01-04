@@ -63,6 +63,11 @@
 #'   under their parent variable name, creating a hierarchical display. If 
 #'   \code{FALSE} (default), shows variable and level in separate columns.
 #'
+#' @param condense_table Logical. If \code{TRUE}, condenses binary categorical 
+#'   variables into single rows by showing only the non-reference category. 
+#'   Automatically sets \code{indent_groups = TRUE}. Useful for tables with 
+#'   many binary variables. Default is \code{FALSE}.
+#'
 #' @param bold_variables Logical. If \code{TRUE}, variable names are displayed
 #'   in bold. If \code{FALSE} (default), variable names are displayed in plain
 #'   text.
@@ -209,6 +214,7 @@ uniforest <- function(x,
                       show_n = TRUE,
                       show_events = NULL,
                       indent_groups = FALSE,
+                      condense_table = FALSE,
                       bold_variables = FALSE,
                       center_padding = 4,
                       zebra_stripes = TRUE,
@@ -449,30 +455,30 @@ uniforest <- function(x,
         to_show_exp_clean[, hr := data.table::fifelse(is.na(estimate), NA_real_, exp(estimate))]
         to_show_exp_clean[, hr_formatted := data.table::fifelse(
                                                             is.na(estimate), "",
-                                                            format(round(exp(estimate), digits), nsmall = digits)
+                                                            format_number(exp(estimate), digits)
                                                         )]
         to_show_exp_clean[, conf_low_formatted := data.table::fifelse(
                                                                   is.na(conf_low), "",
-                                                                  format(round(exp(conf_low), digits), nsmall = digits)
+                                                                  format_number(exp(conf_low), digits)
                                                               )]
         to_show_exp_clean[, conf_high_formatted := data.table::fifelse(
                                                                    is.na(conf_high), "",
-                                                                   format(round(exp(conf_high), digits), nsmall = digits)
+                                                                   format_number(exp(conf_high), digits)
                                                                )]
     } else {
         ## Linear scale: use raw coefficients
         to_show_exp_clean[, hr := data.table::fifelse(is.na(estimate), NA_real_, estimate)]
         to_show_exp_clean[, hr_formatted := data.table::fifelse(
                                                             is.na(estimate), "",
-                                                            format(round(estimate, digits), nsmall = digits)
+                                                            format_number(estimate, digits)
                                                         )]
         to_show_exp_clean[, conf_low_formatted := data.table::fifelse(
                                                                   is.na(conf_low), "",
-                                                                  format(round(conf_low, digits), nsmall = digits)
+                                                                  format_number(conf_low, digits)
                                                               )]
         to_show_exp_clean[, conf_high_formatted := data.table::fifelse(
                                                                    is.na(conf_high), "",
-                                                                   format(round(conf_high, digits), nsmall = digits)
+                                                                   format_number(conf_high, digits)
                                                                )]
     }
     
@@ -483,34 +489,85 @@ uniforest <- function(x,
     to_show_exp_clean[, p_formatted := data.table::fifelse(
                                                        is.na(p_value), "",
                                                        data.table::fifelse(p_value < p_threshold, p_threshold_str,
-                                                                           format(round(p_value, p_digits), nsmall = p_digits))
+                                                                           format_number(p_value, p_digits))
                                                    )]
     
+    ## Determine if ANY coefficient or CI bound is negative (only relevant for linear scale)
+    ## If so, use comma notation throughout for consistency
+    use_comma_notation <- !log_scale && any(to_show_exp_clean$conf_low < 0 | to_show_exp_clean$conf_high < 0, na.rm = TRUE)
+    ci_separator <- if (use_comma_notation) ", " else "-"
+    
     ## Create effect string with italic p
-    ## Use comma separator when CI bounds are negative (for linear models)
     to_show_exp_clean[, hr_string_expr := data.table::fifelse(
                                                           is.na(estimate) | is_reference == TRUE,
                                                           "''",
                                                           data.table::fcase(
-                                                              p_value < p_threshold & (conf_low < 0 | conf_high < 0),
-                                                              paste0("'", hr_formatted, " (", conf_low_formatted, ", ", conf_high_formatted, 
-                                                                     "); '*~italic(p)~'", p_threshold_str, "'"),
-                                                              
                                                               p_value < p_threshold,
-                                                              paste0("'", hr_formatted, " (", conf_low_formatted, "-", conf_high_formatted, 
+                                                              paste0("'", hr_formatted, " (", conf_low_formatted, ci_separator, conf_high_formatted, 
                                                                      "); '*~italic(p)~'", p_threshold_str, "'"),
                                                               
-                                                              conf_low < 0 | conf_high < 0,
-                                                              paste0("'", hr_formatted, " (", conf_low_formatted, ", ", conf_high_formatted, 
-                                                                     "); '*~italic(p)~'= ", p_formatted, "'"),
-                                                              
-                                                              default = paste0("'", hr_formatted, " (", conf_low_formatted, "-", conf_high_formatted, 
+                                                              default = paste0("'", hr_formatted, " (", conf_low_formatted, ci_separator, conf_high_formatted, 
                                                                                "); '*~italic(p)~'= ", p_formatted, "'")
                                                           )
                                                       )]
     
     ## Handle reference rows
     to_show_exp_clean[is_reference == TRUE, hr_string_expr := "'reference'"]
+    
+    ## Handle condense_table: collapse binary variables to single rows
+    if (condense_table) {
+        indent_groups <- TRUE  # condense_table implies indent_groups
+        
+        ## Identify binary predictors (exactly 2 rows)
+        predictor_counts <- to_show_exp_clean[, .N, by = predictor]
+        binary_predictors <- predictor_counts[N == 2]$predictor
+        
+        if (length(binary_predictors) > 0) {
+            ## Process each binary predictor
+            rows_to_remove <- integer()
+            
+            for (pred in binary_predictors) {
+                pred_rows <- to_show_exp_clean[predictor == pred]
+                
+                ## Find reference and non-reference rows
+                ref_idx <- which(pred_rows$is_reference == TRUE)
+                non_ref_idx <- which(pred_rows$is_reference == FALSE)
+                
+                if (length(ref_idx) == 1 && length(non_ref_idx) == 1) {
+                    ref_category <- pred_rows$level[ref_idx]
+                    non_ref_category <- pred_rows$level[non_ref_idx]
+                    
+                    ## Get label for this predictor
+                    var_label <- pred_rows$var_display[1]
+                    
+                    ## Use greedy approach to determine if we should condense
+                    if (should_condense_binary(ref_category, non_ref_category, var_label)) {
+                        ## Keep the non-reference row but update display
+                        to_show_exp_clean[predictor == pred & is_reference == FALSE, 
+                                          var_display := var_label]
+                    } else {
+                        ## Append category name
+                        to_show_exp_clean[predictor == pred & is_reference == FALSE, 
+                                          var_display := paste0(var_label, " (", non_ref_category, ")")]
+                    }
+                    
+                    ## Clear the level for condensed row
+                    to_show_exp_clean[predictor == pred & is_reference == FALSE, level := "-"]
+                    to_show_exp_clean[predictor == pred & is_reference == FALSE, level_display := "-"]
+                    
+                    ## Mark reference row for removal
+                    ref_row_idx <- which(to_show_exp_clean$predictor == pred & 
+                                         to_show_exp_clean$is_reference == TRUE)
+                    rows_to_remove <- c(rows_to_remove, ref_row_idx)
+                }
+            }
+            
+            ## Remove reference rows of binary predictors
+            if (length(rows_to_remove) > 0) {
+                to_show_exp_clean <- to_show_exp_clean[-rows_to_remove]
+            }
+        }
+    }
     
     ## Zebra stripe shading by variable
     if (zebra_stripes) {
@@ -522,7 +579,7 @@ uniforest <- function(x,
     }
     
     ## Handle indented display vs separate columns
-    if (indent_groups) {
+    if (indent_groups || condense_table) {
         ## Create combined display with variable name as header, levels indented
         ## First, identify header rows (first occurrence of each predictor)
         to_show_exp_clean[, is_header := !duplicated(predictor)]
@@ -658,12 +715,12 @@ uniforest <- function(x,
         reference_value <- 0
     }
     
-    ## Calculate layout
+    ## Calculate layout (note: condense_table implies indent_groups)
     layout <- calculate_uniforest_layout(
         to_show_exp_clean = to_show_exp_clean,
         show_n = show_n,
         show_events = show_events,
-        indent_groups = indent_groups,
+        indent_groups = (indent_groups || condense_table),
         table_width = table_width,
         center_padding = center_padding,
         effect_abbrev = effect_abbrev,
@@ -675,7 +732,7 @@ uniforest <- function(x,
 
     ## Set up column positions
     y_variable <- layout$positions$variable
-    if (!indent_groups) {
+    if (!(indent_groups || condense_table)) {
         y_level <- layout$positions$level
     }
     if (show_n) {
@@ -781,7 +838,7 @@ uniforest <- function(x,
                                          breaks = breaks)
          }} +
         
-        ggplot2::theme_light() +
+        ggplot2::theme_light(base_family = detect_plot_font()) +
         ggplot2::theme(plot.margin = ggplot2::margin(t = 10, r = 0, b = 0, l = 0),
                        panel.grid.minor.y = ggplot2::element_blank(),
                        panel.grid.minor.x = ggplot2::element_blank(),
@@ -823,8 +880,8 @@ uniforest <- function(x,
                                hjust = 0, size = annot_font)
          }} +
         
-        ## Level column (only when not indented)
-        {if (!indent_groups) {
+        ## Level column (only when not indented or condensed)
+        {if (!(indent_groups || condense_table)) {
              list(
                  ggplot2::annotate(geom = "text", x = max(to_show_exp_clean$x_pos) + 1.5, y = tfm(y_level),
                                    label = "Group", fontface = "bold", hjust = 0, size = header_font),

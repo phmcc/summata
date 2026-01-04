@@ -77,6 +77,10 @@
 #' @param group_by_outcome Logical. If \code{TRUE} (default), groups rows by 
 #'   outcome with outcome names as headers. If \code{FALSE}, shows flat list.
 #'
+#' @param indent_predictor Logical. If \code{TRUE}, indents predictor levels
+#'   under outcome names, creating a hierarchical display. If \code{FALSE} 
+#'   (default), shows outcome and predictor level in separate columns.
+#'
 #' @param bold_variables Logical. If \code{TRUE}, variable names are displayed
 #'   in bold. If \code{FALSE} (default), variable names are displayed in plain
 #'   text.
@@ -465,14 +469,14 @@ multiforest <- function(x,
         ## Format effect estimate (exponentiated)
         to_show_exp_clean[, hr_formatted := data.table::fifelse(is.na(estimate),
                                                                 "",
-                                                                format(round(exp(estimate), digits), nsmall = digits))]
+                                                                format_number(exp(estimate), digits))]
         
         to_show_exp_clean[, conf_low_formatted := data.table::fifelse(is.na(conf_low), 
                                                                       "",
-                                                                      format(round(exp(conf_low), digits), nsmall = digits))]
+                                                                      format_number(exp(conf_low), digits))]
         to_show_exp_clean[, conf_high_formatted := data.table::fifelse(is.na(conf_high), 
                                                                        "",
-                                                                       format(round(exp(conf_high), digits), nsmall = digits))]
+                                                                       format_number(exp(conf_high), digits))]
     } else {
         ## Linear scale - use raw coefficients
         to_show_exp_clean[, hr := data.table::fifelse(is.na(estimate), 
@@ -482,14 +486,14 @@ multiforest <- function(x,
         ## Format effect estimate (raw coefficient)
         to_show_exp_clean[, hr_formatted := data.table::fifelse(is.na(estimate),
                                                                 "",
-                                                                format(round(estimate, digits), nsmall = digits))]
+                                                                format_number(estimate, digits))]
         
         to_show_exp_clean[, conf_low_formatted := data.table::fifelse(is.na(conf_low), 
                                                                       "",
-                                                                      format(round(conf_low, digits), nsmall = digits))]
+                                                                      format_number(conf_low, digits))]
         to_show_exp_clean[, conf_high_formatted := data.table::fifelse(is.na(conf_high), 
                                                                        "",
-                                                                       format(round(conf_high, digits), nsmall = digits))]
+                                                                       format_number(conf_high, digits))]
     }
 
     ## Format p-values using p_digits parameter
@@ -500,27 +504,23 @@ multiforest <- function(x,
                                                            "",
                                                            data.table::fifelse(p_value < p_threshold, 
                                                                                p_threshold_str,
-                                                                               format(round(p_value, p_digits), nsmall = p_digits)))]
+                                                                               format_number(p_value, p_digits)))]
+
+    ## Determine if ANY coefficient or CI bound is negative (only relevant for linear scale)
+    ## If so, use comma notation throughout for consistency
+    use_comma_notation <- !log_scale && any(to_show_exp_clean$conf_low < 0 | to_show_exp_clean$conf_high < 0, na.rm = TRUE)
+    ci_separator <- if (use_comma_notation) ", " else "-"
 
     ## Create the combined effect string with expression for italic p
-    ## Use comma separator when CI bounds are negative (for linear models)
     to_show_exp_clean[, hr_string_expr := data.table::fifelse(
                                                           is.na(estimate),
                                                           "''",  # Empty string for header rows
                                                           data.table::fcase(
-                                                              p_value < p_threshold & (conf_low < 0 | conf_high < 0),
-                                                              paste0("'", hr_formatted, " (", conf_low_formatted, ", ", 
-                                                                     conf_high_formatted, "); '*~italic(p)~'", p_threshold_str, "'"),
-                                                              
                                                               p_value < p_threshold,
-                                                              paste0("'", hr_formatted, " (", conf_low_formatted, "-", 
+                                                              paste0("'", hr_formatted, " (", conf_low_formatted, ci_separator, 
                                                                      conf_high_formatted, "); '*~italic(p)~'", p_threshold_str, "'"),
                                                               
-                                                              conf_low < 0 | conf_high < 0,
-                                                              paste0("'", hr_formatted, " (", conf_low_formatted, ", ", 
-                                                                     conf_high_formatted, "); '*~italic(p)~'= ", p_formatted, "'"),
-                                                              
-                                                              default = paste0("'", hr_formatted, " (", conf_low_formatted, "-", 
+                                                              default = paste0("'", hr_formatted, " (", conf_low_formatted, ci_separator, 
                                                                                conf_high_formatted, "); '*~italic(p)~'= ", p_formatted, "'")
                                                           )
                                                       )]
@@ -817,7 +817,7 @@ multiforest <- function(x,
                                          breaks = breaks)
          }} +
         
-        ggplot2::theme_light() +
+        ggplot2::theme_light(base_family = detect_plot_font()) +
         ggplot2::theme(plot.margin = ggplot2::margin(t = 10, r = 0, b = 0, l = 0),
                        panel.grid.minor.y = ggplot2::element_blank(),
                        panel.grid.minor.x = ggplot2::element_blank(),

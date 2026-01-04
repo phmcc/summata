@@ -246,6 +246,25 @@ Mixed effects models handle hierarchical or clustered data:
   \item \strong{Poisson} (\code{family = "poisson"}): Rate ratios (RR/aRR)
   \item \strong{Linear}: Raw coefficient estimates
 }
+
+\strong{Confidence Intervals:}
+
+Confidence intervals are computed using the Wald method:
+\deqn{\hat{\beta} \pm z_{1-\alpha/2} \times \mathrm{SE}(\hat{\beta})}
+
+This is the standard approach for GLM, Cox, and mixed-effects regression, 
+and is appropriate for standard sample sizes. The Wald interval is computed
+directly from the coefficient and standard error, avoiding redundant matrix
+operations.
+
+For small samples, sparse data, or parameters near boundary values, profile 
+likelihood confidence intervals may be preferred. These can be obtained from 
+the underlying model object:
+
+\preformatted{
+result <- fit(data, outcome, predictors)
+confint(attr(result, "model"))
+}
 }
 \examples{
 # Load example data

@@ -1,3 +1,10 @@
+## Note: is_reference_category(), is_affirmative_category(), and should_condense_binary()
+## are defined in forest_utils.R as the canonical location. They are also used by 
+## condense_table_rows() below. Since R packages load all files in the R/ directory, 
+## these functions will be available when the package is loaded. For standalone use 
+## of this file, ensure forest_utils.R is sourced first.
+
+
 #' Add padding to exported table headers
 #' 
 #' Adds LaTeX vertical spacing rules to column headers for proper vertical
@@ -594,23 +601,32 @@ condense_table_rows <- function(df, indent_groups = TRUE) {
                 
                 if (length(data_cols) > 0) {
                     first_data_col <- data_cols[1]
+                    ## Find non-reference row by checking for actual data (not "-", "reference", etc.)
                     non_ref_idx <- which(!var_rows[[first_data_col]] %chin% c("-", "reference", "Reference", ""))
                     
                     if (length(non_ref_idx) > 1) {
-                        non_ref_idx <- non_ref_idx[2]
+                        ## Multiple non-ref rows - take the first one
+                        non_ref_idx <- non_ref_idx[1]
                     } else if (length(non_ref_idx) == 0) {
-                        non_ref_idx <- 2
+                        ## All rows are reference-like - skip condensing
+                        next
                     }
                     
                     if (non_ref_idx <= n_rows) {
                         non_ref_row <- var_start + non_ref_idx - 1
-                        category_name <- result$Group[non_ref_row]
+                        ref_idx <- setdiff(1:n_rows, non_ref_idx)[1]
+                        ref_row <- var_start + ref_idx - 1
                         
-                        if (!is.na(category_name) && category_name != "") {
-                            if (category_name %chin% c("Yes", "YES", "yes", "1", "True", "TRUE", "true", "Present", "Positive", "+")) {
+                        non_ref_category <- result$Group[non_ref_row]
+                        ref_category <- result$Group[ref_row]
+                        
+                        if (!is.na(non_ref_category) && non_ref_category != "") {
+                            ## Use greedy helper function for condensing detection
+                            ## Pass var_name as label for case-insensitive matching
+                            if (should_condense_binary(ref_category, non_ref_category, var_name)) {
                                 result[var_start, Variable := paste0(var_name)]
                             } else {
-                                result[var_start, Variable := paste0(var_name, " (", category_name, ")")]                                
+                                result[var_start, Variable := paste0(var_name, " (", non_ref_category, ")")]                                
                             }
                         }
                         

@@ -12,13 +12,13 @@
 
 ## Overview
 
-The `summata` package provides a comprehensive framework for regression analysis. Built on `data.table` for computational efficiency, this package is designed to simplify the path from descriptive analysis, to regression modeling, to publication-ready tables and visualizations—all using a unified input interface with standardized outputs.
+The `summata` package provides a comprehensive framework for generating summary tables and visualizations from statistical analyses. Built on `data.table` for computational efficiency, it streamlines the workflow from descriptive statistics through regression modeling to final output—all using a unified interface with standardized, presentation-ready results.
 
-<img src="man/figures/README-coxforest.png" alt="Cox regression forest plot" width="100%">
+<img src="man/figures/README_coxforest.png" alt="Cox regression forest plot" width="100%">
 
 ## Installation
 
-This package can be installed from GitHub (stable) or Codeberg (development):
+The package may be installed from GitHub (stable) or Codeberg (development):
 
 ```r
 # Stable release
@@ -28,23 +28,22 @@ devtools::install_github("phmcc/summata")
 devtools::install_git("https://codeberg.org/phmcc/summata.git")
 ```
 
-## Theoretical Framework
+## Package Composition
 
 ### Design Principles
 
-The package architecture of `summata` reflects three guiding principles:
+The architecture of `summata` reflects three guiding principles:
 
-1. **Consistent syntax.** All modeling functions share a common signature: data first, followed by the variable of interest, then additional covariates. This convention facilitates both pipe-based workflows and pedagogical clarity.
+1. **Consistent syntax.** All modeling functions share a common signature: data first, followed by the outcome or variable of interest, then additional covariates. This convention facilitates both pipe-based workflows and pedagogical clarity.
 
-2. **Transparent computation.** Functions attach their underlying model objects and raw numerical results as attributes, permitting additional verification of computations or extension of analyses beyond the formatted output.
+2. **Transparent computation.** Functions attach their underlying model objects and raw numerical results as attributes, permitting verification of computations or extension of analyses beyond the formatted output.
    
 3. **Separation of concerns.** Analysis, formatting, and export constitute distinct operations, allowing each stage to be modified independently.
 
 These principles manifest in the standard calling convention:
 
-
 ``` r
-result <- fullfit(data, variable, c("covar1", "covar2", ..., "covarN"), ...)
+result <- fullfit(data, outcome, c("covar1", "covar2", ..., "covarN"), ...)
 
 # The formatted table
 print(result)
@@ -52,7 +51,7 @@ print(result)
 # The underlying model object
 model <- attr(result, "model")
 
-# Unformatted numerical results
+# Raw numerical results
 raw <- attr(result, "raw_data")
 ```
 
@@ -75,15 +74,16 @@ The package provides unified handling for the following regression models:
 
 ### Primary Analysis Functions
 
-The core analytical functions implement standard regression workflows:
+The core analytical functions implement standard statistical workflows:
 
 | Function | Purpose |
 |:---------|:--------|
 | `desctable()` | Descriptive statistics with stratification and hypothesis testing |
+| `survtable()` | Survival probability estimates at specified time points |
 | `uniscreen()` | Systematic univariable analysis across multiple predictors |
 | `fit()` | Single regression model with formatted coefficient extraction |
-| `fullfit()` | Integrated univariable screening and multivariable regression |
-| `compfit()` | Nested model comparison with information criteria |
+| `fullfit()` | Integrated univariable screening with multivariable regression |
+| `compfit()` | Nested model comparison with likelihood ratio tests and information criteria |
 | `multifit()` | Single predictor evaluated against multiple outcomes |
 
 ### Export Functions
@@ -92,173 +92,146 @@ Tables may be rendered to multiple output formats:
 
 | Function | Format | Dependency |
 |:---------|:-------|:-----------|
-| `autotable()` | Auto-detect from extension | Varies |
-| `table2pdf()` | PDF | LaTeX distribution |
+| `autoexport()` | Auto-detect from file extension | Varies |
+| `table2pdf()` | PDF | xtable, LaTeX distribution |
 | `table2docx()` | Microsoft Word | officer, flextable |
 | `table2pptx()` | Microsoft PowerPoint | officer, flextable |
-| `table2tex()` | LaTeX source | xtable |
 | `table2html()` | HTML | xtable |
-| `table2rtf()` | Rich Text Format | — |
+| `table2tex()` | LaTeX source | xtable |
+| `table2rtf()` | Rich Text Format | officer, flextable |
 
 ### Visualization Functions
 
-Forest plots are generated directly from model objects or analysis results:
+Forest plots may be generated directly from model objects or analysis results:
 
 | Function | Application |
 |:---------|:------------|
 | `autoforest()` | Automatic model class detection |
-| `lmforest()` | Linear model coefficients |
-| `glmforest()` | Generalized linear model effects |
-| `coxforest()` | Proportional hazards estimates |
+| `lmforest()` | Linear models |
+| `glmforest()` | Generalized linear models |
+| `coxforest()` | Proportional hazards models |
 | `uniforest()` | Univariable screening results |
 | `multiforest()` | Multi-outcome analysis results |
 
 ## Comparison with Related Packages
 
-The R ecosystem includes several well-established packages for regression table generation. The following abridged comparison identifies areas of overlap and distinction:
+The R ecosystem includes several established packages for regression table generation. The following comparison identifies areas of overlap and distinction:
 
 | Capability | summata | gtsummary | finalfit | arsenal |
 |:-----------|:-------:|:---------:|:--------:|:-------:|
 | Descriptive statistics | ✓ | ✓ | ✓ | ✓ |
+| Survival summaries | ✓ | ✓ | ◐ | — |
 | Univariable screening | ✓ | ✓ | ✓ | ✓ |
 | Multivariable regression | ✓ | ✓ | ✓ | ✓ |
 | Multi-format export | ✓ | ✓ | ✓ | ✓ |
-| Integrated forest plots | ✓ | ○ | ✓ | — |
-| Model comparison | ✓ | ✓ | ○ | — |
-| Mixed-effects models | ✓ | ○ | ○ | — |
-| Multivariate (multi-outcome) analysis | ✓ | — | — | — |
+| Integrated forest plots | ✓ | ◐ | ✓ | — |
+| Model comparison | ✓ | ✓ | ◐ | — |
+| Mixed-effects models | ✓ | ◐ | ◐ | — |
+| Multi-outcome analysis | ✓ | — | — | — |
 
-<sub>✓ Full support | ○ Partial support | — Not available</sub>
+<sub>✓ Full support | ◐ Partial support | — Not available</sub>
 
-A detailed feature comparison is available in the [package documentation](https://phmcc.github.io/summata/articles/feature-comparison.html).
+A detailed feature comparison is available in the [package documentation](https://phmcc.github.io/summata/articles/feature_comparison.html).
 
 ## Illustrative Example
 
-### Step 1 - Data Preparation
+The `clintrial` dataset included with this package provides simulated clinical trial data comprising patient identifiers, baseline characteristics, therapeutic interventions, short-term outcomes, and long-term survival statistics. In the following example, we analyze perioperative factors affecting 30-day hospital readmission:
 
-The `clintrial` dataset included in this package provides mock clinical trial data, including patient identifiers, baseline characteristics, therapeutic interventions, short-term outcomes, and long-term survival statistics. In a hypothetical analysis of perioperative factors affecting 30-day hospital readmission after treatment, first load the data and specify the variables to be tested:
+### Data Preparation
 
+First, load the dataset, apply labels, and define predictors:
 
 ``` r
 library(summata)
-library(ggplot2)
 
 # Load example data
 data("clintrial")
 data("clintrial_labels")
 
-# Organize covariates as a vector
-covars_30d <- c("age",
-                "sex",
-                "race",
-                "ethnicity",
-                "bmi",
-                "smoking",
-                "hypertension",
-                "diabetes",
-                "ecog",
-                "creatinine",
-                "hemoglobin",
-                "biomarker_x",
-                "biomarker_y",
-                "grade",
-                "treatment",
-                "surgery",
-                "los_days",
-                "stage")
+# Define candidate predictors
+predictors <- c("age", "sex", "race", "ethnicity", "bmi", "smoking",
+                "hypertension", "diabetes", "ecog", "creatinine",
+                "hemoglobin", "biomarker_x", "biomarker_y", "grade",
+                "treatment", "surgery", "los_days", "stage")
 ```
 
-### Step 2 - Descriptive Statistics
+### **Step 1:** Descriptive Statistics
 
-After loading and cleaning the data, use the `desctable()` function to generate summary statistics with stratification by 30-day readmission status:
-
+Use the `desctable()` function to generate summary statistics with stratification by a grouping variable (in this case, 30-day readmission):
 
 ``` r
-# Descriptive statistics table
 table1 <- desctable(
     data = clintrial,
     by = "readmission_30d",
-    variables = covars_30d,
+    variables = predictors,
     labels = clintrial_labels
-)
+    )
 
-# Export descriptive statistics table to PDF
 table2pdf(table1, "table1.pdf",
-          caption = "\\textbf{Table 1} - Comparison of baseline characteristics by treatment group",
+          caption = "\\textbf{Table 1} - Baseline characteristics by 30-day readmission status",
           paper = "auto",
-          caption_size = 10,
+          condense_table = TRUE,
           dark_header = TRUE,
-          zebra_stripes = TRUE,
-          condense_table = TRUE
+          zebra_stripes = TRUE
           )
 ```
 
 <details>
-<summary><strong>Fig 1.</strong> Descriptive statistics table</summary>
+<summary><strong>Figure 1.</strong> Descriptive statistics table</summary>
 <br>
-<img src="man/figures/README-desctable.png" alt="Descriptive statistics table" width="100%">
+<img src="man/figures/README_desctable.png" alt="Descriptive statistics table" width="100%">
 </details>
 
-### Step 3 - Regression Analysis
+### **Step 2:** Regression Analysis
 
-Once Table 1 has been created, use the `fullfit()` function to implement a complete univariable-to-multivariable regression workflow to determine factors independently predictive of 30-day readmission:
-
+Perform an integrated univariable-to-multivariable regression workflow using the `fullfit()` function:
 
 ``` r
-# Complete regression workflow: univariable + multivariable
-results_30d <- fullfit(
+table2 <- fullfit(
     data = clintrial,
     outcome = "readmission_30d",
-    predictors = covars_30d,
-    method = "screen",        # Auto-select variables based on univariable p-values
-    p_threshold = 0.05,       # Include variables with p < 0.05 in multivariable model
+    predictors = predictors,
+    method = "screen",
+    p_threshold = 0.05,
     model_type = "glm",
     labels = clintrial_labels
 )
 
-# Export regression table to PDF
-table2pdf(results_30d, "table2.pdf",
+table2pdf(table2, "table2.pdf",
           caption = "\\textbf{Table 2} - Predictors of 30-day readmission, multivariable Cox regression with univariable screen",
           paper = "auto",
-          caption_size = 10,
+          condense_table = TRUE,
           dark_header = TRUE,
-          zebra_stripes = TRUE,
-          condense_table = TRUE
-)
+          zebra_stripes = TRUE)
 ```
 
 <details>
-<summary><strong>Fig 2.</strong> Logistic regression table with univariable screening</summary>
+<summary><strong>Figure 2.</strong> Logistic regression with univariable screening</summary>
 <br>
-<img src="man/figures/README-fullfit.png" alt="Regression table" width="100%">
+<img src="man/figures/README_fullfit.png" alt="Regression table" width="100%">
 </details>
 
-### Step 4 - Forest Plot Generation
+### **Step 3:** Forest Plot
 
-Finally, create a forest plot of the fitted model to visualize the relative effects of these predictive factors:
-
+Finally, generate a forest plot to provide a graphical representation of effect estimates using the `glmforest()` function:
 
 ``` r
-# Fit Cox proportional hazards model
-results <- fullfit(
-  data = clintrial,
-  outcome = "Surv(os_months, os_status)",
-  predictors = c("age", "sex", "stage", "grade", "treatment"),
-  model_type = "coxph",
-  labels = clintrial_labels
-)
+forest_30d <- glmforest(table2,
+                        title = "Factors Affecting 30-Day Readmission",
+                        labels = clintrial_labels,
+                        indent_groups = TRUE
+                        )
 
-# Generate forest plot
-coxforest(
-  x = results,
-  title = "Multivariable Cox Regression: Overall Survival"
-)
+ggsave("forest_30d.pdf", forest_30d,
+       width = attr(forest_30d, "recommended_dims")$width,
+       height = attr(forest_30d, "recommended_dims")$height, 
+       units = "in")
 ```
 
 <details>
-<summary><strong>Fig 3.</strong> Multivariable logistic regression forest plot</summary>
+<summary><strong>Figure 3.</strong> Multivariable GLM forest plot</summary>
 <br>
-<img src="man/figures/README-glmforest.png" alt="Forest plot" width="100%">
+<img src="man/figures/README_glmforest.png" alt="Forest plot" width="100%">
 </details>
 
 ## Development
@@ -274,7 +247,7 @@ Bug reports and feature requests may be submitted via the [issue tracker](https:
 
 ## Acknowledgments
 
-The design of `summata` has been inspired by several existing packages:
+The design of `summata` draws inspiration from several existing packages:
 
 - **finalfit** (Harrison) — Regression workflow concepts  
 - **gtsummary** (Sjoberg et al.) — Table generation architecture  
@@ -283,21 +256,34 @@ The design of `summata` has been inspired by several existing packages:
 
 ## License
 
-GPL (≥ 3)
+GPL ≥ 3.0
 
 ## Citation
 
-
 ``` r
 citation("summata")
+
+To cite summata in publications, use:
+
+  McClelland PH (2026). _summata: Publication-Ready Summary Tables and Forest Plots_. R package version 0.9.5, <https://phmcc.github.io/summata/>.
+
+A BibTeX entry for LaTeX users is
+
+  @Manual{,
+    title = {summata: Publication-Ready Summary Tables and Forest Plots},
+    author = {Paul Hsin-ti McClelland},
+    year = {2026},
+    note = {R package version 0.9.5},
+    url = {https://phmcc.github.io/summata/},
+  }
 ```
 
 ## Further Resources
 
 - **Function documentation**: `?function_name` or the [reference index](https://phmcc.github.io/summata/reference/)
-- **Tutorials**: `vignette("summata")` or [online articles](https://phmcc.github.io/summata/articles/)
+- **Vignettes**: `vignette("summata")` or [online articles](https://phmcc.github.io/summata/articles/)
 - **Issue tracker**: [Codeberg Issues](https://codeberg.org/phmcc/summata/issues)
 
 ---
 
-<sub>The `summata` package is under active development. The API may be subject to revision prior to CRAN submission.</sub>
+<sub>The `summata` package is under active development. The API may change prior to CRAN submission.</sub>

@@ -1,3 +1,19 @@
+#' Fix negative zero in formatted strings
+#' 
+#' Corrects floating-point rounding artifacts that produce "-0.00" or similar
+#' negative zero strings. Works on character vectors, replacing patterns like
+#' "-0.00", "-0.000", etc. with their positive equivalents, even when embedded
+#' within larger strings (e.g., "(-0.00, 1.23)" becomes "(0.00, 1.23)").
+#' 
+#' @param x Character vector of formatted numbers.
+#' @return Character vector with negative zeros corrected.
+#' @keywords internal
+fix_negative_zero <- function(x) {
+    ## Match -0 followed by decimal point and zeros, with word boundaries
+    ## Handles: "-0.0", "-0.00", "-0.000", etc. anywhere in string
+    gsub("(?<![0-9])-0(\\.0+)(?![0-9])", "0\\1", x, perl = TRUE)
+}
+
 #' Format model results for publication-ready display
 #' 
 #' Transforms raw model coefficient data into a formatted table suitable for
@@ -263,6 +279,7 @@ format_model_table <- function(data,
         
         ## Vectorized sprintf is faster than per-row fcase with sprintf
         formatted_effects <- sprintf(fmt_str, effect_vals, ci_lower_vals, ci_upper_vals)
+        formatted_effects <- fix_negative_zero(formatted_effects)
         formatted_effects[is.na(effect_vals)] <- ""
         formatted_effects[is_reference] <- reference_label
         
@@ -319,6 +336,7 @@ format_pvalues_fit <- function(p, digits = 3) {
     
     ## Vectorized formatting (faster than fcase for simple conditions)
     result <- sprintf(fmt_str, p)
+    result <- fix_negative_zero(result)
     result[is.na(p)] <- "-"
     result[!is.na(p) & p < threshold] <- less_than_string
     
@@ -426,6 +444,11 @@ validate_model_outcome <- function(outcome, model_type, family = NULL,
         if (!is.null(family_name)) {
             outcome_type <- detect_outcome_type(data, outcome)
             
+            if (outcome_type == "categorical" && family_name == "binomial") {
+                warning(sprintf(
+                    "Categorical outcome '%s' has more than 2 levels. Binomial GLM will coerce this to binary (first level vs all others), which is likely not intended. Consider: (1) recoding to a true binary variable, (2) using multinomial regression (nnet::multinom), (3) using ordinal regression (MASS::polr or ordinal::clm) if levels are ordered, or (4) using a different outcome.",
+                    outcome), call. = FALSE)
+            }
             if (outcome_type == "continuous" && family_name == "binomial") {
                 stop(sprintf(
                     "Continuous outcome '%s' with family='binomial'. Use model_type='lm' or family='gaussian'.",
@@ -434,6 +457,28 @@ validate_model_outcome <- function(outcome, model_type, family = NULL,
             if (outcome_type == "binary" && family_name == "gaussian") {
                 warning(sprintf(
                     "Binary outcome '%s' with family='gaussian'. Consider family='binomial'.",
+                    outcome), call. = FALSE)
+            }
+        }
+    }
+    
+    ## glmer family checks
+    if (!is.null(data) && model_type == "glmer" && !is.null(family) && !is_survival) {
+        family_name <- if (is.character(family)) {
+            family
+        } else if (is.function(family)) {
+            family()$family
+        } else if (is.list(family) && "family" %in% names(family)) {
+            family$family
+        } else {
+            NULL
+        }
+        
+        if (!is.null(family_name) && family_name == "binomial") {
+            outcome_type <- detect_outcome_type(data, outcome)
+            if (outcome_type == "categorical") {
+                warning(sprintf(
+                    "Categorical outcome '%s' has more than 2 levels. Binomial GLMER will coerce this to binary (first level vs all others), which is likely not intended. Consider recoding to a true binary variable or using a different outcome.",
                     outcome), call. = FALSE)
             }
         }

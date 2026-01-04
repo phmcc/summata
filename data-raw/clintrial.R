@@ -144,32 +144,36 @@ set.seed(71)  # For reproducibility
 n <- 850
 
 create_clintrial <- function() {
+
+    ## ------------------------
+    ## Baseline characteristics
+    ## ------------------------
     
-    ## * Site (generate early for clustering effects)
+    ## Site (generate early for clustering effects)
     greek_letters <- c("Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta", "Iota", "Kappa")
     site <- factor(
         paste0("Site ", sample(greek_letters, n, replace = TRUE)),
         levels = paste0("Site ", greek_letters))
     
-    ## * Generate site-specific random effects
+    ## Generate site-specific random effects
     n_sites <- length(unique(site))
     site_names <- levels(site)
     
-                                        # Site random intercepts (some sites have better/worse outcomes)
+    ## Site random intercepts (some sites have better/worse outcomes)
     site_intercepts <- rnorm(n_sites, mean = 0, sd = 0.5)
     names(site_intercepts) <- site_names
     
-                                        # Site-specific treatment effects (some sites better with Drug A, others with Drug B)
+    ## Site-specific treatment effects (some sites better with Drug A, others with Drug B)
     site_drugA_effect <- rnorm(n_sites, mean = 0, sd = 0.3)
     site_drugB_effect <- rnorm(n_sites, mean = 0, sd = 0.3)
     names(site_drugA_effect) <- site_names
     names(site_drugB_effect) <- site_names
     
-                                        # Site-specific age effects (age matters more at some sites)
+    ## Site-specific age effects (age matters more at some sites)
     site_age_slope <- rnorm(n_sites, mean = 1, sd = 0.2)
     names(site_age_slope) <- site_names
     
-    ## * Basic demographics
+    ## Basic demographics
     age <- round(rnorm(n, mean = 60, sd = 12))
     age[age < 18] <- 18
     age[age > 90] <- 90
@@ -184,7 +188,7 @@ create_clintrial <- function() {
                                replace = TRUE, prob = c(0.88, 0.12)),
                         levels = c("Non-Hispanic", "Hispanic"))
     
-    ## * Clinical characteristics
+    ## Clinical characteristics
     bmi <- round(rnorm(n, mean = 28, sd = 5), 1)
     bmi[bmi < 15] <- 15
     bmi[bmi > 50] <- 50
@@ -199,12 +203,12 @@ create_clintrial <- function() {
     diabetes <- factor(sample(c("No", "Yes"), n, replace = TRUE, 
                               prob = c(0.75, 0.25)))
     
-    ## * Performance status (generate early for use in other variables)
+    ## Performance status (generate early for use in other variables)
     ecog <- factor(sample(0:3, n, replace = TRUE, 
                           prob = c(0.30, 0.40, 0.25, 0.05)),
                    levels = 0:3)
     
-    ## * Disease characteristics
+    ## Disease characteristics
     grade <- factor(sample(c("Well-differentiated", "Moderately differentiated", 
                              "Poorly differentiated"), n,
                            replace = TRUE, prob = c(0.20, 0.50, 0.30)),
@@ -215,18 +219,17 @@ create_clintrial <- function() {
                            replace = TRUE, prob = c(0.25, 0.30, 0.30, 0.15)),
                     levels = c("I", "II", "III", "IV"))
     
-    ## * Biomarkers (continuous with some correlation to outcome)
-                                        # Add interaction with age for biomarker_x
+    ## Biomarkers (continuous with some correlation to outcome)
     biomarker_x <- round(rgamma(n, shape = 2, rate = 0.5) + 
                          as.numeric(stage) * 0.5 + 
-                         (age > 65) * 2 +  # Age interaction with biomarker
+                         (age > 65) * 2 +
                          rnorm(n, 0, 0.5), 2)
     
     biomarker_y <- round(rlnorm(n, meanlog = 3, sdlog = 1) + 
                          (sex == "Male") * 20 + rnorm(n, 0, 10), 1)
     biomarker_y[biomarker_y < 0] <- 0
 
-    ## * Laboratory values
+    ## Laboratory values
     creatinine <- round(rlnorm(n, meanlog = 0, sdlog = 0.3), 2)
     creatinine[creatinine > 5] <- 5
 
@@ -234,32 +237,36 @@ create_clintrial <- function() {
     hemoglobin[hemoglobin < 7] <- 7
     hemoglobin[hemoglobin > 18] <- 18
 
-    ## * Treatment assignment with bias for Drug B
+    ## -------------
+    ## Interventions
+    ## -------------
+    
+    ## Treatment assignment with bias for Drug B
     treatment <- character(n)
     for (i in 1:n) {
-                                        # Drug B biased toward older, sicker patients (max additional 0.2)
+        ## Drug B biased toward older, sicker patients (max additional 0.2)
         drug_b_bias <- 0
         drug_b_bias <- drug_b_bias + (age[i] > 65) * 0.10
         drug_b_bias <- drug_b_bias + (as.numeric(ecog[i]) >= 3) * 0.10
         drug_b_bias <- drug_b_bias + (grade[i] == "Poorly differentiated") * 0.05
         drug_b_bias <- drug_b_bias + (stage[i] %in% c("III", "IV")) * 0.10
         
-                                        # Drug A has slight opposite bias (max additional 0.1)
+        ## Drug A has slight opposite bias (max additional 0.1)
         drug_a_bias <- 0
         drug_a_bias <- drug_a_bias + (age[i] <= 55) * 0.05
         drug_a_bias <- drug_a_bias + (as.numeric(ecog[i]) <= 2) * 0.05
         
-                                        # Base probabilities
+        ## Base probabilities
         base_prob <- 1/3
         
-                                        # Calculate final probabilities (ensuring they sum to 1)
+        ## Calculate final probabilities (ensuring they sum to 1)
         probs <- c(
             Control = base_prob - drug_a_bias/2 - drug_b_bias/2,
             DrugA = base_prob + drug_a_bias,
             DrugB = base_prob + drug_b_bias
         )
         
-                                        # Ensure no negative probabilities
+        ## Ensure no negative probabilities
         probs[probs < 0.05] <- 0.05  # Minimum 5% chance for each
         probs <- probs / sum(probs)  # Normalize to sum to 1
         
@@ -267,7 +274,7 @@ create_clintrial <- function() {
     }
     treatment <- factor(treatment, levels = c("Control", "Drug A", "Drug B"))
     
-    ## * Surgery (biased toward younger, healthier patients)
+    ## Surgery (biased toward younger, healthier patients)
     surgery_prob <- plogis(-1 + 
                            (65 - age) * 0.05 +  # Younger more likely
                            (ecog == "0") * 1.2 +  # ECOG 0 much more likely
@@ -284,7 +291,11 @@ create_clintrial <- function() {
     surgery <- factor(ifelse(runif(n) < surgery_prob, "Yes", "No"),
                       levels = c("No", "Yes"))
 
-    ## * Hospital length of stay in days (influenced by multiple factors WITH INTERACTIONS)
+    ## -----------------------
+    ## Post-treatment outcomes
+    ## -----------------------
+    
+    ## Hospital length of stay in days (influenced by multiple factors with interactions)
     los_days <- 5 +  # Baseline stay
         ## Demographics
         (age - 60) * 0.1 +  # Older patients stay longer
@@ -341,22 +352,12 @@ create_clintrial <- function() {
     
     ## Add some missing values for LOS (e.g., outpatient procedures)
     los_days[sample(which(surgery == "No"), size = 20)] <- NA
-    
-    ## * =========================================================================
-    ## * POSTOPERATIVE OUTCOMES (for multifit/multiforest showcase)
-    ## * =========================================================================
-    ## These outcomes demonstrate:
-    ## - Multiple related binary outcomes (complication types)
-    ## - Continuous outcomes with different distributions
-    ## - Strong associations with preoperative factors
-    ## - Site-level clustering effects
-    ## - Treatment effects and interactions
-    
+
     ## Generate site-specific complication rates (some sites have better/worse outcomes)
     site_complication_effect <- rnorm(n_sites, mean = 0, sd = 0.4)
     names(site_complication_effect) <- site_names
     
-    ## --- BINARY OUTCOME 1: Any Postoperative Complication (composite) ---
+    ## Any Postoperative Complication (composite)
     ## Strong associations with: age, ECOG, diabetes, surgery, treatment
     complication_prob <- plogis(-2.0 +
                                 ## Demographics
@@ -393,12 +394,12 @@ create_clintrial <- function() {
                                                         
                                                         rnorm(n, 0, 0.2))
     
-    any_complication <- factor(ifelse(runif(n) < complication_prob, "Yes", "No"),
-                               levels = c("No", "Yes"))
+    any_complication <- factor(ifelse(runif(n) < complication_prob, "Any complication", "No complication"),
+                               levels = c("No complication", "Any complication"))
     ## Note: All patients can have complications (surgical or treatment-related)
     ## Surgery is already accounted for in the probability model
     
-    ## --- BINARY OUTCOME 2: Wound Infection (SSI) ---
+    ## Wound Infection (SSI)
     ## Subset of complications, more specific risk factors
     wound_prob <- plogis(-3.5 +
                          ## Demographics  
@@ -428,12 +429,12 @@ create_clintrial <- function() {
                          
                          rnorm(n, 0, 0.15))
     
-    wound_infection <- factor(ifelse(runif(n) < wound_prob, "Yes", "No"),
-                              levels = c("No", "Yes"))
+    wound_infection <- factor(ifelse(runif(n) < wound_prob, "Wound infection", "No wound infection"),
+                              levels = c("No wound infection", "Wound infection"))
     ## Note: Non-surgical patients have very low SSI risk (from procedures, lines, etc.)
     ## Surgery effect is captured in the probability model (+2.0 log-odds)
     
-    ## --- BINARY OUTCOME 3: 30-Day Readmission ---
+    ## 30-Day Readmission
     ## Related to complications but also social/system factors
     ## NOTE: Strengthened effects to ensure detectable associations in regression
     readmit_prob <- plogis(-2.8 +
@@ -459,31 +460,31 @@ create_clintrial <- function() {
                            
                            ## Treatment effects (more differentiated)
                            (treatment == "Drug A") * (-0.4) +  # Drug A patients do better
-                           (treatment == "Drug B") * 0.5 +  # Drug B increases readmission
-                           
-                           ## Surgery effect
-                           (surgery == "Yes") * 0.6 +  # Surgical patients more likely to be readmitted
-                           
-                           ## Lab values
-                           (creatinine - 1) * 0.4 +  # Renal function matters
-                           (hemoglobin < 10) * 0.35 +  # Anemia
-                           
-                           ## LOS effect (very short or very long LOS = readmission risk)
-                           ifelse(!is.na(los_days), (abs(los_days - 7) * 0.04), 0) +
-                           
-                           ## INTERACTION EFFECTS
-                           ((diabetes == "Yes") & (age > 70)) * 0.4 +  # Elderly diabetics
-                           ((surgery == "Yes") & (stage %in% c("III", "IV"))) * 0.35 +
-                           
-                           ## Site clustering (some sites have better discharge planning)
-                           site_complication_effect[as.character(site)] * 0.7 +
-                           
-                           rnorm(n, 0, 0.15))
+                                                   (treatment == "Drug B") * 0.5 +  # Drug B increases readmission
+                                                   
+                                                   ## Surgery effect
+                                                   (surgery == "Yes") * 0.6 +  # Surgical patients more likely to be readmitted
+                                                   
+                                                   ## Lab values
+                                                   (creatinine - 1) * 0.4 +  # Renal function matters
+                                                   (hemoglobin < 10) * 0.35 +  # Anemia
+                                                   
+                                                   ## LOS effect (very short or very long LOS = readmission risk)
+                                                   ifelse(!is.na(los_days), (abs(los_days - 7) * 0.04), 0) +
+                                                   
+                                                   ## INTERACTION EFFECTS
+                                                   ((diabetes == "Yes") & (age > 70)) * 0.4 +  # Elderly diabetics
+                                                   ((surgery == "Yes") & (stage %in% c("III", "IV"))) * 0.35 +
+                                                   
+                                                   ## Site clustering (some sites have better discharge planning)
+                                                   site_complication_effect[as.character(site)] * 0.7 +
+                                                   
+                                                   rnorm(n, 0, 0.15))
     
-    readmission_30d <- factor(ifelse(runif(n) < readmit_prob, "Yes", "No"),
-                              levels = c("No", "Yes"))
+    readmission_30d <- factor(ifelse(runif(n) < readmit_prob, "30-day readmission", "No 30-day readmission"),
+                              levels = c("No 30-day readmission", "30-day readmission"))
     
-    ## --- BINARY OUTCOME 4: ICU Admission ---
+    ## ICU Admission
     ## More severe outcome, stronger associations
     icu_prob <- plogis(-3.0 +
                        ## Demographics
@@ -518,10 +519,10 @@ create_clintrial <- function() {
                        
                        rnorm(n, 0, 0.15))
     
-    icu_admission <- factor(ifelse(runif(n) < icu_prob, "Yes", "No"),
-                            levels = c("No", "Yes"))
+    icu_admission <- factor(ifelse(runif(n) < icu_prob, "ICU admission", "No ICU admission"),
+                            levels = c("No ICU admission", "ICU admission"))
     
-    ## --- CONTINUOUS OUTCOME 1: Postoperative Pain Score (0-10) ---
+    ## Postoperative Pain Score (0-10)
     ## Visual analog scale, varies by patient and treatment
     pain_score <- 4.0 +  # Baseline moderate pain
         ## Demographics
@@ -559,7 +560,7 @@ create_clintrial <- function() {
     pain_score[pain_score < 0] <- 0
     pain_score[pain_score > 10] <- 10
     
-    ## --- CONTINUOUS OUTCOME 2: Days to Functional Recovery ---
+    ## Days to Functional Recovery
     ## Time to return to baseline function, log-normal distribution
     recovery_days <- exp(2.0 +  # Baseline ~7 days
                          ## Demographics
@@ -602,7 +603,11 @@ create_clintrial <- function() {
     recovery_days[sample(n, size = 15)] <- NA
     pain_score[sample(n, size = 10)] <- NA
 
-    ## * Survival outcomes (correlated with predictors INCLUDING INTERACTIONS)
+    ## -----------------
+    ## Survival outcomes
+    ## -----------------
+    
+    ## Survival outcomes (correlated with predictors including interactions)
     hazard <- exp(-3 + 
                   ## Disease characteristics (STRONGER effects)
                   (stage == "II") * 0.4 +
@@ -656,7 +661,7 @@ create_clintrial <- function() {
     os_time <- pmin(surv_months, censor_time)
     os_status <- as.numeric(surv_months <= censor_time)
     
-    ## * Progression-free survival (PFS must be <= OS)
+    ## Progression-free survival (PFS must be <= OS)
     ## PFS hazard is higher than OS hazard (progression happens before death)
     pfs_hazard <- exp(-2.5 +  # Higher baseline hazard than OS
                       ## Disease characteristics (similar effects as OS)
@@ -703,7 +708,7 @@ create_clintrial <- function() {
     pfs_time_initial <- pmin(pfs_months_raw, pfs_censor_time)
     pfs_status_initial <- as.numeric(pfs_months_raw <= pfs_censor_time)
     
-    ## CRITICAL: Ensure PFS time is always <= OS time
+    ## Ensure PFS time is always <= OS time
     ## For patients with progression events, PFS must be before OS
     pfs_time <- ifelse(pfs_status_initial == 1 & pfs_time_initial > os_time,
                        os_time * runif(n, 0.5, 0.95),  # Set PFS to 50-95% of OS time
@@ -758,7 +763,7 @@ create_clintrial <- function() {
         ## Interventions
         treatment = treatment,
         surgery = surgery,
-        ## Postoperative outcomes
+        ## Post-treatment outcomes
         icu_admission = icu_admission,
         pain_score = pain_score,
         wound_infection = wound_infection,
@@ -845,7 +850,7 @@ clintrial_labels <- c(
     ## Interventions
     "treatment" = "Treatment Group",
     "surgery" = "Surgical Resection",
-    ## Postoperative/treatment outcomes
+    ## Post-treatment outcomes
     "icu_admission" = "ICU Admission Required",
     "pain_score" = "Postoperative Pain Score (0-10)",
     "wound_infection" = "Wound/Site Infection",
@@ -858,8 +863,8 @@ clintrial_labels <- c(
     "pfs_status" = "Progression or Death Event",
     "os_months" = "Overall Survival Time (months)",
     "os_status" = "Death Event",
-    "Surv(pfs_months, pfs_status)" = "Progression-Free Survival",
-    "Surv(os_months, os_status)" = "Overall Survival"
+    "Surv(pfs_months, pfs_status)" = "Progression-Free Survival (months)",
+    "Surv(os_months, os_status)" = "Overall Survival (months)"
 )
 
 ## Save both objects to "data/" directory

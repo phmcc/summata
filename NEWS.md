@@ -1,4 +1,12 @@
-# *summata* 0.9.4 (2025-01-02)
+# *summata* 0.10.0 (2026-01-04)
+
+* Add automatic font detection to forest plot functions
+* Fix formatting for negative coefficients in forest plots
+* Fix "negative zero" formatting issues
+* Add safeguards to avoid multiple model types in `multifit()` calls
+* Add intelligent handling of binary categorical variables for `condense_table`
+
+# *summata* 0.9.4 (2026-01-02)
 
 * Add `show_logs` parameter to `table2tex()`
 * Consistent Unicode formatting for files

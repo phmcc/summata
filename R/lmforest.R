@@ -946,13 +946,44 @@ Received class: ", paste(class(x), collapse = ", "))
                 is_binary <- nrow(var_rows) == 2
                 
                 if (condense_table && is_binary) {
-                    ## Only condense if both flags are set
-                    non_ref_row <- var_rows[2]
-                    condensed_row <- data.table::copy(non_ref_row)
-                    condensed_row[, var := paste0(v, " (", level, ")")]
-                    condensed_row[, level := "-"]
-                    processed_rows[[row_counter]] <- condensed_row
-                    row_counter <- row_counter + 1
+                    ## Use safer reference detection based on NA estimates
+                    non_ref_idx <- find_non_reference_row(var_rows, "estimate")
+                    
+                    if (!is.null(non_ref_idx)) {
+                        non_ref_row <- var_rows[non_ref_idx]
+                        ref_idx <- setdiff(1:2, non_ref_idx)
+                        ref_row <- var_rows[ref_idx]
+                        
+                        condensed_row <- data.table::copy(non_ref_row)
+                        non_ref_category <- condensed_row$level
+                        ref_category <- ref_row$level
+                        
+                        ## Look up label for smarter condensing detection
+                        var_label <- if (!is.null(labels) && v %in% names(labels)) {
+                                         labels[[v]]
+                                     } else if (v %in% names(model_data) && 
+                                                !is.null(attr(model_data[[v]], "label"))) {
+                                         attr(model_data[[v]], "label")
+                                     } else {
+                                         v
+                                     }
+                        
+                        ## Use greedy approach: condense if EITHER category is recognized
+                        if (should_condense_binary(ref_category, non_ref_category, var_label)) {
+                            condensed_row[, var := v]
+                        } else {
+                            condensed_row[, var := paste0(v, " (", non_ref_category, ")")]
+                        }
+                        condensed_row[, level := "-"]
+                        processed_rows[[row_counter]] <- condensed_row
+                        row_counter <- row_counter + 1
+                    } else {
+                        ## Cannot determine reference - fall back to standard layout
+                        for (i in 1:nrow(var_rows)) {
+                            processed_rows[[row_counter]] <- var_rows[i]
+                            row_counter <- row_counter + 1
+                        }
+                    }
                 } else if (indent_groups) {
                     ## Add header for any multi-level variable when indenting
                     header_row <- data.table::data.table(
@@ -1073,13 +1104,13 @@ Received class: ", paste(class(x), collapse = ", "))
                                                                 "",
                                                                 data.table::fifelse(is.na(estimate), 
                                                                                     ref_label,
-                                                                                    format(round(estimate, digits), nsmall = digits)))]
+                                                                                    format_number(estimate, digits)))]
     to_show_exp_clean[, conf_low_formatted := data.table::fifelse(is.na(conf_low), 
                                                                   NA_character_,
-                                                                  format(round(conf_low, digits), nsmall = digits))]
+                                                                  format_number(conf_low, digits))]
     to_show_exp_clean[, conf_high_formatted := data.table::fifelse(is.na(conf_high), 
                                                                    NA_character_,
-                                                                   format(round(conf_high, digits), nsmall = digits))]
+                                                                   format_number(conf_high, digits))]
     
     ## Format CI percentage for display in headers
     ci_pct <- round(conf_level * 100)
@@ -1092,7 +1123,12 @@ Received class: ", paste(class(x), collapse = ", "))
                                                            NA_character_,
                                                            data.table::fifelse(p_value < p_threshold, 
                                                                                p_threshold_str,
-                                                                               format(round(p_value, p_digits), nsmall = p_digits)))]
+                                                                               format_number(p_value, p_digits)))]
+    
+    ## Determine if ANY coefficient or CI bound is negative - if so, use comma notation throughout
+    ## This ensures consistent formatting across all rows
+    use_comma_notation <- any(to_show_exp_clean$conf_low < 0 | to_show_exp_clean$conf_high < 0, na.rm = TRUE)
+    ci_separator <- if (use_comma_notation) ", " else "-"
     
     ## Create the combined effect string with expression for italic p
     to_show_exp_clean[, effect_string_expr := data.table::fifelse(
@@ -1101,19 +1137,11 @@ Received class: ", paste(class(x), collapse = ", "))
                                                               data.table::fcase(
                                                                   is.na(estimate), paste0("'", ref_label, "'"),
                                                                   
-                                                                  p_value < p_threshold & (conf_low < 0 | conf_high < 0),
-                                                                  paste0("'", effect_formatted, " (", conf_low_formatted, ", ", 
-                                                                         conf_high_formatted, "); '*~italic(p)~'", p_threshold_str, "'"),
-                                                                  
                                                                   p_value < p_threshold,
-                                                                  paste0("'", effect_formatted, " (", conf_low_formatted, "-", 
+                                                                  paste0("'", effect_formatted, " (", conf_low_formatted, ci_separator, 
                                                                          conf_high_formatted, "); '*~italic(p)~'", p_threshold_str, "'"),
                                                                   
-                                                                  conf_low < 0 | conf_high < 0,
-                                                                  paste0("'", effect_formatted, " (", conf_low_formatted, ", ", 
-                                                                         conf_high_formatted, "); '*~italic(p)~'= ", p_formatted, "'"),
-                                                                  
-                                                                  default = paste0("'", effect_formatted, " (", conf_low_formatted, "-", 
+                                                                  default = paste0("'", effect_formatted, " (", conf_low_formatted, ci_separator, 
                                                                                    conf_high_formatted, "); '*~italic(p)~'= ", p_formatted, "'")
                                                               )
                                                           )]
@@ -1145,7 +1173,7 @@ Received class: ", paste(class(x), collapse = ", "))
                 if (!is.null(label)) {
                     if (grepl("\\(", v)) {
                         category <- gsub(".*\\((.*)\\)", "\\1", v)
-                        if (category %in% c("Yes", "YES", "yes", "1", "True", "TRUE", "true", "Present", "Positive", "+")) {
+                        if (is_affirmative_category(category, label)) {
                             to_show_exp_clean[var == v, var_display := label]
                         } else {
                             to_show_exp_clean[var == v, var_display := paste0(label, " (", category, ")")]
@@ -1353,7 +1381,7 @@ Received class: ", paste(class(x), collapse = ", "))
                                     labels = sprintf("%g", breaks),
                                     expand = c(0.02, 0.02),
                                     breaks = breaks) +
-        ggplot2::theme_light() +
+        ggplot2::theme_light(base_family = detect_plot_font()) +
         ggplot2::theme(plot.margin = ggplot2::margin(t = 10, r = 0, b = 0, l = 0),
                        panel.grid.minor.y = ggplot2::element_blank(),
                        panel.grid.minor.x = ggplot2::element_blank(),

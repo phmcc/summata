@@ -988,12 +988,44 @@ Received class: ", paste(class(x), collapse = ", "))
                 is_binary <- nrow(var_rows) == 2
                 
                 if (condense_table && is_binary) {
-                    non_ref_row <- var_rows[2]
-                    condensed_row <- data.table::copy(non_ref_row)
-                    condensed_row[, var := paste0(v, " (", level, ")")]
-                    condensed_row[, level := "-"]
-                    processed_rows[[row_counter]] <- condensed_row
-                    row_counter <- row_counter + 1
+                    ## Use safer reference detection based on NA estimates
+                    non_ref_idx <- find_non_reference_row(var_rows, "estimate")
+                    
+                    if (!is.null(non_ref_idx)) {
+                        non_ref_row <- var_rows[non_ref_idx]
+                        ref_idx <- setdiff(1:2, non_ref_idx)
+                        ref_row <- var_rows[ref_idx]
+                        
+                        condensed_row <- data.table::copy(non_ref_row)
+                        non_ref_category <- condensed_row$level
+                        ref_category <- ref_row$level
+                        
+                        ## Look up label for smarter condensing detection
+                        var_label <- if (!is.null(labels) && v %in% names(labels)) {
+                                         labels[[v]]
+                                     } else if (v %in% names(data) && 
+                                                !is.null(attr(data[[v]], "label"))) {
+                                         attr(data[[v]], "label")
+                                     } else {
+                                         v
+                                     }
+                        
+                        ## Use greedy approach: condense if EITHER category is recognized
+                        if (should_condense_binary(ref_category, non_ref_category, var_label)) {
+                            condensed_row[, var := v]
+                        } else {
+                            condensed_row[, var := paste0(v, " (", non_ref_category, ")")]
+                        }
+                        condensed_row[, level := "-"]
+                        processed_rows[[row_counter]] <- condensed_row
+                        row_counter <- row_counter + 1
+                    } else {
+                        ## Cannot determine reference - fall back to indent_groups behavior
+                        for (i in 1:nrow(var_rows)) {
+                            processed_rows[[row_counter]] <- var_rows[i]
+                            row_counter <- row_counter + 1
+                        }
+                    }
                 } else {
                     if (indent_groups) {
                         header_row <- data.table::data.table(
@@ -1120,14 +1152,14 @@ Received class: ", paste(class(x), collapse = ", "))
                                                             "",  # Empty for header rows
                                                             data.table::fifelse(is.na(estimate), 
                                                                                 ref_label,
-                                                                                format(round(exp(estimate), digits), nsmall = digits)))]
+                                                                                format_number(exp(estimate), digits)))]
 
     to_show_exp_clean[, conf_low_formatted := data.table::fifelse(is.na(conf_low), 
                                                                   NA_character_,
-                                                                  format(round(exp(conf_low), digits), nsmall = digits))]
+                                                                  format_number(exp(conf_low), digits))]
     to_show_exp_clean[, conf_high_formatted := data.table::fifelse(is.na(conf_high), 
                                                                    NA_character_,
-                                                                   format(round(exp(conf_high), digits), nsmall = digits))]
+                                                                   format_number(exp(conf_high), digits))]
 
     ## Format p-values using p_digits parameter
     p_threshold <- 10^(-p_digits)
@@ -1137,7 +1169,7 @@ Received class: ", paste(class(x), collapse = ", "))
                                                            NA_character_,
                                                            data.table::fifelse(p_value < p_threshold, 
                                                                                p_threshold_str,
-                                                                               format(round(p_value, p_digits), nsmall = p_digits)))]
+                                                                               format_number(p_value, p_digits)))]
 
     ## Create the combined HR string with expression for italic p
     to_show_exp_clean[, hr_string_expr := data.table::fifelse(
@@ -1182,7 +1214,7 @@ Received class: ", paste(class(x), collapse = ", "))
                 if (!is.null(label)) {
                     if (grepl("\\(", v)) {
                         category <- gsub(".*\\((.*)\\)", "\\1", v)
-                        if (category %in% c("Yes", "YES", "yes", "1", "True", "TRUE", "true", "Present", "Positive", "+")) {
+                        if (is_affirmative_category(category, label)) {
                             to_show_exp_clean[var == v, var_display := label]
                         } else {
                             to_show_exp_clean[var == v, var_display := paste0(label, " (", category, ")")]
@@ -1382,7 +1414,7 @@ Received class: ", paste(class(x), collapse = ", "))
                                labels = sprintf("%g", breaks),
                                expand = c(0.02, 0.02),
                                breaks = breaks) +
-        ggplot2::theme_light() +
+        ggplot2::theme_light(base_family = detect_plot_font()) +
         ggplot2::theme(plot.margin = ggplot2::margin(t = 10, r = 0, b = 0, l = 0),
                        panel.grid.minor.y = ggplot2::element_blank(),
                        panel.grid.minor.x = ggplot2::element_blank(),
