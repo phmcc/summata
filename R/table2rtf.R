@@ -514,7 +514,7 @@ table2rtf <- function(table,
         rtf_text <- paste(readLines(temp_rtf, warn = FALSE), collapse = "\n")
         
         ## Find the first \trowd (table row definition)
-        ## We'll insert the caption right before it
+        ## Insert the caption before this position
         trowd_pos <- regexpr("\\\\trowd", rtf_text)
         
         if (trowd_pos[1] > 0) {

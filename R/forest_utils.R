@@ -228,63 +228,58 @@ find_non_reference_row <- function(var_rows, estimate_col = "estimate") {
 #' @param category Character string with the category name.
 #' @param label Optional character string with the variable label. If provided,
 #'   checks if category is "No [label]" or similar patterns.
+#' @param norm_category Optional pre-normalized category (lowercase, trimmed).
+#'   If provided, skips normalization for performance.
+#' @param norm_label Optional pre-normalized label (lowercase, trimmed).
+#'   If provided, skips normalization for performance.
 #' @return Logical indicating whether category is a reference/negative value.
 #' @keywords internal
-is_reference_category <- function(category, label = NULL) {
+is_reference_category <- function(category, label = NULL, 
+                                   norm_category = NULL, norm_label = NULL) {
     if (is.null(category) || is.na(category) || category == "") {
         return(FALSE)
     }
     
-    norm_category <- tolower(trimws(category))
+    ## Use pre-normalized value if provided, otherwise normalize
+    if (is.null(norm_category)) {
+        norm_category <- tolower(trimws(category))
+    }
     
-    ## Standard reference/negative values
-    reference_values <- c(
-        "no", "none",
-        "0",
-        "false",
-        "absent",
-        "negative",
-        "normal",
-        "-"
-    )
-    
-    if (norm_category %in% reference_values) {
+    ## Fast check against standard reference values using switch for common cases
+    if (norm_category == "no" || norm_category == "none" || 
+        norm_category == "0" || norm_category == "false" ||
+        norm_category == "absent" || norm_category == "negative" ||
+        norm_category == "normal" || norm_category == "-") {
         return(TRUE)
     }
     
-    ## Check for "No [something]" pattern
-    if (grepl("^no\\s+", norm_category)) {
+    ## Check prefix patterns with startsWith (faster than regex for simple prefixes)
+    if (startsWith(norm_category, "no ") || 
+        startsWith(norm_category, "non-") || 
+        startsWith(norm_category, "non ") ||
+        startsWith(norm_category, "without ")) {
         return(TRUE)
     }
     
-    ## Check for "Non-[something]" or "Non [something]" pattern
-    if (grepl("^non[-\\s]", norm_category)) {
-        return(TRUE)
-    }
-    
-    ## Check for "Without [something]" pattern
-    if (grepl("^without\\s+", norm_category)) {
-        return(TRUE)
-    }
-    
-    ## Check for "[something] absent" or "[something] negative" suffix
-    if (grepl("\\s+(absent|negative)$", norm_category)) {
+    ## Check suffix patterns with endsWith (faster than regex)
+    if (endsWith(norm_category, " absent") || endsWith(norm_category, " negative")) {
         return(TRUE)
     }
     
     ## If label provided, check if category is "No [label]" pattern
     if (!is.null(label) && !is.na(label) && label != "") {
-        norm_label <- tolower(trimws(label))
+        if (is.null(norm_label)) {
+            norm_label <- tolower(trimws(label))
+        }
         
-        ## "No [label]" pattern (e.g., label="DVT", category="No DVT")
-        if (norm_category == paste("no", norm_label)) {
+        ## "No [label]" exact pattern
+        if (norm_category == paste0("no ", norm_label)) {
             return(TRUE)
         }
         
-        ## "No [partial label]" pattern
-        ## e.g., label="30-Day Readmission", category="No 30-day readmission"
-        if (grepl("^no\\s+", norm_category)) {
-            category_suffix <- sub("^no\\s+", "", norm_category)
+        ## "No [partial label]" pattern - only check if starts with "no "
+        if (startsWith(norm_category, "no ")) {
+            category_suffix <- substring(norm_category, 4L)  # Faster than sub()
             if (grepl(category_suffix, norm_label, fixed = TRUE) ||
                 grepl(norm_label, category_suffix, fixed = TRUE)) {
                 return(TRUE)
@@ -307,51 +302,56 @@ is_reference_category <- function(category, label = NULL) {
 #' @param category Character string with the category name.
 #' @param label Optional character string with the variable label. If provided,
 #'   returns TRUE when category is a case-insensitive match or substring.
+#' @param norm_category Optional pre-normalized category (lowercase, trimmed).
+#'   If provided, skips normalization for performance.
+#' @param norm_label Optional pre-normalized label (lowercase, trimmed).
+#'   If provided, skips normalization for performance.
 #' @return Logical indicating whether category should be suppressed.
 #' @keywords internal
-is_affirmative_category <- function(category, label = NULL) {
+is_affirmative_category <- function(category, label = NULL,
+                                     norm_category = NULL, norm_label = NULL) {
     if (is.null(category) || is.na(category) || category == "") {
         return(FALSE)
     }
     
-    norm_category <- tolower(trimws(category))
+    ## Use pre-normalized value if provided, otherwise normalize once
+    if (is.null(norm_category)) {
+        norm_category <- tolower(trimws(category))
+    }
     
-    ## Standard affirmative values
-    affirmative_values <- c(
-        "yes",
-        "1",
-        "true",
-        "present",
-        "positive",
-        "+"
-    )
-    
-    if (norm_category %in% affirmative_values) {
+    ## Fast check against standard affirmative values
+    if (norm_category == "yes" || norm_category == "1" || 
+        norm_category == "true" || norm_category == "present" ||
+        norm_category == "positive" || norm_category == "+") {
         return(TRUE)
     }
     
-    ## Check if it's a reference category (also suppress these)
-    if (is_reference_category(category, label)) {
+    ## Pre-normalize label if needed (do this before calling is_reference_category)
+    if (!is.null(label) && !is.na(label) && label != "" && is.null(norm_label)) {
+        norm_label <- tolower(trimws(label))
+    }
+    
+    ## Check if it's a reference category (pass pre-normalized values)
+    if (is_reference_category(category, label, norm_category, norm_label)) {
         return(TRUE)
     }
     
     ## Check if category matches or is contained in the label (case-insensitive)
-    if (!is.null(label) && !is.na(label) && label != "") {
-        norm_label <- tolower(trimws(label))
-        
+    if (!is.null(norm_label)) {
         ## Check for exact match
         if (norm_category == norm_label) {
             return(TRUE)
         }
         
         ## Check if category is a substantial substring of label
-        ## (e.g., "30-day readmission" in "30-Day Readmission")
-        if (nchar(norm_category) >= 3 && grepl(norm_category, norm_label, fixed = TRUE)) {
+        nc_len <- nchar(norm_category)
+        if (nc_len >= 3L && grepl(norm_category, norm_label, fixed = TRUE)) {
             return(TRUE)
         }
         
         ## Check reverse: label is substring of category
-        if (nchar(norm_label) >= 3 && grepl(norm_label, norm_category, fixed = TRUE)) {
+        nl_len <- nchar(norm_label)
+        if (nl_len >= 3L && grepl(norm_label, norm_category, fixed = TRUE)) {
             return(TRUE)
         }
     }
@@ -397,15 +397,41 @@ is_affirmative_category <- function(category, label = NULL) {
 #' # Returns FALSE (neither is standard nor matches label)
 #' }
 should_condense_binary <- function(ref_category, non_ref_category, label = NULL) {
+    ## Pre-normalize all strings once to avoid redundant normalization
+    norm_ref <- if (!is.null(ref_category) && !is.na(ref_category) && ref_category != "") {
+                    tolower(trimws(ref_category))
+                } else {
+                    NULL
+                }
+    
+    norm_non_ref <- if (!is.null(non_ref_category) && !is.na(non_ref_category) && non_ref_category != "") {
+                        tolower(trimws(non_ref_category))
+                    } else {
+                        NULL
+                    }
+    
+    norm_label <- if (!is.null(label) && !is.na(label) && label != "") {
+                      tolower(trimws(label))
+                  } else {
+                      NULL
+                  }
+    
     ## Greedy approach: if EITHER category is recognizable, condense
+    ## Pass pre-normalized values to avoid redundant tolower/trimws calls
     
-    ## Check if reference category is a standard reference value
-    ref_is_standard <- is_reference_category(ref_category, label)
+    ## Check reference category first (more likely to be "No", "0", etc.)
+    if (!is.null(norm_ref)) {
+        if (is_reference_category(ref_category, label, norm_ref, norm_label)) {
+            return(TRUE)
+        }
+    }
     
-    ## Check if non-reference category is a standard affirmative value
-    ## or matches the label
-    non_ref_is_standard <- is_affirmative_category(non_ref_category, label)
+    ## Check non-reference category
+    if (!is.null(norm_non_ref)) {
+        if (is_affirmative_category(non_ref_category, label, norm_non_ref, norm_label)) {
+            return(TRUE)
+        }
+    }
     
-    ## Return TRUE if either is recognized
-    return(ref_is_standard || non_ref_is_standard)
+    return(FALSE)
 }

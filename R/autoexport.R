@@ -114,7 +114,6 @@
 #' @export
 autoexport <- function(table, file, ...) {
     
-    ## Validate inputs
     if (missing(table) || missing(file)) {
         stop("Both 'table' and 'file' arguments are required")
     }
@@ -123,16 +122,13 @@ autoexport <- function(table, file, ...) {
         stop("'file' must be a single character string")
     }
     
-    ## Extract file extension
     file_ext <- tolower(tools::file_ext(file))
     
-    ## Check if extension is empty
     if (file_ext == "") {
         stop(paste0("File '", file, "' has no extension. ",
                     "Please specify one of: .pdf, .docx, .pptx, .html, .htm, .rtf, .tex"))
     }
     
-    ## Route to appropriate export function based on extension
     result <- switch(file_ext,
                      "pdf" = {
                          table2pdf(table = table, file = file, ...)
@@ -154,7 +150,6 @@ autoexport <- function(table, file, ...) {
                          table2tex(table = table, file = file, ...)
                      },
                      {
-                         ## Unknown extension
                          stop(paste0("Unsupported file extension: '.", file_ext, "'\n",
                                      "Supported formats are:\n",
                                      "  .pdf   - PDF via LaTeX (table2pdf)\n",
@@ -167,6 +162,5 @@ autoexport <- function(table, file, ...) {
                      }
                      )
     
-    ## Return file path invisibly (matches pattern of export functions)
     invisible(file)
 }

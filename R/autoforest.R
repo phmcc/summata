@@ -146,7 +146,7 @@
 #' # Automatically detects coxph and routes to coxforest()
 #' 
 #' # Example 3: Linear regression model
-#' lm_model <- lm(biomarker ~ age + sex + bmi + treatment, data = clintrial)
+#' lm_model <- lm(biomarker_x ~ age + sex + bmi + treatment, data = clintrial)
 #' 
 #' plot3 <- autoforest(lm_model, data = clintrial)
 #' print(plot3)

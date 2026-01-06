@@ -41,7 +41,7 @@ utils::globalVariables(c(
            "FastFit Score",
            "p-value",
            
-           ## Other variables
+           ## Variables used in analysis functions
            ".int_term",
            ".is_ref",
            ".temp_var_order",
