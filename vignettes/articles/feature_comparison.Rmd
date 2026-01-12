@@ -1,0 +1,188 @@
+---
+title: "Feature Comparison and Roadmap"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Feature Comparison}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = TRUE
+)
+```
+
+This article compares `summata` with other R packages for regression table generation and summary statistics.
+
+---
+
+# Package Comparison
+
+The R ecosystem includes several well-established packages for creating publication-ready regression tables. The following comparison identifies areas of overlap and distinction between `summata` and its alternatives.
+
+## Compared Packages
+
+| Package | Primary Focus |
+|:--------|:--------------|
+| **summata** | Fast regression workflows, forest plots, multivariate analysis |
+| **gtsummary** | Comprehensive table generation, gt ecosystem, maximum flexibility |
+| **finalfit** | Clinical research, missing data handling, bootstrap simulations |
+| **arsenal** | Large-scale summaries, SAS-like output |
+| **stargazer** | Econometrics, LaTeX output, academic journal formatting |
+| **tableone** | Simple Table 1 generation, SMD calculations |
+| **compareGroups** | Bivariate analysis, clinical epidemiology |
+
+---
+
+## Core Feature Matrix
+
+```{r feature-table, echo=FALSE, results='asis'}
+# Define the feature matrix
+features <- data.frame(
+  Feature = c(
+    "Descriptive Tables",
+    "Stratified Summaries", 
+    "Univariable Screening",
+    "Multivariable Regression",
+    "Multivariate Analysis",
+    "Model Comparison",
+    "Mixed-Effects Models",
+    "Cox/Survival Models",
+    "Interaction Formatting",
+    "Forest Plots",
+    "Table Merge/Stack",
+    "Export (Word/PDF)",
+    "Variable Labels"
+  ),
+  summata = c("Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "No", "Yes", "Yes"),
+  gtsummary = c("Yes", "Yes", "Yes", "Yes", "No", "Yes", "Yes", "Yes", "Partial", "Partial", "Yes", "Yes", "Yes"),
+  finalfit = c("Yes", "Yes", "Yes", "Yes", "No", "Partial", "Partial", "Yes", "Partial", "Yes", "Partial", "Yes", "Yes"),
+  arsenal = c("Yes", "Yes", "Yes", "Yes", "No", "No", "No", "Yes", "Partial", "No", "No", "Yes", "Yes"),
+  stargazer = c("Yes", "No", "No", "Yes", "No", "Yes", "Partial", "Yes", "No", "No", "No", "Yes", "No"),
+  tableone = c("Yes", "Yes", "No", "No", "No", "No", "No", "No", "No", "No", "No", "Partial", "Yes"),
+  compareGroups = c("Yes", "Yes", "Yes", "Yes", "No", "No", "No", "Yes", "No", "No", "No", "Yes", "Yes"),
+  stringsAsFactors = FALSE
+)
+
+# Create HTML table with color coding
+cat('<table class="table table-sm" style="font-size: 0.9em;">\n')
+cat('<thead>\n<tr>\n')
+cat('<th style="text-align: left;">Feature</th>\n')
+cat('<th style="text-align: center;">summata</th>\n')
+cat('<th style="text-align: center;">gtsummary</th>\n')
+cat('<th style="text-align: center;">finalfit</th>\n')
+cat('<th style="text-align: center;">arsenal</th>\n')
+cat('<th style="text-align: center;">stargazer</th>\n')
+cat('<th style="text-align: center;">tableone</th>\n')
+cat('<th style="text-align: center;">compareGroups</th>\n')
+cat('</tr>\n</thead>\n<tbody>\n')
+
+for (i in 1:nrow(features)) {
+  cat('<tr>\n')
+  cat(sprintf('<td style="text-align: left;">%s</td>\n', features$Feature[i]))
+  
+  for (pkg in c("summata", "gtsummary", "finalfit", "arsenal", "stargazer", "tableone", "compareGroups")) {
+    val <- features[[pkg]][i]
+    if (val == "Yes") {
+      style <- 'background-color: #d4edda; color: #155724; text-align: center;'
+      symbol <- "✓"
+    } else if (val == "Partial") {
+      style <- 'background-color: #fff3cd; color: #856404; text-align: center;'
+      symbol <- "◐"
+    } else {
+      style <- 'background-color: #f8d7da; color: #721c24; text-align: center;'
+      symbol <- "—"
+    }
+    cat(sprintf('<td style="%s">%s</td>\n', style, symbol))
+  }
+  cat('</tr>\n')
+}
+
+cat('</tbody>\n</table>\n')
+cat('<p style="font-size: 0.85em; color: #666;"><strong>Legend:</strong> ✓ Full support | ◐ Partial support | — Not available</p>\n')
+```
+
+---
+
+## Feature Definitions
+
+| Feature | Description |
+|:--------|:------------|
+| **Descriptive Tables** | Summary statistics tables (mean, SD, median, IQR, n, %) |
+| **Stratified Summaries** | Table 1-style summaries stratified by group with p-values |
+| **Univariable Screening** | Test multiple predictors against one outcome (crude associations) |
+| **Multivariable Regression** | Combined univariable + multivariable analysis in one table |
+| **Multivariate Analysis** | Test one predictor across multiple outcomes |
+| **Model Comparison** | Compare multiple models side-by-side with fit statistics |
+| **Mixed-Effects Models** | Support for lmer/glmer/coxme random effects models |
+| **Cox/Survival Models** | Cox proportional hazards and survival analysis |
+| **Interaction Formatting** | Native support for interaction terms with formatted output |
+| **Forest Plots** | Integrated forest plot visualization from regression results |
+| **Table Merge/Stack** | Combine separate tables horizontally or vertically |
+| **Export (Word/PDF)** | Direct export to publication formats |
+| **Variable Labels** | Apply custom labels to variables in output |
+
+---
+
+# Unique Strengths of *summata*
+
+The following features distinguish `summata` from comparable packages:
+
+## Multivariate Analysis
+
+The `multifit()` and `multiforest()` functions implement an inverted screening paradigm: testing a single predictor across multiple outcomes simultaneously. This workflow is common in epidemiological and clinical research but not directly supported by other packages.
+ 
+```{r multifit-example, eval=FALSE}
+# Test treatment effect across multiple outcomes
+result <- multifit(
+  data = clintrial,
+  outcomes = c("surgery", "pfs_status", "os_status"),
+  predictor = "treatment",
+  covariates = c("age", "sex", "stage")
+)
+```
+
+## Integrated Forest Plots
+
+Forest plots are generated directly from analysis results without intermediate steps:
+
+```{r forest-example, eval=FALSE}
+# From univariable screening
+screen_result <- uniscreen(data, outcome, predictors)
+uniforest(screen_result)
+
+# From multivariate analysis
+multi_result <- multifit(data, outcomes, predictor)
+multiforest(multi_result)
+```
+
+## Performance Optimization
+
+Built on `data.table` for computational efficiency, `summata` demonstrates 35–54% faster execution than comparable workflows in other packages. See the [Benchmarks](benchmarks.html) article for detailed comparisons.
+
+## Unified API
+
+All modeling functions share consistent syntax across model types:
+
+```{r api-example, eval=FALSE}
+# Same interface for different model types
+fit(data, outcome, predictors, model_type = "glm")
+fit(data, outcome, predictors, model_type = "coxph")
+fit(data, outcome, predictors, model_type = "lmer", random = "(1|site)")
+```
+
+## Complete Mixed-Effects Support
+
+Full support for `coxme` (mixed-effects Cox models) alongside `lmer` and `glmer`, which is limited or absent in other packages.
+
+---
+
+# Additional Resources
+
+- [Benchmarks](benchmarks.html) — Performance comparisons
+- [gtsummary documentation](https://www.danieldsjoberg.com/gtsummary/)
+- [finalfit documentation](https://finalfit.org/)
+- [arsenal documentation](https://mayoverse.github.io/arsenal/)

@@ -1,0 +1,288 @@
+---
+title: "Survival Tables"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Survival Tables}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE,
+  dpi = 150
+)
+
+# Use ragg for better font rendering if available
+if (requireNamespace("ragg", quietly = TRUE)) {
+  knitr::opts_chunk$set(dev = "ragg_png")
+}
+
+options(width = 180)
+```
+
+Survival analysis requires specialized summary tables that report time-to-event outcomes in formats appropriate for clinical research. While `desctable()` includes basic survival summaries (median with 95% CI), detailed survival analysis often requires more comprehensive reporting: survival probabilities at specified time points, multiple quantiles, and group comparisons with appropriate statistical tests.
+ 
+The `survtable()` function generates publication-ready survival tables with flexible output options. This vignette demonstrates its capabilities using the included sample dataset.
+
+---
+
+# Preliminaries
+
+The examples in this vignette use the `clintrial` dataset included with `summata`:
+
+```{r setup}
+library(summata)
+library(survival)
+
+data(clintrial)
+data(clintrial_labels)
+```
+
+The `clintrial` dataset contains `r nrow(clintrial)` observations with time-to-event variables suitable for demonstrating survival summaries.
+
+---
+
+# Basic Usage
+
+## Function Signature
+
+The `survtable()` function uses the familiar `Surv()` syntax for specifying survival outcomes:
+
+```{r, eval = FALSE}
+survtable(data, outcome, by, times, probs, ...)
+```
+
+Here `data` is the dataset, `outcome` specifies the survival endpoint using `Surv()` notation, `by` defines the grouping variable, `times` specifies landmark time points, and `probs` specifies survival quantiles to report.
+
+---
+
+# Landmark Survival Estimates
+
+Landmark survival estimates report the probability of survival at specific time points, commonly used in oncology trials (e.g., 1-year, 2-year survival rates).
+
+## **Example 1:** Basic Landmark Analysis
+
+The following example reports survival probabilities at 12, 24, and 36 months:
+
+```{r}
+example1 <- survtable(
+  data = clintrial,
+  outcome = "Surv(os_months, os_status)",
+  by = "treatment",
+  times = c(12, 24, 36),
+  time_unit = "months"
+)
+
+example1
+```
+
+## **Example 2:** Combining Time Points and Median Survival
+
+A common reporting format includes both landmark survival rates and median survival time:
+
+```{r}
+example2 <- survtable(
+  data = clintrial,
+  outcome = "Surv(os_months, os_status)",
+  by = "treatment",
+  times = c(12, 24),
+  probs = 0.5,
+  time_unit = "months",
+  total = FALSE
+)
+
+example2
+```
+
+---
+
+# Survival Quantiles
+
+Survival quantiles report the time at which a specified proportion of subjects have experienced the event. The median survival time (50th percentile) is the most common, but other quantiles provide additional context.
+
+## **Example 3:** Survival Quartiles
+
+Report multiple survival quantiles by specifying the `probs` parameter:
+
+```{r}
+example3 <- survtable(
+  data = clintrial,
+  outcome = "Surv(os_months, os_status)",
+  by = "stage",
+  times = NULL,
+  probs = c(0.25, 0.5, 0.75),
+  labels = clintrial_labels
+)
+
+example3
+```
+
+---
+
+# Multiple Endpoints
+
+Studies often include multiple time-to-event outcomes, such as progression-free survival (PFS) and overall survival (OS). The `survtable()` function handles multiple endpoints in a single call.
+
+## **Example 4:** PFS and OS Comparison
+
+Pass a vector of outcomes to compare multiple survival endpoints:
+
+```{r}
+example4 <- survtable(
+  data = clintrial,
+  outcome = c("Surv(pfs_months, pfs_status)", "Surv(os_months, os_status)"),
+  by = "treatment",
+  times = c(12, 24),
+  probs = 0.5,
+  time_unit = "months",
+  total = FALSE,
+  labels = c(
+    "Surv(pfs_months, pfs_status)" = "Progression-Free Survival",
+    "Surv(os_months, os_status)" = "Overall Survival"
+  )
+)
+
+example4
+```
+
+---
+
+# Output Variations
+
+## **Example 5:** Cumulative Event Rates
+
+For competing risks analyses or when reporting event rates rather than survival probabilities, use `type = "risk"` to display cumulative incidence (1 − survival):
+
+```{r}
+example5 <- survtable(
+  data = clintrial,
+  outcome = "Surv(os_months, os_status)",
+  by = "treatment",
+  times = c(12, 24, 36),
+  type = "risk",
+  time_unit = "months"
+)
+
+example5
+```
+
+## **Example 6:** Including At-Risk Counts
+
+The number at risk at each time point provides context for the precision of survival estimates:
+
+```{r}
+example6 <- survtable(
+  data = clintrial,
+  outcome = "Surv(os_months, os_status)",
+  by = "treatment",
+  times = c(12, 24),
+  stats = c("survival", "ci", "n_risk"),
+  time_unit = "months",
+  total = FALSE
+)
+
+example6
+```
+
+---
+
+# Pairing with Kaplan-Meier Curves
+
+Survival tables are often presented alongside Kaplan-Meier curves in publications. While `summata` focuses on tabular output, the `survminer` and `ggsurvfit` packages provide excellent options for survival curves.
+
+## **Example 7:** Coordinated Figure-Table Output
+
+The following workflow produces a matched figure-table pair suitable for publication:
+
+```{r, eval = FALSE}
+library(ggsurvfit)
+library(survival)
+
+# Fit the survival model
+km_fit <- survfit(Surv(os_months, os_status) ~ treatment, data = clintrial)
+
+# Create Kaplan-Meier plot with risk table
+ggsurvfit(km_fit) +
+  add_confidence_interval() +
+  add_risktable() +
+  add_quantile(y_value = 0.5, linetype = "dashed") +
+  scale_ggsurvfit() +
+  labs(
+    title = "Overall Survival by Treatment",
+    x = "Time (months)",
+    y = "Survival Probability"
+  ) +
+  theme_minimal()
+
+# Generate the companion table
+surv_table <- survtable(
+  data = clintrial,
+  outcome = "Surv(os_months, os_status)",
+  by = "treatment",
+  times = c(12, 24, 36),
+  probs = 0.5,
+  time_unit = "months"
+)
+
+# Export both for publication
+ggsave("km_curve.pdf", width = 8, height = 6)
+table2pdf(surv_table, "survival_table.pdf", 
+          caption = "Table 2. Survival Estimates by Treatment Group")
+```
+
+This workflow ensures that the Kaplan-Meier curve and survival table report consistent time points and groupings.
+
+---
+
+# Exporting Tables
+
+Survival tables can be exported to various formats using the standard `summata` export functions. See the [Table Export](table_export.html) vignette for comprehensive documentation.
+
+```{r, eval = FALSE}
+# Microsoft Word
+table2docx(
+  table = example1,
+  file = "SurvivalTable.docx",
+  caption = "Table 2. Survival Estimates by Treatment Group"
+)
+
+# PDF (requires LaTeX)
+table2pdf(
+  table = example1,
+  file = "SurvivalTable.pdf",
+  caption = "Table 2. Survival Estimates by Treatment Group"
+)
+```
+
+---
+
+# Best Practices
+
+## Time Point Selection
+
+When selecting landmark time points, consider the following:
+
+1. Use clinically meaningful intervals (e.g., 1-year, 2-year for oncology)
+2. Ensure adequate follow-up at selected time points
+3. Match time points across treatment arms for comparability
+4. Consider the median follow-up when selecting the latest time point
+
+## Reporting Recommendations
+
+1. Always report confidence intervals alongside point estimates
+2. Include the number at risk when space permits
+3. Specify the time unit in table headers or footnotes
+4. Use consistent decimal precision across estimates
+
+---
+
+# Further Reading
+
+- [Descriptive Tables](descriptive_tables.html): `desctable()` for baseline characteristics
+- [Regression Modeling](regression_modeling.html): Cox regression with `fit()` and `fullfit()`
+- [Forest Plots](forest_plots.html): Visualization of hazard ratios
+- [Table Export](table_export.html): Export to PDF, Word, and other formats

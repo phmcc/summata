@@ -1,3 +1,20 @@
+# *summata* 0.10.3 (2026-01-12)
+
+* Add vignettes
+* Add GitHub Actions CI/CD workflows
+
+# *summata* 0.10.2 (2026-01-12)
+
+* Add support for various GLM families
+* Add `MASS` dependency for `MASS::glm.nb()`
+* Testing suite bugfixes
+* Update documentation
+
+# *summata* 0.10.1 (2026-01-05)
+
+* Streamline intelligent `condense_table` string finding
+* Update documentation
+
 # *summata* 0.10.0 (2026-01-04)
 
 * Add automatic font detection to forest plot functions

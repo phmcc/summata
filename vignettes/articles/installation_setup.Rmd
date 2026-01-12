@@ -1,0 +1,302 @@
+---
+title: "Installation and Setup"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Installation and Setup}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+This document provides instructions for installing the `summata` package and configuring the dependencies required for complete functionality. The package requires R ≥ 4.1.0 and several additional components for document generation.
+
+---
+
+# Package Installation
+
+## From Repository
+
+The package is not yet available on CRAN. The stable release may be installed from GitHub:
+ 
+```{r}
+install.packages("remotes")
+remotes::install_github("phmcc/summata")
+```
+
+The development version is available from Codeberg:
+
+```{r}
+remotes::install_git("https://codeberg.org/phmcc/summata.git")
+```
+
+## Verification
+
+Confirm successful installation by loading the package:
+
+```{r}
+library(summata)
+packageVersion("summata")
+```
+
+---
+
+# Dependencies
+
+## Required Dependencies
+
+The following packages are installed automatically as dependencies:
+
+| Package | Purpose |
+|:--------|:--------|
+| `data.table` | High-performance data manipulation |
+| `ggplot2` | Visualization system |
+| `stats` | Statistical functions |
+| `grDevices` | Graphics devices |
+
+## Optional Dependencies
+
+Additional packages extend functionality for specific use-cases:
+
+| Package | Purpose | Required For |
+|:--------|:--------|:-------------|
+| `survival` | Survival analysis | Cox regression, `Surv()` outcomes |
+| `lme4` | Mixed-effects models | `lmer`, `glmer` model types |
+| `coxme` | Mixed-effects Cox models | `coxme` model type |
+| `xtable` | LaTeX table generation | `table2pdf()`, `table2tex()`, `table2html()` |
+| `flextable` | Office document tables | `table2docx()`, `table2pptx()`, `table2rtf()` |
+| `officer` | Office document creation | `table2docx()`, `table2pptx()` |
+
+Install optional dependencies as needed:
+
+```{r}
+# For survival analysis
+install.packages("survival")
+
+# For mixed-effects models
+install.packages(c("lme4", "coxme"))
+
+# For table export
+install.packages(c("xtable", "flextable", "officer"))
+```
+
+---
+
+# LaTeX Configuration
+
+PDF and LaTeX export through `table2pdf()` and `table2tex()` require a LaTeX distribution.
+
+## TinyTeX (Recommended)
+ 
+TinyTeX provides a lightweight, R-integrated LaTeX distribution:
+
+```{r}
+install.packages("tinytex")
+tinytex::install_tinytex()
+```
+
+Verify the installation:
+
+```{r}
+tinytex::is_tinytex()
+tinytex::tlmgr_version()
+```
+
+TinyTeX installs required LaTeX packages automatically on first use.
+
+## Alternative LaTeX Distributions
+
+Full LaTeX distributions may be installed system-wide:
+
+| Distribution | Platform | URL |
+|:-------------|:---------|:----|
+| TeX Live | Cross-platform | https://www.tug.org/texlive/ |
+| MiKTeX | Windows | https://miktex.org/ |
+| MacTeX | macOS | https://www.tug.org/mactex/ |
+
+For Debian/Ubuntu systems:
+
+```{bash}
+sudo apt install texlive-latex-base texlive-latex-extra texlive-fonts-recommended
+```
+
+## Required LaTeX Packages
+
+The export functions utilize the following LaTeX packages:
+
+| Category | Packages |
+|:---------|:---------|
+| Typography | fontenc, inputenc, helvet |
+| Tables | array, booktabs, longtable, colortbl |
+| Layout | geometry, pdflscape, lscape |
+| Graphics | graphicx, xcolor |
+| Specialized | standalone, varwidth, float, caption |
+
+With TinyTeX, these packages install automatically. For standard distributions:
+
+```{bash}
+tlmgr install fontenc inputenc array booktabs longtable graphicx geometry \
+  pdflscape lscape helvet standalone varwidth float caption xcolor colortbl
+```
+
+---
+
+# Microsoft Office Export
+
+Export to Word, PowerPoint, and RTF formats requires:
+
+```{r}
+install.packages(c("flextable", "officer"))
+```
+
+These packages enable creation of `.docx`, `.pptx`, and `.rtf` files that can be opened and edited in Microsoft Office or compatible applications.
+
+---
+
+# Verification Procedure
+
+Execute the following to verify complete functionality:
+
+```{r}
+library(summata)
+
+# Create test data
+test_data <- data.frame(
+  Variable = c("Sample Size", "Mean", "Standard Deviation"),
+  Value = c("150", "45.3", "12.1")
+)
+
+# Test Word export (requires flextable, officer)
+table2docx(test_data, file = "verification_test.docx")
+
+# Test PDF export (requires xtable, LaTeX)
+table2pdf(test_data, file = "verification_test.pdf")
+
+# Clean up
+file.remove("verification_test.docx", "verification_test.pdf")
+```
+
+Successful execution confirms proper configuration of all dependencies.
+
+---
+
+# Troubleshooting
+
+## LaTeX Not Found
+
+If PDF generation fails, verify LaTeX accessibility:
+
+```{r}
+Sys.which("pdflatex")
+```
+ 
+An empty return value indicates LaTeX is not in the system PATH. Solutions include:
+
+1. Restart the R session after LaTeX installation
+2. Add the LaTeX binary directory to PATH manually
+3. Reinstall TinyTeX: `tinytex::reinstall_tinytex()`
+
+## Missing LaTeX Packages
+
+For TinyTeX, install missing packages directly:
+
+```{r}
+tinytex::tlmgr_install("package_name")
+```
+
+For compilation errors, examine the log file:
+
+```{r}
+table2pdf(test_data, file = "debug.pdf", show_logs = TRUE)
+```
+
+## Package Installation Failures
+
+Ensure repository access is configured:
+
+```{r}
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+```
+
+For packages requiring system libraries (Linux):
+
+```{bash}
+sudo apt install r-base-dev libcurl4-openssl-dev libssl-dev libxml2-dev
+```
+
+## Write Permission Errors
+
+Verify write access to the target directory:
+
+```{r}
+getwd()
+file.access(getwd(), mode = 2)  # Returns 0 if writable
+```
+
+---
+
+# System Requirements
+
+| Component | Requirement |
+|:----------|:------------|
+| R | ≥ 4.1.0 |
+| Operating System | Windows, macOS, or Linux |
+| RAM | 4 GB minimum; 8 GB recommended |
+| Disk Space | Base package < 10 MB |
+| | TinyTeX ~150 MB |
+| | Full LaTeX distribution 2–6 GB |
+
+---
+
+# Additional Resources
+
+## Documentation
+
+Access documentation within R:
+
+```{r}
+help(package = "summata")
+?desctable
+?fullfit
+browseVignettes("summata")
+```
+
+## Support
+
+- Package website: https://phmcc.github.io/summata/
+- Issue tracker: https://codeberg.org/phmcc/summata/issues
+
+---
+
+# Quick Reference
+
+Complete installation script:
+
+```{r}
+# Install summata
+install.packages("remotes")
+remotes::install_github("phmcc/summata")
+
+# Install optional dependencies
+install.packages(c(
+  "survival",           # Survival analysis
+
+  "lme4", "coxme",      # Mixed-effects models
+  "xtable",             # LaTeX/PDF export
+  "flextable", "officer", # Office export
+  "tinytex"             # LaTeX distribution
+))
+
+# Configure LaTeX
+tinytex::install_tinytex()
+
+# Verify installation
+library(summata)
+packageVersion("summata")
+```

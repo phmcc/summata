@@ -1,0 +1,595 @@
+---
+title: "Regression Modeling"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Regression Modeling}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE,
+  fig.width = 12,
+  fig.height = 6,
+  dpi = 150
+)
+
+# Use ragg for better font rendering if available
+if (requireNamespace("ragg", quietly = TRUE)) {
+  knitr::opts_chunk$set(dev = "ragg_png")
+}
+
+options(width = 180)
+```
+
+Regression analysis quantifies the relationship between a response variable and one or more predictors while accounting for potential confounding. The standard analytical workflow proceeds in two phases: *univariable* (unadjusted) analysis examines each predictor independently, whereas *multivariable* (adjusted) analysis estimates effects conditional on other predictors. Comparing these estimates reveals the extent of confounding and identifies independent predictors of a given outcome.
+
+The `summata` package provides three functions for regression analysis:
+
+| Function | Purpose |
+|:---------|:--------|
+| `uniscreen()` | Univariable screening of multiple predictors |
+| `fit()` | Single multivariable model |
+| `fullfit()` | Combined univariable and multivariable analysis |
+
+All functions support linear models, generalized linear models (logistic, Poisson), and Cox proportional hazards models, with consistent syntax and publication-ready output.
+
+---
+
+# Preliminaries
+
+The examples in this vignette use the `clintrial` dataset included with `summata`:
+
+```{r setup}
+library(summata)
+
+data(clintrial)
+data(clintrial_labels)
+```
+
+The `clintrial` dataset includes variables suitable for different regression approaches:
+
+| Variable | Type | Application |
+|:---------|:-----|:------------|
+| `surgery` | Binary | Logistic regression |
+| `los_days` | Continuous | Linear regression |
+| `event_count` | Count | Poisson regression |
+| `os_months`, `os_status` | Time-to-event | Cox regression |
+
+---
+
+# Theoretical Background
+
+## Model Specifications
+
+Let *Y* denote the response and $X_1, \ldots, X_p$ the predictors. The supported model classes are:
+
+**Linear regression** (*Y* continuous):
+$$E[Y | X] = \beta_0 + \beta_1 X_1 + \cdots + \beta_p X_p$$
+
+**Logistic regression** (*Y* binary):
+$$\log\left(\frac{P(Y=1|X)}{1-P(Y=1|X)}\right) = \beta_0 + \beta_1 X_1 + \cdots + \beta_p X_p$$
+
+**Poisson regression** (*Y* count):
+$$\log(E[Y | X]) = \beta_0 + \beta_1 X_1 + \cdots + \beta_p X_p$$
+
+**Cox proportional hazards** (*Y* time-to-event):
+$$h(t|X) = h_0(t) \exp(\beta_1 X_1 + \cdots + \beta_p X_p)$$
+
+## Effect Measures
+
+The interpretation of coefficients depends on the model class:
+
+| Model | Raw Coefficient | Exponentiated |
+|:------|:----------------|:--------------|
+| Linear | *β* (mean difference) | — |
+| Logistic | Log-odds ratio | Odds ratio (OR) |
+| Poisson | Log-rate ratio | Rate ratio (RR) |
+| Cox | Log-hazard ratio | Hazard ratio (HR) |
+
+By default, logistic, Poisson, and Cox models display exponentiated coefficients.
+
+---
+
+# Univariable Screening
+
+The `uniscreen()` function fits separate regression models for each predictor, combining results into a single table. This approach identifies candidate predictors for multivariable modeling.
+
+## Function Signature
+
+The function takes data as the first argument, followed by the outcome, predictors, and model type:
+
+```{r, eval = FALSE}
+uniscreen(data, outcome, predictors, model_type, ...)
+```
+
+## **Example 1:** Binary Outcome (Logistic Regression)
+
+For binary outcomes, use `model_type = "glm"` (logistic regression is the default family):
+
+```{r}
+screening_vars <- c("age", "sex", "race", "bmi", "smoking", 
+                    "diabetes", "stage", "ecog", "treatment")
+
+example1 <- uniscreen(
+  data = clintrial,
+  outcome = "surgery",
+  predictors = screening_vars,
+  model_type = "glm",
+  labels = clintrial_labels
+)
+
+example1
+```
+
+Each row represents a separate univariable model. For categorical predictors, each non-reference level appears as a separate row.
+
+## **Example 2:** Filtering by *p*-Value
+
+The `p_threshold` parameter retains only predictors meeting a significance criterion:
+
+```{r}
+example2 <- uniscreen(
+  data = clintrial,
+  outcome = "surgery",
+  predictors = screening_vars,
+  model_type = "glm",
+  p_threshold = 0.20,
+  labels = clintrial_labels
+)
+
+example2
+```
+
+## **Example 3:** Time-to-Event Outcome (Cox Regression)
+
+For survival outcomes, specify the outcome using `Surv()` notation and set `model_type = "coxph"`:
+
+```{r}
+example3 <- uniscreen(
+  data = clintrial,
+  outcome = "Surv(os_months, os_status)",
+  predictors = c("age", "sex", "treatment", "stage", "ecog"),
+  model_type = "coxph",
+  labels = clintrial_labels
+)
+
+example3
+```
+
+## **Example 4:** Continuous Outcome (Linear Regression)
+
+For continuous outcomes, specify `model_type = "lm"`:
+
+```{r}
+example4 <- uniscreen(
+  data = clintrial,
+  outcome = "los_days",
+  predictors = c("age", "sex", "stage", "surgery", "ecog"),
+  model_type = "lm",
+  labels = clintrial_labels
+)
+
+example4
+```
+
+## **Example 5:** Retaining Model Objects
+
+Setting `keep_models = TRUE` stores the fitted model objects for diagnostics:
+
+```{r}
+example5 <- uniscreen(
+  data = clintrial,
+  outcome = "surgery",
+  predictors = c("age", "sex", "stage"),
+  model_type = "glm",
+  keep_models = TRUE
+)
+
+# Access individual models
+models <- attr(example5, "models")
+names(models)
+
+# Examine a specific model
+summary(models[["age"]])
+```
+
+---
+
+# Multivariable Modeling
+
+The `fit()` function estimates a single regression model with multiple predictors, producing adjusted effect estimates.
+
+## Function Signature
+
+The function follows the same convention as other `summata` functions:
+
+```{r, eval = FALSE}
+fit(data, outcome, predictors, model_type, ...)
+```
+
+## **Example 6:** Logistic Regression
+
+For binary outcomes with multiple predictors:
+
+```{r}
+example6 <- fit(
+  data = clintrial,
+  outcome = "surgery",
+  predictors = c("age", "sex", "treatment", "stage"),
+  model_type = "glm",
+  labels = clintrial_labels
+)
+
+example6
+```
+
+## **Example 7:** Cox Regression
+
+For time-to-event outcomes:
+
+```{r}
+example7 <- fit(
+  data = clintrial,
+  outcome = "Surv(os_months, os_status)",
+  predictors = c("age", "sex", "treatment", "stage"),
+  model_type = "coxph",
+  labels = clintrial_labels
+)
+
+example7
+```
+
+## **Example 8:** Linear Regression
+
+For continuous outcomes:
+
+```{r}
+example8 <- fit(
+  data = clintrial,
+  outcome = "los_days",
+  predictors = c("age", "sex", "stage", "ecog"),
+  model_type = "lm",
+  labels = clintrial_labels
+)
+
+example8
+```
+
+## **Example 9:** Poisson Regression
+
+For count outcomes, use `model_type = "glm"` with `family = "poisson"`:
+
+```{r}
+# Create count outcome for demonstration
+clintrial$event_count <- rpois(nrow(clintrial), lambda = 2)
+
+example9 <- fit(
+  data = clintrial,
+  outcome = "event_count",
+  predictors = c("age", "sex", "treatment"),
+  model_type = "glm",
+  family = "poisson"
+)
+
+example9
+```
+
+## **Example 10:** Toggling Reference Rows for Factors
+
+By default, reference rows are shown in output tables (`reference_rows = TRUE`). Setting this parameter to `FALSE` removes these reference rows:
+
+```{r}
+example10 <- fit(
+  data = clintrial,
+  outcome = "surgery",
+  predictors = c("sex", "stage", "treatment"),
+  model_type = "glm",
+  reference_rows = FALSE,
+  labels = clintrial_labels
+)
+
+example10
+```
+
+## **Example 11:** Confidence Level
+
+The `conf_level` parameter adjusts the confidence interval width:
+
+```{r}
+example11 <- fit(
+  data = clintrial,
+  outcome = "surgery",
+  predictors = c("age", "sex", "stage"),
+  model_type = "glm",
+  conf_level = 0.90
+)
+
+example11
+```
+
+## **Example 12:** Raw Coefficients
+
+For logistic and Cox models, set `exponentiate = FALSE` to display log-scale coefficients (*β* rather than exp(*β*)):
+
+```{r}
+example12 <- fit(
+  data = clintrial,
+  outcome = "surgery",
+  predictors = c("age", "sex", "stage"),
+  model_type = "glm",
+  exponentiate = FALSE
+)
+
+example12
+```
+
+---
+
+# Combined Analysis with fullfit()
+
+The `fullfit()` function integrates univariable screening and multivariable modeling into a single workflow, producing a combined table with both unadjusted and adjusted estimates.
+
+## Function Signature
+
+The function extends `fit()` with additional parameters for variable selection:
+
+```{r, eval = FALSE}
+fullfit(data, outcome, predictors, model_type, method, ...)
+```
+
+## Variable Selection Methods
+
+The `method` parameter controls which predictors enter the multivariable model:
+
+| Method | Description |
+|:-------|:------------|
+| `"screen"` | Only predictors meeting the *p*-threshold in univariable analysis are used in the multivariable model (default) |
+| `"all"` | All predictors are used in both univariable and multivariable analyses |
+| `"custom"` | Multivariable predictors are explicitly specified |
+
+## **Example 13:** Screening-Based Selection
+
+The default `method = "screen"` approach specifies that only predictors with univariable *p*-value below `p_threshold` are subsequently used in the multivariable analysis:
+
+```{r}
+example13 <- fullfit(
+  data = clintrial,
+  outcome = "surgery",
+  predictors = c("age", "sex", "bmi", "smoking", "diabetes",
+                 "stage", "treatment"),
+  model_type = "glm",
+  method = "screen",
+  p_threshold = 0.20,
+  labels = clintrial_labels
+)
+
+example13
+```
+
+## **Example 14:** All Predictors
+
+The `method = "all"` approach includes the same predictors in both univariable and multivariable analysis:
+
+```{r}
+example14 <- fullfit(
+  data = clintrial,
+  outcome = "surgery",
+  predictors = c("age", "sex", "treatment", "stage"),
+  model_type = "glm",
+  method = "all",
+  labels = clintrial_labels
+)
+
+example14
+```
+
+## **Example 15:** Custom Selection
+
+The `method = "custom"` approach allows explicit specification of multivariable predictors via the `multi_predictors` argument:
+
+```{r}
+example15 <- fullfit(
+  data = clintrial,
+  outcome = "surgery",
+  predictors = c("age", "sex", "bmi", "smoking", "stage", "treatment"),
+  model_type = "glm",
+  method = "custom",
+  multi_predictors = c("age", "sex", "stage", "treatment"),
+  labels = clintrial_labels
+)
+
+example15
+```
+
+## **Example 16:** Controlling Output Columns
+
+The `columns` parameter controls which results are displayed:
+
+```{r}
+# Univariable only
+example16a <- fullfit(
+  data = clintrial,
+  outcome = "surgery",
+  predictors = c("age", "sex", "stage"),
+  model_type = "glm",
+  columns = "uni"
+)
+
+example16a
+
+# Multivariable only
+example16b <- fullfit(
+  data = clintrial,
+  outcome = "surgery",
+  predictors = c("age", "sex", "stage"),
+  model_type = "glm",
+  columns = "multi"
+)
+
+example16b
+```
+
+## **Example 17:** Survival Analysis
+
+Output tables can use Cox regression for survival outcomes by specifying `Surv()` notation and `model_type = "coxph"`:
+
+```{r}
+example17 <- fullfit(
+  data = clintrial,
+  outcome = "Surv(os_months, os_status)",
+  predictors = c("age", "sex", "treatment", "stage", "ecog"),
+  model_type = "coxph",
+  method = "screen",
+  p_threshold = 0.10,
+  labels = clintrial_labels
+)
+
+example17
+```
+
+---
+
+# Supported Model Types
+
+The following table summarizes all supported model types:
+
+| `model_type` | Model | Outcome | Effect Measure |
+|:-------------|:------|:--------|:---------------|
+| `"lm"` | Linear | Continuous | Coefficient (*β*) |
+| `"glm"` | Logistic | Binary | Odds ratio |
+| `"glm"` + `family = "poisson"` | Poisson | Count | Rate ratio |
+| `"coxph"` | Cox PH | Time-to-event | Hazard ratio |
+| `"clogit"` | Conditional logistic | Matched binary | Odds ratio |
+
+---
+
+# Exporting Results
+
+Regression tables can be exported to various formats:
+
+```{r, eval = FALSE}
+# Microsoft Word
+table2docx(
+  table = example13,
+  file = "Table2_Regression.docx",
+  caption = "Table 2. Univariable and Multivariable Analysis"
+)
+
+# PDF
+table2pdf(
+  table = example13,
+  file = "Table2_Regression.pdf",
+  caption = "Table 2. Regression Results"
+)
+```
+
+See the [Table Export](table_export.html) vignette for comprehensive documentation.
+
+---
+
+# Best Practices
+
+## Variable Selection Strategy
+
+1. **Exploratory phase**: Use `uniscreen()` with liberal *p*-threshold (e.g., 0.20)
+2. **Model building**: Use `fullfit()` with `method = "screen"` or `method = "custom"`
+3. **Confirmatory analysis**: Use `fit()` with pre-specified predictors
+4. **Sensitivity analysis**: Compare specifications with `compfit()`
+
+## Interpreting Results
+
+The comparison between univariable and multivariable estimates reveals confounding:
+
+- **Large differences**: Substantial confounding present
+- **Similar estimates**: Association robust to adjustment
+- **Sign reversal**: Simpson's paradox; investigate carefully
+
+## Sample Size Considerations
+
+Adequate events per predictor are required for stable estimation:
+
+- Logistic/Cox models: ≥10 events per predictor (rule of thumb)
+- Linear models: ≥10–20 observations per predictor
+- Use `method = "screen"` to reduce predictors when sample size is limited
+
+---
+
+# Common Issues
+
+## Missing Data
+
+Regression functions use complete-case analysis by default:
+
+```{r, eval = FALSE}
+# Check missingness
+sapply(clintrial[, c("age", "sex", "stage")], function(x) sum(is.na(x)))
+
+# Create complete-case dataset explicitly
+complete_data <- na.omit(clintrial[, c("surgery", "age", "sex", "stage")])
+```
+
+## Factor Reference Levels
+
+Ensure reference categories are set appropriately:
+
+```{r, eval = FALSE}
+# Set specific reference level
+clintrial$stage <- relevel(factor(clintrial$stage), ref = "I")
+```
+
+## Convergence Issues
+
+For models that fail to converge:
+
+```{r, eval = FALSE}
+# Access model for diagnostics
+result <- fit(data, outcome, predictors, model_type = "glm")
+model <- attr(result, "model")
+
+# Check convergence
+model$converged
+
+# Large coefficients may indicate separation
+coef(model)
+```
+
+## Multinomial and Ordinal Outcomes
+
+The `summata` package currently supports binary outcomes (via logistic regression) but not multinomial or ordinal outcomes with more than two categories. If you attempt to use a categorical outcome with three or more levels, `summata` will issue a warning because binomial GLM coerces such outcomes to binary (first level vs all others combined).
+
+For categorical outcomes with more than two levels, use dedicated packages:
+
+```{r, eval = FALSE}
+## Multinomial regression (unordered categories)
+library(nnet)
+model <- multinom(outcome ~ predictor1 + predictor2, data = mydata)
+summary(model)
+
+## Ordinal regression (ordered categories)
+library(MASS)
+model <- polr(outcome ~ predictor1 + predictor2, data = mydata, Hess = TRUE)
+summary(model)
+
+## Alternative ordinal package
+library(ordinal)
+model <- clm(outcome ~ predictor1 + predictor2, data = mydata)
+summary(model)
+```
+
+Note that `gtsummary::tbl_regression()` provides limited support for formatting `nnet::multinom` output, though with caveats about the different underlying model structure.
+
+---
+
+# Further Reading
+
+- [Descriptive Tables](descriptive_tables.html): `desctable()` for baseline characteristics
+- [Model Comparison](model_comparison.html): `compfit()` for comparing models
+- [Table Export](table_export.html): Export to PDF, Word, and other formats
+- [Forest Plots](forest_plots.html): Visualization of regression results
+- [Multivariate Analysis](multivariate_analysis.html): `multifit()` for multi-outcome analysis
+- [Advanced Workflows](advanced_workflows.html): Interactions and mixed-effects models

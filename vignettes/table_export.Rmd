@@ -1,0 +1,682 @@
+---
+title: "Table Export"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Table Export}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE,
+  eval = FALSE
+)
+options(width = 180)
+```
+
+Publication requires tables in specific formats: Word documents for collaborative drafting, PDF for final submission, LaTeX for manuscript preparation, HTML for web supplements, PowerPoint for presentations, and RTF for regulatory submissions. The `summata` package provides export functions for each format, with consistent parameters across formats and format-specific options where needed.
+
+| Function | Format | Dependencies |
+|:---------|:-------|:-------------|
+| `table2docx()` | Microsoft Word (.docx) | `flextable`, `officer` |
+| `table2pdf()` | PDF | `xtable`, LaTeX distribution |
+| `table2html()` | HTML | `xtable` |
+| `table2pptx()` | PowerPoint (.pptx) | `flextable`, `officer` |
+| `table2tex()` | LaTeX source (.tex) | `xtable` |
+| `table2rtf()` | Rich Text Format (.rtf) | `flextable` |
+| `autotable()` | Auto-detect from extension | Varies |
+
+---
+
+# Preliminaries
+
+The examples in this vignette create sample tables using `summata` functions:
+
+```{r setup, eval = TRUE}
+library(summata)
+
+data(clintrial)
+data(clintrial_labels)
+
+# Create sample tables for export
+table1 <- desctable(
+  data = clintrial,
+  by = "treatment",
+  variables = c("age", "sex", "bmi", "smoking", "stage", "ecog"),
+  labels = clintrial_labels
+)
+
+table2 <- fullfit(
+  data = clintrial,
+  outcome = "surgery",
+  predictors = c("age", "sex", "stage", "treatment", "ecog"),
+  model_type = "glm",
+  labels = clintrial_labels
+)
+
+table3 <- fullfit(
+  data = clintrial,
+  outcome = "Surv(os_months, os_status)",
+  predictors = c("age", "sex", "stage", "treatment", "ecog"),
+  model_type = "coxph",
+  labels = clintrial_labels
+)
+
+table4 <- compfit(
+  data = clintrial,
+  outcome = "surgery",
+  model_list = list(
+    "Demographics" = c("age", "sex"),
+    "Clinical" = c("age", "sex", "stage", "ecog"),
+    "Full" = c("age", "sex", "stage", "ecog", "treatment")
+  ),
+  model_type = "glm"
+)
+```
+
+---
+
+# Automatic Format Detection
+
+The `autotable()` function detects the output format from the file extension, simplifying the export workflow:
+
+```{r}
+autotable(table1, "Table1.pdf")
+autotable(table1, "Table1.docx")
+autotable(table1, "Table1.pptx")
+autotable(table1, "Table1.html")
+autotable(table1, "Table1.rtf")
+autotable(table1, "Table1.tex")
+```
+
+Format-specific parameters pass through to the underlying function:
+
+```{r}
+autotable(
+  table = table2,
+  file = "Table2.pdf",
+  caption = "Table 2. Regression Analysis",
+  orientation = "landscape",
+  font_size = 8,
+  bold_significant = TRUE,
+  indent_groups = TRUE,
+  zebra_stripes = TRUE
+)
+```
+
+---
+
+# Microsoft Word Export
+
+The `table2docx()` function creates editable Word documents using the `flextable` package.
+
+## Basic Export
+
+The simplest usage requires only a table and filename:
+
+```{r}
+table2docx(
+  table = table1,
+  file = "Table1.docx"
+)
+```
+
+## With Caption
+
+Add a caption using the `caption` parameter:
+
+```{r}
+table2docx(
+  table = table1,
+  file = "Table1.docx",
+  caption = "Table 1. Baseline Characteristics by Group"
+)
+```
+
+## With Formatting Options
+
+Multiple formatting options can be combined:
+
+```{r}
+table2docx(
+  table = table2,
+  file = "Table2.docx",
+  caption = "Table 2. Regression Analysis",
+  font_size = 9,
+  font_family = "Times New Roman",
+  bold_significant = TRUE,
+  p_threshold = 0.05,
+  indent_groups = TRUE,
+  zebra_stripes = TRUE
+)
+```
+
+## Page Layout
+
+Control page size and orientation for wide tables:
+
+```{r}
+table2docx(
+  table = table2,
+  file = "Table2_Landscape.docx",
+  caption = "Table 2. Regression Results",
+  paper = "letter",
+  orientation = "landscape"
+)
+```
+
+## Dark Header Style
+
+Use a dark header background for visual emphasis:
+
+```{r}
+table2docx(
+  table = table1,
+  file = "Table1_DarkHeader.docx",
+  caption = "Table 1. Baseline Characteristics",
+  dark_header = TRUE,
+  zebra_stripes = TRUE
+)
+```
+
+---
+
+# PDF Export
+
+The `table2pdf()` function creates PDF documents using LaTeX typesetting. A LaTeX distribution (TinyTeX, TeX Live, MiKTeX, or MacTeX) is required.
+
+## Basic Export
+
+The simplest usage requires only a table and filename:
+
+```{r}
+table2pdf(
+  table = table1,
+  file = "Table1.pdf"
+)
+```
+
+## With Caption
+
+Add a caption using the `caption` parameter:
+
+```{r}
+table2pdf(
+  table = table1,
+  file = "Table1.pdf",
+  caption = "Table 1. Baseline Characteristics by Group"
+)
+```
+
+## With Formatting Options
+
+Multiple formatting options can be combined:
+
+```{r}
+table2pdf(
+  table = table2,
+  file = "Table2.pdf",
+  caption = "Table 2. Regression Analysis",
+  font_size = 8,
+  bold_significant = TRUE,
+  p_threshold = 0.05,
+  indent_groups = TRUE,
+  variable_padding = TRUE,
+  zebra_stripes = TRUE
+)
+```
+
+## Page Layout
+
+Control page size and orientation:
+
+```{r}
+table2pdf(
+  table = table2,
+  file = "Table2_Landscape.pdf",
+  caption = "Table 2. Regression Results",
+  paper = "letter",
+  orientation = "landscape"
+)
+```
+
+## Custom Margins
+
+Adjust page margins (in inches):
+
+```{r}
+table2pdf(
+  table = table2,
+  file = "Table2_Margins.pdf",
+  margins = c(0.5, 0.5, 0.5, 0.5)  # top, right, bottom, left
+)
+```
+
+## Fit to Page Width
+
+Scale tables to fit the page width:
+
+```{r}
+table2pdf(
+  table = table2,
+  file = "Table2_Fitted.pdf",
+  fit_to_page = TRUE
+)
+```
+
+## Standalone Table
+
+Standalone settings are useful for embedding tables in larger documents:
+
+```{r}
+table2pdf(
+  table = table2,
+  file = "Table2_Auto.pdf",
+  paper = "auto"
+)
+```
+
+---
+
+# HTML Export
+
+The `table2html()` function exports tables to HTML file output for web use.
+
+## Basic Export
+
+The simplest usage requires only a table and filename:
+
+```{r}
+table2html(
+  table = table1,
+  file = "Table1.html"
+)
+```
+
+## With Caption
+
+Add a caption using the `caption` parameter:
+
+```{r}
+table2html(
+  table = table1,
+  file = "Table1.html",
+  caption = "Table 1. Baseline Characteristics"
+)
+```
+
+## With Formatting Options
+
+Multiple formatting options can be combined:
+
+```{r}
+table2html(
+  table = table2,
+  file = "Table2.html",
+  caption = "Table 2. Regression Analysis",
+  bold_significant = TRUE,
+  indent_groups = TRUE,
+  zebra_stripes = TRUE,
+  stripe_color = "#f5f5f5"
+)
+```
+
+---
+
+# PowerPoint Export
+
+The `table2pptx()` function creates PowerPoint presentations with tables.
+
+## Basic Export
+
+The simplest usage creates a single-slide presentation:
+
+```{r}
+table2pptx(
+  table = table1,
+  file = "Table1.pptx"
+)
+```
+
+## With Slide Title
+
+Add a slide title using the `slide_title` parameter:
+
+```{r}
+table2pptx(
+  table = table1,
+  file = "Table1.pptx",
+  slide_title = "Baseline Characteristics"
+)
+```
+
+## With Formatting Options
+
+Multiple formatting options can be combined:
+
+```{r}
+table2pptx(
+  table = table2,
+  file = "Table2.pptx",
+  slide_title = "Regression Analysis",
+  font_size = 10,
+  font_family = "Arial",
+  bold_significant = TRUE,
+  indent_groups = TRUE,
+  zebra_stripes = TRUE
+)
+```
+
+## Custom Template
+
+Use an existing PowerPoint template:
+
+```{r}
+table2pptx(
+  table = table1,
+  file = "Table1_Custom.pptx",
+  template = "my_template.pptx",
+  layout = "Title and Content",
+  master = "Office Theme"
+)
+```
+
+---
+
+# LaTeX Export
+
+The `table2tex()` function creates LaTeX source files for inclusion in manuscripts.
+
+## Basic Export
+
+The simplest usage requires only a table and filename:
+
+```{r}
+table2tex(
+  table = table1,
+  file = "Table1.tex"
+)
+```
+
+## With Caption and Label
+
+Add caption and cross-reference label:
+
+```{r}
+table2tex(
+  table = table1,
+  file = "Table1.tex",
+  caption = "Baseline Characteristics by Group",
+  label = "tab:demographics"
+)
+```
+
+## With Booktabs Styling
+
+Use the booktabs package for professional formatting:
+
+```{r}
+table2tex(
+  table = table2,
+  file = "Table2.tex",
+  caption = "Regression Analysis",
+  label = "tab:regression",
+  booktabs = TRUE,
+  bold_significant = TRUE,
+  indent_groups = TRUE
+)
+```
+
+---
+
+# RTF Export
+
+The `table2rtf()` function creates Rich Text Format files, commonly used for regulatory submissions.
+
+## Basic Export
+
+The simplest usage requires only a table and filename:
+
+```{r}
+table2rtf(
+  table = table1,
+  file = "Table1.rtf"
+)
+```
+
+## With Formatting Options
+
+Multiple formatting options can be combined:
+
+```{r}
+table2rtf(
+  table = table2,
+  file = "Table2.rtf",
+  caption = "Table 2. Regression Analysis",
+  font_size = 9,
+  font_family = "Times New Roman",
+  bold_significant = TRUE,
+  indent_groups = TRUE,
+  zebra_stripes = TRUE
+)
+```
+
+## Page Layout
+
+Control page size and orientation:
+
+```{r}
+table2rtf(
+  table = table2,
+  file = "Table2_Landscape.rtf",
+  paper = "letter",
+  orientation = "landscape"
+)
+```
+
+---
+
+# Common Formatting Parameters
+
+All export functions share common parameters for consistent results:
+
+| Parameter | Description | Default |
+|:----------|:------------|:--------|
+| `caption` | Table caption/title | `NULL` |
+| `font_size` | Base font size (points) | 8–10 |
+| `format_headers` | Auto-format column headers | `TRUE` |
+| `bold_significant` | Bold significant *p*-values | `TRUE` |
+| `p_threshold` | Significance threshold | 0.05 |
+| `indent_groups` | Indent factor levels | `FALSE` |
+| `condense_table` | Show essential rows only | `FALSE` |
+| `condense_quantitative` | Condense continuous/survival only (`desctable()` only) | `FALSE` |
+| `zebra_stripes` | Alternating row shading | `FALSE` |
+| `dark_header` | Dark header background | `FALSE` |
+
+## Condensing Options
+
+The `condense_table` and `condense_quantitative` parameters reduce table height:
+
+- **`condense_table = TRUE`**: Condenses continuous, survival, and binary categorical variables
+- **`condense_quantitative = TRUE`**: Condenses only continuous and survival variables (`desctable()` outputs only)
+
+```{r}
+# Full display
+table2docx(table1, "Table1_Full.docx")
+
+# Condense all variable types
+table2docx(
+  table = table1,
+  file = "Table1_Condensed.docx",
+  condense_table = TRUE,
+  zebra_stripes = TRUE
+)
+
+# Condense only continuous/survival
+table2docx(
+  table = table1,
+  file = "Table1_CondenseQuant.docx",
+  condense_quantitative = TRUE,
+  zebra_stripes = TRUE
+)
+```
+
+---
+
+# Format-Specific Parameters
+
+## Word/RTF/PowerPoint (flextable-based)
+
+| Parameter | Description |
+|:----------|:------------|
+| `font_family` | Font name (e.g., "Arial") |
+| `width` | Table width (inches) |
+| `align` | Column alignment vector |
+| `return_ft` | Return flextable object |
+
+## PDF (LaTeX-based)
+
+| Parameter | Description |
+|:----------|:------------|
+| `margins` | Page margins `c(top, right, bottom, left)` |
+| `fit_to_page` | Scale table to fit page width |
+| `cell_padding` | Vertical padding ("none", "normal", "relaxed", "loose") |
+| `variable_padding` | Add spacing between variables |
+| `show_logs` | Keep LaTeX log files |
+
+## HTML
+
+| Parameter | Description |
+|:----------|:------------|
+| `include_css` | Include embedded CSS styling |
+| `stripe_color` | Zebra stripe color (hex or name) |
+
+## LaTeX
+
+| Parameter | Description |
+|:----------|:------------|
+| `booktabs` | Use booktabs package styling |
+| `label` | LaTeX cross-reference label |
+| `cell_padding` | Arraystretch value |
+
+## PowerPoint
+
+| Parameter | Description |
+|:----------|:------------|
+| `template` | Custom PPTX template file |
+| `layout` | Slide layout name |
+| `master` | Slide master name |
+| `left`, `top` | Table position (inches) |
+
+---
+
+# Best Practices
+
+## Format Selection
+
+| Use-Case | Recommended Format |
+|:---------|:-------------------|
+| Manuscript drafts, collaboration | Word (.docx) |
+| Journal submission | PDF (.pdf) or LaTeX (.tex) |
+| Web/R Markdown | HTML (.html) |
+| Presentations | PowerPoint (.pptx) |
+| Regulatory submissions | RTF (.rtf) |
+| Maximum compatibility | RTF (.rtf) |
+
+## Page Layout Guidelines
+
+1. **Portrait**: Tables with ≤6 columns
+2. **Landscape**: Tables with >6 columns
+3. **Auto-sizing**: Use `paper = "auto"` for embedding
+
+## Consistent Multi-Format Export
+
+Export to multiple formats with consistent formatting:
+
+```{r}
+common_opts <- list(
+  caption = "Table 2. Regression Analysis",
+  bold_significant = TRUE,
+  indent_groups = TRUE,
+  zebra_stripes = TRUE
+)
+
+formats <- c("pdf", "docx", "html", "pptx", "rtf", "tex")
+
+for (fmt in formats) {
+  autotable(
+    table = table2,
+    file = paste0("Table2.", fmt),
+    caption = common_opts$caption,
+    bold_significant = common_opts$bold_significant,
+    indent_groups = common_opts$indent_groups,
+    zebra_stripes = common_opts$zebra_stripes
+  )
+}
+```
+
+---
+
+# Troubleshooting
+
+## PDF Compilation Fails
+
+Verify LaTeX installation and consider keeping log files for debugging:
+
+```{r}
+# Check LaTeX installation
+Sys.which("pdflatex")
+
+# Install TinyTeX if needed
+# tinytex::install_tinytex()
+
+# Keep log files for debugging
+table2pdf(table, "debug.pdf", show_logs = TRUE)
+```
+
+See [Installation and Setup](installation_setup.html) for LaTeX configuration details.
+
+## Table Too Wide
+
+Several options address wide tables:
+
+```{r}
+# Use landscape orientation
+table2pdf(table, "wide.pdf", orientation = "landscape")
+
+# Enable fit-to-page scaling
+table2pdf(table, "wide.pdf", fit_to_page = TRUE)
+
+# Reduce font size
+table2pdf(table, "wide.pdf", font_size = 7)
+```
+
+## Customizing flextable Output
+
+Get the flextable object for further customization:
+
+```{r}
+ft <- table2docx(table1, "Table1.docx", return_ft = TRUE)
+
+library(flextable)
+ft <- ft %>%
+  bold(i = 1, part = "header") %>%
+  color(i = 1, color = "navy", part = "header")
+
+save_as_docx(ft, path = "Table1_Custom.docx")
+```
+
+---
+
+# Further Reading
+
+- [Descriptive Tables](descriptive_tables.html): `desctable()` for baseline characteristics
+- [Regression Modeling](regression_modeling.html): `fit()`, `uniscreen()`, and `fullfit()`
+- [Model Comparison](model_comparison.html): `compfit()` for comparing models
+- [Forest Plots](forest_plots.html): Visualization of regression results
+- [Multivariate Analysis](multivariate_analysis.html): `multifit()` for multi-outcome analysis
+- [Advanced Workflows](advanced_workflows.html): Interactions and mixed-effects models

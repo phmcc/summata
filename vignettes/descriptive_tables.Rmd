@@ -1,0 +1,509 @@
+---
+title: "Descriptive Tables"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Descriptive Tables}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE,
+  dpi = 150
+)
+
+# Use ragg for better font rendering if available
+if (requireNamespace("ragg", quietly = TRUE)) {
+  knitr::opts_chunk$set(dev = "ragg_png")
+}
+
+options(width = 180)
+```
+
+Descriptive statistics provide the foundation for any quantitative analysis. Before estimating relationships between variables, it is essential to first characterize the distribution of each variable and assess balance across comparison groups. A well-constructed descriptive table—often designated "Table 1" in published research—accomplishes three objectives: it summarizes the central tendency and dispersion of continuous variables, tabulates the frequency distribution of categorical variables, and tests for systematic differences between groups.
+
+The `desctable()` function generates publication-ready descriptive tables with automatic detection of variable types, appropriate summary statistics, and optional hypothesis testing. This vignette demonstrates the function's capabilities using the included sample dataset.
+
+---
+
+# Preliminaries
+
+The examples in this vignette use the `clintrial` dataset included with `summata`:
+
+```{r setup}
+library(summata)
+
+data(clintrial)
+data(clintrial_labels)
+```
+
+The `clintrial` dataset contains `r nrow(clintrial)` observations with continuous, categorical, and time-to-event variables suitable for demonstrating descriptive statistics. The `clintrial_labels` vector provides human-readable labels for display.
+
+---
+
+# Theoretical Background
+
+## Summary Statistics
+
+For continuous variables, `desctable()` computes location and scale parameters:
+
+| Statistic | Formula | Use Case |
+|:----------|:--------|:---------|
+| Mean ± SD | $\bar{x} \pm s$ | Symmetric distributions |
+| Median (IQR) | $\tilde{x}$ (Q1–Q3) | Skewed distributions |
+| Median (Range) | $\tilde{x}$ (min–max) | Small samples, outlier detection |
+
+For categorical variables, the function tabulates counts and proportions:
+
+| Statistic | Notation | Description |
+|:----------|:---------|:------------|
+| n (%) | $n_i$ ($100 \cdot n_i / N$) | Count and percentage |
+| n only | $n_i$ | Count without percentage |
+| % only | $100 \cdot n_i / N$ | Percentage without count |
+
+## Hypothesis Tests
+
+When `test = TRUE`, the function selects appropriate tests based on variable type:
+
+| Variable Type | Two Groups | Three or More Groups |
+|:--------------|:-----------|:---------------------|
+| Continuous (mean-based) | Student's *t*-test | One-way ANOVA |
+| Continuous (median-based) | Wilcoxon rank-sum | Kruskal–Wallis |
+| Categorical | χ² test | χ² test |
+| Categorical (sparse cells) | Fisher's exact | Fisher's exact |
+| Time-to-event | Log-rank | Log-rank |
+
+For continuous variables with `test_continuous = "auto"`, the test selection follows the displayed statistic: parametric tests (*t*-test, ANOVA) are used when `stats_continuous` includes mean-based statistics, while nonparametric tests (Wilcoxon, Kruskal–Wallis) are used for median-based statistics. This ensures consistency between the summary measure and its associated test. For categorical variables, the function computes expected cell frequencies and uses Fisher's exact test when any expected count falls below 5.
+
+---
+
+# Basic Usage
+
+## Function Signature
+
+The `desctable()` function follows the standard `summata` calling convention with data as the first argument:
+
+```{r, eval = FALSE}
+desctable(data, by, variables, ...)
+```
+
+Here `data` is the dataset, `by` specifies the grouping variable (optional), and `variables` lists the variables to summarize.
+
+## **Example 1:** Grouped Descriptive Table
+
+The most common use case is comparing characteristics across groups:
+
+```{r}
+desc_vars <- c("age", "sex", "race", "bmi", "stage", "ecog", 
+               "Surv(os_months, os_status)")
+
+example1 <- desctable(
+  data = clintrial, 
+  by = "treatment", 
+  variables = desc_vars,
+  labels = clintrial_labels
+)
+
+example1
+```
+
+The output includes a "Total" column by default, showing overall statistics alongside group-specific values.
+
+## **Example 2:** Ungrouped Summary Statistics
+
+Omitting the `by` argument produces overall summary statistics without group comparisons:
+
+```{r}
+example2 <- desctable(
+  data = clintrial,
+  variables = c("age", "bmi", "sex", "stage"),
+  labels = clintrial_labels
+)
+
+example2
+```
+
+---
+
+# Customizing Summary Statistics
+
+The default summary statistics can be customized for both continuous and categorical variables.
+
+## **Example 3:** Continuous Variables
+
+The `stats_continuous` parameter controls how continuous variables are summarized:
+
+| Value | Output Format |
+|:------|:--------------|
+| `"mean_sd"` | Mean ± SD (default) |
+| `"median_iqr"` | Median (Q1–Q3) |
+| `"median_range"` | Median (min–max) |
+
+```{r}
+example3 <- desctable(
+  data = clintrial,
+  by = "treatment",
+  variables = c("age", "bmi", "los_days"),
+  stats_continuous = "median_iqr",
+  labels = clintrial_labels
+)
+
+example3
+```
+
+## **Example 4:** Categorical Variables
+
+The `stats_categorical` parameter controls categorical variable display:
+
+| Value | Output Format |
+|:------|:--------------|
+| `"n_percent"` | n (%) (default) |
+| `"n"` | n only |
+| `"percent"` | % only |
+
+```{r}
+example4 <- desctable(
+  data = clintrial,
+  by = "treatment",
+  variables = c("sex", "stage", "ecog"),
+  stats_categorical = "percent",
+  labels = clintrial_labels
+)
+
+example4
+```
+
+## **Example 5:** Numeric Precision
+
+Control decimal places with `digits` (for statistics) and `p_digits` (for *p*-values):
+
+```{r}
+example5 <- desctable(
+  data = clintrial,
+  by = "treatment",
+  variables = c("age", "bmi", "sex"),
+  digits = 2,
+  p_digits = 4,
+  test = TRUE,
+  labels = clintrial_labels
+)
+
+example5
+```
+
+---
+
+# Statistical Testing
+
+When comparing groups, hypothesis tests assess whether observed differences are statistically significant.
+
+## **Example 6:** Automatic Test Selection
+
+Setting `test = TRUE` enables automatic hypothesis testing based on the summary statistic being displayed:
+
+```{r}
+example6 <- desctable(
+  data = clintrial,
+  by = "treatment",
+  variables = c("age", "bmi", "sex", "stage"),
+  test = TRUE,
+  labels = clintrial_labels
+)
+
+example6
+```
+
+## **Example 7:** Specifying Tests Manually
+
+Override automatic selection with `test_continuous` and `test_categorical`. The following example forces nonparametric tests for continuous variables:
+
+```{r}
+example7a <- desctable(
+  data = clintrial,
+  by = "treatment",
+  variables = c("age", "bmi", "los_days"),
+  test = TRUE,
+  test_continuous = "wrs",  # Wilcoxon rank-sum
+  labels = clintrial_labels
+)
+
+example7a
+```
+
+This example forces Fisher's exact test for categorical variables:
+
+```{r}
+example7b <- desctable(
+  data = clintrial,
+  by = "treatment",
+  variables = c("sex", "stage"),
+  test = TRUE,
+  test_categorical = "fisher",
+  labels = clintrial_labels
+)
+
+example7b
+```
+
+Available test specifications include:
+
+**Continuous (`test_continuous`):**
+
+- `"auto"`: Automatic selection (default)
+- `"t"`: Student's *t*-test
+- `"wrs"`: Wilcoxon rank-sum test
+- `"aov"`: One-way ANOVA
+- `"kwt"`: Kruskal–Wallis test
+
+**Categorical (`test_categorical`):**
+
+- `"auto"`: Automatic selection (default)
+- `"chisq"`: Pearson's χ² test
+- `"fisher"`: Fisher's exact test
+
+---
+
+# Handling Missing Data
+
+Missing values require special consideration in descriptive tables. Options control whether missing values are displayed and how percentages are calculated.
+
+## **Example 8:** Including Missing Values
+
+By default, missing values are excluded from calculations. Set `na_include = TRUE` to display them as a separate category:
+
+```{r}
+example8 <- desctable(
+  data = clintrial,
+  by = "treatment",
+  variables = c("smoking", "diabetes"),
+  na_include = TRUE,
+  labels = clintrial_labels
+)
+
+example8
+```
+
+## **Example 9:** Missing Value Denominators
+
+The `na_percent` parameter controls whether missing values are included in percentage calculations:
+
+```{r}
+# Percentages exclude missing (denominator = non-missing)
+example9a <- desctable(
+  data = clintrial,
+  by = "treatment",
+  variables = c("smoking"),
+  na_include = TRUE,
+  na_percent = FALSE,
+  labels = clintrial_labels
+)
+
+# Percentages include missing (denominator = total)
+example9b <- desctable(
+  data = clintrial,
+  by = "treatment",
+  variables = c("smoking"),
+  na_include = TRUE,
+  na_percent = TRUE,
+  labels = clintrial_labels
+)
+```
+
+## **Example 10:** Custom Missing Value Label
+
+The label for missing values can be customized using the `na_label` parameter:
+
+```{r}
+example10 <- desctable(
+  data = clintrial,
+  by = "treatment",
+  variables = c("smoking"),
+  na_include = TRUE,
+  na_label = "Not Reported",
+  labels = clintrial_labels
+)
+
+example10
+```
+
+---
+
+# Total Column Options
+
+The total column provides overall statistics alongside group-specific values.
+
+## **Example 11:** Total Column Configuration
+
+The `total` parameter controls the presence and position of the total column:
+
+| Value | Effect |
+|:------|:-------|
+| `TRUE` | Total column first (default) |
+| `"first"` | Total column first |
+| `"last"` | Total column last |
+| `FALSE` | No total column |
+
+```{r}
+# Total column in last position
+example11a <- desctable(
+  data = clintrial,
+  by = "treatment",
+  variables = c("age", "sex", "stage"),
+  total = "last",
+  labels = clintrial_labels
+)
+
+example11a
+
+# No total column
+example11b <- desctable(
+  data = clintrial,
+  by = "treatment",
+  variables = c("age", "sex", "stage"),
+  total = FALSE,
+  labels = clintrial_labels
+)
+
+example11b
+```
+
+---
+
+# Complete Example
+
+The following demonstrates a comprehensive descriptive table suitable for publication:
+
+```{r}
+table1 <- desctable(
+  data = clintrial,
+  by = "treatment",
+  variables = c(
+    "age", "sex", "race", "ethnicity", "bmi",
+    "smoking", "diabetes", "hypertension",
+    "stage", "grade", "ecog",
+    "Surv(os_months, os_status)"
+  ),
+  labels = clintrial_labels,
+  stats_continuous = "mean_sd",
+  stats_categorical = "n_percent",
+  test = TRUE,
+  total = TRUE,
+  digits = 1,
+  p_digits = 3
+)
+
+table1
+```
+
+## Accessing Raw Data
+
+The underlying numeric values are stored as an attribute for programmatic access:
+
+```{r}
+raw_data <- attr(table1, "raw_data")
+head(raw_data)
+```
+
+---
+
+# Survival Summary Tables
+
+For detailed survival analysis—including landmark survival estimates, survival quantiles, and multiple endpoints—see the dedicated [Survival Tables](survival_tables.html) vignette. The `survtable()` function provides comprehensive options for reporting time-to-event outcomes.
+
+---
+
+# Exporting Tables
+
+Descriptive tables can be exported to various formats. See the [Table Export](table_export.html) vignette for comprehensive documentation.
+
+```{r, eval = FALSE}
+# Microsoft Word
+table2docx(
+  table = table1,
+  file = "Table1.docx",
+  caption = "Table 1. Baseline Characteristics by Group"
+)
+
+# PDF (requires LaTeX)
+table2pdf(
+  table = table1,
+  file = "Table1.pdf",
+  caption = "Table 1. Baseline Characteristics by Group"
+)
+
+# HTML
+table2html(
+  table = table1,
+  file = "Table1.html",
+  caption = "Table 1. Baseline Characteristics by Group"
+)
+```
+
+---
+
+# Best Practices
+
+## Variable Selection
+
+1. Include all relevant baseline characteristics
+2. Order variables logically (demographics, then domain-specific variables)
+3. Exclude the grouping variable from the variables list
+4. Consider the audience when selecting variables
+
+## Statistical Considerations
+
+1. Use automatic test selection unless there is specific justification otherwise
+2. Report exact *p*-values; very small values display as "< 0.001"
+3. Consider multiple comparison adjustments when testing many variables
+4. For skewed continuous variables, prefer median and IQR over mean and SD
+
+## Formatting Recommendations
+
+1. Use consistent decimal precision within variable types
+2. Include units in variable labels (e.g., "Age (years)")
+3. Include a total column for context
+4. Use landscape orientation for tables with many columns
+
+---
+
+# Common Issues
+
+## Empty Cells in Categorical Variables
+
+When a factor level has zero observations in a group, ensure all levels are explicitly defined:
+
+```{r, eval = FALSE}
+data$stage <- factor(data$stage, levels = c("I", "II", "III", "IV"))
+```
+
+## Skewed Continuous Variables
+
+For highly skewed distributions, use median and IQR:
+
+```{r, eval = FALSE}
+desctable(data, by, variables, stats_continuous = "median_iqr")
+```
+
+## Large Tables
+
+For tables with many variables, consider splitting by category or using landscape orientation for export:
+
+```{r, eval = FALSE}
+table2pdf(table, "table1.pdf", orientation = "landscape", font_size = 8)
+```
+
+---
+
+# Further Reading
+
+- [Survival Tables](survival_tables.html): `survtable()` for time-to-event summaries
+- [Regression Modeling](regression_modeling.html): `fit()`, `uniscreen()`, and `fullfit()`
+- [Model Comparison](model_comparison.html): `compfit()` for comparing models
+- [Table Export](table_export.html): Export to PDF, Word, and other formats
+- [Forest Plots](forest_plots.html): Visualization of regression results
+- [Multivariate Analysis](multivariate_analysis.html): `multifit()` for multi-outcome analysis
+- [Advanced Workflows](advanced_workflows.html): Interactions and mixed-effects models

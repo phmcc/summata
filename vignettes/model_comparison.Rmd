@@ -1,0 +1,538 @@
+---
+title: "Model Comparison"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Model Comparison}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE,
+  dpi = 150
+)
+
+# Use ragg for better font rendering if available
+if (requireNamespace("ragg", quietly = TRUE)) {
+  knitr::opts_chunk$set(dev = "ragg_png")
+}
+
+options(width = 180)
+```
+
+Model selection is a fundamental problem in applied statistics. Given a set of candidate models, it is important to determine which specification best balances goodness-of-fit against parsimony. Traditional approaches rely on information criteria (AIC, BIC), discrimination metrics (C-statistic), and hypothesis tests for nested models. The `compfit()` function synthesizes these metrics to facilitate systematic model comparison.
+
+---
+
+# Preliminaries
+
+The examples in this vignette use the `clintrial` dataset included with `summata`:
+
+```{r setup}
+library(summata)
+
+data(clintrial)
+data(clintrial_labels)
+```
+
+---
+
+# Theoretical Background
+
+## Information Criteria
+
+Information criteria penalize model complexity to prevent overfitting:
+
+**Akaike Information Criterion (AIC):**
+$$\text{AIC} = -2\log L + 2k$$
+
+**Bayesian Information Criterion (BIC):**
+$$\text{BIC} = -2\log L + k\log n$$
+
+where *L* is the maximized likelihood, *k* is the number of parameters, and *n* is the sample size. Lower values indicate better fit-complexity tradeoff. BIC penalizes complexity more heavily than AIC.
+
+## Discrimination Metrics
+
+The concordance statistic (C-statistic) measures a model's ability to discriminate between outcomes:
+
+- **C = 0.5**: No discrimination (equivalent to random)
+- **C = 0.7–0.8**: Acceptable discrimination
+- **C = 0.8–0.9**: Excellent discrimination
+- **C > 0.9**: Outstanding discrimination
+
+For survival models, this corresponds to Harrell's C-index.
+
+## Pseudo-*R*²
+
+For generalized linear models, McFadden's pseudo-*R*² provides an analog to the coefficient of determination:
+
+$$R^2_{\text{McFadden}} = 1 - \frac{\log L_{\text{full}}}{\log L_{\text{null}}}$$
+
+Values typically range from 0.2–0.4 for well-fitting models.
+
+---
+
+# Basic Usage
+
+## Function Signature
+
+Models are specified as a named list of predictor vectors:
+
+```{r, eval = FALSE}
+compfit(data, outcome, model_list, model_type, ...)
+```
+
+## **Example 1:** Nested Model Comparison
+
+Compare models with increasing complexity:
+
+```{r}
+example1 <- compfit(
+  data = clintrial,
+  outcome = "surgery",
+  model_list = list(
+    "Demographics" = c("age", "sex"),
+    "Plus Stage" = c("age", "sex", "stage", "ecog"),
+    "Full Model" = c("age", "sex", "stage", "ecog", "treatment", "smoking")
+  ),
+  model_type = "glm"
+)
+
+example1
+```
+
+The output includes the following metrics:
+
+| Metric | Interpretation |
+|:-------|:---------------|
+| Summata Score | Composite metric (0–100, higher is better) |
+| N | Sample size |
+| Events | Number of outcome events |
+| Predictors | Number of model parameters |
+| Converged | Convergence status |
+| AIC/BIC | Information criteria (lower is better) |
+| Pseudo-*R*² | Explained variation |
+| Concordance | Discrimination (higher is better) |
+| Brier Score | Prediction accuracy (lower is better) |
+| Global *p* | Overall model significance |
+
+## **Example 2:** Cox Regression Models
+
+For time-to-event outcomes, use `model_type = "coxph"`:
+
+```{r}
+example2 <- compfit(
+  data = clintrial,
+  outcome = "Surv(os_months, os_status)",
+  model_list = list(
+    "Unadjusted" = c("treatment"),
+    "Demographics" = c("treatment", "age", "sex"),
+    "Full" = c("treatment", "age", "sex", "stage", "ecog")
+  ),
+  model_type = "coxph"
+)
+
+example2
+```
+
+## **Example 3:** Linear Regression Models
+
+For continuous outcomes, use `model_type = "lm"`:
+
+```{r}
+example3 <- compfit(
+  data = clintrial,
+  outcome = "los_days",
+  model_list = list(
+    "Simple" = c("age", "sex"),
+    "Disease" = c("age", "sex", "stage", "ecog"),
+    "Treatment" = c("age", "sex", "stage", "ecog", "surgery", "treatment")
+  ),
+  model_type = "lm"
+)
+
+example3
+```
+
+---
+
+# Interaction Testing
+
+A key application of `compfit()` is testing whether interaction terms improve model fit.
+
+## **Example 4:** Single Interaction
+
+Compare a main-effects model to one with an interaction term:
+
+```{r}
+example4 <- compfit(
+  data = clintrial,
+  outcome = "surgery",
+  model_list = list(
+    "Main Effects" = c("age", "treatment", "sex"),
+    "With Interaction" = c("age", "treatment", "sex")
+  ),
+  interactions_list = list(
+    NULL,
+    c("sex:treatment")
+  ),
+  model_type = "glm"
+)
+
+example4
+```
+
+## **Example 5:** Multiple Interactions
+
+Compare different interaction hypotheses:
+
+```{r}
+example5 <- compfit(
+  data = clintrial,
+  outcome = "Surv(os_months, os_status)",
+  model_list = list(
+    "Main Effects" = c("age", "treatment", "sex", "stage"),
+    "Age × Treatment" = c("age", "treatment", "sex", "stage"),
+    "Sex × Treatment" = c("age", "treatment", "sex", "stage"),
+    "Both" = c("age", "treatment", "sex", "stage")
+  ),
+  interactions_list = list(
+    NULL,
+    c("age:treatment"),
+    c("sex:treatment"),
+    c("age:treatment", "sex:treatment")
+  ),
+  model_type = "coxph"
+)
+
+example5
+```
+
+---
+
+# Accessing Detailed Results
+
+## Coefficient Comparison
+
+Setting `include_coefficients = TRUE` generates a table comparing coefficients across models:
+
+```{r}
+example6 <- compfit(
+  data = clintrial,
+  outcome = "surgery",
+  model_list = list(
+    "Model A" = c("age", "sex"),
+    "Model B" = c("age", "sex", "stage"),
+    "Model C" = c("age", "sex", "stage", "treatment")
+  ),
+  model_type = "glm",
+  include_coefficients = TRUE,
+  labels = clintrial_labels
+)
+
+# Main comparison
+example6
+
+# Coefficient table
+coef_table <- attr(example6, "coefficients")
+coef_table
+```
+
+## Fitted Model Objects
+
+The underlying model objects are stored as attributes for further analysis:
+
+```{r}
+models <- attr(example6, "models")
+names(models)
+
+# Examine a specific model
+summary(models[["Model C"]])
+```
+
+## Recommended Model
+
+The best-performing model is identified automatically based on the Summata Score:
+
+```{r}
+example7 <- compfit(
+  data = clintrial,
+  outcome = "Surv(os_months, os_status)",
+  model_list = list(
+    "Minimal" = c("treatment"),
+    "Standard" = c("treatment", "age", "sex", "stage"),
+    "Extended" = c("treatment", "age", "sex", "stage", "ecog", "grade")
+  ),
+  model_type = "coxph"
+)
+
+recommended <- attr(example7, "recommended")
+cat("Recommended model:", recommended, "\n")
+```
+
+---
+
+# The Summata Score
+
+The Summata Score is a composite metric designed to facilitate rapid model comparison. It combines multiple quality indicators into a single value ranging from 0 to 100.
+
+## Score Interpretation
+
+| Range | Interpretation |
+|:------|:---------------|
+| 85–100 | Excellent |
+| 75–84 | Very Good |
+| 65–74 | Good |
+| 55–64 | Fair |
+| < 55 | Poor |
+
+## Default Weights by Model Type
+
+The score components and their default weights vary by model type.
+
+**Linear regression (`lm`):**
+
+| Component | Weight |
+|:----------|:-------|
+| Convergence | 15% |
+| AIC | 25% |
+| Adjusted *R*² | 45% |
+| RMSE | 15% |
+
+**Logistic regression (`glm`):**
+
+| Component | Weight |
+|:----------|:-------|
+| Convergence | 15% |
+| AIC | 25% |
+| Concordance | 40% |
+| Pseudo-*R*² | 15% |
+| Brier Score | 5% |
+
+**Cox regression (`coxph`):**
+
+| Component | Weight |
+|:----------|:-------|
+| Convergence | 15% |
+| AIC | 30% |
+| Concordance | 40% |
+| Global *p* | 15% |
+
+## Custom Weights
+
+Modify the scoring weights to emphasize specific metrics:
+
+```{r}
+example8 <- compfit(
+  data = clintrial,
+  outcome = "surgery",
+  model_list = list(
+    "Simple" = c("age", "sex"),
+    "Standard" = c("age", "sex", "stage"),
+    "Full" = c("age", "sex", "stage", "treatment", "ecog")
+  ),
+  model_type = "glm",
+  scoring_weights = list(
+    convergence = 0.05,
+    aic = 0.20,
+    concordance = 0.60,
+    pseudo_r2 = 0.10,
+    brier = 0.05
+  )
+)
+
+example8
+```
+
+---
+
+# Application Scenarios
+
+## Confounder Assessment
+
+Evaluate the impact of covariate adjustment on effect estimates:
+
+```{r}
+scenario1 <- compfit(
+  data = clintrial,
+  outcome = "Surv(os_months, os_status)",
+  model_list = list(
+    "Crude" = c("treatment"),
+    "Age-Sex Adjusted" = c("treatment", "age", "sex"),
+    "Fully Adjusted" = c("treatment", "age", "sex", "stage", "ecog")
+  ),
+  model_type = "coxph",
+  include_coefficients = TRUE,
+  labels = clintrial_labels
+)
+
+scenario1
+
+# Compare treatment effect across models
+attr(scenario1, "coefficients")
+```
+
+## Variable Selection Validation
+
+Compare automated versus theory-driven selection:
+
+```{r}
+# Identify candidates via screening
+screening <- uniscreen(
+  data = clintrial,
+  outcome = "surgery",
+  predictors = c("age", "sex", "bmi", "smoking", "diabetes",
+                 "hypertension", "stage", "ecog", "treatment"),
+  model_type = "glm",
+  p_threshold = 0.10
+)
+
+# Extract significant predictors
+sig_vars <- unique(attr(screening, "raw_data")$variable)
+
+scenario2 <- compfit(
+  data = clintrial,
+  outcome = "surgery",
+  model_list = list(
+    "Theory-Driven" = c("age", "sex", "stage", "treatment"),
+    "Data-Driven" = sig_vars,
+    "Combined" = unique(c("age", "sex", "stage", "treatment", sig_vars))
+  ),
+  model_type = "glm"
+)
+
+scenario2
+```
+
+## Parsimony Assessment
+
+Test whether additional predictors meaningfully improve fit:
+
+```{r}
+scenario3 <- compfit(
+  data = clintrial,
+  outcome = "los_days",
+  model_list = list(
+    "3 Predictors" = c("age", "surgery", "ecog"),
+    "5 Predictors" = c("age", "surgery", "ecog", "stage", "treatment"),
+    "8 Predictors" = c("age", "surgery", "ecog", "stage", "treatment",
+                       "sex", "smoking", "diabetes")
+  ),
+  model_type = "lm",
+  labels = clintrial_labels
+)
+
+scenario3
+```
+
+---
+
+# Exporting Results
+
+Comparison tables can be exported to various formats:
+
+```{r, eval = FALSE}
+# Main comparison table
+table2docx(
+  table = example1,
+  file = "Model_Comparison.docx",
+  caption = "Table 3. Model Comparison Results"
+)
+
+# Coefficient table
+table2docx(
+  table = attr(example6, "coefficients"),
+  file = "Coefficient_Comparison.docx",
+  caption = "Table S1. Coefficient Estimates Across Models"
+)
+
+# PDF with landscape orientation for wide tables
+table2pdf(
+  table = example1,
+  file = "Model_Comparison.pdf",
+  caption = "Model Comparison",
+  orientation = "landscape"
+)
+```
+
+---
+
+# Best Practices
+
+## When to Compare Models
+
+1. **Covariate selection**: Determine appropriate adjustment level
+2. **Interaction testing**: Evaluate effect modification
+3. **Parsimony**: Balance complexity against fit
+4. **Sensitivity analysis**: Compare different specifications
+
+## Interpreting Results
+
+1. **Multiple metrics**: The Summata Score provides a summary, but examine individual metrics
+2. **Practical significance**: Statistical improvement may not translate to meaningful differences
+3. **Sample size**: Complex models require larger samples
+4. **Convergence**: Non-converged models should be interpreted cautiously
+
+## Limitations
+
+1. The Summata Score is a heuristic, not a formal statistical test
+2. Comparisons assume models are fit on identical observations
+3. Information criteria are most meaningful for nested models
+4. Small score differences may not be practically significant
+
+---
+
+# Common Issues
+
+## Non-Convergence
+
+Check convergence status and consider simplifying non-converging models:
+
+```{r, eval = FALSE}
+# Check convergence status
+comparison[, .(Model, Converged)]
+
+# For non-converging models:
+# 1. Reduce complexity
+# 2. Check for separation (logistic)
+# 3. Examine predictor correlations
+```
+
+## Differing Sample Sizes
+
+Models with missing data may have different sample sizes, which complicates comparison:
+
+```{r, eval = FALSE}
+# Check sample sizes
+comparison[, .(Model, N, Events)]
+
+# Use complete cases for fair comparison
+complete_data <- na.omit(data[, relevant_vars, with = FALSE])
+```
+
+## Interpreting Close Scores
+
+When scores are similar, prefer parsimony and consider domain knowledge:
+
+```{r, eval = FALSE}
+# Examine individual metrics
+comparison[, .(Model, `Summata Score`, AIC, Concordance)]
+
+# Prefer parsimony when scores are close
+# Consider interpretability
+```
+
+---
+
+# Further Reading
+
+- [Descriptive Tables](descriptive_tables.html): `desctable()` for baseline characteristics
+- [Regression Modeling](regression_modeling.html): `fit()`, `uniscreen()`, and `fullfit()`
+- [Table Export](table_export.html): Export to PDF, Word, and other formats
+- [Forest Plots](forest_plots.html): Visualization of regression results
+- [Multivariate Analysis](multivariate_analysis.html): `multifit()` for multi-outcome analysis
+- [Advanced Workflows](advanced_workflows.html): Interactions and mixed-effects models
