@@ -1,0 +1,22 @@
+# lintr configuration for summata package
+# This file controls code style checking behavior
+
+# Exclude specific linters that may be too strict
+linters: linters_with_defaults(
+    line_length_linter(120),  # Allow up to 120 characters (CRAN suggests 80-100)
+    object_name_linter = NULL,  # Don't enforce specific naming conventions
+    cyclocomp_linter = NULL,  # Don't check cyclomatic complexity
+    commented_code_linter = NULL  # Allow commented code for examples
+  )
+
+# Exclude specific files/directories from linting
+exclusions: list(
+    "tests/",
+    "data/",
+    "inst/",
+    "scratch/",
+    "vignettes/"
+  )
+
+# Encoding
+encoding: "UTF-8"
