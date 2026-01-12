@@ -231,6 +231,7 @@ get_model_type_name <- function(model) {
                   coxph = "Cox PH",
                   clogit = "Conditional Logistic",
                   coxme = "Mixed Effects Cox",
+                  negbin = "Negative Binomial",
                   glmer = "glmerMod",  # Keep full name for clarity
                   glmerMod = "glmerMod",
                   lmer = "Linear Mixed",

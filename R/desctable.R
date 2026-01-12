@@ -49,6 +49,11 @@
 #' @param p_digits Integer specifying the number of decimal places for p-values. 
 #'   P-values smaller than \code{10^(-p_digits)} are displayed as 
 #'   "< 0.001", "< 0.01", etc. Default is 3.
+#'
+#' @param p_per_stat Logical. If \code{TRUE}, displays p-values on each row 
+#'   (per statistic) rather than only on the first row of each variable. 
+#'   Useful when different statistics within a variable warrant separate 
+#'   significance testing. Default is \code{FALSE}.
 #'   
 #' @param na_include Logical. If \code{TRUE}, missing values (NAs) are displayed 
 #'   as a separate category/row for each variable. If \code{FALSE}, missing 
@@ -207,6 +212,8 @@
 #' desctable(clintrial,
 #'         variables = c("age", "sex", "bmi"))
 #' 
+#' 
+#' \donttest{
 #' # Example 2: Grouped comparison with default tests
 #' desctable(clintrial,
 #'         by = "treatment",
@@ -372,6 +379,7 @@
 #'     na_include = FALSE
 #' )
 #' print(table1)
+#' }
 #' @export
 desctable <- function(data,
                       by = NULL,

@@ -96,13 +96,13 @@
 #' @param time_unit Character string specifying the time unit for display
 #'   in column headers and labels (e.g., \code{"months"}, \code{"days"}, 
 #'   \code{"years"}). When specified, time column headers become 
-#'   "{time} {time_unit}" (e.g., "12 months"). Default is \code{NULL} (no unit shown).
+#'   "\{time\} \{time_unit\}" (e.g., "12 months"). Default is \code{NULL} (no unit shown).
 #'
 #' @param time_label Character string template for time column headers when
-#'   \code{times} is specified. Use \code{"{time}"} as placeholder for the
-#'   time value and \code{"{unit}"} for the time unit. 
-#'   Default is \code{"{time} {unit}"} when \code{time_unit} is specified,
-#'   otherwise just \code{"{time}"}.
+#'   \code{times} is specified. Use \code{"\{time\}"} as placeholder for the
+#'   time value and \code{"\{unit\}"} for the time unit. 
+#'   Default is \code{"\{time\} \{unit\}"} when \code{time_unit} is specified,
+#'   otherwise just \code{"\{time\}"}.
 #'
 #' @param median_label Character string for the median survival row label.
 #'   Default is \code{"Median (95\% CI)"}.
@@ -199,6 +199,7 @@
 #'     time_unit = "months"
 #' )
 #'
+#' \donttest{
 #' # Example 2: Median survival only
 #' survtable(
 #'     data = clintrial,
@@ -317,6 +318,8 @@
 #'         "Surv(os_months, os_status)" = "Overall Survival"
 #'     )
 #' )
+#'
+#' }
 #'
 #' @export
 survtable <- function(data,

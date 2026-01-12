@@ -13,3 +13,8 @@
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+^scratch$
+^vignettes/figures$
+^vignettes/articles$
+^CODE_OF_CONDUCT\.md$
+^tests/benchmarks/^

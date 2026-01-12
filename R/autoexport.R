@@ -1,9 +1,9 @@
 #' Export Table with Automatic Format Detection
 #'
 #' Automatically detects the output format based on file extension and exports
-#' the table using the appropriate specialized function (table2pdf, table2docx, 
-#' table2pptx, table2html, table2rtf, or table2tex). Provides a unified interface for
-#' table export across all supported formats.
+#' the table using the appropriate specialized function - table2pdf(), table2docx(), 
+#' table2pptx(), table2html(), table2rtf(), or table2tex(). Provides a unified interface
+#' for table export across all supported formats.
 #'
 #' @param table A data.frame, data.table, or matrix to export. Can be output from 
 #'   \code{\link{desctable}}, \code{\link{fit}}, \code{\link{uniscreen}}, 
@@ -12,23 +12,23 @@
 #' @param file Character string specifying the output filename. The file extension
 #'   determines the export format:
 #'   \itemize{
-#'     \item \code{.pdf} - PDF via LaTeX (uses \code{table2pdf})
-#'     \item \code{.docx} - Microsoft Word (uses \code{table2docx})
-#'     \item \code{.pptx} - Microsoft PowerPoint (uses \code{table2pptx})
-#'     \item \code{.html} or \code{.htm} - HTML (uses \code{table2html})
-#'     \item \code{.rtf} - Rich Text Format (uses \code{table2rtf})
-#'     \item \code{.tex} - LaTeX source (uses \code{table2tex})
+#'     \item \code{.pdf} - PDF via LaTeX (uses \code{table2pdf()})
+#'     \item \code{.docx} - Microsoft Word (uses \code{table2docx()})
+#'     \item \code{.pptx} - Microsoft PowerPoint (uses \code{table2pptx()})
+#'     \item \code{.html} or \code{.htm} - HTML (uses \code{table2html()})
+#'     \item \code{.rtf} - Rich Text Format (uses \code{table2rtf()})
+#'     \item \code{.tex} - LaTeX source (uses \code{table2tex()})
 #'   }
 #'   
 #' @param ... Additional arguments passed to the format-specific function. See
 #'   the documentation for individual functions for available parameters:
 #'   \itemize{
-#'     \item PDF: \code{\link{table2pdf}} - orientation, paper, margins, fit_to_page, etc.
-#'     \item DOCX: \code{\link{table2docx}} - font_size, font_family, caption, etc.
-#'     \item PPTX: \code{\link{table2pptx}} - font_size, font_family, caption, etc.
-#'     \item HTML: \code{\link{table2html}} - format_headers, zebra_stripes, etc.
-#'     \item RTF: \code{\link{table2rtf}} - font_size, font_family, caption, etc.
-#'     \item TEX: \code{\link{table2tex}} - caption, format_headers, align, etc.
+#'     \item PDF: \code{\link{table2pdf()}} - orientation, paper, margins, fit_to_page, etc.
+#'     \item DOCX: \code{\link{table2docx()}} - font_size, font_family, caption, etc.
+#'     \item PPTX: \code{\link{table2pptx()}} - font_size, font_family, caption, etc.
+#'     \item HTML: \code{\link{table2html()}} - format_headers, zebra_stripes, etc.
+#'     \item RTF: \code{\link{table2rtf()}} - font_size, font_family, caption, etc.
+#'     \item TEX: \code{\link{table2tex()}} - caption, format_headers, align, etc.
 #'   }
 #'   
 #'   Common parameters across formats include:
@@ -73,12 +73,12 @@
 #' table <- fit(mod, data = clintrial)
 #' 
 #' # Export automatically detects format from extension
-#' autoexport(table, "results.pdf")                 # Creates PDF
-#' autoexport(table, "results.docx")                # Creates Word document
-#' autoexport(table, "results.pptx")                # Creates PowerPoint slide
-#' autoexport(table, "results.html")                # Creates HTML file
-#' autoexport(table, "results.rtf")                 # Creates RTF document
-#' autoexport(table, "results.tex")                 # Creates LaTeX source
+#' autoexport(table, "results.pdf")   # Creates PDF
+#' autoexport(table, "results.docx")  # Creates Word document
+#' autoexport(table, "results.pptx")  # Creates PowerPoint slide
+#' autoexport(table, "results.html")  # Creates HTML file
+#' autoexport(table, "results.rtf")   # Creates RTF document
+#' autoexport(table, "results.tex")   # Creates LaTeX source
 #' 
 #' # Pass format-specific parameters
 #' autoexport(table, "results.pdf", 
@@ -126,7 +126,7 @@ autoexport <- function(table, file, ...) {
     
     if (file_ext == "") {
         stop(paste0("File '", file, "' has no extension. ",
-                    "Please specify one of: .pdf, .docx, .pptx, .html, .htm, .rtf, .tex"))
+                    "Please specify one of the following: .pdf, .docx, .pptx, .html, .htm, .rtf, .tex"))
     }
     
     result <- switch(file_ext,
@@ -152,13 +152,13 @@ autoexport <- function(table, file, ...) {
                      {
                          stop(paste0("Unsupported file extension: '.", file_ext, "'\n",
                                      "Supported formats are:\n",
-                                     "  .pdf   - PDF via LaTeX (table2pdf)\n",
-                                     "  .docx  - Microsoft Word (table2docx)\n",
-                                     "  .pptx  - Microsoft PowerPoint (table2pptx)\n",
-                                     "  .html  - HTML (table2html)\n",
-                                     "  .htm   - HTML (table2html)\n",
-                                     "  .rtf   - Rich Text Format (table2rtf)\n",
-                                     "  .tex   - LaTeX source (table2tex)"))
+                                     "  .pdf   - PDF via LaTeX\n",
+                                     "  .docx  - Microsoft Word\n",
+                                     "  .pptx  - Microsoft PowerPoint\n",
+                                     "  .html  - HTML\n",
+                                     "  .htm   - HTML\n",
+                                     "  .rtf   - Rich Text Format\n",
+                                     "  .tex   - LaTeX source"))
                      }
                      )
     

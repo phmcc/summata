@@ -5,7 +5,7 @@
 #' Computes a composite score combining multiple quality metrics to facilitate 
 #' rapid model comparison and selection.
 #'
-#' @param data A data.frame or data.table containing the dataset.
+#' @param data A data frame or data.table containing the dataset.
 #' @param outcome Character string specifying the outcome variable. For survival
 #'   analysis, use Surv() syntax (e.g., "Surv(time, status)").
 #' @param model_list List of character vectors, each containing predictor names
@@ -18,9 +18,35 @@
 #'   (e.g., c("age:treatment")). If NULL, no interactions are added to any model.
 #'   Default is NULL.
 #' @param model_type Character string specifying model type. If "auto", detects
-#'   based on outcome. Options: "auto", "glm", "lm", "coxph", "clogit".
-#'   Default is "auto".
-#' @param family For GLM models, the error distribution family. Default is "binomial".
+#'   based on outcome. Options include:
+#'   \itemize{
+#'     \item \code{"auto"} - Automatically detect based on outcome type (default)
+#'     \item \code{"glm"} - Generalized linear model. Supports logistic, Poisson, 
+#'       Gamma, Gaussian via \code{family} parameter.
+#'     \item \code{"lm"} - Linear regression for continuous outcomes
+#'     \item \code{"coxph"} - Cox proportional hazards for survival analysis
+#'     \item \code{"lmer"} - Mixed-effects linear regression for clustered continuous
+#'       outcomes
+#'     \item \code{"glmer"} - Mixed-effects logistic regression for clustered
+#'       categorical outcomes
+#'     \item \code{"coxme"} - Mixed-effects Cox regression for clustered time-to-event
+#'       outcomes
+#'     \item \code{"negbin"} - Negative binomial regression for overdispersed counts 
+#'       (requires MASS package)
+#'   }
+#' @param family For GLM models, specifies the error distribution and link function.
+#'   Common options include:
+#'   \itemize{
+#'     \item \code{"binomial"} - Logistic regression for binary outcomes (default)
+#'     \item \code{"poisson"} - Poisson regression for count data
+#'     \item \code{"quasibinomial"} - Logistic with overdispersion
+#'     \item \code{"quasipoisson"} - Poisson with overdispersion
+#'     \item \code{"gaussian"} - Normal distribution (linear regression via GLM)
+#'     \item \code{"Gamma"} - Gamma for positive continuous data
+#'     \item \code{"inverse.gaussian"} - For positive, highly skewed data
+#'   }
+#'   For negative binomial, use \code{model_type = "negbin"} instead.
+#'   See \code{\link[stats]{family}} for all options.
 #' @param conf_level Numeric confidence level for intervals. Default is 0.95.
 #' @param p_digits Integer specifying the number of decimal places for p-values.
 #'   P-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001"
@@ -117,6 +143,7 @@
 #' )
 #' comparison
 #' 
+#' \donttest{
 #' # Example 2: Compare Cox survival models
 #' library(survival)
 #' surv_models <- list(
@@ -170,6 +197,8 @@
 #' # Example 6: Get best model recommendation
 #' best <- attr(comparison, "best_model")
 #' cat("Recommended model:", best, "\n")
+#'
+#' }
 #'
 #' @export
 compfit <- function(data,
@@ -315,7 +344,7 @@ compfit <- function(data,
                                    `Global p` = NA_real_
                                )
             ## Add model-type specific columns for failed models
-            if (model_type == "glm") {
+            if (model_type %in% c("glm", "negbin")) {
                 row$`Brier Score` <- NA_real_
             } else if (model_type %in% c("lmer", "glmer", "coxme")) {
                 row$Groups <- NA_integer_
@@ -359,7 +388,7 @@ compfit <- function(data,
                                )
             
             ## Add model-type specific columns
-            if (model_type == "glm") {
+            if (model_type %in% c("glm", "negbin")) {
                 row$`Brier Score` <- if (!is.null(metrics$brier_score)) round(metrics$brier_score, 3) else NA_real_
             } else if (model_type %in% c("lmer", "glmer", "coxme")) {
                 ## Add mixed-effects specific columns
@@ -402,7 +431,7 @@ compfit <- function(data,
     all_cols <- names(comparison)
     
     ## Define the preferred order for known columns (Score will be moved to end)
-    if (model_type == "glm") {
+    if (model_type %in% c("glm", "negbin")) {
         preferred_order <- c("Model", "N", "Events", "Predictors", "Converged",
                              "AIC", "BIC", "Pseudo-R\u00b2", "Concordance", "Brier Score",
                              "Global p")

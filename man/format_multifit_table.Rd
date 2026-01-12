@@ -30,11 +30,13 @@ format_multifit_table(
 
 \item{p_digits}{Integer decimal places for p-values.}
 
+\item{labels}{Named vector of labels for outcomes and predictors.}
+
 \item{predictor_label}{Label for predictor variable.}
 
-\item{exponentiate}{Logical or NULL for coefficient handling.}
+\item{include_predictor}{Logical for including predictor column.}
 
-\item{outcome_labels}{Named vector of outcome labels.}
+\item{exponentiate}{Logical or NULL for coefficient handling.}
 }
 \value{
 Formatted data.table.

@@ -139,9 +139,6 @@ original names).}
 
 \item{units}{Character string specifying units for plot dimensions: 
 \code{"in"} (inches), \code{"cm"}, or \code{"mm"}. Default is \code{"in"}.}
-
-\item{group_by_outcome}{Logical. If \code{TRUE} (default), groups rows by 
-outcome with outcome names as headers. If \code{FALSE}, shows flat list.}
 }
 \value{
 A \code{ggplot} object containing the complete forest plot.
@@ -203,12 +200,14 @@ result <- multifit(
     data = clintrial,
     outcomes = outcomes,
     predictor = "treatment",
-    covariates = c("age", "sex", "stage")
+    covariates = c("age", "sex", "stage"),
+    parallel = FALSE
 )
 
 plot1 <- multiforest(result)
 print(plot1)
 
+\donttest{
 # Example 2: With custom title and labels
 plot2 <- multiforest(
     result,
@@ -223,7 +222,8 @@ surv_result <- multifit(
     outcomes = c("Surv(pfs_months, pfs_status)", "Surv(os_months, os_status)"),
     predictor = "treatment",
     covariates = c("age", "sex", "stage"),
-    model_type = "coxph"
+    model_type = "coxph",
+    parallel = FALSE
 )
 
 plot3 <- multiforest(
@@ -247,6 +247,7 @@ plot5 <- multiforest(result)
 dims <- attr(plot5, "recommended_dims")
 # ggsave("multioutcome_forest.pdf", plot5,
 #        width = dims$width, height = dims$height)
+}
 
 }
 \seealso{

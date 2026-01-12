@@ -564,7 +564,8 @@ test_that("multiforest works with multifit result", {
         predictor = "treatment",
         covariates = c("age", "sex"),
         model_type = "glm",
-        family = "binomial"
+        family = "binomial",
+        parallel = FALSE
     )
     
     p <- suppressMessages(multiforest(multi_result,
@@ -582,7 +583,8 @@ test_that("multiforest respects key parameters", {
         predictor = "treatment",
         covariates = c("age", "sex"),
         model_type = "glm",
-        family = "binomial"
+        family = "binomial",
+        parallel = FALSE
     )
     
     p <- suppressMessages(multiforest(multi_result,

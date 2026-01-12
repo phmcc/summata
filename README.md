@@ -14,7 +14,7 @@
 
 The `summata` package provides a comprehensive framework for generating summary tables and visualizations from statistical analyses. Built on `data.table` for computational efficiency, it streamlines the workflow from descriptive statistics through regression modeling to final output—all using a unified interface with standardized, presentation-ready results.
 
-<img src="man/figures/README_coxforest.png" alt="Cox regression forest plot" width="100%">
+<img src="assets/images/README_coxforest.png" alt="Cox regression forest plot" width="100%">
 
 ## Installation
 
@@ -57,18 +57,26 @@ raw <- attr(result, "raw_data")
 
 ### Supported Model Classes
 
-The package provides unified handling for the following regression models:
+The package provides unified handling for the following regression models. Specify the model using the `model_type` parameter:
 
-| Model Class | Function | Effect Measure |
-|:------------|:---------|:---------------|
-| Linear regression | `stats::lm()` | *β* coefficient |
-| Logistic regression | `stats::glm()` | Odds ratio |
-| Poisson regression | `stats::glm()` | Rate ratio |
-| Cox proportional hazards | `survival::coxph()` | Hazard ratio |
-| Conditional logistic | `survival::clogit()` | Odds ratio |
-| Linear mixed effects | `lme4::lmer()` | *β* coefficient |
-| Generalized linear mixed effects | `lme4::glmer()` | Odds/rate ratio |
-| Cox mixed effects | `coxme::coxme()` | Hazard ratio |
+| Model Class | Shorthand | Function | Effect Measure |
+|:------------|:----------|:---------|:---------------|
+| Linear regression | `lm` | `stats::lm()` | *β* coefficient |
+| Logistic regression | `glm`, `family = binomial` | `stats::glm()` | Odds ratio |
+| Logistic (overdispersed) | `glm`, `family = quasibinomial` | `stats::glm()` | Odds ratio |
+| Poisson regression | `glm`, `family = poisson` | `stats::glm()` | Rate ratio |
+| Poisson (overdispersed) | `glm`, `family = quasipoisson` | `stats::glm()` | Rate ratio |
+| Negative binomial | `glm.nb` | `MASS::glm.nb()` | Rate ratio |
+| Gaussian (via GLM) | `glm`, `family = gaussian` | `stats::glm()` | *β* coefficient |
+| Gamma regression | `glm`, `family = Gamma` | `stats::glm()` | Ratio* |
+| Inverse Gaussian | `glm`, `family = inverse.gaussian` | `stats::glm()` | Ratio* |
+| Cox proportional hazards | `coxph` | `survival::coxph()` | Hazard ratio |
+| Conditional logistic | `clogit` | `survival::clogit()` | Odds ratio |
+| Linear mixed effects | `lmer` | `lme4::lmer()` | *β* coefficient |
+| Generalized linear mixed effects | `glmer` | `lme4::glmer()` | Odds/rate ratio |
+| Cox mixed effects | `coxme` | `coxme::coxme()` | Hazard ratio |
+
+*With log link; coefficient with identity link
 
 ## Functional Reference
 
@@ -179,7 +187,7 @@ table2pdf(table1, "table1.pdf",
 <details>
 <summary><strong>Figure 1.</strong> Descriptive statistics table</summary>
 <br>
-<img src="man/figures/README_desctable.png" alt="Descriptive statistics table" width="100%">
+<img src="assets/images/README_desctable.png" alt="Descriptive statistics table" width="100%">
 </details>
 
 ### **Step 2:** Regression Analysis
@@ -208,7 +216,7 @@ table2pdf(table2, "table2.pdf",
 <details>
 <summary><strong>Figure 2.</strong> Logistic regression with univariable screening</summary>
 <br>
-<img src="man/figures/README_fullfit.png" alt="Regression table" width="100%">
+<img src="assets/images/README_fullfit.png" alt="Regression table" width="100%">
 </details>
 
 ### **Step 3:** Forest Plot
@@ -231,7 +239,7 @@ ggsave("forest_30d.pdf", forest_30d,
 <details>
 <summary><strong>Figure 3.</strong> Multivariable GLM forest plot</summary>
 <br>
-<img src="man/figures/README_glmforest.png" alt="Forest plot" width="100%">
+<img src="assets/images/README_glmforest.png" alt="Forest plot" width="100%">
 </details>
 
 ## Development

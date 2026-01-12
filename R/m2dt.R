@@ -121,6 +121,7 @@
 #' glm_result <- m2dt(clintrial, glm_model)
 #' glm_result
 #' 
+#' \donttest{
 #' # Example 2: Extract from linear model
 #' lm_model <- lm(los_days ~ age + sex + surgery, data = clintrial)
 #' 
@@ -142,6 +143,8 @@
 #' # Example 5: Change confidence level
 #' result_90ci <- m2dt(clintrial, glm_model, conf_level = 0.90)
 #' result_90ci
+#'
+#' }
 #'
 #' @export
 m2dt <- function(data,
@@ -190,6 +193,10 @@ m2dt <- function(data,
             ## Fallback for generic merMod
             model_class <- "lmerMod"  # Assume linear if not specified
         }
+    } else if ("negbin" %in% model_classes) {
+        ## MASS::glm.nb produces negbin class - treat as glm for extraction
+        ## but mark it for special handling (rate ratios)
+        model_class <- "negbin"
     } else {
         ## Standard detection for other models
         model_class <- class(model)[1]
@@ -210,7 +217,7 @@ m2dt <- function(data,
     model_type_name <- get_model_type_name(model)
     
     ## Extract results based on model class
-    if (model_class %in% c("glm", "lm")) {
+    if (model_class %in% c("glm", "lm", "negbin")) {
         
         coef_summary <- summary(model)$coefficients
         conf_int <- stats::confint.default(model, level = conf_level)
@@ -233,9 +240,9 @@ m2dt <- function(data,
             coef_upper = coefficient + z_score * se
         )]
         
-        ## Special handling for logistic regression
+        ## Special handling for logistic regression (including quasibinomial)
         if (model_class == "glm" && !isS4(model)) {
-            if (model$family$family %in% c("binomial", "poisson", "quasipoisson")) {
+            if (model$family$family %in% c("binomial", "quasibinomial", "poisson", "quasipoisson")) {
                 if (!is.null(model$y)) {
                     dt[, events := sum(model$y, na.rm = TRUE)]
                 } else if (!is.null(model$model)) {
@@ -253,16 +260,23 @@ m2dt <- function(data,
         should_exp <- FALSE
         is_logistic <- FALSE
         is_poisson <- FALSE
+        is_negbin <- model_class == "negbin"
         
         if (model_class == "glm" && !isS4(model)) {
             family_name <- model$family$family
             link_name <- model$family$link
             
-            is_logistic <- family_name == "binomial"
+            ## binomial and quasibinomial both produce odds ratios
+            is_logistic <- family_name %in% c("binomial", "quasibinomial")
             is_poisson <- family_name == "poisson" || 
                 (family_name == "quasipoisson")
             
             should_exp <- is_logistic || is_poisson || link_name == "log"
+        }
+        
+        ## Negative binomial uses log link - exponentiate for rate ratios
+        if (is_negbin) {
+            should_exp <- TRUE
         }
         
         ## Add exponentiated coefficients
@@ -278,7 +292,8 @@ m2dt <- function(data,
                 ci_lower = exp_lower,
                 ci_upper = exp_upper
             )]
-        } else if (is_poisson) {
+        } else if (is_poisson || is_negbin) {
+            ## Poisson and negative binomial both produce rate ratios
             dt[, `:=`(
                 RR = exp_coef,
                 ci_lower = exp_lower,
@@ -309,7 +324,7 @@ m2dt <- function(data,
         
         ## Add QC stats if requested
         if (keep_qc_stats) {
-            if (model_class == "glm") {
+            if (model_class %in% c("glm", "negbin")) {
                 dt[, `:=`(
                     AIC = stats::AIC(model),
                     BIC = stats::BIC(model),
@@ -319,8 +334,13 @@ m2dt <- function(data,
                 )]
                 
                 ## Add R-squared for non-binomial GLMs
-                if (!isS4(model) && model$family$family != "binomial") {
+                if (model_class == "glm" && !isS4(model) && model$family$family != "binomial") {
                     dt[, R2 := 1 - (deviance / null_deviance)]
+                }
+                
+                ## Add theta for negative binomial
+                if (model_class == "negbin") {
+                    dt[, theta := model$theta]
                 }
                 
                 ## For binomial, add discrimination/calibration metrics
@@ -720,7 +740,7 @@ m2dt <- function(data,
             outcome_var <- NULL
             event_var <- NULL
             
-            if (model_class == "glm" && !isS4(model)) {
+            if (model_class %in% c("glm", "negbin") && !isS4(model)) {
                 outcome_var <- all.vars(model$formula)[1]
             } else if (model_class %in% c("lmer", "lmerMod", "glmer", "glmerMod") && inherits(model, "merMod")) {
                 ## For mixed models, get the response variable name from the formula
@@ -823,7 +843,7 @@ m2dt <- function(data,
             
             if (model_class %in% c("coxph", "clogit", "coxme")) {
                 event_var <- get_event_variable(model, model_class)
-            } else if (model_class == "glm" && !isS4(model)) {
+            } else if (model_class %in% c("glm", "negbin") && !isS4(model)) {
                 outcome_var <- all.vars(model$formula)[1]
             } else if (model_class %in% c("lmer", "lmerMod", "glmer", "glmerMod") && inherits(model, "merMod")) {
                 formula_obj <- model@call$formula
@@ -1179,6 +1199,12 @@ m2dt <- function(data,
     if (model_class == "glm") {
         data.table::setattr(dt, "model_family", model$family$family)
         data.table::setattr(dt, "model_link", model$family$link)
+    }
+    
+    if (model_class == "negbin") {
+        data.table::setattr(dt, "model_family", "Negative Binomial")
+        data.table::setattr(dt, "model_link", "log")
+        data.table::setattr(dt, "theta", model$theta)
     }
     
     dt[]

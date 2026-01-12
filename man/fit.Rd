@@ -5,9 +5,10 @@
 \title{Fit Regression Model with Publication-Ready Output}
 \usage{
 fit(
-  data,
-  outcome,
-  predictors,
+  data = NULL,
+  outcome = NULL,
+  predictors = NULL,
+  model = NULL,
   model_type = "glm",
   family = "binomial",
   interactions = NULL,
@@ -27,40 +28,103 @@ fit(
 )
 }
 \arguments{
-\item{data}{A data.frame or data.table containing the analysis dataset. The 
-function automatically converts data.frames to data.tables for efficient 
-processing.}
+\item{data}{A data.frame or data.table containing the analysis dataset. 
+Required for formula-based workflow; optional for model-based workflow
+(extracted from model if not provided).}
 
 \item{outcome}{Character string specifying the outcome variable name. For 
 survival analysis, use \code{Surv()} syntax from the survival package 
-(e.g., \code{"Surv(time, status)"} or \code{"Surv(os_months, os_status)"}).}
+(e.g., \code{"Surv(time, status)"} or \code{"Surv(os_months, os_status)"}).
+Required for formula-based workflow; ignored if \code{model} is provided.}
 
 \item{predictors}{Character vector of predictor variable names to include in 
 the model. All predictors are included simultaneously (multivariable model). 
 For univariable models, provide a single predictor. Can include continuous, 
-categorical (factor), or binary variables.}
+categorical (factor), or binary variables.
+Required for formula-based workflow; ignored if \code{model} is provided.}
 
-\item{model_type}{Character string specifying the type of regression model. 
-Options include:
+\item{model}{Optional. A pre-fitted model object to format. When provided,
+\code{outcome} and \code{predictors} are ignored and the model is formatted
+directly. Supported model classes include:
 \itemize{
-  \item \code{"glm"} - Generalized linear model [default]
-  \item \code{"lm"} - Linear regression
-  \item \code{"coxph"} - Cox proportional hazards (survival)
-  \item \code{"clogit"} - Conditional logistic regression
-  \item \code{"coxme"} - Mixed effects Cox model
-  \item \code{"lmer"} - Linear mixed effects model
-  \item \code{"glmer"} - Generalized linear mixed effects model
+  \item \code{glm} - Generalized linear models
+  \item \code{negbin} - Negative binomial models from \code{MASS::glm.nb()}
+  \item \code{lm} - Linear models
+  \item \code{coxph} - Cox proportional hazards models
+  \item \code{lmerMod}, \code{glmerMod} - Mixed-effects models from lme4
+  \item \code{coxme} - Mixed-effects Cox models
 }}
 
-\item{family}{For GLM models, the error distribution and link function. Common 
-options include:
+\item{model_type}{Character string specifying the type of regression model. 
+Ignored if \code{model} is provided. Options include:
 \itemize{
-  \item \code{"binomial"} - Logistic regression [default]
-  \item \code{"poisson"} - Poisson regression for count data
-  \item \code{"gaussian"} - Normal linear regression via GLM
-  \item \code{"Gamma"} - Gamma regression for positive continuous data
+  \item \code{"glm"} - Generalized linear model (default). Supports multiple 
+    distributions via the \code{family} parameter including logistic, Poisson, 
+    Gamma, Gaussian, and quasi-likelihood models.
+  \item \code{"negbin"} - Negative binomial regression for overdispersed count 
+    data (requires MASS package). Estimates an additional dispersion parameter 
+    compared to Poisson regression.
+  \item \code{"lm"} - Linear regression for continuous outcomes with normally 
+    distributed errors. Equivalent to \code{glm} with \code{family = "gaussian"}.
+  \item \code{"coxph"} - Cox proportional hazards model for time-to-event 
+    survival analysis. Requires \code{Surv()} outcome syntax.
+  \item \code{"clogit"} - Conditional logistic regression for matched 
+    case-control studies or stratified analyses.
+  \item \code{"coxme"} - Cox mixed-effects model for clustered survival data 
+    (requires coxme package).
+  \item \code{"lmer"} - Linear mixed-effects model for hierarchical or clustered 
+    data with continuous outcomes (requires lme4 package).
+  \item \code{"glmer"} - Generalized linear mixed-effects model for hierarchical 
+    or clustered data with non-normal outcomes (requires lme4 package).
+}}
+
+\item{family}{For GLM and GLMER models, specifies the error distribution and link 
+function. Can be a character string, a family function, or a family object.
+Ignored for non-GLM/GLMER models.
+
+\strong{Binary/Binomial outcomes:}
+\itemize{
+  \item \code{"binomial"} or \code{binomial()} - Logistic regression for binary 
+    outcomes (0/1, TRUE/FALSE). Returns odds ratios (OR). Default.
+  \item \code{"quasibinomial"} or \code{quasibinomial()} - Logistic regression 
+    with overdispersion. Use when residual deviance >> residual df.
+  \item \code{binomial(link = "probit")} - Probit regression (normal CDF link).
+  \item \code{binomial(link = "cloglog")} - Complementary log-log link for 
+    asymmetric binary outcomes.
 }
-See \code{\link[stats]{family}} for all options. Ignored for non-GLM models.}
+
+\strong{Count outcomes:}
+\itemize{
+  \item \code{"poisson"} or \code{poisson()} - Poisson regression for count 
+    data. Returns rate ratios (RR). Assumes mean = variance.
+  \item \code{"quasipoisson"} or \code{quasipoisson()} - Poisson regression 
+    with overdispersion. Use when variance > mean.
+}
+
+\strong{Continuous outcomes:}
+\itemize{
+  \item \code{"gaussian"} or \code{gaussian()} - Normal/Gaussian distribution 
+    for continuous outcomes. Equivalent to linear regression.
+  \item \code{gaussian(link = "log")} - Log-linear model for positive continuous 
+    outcomes. Returns multiplicative effects.
+  \item \code{gaussian(link = "inverse")} - Inverse link for specific applications.
+}
+
+\strong{Positive continuous outcomes:}
+\itemize{
+  \item \code{"Gamma"} or \code{Gamma()} - Gamma distribution for positive, 
+    right-skewed continuous data (e.g., costs, lengths of stay). Default log link.
+  \item \code{Gamma(link = "inverse")} - Gamma with inverse (canonical) link.
+  \item \code{Gamma(link = "identity")} - Gamma with identity link for additive 
+    effects on positive outcomes.
+  \item \code{"inverse.gaussian"} or \code{inverse.gaussian()} - Inverse Gaussian 
+    for positive, highly right-skewed data.
+}
+
+For negative binomial regression (overdispersed counts), use 
+\code{model_type = "negbin"} instead of the \code{family} parameter.
+
+See \code{\link[stats]{family}} for additional details and options.}
 
 \item{interactions}{Character vector of interaction terms using colon 
 notation (e.g., \code{c("age:sex", "treatment:stage")}). Interaction terms 
@@ -164,6 +228,15 @@ consistent syntax and output formatting. Handles both univariable and
 multivariable models automatically.
 }
 \details{
+Can be used in two ways:
+\enumerate{
+  \item \strong{Formula-based}: Provide \code{data}, \code{outcome}, and 
+    \code{predictors} to fit a new model
+  \item \strong{Model-based}: Provide a pre-fitted \code{model} object to 
+    format existing results (e.g., from \code{MASS::glm.nb()})
+}
+
+
 \strong{Model Scope Detection:}
 
 The function automatically detects whether the model is:
@@ -241,10 +314,12 @@ Mixed effects models handle hierarchical or clustered data:
 
 \strong{Effect Measures by Model Type:}
 \itemize{
-  \item \strong{Logistic} (\code{family = "binomial"}): Odds ratios (OR/aOR)
+  \item \strong{Logistic} (\code{family = "binomial"/"quasibinomial"}): Odds ratios (OR/aOR)
   \item \strong{Cox} (\code{model_type = "coxph"}): Hazard ratios (HR/aHR)
-  \item \strong{Poisson} (\code{family = "poisson"}): Rate ratios (RR/aRR)
-  \item \strong{Linear}: Raw coefficient estimates
+  \item \strong{Poisson/Count} (\code{family = "poisson"/"quasipoisson"}): Rate ratios (RR/aRR)
+  \item \strong{Negative binomial} (\code{model_type = "negbin"}): Rate ratios (RR/aRR)
+  \item \strong{Gamma/Log-link}: Ratios (multiplicative effects)
+  \item \strong{Linear/Gaussian}: Raw coefficient estimates (additive effects)
 }
 
 \strong{Confidence Intervals:}
@@ -281,6 +356,7 @@ uni_model <- fit(
 print(uni_model)
 # Labeled as "Univariable OR"
 
+\donttest{
 # Example 2: Multivariable logistic regression
 multi_model <- fit(
     data = clintrial,
@@ -355,7 +431,30 @@ poisson_model <- fit(
 print(poisson_model)
 # Returns rate ratios (RR/aRR)
 
-# Example 9: Access the underlying fitted model
+# Example 9: Negative binomial regression for overdispersed counts
+if (requireNamespace("MASS", quietly = TRUE)) {
+    nb_result <- fit(
+        data = clintrial,
+        outcome = "los_days",
+        predictors = c("age", "sex", "treatment", "stage"),
+        model_type = "negbin",
+        labels = clintrial_labels
+    )
+    print(nb_result)
+}
+
+# Example 10: Gamma regression for positive continuous outcomes
+gamma_model <- fit(
+    data = clintrial,
+    outcome = "los_days",
+    predictors = c("age", "treatment", "surgery"),
+    model_type = "glm",
+    family = Gamma(link = "log"),
+    labels = clintrial_labels
+)
+print(gamma_model)
+
+# Example 11: Access the underlying fitted model
 result <- fit(
     data = clintrial,
     outcome = "os_status",
@@ -372,12 +471,12 @@ plot(model_obj)
 # Predictions
 preds <- predict(model_obj, type = "response")
 
-# Example 10: Access raw numeric data
+# Example 12: Access raw numeric data
 raw_data <- attr(result, "raw_data")
 print(raw_data)
 # Contains unformatted coefficients, SEs, CIs, AIC, BIC, etc.
 
-# Example 11: Multiple interactions
+# Example 13: Multiple interactions
 complex_model <- fit(
     data = clintrial,
     outcome = "os_status",
@@ -387,7 +486,7 @@ complex_model <- fit(
 )
 print(complex_model)
 
-# Example 12: Customize output columns
+# Example 14: Customize output columns
 minimal <- fit(
     data = clintrial,
     outcome = "os_status",
@@ -398,7 +497,7 @@ minimal <- fit(
 )
 print(minimal)
 
-# Example 13: Different confidence levels
+# Example 15: Different confidence levels
 ci90 <- fit(
     data = clintrial,
     outcome = "os_status",
@@ -407,7 +506,7 @@ ci90 <- fit(
 )
 print(ci90)
 
-# Example 14: Force coefficient display instead of OR
+# Example 16: Force coefficient display instead of OR
 coef_model <- fit(
     data = clintrial,
     outcome = "os_status",
@@ -416,7 +515,7 @@ coef_model <- fit(
 )
 print(coef_model)
 
-# Example 15: Check model quality statistics
+# Example 17: Check model quality statistics
 result <- fit(
     data = clintrial,
     outcome = "os_status",
@@ -428,8 +527,9 @@ raw <- attr(result, "raw_data")
 cat("AIC:", raw$AIC[1], "\n")
 cat("BIC:", raw$BIC[1], "\n")
 cat("C-statistic:", raw$c_statistic[1], "\n")
+}
 
-# Example 16: Linear mixed effects model with site random effects
+# Example 18: Linear mixed effects model with site random effects
 # (Requires lme4 package)
 \dontrun{
 library(lme4)
@@ -449,6 +549,13 @@ lmer_slopes <- fit(
     model_type = "lmer"
 )
 print(lmer_slopes)
+
+# Example 19: Format a pre-fitted model (model-based workflow)
+# Useful for models fitted outside of fit(), like MASS::glm.nb()
+pre_fitted <- glm(os_status ~ age + sex + treatment,
+                  family = binomial, data = clintrial)
+result <- fit(model = pre_fitted, labels = clintrial_labels)
+print(result)
 }
 
 }

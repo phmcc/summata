@@ -5,7 +5,7 @@
 \alias{clintrial}
 \title{Simulated Clinical Trial Dataset}
 \format{
-A data frame with 850 observations and 24 variables:
+A data frame with 850 observations and 28 variables:
 \describe{
   \item{patient_id}{Unique patient identifier (character)}
   \item{age}{Age at enrollment in years (numeric: 18-90)}
@@ -26,6 +26,12 @@ A data frame with 850 observations and 24 variables:
   \item{stage}{Disease stage at diagnosis (factor: I, II, III, IV)}
   \item{treatment}{Randomized treatment (factor: Control, Drug A, Drug B)}
   \item{surgery}{Surgical resection (factor: No, Yes)}
+  \item{any_complication}{Any post-operative complication (factor: No, Yes)}
+  \item{wound_infection}{Post-operative wound infection (factor: No, Yes)}
+  \item{icu_admission}{ICU admission required (factor: No, Yes)}
+  \item{readmission_30d}{Hospital readmission within 30 days (factor: No, Yes)}
+  \item{pain_score}{Pain score at discharge (numeric: 0-10)}
+  \item{recovery_days}{Days to functional recovery (numeric)}
   \item{los_days}{Hospital length of stay in days (numeric)}
   \item{pfs_months}{Progression-Free Survival Time (months)}
   \item{pfs_status}{Progression or Death Event}

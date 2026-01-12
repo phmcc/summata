@@ -135,6 +135,7 @@ glm_model <- glm(os_status ~ age + sex + treatment,
 glm_result <- m2dt(clintrial, glm_model)
 glm_result
 
+\donttest{
 # Example 2: Extract from linear model
 lm_model <- lm(los_days ~ age + sex + surgery, data = clintrial)
 
@@ -156,6 +157,8 @@ clean_result
 # Example 5: Change confidence level
 result_90ci <- m2dt(clintrial, glm_model, conf_level = 0.90)
 result_90ci
+
+}
 
 }
 \seealso{

@@ -21,7 +21,7 @@ compfit(
 )
 }
 \arguments{
-\item{data}{A data.frame or data.table containing the dataset.}
+\item{data}{A data frame or data.table containing the dataset.}
 
 \item{outcome}{Character string specifying the outcome variable. For survival
 analysis, use Surv() syntax (e.g., "Surv(time, status)").}
@@ -39,10 +39,36 @@ Use NULL for models without interactions. Use colon notation for interactions
 Default is NULL.}
 
 \item{model_type}{Character string specifying model type. If "auto", detects
-based on outcome. Options: "auto", "glm", "lm", "coxph", "clogit".
-Default is "auto".}
+based on outcome. Options include:
+\itemize{
+  \item \code{"auto"} - Automatically detect based on outcome type (default)
+  \item \code{"glm"} - Generalized linear model. Supports logistic, Poisson, 
+    Gamma, Gaussian via \code{family} parameter.
+  \item \code{"lm"} - Linear regression for continuous outcomes
+  \item \code{"coxph"} - Cox proportional hazards for survival analysis
+  \item \code{"lmer"} - Mixed-effects linear regression for clustered continuous
+    outcomes
+  \item \code{"glmer"} - Mixed-effects logistic regression for clustered
+    categorical outcomes
+  \item \code{"coxme"} - Mixed-effects Cox regression for clustered time-to-event
+    outcomes
+  \item \code{"negbin"} - Negative binomial regression for overdispersed counts 
+    (requires MASS package)
+}}
 
-\item{family}{For GLM models, the error distribution family. Default is "binomial".}
+\item{family}{For GLM models, specifies the error distribution and link function.
+Common options include:
+\itemize{
+  \item \code{"binomial"} - Logistic regression for binary outcomes (default)
+  \item \code{"poisson"} - Poisson regression for count data
+  \item \code{"quasibinomial"} - Logistic with overdispersion
+  \item \code{"quasipoisson"} - Poisson with overdispersion
+  \item \code{"gaussian"} - Normal distribution (linear regression via GLM)
+  \item \code{"Gamma"} - Gamma for positive continuous data
+  \item \code{"inverse.gaussian"} - For positive, highly skewed data
+}
+For negative binomial, use \code{model_type = "negbin"} instead.
+See \code{\link[stats]{family}} for all options.}
 
 \item{conf_level}{Numeric confidence level for intervals. Default is 0.95.}
 
@@ -147,6 +173,7 @@ comparison <- compfit(
 )
 comparison
 
+\donttest{
 # Example 2: Compare Cox survival models
 library(survival)
 surv_models <- list(
@@ -200,6 +227,8 @@ names(fitted_models)
 # Example 6: Get best model recommendation
 best <- attr(comparison, "best_model")
 cat("Recommended model:", best, "\n")
+
+}
 
 }
 \seealso{

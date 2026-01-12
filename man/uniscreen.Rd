@@ -42,24 +42,75 @@ continuous, categorical (factor), or binary variables.}
 \item{model_type}{Character string specifying the type of regression model to 
 fit. Options include:
 \itemize{
-  \item \code{"glm"} - Generalized linear model [default]
-  \item \code{"lm"} - Linear regression
-  \item \code{"coxph"} - Cox proportional hazards (survival analysis)
-  \item \code{"clogit"} - Conditional logistic regression
-  \item \code{"glmer"} - Generalized linear mixed-effects model (requires \code{random})
-  \item \code{"lmer"} - Linear mixed-effects model (requires \code{random})
-  \item \code{"coxme"} - Cox mixed-effects model (requires \code{random})
+  \item \code{"glm"} - Generalized linear model (default). Supports multiple 
+    distributions via the \code{family} parameter including logistic, Poisson, 
+    Gamma, Gaussian, and quasi-likelihood models.
+  \item \code{"negbin"} - Negative binomial regression for overdispersed count 
+    data (requires MASS package). Estimates an additional dispersion parameter 
+    compared to Poisson regression.
+  \item \code{"lm"} - Linear regression for continuous outcomes with normally 
+    distributed errors. Equivalent to \code{glm} with \code{family = "gaussian"}.
+  \item \code{"coxph"} - Cox proportional hazards model for time-to-event 
+    survival analysis. Requires \code{Surv()} outcome syntax.
+  \item \code{"clogit"} - Conditional logistic regression for matched 
+    case-control studies or stratified analyses.
+  \item \code{"glmer"} - Generalized linear mixed-effects model for hierarchical 
+    or clustered data with non-normal outcomes (requires lme4 package and 
+    \code{random} parameter).
+  \item \code{"lmer"} - Linear mixed-effects model for hierarchical or clustered 
+    data with continuous outcomes (requires lme4 package and \code{random} 
+    parameter).
+  \item \code{"coxme"} - Cox mixed-effects model for clustered survival data 
+    (requires coxme package and \code{random} parameter).
 }}
 
-\item{family}{For GLM and GLMER models, the error distribution and link function. Common 
-options include:
+\item{family}{For GLM and GLMER models, specifies the error distribution and link 
+function. Can be a character string, a family function, or a family object.
+Ignored for non-GLM/GLMER models.
+
+\strong{Binary/Binomial outcomes:}
 \itemize{
-  \item \code{"binomial"} - Logistic regression for binary outcomes [default]
-  \item \code{"poisson"} - Poisson regression for count data
-  \item \code{"gaussian"} - Normal linear regression via GLM
-  \item \code{"Gamma"} - Gamma regression for positive continuous data
+  \item \code{"binomial"} or \code{binomial()} - Logistic regression for binary 
+    outcomes (0/1, TRUE/FALSE). Returns odds ratios (OR). Default.
+  \item \code{"quasibinomial"} or \code{quasibinomial()} - Logistic regression 
+    with overdispersion. Use when residual deviance >> residual df.
+  \item \code{binomial(link = "probit")} - Probit regression (normal CDF link).
+  \item \code{binomial(link = "cloglog")} - Complementary log-log link for 
+    asymmetric binary outcomes.
 }
-See \code{\link[stats]{family}} for all options. Ignored for non-GLM/GLMER models.}
+
+\strong{Count outcomes:}
+\itemize{
+  \item \code{"poisson"} or \code{poisson()} - Poisson regression for count 
+    data. Returns rate ratios (RR). Assumes mean = variance.
+  \item \code{"quasipoisson"} or \code{quasipoisson()} - Poisson regression 
+    with overdispersion. Use when variance > mean.
+}
+
+\strong{Continuous outcomes:}
+\itemize{
+  \item \code{"gaussian"} or \code{gaussian()} - Normal/Gaussian distribution 
+    for continuous outcomes. Equivalent to linear regression.
+  \item \code{gaussian(link = "log")} - Log-linear model for positive continuous 
+    outcomes. Returns multiplicative effects.
+  \item \code{gaussian(link = "inverse")} - Inverse link for specific applications.
+}
+
+\strong{Positive continuous outcomes:}
+\itemize{
+  \item \code{"Gamma"} or \code{Gamma()} - Gamma distribution for positive, 
+    right-skewed continuous data (e.g., costs, lengths of stay). Default log link.
+  \item \code{Gamma(link = "inverse")} - Gamma with inverse (canonical) link.
+  \item \code{Gamma(link = "identity")} - Gamma with identity link for additive 
+    effects on positive outcomes.
+  \item \code{"inverse.gaussian"} or \code{inverse.gaussian()} - Inverse Gaussian 
+    for positive, highly right-skewed data.
+}
+
+For negative binomial regression (overdispersed counts), use 
+\code{model_type = "negbin"} instead of the \code{family} parameter.
+
+See \code{\link[stats]{family}} for additional details and options.}
 
 \item{random}{Character string specifying the random effects formula for 
 mixed-effects models (\code{glmer}, \code{lmer}, \code{coxme}). Use standard
@@ -110,6 +161,18 @@ OR/HR/RR instead of log odds/log hazards). Default is \code{NULL}, which
 automatically exponentiates for logistic, Poisson, and Cox models, and 
 displays raw coefficients for linear models and other GLM families. Set 
 to \code{TRUE} to force exponentiation or \code{FALSE} to force coefficients.}
+
+\item{parallel}{Logical. If \code{TRUE} (default), fits models in parallel 
+using multiple CPU cores for improved performance with many predictors. 
+On Unix/Mac systems, uses fork-based parallelism via \code{mclapply}; 
+on Windows, uses socket clusters via \code{parLapply}. Set to \code{FALSE} 
+for sequential processing.}
+
+\item{n_cores}{Integer specifying the number of CPU cores to use for parallel 
+processing. Default is \code{NULL}, which automatically detects available 
+cores and uses \code{detectCores() - 1}. During R CMD check, the number 
+of cores is automatically limited to 2 per CRAN policy. Ignored when 
+\code{parallel = FALSE}.}
 
 \item{...}{Additional arguments passed to the underlying model fitting functions 
 (\code{\link[stats]{glm}}, \code{\link[stats]{lm}}, 
@@ -218,8 +281,11 @@ The \code{p_threshold} parameter enables automatic filtering:
   \item \strong{Cox regression} (\code{model_type = "coxph"}): Hazard ratios (HR)
   \item \strong{Poisson regression} (\code{model_type = "glm"}, 
     \code{family = "poisson"}): Rate/risk ratios (RR)
+  \item \strong{Negative binomial} (\code{model_type = "negbin"}): Rate ratios (RR)
   \item \strong{Linear regression} (\code{model_type = "lm"} or GLM with 
     identity link): Raw coefficient estimates
+  \item \strong{Gamma regression} (\code{model_type = "glm"}, 
+    \code{family = "Gamma"}): Multiplicative effects (with default log link)
 }
 
 \strong{Memory Considerations:}
@@ -249,6 +315,7 @@ screen1 <- uniscreen(
 )
 print(screen1)
 
+\donttest{
 # Example 2: With custom variable labels
 screen2 <- uniscreen(
     data = clintrial,
@@ -307,9 +374,10 @@ linear_screen <- uniscreen(
 print(linear_screen)
 
 # Example 7: Poisson regression for count outcomes
+clintrial$event_count <- rpois(nrow(clintrial), lambda = 3)
 poisson_screen <- uniscreen(
     data = clintrial,
-    outcome = "los_days",
+    outcome = "event_count",
     predictors = c("age", "sex", "treatment", "surgery", "stage"),
     model_type = "glm",
     family = "poisson",
@@ -318,48 +386,71 @@ poisson_screen <- uniscreen(
 print(poisson_screen)
 # Returns rate ratios (RR)
 
-# Example 8: Hide reference rows for factor variables
-screen8 <- uniscreen(
+# Example 8: Negative binomial for overdispersed counts
+if (requireNamespace("MASS", quietly = TRUE)) {
+    nb_screen <- uniscreen(
+        data = clintrial,
+        outcome = "los_days",
+        predictors = c("age", "sex", "treatment", "surgery"),
+        model_type = "negbin",
+        labels = clintrial_labels
+    )
+    print(nb_screen)
+}
+
+# Example 9: Gamma regression for positive continuous outcomes (e.g., costs)
+gamma_screen <- uniscreen(
+    data = clintrial,
+    outcome = "los_days",
+    predictors = c("age", "sex", "treatment", "surgery"),
+    model_type = "glm",
+    family = Gamma(link = "log"),
+    labels = clintrial_labels
+)
+print(gamma_screen)
+
+# Example 10: Hide reference rows for factor variables
+screen10 <- uniscreen(
     data = clintrial,
     outcome = "os_status",
     predictors = c("treatment", "stage", "grade"),
     reference_rows = FALSE
 )
-print(screen8)
+print(screen10)
 # Reference categories not shown
 
-# Example 9: Customize decimal places
-screen9 <- uniscreen(
+# Example 11: Customize decimal places
+screen11 <- uniscreen(
     data = clintrial,
     outcome = "os_status",
     predictors = c("age", "bmi", "creatinine"),
     digits = 3,      # 3 decimal places for OR
     p_digits = 4     # 4 decimal places for p-values
 )
-print(screen9)
+print(screen11)
 
-# Example 10: Hide sample size and event columns
-screen10 <- uniscreen(
+# Example 12: Hide sample size and event columns
+screen12 <- uniscreen(
     data = clintrial,
     outcome = "os_status",
     predictors = c("age", "sex", "bmi"),
     show_n = FALSE,
     show_events = FALSE
 )
-print(screen10)
+print(screen12)
 
-# Example 11: Access raw numeric data
-screen11 <- uniscreen(
+# Example 13: Access raw numeric data
+screen13 <- uniscreen(
     data = clintrial,
     outcome = "os_status",
     predictors = c("age", "sex", "treatment")
 )
-raw_data <- attr(screen11, "raw_data")
+raw_data <- attr(screen13, "raw_data")
 print(raw_data)
 # Contains unformatted coefficients, SEs, CIs, etc.
 
-# Example 12: Force coefficient display instead of OR
-screen12 <- uniscreen(
+# Example 14: Force coefficient display instead of OR
+screen14 <- uniscreen(
     data = clintrial,
     outcome = "os_status",
     predictors = c("age", "bmi"),
@@ -367,10 +458,10 @@ screen12 <- uniscreen(
     family = "binomial",
     exponentiate = FALSE  # Show log odds instead of OR
 )
-print(screen12)
+print(screen14)
 
-# Example 13: Screening with weights
-screen13 <- uniscreen(
+# Example 15: Screening with weights
+screen15 <- uniscreen(
     data = clintrial,
     outcome = "Surv(os_months, os_status)",
     predictors = c("age", "sex", "bmi"),
@@ -378,7 +469,7 @@ screen13 <- uniscreen(
     weights = runif(nrow(clintrial), min = 0.5, max = 2)  # Random numbers for example
 )
 
-# Example 14: Strict significance filter (p < 0.05)
+# Example 16: Strict significance filter (p < 0.05)
 sig_only <- uniscreen(
     data = clintrial,
     outcome = "os_status",
@@ -392,7 +483,7 @@ sig_only <- uniscreen(
 n_significant <- length(unique(sig_only$Variable[sig_only$Variable != ""]))
 cat("Significant predictors:", n_significant, "\n")
 
-# Example 15: Complete workflow - screen then use in multivariable
+# Example 17: Complete workflow - screen then use in multivariable
 # Step 1: Screen with liberal threshold
 candidates <- uniscreen(
     data = clintrial,
@@ -414,7 +505,7 @@ multi_model <- fit(
 )
 print(multi_model)
 
-# Example 16: Mixed-effects logistic regression (glmer)
+# Example 18: Mixed-effects logistic regression (glmer)
 # Accounts for clustering by site
 if (requireNamespace("lme4", quietly = TRUE)) {
     glmer_screen <- uniscreen(
@@ -429,11 +520,11 @@ if (requireNamespace("lme4", quietly = TRUE)) {
     print(glmer_screen)
 }
 
-# Example 17: Mixed-effects linear regression (lmer)
+# Example 19: Mixed-effects linear regression (lmer)
 if (requireNamespace("lme4", quietly = TRUE)) {
     lmer_screen <- uniscreen(
         data = clintrial,
-        outcome = "biomarker",
+        outcome = "biomarker_x",
         predictors = c("age", "sex", "treatment", "smoking"),
         model_type = "lmer",
         random = "(1|site)",
@@ -442,7 +533,7 @@ if (requireNamespace("lme4", quietly = TRUE)) {
     print(lmer_screen)
 }
 
-# Example 18: Mixed-effects Cox model (coxme)
+# Example 20: Mixed-effects Cox model (coxme)
 if (requireNamespace("coxme", quietly = TRUE)) {
     coxme_screen <- uniscreen(
         data = clintrial,
@@ -455,7 +546,7 @@ if (requireNamespace("coxme", quietly = TRUE)) {
     print(coxme_screen)
 }
 
-# Example 19: Mixed-effects with nested random effects
+# Example 21: Mixed-effects with nested random effects
 # Patients nested within sites
 if (requireNamespace("lme4", quietly = TRUE)) {
     nested_screen <- uniscreen(
@@ -466,6 +557,7 @@ if (requireNamespace("lme4", quietly = TRUE)) {
         random = "(1|site/patient_id)",
         family = "binomial"
     )
+}
 }
 
 }

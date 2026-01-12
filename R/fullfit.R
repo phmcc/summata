@@ -49,16 +49,66 @@
 #'   
 #' @param model_type Character string specifying the regression model type:
 #'   \itemize{
-#'     \item \code{"glm"} - Generalized linear model [default]
-#'     \item \code{"lm"} - Linear regression
-#'     \item \code{"coxph"} - Cox proportional hazards
-#'     \item \code{"clogit"} - Conditional logistic regression
+#'     \item \code{"glm"} - Generalized linear model (default). Supports multiple 
+#'       distributions via the \code{family} parameter including logistic, Poisson, 
+#'       Gamma, Gaussian, and quasi-likelihood models.
+#'     \item \code{"negbin"} - Negative binomial regression for overdispersed count 
+#'       data (requires MASS package). Estimates an additional dispersion parameter 
+#'       compared to Poisson regression.
+#'     \item \code{"lm"} - Linear regression for continuous outcomes with normally 
+#'       distributed errors.
+#'     \item \code{"coxph"} - Cox proportional hazards model for time-to-event 
+#'       survival analysis. Requires \code{Surv()} outcome syntax.
+#'     \item \code{"clogit"} - Conditional logistic regression for matched 
+#'       case-control studies.
 #'   }
 #'   
-#' @param family For GLM models, the error distribution and link function. 
-#'   Common options: \code{"binomial"} (logistic) [default], \code{"poisson"} 
-#'   (count data), \code{"gaussian"} (linear), \code{"Gamma"}. See 
-#'   \code{\link[stats]{family}}.
+#' @param family For GLM models, specifies the error distribution and link function. 
+#'   Can be a character string, a family function, or a family object.
+#'   Ignored for non-GLM models.
+#'   
+#'   \strong{Binary/Binomial outcomes:}
+#'   \itemize{
+#'     \item \code{"binomial"} or \code{binomial()} - Logistic regression for binary 
+#'       outcomes (0/1, TRUE/FALSE). Returns odds ratios (OR). Default.
+#'     \item \code{"quasibinomial"} or \code{quasibinomial()} - Logistic regression 
+#'       with overdispersion. Use when residual deviance >> residual df.
+#'     \item \code{binomial(link = "probit")} - Probit regression (normal CDF link).
+#'     \item \code{binomial(link = "cloglog")} - Complementary log-log link for 
+#'       asymmetric binary outcomes.
+#'   }
+#'   
+#'   \strong{Count outcomes:}
+#'   \itemize{
+#'     \item \code{"poisson"} or \code{poisson()} - Poisson regression for count 
+#'       data. Returns rate ratios (RR). Assumes mean = variance.
+#'     \item \code{"quasipoisson"} or \code{quasipoisson()} - Poisson regression 
+#'       with overdispersion. Use when variance > mean.
+#'   }
+#'   
+#'   \strong{Continuous outcomes:}
+#'   \itemize{
+#'     \item \code{"gaussian"} or \code{gaussian()} - Normal/Gaussian distribution 
+#'       for continuous outcomes. Equivalent to linear regression.
+#'     \item \code{gaussian(link = "log")} - Log-linear model for positive continuous 
+#'       outcomes. Returns multiplicative effects.
+#'   }
+#'   
+#'   \strong{Positive continuous outcomes:}
+#'   \itemize{
+#'     \item \code{"Gamma"} or \code{Gamma()} - Gamma distribution for positive, 
+#'       right-skewed continuous data (e.g., costs, lengths of stay). Default log link.
+#'     \item \code{Gamma(link = "inverse")} - Gamma with inverse (canonical) link.
+#'     \item \code{Gamma(link = "identity")} - Gamma with identity link for additive 
+#'       effects on positive outcomes.
+#'     \item \code{"inverse.gaussian"} or \code{inverse.gaussian()} - Inverse Gaussian 
+#'       for positive, highly right-skewed data.
+#'   }
+#'   
+#'   For negative binomial regression (overdispersed counts), use 
+#'   \code{model_type = "negbin"} instead of the \code{family} parameter.
+#'   
+#'   See \code{\link[stats]{family}} for additional details and options.
 #'   
 #' @param conf_level Numeric confidence level for confidence intervals. Must be 
 #'   between 0 and 1. Default is 0.95 (95\% CI).
@@ -260,6 +310,7 @@
 #' # Shows both univariable and multivariable results
 #' # Only significant univariable predictors in multivariable model
 #' 
+#' \donttest{
 #' # Example 2: Liberal screening threshold (p < 0.20)
 #' result2 <- fullfit(
 #'     data = clintrial,
@@ -449,6 +500,7 @@
 #' # Can export directly to PDF/LaTeX/HTML for publication
 #' # table2pdf(final_table, "regression_results.pdf")
 #' # table2docx(final_table, "regression_results.docx")
+#' }
 #'
 #' @export
 fullfit <- function(data,

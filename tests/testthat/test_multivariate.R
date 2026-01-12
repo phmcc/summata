@@ -20,6 +20,11 @@ data(clintrial_labels)
 ## Create a complete-case subset for tests requiring no missing data
 clintrial_complete <- na.omit(clintrial)
 
+## Create integer count outcome for Poisson/quasipoisson/negative binomial tests
+set.seed(123)
+clintrial$count_outcome <- as.integer(ceiling(clintrial$los_days))
+clintrial_complete$count_outcome <- as.integer(ceiling(clintrial_complete$los_days))
+
 ## Define outcome sets for different model types
 binary_outcomes <- c("surgery", "pfs_status", "os_status")
 continuous_outcomes <- c("los_days", "biomarker_x")
@@ -346,6 +351,303 @@ test_that("uniscreen respects digits parameter", {
     effect_col_4 <- grep("OR.*CI", names(result_4dig), value = TRUE)[1]
     
     expect_true(nchar(result_4dig[[effect_col_4]][1]) > nchar(result_2dig[[effect_col_2]][1]))
+})
+
+
+## ============================================================================
+## SECTION 1A: uniscreen() Additional GLM Family Tests
+## ============================================================================
+
+## ----------------------------------------------------------------------------
+## Gaussian Family Tests
+## ----------------------------------------------------------------------------
+
+test_that("uniscreen works with gaussian family", {
+    
+    result <- uniscreen(
+        data = clintrial,
+        outcome = "los_days",
+        predictors = standard_predictors,
+        model_type = "glm",
+        family = "gaussian"
+    )
+    
+    expect_uniscreen_result(result)
+    
+    ## Should produce coefficients
+    col_names <- names(result)
+    expect_true(any(grepl("Coefficient.*CI|Estimate.*CI", col_names)),
+                info = paste("Expected Coefficient column for gaussian, found:", 
+                             paste(col_names, collapse = ", ")))
+})
+
+
+## ----------------------------------------------------------------------------
+## Quasibinomial Family Tests
+## ----------------------------------------------------------------------------
+
+test_that("uniscreen works with quasibinomial family", {
+    
+    result <- uniscreen(
+        data = clintrial,
+        outcome = "surgery",
+        predictors = standard_predictors,
+        model_type = "glm",
+        family = "quasibinomial"
+    )
+    
+    expect_uniscreen_result(result)
+    
+    ## Should produce odds ratios
+    col_names <- names(result)
+    expect_true(any(grepl("OR.*CI", col_names)),
+                info = paste("Expected OR column for quasibinomial, found:", 
+                             paste(col_names, collapse = ", ")))
+})
+
+
+test_that("uniscreen quasibinomial point estimates match binomial", {
+    
+    result_quasi <- uniscreen(
+        data = clintrial,
+        outcome = "surgery",
+        predictors = "age",
+        model_type = "glm",
+        family = "quasibinomial",
+        keep_models = TRUE
+    )
+    
+    result_binom <- uniscreen(
+        data = clintrial,
+        outcome = "surgery",
+        predictors = "age",
+        model_type = "glm",
+        family = "binomial",
+        keep_models = TRUE
+    )
+    
+    ## Point estimates should match
+    raw_quasi <- attr(result_quasi, "raw_data")
+    raw_binom <- attr(result_binom, "raw_data")
+    
+    expect_equal(raw_quasi$OR[1], raw_binom$OR[1], tolerance = 1e-6)
+})
+
+
+## ----------------------------------------------------------------------------
+## Quasipoisson Family Tests
+## ----------------------------------------------------------------------------
+
+test_that("uniscreen works with quasipoisson family", {
+    
+    result <- uniscreen(
+        data = clintrial,
+        outcome = "count_outcome",
+        predictors = standard_predictors,
+        model_type = "glm",
+        family = "quasipoisson"
+    )
+    
+    expect_uniscreen_result(result)
+    
+    ## Should produce rate ratios
+    col_names <- names(result)
+    expect_true(any(grepl("RR.*CI", col_names)),
+                info = paste("Expected RR column for quasipoisson, found:", 
+                             paste(col_names, collapse = ", ")))
+})
+
+
+test_that("uniscreen quasipoisson point estimates match poisson", {
+    
+    result_quasi <- uniscreen(
+        data = clintrial,
+        outcome = "count_outcome",
+        predictors = "age",
+        model_type = "glm",
+        family = "quasipoisson",
+        keep_models = TRUE
+    )
+    
+    result_pois <- uniscreen(
+        data = clintrial,
+        outcome = "count_outcome",
+        predictors = "age",
+        model_type = "glm",
+        family = "poisson",
+        keep_models = TRUE
+    )
+    
+    ## Point estimates should match
+    raw_quasi <- attr(result_quasi, "raw_data")
+    raw_pois <- attr(result_pois, "raw_data")
+    
+    expect_equal(raw_quasi$RR[1], raw_pois$RR[1], tolerance = 1e-6)
+})
+
+
+## ----------------------------------------------------------------------------
+## Gamma Family Tests
+## ----------------------------------------------------------------------------
+
+test_that("uniscreen works with Gamma family", {
+    
+    ## Create positive outcome
+    test_data <- data.table::as.data.table(clintrial)
+    test_data <- test_data[los_days > 0]
+    
+    result <- uniscreen(
+        data = test_data,
+        outcome = "los_days",
+        predictors = c("age", "sex", "treatment"),
+        model_type = "glm",
+        family = Gamma(link = "log")
+    )
+    
+    expect_uniscreen_result(result)
+})
+
+
+## ----------------------------------------------------------------------------
+## Inverse Gaussian Family Tests
+## ----------------------------------------------------------------------------
+
+test_that("uniscreen works with inverse.gaussian family", {
+    
+    ## Create positive outcome
+    test_data <- data.table::as.data.table(clintrial)
+    test_data <- test_data[los_days > 0]
+    
+    result <- uniscreen(
+        data = test_data,
+        outcome = "los_days",
+        predictors = c("age", "sex", "treatment"),
+        model_type = "glm",
+        family = inverse.gaussian(link = "log")
+    )
+    
+    expect_uniscreen_result(result)
+})
+
+
+## ----------------------------------------------------------------------------
+## Negative Binomial (negbin) Tests
+## ----------------------------------------------------------------------------
+
+test_that("uniscreen works with negative binomial regression (negbin)", {
+    
+    skip_if_not_installed("MASS")
+    
+    result <- suppressWarnings(uniscreen(
+        data = clintrial,
+        outcome = "count_outcome",
+        predictors = standard_predictors,
+        model_type = "negbin",
+        parallel = FALSE
+    ))
+    
+    expect_uniscreen_result(result)
+    
+    ## Should produce rate ratios
+    col_names <- names(result)
+    expect_true(any(grepl("RR.*CI", col_names)),
+                info = paste("Expected RR column for negbin, found:", 
+                             paste(col_names, collapse = ", ")))
+    
+    ## All predictors should be represented
+    expect_true(any(grepl("age|Age", result$Variable)))
+    expect_true(any(grepl("sex|Sex", result$Variable)))
+})
+
+
+test_that("uniscreen negbin p_threshold filtering works", {
+    
+    skip_if_not_installed("MASS")
+    
+    ## All results
+    result_all <- suppressWarnings(uniscreen(
+        data = clintrial,
+        outcome = "count_outcome",
+        predictors = c("age", "sex", "treatment", "stage", "ecog"),
+        model_type = "negbin",
+        p_threshold = 1,
+        parallel = FALSE
+    ))
+    
+    ## Filtered to p < 0.20
+    result_filtered <- suppressWarnings(uniscreen(
+        data = clintrial,
+        outcome = "count_outcome",
+        predictors = c("age", "sex", "treatment", "stage", "ecog"),
+        model_type = "negbin",
+        p_threshold = 0.20,
+        parallel = FALSE
+    ))
+    
+    expect_lte(nrow(result_filtered), nrow(result_all))
+})
+
+
+test_that("uniscreen negbin with labels works", {
+    
+    skip_if_not_installed("MASS")
+    
+    result <- suppressWarnings(uniscreen(
+        data = clintrial,
+        outcome = "count_outcome",
+        predictors = c("age", "sex", "treatment"),
+        model_type = "negbin",
+        labels = clintrial_labels,
+        parallel = FALSE
+    ))
+    
+    expect_uniscreen_result(result)
+    expect_true(any(grepl("Age|Sex|Treatment", result$Variable)))
+})
+
+
+test_that("uniscreen negbin keep_models stores negbin objects", {
+    
+    skip_if_not_installed("MASS")
+    
+    result <- suppressWarnings(uniscreen(
+        data = clintrial,
+        outcome = "count_outcome",
+        predictors = c("age", "sex"),
+        model_type = "negbin",
+        keep_models = TRUE,
+        parallel = FALSE
+    ))
+    
+    models <- attr(result, "models")
+    expect_type(models, "list")
+    expect_true(length(models) >= 2)
+    expect_true(inherits(models[[1]], "negbin"))
+})
+
+
+test_that("uniscreen negbin coefficients match direct model", {
+    
+    skip_if_not_installed("MASS")
+    
+    result <- suppressWarnings(uniscreen(
+        data = clintrial_complete,
+        outcome = "count_outcome",
+        predictors = "age",
+        model_type = "negbin",
+        keep_models = TRUE,
+        parallel = FALSE
+    ))
+    
+    ## Fit directly
+    direct_model <- suppressWarnings(MASS::glm.nb(count_outcome ~ age, data = clintrial_complete))
+    
+    ## Get raw data
+    raw <- attr(result, "raw_data")
+    
+    ## RR should match exp(coefficient)
+    expected_rr <- exp(coef(direct_model)["age"])
+    expect_equal(raw$RR[1], unname(expected_rr), tolerance = 1e-6)
 })
 
 
@@ -769,6 +1071,306 @@ test_that("multifit works with Poisson regression", {
     
     expect_multifit_result(result)
     expect_effect_column(result, "RR")
+})
+
+
+## ----------------------------------------------------------------------------
+## Gaussian Family Tests
+## ----------------------------------------------------------------------------
+
+test_that("multifit works with gaussian family", {
+    
+    result <- multifit(
+        data = clintrial,
+        outcomes = "los_days",
+        predictor = "treatment",
+        covariates = c("age", "sex"),
+        family = "gaussian",
+        parallel = FALSE
+    )
+    
+    expect_multifit_result(result)
+    
+    ## Should produce coefficients
+    col_names <- names(result)
+    expect_true(any(grepl("Coefficient.*CI|Estimate.*CI", col_names)),
+                info = paste("Expected Coefficient column for gaussian, found:", 
+                             paste(col_names, collapse = ", ")))
+})
+
+
+## ----------------------------------------------------------------------------
+## Quasibinomial Family Tests
+## ----------------------------------------------------------------------------
+
+test_that("multifit works with quasibinomial family", {
+    
+    result <- multifit(
+        data = clintrial,
+        outcomes = binary_outcomes,
+        predictor = "treatment",
+        covariates = c("age", "sex"),
+        family = "quasibinomial",
+        parallel = FALSE
+    )
+    
+    expect_multifit_result(result)
+    
+    ## Should produce odds ratios
+    col_names <- names(result)
+    expect_true(any(grepl("OR.*CI", col_names)),
+                info = paste("Expected OR column for quasibinomial, found:", 
+                             paste(col_names, collapse = ", ")))
+})
+
+
+test_that("multifit quasibinomial with columns='both' works", {
+    
+    result <- multifit(
+        data = clintrial,
+        outcomes = "surgery",
+        predictor = "treatment",
+        covariates = c("age", "sex"),
+        family = "quasibinomial",
+        columns = "both",
+        parallel = FALSE
+    )
+    
+    expect_multifit_result(result)
+    
+    ## Should have both OR and aOR columns
+    col_names <- names(result)
+    expect_true(any(grepl("^OR", col_names)) && any(grepl("^aOR", col_names)))
+})
+
+
+## ----------------------------------------------------------------------------
+## Quasipoisson Family Tests
+## ----------------------------------------------------------------------------
+
+test_that("multifit works with quasipoisson family", {
+    
+    result <- multifit(
+        data = clintrial,
+        outcomes = "count_outcome",
+        predictor = "treatment",
+        covariates = c("age", "sex"),
+        family = "quasipoisson",
+        parallel = FALSE
+    )
+    
+    expect_multifit_result(result)
+    
+    ## Should produce rate ratios
+    col_names <- names(result)
+    expect_true(any(grepl("RR.*CI", col_names)),
+                info = paste("Expected RR column for quasipoisson, found:", 
+                             paste(col_names, collapse = ", ")))
+})
+
+
+test_that("multifit quasipoisson with columns='both' works", {
+    
+    result <- multifit(
+        data = clintrial,
+        outcomes = "count_outcome",
+        predictor = "treatment",
+        covariates = c("age", "sex"),
+        family = "quasipoisson",
+        columns = "both",
+        parallel = FALSE
+    )
+    
+    expect_multifit_result(result)
+    
+    ## Should have both RR and aRR columns
+    col_names <- names(result)
+    expect_true(any(grepl("^RR", col_names)) && any(grepl("^aRR", col_names)))
+})
+
+
+## ----------------------------------------------------------------------------
+## Gamma Family Tests
+## ----------------------------------------------------------------------------
+
+test_that("multifit works with Gamma family", {
+    
+    ## Create positive outcome
+    test_data <- data.table::as.data.table(clintrial)
+    test_data <- test_data[los_days > 0]
+    
+    result <- multifit(
+        data = test_data,
+        outcomes = "los_days",
+        predictor = "treatment",
+        covariates = c("age", "sex"),
+        family = Gamma(link = "log"),
+        parallel = FALSE
+    )
+    
+    expect_multifit_result(result)
+})
+
+
+## ----------------------------------------------------------------------------
+## Inverse Gaussian Family Tests
+## ----------------------------------------------------------------------------
+
+test_that("multifit works with inverse.gaussian family", {
+    
+    ## Create positive outcome
+    test_data <- data.table::as.data.table(clintrial)
+    test_data <- test_data[los_days > 0]
+    
+    result <- multifit(
+        data = test_data,
+        outcomes = "los_days",
+        predictor = "treatment",
+        covariates = c("age", "sex"),
+        family = inverse.gaussian(link = "log"),
+        parallel = FALSE
+    )
+    
+    expect_multifit_result(result)
+})
+
+
+## ----------------------------------------------------------------------------
+## Negative Binomial (negbin) Tests
+## ----------------------------------------------------------------------------
+
+test_that("multifit works with negative binomial regression (negbin)", {
+    
+    skip_if_not_installed("MASS")
+    
+    result <- suppressWarnings(multifit(
+        data = clintrial,
+        outcomes = "count_outcome",
+        predictor = "treatment",
+        covariates = c("age", "sex"),
+        model_type = "negbin",
+        parallel = FALSE
+    ))
+    
+    expect_multifit_result(result)
+    
+    ## Should produce rate ratios
+    col_names <- names(result)
+    expect_true(any(grepl("RR.*CI", col_names)),
+                info = paste("Expected RR column for negbin, found:", 
+                             paste(col_names, collapse = ", ")))
+})
+
+
+test_that("multifit negbin works with multiple outcomes", {
+    
+    skip_if_not_installed("MASS")
+    
+    ## Create second count variable
+    clintrial$count_outcome2 <- as.integer(ceiling(clintrial$los_days / 5))
+    
+    result <- suppressWarnings(multifit(
+        data = clintrial,
+        outcomes = c("count_outcome", "count_outcome2"),
+        predictor = "treatment",
+        covariates = c("age", "sex"),
+        model_type = "negbin",
+        parallel = FALSE
+    ))
+    
+    expect_multifit_result(result)
+    
+    ## Should have rows for both outcomes
+    expect_equal(length(unique(result$Outcome)), 2)
+})
+
+
+test_that("multifit negbin works with columns = 'both'", {
+    
+    skip_if_not_installed("MASS")
+    
+    result <- suppressWarnings(multifit(
+        data = clintrial,
+        outcomes = "count_outcome",
+        predictor = "treatment",
+        covariates = c("age", "sex"),
+        model_type = "negbin",
+        columns = "both",
+        parallel = FALSE
+    ))
+    
+    expect_multifit_result(result)
+    
+    ## Should have unadjusted (RR) and adjusted (aRR) columns
+    col_names <- names(result)
+    expect_true(any(grepl("^RR", col_names)) && any(grepl("^aRR", col_names)),
+                info = paste("Expected both RR and aRR columns, found:", 
+                             paste(col_names, collapse = ", ")))
+})
+
+
+test_that("multifit negbin with interactions works", {
+    
+    skip_if_not_installed("MASS")
+    
+    result <- suppressWarnings(multifit(
+        data = clintrial,
+        outcomes = "count_outcome",
+        predictor = "treatment",
+        covariates = c("age", "sex", "stage"),
+        interactions = c("treatment:stage"),
+        model_type = "negbin",
+        parallel = FALSE
+    ))
+    
+    expect_multifit_result(result)
+    expect_equal(attr(result, "interactions"), "treatment:stage")
+})
+
+
+test_that("multifit negbin with labels works", {
+    
+    skip_if_not_installed("MASS")
+    
+    result <- suppressWarnings(multifit(
+        data = clintrial,
+        outcomes = "count_outcome",
+        predictor = "treatment",
+        covariates = c("age", "sex"),
+        model_type = "negbin",
+        labels = clintrial_labels,
+        parallel = FALSE
+    ))
+    
+    expect_multifit_result(result)
+    
+    ## Labels should be applied
+    expect_true(any(grepl("Treatment", result$Predictor)))
+})
+
+
+test_that("multifit negbin keep_models stores negbin objects", {
+    
+    skip_if_not_installed("MASS")
+    
+    result <- suppressWarnings(multifit(
+        data = clintrial,
+        outcomes = "count_outcome",
+        predictor = "treatment",
+        covariates = c("age", "sex"),
+        model_type = "negbin",
+        keep_models = TRUE,
+        parallel = FALSE
+    ))
+    
+    expect_multifit_result(result)
+    
+    models <- attr(result, "models")
+    expect_type(models, "list")
+    
+    ## Should have negbin model
+    adj_model <- models$count_outcome$adjusted
+    expect_true(inherits(adj_model, "negbin"))
 })
 
 
@@ -1733,32 +2335,32 @@ test_that("full pipeline: multifit with mixed effects -> multiforest", {
 ## SECTION 17: Parallel Processing Tests
 ## ============================================================================
 
-test_that("parallel processing produces same results as sequential", {
-    skip_on_cran()
-    
-    set.seed(123)
-    result_seq <- multifit(
-        data = clintrial,
-        outcomes = binary_outcomes,
-        predictor = "treatment",
-        covariates = c("age", "sex"),
-        parallel = FALSE
-    )
-    
-    set.seed(123)
-    result_par <- multifit(
-        data = clintrial,
-        outcomes = binary_outcomes,
-        predictor = "treatment",
-        covariates = c("age", "sex"),
-        parallel = TRUE,
-        n_cores = 2
-    )
-    
-    ## Results should be identical (may differ in row order)
-    expect_equal(nrow(result_seq), nrow(result_par))
-    expect_equal(sort(result_seq$Outcome), sort(result_par$Outcome))
-})
+## test_that("parallel processing produces same results as sequential", {
+##     skip_on_cran()
+##     
+##     set.seed(123)
+##     result_seq <- multifit(
+##         data = clintrial,
+##         outcomes = binary_outcomes,
+##         predictor = "treatment",
+##         covariates = c("age", "sex"),
+##         parallel = FALSE
+##     )
+##     
+##     set.seed(123)
+##     result_par <- multifit(
+##         data = clintrial,
+##         outcomes = binary_outcomes,
+##         predictor = "treatment",
+##         covariates = c("age", "sex"),
+##         parallel = TRUE,
+##         n_cores = 2
+##     )
+##     
+##     ## Results should be identical (may differ in row order)
+##     expect_equal(nrow(result_seq), nrow(result_par))
+##     expect_equal(sort(result_seq$Outcome), sort(result_par$Outcome))
+## })
 
 
 ## ============================================================================

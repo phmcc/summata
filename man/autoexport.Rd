@@ -14,23 +14,23 @@ autoexport(table, file, ...)
 \item{file}{Character string specifying the output filename. The file extension
 determines the export format:
 \itemize{
-  \item \code{.pdf} - PDF via LaTeX (uses \code{table2pdf})
-  \item \code{.docx} - Microsoft Word (uses \code{table2docx})
-  \item \code{.pptx} - Microsoft PowerPoint (uses \code{table2pptx})
-  \item \code{.html} or \code{.htm} - HTML (uses \code{table2html})
-  \item \code{.rtf} - Rich Text Format (uses \code{table2rtf})
-  \item \code{.tex} - LaTeX source (uses \code{table2tex})
+  \item \code{.pdf} - PDF via LaTeX (uses \code{table2pdf()})
+  \item \code{.docx} - Microsoft Word (uses \code{table2docx()})
+  \item \code{.pptx} - Microsoft PowerPoint (uses \code{table2pptx()})
+  \item \code{.html} or \code{.htm} - HTML (uses \code{table2html()})
+  \item \code{.rtf} - Rich Text Format (uses \code{table2rtf()})
+  \item \code{.tex} - LaTeX source (uses \code{table2tex()})
 }}
 
 \item{...}{Additional arguments passed to the format-specific function. See
 the documentation for individual functions for available parameters:
 \itemize{
-  \item PDF: \code{\link{table2pdf}} - orientation, paper, margins, fit_to_page, etc.
-  \item DOCX: \code{\link{table2docx}} - font_size, font_family, caption, etc.
-  \item PPTX: \code{\link{table2pptx}} - font_size, font_family, caption, etc.
-  \item HTML: \code{\link{table2html}} - format_headers, zebra_stripes, etc.
-  \item RTF: \code{\link{table2rtf}} - font_size, font_family, caption, etc.
-  \item TEX: \code{\link{table2tex}} - caption, format_headers, align, etc.
+  \item PDF: \code{\link{table2pdf()}} - orientation, paper, margins, fit_to_page, etc.
+  \item DOCX: \code{\link{table2docx()}} - font_size, font_family, caption, etc.
+  \item PPTX: \code{\link{table2pptx()}} - font_size, font_family, caption, etc.
+  \item HTML: \code{\link{table2html()}} - format_headers, zebra_stripes, etc.
+  \item RTF: \code{\link{table2rtf()}} - font_size, font_family, caption, etc.
+  \item TEX: \code{\link{table2tex()}} - caption, format_headers, align, etc.
 }
 
 Common parameters across formats include:
@@ -51,9 +51,9 @@ Invisibly returns the file path. Called primarily for its side effect
 }
 \description{
 Automatically detects the output format based on file extension and exports
-the table using the appropriate specialized function (table2pdf, table2docx, 
-table2pptx, table2html, table2rtf, or table2tex). Provides a unified interface for
-table export across all supported formats.
+the table using the appropriate specialized function - table2pdf(), table2docx(), 
+table2pptx(), table2html(), table2rtf(), or table2tex(). Provides a unified interface
+for table export across all supported formats.
 }
 \details{
 This function provides a convenient wrapper around format-specific export 
@@ -82,12 +82,12 @@ mod <- glm(outcome ~ age + gender + treatment,
 table <- fit(mod, data = clintrial)
 
 # Export automatically detects format from extension
-autoexport(table, "results.pdf")                 # Creates PDF
-autoexport(table, "results.docx")                # Creates Word document
-autoexport(table, "results.pptx")                # Creates PowerPoint slide
-autoexport(table, "results.html")                # Creates HTML file
-autoexport(table, "results.rtf")                 # Creates RTF document
-autoexport(table, "results.tex")                 # Creates LaTeX source
+autoexport(table, "results.pdf")   # Creates PDF
+autoexport(table, "results.docx")  # Creates Word document
+autoexport(table, "results.pptx")  # Creates PowerPoint slide
+autoexport(table, "results.html")  # Creates HTML file
+autoexport(table, "results.rtf")   # Creates RTF document
+autoexport(table, "results.tex")   # Creates LaTeX source
 
 # Pass format-specific parameters
 autoexport(table, "results.pdf", 

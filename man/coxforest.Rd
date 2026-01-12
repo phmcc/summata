@@ -101,6 +101,11 @@ analysis interpretation. Default is \code{TRUE}.}
 their parent variable, creating hierarchical structure. The "Group" column 
 is hidden when \code{TRUE}. Default is \code{FALSE}.}
 
+\item{condense_table}{Logical. If \code{TRUE}, condenses binary variables to 
+show only the non-reference level (e.g., "Yes" for Yes/No variables), with 
+the variable name indicating the displayed level. This creates a more compact 
+table for models with many binary predictors. Default is \code{FALSE}.}
+
 \item{bold_variables}{Logical. If \code{TRUE}, variable names are displayed
 in bold. If \code{FALSE} (default), variable names are displayed in plain
 text.}
@@ -268,9 +273,10 @@ model1 <- coxph(Surv(os_months, os_status) ~ age + sex + treatment,
 plot1 <- coxforest(model1, data = clintrial)
 print(plot1)
 
+\donttest{
 # Example 2: With custom labels and title
 plot2 <- coxforest(
-    model = model1,
+    x = model1,
     data = clintrial,
     title = "Prognostic Factors for Overall Survival",
     labels = clintrial_labels
@@ -285,7 +291,7 @@ model3 <- coxph(
 )
 
 plot3 <- coxforest(
-    model = model3,
+    x = model3,
     data = clintrial,
     labels = clintrial_labels,
     indent_groups = TRUE
@@ -300,7 +306,7 @@ model4 <- coxph(
 )
 
 plot4 <- coxforest(
-    model = model4,
+    x = model4,
     data = clintrial,
     condense_table = TRUE,
     labels = clintrial_labels
@@ -309,7 +315,7 @@ print(plot4)
 
 # Example 5: Custom color scheme
 plot5 <- coxforest(
-    model = model1,
+    x = model1,
     data = clintrial,
     color = "#E74C3C",  # Red
     zebra_stripes = FALSE,
@@ -319,7 +325,7 @@ print(plot5)
 
 # Example 6: Hide sample sizes, show only events
 plot6 <- coxforest(
-    model = model1,
+    x = model1,
     data = clintrial,
     show_n = FALSE,
     show_events = TRUE,
@@ -329,7 +335,7 @@ print(plot6)
 
 # Example 7: Adjust table width
 plot7 <- coxforest(
-    model = model3,
+    x = model3,
     data = clintrial,
     table_width = 0.65,  # More space for long variable names
     labels = clintrial_labels
@@ -338,7 +344,7 @@ print(plot7)
 
 # Example 8: Specify exact dimensions
 plot8 <- coxforest(
-    model = model1,
+    x = model1,
     data = clintrial,
     plot_width = 14,
     plot_height = 8,
@@ -355,7 +361,7 @@ dims <- attr(plot9, "recommended_dims")
 
 # Example 10: Different units (centimeters)
 plot10 <- coxforest(
-    model = model1,
+    x = model1,
     data = clintrial,
     plot_width = 35,
     plot_height = 25,
@@ -371,7 +377,7 @@ model11 <- coxph(
 )
 
 plot11 <- coxforest(
-    model = model11,
+    x = model11,
     data = clintrial,
     title = "Stratified by Study Site",
     labels = clintrial_labels
@@ -385,7 +391,7 @@ model12 <- coxph(
 )
 
 plot12 <- coxforest(
-    model = model12,
+    x = model12,
     data = clintrial,
     title = "Clustered by Study Site",
     labels = clintrial_labels
@@ -395,7 +401,7 @@ print(plot12)
 
 # Example 13: Custom reference label
 plot13 <- coxforest(
-    model = model1,
+    x = model1,
     data = clintrial,
     ref_label = "1.00 (ref)",
     labels = clintrial_labels
@@ -404,7 +410,7 @@ print(plot13)
 
 # Example 14: Presentation-sized fonts
 plot14 <- coxforest(
-    model = model1,
+    x = model1,
     data = clintrial,
     font_size = 1.4,
     title_size = 28,
@@ -420,7 +426,7 @@ final_model <- coxph(
 )
 
 final_plot <- coxforest(
-    model = final_model,
+    x = final_model,
     data = clintrial,
     title = "Multivariable Cox Regression: Prognostic Factors for Overall Survival",
     labels = clintrial_labels,
@@ -443,6 +449,7 @@ dims <- attr(final_plot, "recommended_dims")
 #        width = dims$width, height = dims$height)
 # ggsave("figure2_survival.png", final_plot,
 #        width = dims$width, height = dims$height, dpi = 300)
+}
 
 }
 \seealso{

@@ -5,41 +5,112 @@
 #' linear models, linear models, survival models, and mixed effects models with 
 #' consistent syntax and output formatting. Handles both univariable and 
 #' multivariable models automatically.
+#' 
+#' Can be used in two ways:
+#' \enumerate{
+#'   \item \strong{Formula-based}: Provide \code{data}, \code{outcome}, and 
+#'     \code{predictors} to fit a new model
+#'   \item \strong{Model-based}: Provide a pre-fitted \code{model} object to 
+#'     format existing results (e.g., from \code{MASS::glm.nb()})
+#' }
 #'
-#' @param data A data.frame or data.table containing the analysis dataset. The 
-#'   function automatically converts data.frames to data.tables for efficient 
-#'   processing.
+#' @param data A data.frame or data.table containing the analysis dataset. 
+#'   Required for formula-based workflow; optional for model-based workflow
+#'   (extracted from model if not provided).
 #'   
 #' @param outcome Character string specifying the outcome variable name. For 
 #'   survival analysis, use \code{Surv()} syntax from the survival package 
 #'   (e.g., \code{"Surv(time, status)"} or \code{"Surv(os_months, os_status)"}).
+#'   Required for formula-based workflow; ignored if \code{model} is provided.
 #'   
 #' @param predictors Character vector of predictor variable names to include in 
 #'   the model. All predictors are included simultaneously (multivariable model). 
 #'   For univariable models, provide a single predictor. Can include continuous, 
 #'   categorical (factor), or binary variables.
+#'   Required for formula-based workflow; ignored if \code{model} is provided.
+#'
+#' @param model Optional. A pre-fitted model object to format. When provided,
+#'   \code{outcome} and \code{predictors} are ignored and the model is formatted
+#'   directly. Supported model classes include:
+#'   \itemize{
+#'     \item \code{glm} - Generalized linear models
+#'     \item \code{negbin} - Negative binomial models from \code{MASS::glm.nb()}
+#'     \item \code{lm} - Linear models
+#'     \item \code{coxph} - Cox proportional hazards models
+#'     \item \code{lmerMod}, \code{glmerMod} - Mixed-effects models from lme4
+#'     \item \code{coxme} - Mixed-effects Cox models
+#'   }
 #'   
 #' @param model_type Character string specifying the type of regression model. 
-#'   Options include:
+#'   Ignored if \code{model} is provided. Options include:
 #'   \itemize{
-#'     \item \code{"glm"} - Generalized linear model [default]
-#'     \item \code{"lm"} - Linear regression
-#'     \item \code{"coxph"} - Cox proportional hazards (survival)
-#'     \item \code{"clogit"} - Conditional logistic regression
-#'     \item \code{"coxme"} - Mixed effects Cox model
-#'     \item \code{"lmer"} - Linear mixed effects model
-#'     \item \code{"glmer"} - Generalized linear mixed effects model
+#'     \item \code{"glm"} - Generalized linear model (default). Supports multiple 
+#'       distributions via the \code{family} parameter including logistic, Poisson, 
+#'       Gamma, Gaussian, and quasi-likelihood models.
+#'     \item \code{"negbin"} - Negative binomial regression for overdispersed count 
+#'       data (requires MASS package). Estimates an additional dispersion parameter 
+#'       compared to Poisson regression.
+#'     \item \code{"lm"} - Linear regression for continuous outcomes with normally 
+#'       distributed errors. Equivalent to \code{glm} with \code{family = "gaussian"}.
+#'     \item \code{"coxph"} - Cox proportional hazards model for time-to-event 
+#'       survival analysis. Requires \code{Surv()} outcome syntax.
+#'     \item \code{"clogit"} - Conditional logistic regression for matched 
+#'       case-control studies or stratified analyses.
+#'     \item \code{"coxme"} - Cox mixed-effects model for clustered survival data 
+#'       (requires coxme package).
+#'     \item \code{"lmer"} - Linear mixed-effects model for hierarchical or clustered 
+#'       data with continuous outcomes (requires lme4 package).
+#'     \item \code{"glmer"} - Generalized linear mixed-effects model for hierarchical 
+#'       or clustered data with non-normal outcomes (requires lme4 package).
 #'   }
 #'   
-#' @param family For GLM models, the error distribution and link function. Common 
-#'   options include:
+#' @param family For GLM and GLMER models, specifies the error distribution and link 
+#'   function. Can be a character string, a family function, or a family object.
+#'   Ignored for non-GLM/GLMER models.
+#'   
+#'   \strong{Binary/Binomial outcomes:}
 #'   \itemize{
-#'     \item \code{"binomial"} - Logistic regression [default]
-#'     \item \code{"poisson"} - Poisson regression for count data
-#'     \item \code{"gaussian"} - Normal linear regression via GLM
-#'     \item \code{"Gamma"} - Gamma regression for positive continuous data
+#'     \item \code{"binomial"} or \code{binomial()} - Logistic regression for binary 
+#'       outcomes (0/1, TRUE/FALSE). Returns odds ratios (OR). Default.
+#'     \item \code{"quasibinomial"} or \code{quasibinomial()} - Logistic regression 
+#'       with overdispersion. Use when residual deviance >> residual df.
+#'     \item \code{binomial(link = "probit")} - Probit regression (normal CDF link).
+#'     \item \code{binomial(link = "cloglog")} - Complementary log-log link for 
+#'       asymmetric binary outcomes.
 #'   }
-#'   See \code{\link[stats]{family}} for all options. Ignored for non-GLM models.
+#'   
+#'   \strong{Count outcomes:}
+#'   \itemize{
+#'     \item \code{"poisson"} or \code{poisson()} - Poisson regression for count 
+#'       data. Returns rate ratios (RR). Assumes mean = variance.
+#'     \item \code{"quasipoisson"} or \code{quasipoisson()} - Poisson regression 
+#'       with overdispersion. Use when variance > mean.
+#'   }
+#'   
+#'   \strong{Continuous outcomes:}
+#'   \itemize{
+#'     \item \code{"gaussian"} or \code{gaussian()} - Normal/Gaussian distribution 
+#'       for continuous outcomes. Equivalent to linear regression.
+#'     \item \code{gaussian(link = "log")} - Log-linear model for positive continuous 
+#'       outcomes. Returns multiplicative effects.
+#'     \item \code{gaussian(link = "inverse")} - Inverse link for specific applications.
+#'   }
+#'   
+#'   \strong{Positive continuous outcomes:}
+#'   \itemize{
+#'     \item \code{"Gamma"} or \code{Gamma()} - Gamma distribution for positive, 
+#'       right-skewed continuous data (e.g., costs, lengths of stay). Default log link.
+#'     \item \code{Gamma(link = "inverse")} - Gamma with inverse (canonical) link.
+#'     \item \code{Gamma(link = "identity")} - Gamma with identity link for additive 
+#'       effects on positive outcomes.
+#'     \item \code{"inverse.gaussian"} or \code{inverse.gaussian()} - Inverse Gaussian 
+#'       for positive, highly right-skewed data.
+#'   }
+#'   
+#'   For negative binomial regression (overdispersed counts), use 
+#'   \code{model_type = "negbin"} instead of the \code{family} parameter.
+#'   
+#'   See \code{\link[stats]{family}} for additional details and options.
 #'   
 #' @param interactions Character vector of interaction terms using colon 
 #'   notation (e.g., \code{c("age:sex", "treatment:stage")}). Interaction terms 
@@ -212,10 +283,12 @@
 #' 
 #' \strong{Effect Measures by Model Type:}
 #' \itemize{
-#'   \item \strong{Logistic} (\code{family = "binomial"}): Odds ratios (OR/aOR)
+#'   \item \strong{Logistic} (\code{family = "binomial"/"quasibinomial"}): Odds ratios (OR/aOR)
 #'   \item \strong{Cox} (\code{model_type = "coxph"}): Hazard ratios (HR/aHR)
-#'   \item \strong{Poisson} (\code{family = "poisson"}): Rate ratios (RR/aRR)
-#'   \item \strong{Linear}: Raw coefficient estimates
+#'   \item \strong{Poisson/Count} (\code{family = "poisson"/"quasipoisson"}): Rate ratios (RR/aRR)
+#'   \item \strong{Negative binomial} (\code{model_type = "negbin"}): Rate ratios (RR/aRR)
+#'   \item \strong{Gamma/Log-link}: Ratios (multiplicative effects)
+#'   \item \strong{Linear/Gaussian}: Raw coefficient estimates (additive effects)
 #' }
 #' 
 #' \strong{Confidence Intervals:}
@@ -258,6 +331,7 @@
 #' print(uni_model)
 #' # Labeled as "Univariable OR"
 #' 
+#' \donttest{
 #' # Example 2: Multivariable logistic regression
 #' multi_model <- fit(
 #'     data = clintrial,
@@ -332,7 +406,30 @@
 #' print(poisson_model)
 #' # Returns rate ratios (RR/aRR)
 #' 
-#' # Example 9: Access the underlying fitted model
+#' # Example 9: Negative binomial regression for overdispersed counts
+#' if (requireNamespace("MASS", quietly = TRUE)) {
+#'     nb_result <- fit(
+#'         data = clintrial,
+#'         outcome = "los_days",
+#'         predictors = c("age", "sex", "treatment", "stage"),
+#'         model_type = "negbin",
+#'         labels = clintrial_labels
+#'     )
+#'     print(nb_result)
+#' }
+#' 
+#' # Example 10: Gamma regression for positive continuous outcomes
+#' gamma_model <- fit(
+#'     data = clintrial,
+#'     outcome = "los_days",
+#'     predictors = c("age", "treatment", "surgery"),
+#'     model_type = "glm",
+#'     family = Gamma(link = "log"),
+#'     labels = clintrial_labels
+#' )
+#' print(gamma_model)
+#' 
+#' # Example 11: Access the underlying fitted model
 #' result <- fit(
 #'     data = clintrial,
 #'     outcome = "os_status",
@@ -349,12 +446,12 @@
 #' # Predictions
 #' preds <- predict(model_obj, type = "response")
 #' 
-#' # Example 10: Access raw numeric data
+#' # Example 12: Access raw numeric data
 #' raw_data <- attr(result, "raw_data")
 #' print(raw_data)
 #' # Contains unformatted coefficients, SEs, CIs, AIC, BIC, etc.
 #' 
-#' # Example 11: Multiple interactions
+#' # Example 13: Multiple interactions
 #' complex_model <- fit(
 #'     data = clintrial,
 #'     outcome = "os_status",
@@ -364,7 +461,7 @@
 #' )
 #' print(complex_model)
 #' 
-#' # Example 12: Customize output columns
+#' # Example 14: Customize output columns
 #' minimal <- fit(
 #'     data = clintrial,
 #'     outcome = "os_status",
@@ -375,7 +472,7 @@
 #' )
 #' print(minimal)
 #' 
-#' # Example 13: Different confidence levels
+#' # Example 15: Different confidence levels
 #' ci90 <- fit(
 #'     data = clintrial,
 #'     outcome = "os_status",
@@ -384,7 +481,7 @@
 #' )
 #' print(ci90)
 #' 
-#' # Example 14: Force coefficient display instead of OR
+#' # Example 16: Force coefficient display instead of OR
 #' coef_model <- fit(
 #'     data = clintrial,
 #'     outcome = "os_status",
@@ -393,7 +490,7 @@
 #' )
 #' print(coef_model)
 #' 
-#' # Example 15: Check model quality statistics
+#' # Example 17: Check model quality statistics
 #' result <- fit(
 #'     data = clintrial,
 #'     outcome = "os_status",
@@ -405,8 +502,9 @@
 #' cat("AIC:", raw$AIC[1], "\n")
 #' cat("BIC:", raw$BIC[1], "\n")
 #' cat("C-statistic:", raw$c_statistic[1], "\n")
+#' }
 #' 
-#' # Example 16: Linear mixed effects model with site random effects
+#' # Example 18: Linear mixed effects model with site random effects
 #' # (Requires lme4 package)
 #' \dontrun{
 #' library(lme4)
@@ -426,12 +524,20 @@
 #'     model_type = "lmer"
 #' )
 #' print(lmer_slopes)
+#'
+#' # Example 19: Format a pre-fitted model (model-based workflow)
+#' # Useful for models fitted outside of fit(), like MASS::glm.nb()
+#' pre_fitted <- glm(os_status ~ age + sex + treatment,
+#'                   family = binomial, data = clintrial)
+#' result <- fit(model = pre_fitted, labels = clintrial_labels)
+#' print(result)
 #' }
 #'
 #' @export
-fit <- function(data, 
-                outcome,
-                predictors,
+fit <- function(data = NULL, 
+                outcome = NULL,
+                predictors = NULL,
+                model = NULL,
                 model_type = "glm",
                 family = "binomial",
                 interactions = NULL,
@@ -449,13 +555,84 @@ fit <- function(data,
                 exponentiate = NULL,
                 ...) {
     
-    ## Work with 'data' directly
-    if (!data.table::is.data.table(data)) {
-        data <- data.table::as.data.table(data)
+    ## Check if we're using model-based workflow
+    if (!is.null(model)) {
+        ## Model-based workflow: format existing model
+        
+        ## Get data from model if not provided
+        if (is.null(data)) {
+            data <- get_model_data(model)
+            if (is.null(data)) {
+                stop("Cannot extract data from model. Please provide 'data' parameter.")
+            }
+        }
+        
+        ## Convert to data.table
+        if (!data.table::is.data.table(data)) {
+            data <- data.table::as.data.table(data)
+        }
+        
+        ## Store data in model for m2dt
+        if (isS4(model)) {
+            attr(model, "data") <- data
+        } else {
+            model$data <- data
+            attr(model, "data") <- data
+        }
+        
+        ## Convert to readable format using m2dt
+        raw_data <- m2dt(data = data,
+                         model = model, 
+                         conf_level = conf_level,
+                         keep_qc_stats = keep_qc_stats,
+                         include_intercept = FALSE,
+                         reference_rows = reference_rows,
+                         skip_counts = (!show_n && !show_events))
+        
+        ## Format results for publication
+        formatted <- format_model_table(raw_data,
+                                        show_n = show_n,
+                                        show_events = show_events,
+                                        digits = digits,
+                                        p_digits = p_digits,
+                                        labels = labels,
+                                        exponentiate = exponentiate)
+        
+        ## Extract formula and predictors from model
+        formula_str <- deparse(stats::formula(model))
+        
+        ## Attach metadata
+        data.table::setattr(formatted, "model", model)
+        data.table::setattr(formatted, "raw_data", raw_data)
+        data.table::setattr(formatted, "formula_str", formula_str)
+        data.table::setattr(formatted, "model_scope", raw_data$model_scope[1])
+        data.table::setattr(formatted, "model_type", raw_data$model_type[1])
+        
+        class(formatted) <- c("fit_result", class(formatted))
+        
+        return(formatted)
+    }
+    
+    ## Formula-based workflow: fit new model
+    
+    ## Validate required parameters for formula-based workflow
+    if (is.null(data)) {
+        stop("'data' parameter is required when not providing a pre-fitted model.")
+    }
+    if (is.null(outcome)) {
+        stop("'outcome' parameter is required when not providing a pre-fitted model.")
+    }
+    if (is.null(predictors)) {
+        stop("'predictors' parameter is required when not providing a pre-fitted model.")
     }
     
     ## Store original data name for reference
     data_name <- deparse(substitute(data))
+    
+    ## Convert to data.table once at the start
+    if (!data.table::is.data.table(data)) {
+        data <- data.table::as.data.table(data)
+    }
     
     ## Validate inputs and auto-correct model type if needed
     validation <- validate_fit_inputs(
@@ -475,20 +652,7 @@ fit <- function(data,
         model_type <- validation$model_type
     }
     
-    ## Validate predictors - check for misplaced interaction terms
-    ## Interaction terms contain ":" but are not random effects (which contain "|")
-    misplaced_interactions <- predictors[grepl(":", predictors) & !grepl("\\|", predictors)]
-    if (length(misplaced_interactions) > 0) {
-        warning(
-            "Detected interaction term(s) in 'predictors': ", 
-            paste(misplaced_interactions, collapse = ", "), 
-            "\n  Interaction terms should be specified via the 'interactions' parameter.",
-            "\n  Example: fit(..., predictors = c('age', 'sex'), interactions = c('age:sex'))",
-            call. = FALSE
-        )
-    }
-    
-    ## Build formula
+    ## Build formula string
     if (!is.null(interactions)) {
         formula_str <- paste(outcome, "~", 
                              paste(c(predictors, interactions), collapse = " + "))
@@ -510,6 +674,16 @@ fit <- function(data,
                                 weights = data[[weights]], ...)
         } else {
             model <- stats::glm(formula, data = data, family = family, ...)
+        }
+        
+    } else if (model_type == "negbin") {
+        if (!requireNamespace("MASS", quietly = TRUE))
+            stop("Package 'MASS' required for negative binomial models")
+        if (!is.null(weights)) {
+            model <- MASS::glm.nb(formula, data = data, 
+                                   weights = data[[weights]], ...)
+        } else {
+            model <- MASS::glm.nb(formula, data = data, ...)
         }
         
     } else if (model_type == "lm") {

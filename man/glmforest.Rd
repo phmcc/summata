@@ -320,9 +320,10 @@ model1 <- glm(os_status ~ age + sex + bmi + treatment,
 plot1 <- glmforest(model1, data = clintrial)
 print(plot1)
 
+\donttest{
 # Example 2: With custom variable labels
 plot2 <- glmforest(
-    model = model1,
+    x = model1,
     data = clintrial,
     title = "Risk Factors for Mortality",
     labels = clintrial_labels
@@ -331,7 +332,7 @@ print(plot2)
 
 # Example 3: Customize appearance
 plot3 <- glmforest(
-    model = model1,
+    x = model1,
     data = clintrial,
     title = "Adjusted Odds Ratios",
     color = "#D62728",  # Red points
@@ -343,7 +344,7 @@ print(plot3)
 
 # Example 4: Indented layout for hierarchical view
 plot4 <- glmforest(
-    model = model1,
+    x = model1,
     data = clintrial,
     indent_groups = TRUE,
     labels = clintrial_labels
@@ -358,7 +359,7 @@ model5 <- glm(os_status ~ age + sex + smoking + hypertension +
               family = binomial)
 
 plot5 <- glmforest(
-    model = model5,
+    x = model5,
     data = clintrial,
     condense_table = TRUE,
     labels = clintrial_labels
@@ -368,7 +369,7 @@ print(plot5)
 
 # Example 6: Hide sample size and events columns
 plot6 <- glmforest(
-    model = model1,
+    x = model1,
     data = clintrial,
     show_n = FALSE,
     show_events = FALSE,
@@ -378,7 +379,7 @@ print(plot6)
 
 # Example 7: Adjust table/forest proportions
 plot7 <- glmforest(
-    model = model1,
+    x = model1,
     data = clintrial,
     table_width = 0.7,  # More space for table
     labels = clintrial_labels
@@ -396,7 +397,7 @@ cat("Recommended: ", dims$width, "x", dims$height, "inches\n")
 
 # Example 9: Specify exact output dimensions
 plot9 <- glmforest(
-    model = model1,
+    x = model1,
     data = clintrial,
     plot_width = 14,
     plot_height = 10,
@@ -406,7 +407,7 @@ plot9 <- glmforest(
 
 # Example 10: Use different units (centimeters)
 plot10 <- glmforest(
-    model = model1,
+    x = model1,
     data = clintrial,
     plot_width = 30,  # 30 cm
     plot_height = 20,  # 20 cm
@@ -420,7 +421,7 @@ model11 <- glm(los_days ~ age + treatment + surgery + stage,
                family = poisson)
 
 plot11 <- glmforest(
-    model = model11,
+    x = model11,
     data = clintrial,
     title = "Rate Ratios for Length of Stay",
     effect_label = "Rate Ratio",
@@ -431,7 +432,7 @@ print(plot11)
 
 # Example 12: Force display of raw coefficients
 plot12 <- glmforest(
-    model = model1,
+    x = model1,
     data = clintrial,
     exponentiate = FALSE,  # Show log odds
     effect_label = "Log Odds",
@@ -442,7 +443,7 @@ print(plot12)
 
 # Example 13: Custom reference label
 plot13 <- glmforest(
-    model = model1,
+    x = model1,
     data = clintrial,
     ref_label = "1.00 (ref)",
     labels = clintrial_labels
@@ -451,7 +452,7 @@ print(plot13)
 
 # Example 14: Adjust font sizes for presentations
 plot14 <- glmforest(
-    model = model1,
+    x = model1,
     data = clintrial,
     font_size = 1.5,      # 50\% larger
     title_size = 30,      # Larger title
@@ -468,7 +469,7 @@ final_model <- glm(
 )
 
 final_plot <- glmforest(
-    model = final_model,
+    x = final_model,
     data = clintrial,
     title = "Multivariable Logistic Regression: Risk Factors for Mortality",
     labels = clintrial_labels,
@@ -485,6 +486,7 @@ dims <- attr(final_plot, "recommended_dims")
 #        width = dims$width, height = dims$height)
 # ggsave("figure1.png", final_plot,
 #        width = dims$width, height = dims$height, dpi = 300)
+}
 
 }
 \seealso{

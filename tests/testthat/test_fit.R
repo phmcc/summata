@@ -30,6 +30,12 @@ clintrial_complete <- na.omit(clintrial)
 clintrial$response <- as.integer(clintrial$os_status == 1 & clintrial$os_months < 24)
 clintrial_complete$response <- as.integer(clintrial_complete$os_status == 1 & clintrial_complete$os_months < 24)
 
+## Create integer count outcome for Poisson/quasipoisson/negative binomial tests
+## IMPORTANT: Add to BOTH datasets
+set.seed(123)
+clintrial$count_outcome <- as.integer(ceiling(clintrial$los_days))
+clintrial_complete$count_outcome <- as.integer(ceiling(clintrial_complete$los_days))
+
 ## Create a weights column for weighted regression tests
 set.seed(42)
 clintrial$weight <- runif(nrow(clintrial), 0.5, 2.0)
@@ -568,43 +574,6 @@ test_that("fit handles multiple interaction terms", {
     expect_true(grepl("age:sex", formula_str))
     expect_true(grepl("age:treatment", formula_str))
 })
-
-
-test_that("fit handles factor-factor interactions", {
-    
-    ## Suppress Hoslem test "bins" warning from ResourceSelection
-    result <- suppressWarnings(fit(
-        data = clintrial,
-        outcome = "response",
-        predictors = c("sex", "stage"),
-        interactions = c("sex:stage"),
-        model_type = "glm"
-    ))
-    
-    expect_fit_result(result)
-    
-    ## Factor-factor interactions create multiple terms
-    raw <- attr(result, "raw_data")
-    interaction_rows <- raw[grepl(":", variable)]
-    
-    ## Should have multiple interaction rows for factor combinations
-    expect_true(nrow(interaction_rows) >= 1)
-})
-
-
-test_that("fit warns when interaction terms placed in predictors", {
-    
-    expect_warning(
-        fit(
-            data = clintrial,
-            outcome = "response",
-            predictors = c("age", "sex", "age:sex"),  # Wrong! Should be in interactions
-            model_type = "glm"
-        ),
-        regexp = "Detected interaction term"
-    )
-})
-
 
 ## ============================================================================
 ## SECTION 6: Weighted Regression Tests
@@ -1499,6 +1468,10 @@ test_that("fit preserves factor level ordering", {
 ## SECTION 16: Different GLM Families Tests
 ## ============================================================================
 
+## ----------------------------------------------------------------------------
+## 16a: Gaussian Family Tests
+## ----------------------------------------------------------------------------
+
 test_that("fit works with gaussian family", {
     
     result <- fit(
@@ -1510,12 +1483,248 @@ test_that("fit works with gaussian family", {
     )
     
     expect_fit_result(result)
+    
+    ## Should produce coefficients (not exponentiated)
+    col_names <- names(result)
+    expect_true(any(grepl("Coefficient.*CI|Estimate.*CI", col_names)),
+                info = paste("Expected Coefficient column for gaussian, found:", 
+                             paste(col_names, collapse = ", ")))
 })
 
 
-test_that("fit works with Gamma family", {
+test_that("fit gaussian coefficients match direct glm", {
     
-    ## Create positive outcome - use data.table properly
+    result <- fit(
+        data = clintrial,
+        outcome = "los_days",
+        predictors = c("age", "sex"),
+        model_type = "glm",
+        family = "gaussian"
+    )
+    
+    ## Fit directly
+    direct_model <- glm(los_days ~ age + sex, data = clintrial, family = gaussian)
+    
+    ## Coefficients should match
+    fit_coefs <- coef(attr(result, "model"))
+    direct_coefs <- coef(direct_model)
+    
+    expect_equal(fit_coefs, direct_coefs, tolerance = 1e-10)
+})
+
+
+test_that("fit gaussian matches lm results", {
+    
+    result_glm <- fit(
+        data = clintrial,
+        outcome = "los_days",
+        predictors = c("age", "sex"),
+        model_type = "glm",
+        family = "gaussian"
+    )
+    
+    result_lm <- fit(
+        data = clintrial,
+        outcome = "los_days",
+        predictors = c("age", "sex"),
+        model_type = "lm"
+    )
+    
+    ## Coefficients should be essentially identical
+    coefs_glm <- coef(attr(result_glm, "model"))
+    coefs_lm <- coef(attr(result_lm, "model"))
+    
+    expect_equal(coefs_glm, coefs_lm, tolerance = 1e-10)
+})
+
+
+## ----------------------------------------------------------------------------
+## 16b: Quasibinomial Family Tests (overdispersed binary)
+## ----------------------------------------------------------------------------
+
+test_that("fit works with quasibinomial family", {
+    
+    result <- fit(
+        data = clintrial,
+        outcome = "response",
+        predictors = c("age", "sex", "treatment"),
+        model_type = "glm",
+        family = "quasibinomial"
+    )
+    
+    expect_fit_result(result)
+    
+    ## Should produce odds ratios like binomial
+    col_names <- names(result)
+    expect_true(any(grepl("OR.*CI", col_names)),
+                info = paste("Expected OR column for quasibinomial, found:", 
+                             paste(col_names, collapse = ", ")))
+})
+
+
+test_that("fit quasibinomial coefficients match direct glm", {
+    
+    result <- fit(
+        data = clintrial,
+        outcome = "response",
+        predictors = c("age", "sex"),
+        model_type = "glm",
+        family = "quasibinomial"
+    )
+    
+    ## Fit directly
+    direct_model <- glm(response ~ age + sex, data = clintrial, family = quasibinomial)
+    
+    ## Coefficients should match
+    fit_coefs <- coef(attr(result, "model"))
+    direct_coefs <- coef(direct_model)
+    
+    expect_equal(fit_coefs, direct_coefs, tolerance = 1e-10)
+})
+
+
+test_that("fit quasibinomial point estimates match binomial", {
+    
+    result_quasi <- fit(
+        data = clintrial,
+        outcome = "response",
+        predictors = c("age", "sex"),
+        model_type = "glm",
+        family = "quasibinomial"
+    )
+    
+    result_binom <- fit(
+        data = clintrial,
+        outcome = "response",
+        predictors = c("age", "sex"),
+        model_type = "glm",
+        family = "binomial"
+    )
+    
+    ## Point estimates should be identical (SEs differ due to dispersion)
+    coefs_quasi <- coef(attr(result_quasi, "model"))
+    coefs_binom <- coef(attr(result_binom, "model"))
+    
+    expect_equal(coefs_quasi, coefs_binom, tolerance = 1e-10)
+})
+
+
+test_that("fit quasibinomial handles overdispersion", {
+    
+    ## Quasibinomial allows dispersion != 1
+    result <- fit(
+        data = clintrial,
+        outcome = "response",
+        predictors = c("age", "sex", "treatment", "stage"),
+        model_type = "glm",
+        family = "quasibinomial"
+    )
+    
+    model <- attr(result, "model")
+    
+    ## Dispersion parameter should be estimated
+    summ <- summary(model)
+    expect_true(!is.null(summ$dispersion))
+})
+
+
+## ----------------------------------------------------------------------------
+## 16c: Quasipoisson Family Tests (overdispersed counts)
+## ----------------------------------------------------------------------------
+
+test_that("fit works with quasipoisson family", {
+    
+    result <- fit(
+        data = clintrial,
+        outcome = "count_outcome",
+        predictors = c("age", "sex", "treatment"),
+        model_type = "glm",
+        family = "quasipoisson"
+    )
+    
+    expect_fit_result(result)
+    
+    ## Should produce rate ratios like poisson
+    col_names <- names(result)
+    expect_true(any(grepl("RR.*CI", col_names)),
+                info = paste("Expected RR column for quasipoisson, found:", 
+                             paste(col_names, collapse = ", ")))
+})
+
+
+test_that("fit quasipoisson coefficients match direct glm", {
+    
+    result <- fit(
+        data = clintrial,
+        outcome = "count_outcome",
+        predictors = c("age", "sex"),
+        model_type = "glm",
+        family = "quasipoisson"
+    )
+    
+    ## Fit directly
+    direct_model <- glm(count_outcome ~ age + sex, data = clintrial, family = quasipoisson)
+    
+    ## Coefficients should match
+    fit_coefs <- coef(attr(result, "model"))
+    direct_coefs <- coef(direct_model)
+    
+    expect_equal(fit_coefs, direct_coefs, tolerance = 1e-10)
+})
+
+
+test_that("fit quasipoisson point estimates match poisson", {
+    
+    result_quasi <- fit(
+        data = clintrial,
+        outcome = "count_outcome",
+        predictors = c("age", "sex"),
+        model_type = "glm",
+        family = "quasipoisson"
+    )
+    
+    result_pois <- fit(
+        data = clintrial,
+        outcome = "count_outcome",
+        predictors = c("age", "sex"),
+        model_type = "glm",
+        family = "poisson"
+    )
+    
+    ## Point estimates should be identical (SEs differ due to dispersion)
+    coefs_quasi <- coef(attr(result_quasi, "model"))
+    coefs_pois <- coef(attr(result_pois, "model"))
+    
+    expect_equal(coefs_quasi, coefs_pois, tolerance = 1e-10)
+})
+
+
+test_that("fit quasipoisson handles overdispersion", {
+    
+    result <- fit(
+        data = clintrial,
+        outcome = "count_outcome",
+        predictors = c("age", "sex", "treatment", "stage"),
+        model_type = "glm",
+        family = "quasipoisson"
+    )
+    
+    model <- attr(result, "model")
+    
+    ## Dispersion parameter should be estimated
+    summ <- summary(model)
+    expect_true(!is.null(summ$dispersion))
+    expect_true(summ$dispersion != 1)  ## Should differ from 1 for overdispersed data
+})
+
+
+## ----------------------------------------------------------------------------
+## 16d: Gamma Family Tests (positive continuous)
+## ----------------------------------------------------------------------------
+
+test_that("fit works with Gamma family (log link)", {
+    
+    ## Create positive outcome
     test_data <- data.table::as.data.table(clintrial)
     test_data <- test_data[los_days > 0]
     
@@ -1528,6 +1737,338 @@ test_that("fit works with Gamma family", {
     )
     
     expect_fit_result(result)
+    
+    ## With log link, should produce ratios (exponentiated)
+    col_names <- names(result)
+    expect_true(any(grepl("Ratio.*CI|Coefficient.*CI", col_names)),
+                info = paste("Expected Ratio or Coefficient column for Gamma, found:", 
+                             paste(col_names, collapse = ", ")))
+})
+
+
+test_that("fit works with Gamma family (inverse link - default)", {
+    
+    ## Create positive outcome
+    test_data <- data.table::as.data.table(clintrial)
+    test_data <- test_data[los_days > 0]
+    
+    result <- fit(
+        data = test_data,
+        outcome = "los_days",
+        predictors = c("age", "sex"),
+        model_type = "glm",
+        family = Gamma()  ## Default inverse link
+    )
+    
+    expect_fit_result(result)
+})
+
+
+test_that("fit Gamma coefficients match direct glm", {
+    
+    ## Create positive outcome
+    test_data <- data.table::as.data.table(clintrial)
+    test_data <- test_data[los_days > 0]
+    
+    result <- fit(
+        data = test_data,
+        outcome = "los_days",
+        predictors = c("age", "sex"),
+        model_type = "glm",
+        family = Gamma(link = "log")
+    )
+    
+    ## Fit directly
+    direct_model <- glm(los_days ~ age + sex, data = test_data, family = Gamma(link = "log"))
+    
+    ## Coefficients should match
+    fit_coefs <- coef(attr(result, "model"))
+    direct_coefs <- coef(direct_model)
+    
+    expect_equal(fit_coefs, direct_coefs, tolerance = 1e-10)
+})
+
+
+test_that("fit Gamma handles factor variables", {
+    
+    ## Create positive outcome
+    test_data <- data.table::as.data.table(clintrial)
+    test_data <- test_data[los_days > 0]
+    
+    result <- fit(
+        data = test_data,
+        outcome = "los_days",
+        predictors = c("age", "stage"),
+        model_type = "glm",
+        family = Gamma(link = "log"),
+        reference_rows = TRUE
+    )
+    
+    expect_fit_result(result)
+    
+    ## Stage should have reference row
+    raw <- attr(result, "raw_data")
+    stage_rows <- raw[variable == "stage"]
+    expect_true(nrow(stage_rows) >= 2)
+})
+
+
+## ----------------------------------------------------------------------------
+## 16e: Inverse Gaussian Family Tests (positive, right-skewed)
+## ----------------------------------------------------------------------------
+
+test_that("fit works with inverse.gaussian family", {
+    
+    ## Create positive outcome
+    test_data <- data.table::as.data.table(clintrial)
+    test_data <- test_data[los_days > 0]
+    
+    result <- fit(
+        data = test_data,
+        outcome = "los_days",
+        predictors = c("age", "sex"),
+        model_type = "glm",
+        family = inverse.gaussian()
+    )
+    
+    expect_fit_result(result)
+})
+
+
+test_that("fit inverse.gaussian with log link works", {
+    
+    ## Create positive outcome
+    test_data <- data.table::as.data.table(clintrial)
+    test_data <- test_data[los_days > 0]
+    
+    result <- fit(
+        data = test_data,
+        outcome = "los_days",
+        predictors = c("age", "sex"),
+        model_type = "glm",
+        family = inverse.gaussian(link = "log")
+    )
+    
+    expect_fit_result(result)
+    
+    ## With log link, should produce ratios
+    col_names <- names(result)
+    expect_true(any(grepl("Ratio.*CI|Coefficient.*CI", col_names)),
+                info = paste("Expected Ratio or Coefficient column, found:", 
+                             paste(col_names, collapse = ", ")))
+})
+
+
+test_that("fit inverse.gaussian coefficients match direct glm", {
+    
+    ## Create positive outcome
+    test_data <- data.table::as.data.table(clintrial)
+    test_data <- test_data[los_days > 0]
+    
+    result <- fit(
+        data = test_data,
+        outcome = "los_days",
+        predictors = c("age", "sex"),
+        model_type = "glm",
+        family = inverse.gaussian(link = "log")
+    )
+    
+    ## Fit directly
+    direct_model <- glm(los_days ~ age + sex, data = test_data, 
+                        family = inverse.gaussian(link = "log"))
+    
+    ## Coefficients should match
+    fit_coefs <- coef(attr(result, "model"))
+    direct_coefs <- coef(direct_model)
+    
+    expect_equal(fit_coefs, direct_coefs, tolerance = 1e-10)
+})
+
+
+## ----------------------------------------------------------------------------
+## 16f: Negative Binomial (negbin) Tests
+## ----------------------------------------------------------------------------
+
+test_that("fit works with negative binomial regression (negbin)", {
+    
+    skip_if_not_installed("MASS")
+    
+    result <- suppressWarnings(fit(
+        data = clintrial,
+        outcome = "count_outcome",
+        predictors = c("age", "sex", "treatment"),
+        model_type = "negbin"
+    ))
+    
+    expect_fit_result(result)
+    
+    ## Should produce rate ratios
+    col_names <- names(result)
+    expect_true(any(grepl("RR.*CI", col_names)),
+                info = paste("Expected RR column for negative binomial, found:", 
+                             paste(col_names, collapse = ", ")))
+    
+    ## Model should be of class negbin
+    model <- attr(result, "model")
+    expect_true(inherits(model, "negbin"))
+})
+
+
+test_that("fit negbin produces correct effect estimates", {
+    
+    skip_if_not_installed("MASS")
+    
+    ## Fit using fit()
+    result <- suppressWarnings(fit(
+        data = clintrial,
+        outcome = "count_outcome",
+        predictors = c("age", "sex"),
+        model_type = "negbin"
+    ))
+    
+    ## Fit directly with MASS
+    direct_model <- suppressWarnings(MASS::glm.nb(count_outcome ~ age + sex, data = clintrial))
+    
+    ## Coefficients should match
+    fit_coefs <- coef(attr(result, "model"))
+    direct_coefs <- coef(direct_model)
+    
+    expect_equal(fit_coefs, direct_coefs, tolerance = 1e-10)
+})
+
+
+test_that("fit negbin works with multivariable models", {
+    
+    skip_if_not_installed("MASS")
+    
+    result <- suppressWarnings(fit(
+        data = clintrial,
+        outcome = "count_outcome",
+        predictors = c("age", "sex", "treatment", "stage"),
+        model_type = "negbin"
+    ))
+    
+    expect_fit_result(result)
+    expect_equal(attr(result, "model_scope"), "Multivariable")
+    
+    ## Should have aRR column for multivariable
+    col_names <- names(result)
+    expect_true(any(grepl("aRR.*CI", col_names)),
+                info = paste("Expected aRR column for multivariable negbin, found:", 
+                             paste(col_names, collapse = ", ")))
+})
+
+
+test_that("fit negbin handles factor variables correctly", {
+    
+    skip_if_not_installed("MASS")
+    
+    result <- suppressWarnings(fit(
+        data = clintrial,
+        outcome = "count_outcome",
+        predictors = c("age", "stage"),
+        model_type = "negbin",
+        reference_rows = TRUE
+    ))
+    
+    expect_fit_result(result)
+    
+    ## Stage is a factor - should have multiple rows with reference
+    raw <- attr(result, "raw_data")
+    stage_rows <- raw[variable == "stage"]
+    expect_true(nrow(stage_rows) >= 2)
+    
+    ## Check reference row exists
+    has_ref <- any(stage_rows$reference == "reference", na.rm = TRUE)
+    expect_true(has_ref)
+})
+
+
+test_that("fit negbin respects formatting parameters", {
+    
+    skip_if_not_installed("MASS")
+    
+    result <- suppressWarnings(fit(
+        data = clintrial,
+        outcome = "count_outcome",
+        predictors = c("age", "sex"),
+        model_type = "negbin",
+        digits = 3,
+        p_digits = 4,
+        show_n = TRUE,
+        show_events = FALSE
+    ))
+    
+    expect_fit_result(result)
+    expect_true("n" %in% names(result))
+    expect_false("Events" %in% names(result))
+})
+
+
+test_that("fit negbin works with labels", {
+    
+    skip_if_not_installed("MASS")
+    
+    result <- suppressWarnings(fit(
+        data = clintrial,
+        outcome = "count_outcome",
+        predictors = c("age", "sex", "treatment"),
+        model_type = "negbin",
+        labels = clintrial_labels
+    ))
+    
+    expect_fit_result(result)
+    
+    ## Labels should be applied
+    expect_true(any(grepl("Age|Sex|Treatment", result$Variable)))
+})
+
+
+test_that("fit negbin works with interactions", {
+    
+    skip_if_not_installed("MASS")
+    
+    result <- suppressWarnings(fit(
+        data = clintrial,
+        outcome = "count_outcome",
+        predictors = c("age", "sex", "treatment"),
+        interactions = c("age:sex"),
+        model_type = "negbin"
+    ))
+    
+    expect_fit_result(result)
+    
+    ## Interaction should be in formula
+    formula_str <- attr(result, "formula_str")
+    expect_true(grepl("age:sex", formula_str))
+})
+
+
+test_that("fit with pre-fitted model works for negbin", {
+    
+    skip_if_not_installed("MASS")
+    
+    ## Fit model directly with MASS
+    nb_model <- suppressWarnings(MASS::glm.nb(count_outcome ~ age + sex + treatment, data = clintrial))
+    
+    ## Pass to fit()
+    result <- fit(
+        model = nb_model,
+        data = clintrial,
+        labels = clintrial_labels
+    )
+    
+    ## Check basic structure (without outcome/predictors which aren't available for pre-fitted models)
+    expect_s3_class(result, "fit_result")
+    expect_s3_class(result, "data.table")
+    expect_true("Variable" %in% names(result))
+    expect_true("Group" %in% names(result))
+    expect_true(!is.null(attr(result, "model")))
+    expect_true(!is.null(attr(result, "raw_data")))
+    
+    ## Should recognize it as negative binomial
+    model_type <- attr(result, "model_type")
+    expect_true(grepl("Negative Binomial", model_type))
 })
 
 

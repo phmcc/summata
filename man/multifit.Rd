@@ -70,23 +70,74 @@ Cox models. Computes robust clustered standard errors. Default is \code{NULL}.}
 \item{model_type}{Character string specifying the type of regression model to 
 fit. Options include:
 \itemize{
-  \item \code{"glm"} - Generalized linear model [default]
-  \item \code{"lm"} - Linear regression
-  \item \code{"coxph"} - Cox proportional hazards (survival analysis)
-  \item \code{"clogit"} - Conditional logistic regression
-  \item \code{"glmer"} - Generalized linear mixed effects model (requires \code{random})
-  \item \code{"lmer"} - Linear mixed effects model (requires \code{random})
-  \item \code{"coxme"} - Mixed effects Cox model (requires \code{random})
+  \item \code{"glm"} - Generalized linear model (default). Supports multiple 
+    distributions via the \code{family} parameter including logistic, Poisson, 
+    Gamma, Gaussian, and quasi-likelihood models.
+  \item \code{"negbin"} - Negative binomial regression for overdispersed count 
+    data (requires MASS package). Estimates an additional dispersion parameter 
+    compared to Poisson regression.
+  \item \code{"lm"} - Linear regression for continuous outcomes with normally 
+    distributed errors.
+  \item \code{"coxph"} - Cox proportional hazards model for time-to-event 
+    survival analysis. Requires \code{Surv()} outcome syntax.
+  \item \code{"clogit"} - Conditional logistic regression for matched 
+    case-control studies.
+  \item \code{"glmer"} - Generalized linear mixed-effects model for hierarchical 
+    or clustered data with non-normal outcomes (requires lme4 package and 
+    \code{random} parameter).
+  \item \code{"lmer"} - Linear mixed-effects model for hierarchical or clustered 
+    data with continuous outcomes (requires lme4 package and \code{random} 
+    parameter).
+  \item \code{"coxme"} - Cox mixed-effects model for clustered survival data 
+    (requires coxme package and \code{random} parameter).
 }}
 
-\item{family}{For GLM models, the error distribution and link function. Common 
-options include:
+\item{family}{For GLM and GLMER models, specifies the error distribution and link 
+function. Can be a character string, a family function, or a family object.
+Ignored for non-GLM/GLMER models.
+
+\strong{Binary/Binomial outcomes:}
 \itemize{
-  \item \code{"binomial"} - Logistic regression for binary outcomes [default]
-  \item \code{"poisson"} - Poisson regression for count data
-  \item \code{"gaussian"} - Normal linear regression via GLM
+  \item \code{"binomial"} or \code{binomial()} - Logistic regression for binary 
+    outcomes (0/1, TRUE/FALSE). Returns odds ratios (OR). Default.
+  \item \code{"quasibinomial"} or \code{quasibinomial()} - Logistic regression 
+    with overdispersion. Use when residual deviance >> residual df.
+  \item \code{binomial(link = "probit")} - Probit regression (normal CDF link).
+  \item \code{binomial(link = "cloglog")} - Complementary log-log link for 
+    asymmetric binary outcomes.
 }
-See \code{\link[stats]{family}} for all options. Ignored for non-GLM models.}
+
+\strong{Count outcomes:}
+\itemize{
+  \item \code{"poisson"} or \code{poisson()} - Poisson regression for count 
+    data. Returns rate ratios (RR). Assumes mean = variance.
+  \item \code{"quasipoisson"} or \code{quasipoisson()} - Poisson regression 
+    with overdispersion. Use when variance > mean.
+}
+
+\strong{Continuous outcomes:}
+\itemize{
+  \item \code{"gaussian"} or \code{gaussian()} - Normal/Gaussian distribution 
+    for continuous outcomes. Equivalent to linear regression.
+  \item \code{gaussian(link = "log")} - Log-linear model for positive continuous 
+    outcomes. Returns multiplicative effects.
+}
+
+\strong{Positive continuous outcomes:}
+\itemize{
+  \item \code{"Gamma"} or \code{Gamma()} - Gamma distribution for positive, 
+    right-skewed continuous data (e.g., costs, lengths of stay). Default log link.
+  \item \code{Gamma(link = "inverse")} - Gamma with inverse (canonical) link.
+  \item \code{Gamma(link = "identity")} - Gamma with identity link for additive 
+    effects on positive outcomes.
+  \item \code{"inverse.gaussian"} or \code{inverse.gaussian()} - Inverse Gaussian 
+    for positive, highly right-skewed data.
+}
+
+For negative binomial regression (overdispersed counts), use 
+\code{model_type = "negbin"} instead of the \code{family} parameter.
+
+See \code{\link[stats]{family}} for additional details and options.}
 
 \item{columns}{Character string specifying which result columns to display when 
 both unadjusted and adjusted models are fit (i.e., when \code{covariates} is 
@@ -368,6 +419,7 @@ result1 <- multifit(
 print(result1)
 # Shows odds ratios comparing Drug A and Drug B to Control
 
+\donttest{
 # Example 2: Adjusted analysis with covariates
 # Adjust for age, sex, and disease stage
 result2 <- multifit(
@@ -612,6 +664,8 @@ result_forest <- multifit(
 # p <- multiforest(result_forest, 
 #                  title = "Treatment Effects Across Outcomes")
 # print(p)
+
+}
 
 }
 \seealso{

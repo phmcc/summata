@@ -73,9 +73,6 @@
 #'   listing the covariates used in adjusted models. Covariate names are formatted
 #'   using the \code{labels} parameter if provided. Only shown when displaying
 #'   adjusted results.
-#'   
-#' @param group_by_outcome Logical. If \code{TRUE} (default), groups rows by 
-#'   outcome with outcome names as headers. If \code{FALSE}, shows flat list.
 #'
 #' @param indent_predictor Logical. If \code{TRUE}, indents predictor levels
 #'   under outcome names, creating a hierarchical display. If \code{FALSE} 
@@ -172,12 +169,14 @@
 #'     data = clintrial,
 #'     outcomes = outcomes,
 #'     predictor = "treatment",
-#'     covariates = c("age", "sex", "stage")
+#'     covariates = c("age", "sex", "stage"),
+#'     parallel = FALSE
 #' )
 #' 
 #' plot1 <- multiforest(result)
 #' print(plot1)
 #' 
+#' \donttest{
 #' # Example 2: With custom title and labels
 #' plot2 <- multiforest(
 #'     result,
@@ -192,7 +191,8 @@
 #'     outcomes = c("Surv(pfs_months, pfs_status)", "Surv(os_months, os_status)"),
 #'     predictor = "treatment",
 #'     covariates = c("age", "sex", "stage"),
-#'     model_type = "coxph"
+#'     model_type = "coxph",
+#'     parallel = FALSE
 #' )
 #' 
 #' plot3 <- multiforest(
@@ -216,6 +216,7 @@
 #' dims <- attr(plot5, "recommended_dims")
 #' # ggsave("multioutcome_forest.pdf", plot5,
 #' #        width = dims$width, height = dims$height)
+#' }
 #'
 #' @export
 multiforest <- function(x,

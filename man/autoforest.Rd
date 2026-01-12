@@ -9,11 +9,11 @@ autoforest(x, data = NULL, title = NULL, ...)
 \arguments{
 \item{x}{One of the following:
 \itemize{
-  \item A fitted model object: \code{glm}, \code{lm}, \code{coxph}, or \code{clogit}
-  \item A \code{fit_result} object from \code{\link{fit}}
-  \item A \code{fullfit_result} object from \code{\link{fullfit}}
-  \item A \code{uniscreen_result} object from \code{\link{uniscreen}}
-  \item A \code{multifit_result} object from \code{\link{multifit}}
+  \item A fitted model object: \code{glm}, \code{lm}, \code{coxph}, etc.
+  \item A \code{fit_result} object from \code{\link{fit()}}
+  \item A \code{fullfit_result} object from \code{\link{fullfit()}}
+  \item A \code{uniscreen_result} object from \code{\link{uniscreen()}}
+  \item A \code{multifit_result} object from \code{\link{multifit()}}
 }}
 
 \item{data}{Data frame or data.table containing the original data. Required 
@@ -29,7 +29,7 @@ appropriate title is generated based on the detected model type:
   \item Poisson regression: "Poisson Regression Model"
   \item Linear regression: "Linear Regression Model"
   \item Uniscreen results: "Univariable [Type] Screening"
-  \item Multifit results: "Multi-Outcome [Type] Analysis"
+  \item Multifit results: "Multivariate [Type] Analysis"
 }}
 
 \item{...}{Additional arguments passed to the specific forest plot function.
@@ -57,10 +57,10 @@ A \code{ggplot} object containing the forest plot. The returned object
   \code{attr(plot, "recommended_dims")} containing recommended width and height.
 }
 \description{
-A convenience wrapper that automatically detects the input type and routes to
-the appropriate specialized forest plot function. This eliminates the need to
-remember which forest function to call for different model types or analysis
-objects, making it ideal for exploratory analysis and rapid prototyping.
+A convenience wrapper function that automatically detects the input type and
+routes to the appropriate specialized forest plot function. This eliminates
+the need to remember which forest function to call for different model types
+or analysis objects, making it ideal for exploratory analysis and rapid prototyping.
 }
 \details{
 \strong{Automatic Detection Logic:}
@@ -110,15 +110,15 @@ When \code{title = NULL}, titles are generated based on model type:
   uniscreen (glm) \tab "Univariable Logistic Regression Screening" \cr
   uniscreen (coxph) \tab "Univariable Survival Analysis Screening" \cr
   uniscreen (lm) \tab "Univariable Linear Regression Screening" \cr
-  uniscreen (glmer) \tab "Univariable Mixed Effects Logistic Screening" \cr
-  uniscreen (lmer) \tab "Univariable Mixed Effects Linear Screening" \cr
-  uniscreen (coxme) \tab "Univariable Mixed Effects Survival Screening" \cr
-  multifit (glm) \tab "Multi-Outcome Logistic Regression" \cr
-  multifit (coxph) \tab "Multi-Outcome Survival Analysis" \cr
-  multifit (lm) \tab "Multi-Outcome Linear Regression" \cr
-  multifit (glmer) \tab "Multi-Outcome Mixed Effects Logistic Regression" \cr
-  multifit (lmer) \tab "Multi-Outcome Mixed Effects Linear Regression" \cr
-  multifit (coxme) \tab "Multi-Outcome Mixed Effects Survival Analysis" \cr
+  uniscreen (glmer) \tab "Univariable Mixed-Effects Logistic Screening" \cr
+  uniscreen (lmer) \tab "Univariable Mixed-Effects Linear Screening" \cr
+  uniscreen (coxme) \tab "Univariable Mixed-Effects Survival Screening" \cr
+  multifit (glm) \tab "Multivariate Logistic Regression" \cr
+  multifit (coxph) \tab "Multivariate Survival Analysis" \cr
+  multifit (lm) \tab "Multivariate Linear Regression" \cr
+  multifit (glmer) \tab "Multivariate Mixed-Effects Logistic Regression" \cr
+  multifit (lmer) \tab "Multivariate Mixed-Effects Linear Regression" \cr
+  multifit (coxme) \tab "Multivariate Mixed-Effects Survival Analysis" \cr
 }
 }
 \examples{
@@ -135,6 +135,7 @@ plot1 <- autoforest(glm_model, data = clintrial)
 print(plot1)
 # Automatically detects GLM and routes to glmforest()
 
+\donttest{
 # Example 2: Cox proportional hazards model
 cox_model <- coxph(Surv(os_months, os_status) ~ age + sex + treatment + stage,
                    data = clintrial)
@@ -144,7 +145,7 @@ print(plot2)
 # Automatically detects coxph and routes to coxforest()
 
 # Example 3: Linear regression model
-lm_model <- lm(biomarker ~ age + sex + bmi + treatment, data = clintrial)
+lm_model <- lm(biomarker_x ~ age + sex + bmi + treatment, data = clintrial)
 
 plot3 <- autoforest(lm_model, data = clintrial)
 print(plot3)
@@ -208,7 +209,7 @@ print(plot8)
 # Example 9: From multifit() result
 mf_result <- multifit(
     data = clintrial,
-    outcomes = c("surgery", "complication", "readmission"),
+    outcomes = c("surgery", "any_complication", "readmission_30d"),
     predictor = "treatment",
     labels = clintrial_labels
 )
@@ -246,14 +247,15 @@ dims <- attr(plot12, "recommended_dims")
 # ggsave("forest_plot.png", plot12, width = dims$width, height = dims$height, dpi = 300)
 
 # Example 13: Poisson regression
-pois_model <- glm(n_events ~ age + sex + treatment,
+clintrial$event_count <- rpois(nrow(clintrial), lambda = 3)
+pois_model <- glm(event_count ~ age + sex + treatment,
                   family = poisson, data = clintrial)
 
 plot13 <- autoforest(pois_model, data = clintrial)
 print(plot13)
 # Automatically detects Poisson GLM, title set to "Poisson Regression Model"
 
-# Example 14: Mixed effects uniscreen
+# Example 14: Mixed-Effects uniscreen
 if (requireNamespace("lme4", quietly = TRUE)) {
     me_uni <- uniscreen(
         data = clintrial,
@@ -266,7 +268,7 @@ if (requireNamespace("lme4", quietly = TRUE)) {
     
     plot14 <- autoforest(me_uni)
     print(plot14)
-    # Title: "Univariable Mixed Effects Logistic Screening"
+    # Title: "Univariable Mixed-Effects Logistic Screening"
 }
 
 # Example 15: Quick comparison workflow
@@ -274,7 +276,7 @@ if (requireNamespace("lme4", quietly = TRUE)) {
 models <- list(
     logistic = glm(surgery ~ age + sex + treatment, binomial, clintrial),
     survival = coxph(Surv(os_months, os_status) ~ age + sex + treatment, clintrial),
-    linear = lm(biomarker ~ age + sex + treatment, clintrial)
+    linear = lm(biomarker_x ~ age + sex + treatment, clintrial)
 )
 
 # autoforest handles each appropriately
@@ -284,6 +286,7 @@ plots <- lapply(models, function(m) autoforest(m, data = clintrial))
 print(plots$logistic)
 print(plots$survival)
 print(plots$linear)
+}
 
 }
 \seealso{
@@ -291,9 +294,9 @@ print(plots$linear)
 \code{\link{coxforest}} for Cox model forest plots,
 \code{\link{lmforest}} for linear model forest plots,
 \code{\link{uniforest}} for univariable screening forest plots,
-\code{\link{multiforest}} for multi-outcome forest plots,
+\code{\link{multiforest}} for Multivariate forest plots,
 \code{\link{fit}} for single-model regression,
 \code{\link{fullfit}} for combined univariable/multivariable regression,
 \code{\link{uniscreen}} for univariable screening,
-\code{\link{multifit}} for multi-outcome analysis
+\code{\link{multifit}} for Multivariate analysis
 }

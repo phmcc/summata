@@ -253,9 +253,10 @@
 #' plot1 <- lmforest(model1, data = clintrial)
 #' print(plot1)
 #' 
+#' \donttest{
 #' # Example 2: With custom labels and title
 #' plot2 <- lmforest(
-#'     model = model1,
+#'     x = model1,
 #'     data = clintrial,
 #'     title = "Predictors of Body Mass Index",
 #'     effect_label = "Change in BMI (kg/m²)",
@@ -270,7 +271,7 @@
 #' )
 #' 
 #' plot3 <- lmforest(
-#'     model = model3,
+#'     x = model3,
 #'     data = clintrial,
 #'     labels = clintrial_labels,
 #'     indent_groups = TRUE
@@ -288,7 +289,7 @@
 #' )
 #' 
 #' plot5 <- lmforest(
-#'     model = model5,
+#'     x = model5,
 #'     data = clintrial,
 #'     condense_table = TRUE,
 #'     labels = clintrial_labels
@@ -297,7 +298,7 @@
 #' 
 #' # Example 6: Custom color
 #' plot6 <- lmforest(
-#'     model = model1,
+#'     x = model1,
 #'     data = clintrial,
 #'     color = "#2ECC71",  # Bright green
 #'     labels = clintrial_labels
@@ -306,7 +307,7 @@
 #' 
 #' # Example 7: Hide sample sizes
 #' plot7 <- lmforest(
-#'     model = model1,
+#'     x = model1,
 #'     data = clintrial,
 #'     show_n = FALSE,
 #'     labels = clintrial_labels
@@ -315,7 +316,7 @@
 #' 
 #' # Example 8: Adjust table width
 #' plot8 <- lmforest(
-#'     model = model3,
+#'     x = model3,
 #'     data = clintrial,
 #'     table_width = 0.55,
 #'     labels = clintrial_labels
@@ -329,7 +330,7 @@
 #' 
 #' # Example 10: Specify exact dimensions
 #' plot10 <- lmforest(
-#'     model = model1,
+#'     x = model1,
 #'     data = clintrial,
 #'     plot_width = 12,
 #'     plot_height = 7,
@@ -338,7 +339,7 @@
 #' 
 #' # Example 11: Different units
 #' plot11 <- lmforest(
-#'     model = model1,
+#'     x = model1,
 #'     data = clintrial,
 #'     plot_width = 30,
 #'     plot_height = 20,
@@ -348,7 +349,7 @@
 #' 
 #' # Example 12: No zebra stripes
 #' plot12 <- lmforest(
-#'     model = model1,
+#'     x = model1,
 #'     data = clintrial,
 #'     zebra_stripes = FALSE,
 #'     labels = clintrial_labels
@@ -357,7 +358,7 @@
 #' 
 #' # Example 13: Custom reference label
 #' plot13 <- lmforest(
-#'     model = model1,
+#'     x = model1,
 #'     data = clintrial,
 #'     ref_label = "0.00 (ref)",
 #'     labels = clintrial_labels
@@ -366,7 +367,7 @@
 #' 
 #' # Example 14: Larger fonts for presentation
 #' plot14 <- lmforest(
-#'     model = model1,
+#'     x = model1,
 #'     data = clintrial,
 #'     font_size = 1.3,
 #'     title_size = 26,
@@ -376,7 +377,7 @@
 #' 
 #' # Example 15: More decimal places
 #' plot15 <- lmforest(
-#'     model = model1,
+#'     x = model1,
 #'     data = clintrial,
 #'     digits = 3,
 #'     labels = clintrial_labels
@@ -390,7 +391,7 @@
 #' )
 #' 
 #' plot16 <- lmforest(
-#'     model = model16,
+#'     x = model16,
 #'     data = clintrial,
 #'     title = "Predictors of Baseline Hemoglobin",
 #'     effect_label = "Change in Hemoglobin (g/dL)",
@@ -414,7 +415,7 @@
 #' summary(final_model)
 #' 
 #' final_plot <- lmforest(
-#'     model = final_model,
+#'     x = final_model,
 #'     data = clintrial,
 #'     title = "Multivariable Linear Regression: Predictors of Body Mass Index",
 #'     effect_label = "Change in BMI (kg/m²)",
@@ -432,6 +433,7 @@
 #' #        width = dims$width, height = dims$height)
 #' # ggsave("figure3_linear.png", final_plot,
 #' #        width = dims$width, height = dims$height, dpi = 300)
+#' }
 #'
 #' @export
 lmforest <- function(x, data = NULL,

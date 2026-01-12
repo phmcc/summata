@@ -25,6 +25,12 @@ clintrial_complete <- na.omit(clintrial)
 clintrial$response <- as.integer(clintrial$os_status == 1 & clintrial$os_months < 24)
 clintrial_complete$response <- as.integer(clintrial_complete$os_status == 1 & clintrial_complete$os_months < 24)
 
+## Create integer count outcome for Poisson/quasipoisson/negative binomial tests
+## IMPORTANT: Add to BOTH datasets
+set.seed(123)
+clintrial$count_outcome <- as.integer(ceiling(clintrial$los_days))
+clintrial_complete$count_outcome <- as.integer(ceiling(clintrial_complete$los_days))
+
 ## Helper function to check fullfit_result structure
 expect_fullfit_result <- function(result) {
     expect_s3_class(result, "fullfit_result")
@@ -1336,6 +1342,319 @@ test_that("fullfit linear model screening works", {
     )
     
     expect_fullfit_result(result)
+})
+
+
+## ============================================================================
+## SECTION 19b: Additional GLM Family Tests
+## ============================================================================
+
+## ----------------------------------------------------------------------------
+## Gaussian Family Tests
+## ----------------------------------------------------------------------------
+
+test_that("fullfit works with gaussian family via glm", {
+    
+    result <- fullfit(
+        data = clintrial,
+        outcome = "los_days",
+        predictors = c("age", "sex", "treatment", "stage"),
+        model_type = "glm",
+        family = "gaussian",
+        method = "all"
+    )
+    
+    expect_fullfit_result(result)
+    
+    ## Should have Coefficient columns (not OR/RR)
+    col_names <- names(result)
+    expect_true(any(grepl("Coefficient.*CI|Estimate.*CI", col_names)),
+                info = paste("Expected Coefficient column for gaussian, found:", 
+                             paste(col_names, collapse = ", ")))
+})
+
+
+test_that("fullfit gaussian screening works", {
+    
+    result <- fullfit(
+        data = clintrial,
+        outcome = "los_days",
+        predictors = c("age", "sex", "treatment", "stage", "grade"),
+        model_type = "glm",
+        family = "gaussian",
+        method = "screen",
+        p_threshold = 0.20
+    )
+    
+    expect_fullfit_result(result)
+})
+
+
+## ----------------------------------------------------------------------------
+## Quasibinomial Family Tests
+## ----------------------------------------------------------------------------
+
+test_that("fullfit works with quasibinomial family", {
+    
+    result <- fullfit(
+        data = clintrial,
+        outcome = "response",
+        predictors = c("age", "sex", "treatment", "stage"),
+        model_type = "glm",
+        family = "quasibinomial",
+        method = "all"
+    )
+    
+    expect_fullfit_result(result)
+    
+    ## Should have OR columns like binomial
+    col_names <- names(result)
+    expect_true(any(grepl("OR.*CI", col_names)),
+                info = paste("Expected OR column for quasibinomial, found:", 
+                             paste(col_names, collapse = ", ")))
+})
+
+
+test_that("fullfit quasibinomial screening works", {
+    
+    result <- fullfit(
+        data = clintrial,
+        outcome = "response",
+        predictors = c("age", "sex", "treatment", "stage", "grade"),
+        model_type = "glm",
+        family = "quasibinomial",
+        method = "screen",
+        p_threshold = 0.20
+    )
+    
+    expect_fullfit_result(result)
+})
+
+
+## ----------------------------------------------------------------------------
+## Quasipoisson Family Tests
+## ----------------------------------------------------------------------------
+
+test_that("fullfit works with quasipoisson family", {
+    
+    result <- fullfit(
+        data = clintrial,
+        outcome = "count_outcome",
+        predictors = c("age", "sex", "treatment", "stage"),
+        model_type = "glm",
+        family = "quasipoisson",
+        method = "all"
+    )
+    
+    expect_fullfit_result(result)
+    
+    ## Should have RR columns like poisson
+    col_names <- names(result)
+    expect_true(any(grepl("RR.*CI", col_names)),
+                info = paste("Expected RR column for quasipoisson, found:", 
+                             paste(col_names, collapse = ", ")))
+})
+
+
+test_that("fullfit quasipoisson screening works", {
+    
+    result <- fullfit(
+        data = clintrial,
+        outcome = "count_outcome",
+        predictors = c("age", "sex", "treatment", "stage", "grade"),
+        model_type = "glm",
+        family = "quasipoisson",
+        method = "screen",
+        p_threshold = 0.20
+    )
+    
+    expect_fullfit_result(result)
+})
+
+
+## ----------------------------------------------------------------------------
+## Gamma Family Tests
+## ----------------------------------------------------------------------------
+
+test_that("fullfit works with Gamma family (log link)", {
+    
+    ## Create positive outcome
+    test_data <- data.table::as.data.table(clintrial)
+    test_data <- test_data[los_days > 0]
+    
+    result <- fullfit(
+        data = test_data,
+        outcome = "los_days",
+        predictors = c("age", "sex", "treatment"),
+        model_type = "glm",
+        family = Gamma(link = "log"),
+        method = "all"
+    )
+    
+    expect_fullfit_result(result)
+})
+
+
+test_that("fullfit Gamma screening works", {
+    
+    ## Create positive outcome
+    test_data <- data.table::as.data.table(clintrial)
+    test_data <- test_data[los_days > 0]
+    
+    result <- fullfit(
+        data = test_data,
+        outcome = "los_days",
+        predictors = c("age", "sex", "treatment", "stage"),
+        model_type = "glm",
+        family = Gamma(link = "log"),
+        method = "screen",
+        p_threshold = 0.20
+    )
+    
+    expect_fullfit_result(result)
+})
+
+
+## ----------------------------------------------------------------------------
+## Inverse Gaussian Family Tests
+## ----------------------------------------------------------------------------
+
+test_that("fullfit works with inverse.gaussian family", {
+    
+    ## Create positive outcome
+    test_data <- data.table::as.data.table(clintrial)
+    test_data <- test_data[los_days > 0]
+    
+    result <- fullfit(
+        data = test_data,
+        outcome = "los_days",
+        predictors = c("age", "sex", "treatment"),
+        model_type = "glm",
+        family = inverse.gaussian(link = "log"),
+        method = "all"
+    )
+    
+    expect_fullfit_result(result)
+})
+
+
+## ----------------------------------------------------------------------------
+## Negative Binomial (negbin) Tests
+## ----------------------------------------------------------------------------
+
+test_that("fullfit works with negative binomial regression (negbin)", {
+    
+    skip_if_not_installed("MASS")
+    
+    result <- suppressWarnings(fullfit(
+        data = clintrial,
+        outcome = "count_outcome",
+        predictors = c("age", "sex", "treatment", "stage"),
+        model_type = "negbin",
+        method = "all"
+    ))
+    
+    expect_fullfit_result(result)
+    
+    ## Should have RR columns for count data
+    col_names <- names(result)
+    expect_true(any(grepl("RR.*CI", col_names)),
+                info = paste("Expected RR column for negbin, found:", 
+                             paste(col_names, collapse = ", ")))
+})
+
+
+test_that("fullfit negbin screening works", {
+    
+    skip_if_not_installed("MASS")
+    
+    result <- suppressWarnings(fullfit(
+        data = clintrial,
+        outcome = "count_outcome",
+        predictors = c("age", "sex", "treatment", "stage", "grade"),
+        model_type = "negbin",
+        method = "screen",
+        p_threshold = 0.20
+    ))
+    
+    expect_fullfit_result(result)
+    expect_equal(attr(result, "method"), "screen")
+})
+
+
+test_that("fullfit negbin method='custom' works", {
+    
+    skip_if_not_installed("MASS")
+    
+    result <- suppressWarnings(fullfit(
+        data = clintrial,
+        outcome = "count_outcome",
+        predictors = c("age", "sex", "treatment", "stage"),
+        model_type = "negbin",
+        method = "custom",
+        multi_predictors = c("age", "treatment")
+    ))
+    
+    expect_fullfit_result(result)
+    expect_equal(attr(result, "method"), "custom")
+    expect_equal(attr(result, "n_multi"), 2)
+})
+
+
+test_that("fullfit negbin with labels works", {
+    
+    skip_if_not_installed("MASS")
+    
+    result <- suppressWarnings(fullfit(
+        data = clintrial,
+        outcome = "count_outcome",
+        predictors = c("age", "sex", "treatment"),
+        model_type = "negbin",
+        method = "all",
+        labels = clintrial_labels
+    ))
+    
+    expect_fullfit_result(result)
+    
+    ## Labels should be applied
+    expect_true(any(grepl("Age|Sex|Treatment", result$Variable)))
+})
+
+
+test_that("fullfit negbin return_type='model' works", {
+    
+    skip_if_not_installed("MASS")
+    
+    result <- suppressWarnings(fullfit(
+        data = clintrial,
+        outcome = "count_outcome",
+        predictors = c("age", "sex", "treatment"),
+        model_type = "negbin",
+        method = "all",
+        return_type = "model"
+    ))
+    
+    ## Should return a negbin model object
+    expect_true(inherits(result, "negbin"))
+})
+
+
+test_that("fullfit negbin return_type='both' works", {
+    
+    skip_if_not_installed("MASS")
+    
+    result <- suppressWarnings(fullfit(
+        data = clintrial,
+        outcome = "count_outcome",
+        predictors = c("age", "sex", "treatment"),
+        model_type = "negbin",
+        method = "all",
+        return_type = "both"
+    ))
+    
+    expect_type(result, "list")
+    expect_s3_class(result$table, "fullfit_result")
+    expect_true(inherits(result$model, "negbin"))
 })
 
 

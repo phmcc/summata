@@ -70,6 +70,11 @@ regardless of decimal setting. Default is 1.}
 P-values smaller than \code{10^(-p_digits)} are displayed as 
 "< 0.001", "< 0.01", etc. Default is 3.}
 
+\item{p_per_stat}{Logical. If \code{TRUE}, displays p-values on each row 
+(per statistic) rather than only on the first row of each variable. 
+Useful when different statistics within a variable warrant separate 
+significance testing. Default is \code{FALSE}.}
+
 \item{na_include}{Logical. If \code{TRUE}, missing values (NAs) are displayed 
 as a separate category/row for each variable. If \code{FALSE}, missing 
 values are silently excluded from calculations. Default is \code{FALSE}.}
@@ -231,6 +236,8 @@ data(clintrial)
 desctable(clintrial,
         variables = c("age", "sex", "bmi"))
 
+
+\donttest{
 # Example 2: Grouped comparison with default tests
 desctable(clintrial,
         by = "treatment",
@@ -396,6 +403,7 @@ table1 <- desctable(
     na_include = FALSE
 )
 print(table1)
+}
 }
 \seealso{
 \code{\link{fit}} for regression modeling, 

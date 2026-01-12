@@ -182,6 +182,7 @@ uni_results <- uniscreen(
 
 uniforest(uni_results, title = "Univariable Associations with Mortality")
 
+\donttest{
 # Example 2: Survival analysis
 library(survival)
 surv_results <- uniscreen(
@@ -226,6 +227,7 @@ uniforest(uni_results,
 p <- uniforest(uni_results)
 dims <- attr(p, "recommended_dims")
 # ggsave("univariable_forest.pdf", p, width = dims$width, height = dims$height)
+}
 
 }
 \seealso{

@@ -44,23 +44,74 @@
 #' @param model_type Character string specifying the type of regression model to 
 #'   fit. Options include:
 #'   \itemize{
-#'     \item \code{"glm"} - Generalized linear model [default]
-#'     \item \code{"lm"} - Linear regression
-#'     \item \code{"coxph"} - Cox proportional hazards (survival analysis)
-#'     \item \code{"clogit"} - Conditional logistic regression
-#'     \item \code{"glmer"} - Generalized linear mixed effects model (requires \code{random})
-#'     \item \code{"lmer"} - Linear mixed effects model (requires \code{random})
-#'     \item \code{"coxme"} - Mixed effects Cox model (requires \code{random})
+#'     \item \code{"glm"} - Generalized linear model (default). Supports multiple 
+#'       distributions via the \code{family} parameter including logistic, Poisson, 
+#'       Gamma, Gaussian, and quasi-likelihood models.
+#'     \item \code{"negbin"} - Negative binomial regression for overdispersed count 
+#'       data (requires MASS package). Estimates an additional dispersion parameter 
+#'       compared to Poisson regression.
+#'     \item \code{"lm"} - Linear regression for continuous outcomes with normally 
+#'       distributed errors.
+#'     \item \code{"coxph"} - Cox proportional hazards model for time-to-event 
+#'       survival analysis. Requires \code{Surv()} outcome syntax.
+#'     \item \code{"clogit"} - Conditional logistic regression for matched 
+#'       case-control studies.
+#'     \item \code{"glmer"} - Generalized linear mixed-effects model for hierarchical 
+#'       or clustered data with non-normal outcomes (requires lme4 package and 
+#'       \code{random} parameter).
+#'     \item \code{"lmer"} - Linear mixed-effects model for hierarchical or clustered 
+#'       data with continuous outcomes (requires lme4 package and \code{random} 
+#'       parameter).
+#'     \item \code{"coxme"} - Cox mixed-effects model for clustered survival data 
+#'       (requires coxme package and \code{random} parameter).
 #'   }
 #'   
-#' @param family For GLM models, the error distribution and link function. Common 
-#'   options include:
+#' @param family For GLM and GLMER models, specifies the error distribution and link 
+#'   function. Can be a character string, a family function, or a family object.
+#'   Ignored for non-GLM/GLMER models.
+#'   
+#'   \strong{Binary/Binomial outcomes:}
 #'   \itemize{
-#'     \item \code{"binomial"} - Logistic regression for binary outcomes [default]
-#'     \item \code{"poisson"} - Poisson regression for count data
-#'     \item \code{"gaussian"} - Normal linear regression via GLM
+#'     \item \code{"binomial"} or \code{binomial()} - Logistic regression for binary 
+#'       outcomes (0/1, TRUE/FALSE). Returns odds ratios (OR). Default.
+#'     \item \code{"quasibinomial"} or \code{quasibinomial()} - Logistic regression 
+#'       with overdispersion. Use when residual deviance >> residual df.
+#'     \item \code{binomial(link = "probit")} - Probit regression (normal CDF link).
+#'     \item \code{binomial(link = "cloglog")} - Complementary log-log link for 
+#'       asymmetric binary outcomes.
 #'   }
-#'   See \code{\link[stats]{family}} for all options. Ignored for non-GLM models.
+#'   
+#'   \strong{Count outcomes:}
+#'   \itemize{
+#'     \item \code{"poisson"} or \code{poisson()} - Poisson regression for count 
+#'       data. Returns rate ratios (RR). Assumes mean = variance.
+#'     \item \code{"quasipoisson"} or \code{quasipoisson()} - Poisson regression 
+#'       with overdispersion. Use when variance > mean.
+#'   }
+#'   
+#'   \strong{Continuous outcomes:}
+#'   \itemize{
+#'     \item \code{"gaussian"} or \code{gaussian()} - Normal/Gaussian distribution 
+#'       for continuous outcomes. Equivalent to linear regression.
+#'     \item \code{gaussian(link = "log")} - Log-linear model for positive continuous 
+#'       outcomes. Returns multiplicative effects.
+#'   }
+#'   
+#'   \strong{Positive continuous outcomes:}
+#'   \itemize{
+#'     \item \code{"Gamma"} or \code{Gamma()} - Gamma distribution for positive, 
+#'       right-skewed continuous data (e.g., costs, lengths of stay). Default log link.
+#'     \item \code{Gamma(link = "inverse")} - Gamma with inverse (canonical) link.
+#'     \item \code{Gamma(link = "identity")} - Gamma with identity link for additive 
+#'       effects on positive outcomes.
+#'     \item \code{"inverse.gaussian"} or \code{inverse.gaussian()} - Inverse Gaussian 
+#'       for positive, highly right-skewed data.
+#'   }
+#'   
+#'   For negative binomial regression (overdispersed counts), use 
+#'   \code{model_type = "negbin"} instead of the \code{family} parameter.
+#'   
+#'   See \code{\link[stats]{family}} for additional details and options.
 #'   
 #' @param columns Character string specifying which result columns to display when 
 #'   both unadjusted and adjusted models are fit (i.e., when \code{covariates} is 
@@ -340,6 +391,7 @@
 #' print(result1)
 #' # Shows odds ratios comparing Drug A and Drug B to Control
 #' 
+#' \donttest{
 #' # Example 2: Adjusted analysis with covariates
 #' # Adjust for age, sex, and disease stage
 #' result2 <- multifit(
@@ -585,6 +637,8 @@
 #' #                  title = "Treatment Effects Across Outcomes")
 #' # print(p)
 #'
+#' }
+#'
 #' @export
 multifit <- function(data,
                      outcomes,
@@ -689,6 +743,12 @@ multifit <- function(data,
                 switch(model_type,
                        "glm" = stats::glm(unadj_formula, data = .data, family = family,
                                           model = keep_models, x = FALSE, y = TRUE, ...),
+                       "negbin" = {
+                           if (!requireNamespace("MASS", quietly = TRUE))
+                               stop("Package 'MASS' required for negative binomial models")
+                           MASS::glm.nb(unadj_formula, data = .data,
+                                         model = keep_models, x = FALSE, y = TRUE, ...)
+                       },
                        "lm" = stats::lm(unadj_formula, data = .data,
                                         model = keep_models, x = FALSE, y = TRUE, ...),
                        "coxph" = {
@@ -790,6 +850,12 @@ multifit <- function(data,
                 switch(model_type,
                        "glm" = stats::glm(adj_formula, data = .data, family = family,
                                           model = keep_models, x = FALSE, y = TRUE, ...),
+                       "negbin" = {
+                           if (!requireNamespace("MASS", quietly = TRUE))
+                               stop("Package 'MASS' required for negative binomial models")
+                           MASS::glm.nb(adj_formula, data = .data,
+                                         model = keep_models, x = FALSE, y = TRUE, ...)
+                       },
                        "lm" = stats::lm(adj_formula, data = .data,
                                         model = keep_models, x = FALSE, y = TRUE, ...),
                        "coxph" = {
@@ -857,8 +923,14 @@ multifit <- function(data,
     ## Fit models (parallel or sequential)
     if (parallel && length(outcomes) > 1) {
         ## Determine number of cores
+        ## Respect CRAN's 2-core limit during R CMD check
         if (is.null(n_cores)) {
             n_cores <- max(1L, parallel::detectCores() - 1L)
+        }
+        ## CRAN policy: respect _R_CHECK_LIMIT_CORES_ environment variable
+        chk <- tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_", ""))
+        if (nzchar(chk) && chk == "true") {
+            n_cores <- min(n_cores, 2L)
         }
         
         if (.Platform$OS.type == "windows") {
@@ -1129,16 +1201,21 @@ extract_predictor_effects <- function(model, predictor, outcome,
     
     events <- NA_integer_
     if (model_class == "glm") {
-        if (model$family$family == "binomial") {
+        if (model$family$family %in% c("binomial", "quasibinomial")) {
             ## Binary outcome - count events (1s)
             if (!is.null(model$y)) {
                 events <- sum(model$y, na.rm = TRUE)
             }
-        } else if (model$family$family %in% c("poisson", "quasipoisson", "negbin")) {
+        } else if (model$family$family %in% c("poisson", "quasipoisson")) {
             ## Count outcome - sum total events
             if (!is.null(model$y)) {
                 events <- sum(model$y, na.rm = TRUE)
             }
+        }
+    } else if (model_class == "negbin") {
+        ## Negative binomial count outcome - sum total events
+        if (!is.null(model$y)) {
+            events <- sum(model$y, na.rm = TRUE)
         }
     } else if (model_class == "coxph") {
         events <- model$nevent
@@ -1177,7 +1254,7 @@ extract_predictor_effects <- function(model, predictor, outcome,
         se_col <- "se(coef)"
         stat_col <- "z"
         p_col <- if ("Pr(>|z|)" %in% colnames(pred_coefs)) "Pr(>|z|)" else "p"
-    } else if (model_class == "glm" || inherits(model, "glmerMod")) {
+    } else if (model_class %in% c("glm", "negbin") || inherits(model, "glmerMod")) {
         coef_col <- "Estimate"
         se_col <- "Std. Error"
         stat_col <- "z value"
@@ -1207,9 +1284,15 @@ extract_predictor_effects <- function(model, predictor, outcome,
         exp_coef <- exp(coefficients)
         exp_lower <- exp(ci_lower)
         exp_upper <- exp(ci_upper)
+    } else if (model_class == "negbin") {
+        ## Negative binomial models produce rate ratios
+        effect_type <- "RR"
+        exp_coef <- exp(coefficients)
+        exp_lower <- exp(ci_lower)
+        exp_upper <- exp(ci_upper)
     } else if (model_class == "glm" || inherits(model, "glmerMod")) {
         family_name <- if (is_merMod) model@resp$family$family else model$family$family
-        if (family_name == "binomial") {
+        if (family_name %in% c("binomial", "quasibinomial")) {
             effect_type <- "OR"
             exp_coef <- exp(coefficients)
             exp_lower <- exp(ci_lower)
@@ -1370,8 +1453,9 @@ combine_multifit_results <- function(all_results, columns) {
 #' @param show_events Logical for events column.
 #' @param digits Integer decimal places for effects.
 #' @param p_digits Integer decimal places for p-values.
-#' @param outcome_labels Named vector of outcome labels.
+#' @param labels Named vector of labels for outcomes and predictors.
 #' @param predictor_label Label for predictor variable.
+#' @param include_predictor Logical for including predictor column.
 #' @param exponentiate Logical or NULL for coefficient handling.
 #' @return Formatted data.table.
 #' @keywords internal
@@ -1718,6 +1802,17 @@ validate_outcome_homogeneity <- function(data, outcomes, model_type, family = "b
         return(invisible(NULL))
     }
     
+    ## Extract family name from family object/function/string
+    family_name <- if (is.character(family)) {
+        family
+    } else if (is.function(family)) {
+        tryCatch(family()$family, error = function(e) NULL)
+    } else if (is.list(family) && "family" %in% names(family)) {
+        family$family
+    } else {
+        NULL
+    }
+    
     ## Classify each outcome
     outcome_types <- vapply(outcomes, function(out) {
         if (grepl("^Surv\\(", out)) return("survival")
@@ -1745,7 +1840,7 @@ validate_outcome_homogeneity <- function(data, outcomes, model_type, family = "b
     }, character(1))
     
     ## Check for categorical outcomes with >2 levels (problematic for binomial GLM)
-    if (model_type %in% c("glm", "glmer") && family == "binomial") {
+    if (model_type %in% c("glm", "glmer") && !is.null(family_name) && family_name == "binomial") {
         categorical_outcomes <- names(outcome_types)[outcome_types == "categorical"]
         if (length(categorical_outcomes) > 0) {
             warning("Categorical outcome(s) with more than 2 levels detected: ",
@@ -1777,7 +1872,7 @@ validate_outcome_homogeneity <- function(data, outcomes, model_type, family = "b
     }
     
     ## Check for model/outcome mismatch
-    if (model_type %in% c("glm", "glmer") && family == "binomial") {
+    if (model_type %in% c("glm", "glmer") && !is.null(family_name) && family_name == "binomial") {
         non_binary <- names(outcome_types)[outcome_types == "continuous"]
         if (length(non_binary) > 0) {
             warning("Continuous outcome(s) detected with binomial family: ",
