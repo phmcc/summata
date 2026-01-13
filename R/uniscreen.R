@@ -669,10 +669,13 @@ uniscreen <- function(data,
     }
     
     ## Fit models (parallel or sequential)
-    is_r_cmd_check <- nzchar(Sys.getenv("_R_CHECK_PACKAGE_NAME_", ""))
+    can_use_windows_parallel <- .Platform$OS.type == "windows" && 
+        interactive() && 
+        !nzchar(Sys.getenv("_R_CHECK_PACKAGE_NAME_", ""))
+    
     use_parallel <- parallel && 
         length(predictors) > 1 && 
-        !(.Platform$OS.type == "windows" && is_r_cmd_check)
+        (.Platform$OS.type != "windows" || can_use_windows_parallel)
     
     if (use_parallel) {
         ## Determine number of cores
@@ -687,11 +690,11 @@ uniscreen <- function(data,
         
         if (.Platform$OS.type == "windows") {
             ## Windows: use parLapply() with PSOCK cluster
-            ## This branch only runs when package is properly installed (not during R CMD check)
+            ## Only reaches here in interactive sessions with package installed
             cl <- parallel::makeCluster(n_cores)
             on.exit(parallel::stopCluster(cl), add = TRUE)
             
-            ## Export the fit_one_predictor closure and all required objects
+            ## Export the fit_one_predictor closure and all required local objects
             parallel::clusterExport(cl, 
                                     varlist = c("fit_one_predictor", "data", "outcome", 
                                                 "model_type", "family", "random", 
@@ -700,11 +703,9 @@ uniscreen <- function(data,
                                     envir = environment()
                                     )
             
-            ## Export internal functions from summata namespace
-            ## m2dt and its dependencies are available because package is installed
+            ## Export m2dt from summata namespace
             parallel::clusterExport(cl, 
-                                    varlist = c("m2dt", "detect_model_type", 
-                                                "get_reference_levels", "format_pvalue"),
+                                    varlist = "m2dt",
                                     envir = asNamespace("summata")
                                     )
             
@@ -729,7 +730,7 @@ uniscreen <- function(data,
             results <- parallel::parLapply(cl, predictors, fit_one_predictor)
             
         } else {
-            ## Unix/Mac: use mclapply() (fork-based, shares memory so no export needed)
+            ## Unix/Mac: use mclapply (fork-based, shares memory so no export needed)
             results <- parallel::mclapply(
                                      predictors, 
                                      fit_one_predictor,
@@ -738,7 +739,7 @@ uniscreen <- function(data,
         }
     } else {
         ## Sequential processing with lapply()
-        ## Used when: parallel = FALSE, single predictor, or Windows during R CMD check
+        ## Used when: parallel = FALSE, single predictor, or Windows in non-interactive context
         results <- lapply(predictors, fit_one_predictor)
     }
     

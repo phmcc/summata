@@ -921,10 +921,13 @@ multifit <- function(data,
     }
     
     ## Fit models (parallel or sequential)
-    is_r_cmd_check <- nzchar(Sys.getenv("_R_CHECK_PACKAGE_NAME_", ""))
+    can_use_windows_parallel <- .Platform$OS.type == "windows" && 
+        interactive() && 
+        !nzchar(Sys.getenv("_R_CHECK_PACKAGE_NAME_", ""))
+    
     use_parallel <- parallel && 
         length(outcomes) > 1 && 
-        !(.Platform$OS.type == "windows" && is_r_cmd_check)
+        (.Platform$OS.type != "windows" || can_use_windows_parallel)
     
     if (use_parallel) {
         ## Determine number of cores
@@ -939,8 +942,8 @@ multifit <- function(data,
         }
         
         if (.Platform$OS.type == "windows") {
-            ## Windows: use parLapply() with PSOCK cluster
-            ## This branch only runs when package is properly installed
+            ## Windows: use parLapply with PSOCK cluster
+            ## Only reaches here in interactive sessions with package installed
             cl <- parallel::makeCluster(n_cores)
             on.exit(parallel::stopCluster(cl), add = TRUE)
             
@@ -973,7 +976,7 @@ multifit <- function(data,
             all_results <- parallel::parLapply(cl, outcomes, fit_one_outcome)
             
         } else {
-            ## Unix/Mac: use mclapply() (fork-based, shares memory)
+            ## Unix/Mac: use mclapply (fork-based, shares memory)
             all_results <- parallel::mclapply(
                                          outcomes, 
                                          fit_one_outcome,
@@ -982,7 +985,7 @@ multifit <- function(data,
         }
     } else {
         ## Sequential processing
-        ## Used when: parallel = FALSE, single outcome, or Windows during R CMD check
+        ## Used when: parallel=FALSE, single outcome, or Windows in non-interactive context
         all_results <- lapply(outcomes, fit_one_outcome)
     }
     
