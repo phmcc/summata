@@ -669,9 +669,13 @@ uniscreen <- function(data,
     }
     
     ## Fit models (parallel or sequential)
-    if (parallel && length(predictors) > 1) {
+    is_r_cmd_check <- nzchar(Sys.getenv("_R_CHECK_PACKAGE_NAME_", ""))
+    use_parallel <- parallel && 
+        length(predictors) > 1 && 
+        !(.Platform$OS.type == "windows" && is_r_cmd_check)
+    
+    if (use_parallel) {
         ## Determine number of cores
-        ## Respect CRAN 2-core limit during R CMD check
         if (is.null(n_cores)) {
             n_cores <- max(1L, parallel::detectCores() - 1L)
         }
@@ -682,24 +686,30 @@ uniscreen <- function(data,
         }
         
         if (.Platform$OS.type == "windows") {
-            ## Windows: use parLapply with PSOCK cluster
+            ## Windows: use parLapply() with PSOCK cluster
+            ## This branch only runs when package is properly installed (not during R CMD check)
             cl <- parallel::makeCluster(n_cores)
             on.exit(parallel::stopCluster(cl), add = TRUE)
             
-            ## Load required packages on workers
-            parallel::clusterEvalQ(cl, {
-                library(summata)
-                library(data.table)
-                library(stats)
-            })
-            
-            ## Export required objects to workers (including random for mixed models)
+            ## Export the fit_one_predictor closure and all required objects
             parallel::clusterExport(cl, 
-                                    varlist = c("data", "outcome", "model_type", "family", 
-                                                "random", "conf_level", "reference_rows", 
-                                                "keep_models", "show_n", "show_events", "m2dt"),
+                                    varlist = c("fit_one_predictor", "data", "outcome", 
+                                                "model_type", "family", "random", 
+                                                "conf_level", "reference_rows", 
+                                                "keep_models", "show_n", "show_events"),
                                     envir = environment()
                                     )
+            
+            ## Export internal functions from summata namespace
+            ## m2dt and its dependencies are available because package is installed
+            parallel::clusterExport(cl, 
+                                    varlist = c("m2dt", "detect_model_type", 
+                                                "get_reference_levels", "format_pvalue"),
+                                    envir = asNamespace("summata")
+                                    )
+            
+            ## Load required packages on workers
+            parallel::clusterEvalQ(cl, library(data.table))
             
             ## Load survival if needed
             if (model_type %in% c("coxph", "clogit", "coxme")) {
@@ -719,7 +729,7 @@ uniscreen <- function(data,
             results <- parallel::parLapply(cl, predictors, fit_one_predictor)
             
         } else {
-            ## Unix/Mac: use mclapply (fork-based, more efficient)
+            ## Unix/Mac: use mclapply() (fork-based, shares memory so no export needed)
             results <- parallel::mclapply(
                                      predictors, 
                                      fit_one_predictor,
@@ -727,7 +737,8 @@ uniscreen <- function(data,
                                  )
         }
     } else {
-        ## Sequential processing with lapply
+        ## Sequential processing with lapply()
+        ## Used when: parallel = FALSE, single predictor, or Windows during R CMD check
         results <- lapply(predictors, fit_one_predictor)
     }
     

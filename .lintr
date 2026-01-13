@@ -1,8 +1,8 @@
 linters: linters_with_defaults(
-    line_length_linter(120),  # Allow up to 120 characters (CRAN suggests 80-100)
-    object_name_linter = NULL,  # Don't enforce specific naming conventions
-    cyclocomp_linter = NULL,  # Don't check cyclomatic complexity
-    commented_code_linter = NULL  # Allow commented code for examples
+    line_length_linter(120),
+    object_name_linter = NULL,
+    cyclocomp_linter = NULL,
+    commented_code_linter = NULL
   )
 
 exclusions: list(
