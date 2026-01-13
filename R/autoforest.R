@@ -8,10 +8,10 @@
 #' @param x One of the following:
 #'   \itemize{
 #'     \item A fitted model object: \code{glm}, \code{lm}, \code{coxph}, etc.
-#'     \item A \code{fit_result} object from \code{\link{fit()}}
-#'     \item A \code{fullfit_result} object from \code{\link{fullfit()}}
-#'     \item A \code{uniscreen_result} object from \code{\link{uniscreen()}}
-#'     \item A \code{multifit_result} object from \code{\link{multifit()}}
+#'     \item A \code{fit_result} object from \code{\link{fit}}
+#'     \item A \code{fullfit_result} object from \code{\link{fullfit}}
+#'     \item A \code{uniscreen_result} object from \code{\link{uniscreen}}
+#'     \item A \code{multifit_result} object from \code{\link{multifit}}
 #'   }
 #'
 #' @param data Data frame or data.table containing the original data. Required 

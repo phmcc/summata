@@ -164,6 +164,7 @@ utils::globalVariables(c(
            "statistic",
            "status_var",
            "term",
+           "theta",
            "time_var",
            "tjur_r2",
            "treatment",

@@ -33,6 +33,11 @@ convert_units <- function(value, from = "in", to = "in", dpi = 96) {
 #' @return Character string with the font family name to use.
 #' @keywords internal
 detect_plot_font <- function() {
+    
+    if (!interactive()) {
+        return("sans")
+    }
+    
     if (requireNamespace("systemfonts", quietly = TRUE)) {
         available_fonts <- systemfonts::system_fonts()$family
         ## Check fonts in order of preference

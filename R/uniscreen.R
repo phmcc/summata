@@ -686,6 +686,13 @@ uniscreen <- function(data,
             cl <- parallel::makeCluster(n_cores)
             on.exit(parallel::stopCluster(cl), add = TRUE)
             
+            ## Load required packages on workers
+            parallel::clusterEvalQ(cl, {
+                library(summata)
+                library(data.table)
+                library(stats)
+            })
+            
             ## Export required objects to workers (including random for mixed models)
             parallel::clusterExport(cl, 
                                     varlist = c("data", "outcome", "model_type", "family", 
@@ -693,12 +700,6 @@ uniscreen <- function(data,
                                                 "keep_models", "show_n", "show_events", "m2dt"),
                                     envir = environment()
                                     )
-            
-            ## Load required packages on workers
-            parallel::clusterEvalQ(cl, {
-                library(data.table)
-                library(stats)
-            })
             
             ## Load survival if needed
             if (model_type %in% c("coxph", "clogit", "coxme")) {

@@ -23,12 +23,12 @@
 #' @param ... Additional arguments passed to the format-specific function. See
 #'   the documentation for individual functions for available parameters:
 #'   \itemize{
-#'     \item PDF: \code{\link{table2pdf()}} - orientation, paper, margins, fit_to_page, etc.
-#'     \item DOCX: \code{\link{table2docx()}} - font_size, font_family, caption, etc.
-#'     \item PPTX: \code{\link{table2pptx()}} - font_size, font_family, caption, etc.
-#'     \item HTML: \code{\link{table2html()}} - format_headers, zebra_stripes, etc.
-#'     \item RTF: \code{\link{table2rtf()}} - font_size, font_family, caption, etc.
-#'     \item TEX: \code{\link{table2tex()}} - caption, format_headers, align, etc.
+#'     \item PDF: \code{\link{table2pdf}} - orientation, paper, margins, fit_to_page, etc.
+#'     \item DOCX: \code{\link{table2docx}} - font_size, font_family, caption, etc.
+#'     \item PPTX: \code{\link{table2pptx}} - font_size, font_family, caption, etc.
+#'     \item HTML: \code{\link{table2html}} - format_headers, zebra_stripes, etc.
+#'     \item RTF: \code{\link{table2rtf}} - font_size, font_family, caption, etc.
+#'     \item TEX: \code{\link{table2tex}} - caption, format_headers, align, etc.
 #'   }
 #'   
 #'   Common parameters across formats include:
