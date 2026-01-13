@@ -289,7 +289,8 @@
 #'     outcome = "os_status",
 #'     predictors = c("age", "sex", "bmi", "smoking", "hypertension"),
 #'     model_type = "glm",
-#'     family = "binomial"
+#'     family = "binomial",
+#'     parallel = FALSE
 #' )
 #' print(screen1)
 #' 
@@ -299,7 +300,8 @@
 #'     data = clintrial,
 #'     outcome = "os_status",
 #'     predictors = c("age", "sex", "bmi", "treatment"),
-#'     labels = clintrial_labels
+#'     labels = clintrial_labels,
+#'     parallel = FALSE
 #' )
 #' print(screen2)
 #' 
@@ -311,7 +313,8 @@
 #'     predictors = c("age", "sex", "bmi", "smoking", "hypertension", 
 #'                   "diabetes", "ecog", "stage"),
 #'     p_threshold = 0.20,
-#'     labels = clintrial_labels
+#'     labels = clintrial_labels,
+#'     parallel = FALSE
 #' )
 #' print(screen3)
 #' # Only significant predictors are shown
@@ -323,7 +326,8 @@
 #'     outcome = "Surv(os_months, os_status)",
 #'     predictors = c("age", "sex", "treatment", "stage", "grade"),
 #'     model_type = "coxph",
-#'     labels = clintrial_labels
+#'     labels = clintrial_labels,
+#'     parallel = FALSE
 #' )
 #' print(cox_screen)
 #' # Returns hazard ratios (HR) instead of odds ratios
@@ -333,7 +337,8 @@
 #'     data = clintrial,
 #'     outcome = "os_status",
 #'     predictors = c("age", "bmi", "creatinine"),
-#'     keep_models = TRUE
+#'     keep_models = TRUE,
+#'     parallel = FALSE
 #' )
 #' 
 #' # Access stored models
@@ -347,7 +352,8 @@
 #'     outcome = "bmi",
 #'     predictors = c("age", "sex", "smoking", "creatinine", "hemoglobin"),
 #'     model_type = "lm",
-#'     labels = clintrial_labels
+#'     labels = clintrial_labels,
+#'     parallel = FALSE
 #' )
 #' print(linear_screen)
 #' 
@@ -359,7 +365,8 @@
 #'     predictors = c("age", "sex", "treatment", "surgery", "stage"),
 #'     model_type = "glm",
 #'     family = "poisson",
-#'     labels = clintrial_labels
+#'     labels = clintrial_labels,
+#'     parallel = FALSE
 #' )
 #' print(poisson_screen)
 #' # Returns rate ratios (RR)
@@ -371,7 +378,8 @@
 #'         outcome = "los_days",
 #'         predictors = c("age", "sex", "treatment", "surgery"),
 #'         model_type = "negbin",
-#'         labels = clintrial_labels
+#'         labels = clintrial_labels,
+#'         parallel = FALSE
 #'     )
 #'     print(nb_screen)
 #' }
@@ -383,7 +391,8 @@
 #'     predictors = c("age", "sex", "treatment", "surgery"),
 #'     model_type = "glm",
 #'     family = Gamma(link = "log"),
-#'     labels = clintrial_labels
+#'     labels = clintrial_labels,
+#'     parallel = FALSE
 #' )
 #' print(gamma_screen)
 #' 
@@ -392,7 +401,8 @@
 #'     data = clintrial,
 #'     outcome = "os_status",
 #'     predictors = c("treatment", "stage", "grade"),
-#'     reference_rows = FALSE
+#'     reference_rows = FALSE,
+#'     parallel = FALSE
 #' )
 #' print(screen10)
 #' # Reference categories not shown
@@ -413,7 +423,8 @@
 #'     outcome = "os_status",
 #'     predictors = c("age", "sex", "bmi"),
 #'     show_n = FALSE,
-#'     show_events = FALSE
+#'     show_events = FALSE,
+#'     parallel = FALSE
 #' )
 #' print(screen12)
 #' 
@@ -421,7 +432,8 @@
 #' screen13 <- uniscreen(
 #'     data = clintrial,
 #'     outcome = "os_status",
-#'     predictors = c("age", "sex", "treatment")
+#'     predictors = c("age", "sex", "treatment"),
+#'     parallel = FALSE
 #' )
 #' raw_data <- attr(screen13, "raw_data")
 #' print(raw_data)
@@ -434,6 +446,7 @@
 #'     predictors = c("age", "bmi"),
 #'     model_type = "glm",
 #'     family = "binomial",
+#'     parallel = FALSE,
 #'     exponentiate = FALSE  # Show log odds instead of OR
 #' )
 #' print(screen14)
@@ -444,7 +457,8 @@
 #'     outcome = "Surv(os_months, os_status)",
 #'     predictors = c("age", "sex", "bmi"),
 #'     model_type = "coxph",
-#'     weights = runif(nrow(clintrial), min = 0.5, max = 2)  # Random numbers for example
+#'     weights = runif(nrow(clintrial), min = 0.5, max = 2),  # Random numbers for example
+#'     parallel = FALSE
 #' )
 #' 
 #' # Example 16: Strict significance filter (p < 0.05)
@@ -454,7 +468,8 @@
 #'     predictors = c("age", "sex", "bmi", "smoking", "hypertension", 
 #'                   "diabetes", "ecog", "treatment", "stage", "grade"),
 #'     p_threshold = 0.05,
-#'     labels = clintrial_labels
+#'     labels = clintrial_labels,
+#'     parallel = FALSE
 #' )
 #' 
 #' # Check how many predictors passed the filter
@@ -468,7 +483,8 @@
 #'     outcome = "os_status",
 #'     predictors = c("age", "sex", "bmi", "smoking", "hypertension",
 #'                   "diabetes", "treatment", "stage", "grade"),
-#'     p_threshold = 0.20
+#'     p_threshold = 0.20,
+#'     parallel = FALSE
 #' )
 #' 
 #' # Step 2: Extract significant predictor names from raw data
@@ -479,7 +495,8 @@
 #'     data = clintrial,
 #'     outcome = "os_status",
 #'     predictors = sig_predictors,
-#'     labels = clintrial_labels
+#'     labels = clintrial_labels,
+#'     parallel = FALSE
 #' )
 #' print(multi_model)
 #'
@@ -493,7 +510,8 @@
 #'         model_type = "glmer",
 #'         random = "(1|site)",
 #'         family = "binomial",
-#'         labels = clintrial_labels
+#'         labels = clintrial_labels,
+#'         parallel = FALSE
 #'     )
 #'     print(glmer_screen)
 #' }
@@ -506,7 +524,8 @@
 #'         predictors = c("age", "sex", "treatment", "smoking"),
 #'         model_type = "lmer",
 #'         random = "(1|site)",
-#'         labels = clintrial_labels
+#'         labels = clintrial_labels,
+#'         parallel = FALSE
 #'     )
 #'     print(lmer_screen)
 #' }
@@ -519,7 +538,8 @@
 #'         predictors = c("age", "sex", "treatment", "stage"),
 #'         model_type = "coxme",
 #'         random = "(1|site)",
-#'         labels = clintrial_labels
+#'         labels = clintrial_labels,
+#'         parallel = FALSE
 #'     )
 #'     print(coxme_screen)
 #' }
@@ -533,7 +553,8 @@
 #'         predictors = c("age", "treatment"),
 #'         model_type = "glmer",
 #'         random = "(1|site/patient_id)",
-#'         family = "binomial"
+#'         family = "binomial",
+#'         parallel = FALSE
 #'     )
 #' }
 #' }
