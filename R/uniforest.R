@@ -1,12 +1,12 @@
 #' Create Forest Plot for Univariable Screening Results
 #'
-#' Generates a publication-ready forest plot from a \code{\link{uniscreen}} output
+#' Generates a publication-ready forest plot from a \code{uniscreen()} output
 #' object. The plot displays effect estimates (OR, HR, RR, or coefficients) with
 #' confidence intervals for each predictor tested in univariable analysis against
 #' a single outcome.
 #'
-#' @param x A uniscreen result object (data.table with class \code{uniscreen_result}
-#'   from \code{\link{uniscreen}}).
+#' @param x Univariable screen result object (data.table with class attributes
+#'   from \code{uniscreen()}).
 #'   
 #' @param title Character string specifying the plot title. Default is 
 #'   \code{"Univariable Screening"}. Use descriptive titles for publication.

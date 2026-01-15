@@ -5,13 +5,13 @@
 #' with statistical testing. Designed for creating survival summaries commonly
 #' used in clinical and epidemiological research publications.
 #'
-#' @param data A data.frame or data.table containing the survival dataset.
-#'   The function automatically converts data.frames to data.tables for
+#' @param data Data frame or data.table containing the survival dataset.
+#'   The function automatically converts data frames to data.tables for
 #'   efficient processing.
 #'
 #' @param outcome Character string specifying the survival outcome using
 #'   \code{Surv()} syntax (e.g., \code{"Surv(os_months, os_status)"}). This
-#'   follows the same convention as other summata functions like \code{fit()}
+#'   follows the same convention as other \pkg{summata} functions like \code{fit()}
 #'   and \code{fullfit()}.
 #'
 #' @param by Character string specifying the column name of the stratifying

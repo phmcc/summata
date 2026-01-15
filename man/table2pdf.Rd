@@ -32,9 +32,9 @@ table2pdf(
 )
 }
 \arguments{
-\item{table}{A data.frame, data.table, or matrix to export. Can be output from 
-\code{\link{desctable}}, \code{\link{fit}}, \code{\link{uniscreen}}, 
-\code{\link{fullfit}}, \code{\link{compfit}}, or any tabular data structure.}
+\item{table}{Data frame, data.table, or matrix to export. Can be output from 
+\code{desctable()}, \code{fit()}, \code{uniscreen()}, 
+\code{fullfit()}, \code{compfit()}, or any tabular data structure.}
 
 \item{file}{Character string specifying the output PDF filename. Must have 
 \code{.pdf} extension. Example: \code{"results.pdf"}, \code{"Table1.pdf"}.}
@@ -48,7 +48,7 @@ table2pdf(
 \item{paper}{Character string specifying paper size:
 \itemize{
   \item \code{"letter"} - US Letter (8.5" x 11") [default]
-  \item \code{"a4"} - A4 (210mm x 297mm)
+  \item \code{"a4"} - A4 (210 mm x 297 mm)
   \item \code{"legal"} - US Legal (8.5" x 14")
   \item \code{"auto"} - Auto-size to content (no margins, crops to fit)
 }}
@@ -161,7 +161,7 @@ Converts a data frame, data.table, or matrix to a professionally formatted PDF
 document using LaTeX as an intermediate format. Provides extensive control over 
 page layout, typography, and formatting for publication-ready output. Particularly 
 well-suited for tables from regression analyses, descriptive statistics, and 
-model comparisons.
+model comparisons. Requires \pkg{xtable} for export.
 }
 \details{
 \strong{LaTeX Requirements:}
@@ -240,11 +240,11 @@ For wide tables that don't fit on the page:
 
 This function is specifically designed for tables produced by:
 \itemize{
-  \item \code{\link{desctable}} - Descriptive statistics tables
-  \item \code{\link{fit}} - Single model regression tables
-  \item \code{\link{uniscreen}} - Univariable screening tables
-  \item \code{\link{fullfit}} - Combined univariable/multivariable tables
-  \item \code{\link{compfit}} - Model comparison tables
+  \item \code{desctable()} - Descriptive statistics tables
+  \item \code{fit()} - Single model regression tables
+  \item \code{uniscreen()} - Univariable screening tables
+  \item \code{fullfit()} - Combined univariable/multivariable tables
+  \item \code{compfit()} - Model comparison tables
 }
 
 The function automatically detects and formats these table types, including:

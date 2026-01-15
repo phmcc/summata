@@ -31,20 +31,4 @@ matches/contains the variable label.
 This function is designed for binary (2-level) categorical variables where
 one level is a reference and one is the "event" or "condition" level.
 }
-\examples{
-\dontrun{
-# Standard Yes/No - should condense
-should_condense_binary("No", "Yes", "Diabetes")
-# Returns TRUE (both are standard values)
-
-# Descriptive levels matching label - should condense
-should_condense_binary("No 30-day readmission", "30-day readmission", 
-                       "30-Day Readmission")
-# Returns TRUE (levels match/contain label)
-
-# Custom levels not matching - should NOT condense
-should_condense_binary("Group A", "Group B", "Treatment Arm")
-# Returns FALSE (neither is standard nor matches label)
-}
-}
 \keyword{internal}

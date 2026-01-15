@@ -18,30 +18,33 @@ validate_fit_inputs(
 )
 }
 \arguments{
-\item{data}{Data frame}
+\item{data}{Data frame or data.table containing all variables.}
 
-\item{outcome}{Outcome specification}
+\item{outcome}{Character string outcome specification (may include Surv()).}
 
-\item{predictors}{Predictor names}
+\item{predictors}{Character vector of predictor variable names.}
 
-\item{model_type}{Model type}
+\item{model_type}{Character string model type to validate.}
 
-\item{family}{GLM family}
+\item{family}{GLM family object, function, or string if applicable.}
 
-\item{conf_level}{Confidence level}
+\item{conf_level}{Numeric confidence level (must be between 0 and 1).}
 
-\item{digits}{Effect estimate digits}
+\item{digits}{Integer number of decimal places for effect estimates.}
 
-\item{p_digits}{P-value digits}
+\item{p_digits}{Integer number of decimal places for p-values.}
 
-\item{p_threshold}{P-value threshold}
+\item{p_threshold}{Numeric p-value threshold for significance highlighting.}
 
-\item{auto_correct_model}{Auto-correct model type mismatches}
+\item{auto_correct_model}{Logical whether to auto-correct model type mismatches.}
 }
 \value{
-List with validated model_type, family, auto_corrected flag
+List with validated model_type, family, auto_corrected flag.
 }
 \description{
-Master validation function called by fit(), uniscreen(), fullfit().
+Master validation function called by fit(), uniscreen(), fullfit(). Performs
+comprehensive checks on data structure, variable existence, numeric parameter
+ranges, and model-outcome consistency. Returns validated parameters with
+auto-corrections applied when appropriate.
 }
 \keyword{internal}

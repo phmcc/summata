@@ -7,7 +7,7 @@
 extract_model_metrics(model, raw_data, model_type)
 }
 \arguments{
-\item{model}{A fitted model object.}
+\item{model}{Fitted model object.}
 
 \item{raw_data}{Data.table with raw model information.}
 

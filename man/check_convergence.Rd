@@ -7,7 +7,7 @@
 check_convergence(model)
 }
 \arguments{
-\item{model}{A fitted model object.}
+\item{model}{Fitted model object.}
 }
 \value{
 Character string: "Yes", "No", "Suspect", or "Failed"

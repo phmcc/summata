@@ -18,7 +18,35 @@ process_survival(
   ...
 )
 }
+\arguments{
+\item{data}{Data.table containing the survival variables.}
+
+\item{var}{Character string with Surv() expression (e.g., "Surv(time, status)").}
+
+\item{var_label}{Character string label for display.}
+
+\item{group_var}{Optional character string naming the grouping variable.}
+
+\item{digits}{Integer number of decimal places.}
+
+\item{na_include}{Logical whether to include missing values.}
+
+\item{na_label}{Character string label for missing values.}
+
+\item{test}{Logical whether to perform log-rank test.}
+
+\item{total}{Logical or character controlling total column display.}
+
+\item{total_label}{Character string label for total column.}
+
+\item{...}{Additional arguments (currently unused).}
+}
+\value{
+List with 'formatted' and 'raw' data.table components.
+}
 \description{
-Process survival variable
+Calculates survival statistics including median survival times with 95%
+confidence intervals, with optional grouping and log-rank testing. Parses
+Surv() expressions and uses \pkg{survival} package functions.
 }
 \keyword{internal}

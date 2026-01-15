@@ -28,22 +28,22 @@ fit(
 )
 }
 \arguments{
-\item{data}{A data.frame or data.table containing the analysis dataset. 
+\item{data}{Data frame or data.table containing the analysis dataset. 
 Required for formula-based workflow; optional for model-based workflow
 (extracted from model if not provided).}
 
 \item{outcome}{Character string specifying the outcome variable name. For 
-survival analysis, use \code{Surv()} syntax from the survival package 
+survival analysis, use \code{Surv()} syntax from the \pkg{survival} package 
 (e.g., \code{"Surv(time, status)"} or \code{"Surv(os_months, os_status)"}).
 Required for formula-based workflow; ignored if \code{model} is provided.}
 
 \item{predictors}{Character vector of predictor variable names to include in 
 the model. All predictors are included simultaneously (multivariable model). 
 For univariable models, provide a single predictor. Can include continuous, 
-categorical (factor), or binary variables.
-Required for formula-based workflow; ignored if \code{model} is provided.}
+categorical (factor), or binary variables. Required for formula-based
+workflow; ignored if \code{model} is provided.}
 
-\item{model}{Optional. A pre-fitted model object to format. When provided,
+\item{model}{Optional pre-fitted model object to format. When provided,
 \code{outcome} and \code{predictors} are ignored and the model is formatted
 directly. Supported model classes include:
 \itemize{
@@ -61,21 +61,21 @@ Ignored if \code{model} is provided. Options include:
   \item \code{"glm"} - Generalized linear model (default). Supports multiple 
     distributions via the \code{family} parameter including logistic, Poisson, 
     Gamma, Gaussian, and quasi-likelihood models.
-  \item \code{"negbin"} - Negative binomial regression for overdispersed count 
-    data (requires MASS package). Estimates an additional dispersion parameter 
-    compared to Poisson regression.
   \item \code{"lm"} - Linear regression for continuous outcomes with normally 
     distributed errors. Equivalent to \code{glm} with \code{family = "gaussian"}.
   \item \code{"coxph"} - Cox proportional hazards model for time-to-event 
     survival analysis. Requires \code{Surv()} outcome syntax.
   \item \code{"clogit"} - Conditional logistic regression for matched 
     case-control studies or stratified analyses.
+  \item \code{"negbin"} - Negative binomial regression for overdispersed count 
+    data (requires MASS package). Estimates an additional dispersion parameter 
+    compared to Poisson regression.
+  \item \code{"lmer"} - Linear mixed-effects model for hierarchical or clustered 
+    data with continuous outcomes (requires \pkg{lme4} package).
+  \item \code{"glmer"} - Generalized linear mixed-effects model for hierarchical 
+    or clustered data with non-normal outcomes (requires \pkg{lme4} package).
   \item \code{"coxme"} - Cox mixed-effects model for clustered survival data 
     (requires coxme package).
-  \item \code{"lmer"} - Linear mixed-effects model for hierarchical or clustered 
-    data with continuous outcomes (requires lme4 package).
-  \item \code{"glmer"} - Generalized linear mixed-effects model for hierarchical 
-    or clustered data with non-normal outcomes (requires lme4 package).
 }}
 
 \item{family}{For GLM and GLMER models, specifies the error distribution and link 
@@ -530,7 +530,7 @@ cat("C-statistic:", raw$c_statistic[1], "\n")
 }
 
 # Example 18: Linear mixed effects model with site random effects
-# (Requires lme4 package)
+# (Requires \pkg{lme4} package)
 \dontrun{
 library(lme4)
 lmer_model <- fit(

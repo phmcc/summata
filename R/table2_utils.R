@@ -676,7 +676,7 @@ condense_table_rows <- function(df, indent_groups = TRUE) {
 #' while preserving all categorical variable rows (including binary).
 #' Only applies to descriptive tables from desctable().
 #' 
-#' @param df A data.table or data.frame
+#' @param df Data.table or data frame
 #' @param indent_groups Logical. Whether to apply indentation formatting.
 #' @return A data.table with condensed continuous/survival rows
 #' @keywords internal
@@ -765,7 +765,7 @@ condense_quantitative_rows <- function(df, indent_groups = TRUE) {
 
 #' Core flextable processing function
 #' 
-#' Central processing function for creating flextable objects from data tables.
+#' Central processing function for creating \pkg{flextable} objects from data tables.
 #' Handles N row extraction, condensing, indentation, zebra stripes, formatting,
 #' and styling. Used by table2docx, table2pptx, and table2rtf.
 #' 
@@ -786,7 +786,7 @@ condense_quantitative_rows <- function(df, indent_groups = TRUE) {
 #' @param orientation Character string page orientation.
 #' @param width Optional numeric table width in inches.
 #' @param align Optional alignment specification.
-#' @return List with ft (flextable object) and caption components.
+#' @return List with ft (\pkg{flextable} object) and caption components.
 #' @keywords internal
 process_table_for_flextable <- function(table,
                                         caption = NULL,
@@ -984,11 +984,11 @@ replace_empty_cells <- function(df) {
 
 #' Apply zebra stripes with proper variable group detection for indented tables
 #' 
-#' Applies alternating background colors to variable groups in flextable objects.
+#' Applies alternating background colors to variable groups in \pkg{flextable} objects.
 #' Handles both indented tables (detects groups by leading whitespace) and
 #' non-indented tables (uses pre-identified groups).
 #' 
-#' @param ft A flextable object.
+#' @param ft \pkg{flextable} object.
 #' @param df The source data.table used to create the flextable.
 #' @param var_groups List of row index vectors for variable groups.
 #' @return Flextable object with zebra stripe formatting applied.
@@ -1080,10 +1080,10 @@ calculate_table_width <- function(paper, orientation) {
 #' Applies formatting to flextable headers including italicizing 'n',
 #' adding sample size counts from N row data, and bolding all headers.
 #' 
-#' @param ft A flextable object.
+#' @param ft \pkg{flextable} object.
 #' @param has_n_row Logical whether source data had an N row.
 #' @param n_row_data Data from the N row for adding counts to headers.
-#' @return Formatted flextable object.
+#' @return Formatted \pkg{flextable} object.
 #' @keywords internal
 format_headers_ft <- function(ft, has_n_row, n_row_data) {
     col_names <- names(ft$body$dataset)
@@ -1121,10 +1121,10 @@ format_headers_ft <- function(ft, has_n_row, n_row_data) {
 
 #' Bold significant p-values in DOCX
 #' 
-#' Applies bold formatting to significant p-values in flextable objects
+#' Applies bold formatting to significant p-values in \pkg{flextable} objects
 #' by detecting values below threshold or "< 0.001" patterns.
 #' 
-#' @param ft A flextable object.
+#' @param ft \pkg{flextable} object.
 #' @param df The source data.table.
 #' @param p_threshold Numeric p-value threshold for significance.
 #' @return Flextable object with significant p-values bolded.

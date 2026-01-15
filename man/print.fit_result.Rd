@@ -7,7 +7,7 @@
 \method{print}{fit_result}(x, ...)
 }
 \arguments{
-\item{x}{A fit_result object.}
+\item{x}{fit_result object.}
 
 \item{...}{Additional arguments passed to print methods.}
 }

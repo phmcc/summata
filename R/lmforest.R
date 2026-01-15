@@ -8,12 +8,12 @@
 #' presentations.
 #'
 #' @param x Either a fitted linear model object (class \code{lm} or \code{lmerMod}), 
-#'   a \code{fit_result} object from \code{\link{fit}}, or a \code{fullfit_result}
-#'   object from \code{\link{fullfit}}. When a \code{fit_result} or \code{fullfit_result}
+#'   a \code{fit_result} object from \code{fit()}, or a \code{fullfit_result}
+#'   object from \code{fullfit()}. When a \code{fit_result} or \code{fullfit_result}
 #'   is provided, the model, data, and labels are automatically extracted.
-#'   Note: GLM objects are not accepted - use \code{\link{glmforest}} instead.
+#'   Note: GLM objects are not accepted - use \code{glmforest()} instead.
 #'   
-#' @param data A data.frame or data.table containing the original data used to 
+#' @param data Data frame or data.table containing the original data used to 
 #'   fit the model. If \code{NULL} (default) and \code{x} is a model, the function 
 #'   attempts to extract data from the model object. If \code{x} is a \code{fit_result},
 #'   data is extracted automatically. Providing data explicitly is recommended when
@@ -97,7 +97,7 @@
 #'   hex codes or R color names.
 #'
 #' @param qc_footer Logical. If \code{TRUE}, displays model quality control
-#'   statistics in the footer (observations analyzed, R-squared, adjusted R-squared,
+#'   statistics in the footer (observations analyzed, R², adjusted R²,
 #'   F-statistic, AIC). Default is \code{TRUE}.
 #'
 #' @return A \code{ggplot} object containing the complete forest plot. The plot 

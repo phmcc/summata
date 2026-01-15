@@ -32,10 +32,11 @@ fullfit(
 }
 \arguments{
 \item{data}{Data.frame or data.table containing the analysis dataset. The 
-function automatically converts data.frames to data.tables for processing.}
+function automatically converts data frames to data.tables for processing.}
 
 \item{outcome}{Character string specifying the outcome variable name. For 
-survival analysis, use \code{Surv()} syntax (e.g., \code{"Surv(os_months, os_status)"}).}
+time-to-event analysis, use \code{Surv()} syntax for the outcome variable
+(e.g., \code{"Surv(os_months, os_status)"}).}
 
 \item{predictors}{Character vector of predictor variable names to analyze. 
 All predictors are tested in univariable models. The subset included in 

@@ -7,7 +7,7 @@
 get_event_variable(model, model_class)
 }
 \arguments{
-\item{model}{A fitted survival model object.}
+\item{model}{Fitted survival model object.}
 
 \item{model_class}{Character string of the model class.}
 }

@@ -7,7 +7,7 @@
 get_model_type_name(model)
 }
 \arguments{
-\item{model}{A fitted model object.}
+\item{model}{Fitted model object.}
 }
 \value{
 Character string with readable model type name.

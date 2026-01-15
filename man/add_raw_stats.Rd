@@ -6,7 +6,20 @@
 \usage{
 add_raw_stats(row, col, stats, stat_type)
 }
+\arguments{
+\item{row}{Data.table row to modify.}
+
+\item{col}{Character string column name for the statistics.}
+
+\item{stats}{Named list of numeric statistics (mean, sd, median, etc.).}
+
+\item{stat_type}{Character string indicating which statistic is displayed.}
+}
+\value{
+Modified row (by reference).
+}
 \description{
-Add raw statistics to row
+Appends raw numeric statistics to a data.table row for downstream processing.
+Used to preserve underlying values alongside formatted display strings.
 }
 \keyword{internal}

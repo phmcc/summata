@@ -7,7 +7,7 @@
 \method{print}{fullfit_result}(x, ...)
 }
 \arguments{
-\item{x}{A fullfit_result object.}
+\item{x}{fullfit_result object.}
 
 \item{...}{Additional arguments passed to print methods.}
 }

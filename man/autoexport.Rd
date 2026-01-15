@@ -7,9 +7,9 @@
 autoexport(table, file, ...)
 }
 \arguments{
-\item{table}{A data.frame, data.table, or matrix to export. Can be output from 
-\code{\link{desctable}}, \code{\link{fit}}, \code{\link{uniscreen}}, 
-\code{\link{fullfit}}, \code{\link{compfit}}, or any tabular data structure.}
+\item{table}{Data frame, data.table, or matrix to export. Can be output from 
+\code{desctable()}, \code{fit()}, \code{uniscreen()}, \code{fullfit()},
+\code{compfit()}, or any tabular data structure.}
 
 \item{file}{Character string specifying the output filename. The file extension
 determines the export format:
@@ -24,25 +24,25 @@ determines the export format:
 
 \item{...}{Additional arguments passed to the format-specific function. See
 the documentation for individual functions for available parameters:
-\itemize{
-  \item PDF: \code{\link{table2pdf}} - orientation, paper, margins, fit_to_page, etc.
-  \item DOCX: \code{\link{table2docx}} - font_size, font_family, caption, etc.
-  \item PPTX: \code{\link{table2pptx}} - font_size, font_family, caption, etc.
-  \item HTML: \code{\link{table2html}} - format_headers, zebra_stripes, etc.
-  \item RTF: \code{\link{table2rtf}} - font_size, font_family, caption, etc.
-  \item TEX: \code{\link{table2tex}} - caption, format_headers, align, etc.
+\describe{
+  \item{PDF}{\code{table2pdf()} - orientation, paper, margins, fit_to_page, etc.}
+  \item{DOCX}{\code{table2docx()} - font_size, font_family, caption, etc.}
+  \item{PPTX}{\code{table2pptx()} - font_size, font_family, caption, etc.}
+  \item{HTML}{\code{table2html()} - format_headers, zebra_stripes, etc.}
+  \item{RTF}{\code{table2rtf()} - font_size, font_family, caption, etc.}
+  \item{TEX}{\code{table2tex()} - caption, format_headers, align, etc.}
 }
 
 Common parameters across formats include:
-\itemize{
-  \item \code{caption} - Table caption (supported by most formats)
-  \item \code{font_size} - Base font size in points (PDF, DOCX, PPTX, RTF)
-  \item \code{format_headers} - Format column headers (all formats)
-  \item \code{bold_significant} - Bold significant p-values (all formats)
-  \item \code{p_threshold} - P-value threshold for bolding (all formats)
-  \item \code{indent_groups} - Indent factor levels (all formats)
-  \item \code{condense_table} - Condense to essential rows (all formats)
-  \item \code{zebra_stripes} - Alternating background colors (most formats)
+\describe{
+  \item{\code{caption}}{Table caption (supported by most formats)}
+  \item{\code{font_size}}{Base font size in points (PDF, DOCX, PPTX, RTF)}
+  \item{\code{format_headers}}{Format column headers (all formats)}
+  \item{\code{bold_significant}}{Bold significant p-values (all formats)}
+  \item{\code{p_threshold}}{P-value threshold for bolding (all formats)}
+  \item{\code{indent_groups}}{Indent factor levels (all formats)}
+  \item{\code{condense_table}}{Condense to essential rows (all formats)}
+  \item{\code{zebra_stripes}}{Alternating background colors (most formats)}
 }}
 }
 \value{
@@ -51,8 +51,7 @@ Invisibly returns the file path. Called primarily for its side effect
 }
 \description{
 Automatically detects the output format based on file extension and exports
-the table using the appropriate specialized function - table2pdf(), table2docx(), 
-table2pptx(), table2html(), table2rtf(), or table2tex(). Provides a unified interface
+the table using the appropriate specialized function. Provides a unified interface
 for table export across all supported formats.
 }
 \details{
@@ -65,9 +64,9 @@ For format-specific advanced features, you may prefer to use the individual
 export functions directly:
 \itemize{
   \item PDF exports support orientation, paper size, margins, and auto-sizing
-  \item DOCX/PPTX/RTF support font customization and flextable formatting
+  \item DOCX/PPTX/RTF support font customization and \pkg{flextable} formatting
   \item HTML supports CSS styling, responsive design, and custom themes
-  \item TEX generates standalone LaTeX source with booktabs styling
+  \item TeX generates standalone LaTeX source with booktabs styling
 }
 }
 \examples{

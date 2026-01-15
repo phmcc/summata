@@ -2,11 +2,20 @@
 % Please edit documentation in R/desc_utils.R
 \name{format_pvalues_desctable}
 \alias{format_pvalues_desctable}
-\title{Format p-values in result table}
+\title{Format p-values for descriptive tables}
 \usage{
 format_pvalues_desctable(result, p_digits)
 }
+\arguments{
+\item{result}{Data.table with 'p_value' column to format.}
+
+\item{p_digits}{Integer number of decimal places for p-values.}
+}
+\value{
+Modified data.table with 'p-value' column (formatted strings).
+}
 \description{
-Format p-values in result table
+Converts numeric p-values to formatted strings with appropriate precision.
+Handles very small p-values with threshold notation (e.g., "< 0.001").
 }
 \keyword{internal}

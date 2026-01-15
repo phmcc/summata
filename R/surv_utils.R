@@ -539,6 +539,8 @@ add_pvalue_column <- function(result, p_value, p_digits) {
 
 #' Format p-value for survtable
 #'
+#' Provides p-value formatting to the survtable result.
+#'
 #' @param p Numeric p-value.
 #' @param digits Integer decimal places.
 #' @return Character formatted p-value.

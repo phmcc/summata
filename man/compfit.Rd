@@ -21,7 +21,7 @@ compfit(
 )
 }
 \arguments{
-\item{data}{A data frame or data.table containing the dataset.}
+\item{data}{Data frame or data.table containing the dataset.}
 
 \item{outcome}{Character string specifying the outcome variable. For survival
 analysis, use Surv() syntax (e.g., "Surv(time, status)").}

@@ -7,7 +7,7 @@
 bold_pvalues_ft(ft, df, p_threshold = 0.05)
 }
 \arguments{
-\item{ft}{A flextable object.}
+\item{ft}{\pkg{flextable} object.}
 
 \item{df}{The source data.table.}
 
@@ -17,7 +17,7 @@ bold_pvalues_ft(ft, df, p_threshold = 0.05)
 Flextable object with significant p-values bolded.
 }
 \description{
-Applies bold formatting to significant p-values in flextable objects
+Applies bold formatting to significant p-values in \pkg{flextable} objects
 by detecting values below threshold or "< 0.001" patterns.
 }
 \keyword{internal}

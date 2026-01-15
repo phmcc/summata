@@ -27,12 +27,12 @@ uniscreen(
 )
 }
 \arguments{
-\item{data}{A data.frame or data.table containing the analysis dataset. The 
-function automatically converts data.frames to data.tables for efficient 
+\item{data}{Data frame or data.table containing the analysis dataset. The 
+function automatically converts data frames to data.tables for efficient 
 processing.}
 
 \item{outcome}{Character string specifying the outcome variable name. For 
-survival analysis, use \code{Surv()} syntax from the survival package 
+survival analysis, use \code{Surv()} syntax from the \pkg{survival} package 
 (e.g., \code{"Surv(time, status)"} or \code{"Surv(os_months, os_status)"}).}
 
 \item{predictors}{Character vector of predictor variable names to screen. Each 
@@ -45,20 +45,20 @@ fit. Options include:
   \item \code{"glm"} - Generalized linear model (default). Supports multiple 
     distributions via the \code{family} parameter including logistic, Poisson, 
     Gamma, Gaussian, and quasi-likelihood models.
-  \item \code{"negbin"} - Negative binomial regression for overdispersed count 
-    data (requires MASS package). Estimates an additional dispersion parameter 
-    compared to Poisson regression.
   \item \code{"lm"} - Linear regression for continuous outcomes with normally 
     distributed errors. Equivalent to \code{glm} with \code{family = "gaussian"}.
   \item \code{"coxph"} - Cox proportional hazards model for time-to-event 
     survival analysis. Requires \code{Surv()} outcome syntax.
   \item \code{"clogit"} - Conditional logistic regression for matched 
     case-control studies or stratified analyses.
+  \item \code{"negbin"} - Negative binomial regression for overdispersed count 
+    data (requires MASS package). Estimates an additional dispersion parameter 
+    compared to Poisson regression.
   \item \code{"glmer"} - Generalized linear mixed-effects model for hierarchical 
-    or clustered data with non-normal outcomes (requires lme4 package and 
+    or clustered data with non-normal outcomes (requires \pkg{lme4} package and 
     \code{random} parameter).
   \item \code{"lmer"} - Linear mixed-effects model for hierarchical or clustered 
-    data with continuous outcomes (requires lme4 package and \code{random} 
+    data with continuous outcomes (requires \pkg{lme4} package and \code{random} 
     parameter).
   \item \code{"coxme"} - Cox mixed-effects model for clustered survival data 
     (requires coxme package and \code{random} parameter).
@@ -311,7 +311,8 @@ screen1 <- uniscreen(
     outcome = "os_status",
     predictors = c("age", "sex", "bmi", "smoking", "hypertension"),
     model_type = "glm",
-    family = "binomial"
+    family = "binomial",
+    parallel = FALSE
 )
 print(screen1)
 
@@ -321,7 +322,8 @@ screen2 <- uniscreen(
     data = clintrial,
     outcome = "os_status",
     predictors = c("age", "sex", "bmi", "treatment"),
-    labels = clintrial_labels
+    labels = clintrial_labels,
+    parallel = FALSE
 )
 print(screen2)
 
@@ -333,7 +335,8 @@ screen3 <- uniscreen(
     predictors = c("age", "sex", "bmi", "smoking", "hypertension", 
                   "diabetes", "ecog", "stage"),
     p_threshold = 0.20,
-    labels = clintrial_labels
+    labels = clintrial_labels,
+    parallel = FALSE
 )
 print(screen3)
 # Only significant predictors are shown
@@ -345,7 +348,8 @@ cox_screen <- uniscreen(
     outcome = "Surv(os_months, os_status)",
     predictors = c("age", "sex", "treatment", "stage", "grade"),
     model_type = "coxph",
-    labels = clintrial_labels
+    labels = clintrial_labels,
+    parallel = FALSE
 )
 print(cox_screen)
 # Returns hazard ratios (HR) instead of odds ratios
@@ -355,7 +359,8 @@ screen5 <- uniscreen(
     data = clintrial,
     outcome = "os_status",
     predictors = c("age", "bmi", "creatinine"),
-    keep_models = TRUE
+    keep_models = TRUE,
+    parallel = FALSE
 )
 
 # Access stored models
@@ -369,7 +374,8 @@ linear_screen <- uniscreen(
     outcome = "bmi",
     predictors = c("age", "sex", "smoking", "creatinine", "hemoglobin"),
     model_type = "lm",
-    labels = clintrial_labels
+    labels = clintrial_labels,
+    parallel = FALSE
 )
 print(linear_screen)
 
@@ -381,7 +387,8 @@ poisson_screen <- uniscreen(
     predictors = c("age", "sex", "treatment", "surgery", "stage"),
     model_type = "glm",
     family = "poisson",
-    labels = clintrial_labels
+    labels = clintrial_labels,
+    parallel = FALSE
 )
 print(poisson_screen)
 # Returns rate ratios (RR)
@@ -390,10 +397,11 @@ print(poisson_screen)
 if (requireNamespace("MASS", quietly = TRUE)) {
     nb_screen <- uniscreen(
         data = clintrial,
-        outcome = "los_days",
+        outcome = "event_count",
         predictors = c("age", "sex", "treatment", "surgery"),
         model_type = "negbin",
-        labels = clintrial_labels
+        labels = clintrial_labels,
+        parallel = FALSE
     )
     print(nb_screen)
 }
@@ -405,7 +413,8 @@ gamma_screen <- uniscreen(
     predictors = c("age", "sex", "treatment", "surgery"),
     model_type = "glm",
     family = Gamma(link = "log"),
-    labels = clintrial_labels
+    labels = clintrial_labels,
+    parallel = FALSE
 )
 print(gamma_screen)
 
@@ -414,7 +423,8 @@ screen10 <- uniscreen(
     data = clintrial,
     outcome = "os_status",
     predictors = c("treatment", "stage", "grade"),
-    reference_rows = FALSE
+    reference_rows = FALSE,
+    parallel = FALSE
 )
 print(screen10)
 # Reference categories not shown
@@ -435,7 +445,8 @@ screen12 <- uniscreen(
     outcome = "os_status",
     predictors = c("age", "sex", "bmi"),
     show_n = FALSE,
-    show_events = FALSE
+    show_events = FALSE,
+    parallel = FALSE
 )
 print(screen12)
 
@@ -443,7 +454,8 @@ print(screen12)
 screen13 <- uniscreen(
     data = clintrial,
     outcome = "os_status",
-    predictors = c("age", "sex", "treatment")
+    predictors = c("age", "sex", "treatment"),
+    parallel = FALSE
 )
 raw_data <- attr(screen13, "raw_data")
 print(raw_data)
@@ -456,6 +468,7 @@ screen14 <- uniscreen(
     predictors = c("age", "bmi"),
     model_type = "glm",
     family = "binomial",
+    parallel = FALSE,
     exponentiate = FALSE  # Show log odds instead of OR
 )
 print(screen14)
@@ -466,7 +479,8 @@ screen15 <- uniscreen(
     outcome = "Surv(os_months, os_status)",
     predictors = c("age", "sex", "bmi"),
     model_type = "coxph",
-    weights = runif(nrow(clintrial), min = 0.5, max = 2)  # Random numbers for example
+    weights = runif(nrow(clintrial), min = 0.5, max = 2),  # Random numbers for example
+    parallel = FALSE
 )
 
 # Example 16: Strict significance filter (p < 0.05)
@@ -476,7 +490,8 @@ sig_only <- uniscreen(
     predictors = c("age", "sex", "bmi", "smoking", "hypertension", 
                   "diabetes", "ecog", "treatment", "stage", "grade"),
     p_threshold = 0.05,
-    labels = clintrial_labels
+    labels = clintrial_labels,
+    parallel = FALSE
 )
 
 # Check how many predictors passed the filter
@@ -490,7 +505,8 @@ candidates <- uniscreen(
     outcome = "os_status",
     predictors = c("age", "sex", "bmi", "smoking", "hypertension",
                   "diabetes", "treatment", "stage", "grade"),
-    p_threshold = 0.20
+    p_threshold = 0.20,
+    parallel = FALSE
 )
 
 # Step 2: Extract significant predictor names from raw data
@@ -515,7 +531,8 @@ if (requireNamespace("lme4", quietly = TRUE)) {
         model_type = "glmer",
         random = "(1|site)",
         family = "binomial",
-        labels = clintrial_labels
+        labels = clintrial_labels,
+        parallel = FALSE
     )
     print(glmer_screen)
 }
@@ -528,7 +545,8 @@ if (requireNamespace("lme4", quietly = TRUE)) {
         predictors = c("age", "sex", "treatment", "smoking"),
         model_type = "lmer",
         random = "(1|site)",
-        labels = clintrial_labels
+        labels = clintrial_labels,
+        parallel = FALSE
     )
     print(lmer_screen)
 }
@@ -541,7 +559,8 @@ if (requireNamespace("coxme", quietly = TRUE)) {
         predictors = c("age", "sex", "treatment", "stage"),
         model_type = "coxme",
         random = "(1|site)",
-        labels = clintrial_labels
+        labels = clintrial_labels,
+        parallel = FALSE
     )
     print(coxme_screen)
 }
@@ -555,7 +574,8 @@ if (requireNamespace("lme4", quietly = TRUE)) {
         predictors = c("age", "treatment"),
         model_type = "glmer",
         random = "(1|site/patient_id)",
-        family = "binomial"
+        family = "binomial",
+        parallel = FALSE
     )
 }
 }

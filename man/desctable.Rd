@@ -26,8 +26,8 @@ desctable(
 )
 }
 \arguments{
-\item{data}{A data.frame or data.table containing the dataset to summarize.
-The function automatically converts data.frames to data.tables for 
+\item{data}{Data frame or data.table containing the dataset to summarize.
+The function automatically converts data frames to data.tables for 
 efficient processing.}
 
 \item{by}{Character string specifying the column name of the grouping variable 
@@ -112,9 +112,9 @@ continuous variables:
 categorical variables:
 \itemize{
   \item \code{"auto"} - Automatic selection: Fisher's exact test if any 
-    expected cell frequency < 5, otherwise chi-squared [default]
-  \item \code{"fisher"} - Fisher's exact test
-  \item \code{"chisq"} - Chi-squared test
+    expected cell frequency < 5, otherwise χ² [default]
+  \item \code{"fisher"} - Fisher exact test
+  \item \code{"chisq"} - χ² test
 }}
 
 \item{total}{Logical or character string controlling the total column:
@@ -173,9 +173,9 @@ A data.table with S3 class \code{"desctable"} containing formatted
 \description{
 Generates comprehensive descriptive statistics tables with automatic variable 
 type detection, group comparisons, and appropriate statistical testing. This 
-function is designed to create "Table 1" style summaries commonly used in 
-clinical and epidemiological research, with full support for continuous, 
-categorical, and survival variables.
+function is designed to create "Table 1"-style summaries commonly used in 
+statistical research, with full support for continuous, categorical, and
+time-to-event variables.
 }
 \details{
 \strong{Variable Type Detection:}
@@ -187,7 +187,7 @@ summaries:
     statistics specified in \code{stats_continuous}
   \item \strong{Categorical}: Character, factor, or logical variables receive 
     frequency counts and percentages
-  \item \strong{Survival}: Variables specified as \code{Surv(time, event)} 
+  \item \strong{Time-to-Event}: Variables specified as \code{Surv(time, event)} 
     display median survival with 95\% confidence intervals
 }
 
@@ -198,8 +198,8 @@ When \code{test = TRUE} and \code{by} is specified:
   \item \strong{Continuous with "auto"}: Parametric tests (t-test, ANOVA) 
     for mean-based statistics; non-parametric tests (Wilcoxon, Kruskal-Wallis) 
     for median-based statistics
-  \item \strong{Categorical with "auto"}: Fisher's exact test when any 
-    expected cell frequency < 5; chi-squared test otherwise
+  \item \strong{Categorical with "auto"}: Fisher exact test when any 
+    expected cell frequency < 5; χ² test otherwise
   \item \strong{Survival}: Log-rank test for comparing survival curves
   \item \strong{Range statistics}: No p-value computed (ranges are descriptive)
 }
@@ -347,7 +347,7 @@ table1 <- desctable(clintrial,
 desctable(clintrial,
         by = "stage",  # Assuming stage has 3+ levels
         variables = c("age", "sex", "bmi"))
-# Automatically uses ANOVA/Kruskal-Wallis and chi-squared
+# Automatically uses ANOVA/Kruskal-Wallis and χ²
 
 # Example 17: Access raw unformatted data
 result <- desctable(clintrial,

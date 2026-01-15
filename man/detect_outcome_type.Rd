@@ -7,14 +7,17 @@
 detect_outcome_type(data, outcome)
 }
 \arguments{
-\item{data}{Data frame}
+\item{data}{Data frame or data.table containing the outcome variable.}
 
-\item{outcome}{Outcome variable name}
+\item{outcome}{Character string naming the outcome variable.}
 }
 \value{
-Character: "binary", "continuous", "count", or "unknown"
+Character string: "binary", "continuous", "count", or "unknown".
 }
 \description{
-Detect outcome type from data
+Automatically determines whether an outcome variable is binary, continuous,
+or count-based by examining the data values. Used for automatic model type
+selection and validation. Binary outcomes have 2 unique values, continuous
+have many values or non-integers, counts have integers >= 0.
 }
 \keyword{internal}

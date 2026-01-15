@@ -7,7 +7,7 @@
 detect_model_type(model)
 }
 \arguments{
-\item{model}{A fitted model object.}
+\item{model}{Fitted model object.}
 }
 \value{
 Character string: "Univariable" or "Multivariable".

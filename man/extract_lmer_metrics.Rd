@@ -7,7 +7,7 @@
 extract_lmer_metrics(model, raw_data, metrics)
 }
 \arguments{
-\item{model}{A fitted lmerMod object from lme4.}
+\item{model}{Fitted lmerMod object from lme4.}
 
 \item{raw_data}{Data.table with raw model information.}
 

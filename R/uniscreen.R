@@ -6,12 +6,12 @@
 #' crude associations before multivariable modeling. Returns publication-ready 
 #' formatted results with optional p-value filtering.
 #'
-#' @param data A data.frame or data.table containing the analysis dataset. The 
-#'   function automatically converts data.frames to data.tables for efficient 
+#' @param data Data frame or data.table containing the analysis dataset. The 
+#'   function automatically converts data frames to data.tables for efficient 
 #'   processing.
 #'   
 #' @param outcome Character string specifying the outcome variable name. For 
-#'   survival analysis, use \code{Surv()} syntax from the survival package 
+#'   survival analysis, use \code{Surv()} syntax from the \pkg{survival} package 
 #'   (e.g., \code{"Surv(time, status)"} or \code{"Surv(os_months, os_status)"}).
 #'   
 #' @param predictors Character vector of predictor variable names to screen. Each 
@@ -24,20 +24,20 @@
 #'     \item \code{"glm"} - Generalized linear model (default). Supports multiple 
 #'       distributions via the \code{family} parameter including logistic, Poisson, 
 #'       Gamma, Gaussian, and quasi-likelihood models.
-#'     \item \code{"negbin"} - Negative binomial regression for overdispersed count 
-#'       data (requires MASS package). Estimates an additional dispersion parameter 
-#'       compared to Poisson regression.
 #'     \item \code{"lm"} - Linear regression for continuous outcomes with normally 
 #'       distributed errors. Equivalent to \code{glm} with \code{family = "gaussian"}.
 #'     \item \code{"coxph"} - Cox proportional hazards model for time-to-event 
 #'       survival analysis. Requires \code{Surv()} outcome syntax.
 #'     \item \code{"clogit"} - Conditional logistic regression for matched 
 #'       case-control studies or stratified analyses.
+#'     \item \code{"negbin"} - Negative binomial regression for overdispersed count 
+#'       data (requires MASS package). Estimates an additional dispersion parameter 
+#'       compared to Poisson regression.
 #'     \item \code{"glmer"} - Generalized linear mixed-effects model for hierarchical 
-#'       or clustered data with non-normal outcomes (requires lme4 package and 
+#'       or clustered data with non-normal outcomes (requires \pkg{lme4} package and 
 #'       \code{random} parameter).
 #'     \item \code{"lmer"} - Linear mixed-effects model for hierarchical or clustered 
-#'       data with continuous outcomes (requires lme4 package and \code{random} 
+#'       data with continuous outcomes (requires \pkg{lme4} package and \code{random} 
 #'       parameter).
 #'     \item \code{"coxme"} - Cox mixed-effects model for clustered survival data 
 #'       (requires coxme package and \code{random} parameter).
@@ -375,7 +375,7 @@
 #' if (requireNamespace("MASS", quietly = TRUE)) {
 #'     nb_screen <- uniscreen(
 #'         data = clintrial,
-#'         outcome = "los_days",
+#'         outcome = "event_count",
 #'         predictors = c("age", "sex", "treatment", "surgery"),
 #'         model_type = "negbin",
 #'         labels = clintrial_labels,
@@ -495,8 +495,7 @@
 #'     data = clintrial,
 #'     outcome = "os_status",
 #'     predictors = sig_predictors,
-#'     labels = clintrial_labels,
-#'     parallel = FALSE
+#'     labels = clintrial_labels
 #' )
 #' print(multi_model)
 #'

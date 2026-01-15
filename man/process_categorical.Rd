@@ -20,7 +20,39 @@ process_categorical(
   ...
 )
 }
+\arguments{
+\item{data}{Data.table containing the variable.}
+
+\item{var}{Character string naming the variable to process.}
+
+\item{var_label}{Character string label for display.}
+
+\item{group_var}{Optional character string naming the grouping variable.}
+
+\item{stats}{Character vector of statistics to calculate.}
+
+\item{na_include}{Logical whether to include missing values as a category.}
+
+\item{na_label}{Character string label for missing values.}
+
+\item{test}{Logical whether to perform statistical tests.}
+
+\item{test_type}{Character string specifying test type.}
+
+\item{total}{Logical or character controlling total column display.}
+
+\item{total_label}{Character string label for total column.}
+
+\item{na_percent}{Logical whether to include NA in percentage denominators.}
+
+\item{...}{Additional arguments passed to test functions.}
+}
+\value{
+List with 'formatted' and 'raw' data.table components.
+}
 \description{
-Process categorical variable
+Calculates frequency and percentage statistics for categorical variables,
+with optional grouping and chi-square/Fisher's exact testing. Handles
+factor levels, missing values, and custom labeling.
 }
 \keyword{internal}

@@ -7,7 +7,7 @@
 extract_coxme_metrics(model, raw_data, metrics)
 }
 \arguments{
-\item{model}{A fitted coxme object from coxme package.}
+\item{model}{Fitted coxme object from coxme package.}
 
 \item{raw_data}{Data.table with raw model information.}
 

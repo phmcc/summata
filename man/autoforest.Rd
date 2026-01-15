@@ -10,10 +10,10 @@ autoforest(x, data = NULL, title = NULL, ...)
 \item{x}{One of the following:
 \itemize{
   \item A fitted model object: \code{glm}, \code{lm}, \code{coxph}, etc.
-  \item A \code{fit_result} object from \code{\link{fit}}
-  \item A \code{fullfit_result} object from \code{\link{fullfit}}
-  \item A \code{uniscreen_result} object from \code{\link{uniscreen}}
-  \item A \code{multifit_result} object from \code{\link{multifit}}
+  \item A \code{fit_result} object from \code{fit()}
+  \item A \code{fullfit_result} object from \code{fullfit()}
+  \item A \code{uniscreen_result} object from \code{uniscreen()}
+  \item A \code{multifit_result} object from \code{multifit()}
 }}
 
 \item{data}{Data frame or data.table containing the original data. Required 
@@ -63,62 +63,28 @@ the need to remember which forest function to call for different model types
 or analysis objects, making it ideal for exploratory analysis and rapid prototyping.
 }
 \details{
+This function provides a convenient wrapper around format-specific export 
+functions, automatically routing to the appropriate function based on the 
+file extension. All parameters are passed through to the underlying function,
+so the full range of format-specific options remains available.
+
+For format-specific advanced features, you may prefer to use the individual
+export functions directly.
 \strong{Automatic Detection Logic:}
 
 The function uses the following priority order for detection:
 \enumerate{
   \item \strong{uniscreen results}: Detected by class \code{"uniscreen_result"} or
     presence of attributes \code{outcome}, \code{predictors}, \code{model_type},
-    and \code{model_scope = "Univariable"}. Routes to \code{\link{uniforest}}.
+    and \code{model_scope = "Univariable"}. Routes to \code{uniforest()}.
   \item \strong{multifit results}: Detected by presence of attributes 
     \code{predictor}, \code{outcomes}, \code{model_type}, and \code{raw_data}.
-    Routes to \code{\link{multiforest}}.
+    Routes to \code{multiforest()}.
   \item \strong{Cox models}: Classes \code{coxph} or \code{clogit}. Routes to 
-    \code{\link{coxforest}}.
-  \item \strong{GLM models}: Class \code{glm}. Routes to \code{\link{glmforest}}.
+    \code{coxforest()}.
+  \item \strong{GLM models}: Class \code{glm}. Routes to \code{glmforest()}.
   \item \strong{Linear models}: Class \code{lm} (but not \code{glm}). Routes to 
-    \code{\link{lmforest}}.
-}
-
-\strong{When to Use autoforest() vs Specific Functions:}
-
-Use \code{autoforest()} when:
-\itemize{
-  \item You want quick visualization without remembering function names
-  \item You're working interactively and exploring different model types
-  \item You're writing generic code that handles multiple model types
-}
-
-Use the specific functions (\code{coxforest}, \code{glmforest}, etc.) when:
-\itemize{
-  \item You need model-specific options not available in autoforest
-  \item You want explicit control over the visualization
-  \item You're writing production code and want clarity
-}
-
-\strong{Title Generation:}
-
-When \code{title = NULL}, titles are generated based on model type:
-\tabular{ll}{
-  \strong{Input Type} \tab \strong{Generated Title} \cr
-  coxph \tab "Cox Proportional Hazards Model" \cr
-  clogit \tab "Conditional Logistic Regression" \cr
-  glm (binomial) \tab "Logistic Regression Model" \cr
-  glm (poisson) \tab "Poisson Regression Model" \cr
-  glm (other) \tab "Generalized Linear Model" \cr
-  lm \tab "Linear Regression Model" \cr
-  uniscreen (glm) \tab "Univariable Logistic Regression Screening" \cr
-  uniscreen (coxph) \tab "Univariable Survival Analysis Screening" \cr
-  uniscreen (lm) \tab "Univariable Linear Regression Screening" \cr
-  uniscreen (glmer) \tab "Univariable Mixed-Effects Logistic Screening" \cr
-  uniscreen (lmer) \tab "Univariable Mixed-Effects Linear Screening" \cr
-  uniscreen (coxme) \tab "Univariable Mixed-Effects Survival Screening" \cr
-  multifit (glm) \tab "Multivariate Logistic Regression" \cr
-  multifit (coxph) \tab "Multivariate Survival Analysis" \cr
-  multifit (lm) \tab "Multivariate Linear Regression" \cr
-  multifit (glmer) \tab "Multivariate Mixed-Effects Logistic Regression" \cr
-  multifit (lmer) \tab "Multivariate Mixed-Effects Linear Regression" \cr
-  multifit (coxme) \tab "Multivariate Mixed-Effects Survival Analysis" \cr
+    \code{lmforest()}.
 }
 }
 \examples{

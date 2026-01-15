@@ -7,13 +7,14 @@
 #' formatted results with optional covariate adjustment. Supports interactions,
 #' mixed effects models, stratification, and clustered standard errors.
 #'
-#' @param data A data.frame or data.table containing the analysis dataset. The 
-#'   function automatically converts data.frames to data.tables for efficient 
+#' @param data Data frame or data.table containing the analysis dataset. The 
+#'   function automatically converts data frames to data.tables for efficient 
 #'   processing.
 #'   
 #' @param outcomes Character vector of outcome variable names to analyze. Each 
-#'   outcome is tested in its own model with the predictor. For survival analysis, 
-#'   use \code{Surv()} syntax (e.g., \code{c("Surv(time1, status1)", "Surv(time2, status2)")}).
+#'   outcome is tested in its own model with the predictor. For time-to-event
+#'   analysis, use \code{Surv()} syntax for the outcome variable
+#'   (e.g., \code{c("Surv(time1, status1)", "Surv(time2, status2)")}).
 #'   
 #' @param predictor Character string specifying the predictor (exposure) variable 
 #'   name. This variable is tested against each outcome. Can be continuous or 
@@ -47,20 +48,20 @@
 #'     \item \code{"glm"} - Generalized linear model (default). Supports multiple 
 #'       distributions via the \code{family} parameter including logistic, Poisson, 
 #'       Gamma, Gaussian, and quasi-likelihood models.
-#'     \item \code{"negbin"} - Negative binomial regression for overdispersed count 
-#'       data (requires MASS package). Estimates an additional dispersion parameter 
-#'       compared to Poisson regression.
 #'     \item \code{"lm"} - Linear regression for continuous outcomes with normally 
 #'       distributed errors.
 #'     \item \code{"coxph"} - Cox proportional hazards model for time-to-event 
 #'       survival analysis. Requires \code{Surv()} outcome syntax.
 #'     \item \code{"clogit"} - Conditional logistic regression for matched 
 #'       case-control studies.
+#'     \item \code{"negbin"} - Negative binomial regression for overdispersed count 
+#'       data (requires MASS package). Estimates an additional dispersion parameter 
+#'       compared to Poisson regression.
 #'     \item \code{"glmer"} - Generalized linear mixed-effects model for hierarchical 
-#'       or clustered data with non-normal outcomes (requires lme4 package and 
+#'       or clustered data with non-normal outcomes (requires \pkg{lme4} package and 
 #'       \code{random} parameter).
 #'     \item \code{"lmer"} - Linear mixed-effects model for hierarchical or clustered 
-#'       data with continuous outcomes (requires lme4 package and \code{random} 
+#'       data with continuous outcomes (requires \pkg{lme4} package and \code{random} 
 #'       parameter).
 #'     \item \code{"coxme"} - Cox mixed-effects model for clustered survival data 
 #'       (requires coxme package and \code{random} parameter).
@@ -158,8 +159,8 @@
 #'   original name).
 #'
 #' @param include_predictor Logical. If \code{TRUE} (default), includes the 
-#'   Predictor column in the output table showing which level of a factor 
-#'   predictor is being compared. If \code{FALSE}, omits the Predictor column,
+#'   predictor column in the output table showing which level of a factor 
+#'   predictor is being compared. If \code{FALSE}, omits the predictor column,
 #'   which may be useful when the predictor information will be explained in 
 #'   a table caption or figure legend.
 #'   
@@ -236,8 +237,7 @@
 #'   \item Optionally filters by p-value threshold
 #' }
 #' 
-#' This is conceptually opposite to \code{\link{uniscreen}}, which tests multiple 
-
+#' This is conceptually opposite to \code{uniscreen()}, which tests multiple 
 #' predictors against a single outcome. Use \code{multifit} when you have one 
 #' exposure of interest and want to screen across multiple endpoints.
 #' 
@@ -1117,7 +1117,7 @@ format_interaction_term <- function(term, labels = NULL) {
 #' Supports standard models (glm, lm, coxph) and mixed effects models
 #' (glmer, lmer, coxme).
 #' 
-#' @param model A fitted model object.
+#' @param model Fitted model object.
 #' @param predictor Character string of the predictor variable name.
 #' @param outcome Character string of the outcome variable name.
 #' @param conf_level Numeric confidence level.

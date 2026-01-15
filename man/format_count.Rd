@@ -2,11 +2,18 @@
 % Please edit documentation in R/desc_utils.R
 \name{format_count}
 \alias{format_count}
-\title{Format count}
+\title{Format count values with comma separators}
 \usage{
 format_count(n)
 }
+\arguments{
+\item{n}{Integer count value.}
+}
+\value{
+Character string with formatted count.
+}
 \description{
-Format count
+Converts integer counts to formatted strings with thousand separators
+for improved readability in tables.
 }
 \keyword{internal}

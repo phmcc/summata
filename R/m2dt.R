@@ -3,12 +3,12 @@
 #' Extracts coefficients, confidence intervals, and comprehensive model statistics 
 #' from fitted regression models and converts them to a standardized data.table 
 #' format suitable for further analysis or publication. This is a core utility 
-#' function used internally by other fullfit functions.
+#' function used internally by other \pkg{summata} regression functions.
 #'
-#' @param data A data.frame or data.table containing the dataset used to fit the
+#' @param data Data frame or data.table containing the dataset used to fit the
 #'   model. Required for computing group-level sample sizes and event counts.
 #'
-#' @param model A fitted model object. Supported classes include:
+#' @param model Fitted model object. Supported classes include:
 #'   \itemize{
 #'     \item \code{glm} - Generalized linear models (logistic, Poisson, etc.)
 #'     \item \code{lm} - Linear models
@@ -23,7 +23,7 @@
 #'   between 0 and 1. Default is 0.95 (95\% CI).
 #'   
 #' @param keep_qc_stats Logical. If \code{TRUE}, includes model quality statistics 
-#'   such as AIC, BIC, R-squared, concordance, and model fit tests. These appear 
+#'   such as AIC, BIC, R², concordance, and model fit tests. These appear 
 #'   as additional columns in the output. Default is \code{TRUE}.
 #'   
 #' @param include_intercept Logical. If \code{TRUE}, includes the model intercept 
@@ -53,7 +53,7 @@
 #'     \item{model_scope}{Character. Either "Univariable" (unadjusted model with 
 #'       single predictor) or "Multivariable" (adjusted model with multiple predictors)}
 #'     \item{model_type}{Character. Type of regression (e.g., "Logistic", "Linear", 
-#'       "Cox PH", "Poisson")}
+#'       "Cox PH", "Poisson", etc.)}
 #'     \item{variable}{Character. Variable name (for factor variables, the base 
 #'       variable name without the level)}
 #'     \item{group}{Character. Group/level name for factor variables; empty string 
@@ -80,18 +80,18 @@
 #'     \item{ci_upper}{Numeric. Upper bound of confidence interval for effect estimate}
 #'     \item{statistic}{Numeric. Test statistic (z-value for GLM/Cox, t-value for LM)}
 #'     \item{p_value}{Numeric. P-value for coefficient test}
-#'     \item{sig}{Character. Significance markers: "***" (p<0.001), "**" (p<0.01), 
-#'       "*" (p<0.05), "." (p<0.10), "" (p≥0.10)}
-#'     \item{sig_binary}{Logical. Binary indicator: \code{TRUE} if p<0.05, 
+#'     \item{sig}{Character. Significance markers: "***" (p<0.001), "**" (p < 0.01), 
+#'       "*" (p < 0.05), "." (p < 0.10), "" (p ≥ 0.10)}
+#'     \item{sig_binary}{Logical. Binary indicator: \code{TRUE} if p < 0.05, 
 #'       \code{FALSE} otherwise}
 #'     \item{reference}{Character. Contains \code{reference_label} for reference 
 #'       category rows when \code{reference_rows = TRUE}, empty string otherwise}
 #'   }
 #'
 #' @details
-#' This function is the core extraction utility used by \code{\link{fit}} and other
-#' functions. It handles the complexities of different model classes and provides 
-#' a consistent output format suitable for tables and forest plots.
+#' This function is the core extraction utility used by \code{fit()} and other
+#' regression functions. It handles the complexities of different model classes
+#' and provides a consistent output format suitable for tables and forest plots.
 #'
 #' \strong{Model Type Detection:}
 #' The function automatically detects model type and applies appropriate:

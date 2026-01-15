@@ -7,11 +7,16 @@
 validate_predictors_exist(data, predictors)
 }
 \arguments{
-\item{data}{Data frame}
+\item{data}{Data frame or data.table to check.}
 
-\item{predictors}{Predictor names}
+\item{predictors}{Character vector of predictor variable names.}
+}
+\value{
+Invisible TRUE if validation passes, otherwise stops with error.
 }
 \description{
-Validate predictors exist in data
+Checks that all specified predictor variables exist in the dataset. Handles
+interaction terms (splits on ":"), mixed-effects random effects (ignores
+"|" syntax), and raises informative errors for missing variables.
 }
 \keyword{internal}

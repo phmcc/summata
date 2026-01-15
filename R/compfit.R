@@ -5,7 +5,7 @@
 #' Computes a composite score combining multiple quality metrics to facilitate 
 #' rapid model comparison and selection.
 #'
-#' @param data A data frame or data.table containing the dataset.
+#' @param data Data frame or data.table containing the dataset.
 #' @param outcome Character string specifying the outcome variable. For survival
 #'   analysis, use Surv() syntax (e.g., "Surv(time, status)").
 #' @param model_list List of character vectors, each containing predictor names

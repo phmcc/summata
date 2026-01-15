@@ -7,7 +7,7 @@
 get_model_xlevels(model)
 }
 \arguments{
-\item{model}{A fitted model object (S3 or S4).}
+\item{model}{Fitted model object (S3 or S4).}
 }
 \value{
 Named list of factor levels, or NULL if no factors present.

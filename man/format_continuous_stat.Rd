@@ -2,11 +2,22 @@
 % Please edit documentation in R/desc_utils.R
 \name{format_continuous_stat}
 \alias{format_continuous_stat}
-\title{Format continuous statistic}
+\title{Format continuous statistic for display}
 \usage{
 format_continuous_stat(stats, stat_type, fmt_str)
 }
+\arguments{
+\item{stats}{Named list of numeric statistics (mean, sd, median, q1, q3, min, max).}
+
+\item{stat_type}{Character string: "mean_sd", "median_iqr", "median_range", or "range".}
+
+\item{fmt_str}{Character string format specification for sprintf.}
+}
+\value{
+Character string with formatted statistic.
+}
 \description{
-Format continuous statistic
+Converts numeric summary statistics into formatted display strings following
+standard conventions (mean ± SD, median [IQR], range, etc.).
 }
 \keyword{internal}

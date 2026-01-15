@@ -1,15 +1,15 @@
 #' Export Table to Rich Text Format (RTF)
 #'
 #' Converts a data frame, data.table, or matrix to a Rich Text Format (.rtf) 
-#' document using the flextable and officer packages. Creates professional, 
+#' document using the \pkg{flextable} and \pkg{officer} packages. Creates 
 #' widely-compatible tables with extensive formatting options. RTF files can be 
 #' opened and edited in Microsoft Word, LibreOffice, WordPad, and many other word 
 #' processors. Particularly useful for regulatory submissions, cross-platform 
 #' compatibility, and when maximum editability is required.
 #'
-#' @param table A data.frame, data.table, or matrix to export. Can be output from 
-#'   \code{\link{desctable}}, \code{\link{fit}}, \code{\link{uniscreen}}, 
-#'   \code{\link{fullfit}}, \code{\link{compfit}}, or any tabular data.
+#' @param table Data frame, data.table, or matrix to export. Can be output from 
+#'   \code{desctable()}, \code{fit()}, \code{uniscreen()}, 
+#'   \code{fullfit()}, \code{compfit()}, or any tabular data.
 #'   
 #' @param file Character string specifying the output RTF filename. Must have 
 #'   \code{.rtf} extension. Example: \code{"results.rtf"}, \code{"Table1.rtf"}.
@@ -65,7 +65,7 @@
 #' @param paper Character string specifying paper size:
 #'   \itemize{
 #'     \item \code{"letter"} - US Letter (8.5" × 11") [default]
-#'     \item \code{"a4"} - A4 (210mm × 297mm)
+#'     \item \code{"a4"} - A4 (210 mm × 297 mm)
 #'     \item \code{"legal"} - US Legal (8.5" × 14")
 #'   }
 #'   
@@ -83,7 +83,7 @@
 #'   (default), automatically determines based on content (text left, numbers right).
 #'   Example: \code{c("left", "left", "center", "right", "right")}.
 #'   
-#' @param return_ft Logical. If \code{TRUE}, returns the flextable object 
+#' @param return_ft Logical. If \code{TRUE}, returns the \pkg{flextable} object 
 #'   directly for further customization. If \code{FALSE} (default), returns 
 #'   invisibly with flextable as attribute. See Details for usage. 
 #'   Default is \code{FALSE}.
@@ -97,9 +97,9 @@
 #'         \item \code{file} - Path to created file
 #'         \item \code{caption} - Caption text (if provided)
 #'       }
-#'       The flextable object is accessible via \code{attr(result, "flextable")}
+#'       The \pkg{flextable} object is accessible via \code{attr(result, "flextable")}
 #'     }
-#'     \item{\code{return_ft = TRUE}}{Directly returns the flextable object for 
+#'     \item{\code{return_ft = TRUE}}{Directly returns the \pkg{flextable} object for 
 #'       immediate further customization}
 #'   }
 #'   
@@ -110,8 +110,8 @@
 #' 
 #' This function requires:
 #' \itemize{
-#'   \item \strong{flextable} - For creating formatted tables
-#'   \item \strong{officer} - For RTF document generation
+#'   \item \strong{\pkg{flextable}} - For creating formatted tables
+#'   \item \strong{\pkg{officer}} - For RTF document generation
 #' }
 #' 
 #' Install if needed:
@@ -190,7 +190,7 @@
 #' \strong{Further Customization with Flextable:}
 #' 
 #' For programmatic customization beyond the built-in options, access the 
-#' flextable object:
+#' \pkg{flextable} object:
 #' 
 #' \emph{Method 1: Via attribute (default)}
 #' ```r

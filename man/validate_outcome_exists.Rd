@@ -7,11 +7,16 @@
 validate_outcome_exists(data, outcome)
 }
 \arguments{
-\item{data}{Data frame}
+\item{data}{Data frame or data.table to check.}
 
-\item{outcome}{Outcome specification}
+\item{outcome}{Character string outcome specification (may include Surv()).}
+}
+\value{
+Invisible TRUE if validation passes, otherwise stops with error.
 }
 \description{
-Validate outcome exists in data
+Checks that the specified outcome variable (or survival variables within
+Surv() expression) exists in the dataset. Raises informative error if
+variables are missing. Handles both simple outcomes and Surv() expressions.
 }
 \keyword{internal}

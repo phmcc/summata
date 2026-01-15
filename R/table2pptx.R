@@ -1,14 +1,14 @@
 #' Export Table to Microsoft PowerPoint Format (PPTX)
 #'
 #' Converts a data frame, data.table, or matrix to a Microsoft PowerPoint slide 
-#' (.pptx) with a formatted table using the flextable and officer packages. Creates 
-#' presentation-ready slides with extensive control over table formatting, positioning, 
-#' and layout. Tables can be further edited in PowerPoint after creation. Ideal for 
-#' creating data-driven presentations, conference talks, and stakeholder reports.
+#' (.pptx) with a formatted table using the \pkg{flextable} and \pkg{officer} packages.
+#' Creates presentation-ready slides with extensive control over table formatting,
+#' positioning, and layout. Tables can be further edited in PowerPoint after creation.
+#' Ideal for creating data-driven presentations and conference talks.
 #'
-#' @param table A data.frame, data.table, or matrix to export. Can be output from 
-#'   \code{\link{desctable}}, \code{\link{fit}}, \code{\link{uniscreen}}, 
-#'   \code{\link{fullfit}}, \code{\link{compfit}}, or any tabular data.
+#' @param table Data frame, data.table, or matrix to export. Can be output from 
+#'   \code{desctable()}, \code{fit()}, \code{uniscreen()}, 
+#'   \code{fullfit()}, \code{compfit()}, or any tabular data.
 #'   
 #' @param file Character string specifying the output PPTX filename. Must have 
 #'   \code{.pptx} extension. Example: \code{"results.pptx"}, \code{"Slide1.pptx"}.
@@ -92,7 +92,7 @@
 #'   Default is 1.5 (leaves room for title). Standard slide is 7.5 inches tall. 
 #'   Adjust based on table size and layout.
 #'   
-#' @param return_ft Logical. If \code{TRUE}, returns the flextable object 
+#' @param return_ft Logical. If \code{TRUE}, returns the \pkg{flextable} object 
 #'   directly for further customization. If \code{FALSE} (default), returns 
 #'   invisibly with metadata. Default is \code{FALSE}.
 #'   
@@ -111,7 +111,7 @@
 #'       }
 #'       Flextable accessible via \code{attr(result, "flextable")}
 #'     }
-#'     \item{\code{return_ft = TRUE}}{Directly returns the flextable object}
+#'     \item{\code{return_ft = TRUE}}{Directly returns the \pkg{flextable} object}
 #'   }
 #'   
 #'   Always creates a .pptx file at the specified location.
@@ -121,8 +121,8 @@
 #' 
 #' Requires:
 #' \itemize{
-#'   \item \strong{flextable} - Table creation and formatting
-#'   \item \strong{officer} - PowerPoint manipulation
+#'   \item \strong{\pkg{flextable}} - Table creation and formatting
+#'   \item \strong{\pkg{officer}} - PowerPoint manipulation
 #' }
 #' 
 #' Install: \code{install.packages(c("flextable", "officer"))}

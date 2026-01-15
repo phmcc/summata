@@ -2,11 +2,20 @@
 % Please edit documentation in R/desc_utils.R
 \name{format_num}
 \alias{format_num}
-\title{Format numbers with commas for large values}
+\title{Format numbers with appropriate precision}
 \usage{
 format_num(x, fmt_str)
 }
+\arguments{
+\item{x}{Numeric value to format.}
+
+\item{fmt_str}{Character string format specification for sprintf.}
+}
+\value{
+Character string with formatted number.
+}
 \description{
-Format numbers with commas for large values
+Formats numeric values using sprintf with automatic comma insertion for
+large values (>= 1000). Handles special cases for very small numbers.
 }
 \keyword{internal}

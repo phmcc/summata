@@ -21,7 +21,7 @@ A data frame with 850 observations and 28 variables:
   \item{hemoglobin}{Baseline hemoglobin in g/dL (numeric)}
   \item{biomarker_x}{Serum biomarker A in ng/mL (numeric)}
   \item{biomarker_y}{Serum biomarker B in U/L (numeric)}
-  \item{site}{Enrolling site (factor: Site_A through Site_J)}
+  \item{site}{Enrolling site (factor: Site Alpha through Site Kappa)}
   \item{grade}{Tumor grade (factor: Well/Moderately/Poorly differentiated)}
   \item{stage}{Disease stage at diagnosis (factor: I, II, III, IV)}
   \item{treatment}{Randomized treatment (factor: Control, Drug A, Drug B)}

@@ -7,7 +7,7 @@
 get_model_data(model)
 }
 \arguments{
-\item{model}{A fitted model object (S3 or S4).}
+\item{model}{Fitted model object (S3 or S4).}
 }
 \value{
 Data frame or data.table used to fit the model, or NULL if unavailable.

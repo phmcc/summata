@@ -7,14 +7,14 @@
 format_headers_ft(ft, has_n_row, n_row_data)
 }
 \arguments{
-\item{ft}{A flextable object.}
+\item{ft}{\pkg{flextable} object.}
 
 \item{has_n_row}{Logical whether source data had an N row.}
 
 \item{n_row_data}{Data from the N row for adding counts to headers.}
 }
 \value{
-Formatted flextable object.
+Formatted \pkg{flextable} object.
 }
 \description{
 Applies formatting to flextable headers including italicizing 'n',

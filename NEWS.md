@@ -1,3 +1,8 @@
+# *summata* 0.10.4 (2026-01-15)
+
+* Revise and standardize documentation
+* Add linting fixes
+
 # *summata* 0.10.3 (2026-01-12)
 
 * Add vignettes

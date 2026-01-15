@@ -7,7 +7,7 @@
 apply_zebra_stripes_ft(ft, df, var_groups)
 }
 \arguments{
-\item{ft}{A flextable object.}
+\item{ft}{\pkg{flextable} object.}
 
 \item{df}{The source data.table used to create the flextable.}
 
@@ -17,7 +17,7 @@ apply_zebra_stripes_ft(ft, df, var_groups)
 Flextable object with zebra stripe formatting applied.
 }
 \description{
-Applies alternating background colors to variable groups in flextable objects.
+Applies alternating background colors to variable groups in \pkg{flextable} objects.
 Handles both indented tables (detects groups by leading whitespace) and
 non-indented tables (uses pre-identified groups).
 }

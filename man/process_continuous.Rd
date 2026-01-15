@@ -22,11 +22,42 @@ process_continuous(
 )
 }
 \arguments{
+\item{data}{Data.table containing the variable.}
+
+\item{var}{Character string naming the variable to process.}
+
+\item{var_label}{Character string label for display.}
+
+\item{group_var}{Optional character string naming the grouping variable.}
+
+\item{stats}{Character vector of statistics to calculate.}
+
+\item{digits}{Integer number of decimal places.}
+
+\item{na_include}{Logical whether to include missing values.}
+
+\item{na_label}{Character string label for missing values.}
+
+\item{test}{Logical whether to perform statistical tests.}
+
+\item{test_type}{Character string specifying test type.}
+
+\item{total}{Logical or character controlling total column display.}
+
+\item{total_label}{Character string label for total column.}
+
 \item{p_per_stat}{Logical. If TRUE, calculate separate p-values for each 
 statistic type (e.g., t-test for means, Wilcoxon for medians). If FALSE
 (default), calculate a single p-value based on the first statistic type.}
+
+\item{...}{Additional arguments passed to test functions.}
+}
+\value{
+List with 'formatted' and 'raw' data.table components.
 }
 \description{
-Process continuous variable
+Calculates descriptive statistics for continuous numeric variables, with
+optional grouping and statistical testing. Supports multiple summary
+statistics (mean ± SD, median [IQR], range) and various hypothesis tests.
 }
 \keyword{internal}

@@ -91,9 +91,27 @@ process_variable <- function(data, var, group_var = NULL,
 
 #' Process continuous variable
 #' 
+#' Calculates descriptive statistics for continuous numeric variables, with
+#' optional grouping and statistical testing. Supports multiple summary
+#' statistics (mean ± SD, median [IQR], range) and various hypothesis tests.
+#' 
+#' @param data Data.table containing the variable.
+#' @param var Character string naming the variable to process.
+#' @param var_label Character string label for display.
+#' @param group_var Optional character string naming the grouping variable.
+#' @param stats Character vector of statistics to calculate.
+#' @param digits Integer number of decimal places.
+#' @param na_include Logical whether to include missing values.
+#' @param na_label Character string label for missing values.
+#' @param test Logical whether to perform statistical tests.
+#' @param test_type Character string specifying test type.
+#' @param total Logical or character controlling total column display.
+#' @param total_label Character string label for total column.
 #' @param p_per_stat Logical. If TRUE, calculate separate p-values for each 
 #'   statistic type (e.g., t-test for means, Wilcoxon for medians). If FALSE
 #'   (default), calculate a single p-value based on the first statistic type.
+#' @param ... Additional arguments passed to test functions.
+#' @return List with 'formatted' and 'raw' data.table components.
 #' @keywords internal
 process_continuous <- function(data, var, var_label, group_var, stats, digits,
                                na_include, na_label, test, test_type,
@@ -279,6 +297,15 @@ process_continuous <- function(data, var, var_label, group_var, stats, digits,
 
 
 #' Add raw statistics to row
+#' 
+#' Appends raw numeric statistics to a data.table row for downstream processing.
+#' Used to preserve underlying values alongside formatted display strings.
+#' 
+#' @param row Data.table row to modify.
+#' @param col Character string column name for the statistics.
+#' @param stats Named list of numeric statistics (mean, sd, median, etc.).
+#' @param stat_type Character string indicating which statistic is displayed.
+#' @return Modified row (by reference).
 #' @keywords internal
 add_raw_stats <- function(row, col, stats, stat_type) {
     if (stat_type == "mean_sd") {
@@ -303,7 +330,17 @@ add_raw_stats <- function(row, col, stats, stat_type) {
     row  # Return the modified row
 }
 
-#' Perform continuous tests
+#' Perform statistical tests for continuous variables
+#' 
+#' Conducts hypothesis tests comparing continuous variables across groups.
+#' Supports t-tests, Wilcoxon tests, ANOVA, and Kruskal-Wallis tests with
+#' automatic selection based on number of groups.
+#' 
+#' @param var_vec Numeric vector of the continuous variable.
+#' @param grp_vec Factor or character vector defining groups.
+#' @param test_type Character string: "parametric", "nonparametric", or "auto".
+#' @param stat_type Character string indicating primary statistic being tested.
+#' @return Numeric p-value from the hypothesis test.
 #' @keywords internal
 perform_continuous_test <- function(var_vec, grp_vec, test_type, stat_type) {
     ## Remove NAs
@@ -341,14 +378,22 @@ perform_continuous_test <- function(var_vec, grp_vec, test_type, stat_type) {
 }
 
 
-#' Format continuous statistic
+#' Format continuous statistic for display
+#' 
+#' Converts numeric summary statistics into formatted display strings following
+#' standard conventions (mean ± SD, median [IQR], range, etc.).
+#' 
+#' @param stats Named list of numeric statistics (mean, sd, median, q1, q3, min, max).
+#' @param stat_type Character string: "mean_sd", "median_iqr", "median_range", or "range".
+#' @param fmt_str Character string format specification for sprintf.
+#' @return Character string with formatted statistic.
 #' @keywords internal
 format_continuous_stat <- function(stats, stat_type, fmt_str) {
     if (stats$n == 0) return("")
     
     switch(stat_type,
         "mean_sd" = paste0(
-            format_num(stats$mean, fmt_str), " +/- ", 
+            format_num(stats$mean, fmt_str), " \u00B1 ",
             format_num(stats$sd, fmt_str)
         ),
         "median_iqr" = paste0(
@@ -374,7 +419,14 @@ format_continuous_stat <- function(stats, stat_type, fmt_str) {
 }
 
 
-#' Format numbers with commas for large values
+#' Format numbers with appropriate precision
+#' 
+#' Formats numeric values using sprintf with automatic comma insertion for
+#' large values (>= 1000). Handles special cases for very small numbers.
+#' 
+#' @param x Numeric value to format.
+#' @param fmt_str Character string format specification for sprintf.
+#' @return Character string with formatted number.
 #' @keywords internal
 format_num <- function(x, fmt_str) {
     if (is.na(x)) return("")
@@ -388,18 +440,31 @@ format_num <- function(x, fmt_str) {
 }
 
 
-#' Format count
+#' Format count values with comma separators
+#' 
+#' Converts integer counts to formatted strings with thousand separators
+#' for improved readability in tables.
+#' 
+#' @param n Integer count value.
+#' @return Character string with formatted count.
 #' @keywords internal
 format_count <- function(n) {
     if (n >= 1000) format(n, big.mark = ",") else as.character(n)
 }
 
 
-#' Get statistic label
+#' Get display label for statistic type
+#' 
+#' Converts internal statistic type codes to formatted display labels for
+#' table column headers.
+#' 
+#' @param stat_type Character string: "mean_sd", "median_iqr", "median_range",
+#'   "range", "n_miss", or custom type.
+#' @return Character string with formatted label (e.g., "Mean ± SD").
 #' @keywords internal
 get_stat_label <- function(stat_type) {
     switch(stat_type,
-           "mean_sd" = "Mean +/- SD",
+           "mean_sd" = "Mean \u00B1 SD",
            "median_iqr" = "Median [IQR]",
            "median_range" = "Median (Range)",
            "range" = "Range",
@@ -410,6 +475,25 @@ get_stat_label <- function(stat_type) {
 
 
 #' Process categorical variable
+#' 
+#' Calculates frequency and percentage statistics for categorical variables,
+#' with optional grouping and chi-square/Fisher's exact testing. Handles
+#' factor levels, missing values, and custom labeling.
+#' 
+#' @param data Data.table containing the variable.
+#' @param var Character string naming the variable to process.
+#' @param var_label Character string label for display.
+#' @param group_var Optional character string naming the grouping variable.
+#' @param stats Character vector of statistics to calculate.
+#' @param na_include Logical whether to include missing values as a category.
+#' @param na_label Character string label for missing values.
+#' @param test Logical whether to perform statistical tests.
+#' @param test_type Character string specifying test type.
+#' @param total Logical or character controlling total column display.
+#' @param total_label Character string label for total column.
+#' @param na_percent Logical whether to include NA in percentage denominators.
+#' @param ... Additional arguments passed to test functions.
+#' @return List with 'formatted' and 'raw' data.table components.
 #' @keywords internal
 process_categorical <- function(data, var, var_label, group_var, stats,
                                 na_include, na_label, test, test_type,
@@ -586,7 +670,16 @@ process_categorical <- function(data, var, var_label, group_var, stats,
 }
 
 
-#' Perform categorical test
+#' Perform statistical tests for categorical variables
+#' 
+#' Conducts chi-square or Fisher's exact tests for categorical variables
+#' across groups. Automatically selects Fisher's exact test for small
+#' expected frequencies.
+#' 
+#' @param tab Contingency table (matrix or table object).
+#' @param test_type Character string: "chisq" for chi-square, "fisher" for
+#'   Fisher's exact, or "auto" for automatic selection.
+#' @return Numeric p-value from the hypothesis test.
 #' @keywords internal
 perform_categorical_test <- function(tab, test_type) {
     ## Remove NA rows for testing
@@ -613,7 +706,15 @@ perform_categorical_test <- function(tab, test_type) {
 }
 
 
-#' Format categorical statistic
+#' Format categorical statistic for display
+#' 
+#' Converts frequency counts into formatted display strings following
+#' standard conventions (n, n (%), % only).
+#' 
+#' @param n Integer count for the category.
+#' @param total Integer total count for percentage calculation.
+#' @param stat_type Character string: "n", "n_percent", or "percent".
+#' @return Character string with formatted statistic.
 #' @keywords internal
 format_categorical_stat <- function(n, total, stat_type) {
     if (length(stat_type) > 1) stat_type <- stat_type[1]
@@ -630,6 +731,23 @@ format_categorical_stat <- function(n, total, stat_type) {
 
 
 #' Process survival variable
+#' 
+#' Calculates survival statistics including median survival times with 95%
+#' confidence intervals, with optional grouping and log-rank testing. Parses
+#' Surv() expressions and uses \pkg{survival} package functions.
+#' 
+#' @param data Data.table containing the survival variables.
+#' @param var Character string with Surv() expression (e.g., "Surv(time, status)").
+#' @param var_label Character string label for display.
+#' @param group_var Optional character string naming the grouping variable.
+#' @param digits Integer number of decimal places.
+#' @param na_include Logical whether to include missing values.
+#' @param na_label Character string label for missing values.
+#' @param test Logical whether to perform log-rank test.
+#' @param total Logical or character controlling total column display.
+#' @param total_label Character string label for total column.
+#' @param ... Additional arguments (currently unused).
+#' @return List with 'formatted' and 'raw' data.table components.
 #' @keywords internal
 process_survival <- function(data, var, var_label, group_var, digits,
                              na_include, na_label, test, total, total_label, ...) {
@@ -761,7 +879,14 @@ process_survival <- function(data, var, var_label, group_var, digits,
 }
 
 
-#' Format p-values in result table
+#' Format p-values for descriptive tables
+#' 
+#' Converts numeric p-values to formatted strings with appropriate precision.
+#' Handles very small p-values with threshold notation (e.g., "< 0.001").
+#' 
+#' @param result Data.table with 'p_value' column to format.
+#' @param p_digits Integer number of decimal places for p-values.
+#' @return Modified data.table with 'p-value' column (formatted strings).
 #' @keywords internal
 format_pvalues_desctable <- function(result, p_digits) {
     if ("p_value" %chin% names(result)) {
@@ -788,6 +913,15 @@ format_pvalues_desctable <- function(result, p_digits) {
 
 
 #' Reorder columns to position total column
+#' 
+#' Rearranges data.table columns to place the total column in the specified
+#' position (first, last, or default). Ensures proper ordering of Variable,
+#' Group, total, group columns, and p-value.
+#' 
+#' @param result Data.table with columns to reorder.
+#' @param total Logical or character: TRUE/"first" (total first), "last" (total last).
+#' @param total_label Character string name of the total column.
+#' @return Modified data.table with reordered columns.
 #' @keywords internal
 reorder_total_column <- function(result, total, total_label) {
     if (total_label %chin% names(result)) {

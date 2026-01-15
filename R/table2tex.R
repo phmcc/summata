@@ -4,11 +4,11 @@
 #' inclusion in LaTeX documents. Generates publication-quality table markup with 
 #' extensive formatting options including booktabs styling, color schemes, and 
 #' hierarchical displays. Output can be directly \code{\\input{}} or \code{\\include{}} 
-#' into LaTeX manuscripts.
+#' into LaTeX manuscripts. Requires \pkg{xtable} for export.
 #'
-#' @param table A data.frame, data.table, or matrix to export. Can be output from 
-#'   \code{\link{desctable}}, \code{\link{fit}}, \code{\link{uniscreen}}, 
-#'   \code{\link{fullfit}}, \code{\link{compfit}}, or any tabular data.
+#' @param table Data frame, data.table, or matrix to export. Can be output from 
+#'   \code{desctable()}, \code{fit()}, \code{uniscreen()}, 
+#'   \code{fullfit()}, \code{compfit()}, or any tabular data.
 #'   
 #' @param file Character string specifying the output .tex filename. Must have 
 #'   \code{.tex} extension. Example: \code{"results.tex"}, \code{"table1.tex"}.

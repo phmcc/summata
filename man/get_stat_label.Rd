@@ -2,11 +2,19 @@
 % Please edit documentation in R/desc_utils.R
 \name{get_stat_label}
 \alias{get_stat_label}
-\title{Get statistic label}
+\title{Get display label for statistic type}
 \usage{
 get_stat_label(stat_type)
 }
+\arguments{
+\item{stat_type}{Character string: "mean_sd", "median_iqr", "median_range",
+"range", "n_miss", or custom type.}
+}
+\value{
+Character string with formatted label (e.g., "Mean ± SD").
+}
 \description{
-Get statistic label
+Converts internal statistic type codes to formatted display labels for
+table column headers.
 }
 \keyword{internal}

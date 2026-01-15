@@ -7,7 +7,7 @@
 condense_quantitative_rows(df, indent_groups = TRUE)
 }
 \arguments{
-\item{df}{A data.table or data.frame}
+\item{df}{Data.table or data frame}
 
 \item{indent_groups}{Logical. Whether to apply indentation formatting.}
 }

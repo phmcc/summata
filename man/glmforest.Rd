@@ -36,11 +36,11 @@ glmforest(
 }
 \arguments{
 \item{x}{Either a fitted GLM object (class \code{glm} or \code{glmerMod}), 
-a \code{fit_result} object from \code{\link{fit}}, or a \code{fullfit_result}
-object from \code{\link{fullfit}}. When a \code{fit_result} or \code{fullfit_result}
+a \code{fit_result} object from \code{fit()}, or a \code{fullfit_result}
+object from \code{fullfit()}. When a \code{fit_result} or \code{fullfit_result}
 is provided, the model, data, and labels are automatically extracted.}
 
-\item{data}{A data.frame or data.table containing the original data used to 
+\item{data}{Data frame or data.table containing the original data used to 
 fit the model. If \code{NULL} (default) and \code{x} is a model, the function 
 attempts to extract data from the model object. If \code{x} is a \code{fit_result},
 data is extracted automatically. Providing data explicitly is recommended when
@@ -154,7 +154,7 @@ link.}
 
 \item{qc_footer}{Logical. If \code{TRUE}, displays model quality control
 statistics in the footer (observations analyzed, model family, deviance,
-pseudo R-squared, AIC). Default is \code{TRUE}.}
+pseudo-R², AIC). Default is \code{TRUE}.}
 
 \item{units}{Character string specifying the units for plot dimensions. 
 Options: \code{"in"} (inches), \code{"cm"} (centimeters), \code{"mm"} 

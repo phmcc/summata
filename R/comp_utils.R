@@ -1,5 +1,5 @@
 # Column name constants for Unicode superscripts
-# These are defined here to ensure consistent column naming throughout
+# Defined here to ensure consistent column naming throughout
 .pseudo_r2_col <- "Pseudo-R\u00b2"
 .marginal_r2_col <- "Marginal R\u00b2"
 .conditional_r2_col <- "Conditional R\u00b2"
@@ -10,7 +10,7 @@
 #' Checks convergence status for various model types including standard
 #' regression models and mixed-effects models.
 #' 
-#' @param model A fitted model object.
+#' @param model Fitted model object.
 #' @return Character string: "Yes", "No", "Suspect", or "Failed"
 #' @keywords internal
 check_convergence <- function(model) {
@@ -89,7 +89,7 @@ check_convergence <- function(model) {
 #' Extracts quality control metrics from fitted models for comparison.
 #' Supports GLM, Cox, linear, and mixed-effects models.
 #' 
-#' @param model A fitted model object.
+#' @param model Fitted model object.
 #' @param raw_data Data.table with raw model information.
 #' @param model_type Character string indicating model type.
 #' @return Named list of metrics.
@@ -254,7 +254,7 @@ extract_model_metrics <- function(model, raw_data, model_type) {
 #' Extracts quality metrics specific to linear mixed-effects models including
 #' R-squared measures, ICC, and global significance tests.
 #' 
-#' @param model A fitted lmerMod object from lme4.
+#' @param model Fitted lmerMod object from lme4.
 #' @param raw_data Data.table with raw model information.
 #' @param metrics Named list of initialized metrics to populate.
 #' @return Updated metrics list with lmer-specific values.
@@ -351,7 +351,7 @@ extract_lmer_metrics <- function(model, raw_data, metrics) {
 #' Extracts quality metrics specific to generalized linear mixed-effects models
 #' including concordance, R-squared measures, ICC, and Brier score for binomial.
 #' 
-#' @param model A fitted glmerMod object from lme4.
+#' @param model Fitted glmerMod object from lme4.
 #' @param raw_data Data.table with raw model information.
 #' @param metrics Named list of initialized metrics to populate.
 #' @return Updated metrics list with glmer-specific values.
@@ -454,7 +454,7 @@ extract_glmer_metrics <- function(model, raw_data, metrics) {
 #' Extracts quality metrics specific to mixed-effects Cox proportional hazards
 #' models including concordance, pseudo-R-squared, and ICC.
 #' 
-#' @param model A fitted coxme object from coxme package.
+#' @param model Fitted coxme object from coxme package.
 #' @param raw_data Data.table with raw model information.
 #' @param metrics Named list of initialized metrics to populate.
 #' @return Updated metrics list with coxme-specific values.

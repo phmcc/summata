@@ -1,12 +1,12 @@
 #' Create Forest Plot for Multivariate Analysis
 #'
-#' Generates a publication-ready forest plot from a \code{\link{multifit}} output
+#' Generates a publication-ready forest plot from a \code{multifit()} output
 #' object. The plot displays effect estimates (OR, HR, RR, or coefficients) with
 #' confidence intervals across multiple outcomes, organized by outcome with the
 #' predictor levels shown for each.
 #'
-#' @param x A multifit result object (data.table with class attributes from 
-#'   \code{\link{multifit}}).
+#' @param x Multifit result object (data.table with class attributes from 
+#'   \code{multifit()}).
 #'   
 #' @param title Character string specifying the plot title. Default is 
 #'   \code{"Multivariate Analysis"}. Use descriptive titles for publication.

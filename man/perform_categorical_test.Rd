@@ -2,11 +2,22 @@
 % Please edit documentation in R/desc_utils.R
 \name{perform_categorical_test}
 \alias{perform_categorical_test}
-\title{Perform categorical test}
+\title{Perform statistical tests for categorical variables}
 \usage{
 perform_categorical_test(tab, test_type)
 }
+\arguments{
+\item{tab}{Contingency table (matrix or table object).}
+
+\item{test_type}{Character string: "chisq" for chi-square, "fisher" for
+Fisher's exact, or "auto" for automatic selection.}
+}
+\value{
+Numeric p-value from the hypothesis test.
+}
 \description{
-Perform categorical test
+Conducts chi-square or Fisher's exact tests for categorical variables
+across groups. Automatically selects Fisher's exact test for small
+expected frequencies.
 }
 \keyword{internal}

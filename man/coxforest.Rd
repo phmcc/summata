@@ -35,11 +35,11 @@ coxforest(
 }
 \arguments{
 \item{x}{Either a fitted Cox model object (class \code{coxph} or \code{coxme}), 
-a \code{fit_result} object from \code{\link{fit}}, or a \code{fullfit_result}
-object from \code{\link{fullfit}}. When a \code{fit_result} or \code{fullfit_result}
+a \code{fit_result} object from \code{fit()}, or a \code{fullfit_result}
+object from \code{fullfit()}. When a \code{fit_result} or \code{fullfit_result}
 is provided, the model, data, and labels are automatically extracted.}
 
-\item{data}{A data.frame or data.table containing the original data used to 
+\item{data}{Data frame or data.table containing the original data used to 
 fit the model. If \code{NULL} (default) and \code{x} is a model, the function 
 attempts to extract data from the model object. If \code{x} is a \code{fit_result},
 data is extracted automatically. Providing data explicitly is recommended when

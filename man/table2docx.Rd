@@ -28,9 +28,9 @@ table2docx(
 )
 }
 \arguments{
-\item{table}{A data.frame, data.table, or matrix to export. Can be output from 
-\code{\link{desctable}}, \code{\link{fit}}, \code{\link{uniscreen}}, 
-\code{\link{fullfit}}, \code{\link{compfit}}, or any tabular data.}
+\item{table}{Data frame, data.table, or matrix to export. Can be output from 
+\code{desctable()}, \code{fit()}, \code{uniscreen()}, 
+\code{fullfit()}, \code{compfit()}, or any tabular data.}
 
 \item{file}{Character string specifying the output DOCX filename. Must have 
 \code{.docx} extension. Example: \code{"results.docx"}, \code{"Table1.docx"}.}
@@ -86,7 +86,7 @@ Default is \code{FALSE}.}
 \item{paper}{Character string specifying paper size:
 \itemize{
   \item \code{"letter"} - US Letter (8.5" × 11") [default]
-  \item \code{"a4"} - A4 (210mm × 297mm)
+  \item \code{"a4"} - A4 (210 mm × 297 mm)
   \item \code{"legal"} - US Legal (8.5" × 14")
 }}
 
@@ -104,7 +104,7 @@ Options: \code{"left"}, \code{"center"}, or \code{"right"}. If \code{NULL}
 (default), automatically determines based on content (text left, numbers right).
 Example: \code{c("left", "left", "center", "right", "right")}.}
 
-\item{return_ft}{Logical. If \code{TRUE}, returns the flextable object 
+\item{return_ft}{Logical. If \code{TRUE}, returns the \pkg{flextable} object 
 directly for further customization. If \code{FALSE} (default), returns 
 invisibly with flextable as attribute. See Details for usage. 
 Default is \code{FALSE}.}
@@ -120,9 +120,9 @@ Behavior depends on \code{return_ft}:
         \item \code{file} - Path to created file
         \item \code{caption} - Caption text (if provided)
       }
-      The flextable object is accessible via \code{attr(result, "flextable")}
+      The \pkg{flextable} object is accessible via \code{attr(result, "flextable")}
     }
-    \item{\code{return_ft = TRUE}}{Directly returns the flextable object for 
+    \item{\code{return_ft = TRUE}}{Directly returns the \pkg{flextable} object for 
       immediate further customization}
   }
   
@@ -130,7 +130,7 @@ Behavior depends on \code{return_ft}:
 }
 \description{
 Converts a data frame, data.table, or matrix to a fully editable Microsoft Word 
-document (.docx) using the flextable and officer packages. Creates professional, 
+document (.docx) using the \pkg{flextable} and \pkg{officer} packages. Creates
 publication-ready tables with extensive formatting options including typography, 
 alignment, colors, and page layout. Tables can be further edited in Microsoft 
 Word after creation.
@@ -140,8 +140,8 @@ Word after creation.
 
 This function requires:
 \itemize{
-  \item \strong{flextable} - For creating formatted tables
-  \item \strong{officer} - For Word document manipulation
+  \item \strong{\pkg{flextable}} - For creating formatted tables
+  \item \strong{\pkg{officer}} - For Word document manipulation
 }
 
 Install if needed:
@@ -180,7 +180,7 @@ manual refinement.
 \strong{Further Customization with Flextable:}
 
 For programmatic customization beyond the built-in options, access the 
-flextable object:
+\pkg{flextable} object:
 
 \emph{Method 1: Via attribute (default)}
 ```r
@@ -309,11 +309,11 @@ Or use flextable directly in chunks:
 
 Specifically designed for tables from:
 \itemize{
-  \item \code{\link{desctable}} - Descriptive statistics
-  \item \code{\link{fit}} - Regression results
-  \item \code{\link{uniscreen}} - Univariable screening
-  \item \code{\link{fullfit}} - Combined analyses
-  \item \code{\link{compfit}} - Model comparisons
+  \item \code{desctable()} - Descriptive statistics
+  \item \code{fit()} - Regression results
+  \item \code{uniscreen()} - Univariable screening
+  \item \code{fullfit()} - Combined analyses
+  \item \code{compfit()} - Model comparisons
 }
 
 Automatic handling of:
@@ -347,7 +347,7 @@ Common issues and solutions:
 \emph{Need more customization:}
 \itemize{
   \item Use \code{return_ft = TRUE}
-  \item Modify flextable object with flextable package functions
+  \item Modify \pkg{flextable} object with flextable package functions
   \item Edit directly in Word after creation
 }
 }

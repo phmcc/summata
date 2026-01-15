@@ -2,11 +2,22 @@
 % Please edit documentation in R/desc_utils.R
 \name{format_categorical_stat}
 \alias{format_categorical_stat}
-\title{Format categorical statistic}
+\title{Format categorical statistic for display}
 \usage{
 format_categorical_stat(n, total, stat_type)
 }
+\arguments{
+\item{n}{Integer count for the category.}
+
+\item{total}{Integer total count for percentage calculation.}
+
+\item{stat_type}{Character string: "n", "n_percent", or "percent".}
+}
+\value{
+Character string with formatted statistic.
+}
 \description{
-Format categorical statistic
+Converts frequency counts into formatted display strings following
+standard conventions (n, n (%), % only).
 }
 \keyword{internal}

@@ -13,20 +13,26 @@ validate_model_outcome(
 )
 }
 \arguments{
-\item{outcome}{Outcome specification string}
+\item{outcome}{Character string outcome specification (may include Surv()).}
 
-\item{model_type}{Specified model type}
+\item{model_type}{Character string specified model type.}
 
-\item{family}{GLM family if applicable}
+\item{family}{GLM family object, function, or string if applicable.}
 
-\item{data}{Data for outcome type detection}
+\item{data}{Data frame or data.table for outcome type detection.}
 
-\item{auto_correct}{Whether to auto-correct fixable mismatches}
+\item{auto_correct}{Logical whether to auto-correct fixable mismatches.}
 }
 \value{
-List with model_type, family, messages, auto_corrected
+List with model_type, family, messages, auto_corrected flag.
 }
 \description{
+Ensures consistency between the specified model type, outcome variable type,
+and GLM family (if applicable). Detects common mismatches like using survival
+outcomes with non-survival models or binary outcomes with linear models.
+Can auto-correct fixable issues or raise informative errors.
+}
+\details{
 Checks for mismatches and auto-corrects or errors as appropriate.
 }
 \keyword{internal}

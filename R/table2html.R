@@ -4,10 +4,11 @@
 #' styling for web display, HTML documents, or embedding in web applications. 
 #' Generates clean, standards-compliant HTML with professional styling options 
 #' including responsive design support, color schemes, and interactive features.
+#' Requires \pkg{xtable} for export.
 #'
-#' @param table A data.frame, data.table, or matrix to export. Can be output from 
-#'   \code{\link{desctable}}, \code{\link{fit}}, \code{\link{uniscreen}}, 
-#'   \code{\link{fullfit}}, \code{\link{compfit}}, or any tabular data.
+#' @param table Data frame, data.table, or matrix to export. Can be output from 
+#'   \code{desctable()}, \code{fit()}, \code{uniscreen()}, 
+#'   \code{fullfit()}, \code{compfit()}, or any tabular data.
 #'   
 #' @param file Character string specifying the output HTML filename. Must have 
 #'   \code{.html} or \code{.htm} extension. Example: \code{"results.html"}.
@@ -480,7 +481,7 @@ table2html <- function(table,
         df <- format_pvalues_export_html(df, p_threshold)
     }
     
-    ## Calculate var_groups on the FINAL dataframe structure
+    ## Calculate var_groups on the FINAL data frame structure
     var_groups <- NULL
     if (zebra_stripes && "Variable" %in% names(df)) {
         ## For indented tables, non-indented rows mark variable starts

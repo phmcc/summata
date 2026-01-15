@@ -385,22 +385,6 @@ is_affirmative_category <- function(category, label = NULL,
 #' @return Logical indicating whether the binary variable should be condensed
 #'   without appending the category name.
 #' @keywords internal
-#' 
-#' @examples
-#' \dontrun{
-#' # Standard Yes/No - should condense
-#' should_condense_binary("No", "Yes", "Diabetes")
-#' # Returns TRUE (both are standard values)
-#' 
-#' # Descriptive levels matching label - should condense
-#' should_condense_binary("No 30-day readmission", "30-day readmission", 
-#'                        "30-Day Readmission")
-#' # Returns TRUE (levels match/contain label)
-#' 
-#' # Custom levels not matching - should NOT condense
-#' should_condense_binary("Group A", "Group B", "Treatment Arm")
-#' # Returns FALSE (neither is standard nor matches label)
-#' }
 should_condense_binary <- function(ref_category, non_ref_category, label = NULL) {
     ## Pre-normalize all strings once to avoid redundant normalization
     norm_ref <- if (!is.null(ref_category) && !is.na(ref_category) && ref_category != "") {
@@ -420,9 +404,6 @@ should_condense_binary <- function(ref_category, non_ref_category, label = NULL)
                   } else {
                       NULL
                   }
-    
-    ## Greedy approach: if EITHER category is recognizable, condense
-    ## Pass pre-normalized values to avoid redundant tolower/trimws calls
     
     ## Check reference category first (more likely to be "No", "0", etc.)
     if (!is.null(norm_ref)) {

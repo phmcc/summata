@@ -24,9 +24,9 @@ table2html(
 )
 }
 \arguments{
-\item{table}{A data.frame, data.table, or matrix to export. Can be output from 
-\code{\link{desctable}}, \code{\link{fit}}, \code{\link{uniscreen}}, 
-\code{\link{fullfit}}, \code{\link{compfit}}, or any tabular data.}
+\item{table}{Data frame, data.table, or matrix to export. Can be output from 
+\code{desctable()}, \code{fit()}, \code{uniscreen()}, 
+\code{fullfit()}, \code{compfit()}, or any tabular data.}
 
 \item{file}{Character string specifying the output HTML filename. Must have 
 \code{.html} or \code{.htm} extension. Example: \code{"results.html"}.}
@@ -94,6 +94,7 @@ Converts a data frame, data.table, or matrix to HTML format with optional CSS
 styling for web display, HTML documents, or embedding in web applications. 
 Generates clean, standards-compliant HTML with professional styling options 
 including responsive design support, color schemes, and interactive features.
+Requires \pkg{xtable} for export.
 }
 \details{
 \strong{Output Format:}

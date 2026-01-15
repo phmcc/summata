@@ -14,7 +14,7 @@ extract_predictor_effects(
 )
 }
 \arguments{
-\item{model}{A fitted model object.}
+\item{model}{Fitted model object.}
 
 \item{predictor}{Character string of the predictor variable name.}
 

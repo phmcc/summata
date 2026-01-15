@@ -4,7 +4,7 @@
 #' S3 models (glm, lm, coxph) via xlevels slot and S4 models (lme4) via
 #' the model frame.
 #' 
-#' @param model A fitted model object (S3 or S4).
+#' @param model Fitted model object (S3 or S4).
 #' @return Named list of factor levels, or NULL if no factors present.
 #' @keywords internal
 get_model_xlevels <- function(model) {
@@ -42,7 +42,7 @@ get_model_xlevels <- function(model) {
 #' Retrieves the original data used to fit a model. Checks multiple locations
 #' including model attributes, $data slot, $model slot, and @frame for S4.
 #' 
-#' @param model A fitted model object (S3 or S4).
+#' @param model Fitted model object (S3 or S4).
 #' @return Data frame or data.table used to fit the model, or NULL if unavailable.
 #' @keywords internal
 get_model_data <- function(model) {
@@ -78,7 +78,7 @@ get_model_data <- function(model) {
 #' predictors (multivariable) by analyzing coefficient names and factor structure.
 #' Handles interactions and random effects appropriately.
 #' 
-#' @param model A fitted model object.
+#' @param model Fitted model object.
 #' @return Character string: "Univariable" or "Multivariable".
 #' @keywords internal
 detect_model_type <- function(model) {
@@ -198,7 +198,7 @@ detect_model_type <- function(model) {
 #' Converts model class names to human-readable descriptions. For GLMs,
 #' uses the family to provide specific names (e.g., "Logistic", "Poisson").
 #' 
-#' @param model A fitted model object.
+#' @param model Fitted model object.
 #' @return Character string with readable model type name.
 #' @keywords internal
 get_model_type_name <- function(model) {
@@ -328,7 +328,7 @@ parse_term <- function(terms, xlevels = NULL, model = NULL) {
 #' Parses the Surv() expression in survival model formulas to extract
 #' the event/status variable name. Works with coxph, clogit, and coxme models.
 #' 
-#' @param model A fitted survival model object.
+#' @param model Fitted survival model object.
 #' @param model_class Character string of the model class.
 #' @return Character string naming the event variable, or NULL if not found.
 #' @keywords internal

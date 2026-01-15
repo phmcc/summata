@@ -2,7 +2,8 @@
 #'
 #' This file declares global variables used in non-standard evaluation (NSE)
 #' contexts throughout the package, primarily in data.table and ggplot2 operations.
-#' These declarations prevent R CMD check warnings about "no visible binding for global variable".
+#' These declarations prevent R CMD check warnings about "no visible binding for
+#' global variable".
 #'
 #' @importFrom stats aov fivenum
 #' @keywords internal

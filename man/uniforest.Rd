@@ -34,8 +34,8 @@ uniforest(
 )
 }
 \arguments{
-\item{x}{A uniscreen result object (data.table with class \code{uniscreen_result}
-from \code{\link{uniscreen}}).}
+\item{x}{Univariable screen result object (data.table with class attributes
+from \code{uniscreen()}).}
 
 \item{title}{Character string specifying the plot title. Default is 
 \code{"Univariable Screening"}. Use descriptive titles for publication.}
@@ -142,7 +142,7 @@ A \code{ggplot} object containing the complete forest plot.
   }
 }
 \description{
-Generates a publication-ready forest plot from a \code{\link{uniscreen}} output
+Generates a publication-ready forest plot from a \code{uniscreen()} output
 object. The plot displays effect estimates (OR, HR, RR, or coefficients) with
 confidence intervals for each predictor tested in univariable analysis against
 a single outcome.

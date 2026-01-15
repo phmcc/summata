@@ -35,8 +35,8 @@ multiforest(
 )
 }
 \arguments{
-\item{x}{A multifit result object (data.table with class attributes from 
-\code{\link{multifit}}).}
+\item{x}{Multifit result object (data.table with class attributes from 
+\code{multifit()}).}
 
 \item{title}{Character string specifying the plot title. Default is 
 \code{"Multivariate Analysis"}. Use descriptive titles for publication.}
@@ -151,7 +151,7 @@ A \code{ggplot} object containing the complete forest plot.
   }
 }
 \description{
-Generates a publication-ready forest plot from a \code{\link{multifit}} output
+Generates a publication-ready forest plot from a \code{multifit()} output
 object. The plot displays effect estimates (OR, HR, RR, or coefficients) with
 confidence intervals across multiple outcomes, organized by outcome with the
 predictor levels shown for each.

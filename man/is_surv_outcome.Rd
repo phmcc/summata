@@ -7,12 +7,14 @@
 is_surv_outcome(outcome)
 }
 \arguments{
-\item{outcome}{Character string of the outcome specification}
+\item{outcome}{Character string of the outcome specification.}
 }
 \value{
-Logical
+Logical TRUE if outcome starts with "Surv(", FALSE otherwise.
 }
 \description{
-Check if outcome is a Surv() expression
+Tests whether an outcome specification string represents a survival outcome
+by checking for the Surv() function pattern. Used to route model fitting
+to Cox proportional hazards methods.
 }
 \keyword{internal}

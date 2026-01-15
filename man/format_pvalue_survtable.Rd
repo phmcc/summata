@@ -15,6 +15,6 @@ format_pvalue_survtable(p, digits)
 Character formatted p-value.
 }
 \description{
-Format p-value for survtable
+Provides p-value formatting to the survtable result.
 }
 \keyword{internal}

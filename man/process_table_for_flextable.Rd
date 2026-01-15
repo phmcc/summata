@@ -60,10 +60,10 @@ process_table_for_flextable(
 \item{align}{Optional alignment specification.}
 }
 \value{
-List with ft (flextable object) and caption components.
+List with ft (\pkg{flextable} object) and caption components.
 }
 \description{
-Central processing function for creating flextable objects from data tables.
+Central processing function for creating \pkg{flextable} objects from data tables.
 Handles N row extraction, condensing, indentation, zebra stripes, formatting,
 and styling. Used by table2docx, table2pptx, and table2rtf.
 }

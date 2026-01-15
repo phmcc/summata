@@ -343,23 +343,29 @@ format_pvalues_fit <- function(p, digits = 3) {
     result
 }
 
-
-## ============================================================================
-## INPUT VALIDATION UTILITIES
-## ============================================================================
-
 #' Check if outcome is a Surv() expression
-#' @param outcome Character string of the outcome specification
-#' @return Logical
+#' 
+#' Tests whether an outcome specification string represents a survival outcome
+#' by checking for the Surv() function pattern. Used to route model fitting
+#' to Cox proportional hazards methods.
+#' 
+#' @param outcome Character string of the outcome specification.
+#' @return Logical TRUE if outcome starts with "Surv(", FALSE otherwise.
 #' @keywords internal
 is_surv_outcome <- function(outcome) {
     grepl("^Surv\\s*\\(", outcome)
 }
 
 #' Detect outcome type from data
-#' @param data Data frame
-#' @param outcome Outcome variable name
-#' @return Character: "binary", "continuous", "count", or "unknown"
+#' 
+#' Automatically determines whether an outcome variable is binary, continuous,
+#' or count-based by examining the data values. Used for automatic model type
+#' selection and validation. Binary outcomes have 2 unique values, continuous
+#' have many values or non-integers, counts have integers >= 0.
+#' 
+#' @param data Data frame or data.table containing the outcome variable.
+#' @param outcome Character string naming the outcome variable.
+#' @return Character string: "binary", "continuous", "count", or "unknown".
 #' @keywords internal
 detect_outcome_type <- function(data, outcome) {
     if (!outcome %in% names(data)) return("unknown")
@@ -384,15 +390,20 @@ detect_outcome_type <- function(data, outcome) {
 }
 
 #' Validate model type matches outcome specification
+#' 
+#' Ensures consistency between the specified model type, outcome variable type,
+#' and GLM family (if applicable). Detects common mismatches like using survival
+#' outcomes with non-survival models or binary outcomes with linear models.
+#' Can auto-correct fixable issues or raise informative errors.
 #'
 #' Checks for mismatches and auto-corrects or errors as appropriate.
 #'
-#' @param outcome Outcome specification string
-#' @param model_type Specified model type
-#' @param family GLM family if applicable
-#' @param data Data for outcome type detection
-#' @param auto_correct Whether to auto-correct fixable mismatches
-#' @return List with model_type, family, messages, auto_corrected
+#' @param outcome Character string outcome specification (may include Surv()).
+#' @param model_type Character string specified model type.
+#' @param family GLM family object, function, or string if applicable.
+#' @param data Data frame or data.table for outcome type detection.
+#' @param auto_correct Logical whether to auto-correct fixable mismatches.
+#' @return List with model_type, family, messages, auto_corrected flag.
 #' @keywords internal
 validate_model_outcome <- function(outcome, model_type, family = NULL, 
                                    data = NULL, auto_correct = TRUE) {
@@ -499,8 +510,14 @@ validate_model_outcome <- function(outcome, model_type, family = NULL,
 }
 
 #' Validate outcome exists in data
-#' @param data Data frame
-#' @param outcome Outcome specification
+#' 
+#' Checks that the specified outcome variable (or survival variables within
+#' Surv() expression) exists in the dataset. Raises informative error if
+#' variables are missing. Handles both simple outcomes and Surv() expressions.
+#' 
+#' @param data Data frame or data.table to check.
+#' @param outcome Character string outcome specification (may include Surv()).
+#' @return Invisible TRUE if validation passes, otherwise stops with error.
 #' @keywords internal
 validate_outcome_exists <- function(data, outcome) {
     if (is_surv_outcome(outcome)) {
@@ -518,8 +535,14 @@ validate_outcome_exists <- function(data, outcome) {
 }
 
 #' Validate predictors exist in data
-#' @param data Data frame
-#' @param predictors Predictor names
+#' 
+#' Checks that all specified predictor variables exist in the dataset. Handles
+#' interaction terms (splits on ":"), mixed-effects random effects (ignores
+#' "|" syntax), and raises informative errors for missing variables.
+#' 
+#' @param data Data frame or data.table to check.
+#' @param predictors Character vector of predictor variable names.
+#' @return Invisible TRUE if validation passes, otherwise stops with error.
 #' @keywords internal
 validate_predictors_exist <- function(data, predictors) {
     ## Remove random effects and extract interaction components
@@ -539,19 +562,22 @@ validate_predictors_exist <- function(data, predictors) {
 
 #' Complete input validation for fit functions
 #'
-#' Master validation function called by fit(), uniscreen(), fullfit().
+#' Master validation function called by fit(), uniscreen(), fullfit(). Performs
+#' comprehensive checks on data structure, variable existence, numeric parameter
+#' ranges, and model-outcome consistency. Returns validated parameters with
+#' auto-corrections applied when appropriate.
 #'
-#' @param data Data frame
-#' @param outcome Outcome specification
-#' @param predictors Predictor names
-#' @param model_type Model type
-#' @param family GLM family
-#' @param conf_level Confidence level
-#' @param digits Effect estimate digits
-#' @param p_digits P-value digits
-#' @param p_threshold P-value threshold
-#' @param auto_correct_model Auto-correct model type mismatches
-#' @return List with validated model_type, family, auto_corrected flag
+#' @param data Data frame or data.table containing all variables.
+#' @param outcome Character string outcome specification (may include Surv()).
+#' @param predictors Character vector of predictor variable names.
+#' @param model_type Character string model type to validate.
+#' @param family GLM family object, function, or string if applicable.
+#' @param conf_level Numeric confidence level (must be between 0 and 1).
+#' @param digits Integer number of decimal places for effect estimates.
+#' @param p_digits Integer number of decimal places for p-values.
+#' @param p_threshold Numeric p-value threshold for significance highlighting.
+#' @param auto_correct_model Logical whether to auto-correct model type mismatches.
+#' @return List with validated model_type, family, auto_corrected flag.
 #' @keywords internal
 validate_fit_inputs <- function(data, outcome, predictors, model_type,
                                 family = NULL, conf_level = 0.95,
