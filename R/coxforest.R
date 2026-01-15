@@ -1028,7 +1028,7 @@ Received class: ", paste(class(x), collapse = ", "))
                         row_counter <- row_counter + 1
                     } else {
                         ## Cannot determine reference - fall back to indent_groups behavior
-                        for (i in 1:nrow(var_rows)) {
+                        for (i in seq_len(nrow(var_rows))) {
                             processed_rows[[row_counter]] <- var_rows[i]
                             row_counter <- row_counter + 1
                         }
@@ -1047,7 +1047,7 @@ Received class: ", paste(class(x), collapse = ", "))
                         processed_rows[[row_counter]] <- header_row
                         row_counter <- row_counter + 1
                         
-                        for (i in 1:nrow(var_rows)) {
+                        for (i in seq_len(nrow(var_rows))) {
                             group_row <- data.table::copy(var_rows[i])
                             group_row[, var := paste0("    ", level)]
                             group_row[, level := "-"]
@@ -1055,7 +1055,7 @@ Received class: ", paste(class(x), collapse = ", "))
                             row_counter <- row_counter + 1
                         }
                     } else {
-                        for (i in 1:nrow(var_rows)) {
+                        for (i in seq_len(nrow(var_rows))) {
                             processed_rows[[row_counter]] <- var_rows[i]
                             row_counter <- row_counter + 1
                         }
@@ -1066,7 +1066,7 @@ Received class: ", paste(class(x), collapse = ", "))
         
         all_terms_df <- data.table::rbindlist(processed_rows, fill = TRUE)
         
-        for (i in 1:nrow(all_terms_df)) {
+        for (i in seq_len(nrow(all_terms_df))) {
             current_var <- all_terms_df$var[i]
             
             if (is.na(all_terms_df$inds[i]) && !grepl("^    ", current_var) && !grepl("\\(", current_var)) {
@@ -1260,7 +1260,7 @@ Received class: ", paste(class(x), collapse = ", "))
     to_show_exp_clean[is.na(estimate), estimate := 0]
     
     ## Reorder (flip) - but maintain the variable grouping
-    to_show_exp_clean <- to_show_exp_clean[order(nrow(to_show_exp_clean):1)]
+    to_show_exp_clean <- to_show_exp_clean[order(rev(seq_len(nrow(to_show_exp_clean))))]
     to_show_exp_clean[, x_pos := .I]
     
     ## Calculate plot ranges with better handling of extreme cases

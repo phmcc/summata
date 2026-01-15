@@ -656,7 +656,7 @@ uniforest <- function(x,
     to_show_exp_clean[is.na(estimate), estimate := 0]
     
     ## Reorder (flip) - maintain variable grouping
-    to_show_exp_clean <- to_show_exp_clean[order(nrow(to_show_exp_clean):1)]
+    to_show_exp_clean <- to_show_exp_clean[order(rev(seq_len(nrow(to_show_exp_clean))))]
     to_show_exp_clean[, x_pos := .I]
     
     ## Calculate plot ranges

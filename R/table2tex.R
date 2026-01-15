@@ -553,7 +553,7 @@ table2tex <- function (table,
             ## Adjust var_groups for padding
             new_var_groups <- integer(nrow(df) + length(padding_positions))
             current_pos <- 1
-            for (i in 1:nrow(df)) {
+            for (i in seq_len(nrow(df))) {
                 new_var_groups[current_pos] <- var_groups[i]
                 current_pos <- current_pos + 1
                 if (i %in% padding_positions) {
@@ -644,7 +644,7 @@ table2tex <- function (table,
             commands <- character()
             positions <- numeric()
             
-            for (i in 1:nrow(df)) {
+            for (i in seq_len(nrow(df))) {
                 if (var_groups[i] %% 2 != 0 && var_groups[i] > 0) {
                     commands <- c(commands, paste0("\\rowcolor{", stripe_color, "}"))
                     positions <- c(positions, i - 1)
