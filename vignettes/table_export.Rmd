@@ -114,7 +114,7 @@ autotable(
 
 The `table2docx()` function creates editable Word documents using the `flextable` package.
 
-## Basic Export
+## **Example 1:** Basic Export
 
 The simplest usage requires only a table and filename:
 
@@ -125,7 +125,7 @@ table2docx(
 )
 ```
 
-## With Caption
+## **Example 2:** With Caption
 
 Add a caption using the `caption` parameter:
 
@@ -137,7 +137,7 @@ table2docx(
 )
 ```
 
-## With Formatting Options
+## **Example 3:** With Formatting Options
 
 Multiple formatting options can be combined:
 
@@ -155,7 +155,7 @@ table2docx(
 )
 ```
 
-## Page Layout
+## **Example 4:** Page Layout
 
 Control page size and orientation for wide tables:
 
@@ -169,7 +169,7 @@ table2docx(
 )
 ```
 
-## Dark Header Style
+## **Example 5:** Dark Header Style
 
 Use a dark header background for visual emphasis:
 
@@ -189,7 +189,7 @@ table2docx(
 
 The `table2pdf()` function creates PDF documents using LaTeX typesetting. A LaTeX distribution (TinyTeX, TeX Live, MiKTeX, or MacTeX) is required.
 
-## Basic Export
+## **Example 6:** Basic Export
 
 The simplest usage requires only a table and filename:
 
@@ -200,7 +200,7 @@ table2pdf(
 )
 ```
 
-## With Caption
+## **Example 7:** With Caption
 
 Add a caption using the `caption` parameter:
 
@@ -212,7 +212,7 @@ table2pdf(
 )
 ```
 
-## With Formatting Options
+## **Example 8:** With Formatting Options
 
 Multiple formatting options can be combined:
 
@@ -230,7 +230,7 @@ table2pdf(
 )
 ```
 
-## Page Layout
+## **Example 9:** Page Layout
 
 Control page size and orientation:
 
@@ -244,7 +244,7 @@ table2pdf(
 )
 ```
 
-## Custom Margins
+## **Example 10:** Custom Margins
 
 Adjust page margins (in inches):
 
@@ -256,7 +256,7 @@ table2pdf(
 )
 ```
 
-## Fit to Page Width
+## **Example 11:** Fit to Page Width
 
 Scale tables to fit the page width:
 
@@ -268,7 +268,7 @@ table2pdf(
 )
 ```
 
-## Standalone Table
+## **Example 12:** Standalone Table
 
 Standalone settings are useful for embedding tables in larger documents:
 
@@ -286,7 +286,7 @@ table2pdf(
 
 The `table2html()` function exports tables to HTML file output for web use.
 
-## Basic Export
+## **Example 13:** Basic Export
 
 The simplest usage requires only a table and filename:
 
@@ -297,7 +297,7 @@ table2html(
 )
 ```
 
-## With Caption
+## **Example 14:** With Caption
 
 Add a caption using the `caption` parameter:
 
@@ -309,7 +309,7 @@ table2html(
 )
 ```
 
-## With Formatting Options
+## **Example 15:** With Formatting Options
 
 Multiple formatting options can be combined:
 
@@ -331,7 +331,7 @@ table2html(
 
 The `table2pptx()` function creates PowerPoint presentations with tables.
 
-## Basic Export
+## **Example 16:** Basic Export
 
 The simplest usage creates a single-slide presentation:
 
@@ -342,7 +342,7 @@ table2pptx(
 )
 ```
 
-## With Slide Title
+## **Example 17:** With Slide Title
 
 Add a slide title using the `slide_title` parameter:
 
@@ -354,7 +354,7 @@ table2pptx(
 )
 ```
 
-## With Formatting Options
+## **Example 18:** With Formatting Options
 
 Multiple formatting options can be combined:
 
@@ -371,7 +371,7 @@ table2pptx(
 )
 ```
 
-## Custom Template
+## **Example 19:** Custom Template
 
 Use an existing PowerPoint template:
 
@@ -391,7 +391,7 @@ table2pptx(
 
 The `table2tex()` function creates LaTeX source files for inclusion in manuscripts.
 
-## Basic Export
+## **Example 20:** Basic Export
 
 The simplest usage requires only a table and filename:
 
@@ -402,7 +402,7 @@ table2tex(
 )
 ```
 
-## With Caption and Label
+## **Example 21:** With Caption and Label
 
 Add caption and cross-reference label:
 
@@ -415,7 +415,7 @@ table2tex(
 )
 ```
 
-## With Booktabs Styling
+## **Example 22:** With Booktabs Styling
 
 Use the booktabs package for professional formatting:
 
@@ -437,7 +437,7 @@ table2tex(
 
 The `table2rtf()` function creates Rich Text Format files, commonly used for regulatory submissions.
 
-## Basic Export
+## **Example 23:** Basic Export
 
 The simplest usage requires only a table and filename:
 
@@ -448,7 +448,7 @@ table2rtf(
 )
 ```
 
-## With Formatting Options
+## **Example 24:** With Formatting Options
 
 Multiple formatting options can be combined:
 
@@ -465,7 +465,7 @@ table2rtf(
 )
 ```
 
-## Page Layout
+## **Example 25:** Page Layout
 
 Control page size and orientation:
 
@@ -516,7 +516,7 @@ table2docx(
   zebra_stripes = TRUE
 )
 
-# Condense only continuous/survival
+# Condense only continuous/survival (descriptive tables only)
 table2docx(
   table = table1,
   file = "Table1_CondenseQuant.docx",
@@ -589,8 +589,8 @@ table2docx(
 
 ## Page Layout Guidelines
 
-1. **Portrait**: Tables with ≤6 columns
-2. **Landscape**: Tables with >6 columns
+1. **Portrait**: Tables with ≤ 6 columns
+2. **Landscape**: Tables with > 6 columns
 3. **Auto-sizing**: Use `paper = "auto"` for embedding
 
 ## Consistent Multi-Format Export

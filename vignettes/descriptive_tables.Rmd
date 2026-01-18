@@ -45,39 +45,18 @@ The `clintrial` dataset contains `r nrow(clintrial)` observations with continuou
 
 ---
 
-# Theoretical Background
+# Summary Statistics and Tests
 
-## Summary Statistics
+The `desctable()` function automatically selects appropriate summary statistics and hypothesis tests based on variable type:
 
-For continuous variables, `desctable()` computes location and scale parameters:
+| Variable Type | Summary Statistic | Two Groups | Three+ Groups |
+|:--------------|:------------------|:-----------|:--------------|
+| Continuous (parametric) | Mean ± SD | *t*-test | ANOVA |
+| Continuous (nonparametric) | Median [IQR] | Wilcoxon | Kruskal–Wallis |
+| Categorical | *n* (%) | χ² or Fisher | χ² or Fisher |
+| Time-to-event | Median (95% CI) | Log-rank | Log-rank |
 
-| Statistic | Formula | Use Case |
-|:----------|:--------|:---------|
-| Mean ± SD | $\bar{x} \pm s$ | Symmetric distributions |
-| Median (IQR) | $\tilde{x}$ (Q1–Q3) | Skewed distributions |
-| Median (Range) | $\tilde{x}$ (min–max) | Small samples, outlier detection |
-
-For categorical variables, the function tabulates counts and proportions:
-
-| Statistic | Notation | Description |
-|:----------|:---------|:------------|
-| n (%) | $n_i$ ($100 \cdot n_i / N$) | Count and percentage |
-| n only | $n_i$ | Count without percentage |
-| % only | $100 \cdot n_i / N$ | Percentage without count |
-
-## Hypothesis Tests
-
-When `test = TRUE`, the function selects appropriate tests based on variable type:
-
-| Variable Type | Two Groups | Three or More Groups |
-|:--------------|:-----------|:---------------------|
-| Continuous (mean-based) | Student's *t*-test | One-way ANOVA |
-| Continuous (median-based) | Wilcoxon rank-sum | Kruskal–Wallis |
-| Categorical | χ² test | χ² test |
-| Categorical (sparse cells) | Fisher's exact | Fisher's exact |
-| Time-to-event | Log-rank | Log-rank |
-
-For continuous variables with `test_continuous = "auto"`, the test selection follows the displayed statistic: parametric tests (*t*-test, ANOVA) are used when `stats_continuous` includes mean-based statistics, while nonparametric tests (Wilcoxon, Kruskal–Wallis) are used for median-based statistics. This ensures consistency between the summary measure and its associated test. For categorical variables, the function computes expected cell frequencies and uses Fisher's exact test when any expected count falls below 5.
+For categorical variables, Fisher's exact test is used when any expected cell count falls below 5. For continuous variables, the test selection follows the displayed statistic: parametric tests are used with mean-based statistics, nonparametric tests with median-based statistics.
 
 ---
 
@@ -91,7 +70,7 @@ The `desctable()` function follows the standard `summata` calling convention wit
 desctable(data, by, variables, ...)
 ```
 
-Here `data` is the dataset, `by` specifies the grouping variable (optional), and `variables` lists the variables to summarize.
+where `data` is the dataset, `by` specifies the grouping variable (optional), and `variables` lists the variables to summarize.
 
 ## **Example 1:** Grouped Descriptive Table
 
@@ -139,8 +118,8 @@ The `stats_continuous` parameter controls how continuous variables are summarize
 
 | Value | Output Format |
 |:------|:--------------|
-| `"mean_sd"` | Mean ± SD (default) |
-| `"median_iqr"` | Median (Q1–Q3) |
+| `"mean_sd"` | Mean ± SD |
+| `"median_iqr"` | Median [Q1–Q3] (default) |
 | `"median_range"` | Median (min–max) |
 
 ```{r}
@@ -148,7 +127,7 @@ example3 <- desctable(
   data = clintrial,
   by = "treatment",
   variables = c("age", "bmi", "los_days"),
-  stats_continuous = "median_iqr",
+  stats_continuous = c("mean_sd", "median_iqr", "median_range"),
   labels = clintrial_labels
 )
 
@@ -161,8 +140,8 @@ The `stats_categorical` parameter controls categorical variable display:
 
 | Value | Output Format |
 |:------|:--------------|
-| `"n_percent"` | n (%) (default) |
-| `"n"` | n only |
+| `"n_percent"` | *n* (%) (default) |
+| `"n"` | *n* only |
 | `"percent"` | % only |
 
 ```{r}
@@ -201,16 +180,16 @@ example5
 
 When comparing groups, hypothesis tests assess whether observed differences are statistically significant.
 
-## **Example 6:** Automatic Test Selection
+## **Example 6:** Disabling Automatic Test Selection
 
-Setting `test = TRUE` enables automatic hypothesis testing based on the summary statistic being displayed:
+By default, automatic hypothesis testing based on the summary statistic is displayed (`test = TRUE`). Setting `test = FALSE` disables this functionality:
 
 ```{r}
 example6 <- desctable(
   data = clintrial,
   by = "treatment",
   variables = c("age", "bmi", "sex", "stage"),
-  test = TRUE,
+  test = FALSE,
   labels = clintrial_labels
 )
 
@@ -219,7 +198,23 @@ example6
 
 ## **Example 7:** Specifying Tests Manually
 
-Override automatic selection with `test_continuous` and `test_categorical`. The following example forces nonparametric tests for continuous variables:
+Override automatic selection with `test_continuous` and `test_categorical`. Available test specifications include:
+
+**Continuous** (`test_continuous`):
+
+- `"auto"`: Automatic selection (default)
+- `"t"`: Student's *t*-test
+- `"wrs"`: Wilcoxon rank-sum test
+- `"aov"`: One-way ANOVA
+- `"kwt"`: Kruskal–Wallis test
+
+**Categorical** (`test_categorical`):
+
+- `"auto"`: Automatic selection (default)
+- `"chisq"`: Pearson's χ² test
+- `"fisher"`: Fisher's exact test
+
+The following example forces parametric tests for continuous variables:
 
 ```{r}
 example7a <- desctable(
@@ -227,7 +222,7 @@ example7a <- desctable(
   by = "treatment",
   variables = c("age", "bmi", "los_days"),
   test = TRUE,
-  test_continuous = "wrs",  # Wilcoxon rank-sum
+  test_continuous = "aov",  # ANOVA
   labels = clintrial_labels
 )
 
@@ -248,22 +243,6 @@ example7b <- desctable(
 
 example7b
 ```
-
-Available test specifications include:
-
-**Continuous (`test_continuous`):**
-
-- `"auto"`: Automatic selection (default)
-- `"t"`: Student's *t*-test
-- `"wrs"`: Wilcoxon rank-sum test
-- `"aov"`: One-way ANOVA
-- `"kwt"`: Kruskal–Wallis test
-
-**Categorical (`test_categorical`):**
-
-- `"auto"`: Automatic selection (default)
-- `"chisq"`: Pearson's χ² test
-- `"fisher"`: Fisher's exact test
 
 ---
 
@@ -302,6 +281,8 @@ example9a <- desctable(
   labels = clintrial_labels
 )
 
+example9a
+
 # Percentages include missing (denominator = total)
 example9b <- desctable(
   data = clintrial,
@@ -311,6 +292,8 @@ example9b <- desctable(
   na_percent = TRUE,
   labels = clintrial_labels
 )
+
+example9b
 ```
 
 ## **Example 10:** Custom Missing Value Label
@@ -342,8 +325,7 @@ The `total` parameter controls the presence and position of the total column:
 
 | Value | Effect |
 |:------|:-------|
-| `TRUE` | Total column first (default) |
-| `"first"` | Total column first |
+| `TRUE`, `"first"` | Total column first (default) |
 | `"last"` | Total column last |
 | `FALSE` | No total column |
 

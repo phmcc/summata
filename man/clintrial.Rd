@@ -5,7 +5,7 @@
 \alias{clintrial}
 \title{Simulated Clinical Trial Dataset}
 \format{
-A data frame with 850 observations and 28 variables:
+A data frame with 850 observations and 32 variables:
 \describe{
   \item{patient_id}{Unique patient identifier (character)}
   \item{age}{Age at enrollment in years (numeric: 18-90)}
@@ -33,6 +33,10 @@ A data frame with 850 observations and 28 variables:
   \item{pain_score}{Pain score at discharge (numeric: 0-10)}
   \item{recovery_days}{Days to functional recovery (numeric)}
   \item{los_days}{Hospital length of stay in days (numeric)}
+  \item{ae_count}{Adverse event count (integer). Overdispersed count suitable
+    for negative binomial or quasipoisson regression.}
+  \item{fu_count}{Follow-up visit count (integer). Equidispersed count
+    suitable for standard Poisson regression.}
   \item{pfs_months}{Progression-Free Survival Time (months)}
   \item{pfs_status}{Progression or Death Event}
   \item{os_months}{Overall survival time in months (numeric)}
@@ -54,6 +58,8 @@ the full capabilities of descriptive and regression analysis functions.
 This dataset includes realistic correlations between variables:
 - Survival is worse with higher stage, ECOG, age, and biomarker_x
 - Treatment effects show Drug B > Drug A > Control
+- \code{ae_count} is overdispersed (variance > mean) for negative binomial demos
+- \code{fu_count} is equidispersed (variance ≈ mean) for Poisson demos
 - Approximately 2\% of values are missing at random
 - Median follow-up is approximately 30 months
 }
@@ -68,19 +74,19 @@ desctable(clintrial,
                      "biomarker_x", "Surv(os_months, os_status)"),
         labels = clintrial_labels)
 
-# Univariable screening
-uniscreen(clintrial,
-        outcome = "Surv(os_months, os_status)",
-        predictors = c("age", "sex", "stage", "grade", "ecog",
-                      "biomarker_x", "treatment"),
-        model_type = "coxph",
-        labels = clintrial_labels)
-
-# Multivariable model
+# Poisson regression for equidispersed counts
 fit(clintrial,
-    outcome = "Surv(os_months, os_status)",
-    predictors = c("age", "stage", "ecog", "biomarker_x", "treatment"),
-    model_type = "coxph",
+    outcome = "fu_count",
+    predictors = c("age", "stage", "treatment"),
+    model_type = "glm",
+    family = "poisson",
+    labels = clintrial_labels)
+
+# Negative binomial for overdispersed counts
+fit(clintrial,
+    outcome = "ae_count",
+    predictors = c("age", "treatment", "diabetes"),
+    model_type = "negbin",
     labels = clintrial_labels)
 
 # Complete analysis pipeline

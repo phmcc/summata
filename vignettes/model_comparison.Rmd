@@ -41,38 +41,17 @@ data(clintrial_labels)
 
 ---
 
-# Theoretical Background
+# Model Quality Metrics
 
-## Information Criteria
+The `compfit()` function reports several metrics for comparing models. For mathematical details, see the [Statistical Foundations](statistical_foundations.html) article.
 
-Information criteria penalize model complexity to prevent overfitting:
-
-**Akaike Information Criterion (AIC):**
-$$\text{AIC} = -2\log L + 2k$$
-
-**Bayesian Information Criterion (BIC):**
-$$\text{BIC} = -2\log L + k\log n$$
-
-where *L* is the maximized likelihood, *k* is the number of parameters, and *n* is the sample size. Lower values indicate better fit-complexity tradeoff. BIC penalizes complexity more heavily than AIC.
-
-## Discrimination Metrics
-
-The concordance statistic (C-statistic) measures a model's ability to discriminate between outcomes:
-
-- **C = 0.5**: No discrimination (equivalent to random)
-- **C = 0.7–0.8**: Acceptable discrimination
-- **C = 0.8–0.9**: Excellent discrimination
-- **C > 0.9**: Outstanding discrimination
-
-For survival models, this corresponds to Harrell's C-index.
-
-## Pseudo-*R*²
-
-For generalized linear models, McFadden's pseudo-*R*² provides an analog to the coefficient of determination:
-
-$$R^2_{\text{McFadden}} = 1 - \frac{\log L_{\text{full}}}{\log L_{\text{null}}}$$
-
-Values typically range from 0.2–0.4 for well-fitting models.
+| Metric | Interpretation | Better |
+|:-------|:---------------|:-------|
+| AIC | Information criterion balancing fit and complexity | Lower |
+| BIC | Information criterion with stronger complexity penalty | Lower |
+| Concordance | Discrimination ability (0.5 = random, 1.0 = perfect) | Higher |
+| Pseudo-*R²* | Proportion of variation explained (GLMs) | Higher |
+| Brier Score | Prediction accuracy for binary outcomes | Lower |
 
 ---
 
@@ -110,7 +89,7 @@ The output includes the following metrics:
 | Metric | Interpretation |
 |:-------|:---------------|
 | Summata Score | Composite metric (0–100, higher is better) |
-| N | Sample size |
+| *n* | Sample size |
 | Events | Number of outcome events |
 | Predictors | Number of model parameters |
 | Converged | Convergence status |
@@ -158,18 +137,41 @@ example3 <- compfit(
 example3
 ```
 
+## **Example 4:** Count Models (Poisson Regression)
+
+For count outcomes, use `model_type = "glm"` with `family = "poisson"`. The `clintrial` dataset includes `fu_count` (equidispersed follow-up visits) suitable for Poisson regression:
+
+```{r}
+example4 <- compfit(
+  data = clintrial,
+  outcome = "fu_count",
+  model_list = list(
+    "Minimal" = c("age", "treatment"),
+    "Clinical" = c("age", "treatment", "stage", "ecog"),
+    "Full" = c("age", "treatment", "stage", "ecog", "surgery", "diabetes")
+  ),
+  model_type = "glm",
+  family = "poisson",
+  labels = clintrial_labels
+)
+
+example4
+```
+
+For overdispersed count data like `ae_count`, use `model_type = "negbin"` instead to properly account for extra-Poisson variation.
+
 ---
 
 # Interaction Testing
 
 A key application of `compfit()` is testing whether interaction terms improve model fit.
 
-## **Example 4:** Single Interaction
+## **Example 5:** Single Interaction
 
 Compare a main-effects model to one with an interaction term:
 
 ```{r}
-example4 <- compfit(
+example5 <- compfit(
   data = clintrial,
   outcome = "surgery",
   model_list = list(
@@ -183,15 +185,15 @@ example4 <- compfit(
   model_type = "glm"
 )
 
-example4
+example5
 ```
 
-## **Example 5:** Multiple Interactions
+## **Example 6:** Multiple Interactions
 
 Compare different interaction hypotheses:
 
 ```{r}
-example5 <- compfit(
+example6 <- compfit(
   data = clintrial,
   outcome = "Surv(os_months, os_status)",
   model_list = list(
@@ -209,19 +211,19 @@ example5 <- compfit(
   model_type = "coxph"
 )
 
-example5
+example6
 ```
 
 ---
 
 # Accessing Detailed Results
 
-## Coefficient Comparison
+## **Example 7:** Coefficient Comparison
 
 Setting `include_coefficients = TRUE` generates a table comparing coefficients across models:
 
 ```{r}
-example6 <- compfit(
+example7 <- compfit(
   data = clintrial,
   outcome = "surgery",
   model_list = list(
@@ -235,31 +237,31 @@ example6 <- compfit(
 )
 
 # Main comparison
-example6
+example7
 
 # Coefficient table
-coef_table <- attr(example6, "coefficients")
+coef_table <- attr(example7, "coefficients")
 coef_table
 ```
 
-## Fitted Model Objects
+## **Example 8:** Fitted Model Objects
 
 The underlying model objects are stored as attributes for further analysis:
 
 ```{r}
-models <- attr(example6, "models")
+models <- attr(example7, "models")
 names(models)
 
 # Examine a specific model
 summary(models[["Model C"]])
 ```
 
-## Recommended Model
+## **Example 9:** Recommended Model
 
 The best-performing model is identified automatically based on the Summata Score:
 
 ```{r}
-example7 <- compfit(
+example9 <- compfit(
   data = clintrial,
   outcome = "Surv(os_months, os_status)",
   model_list = list(
@@ -270,7 +272,7 @@ example7 <- compfit(
   model_type = "coxph"
 )
 
-recommended <- attr(example7, "recommended")
+recommended <- attr(example9, "recommended")
 cat("Recommended model:", recommended, "\n")
 ```
 
@@ -300,7 +302,7 @@ The score components and their default weights vary by model type.
 |:----------|:-------|
 | Convergence | 15% |
 | AIC | 25% |
-| Adjusted *R*² | 45% |
+| Adjusted *R²* | 45% |
 | RMSE | 15% |
 
 **Logistic regression (`glm`):**
@@ -310,7 +312,7 @@ The score components and their default weights vary by model type.
 | Convergence | 15% |
 | AIC | 25% |
 | Concordance | 40% |
-| Pseudo-*R*² | 15% |
+| Pseudo-*R²* | 15% |
 | Brier Score | 5% |
 
 **Cox regression (`coxph`):**
@@ -322,12 +324,12 @@ The score components and their default weights vary by model type.
 | Concordance | 40% |
 | Global *p* | 15% |
 
-## Custom Weights
+## **Example 10:** Custom Weights
 
 Modify the scoring weights to emphasize specific metrics:
 
 ```{r}
-example8 <- compfit(
+example10 <- compfit(
   data = clintrial,
   outcome = "surgery",
   model_list = list(
@@ -345,14 +347,14 @@ example8 <- compfit(
   )
 )
 
-example8
+example10
 ```
 
 ---
 
 # Application Scenarios
 
-## Confounder Assessment
+## **Scenario 1:** Confounder Assessment
 
 Evaluate the impact of covariate adjustment on effect estimates:
 
@@ -376,7 +378,7 @@ scenario1
 attr(scenario1, "coefficients")
 ```
 
-## Variable Selection Validation
+## **Scenario 2:** Variable Selection Validation
 
 Compare automated versus theory-driven selection:
 
@@ -408,7 +410,7 @@ scenario2 <- compfit(
 scenario2
 ```
 
-## Parsimony Assessment
+## **Scenario 3:** Parsimony Assessment
 
 Test whether additional predictors meaningfully improve fit:
 
@@ -530,6 +532,7 @@ comparison[, .(Model, `Summata Score`, AIC, Concordance)]
 
 # Further Reading
 
+- [Statistical Foundations](statistical_foundations.html): Mathematical details for model quality metrics
 - [Descriptive Tables](descriptive_tables.html): `desctable()` for baseline characteristics
 - [Regression Modeling](regression_modeling.html): `fit()`, `uniscreen()`, and `fullfit()`
 - [Table Export](table_export.html): Export to PDF, Word, and other formats

@@ -468,11 +468,12 @@ linear_result <- fullfit(
 )
 print(linear_result)
 
-# Example 13: Poisson regression
+# Example 13: Poisson regression for equidispersed count outcomes
+# fu_count has variance ≈ mean, appropriate for standard Poisson
 poisson_result <- fullfit(
     data = clintrial,
-    outcome = "los_days",
-    predictors = c("age", "treatment", "surgery", "stage"),
+    outcome = "fu_count",
+    predictors = c("age", "stage", "treatment", "surgery"),
     model_type = "glm",
     family = "poisson",
     method = "all",
@@ -480,6 +481,7 @@ poisson_result <- fullfit(
 )
 print(poisson_result)
 # Returns rate ratios (RR/aRR)
+# For overdispersed counts (ae_count), use model_type = "negbin" instead
 
 # Example 14: Keep univariable models for diagnostics
 with_models <- fullfit(

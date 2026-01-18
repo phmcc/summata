@@ -31,8 +31,8 @@
 #'     \item \code{"median_range"} - Median (minimum-maximum)
 #'     \item \code{"range"} - Minimum-maximum only
 #'   }
-#'   Default is \code{c("mean_sd", "median_iqr", "range")}. Multiple statistics 
-#'   create separate rows for each variable.
+#'   Multiple statistics create separate rows for each variable. Default is
+#'   \code{"median_iqr"}. 
 #'   
 #' @param stats_categorical Character string specifying the format for 
 #'   categorical variable summaries:

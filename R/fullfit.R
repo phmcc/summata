@@ -441,11 +441,12 @@
 #' )
 #' print(linear_result)
 #' 
-#' # Example 13: Poisson regression
+#' # Example 13: Poisson regression for equidispersed count outcomes
+#' # fu_count has variance ≈ mean, appropriate for standard Poisson
 #' poisson_result <- fullfit(
 #'     data = clintrial,
-#'     outcome = "los_days",
-#'     predictors = c("age", "treatment", "surgery", "stage"),
+#'     outcome = "fu_count",
+#'     predictors = c("age", "stage", "treatment", "surgery"),
 #'     model_type = "glm",
 #'     family = "poisson",
 #'     method = "all",
@@ -453,6 +454,7 @@
 #' )
 #' print(poisson_result)
 #' # Returns rate ratios (RR/aRR)
+#' # For overdispersed counts (ae_count), use model_type = "negbin" instead
 #' 
 #' # Example 14: Keep univariable models for diagnostics
 #' with_models <- fullfit(
@@ -679,7 +681,8 @@ fullfit <- function(data,
         show_n = show_n,
         show_events = show_events,
         labels = labels,
-        exponentiate = exponentiate
+        exponentiate = exponentiate,
+        conf_level = conf_level
     )
 
     ## Add attributes
@@ -689,6 +692,8 @@ fullfit <- function(data,
     data.table::setattr(result, "columns", columns)
     data.table::setattr(result, "uni_raw", uni_raw)
     data.table::setattr(result, "multi_raw", multi_raw)
+    data.table::setattr(result, "p_threshold", p_threshold)
+    data.table::setattr(result, "n_screened", length(predictors))
 
     if (!is.null(multi_model)) {
         data.table::setattr(result, "model", multi_model)
@@ -723,23 +728,25 @@ fullfit <- function(data,
 #' @param show_events Logical whether to include events column.
 #' @param labels Optional named character vector of variable labels.
 #' @param exponentiate Optional logical for coefficient exponentiation.
+#' @param conf_level Numeric confidence level for CI label.
 #' @return Combined data.table with aligned univariable and multivariable results.
 #' @keywords internal
 format_fullfit_combined <- function(uni_formatted, multi_formatted, 
                                     uni_raw, multi_raw,
                                     predictors, columns, metrics, 
                                     show_n, show_events, labels,
-                                    exponentiate = NULL) {
+                                    exponentiate = NULL,
+                                    conf_level = 0.95) {
     
     ## Handle single-table cases quickly
     if (columns == "uni" && !is.null(uni_formatted)) {
         return(finalize_column_names(uni_formatted, uni_raw, multi_raw, 
-                                     exponentiate, columns, metrics))
+                                     exponentiate, columns, metrics, conf_level))
     }
     
     if (columns == "multi" && !is.null(multi_formatted)) {
         return(finalize_column_names(multi_formatted, uni_raw, multi_raw, 
-                                     exponentiate, columns, metrics))
+                                     exponentiate, columns, metrics, conf_level))
     }
     
     ## For "both" columns, use merge approach
@@ -749,12 +756,12 @@ format_fullfit_combined <- function(uni_formatted, multi_formatted,
     
     if (is.null(uni_formatted)) {
         return(finalize_column_names(multi_formatted, uni_raw, multi_raw, 
-                                     exponentiate, "multi", metrics))
+                                     exponentiate, "multi", metrics, conf_level))
     }
     
     if (is.null(multi_formatted)) {
         return(finalize_column_names(uni_formatted, uni_raw, multi_raw, 
-                                     exponentiate, "uni", metrics))
+                                     exponentiate, "uni", metrics, conf_level))
     }
     
     ## Events only apply to binomial GLM (logistic) and survival models
@@ -781,11 +788,11 @@ format_fullfit_combined <- function(uni_formatted, multi_formatted,
     multi_copy[, .var_group := Variable[1], by = .var_group_id]
     multi_copy[, .row_in_var := seq_len(.N), by = .var_group_id]
     
-    ## Identify effect and p-value columns
-    uni_effect_col <- grep("\\(95% CI\\)$", names(uni_copy), value = TRUE)[1]
+    ## Identify effect and p-value columns (match any CI percentage)
+    uni_effect_col <- grep("\\([0-9]+% CI\\)$", names(uni_copy), value = TRUE)[1]
     uni_p_col <- if ("p-value" %in% names(uni_copy)) "p-value" else NULL
     
-    multi_effect_col <- grep("\\(95% CI\\)$", names(multi_copy), value = TRUE)[1]
+    multi_effect_col <- grep("\\([0-9]+% CI\\)$", names(multi_copy), value = TRUE)[1]
     multi_p_col <- if ("p-value" %in% names(multi_copy)) "p-value" else NULL
     
     ## Rename columns for merge
@@ -843,7 +850,7 @@ format_fullfit_combined <- function(uni_formatted, multi_formatted,
     }
     
     ## Rename columns for display
-    result <- finalize_column_names(result, uni_raw, multi_raw, exponentiate, columns, metrics)
+    result <- finalize_column_names(result, uni_raw, multi_raw, exponentiate, columns, metrics, conf_level)
     
     return(result)
 }
@@ -871,11 +878,15 @@ format_fullfit_combined <- function(uni_formatted, multi_formatted,
 #'   \code{"p"}, or both). Used for context.
 #' @return The input data.table with columns renamed
 #' @keywords internal
-finalize_column_names <- function(result, uni_raw, multi_raw, exponentiate, columns, metrics) {
+finalize_column_names <- function(result, uni_raw, multi_raw, exponentiate, columns, metrics, conf_level = 0.95) {
+    
+    ## Format confidence level for display
+    ci_pct <- round(conf_level * 100)
+    ci_label <- paste0(ci_pct, "% CI")
     
     if ("uni_effect" %in% names(result)) {
         effect_type <- determine_effect_type(uni_raw, multi_raw, exponentiate, adjusted = FALSE)
-        data.table::setnames(result, "uni_effect", paste0(effect_type, " (95% CI)"))
+        data.table::setnames(result, "uni_effect", paste0(effect_type, " (", ci_label, ")"))
     }
     
     if ("uni_p" %in% names(result)) {
@@ -884,7 +895,7 @@ finalize_column_names <- function(result, uni_raw, multi_raw, exponentiate, colu
     
     if ("multi_effect" %in% names(result)) {
         effect_type <- determine_effect_type(uni_raw, multi_raw, exponentiate, adjusted = TRUE)
-        data.table::setnames(result, "multi_effect", paste0(effect_type, " (95% CI)"))
+        data.table::setnames(result, "multi_effect", paste0(effect_type, " (", ci_label, ")"))
     }
     
     if ("multi_p" %in% names(result)) {
@@ -953,16 +964,30 @@ determine_effect_type <- function(uni_raw, multi_raw, exponentiate, adjusted = F
 #' @keywords internal
 #' @export
 print.fullfit_result <- function(x, ...) {
-    cat("\nFastfit Analysis Results\n")
+    cat("\nFullfit Analysis Results\n")
     cat("Outcome: ", attr(x, "outcome"), "\n", sep = "")
     cat("Model Type: ", attr(x, "model_type"), "\n", sep = "")
-    cat("Method: ", attr(x, "method"), "\n", sep = "")
     
-    if (!is.null(attr(x, "n_multi"))) {
-        cat("Multivariable predictors: ", attr(x, "n_multi"), "\n", sep = "")
+    method <- attr(x, "method")
+    p_thresh <- attr(x, "p_threshold")
+    if (!is.null(method) && method == "screen" && !is.null(p_thresh)) {
+        cat("Method: screen (p < ", p_thresh, ")\n", sep = "")
+    } else if (!is.null(method)) {
+        cat("Method: ", method, "\n", sep = "")
+    }
+    
+    n_screened <- attr(x, "n_screened")
+    if (!is.null(n_screened)) {
+        cat("Predictors Screened: ", n_screened, "\n", sep = "")
+    }
+    
+    n_multi <- attr(x, "n_multi")
+    if (!is.null(n_multi)) {
+        cat("Multivariable Predictors: ", n_multi, "\n", sep = "")
     }
     
     cat("\n")
-    NextMethod("print", x)
+    ## Print as data.table, skipping uniscreen_result print method
+    print(as.data.table(x))
     invisible(x)
 }

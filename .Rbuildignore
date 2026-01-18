@@ -14,7 +14,8 @@
 ^docs$
 ^pkgdown$
 ^scratch$
+^man/figures/README_
 ^vignettes/figures$
-^vignettes/articles$
+^vignettes/articles/figures$
 ^tests/benchmarks/^
 ^\.lintr$

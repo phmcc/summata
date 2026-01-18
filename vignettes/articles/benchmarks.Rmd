@@ -1,10 +1,5 @@
 ---
 title: "Performance Benchmarks"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Performance Benchmarks}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, include = FALSE}
@@ -46,23 +41,17 @@ library(ggplot2)
 
 Descriptive summary tables represent a common first step in data analysis. The following packages provide comparable functionality with differing implementation strategies.
 
-## Compared Packages
-
 | Package | Function | Implementation Notes |
 |:--------|:---------|:---------------------|
 | summata | `desctable()` | data.table operations |
 | finalfit | `summary_factorlist()` | tidyverse ecosystem |
-| gtsummary | `tbl_summary()` | gt table framework |
+| gtsummary | `tbl_summary()` | `gt` table framework |
 | arsenal | `tableby()` | Formula-based interface |
 | tableone | `CreateTableOne()` | Matrix-based computation |
 
-## Results
-
 ```{r, echo = FALSE, eval = TRUE, out.width = "100%"}
-knitr::include_graphics("figures/benchmark_desctable.png")
+knitr::include_graphics("figures/benchmarks_desctable.png")
 ```
-
-## Observed Timings
 
 | Dataset Size | summata | arsenal | tableone | finalfit | gtsummary |
 |:-------------|--------:|--------:|---------:|---------:|----------:|
@@ -70,7 +59,7 @@ knitr::include_graphics("figures/benchmark_desctable.png")
 | *n* = 5,000    | 54 ms   | 80 ms   | 84 ms    | 481 ms   | 3,113 ms  |
 | *n* = 10,000   | 68 ms   | 101 ms  | 129 ms   | 496 ms   | 3,155 ms  |
 
-The observed timing differences reflect underlying implementation choices. Packages built on `data.table` or base R matrix operations (`summata`, `tableone`, `arsenal`) exhibit lower overhead than those employing more extensive formatting pipelines (`gtsummary`). The `gtsummary` package prioritizes output flexibility and gt integration, which introduces additional computational cost.
+The observed timing differences reflect underlying implementation choices. Packages built on `data.table` or base R matrix operations (`summata`, `tableone`, `arsenal`) exhibit lower overhead than those employing more extensive formatting pipelines (`gtsummary`). The `gtsummary` package prioritizes output flexibility and `gt` integration, which introduces additional computational cost.
 
 ---
 
@@ -78,21 +67,15 @@ The observed timing differences reflect underlying implementation choices. Packa
 
 Survival probability tables summarize Kaplan-Meier estimates at specified time points.
 
-## Compared Approaches
-
 | Package | Function | Notes |
 |:--------|:---------|:------|
 | summata | `survtable()` | Formatted output |
-| gtsummary | `tbl_survfit()` | gt integration |
+| gtsummary | `tbl_survfit()` | `gt` integration |
 | manual | `survival::survfit()` | Raw computation |
 
-## Results
-
 ```{r, echo = FALSE, eval = TRUE, out.width = "100%"}
-knitr::include_graphics("figures/benchmark_survtable.png")
+knitr::include_graphics("figures/benchmarks_survtable.png")
 ```
-
-## Observed Timings
 
 | Dataset Size | summata | gtsummary | manual |
 |:-------------|--------:|----------:|-------:|
@@ -106,24 +89,20 @@ Direct `survfit()` computation provides a baseline for the minimum time required
 
 # Regression Output
 
-The following benchmarks compare functions that extract and format regression coefficients. Each package produces tables suitable for publication, though with varying levels of default formatting.
-
-## Compared Packages
+The following benchmarks compare functions that extract and format regression coefficients. Each package produces tables suitable for publication, though with varying levels of default formatting. Compared functions are as follows:
 
 | Package | Function | Notes |
 |:--------|:---------|:------|
 | summata | `fit()` | Formatted output with counts and reference rows |
-| summata_minimal | `fit(..., show_n=FALSE, show_events=FALSE, reference_rows=FALSE)` | Reduced output |
+| summata_minimal | `fit(..., show_n = FALSE, show_events = FALSE, reference_rows = FALSE)` | Reduced output |
 | finalfit | `glmuni()` + `fit2df()` | Two-step extraction |
-| gtsummary | `tbl_regression()` | gt formatting |
+| gtsummary | `tbl_regression()` | `gt` formatting |
 | broom | `tidy()` | Minimal extraction |
-
----
 
 ## Logistic Regression
 
 ```{r, echo = FALSE, eval = TRUE, out.width = "100%"}
-knitr::include_graphics("figures/benchmark_logistic.png")
+knitr::include_graphics("figures/benchmarks_logistic.png")
 ```
 
 | Dataset Size | summata_minimal | summata | finalfit | broom | gtsummary |
@@ -135,12 +114,10 @@ knitr::include_graphics("figures/benchmark_logistic.png")
 
 Among tested packages, `summata` performs the fastest summarization of logistic regression models. The `summata_minimal` configuration, which omits sample size counts and reference rows, provides additional speed at the cost of less complete output.
 
----
-
 ## Linear Regression
 
 ```{r, echo = FALSE, eval = TRUE, out.width = "100%"}
-knitr::include_graphics("figures/benchmark_linear.png")
+knitr::include_graphics("figures/benchmarks_linear.png")
 ```
 
 | Dataset Size | summata_minimal | summata | finalfit | broom | gtsummary |
@@ -152,12 +129,10 @@ knitr::include_graphics("figures/benchmark_linear.png")
 
 For linear models, `broom::tidy()` and `finalfit` achieve faster coefficient extraction due to the simpler structure of `lm` objects. The `summata` package applies additional formatting by default, accounting for the difference.
 
----
-
 ## Poisson Regression
 
 ```{r, echo = FALSE, eval = TRUE, out.width = "100%"}
-knitr::include_graphics("figures/benchmark_poisson.png")
+knitr::include_graphics("figures/benchmarks_poisson.png")
 ```
 
 | Dataset Size | summata_minimal | summata | finalfit | broom | gtsummary |
@@ -169,12 +144,10 @@ knitr::include_graphics("figures/benchmark_poisson.png")
 
 Poisson regression exhibits similar patterns to logistic regression, with GLM-based extraction showing comparable relative performance across packages.
 
----
-
-## Cox Proportional Hazards
+## Cox Regression
 
 ```{r, echo = FALSE, eval = TRUE, out.width = "100%"}
-knitr::include_graphics("figures/benchmark_cox.png")
+knitr::include_graphics("figures/benchmarks_cox.png")
 ```
 
 | Dataset Size | summata_minimal | summata | finalfit | broom | gtsummary |
@@ -191,22 +164,17 @@ Similar to linear regression, Cox model coefficient extraction is fastest in `fi
 
 Mixed-effects models present a useful comparison case because the underlying model fitting (via `lme4`) dominates execution time regardless of the wrapper package.
 
-## Compared Packages
-
 | Package | Function | Notes |
 |:--------|:---------|:------|
 | summata | `fit(..., model_type = "lmer")` | Unified interface |
+| summata_minimal | `fit(..., model_type = "lmer", show_n = FALSE, show_events = FALSE, reference_rows = FALSE)` | Reduced output |
 | finalfit | `lmmixed()` + `fit2df()` | Two-step process |
 | gtsummary | `tbl_regression()` | gt formatting |
 | broom.mixed | `tidy()` | Minimal extraction |
 
-## Results
-
 ```{r, echo = FALSE, eval = TRUE, out.width = "100%"}
-knitr::include_graphics("figures/benchmark_mixed.png")
+knitr::include_graphics("figures/benchmarks_mixed.png")
 ```
-
-## Observed Timings
 
 | Dataset Size | summata_minimal | summata | finalfit | broom | gtsummary |
 |:-------------|----------------:|--------:|---------:|------:|----------:|
@@ -222,8 +190,6 @@ The relatively narrow spread among `summata`, `finalfit`, and `broom` reflects t
 
 Univariable screening—fitting separate models for each predictor—provides a test case for operations involving many repeated model fits.
 
-## Compared Approaches
-
 | Package | Function | Notes |
 |:--------|:---------|:------|
 | summata | `uniscreen()` | Parallel-capable |
@@ -232,13 +198,9 @@ Univariable screening—fitting separate models for each predictor—provides a 
 | arsenal | `modelsum()` | Formula interface |
 | broom | Loop + `tidy()` | Manual implementation |
 
-## Results
-
 ```{r, echo = FALSE, eval = TRUE, out.width = "100%"}
-knitr::include_graphics("figures/benchmark_uniscreen.png")
+knitr::include_graphics("figures/benchmarks_uniscreen.png")
 ```
-
-## Observed Timings
 
 Screening 14 predictors:
 
@@ -256,8 +218,6 @@ The performance differences in univariable screening are more pronounced than in
 
 The combined univariable screening and multivariable modeling workflow represents a common analytical pattern in statistical research.
 
-## Compared Approaches
-
 | Package | Approach | Notes |
 |:--------|:---------|:------|
 | summata | `fullfit()` | Single function |
@@ -265,13 +225,9 @@ The combined univariable screening and multivariable modeling workflow represent
 | gtsummary | `tbl_uvregression()` + `tbl_regression()` + `tbl_merge()` | Multi-step |
 | manual | Loop + `glm()` + `broom::tidy()` + `rbind()` | Custom |
 
-## Results
-
 ```{r, echo = FALSE, eval = TRUE, out.width = "100%"}
-knitr::include_graphics("figures/benchmark_workflow.png")
+knitr::include_graphics("figures/benchmarks_workflow.png")
 ```
-
-## Observed Timings
 
 | Dataset Size | summata_minimal | summata | finalfit | manual | gtsummary |
 |:-------------|----------------:|--------:|---------:|-------:|----------:|
@@ -287,21 +243,15 @@ The `summata` and `finalfit` packages show comparable performance for the comple
 
 Forest plot generation combines data extraction with graphical rendering.
 
-## Compared Approaches
-
 | Package | Function | Notes |
 |:--------|:---------|:------|
 | summata | `coxforest()` | Integrated table and plot |
 | survminer | `ggforest()` | Survival-focused |
 | manual | Custom `ggplot2` | Maximum flexibility |
 
-## Results
-
 ```{r, echo = FALSE, eval = TRUE, out.width = "100%"}
-knitr::include_graphics("figures/benchmark_forest.png")
+knitr::include_graphics("figures/benchmarks_forest.png")
 ```
-
-## Observed Timings
 
 | Dataset Size | summata | survminer | manual |
 |:-------------|--------:|----------:|-------:|
@@ -309,7 +259,7 @@ knitr::include_graphics("figures/benchmark_forest.png")
 | *n* = 1,000    | 163 ms  | 348 ms    | 57 ms  |
 | *n* = 5,000    | 164 ms  | 335 ms    | 56 ms  |
 
-The manual approach produces only the graphical element, while `summata` and `survminer` generate integrated displays with coefficient tables. The relatively constant timing across dataset sizes indicates that plot rendering, rather than data processing, dominates execution time.
+The manual approach produces only the graphical element, while `summata` and `survminer` generate integrated displays with coefficient tables. The relatively constant timing across dataset sizes indicates that plot rendering, rather than data processing, dominates execution time. Also, there are significant cosmetic differences between the three graphical outputs, which predominates other factors when selecting a plotting function.
 
 ---
 
@@ -318,7 +268,7 @@ The manual approach produces only the graphical element, while `summata` and `su
 The following figure summarizes timing ratios across benchmarks. Values greater than 1 indicate the comparison package requires more time than `summata`.
 
 ```{r, echo = FALSE, eval = TRUE, out.width = "100%"}
-knitr::include_graphics("figures/benchmark_speedup.png")
+knitr::include_graphics("figures/benchmarks_speedup.png")
 ```
 
 ## Summary of Ratios
@@ -419,6 +369,17 @@ Results will vary across systems due to differences in hardware, R version, and 
 
 # Session Information
 
+This benchmark was run under the following conditions:
+
 ```{r, eval = FALSE}
-sessionInfo()
+R version 4.5.2 (2025-10-31)
+Platform: x86_64-unknown-linux-gnu
+
+Matrix products: default
+BLAS/LAPACK: /usr/lib/libopenblasp-r0.3.30.so;  LAPACK version 3.12.0
+
+Void Linux x86_64
+Linux 6.12.63_1
+Intel(R) Core(TM) i5-4670K (4) @ 3.80 GHz
+NVIDIA GeForce GTX 970 [Discrete]
 ```

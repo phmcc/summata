@@ -15,7 +15,8 @@ format_fullfit_combined(
   show_n,
   show_events,
   labels,
-  exponentiate = NULL
+  exponentiate = NULL,
+  conf_level = 0.95
 )
 }
 \arguments{
@@ -40,6 +41,8 @@ format_fullfit_combined(
 \item{labels}{Optional named character vector of variable labels.}
 
 \item{exponentiate}{Optional logical for coefficient exponentiation.}
+
+\item{conf_level}{Numeric confidence level for CI label.}
 }
 \value{
 Combined data.table with aligned univariable and multivariable results.

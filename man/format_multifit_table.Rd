@@ -14,7 +14,8 @@ format_multifit_table(
   labels = NULL,
   predictor_label = NULL,
   include_predictor = TRUE,
-  exponentiate = NULL
+  exponentiate = NULL,
+  conf_level = 0.95
 )
 }
 \arguments{

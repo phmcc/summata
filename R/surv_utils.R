@@ -325,12 +325,12 @@ format_survival_cells_vectorized <- function(est, lower, upper, n_risk, n_event,
 
     ## Add n_risk if requested
     if ("n_risk" %in% stats) {
-        formatted <- paste0(formatted, " [n=", n_risk[valid_idx], "]")
+        formatted <- paste0(formatted, " [n = ", n_risk[valid_idx], "]")
     }
 
     ## Add n_event if requested
     if ("n_event" %in% stats) {
-        formatted <- paste0(formatted, " [e=", n_event[valid_idx], "]")
+        formatted <- paste0(formatted, " [e = ", n_event[valid_idx], "]")
     }
 
     result[valid_idx] <- formatted

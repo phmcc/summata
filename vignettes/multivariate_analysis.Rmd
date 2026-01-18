@@ -10,10 +10,15 @@ vignette: >
 ```{r, include = FALSE}
 ## Use ragg for better font rendering if available
 if (requireNamespace("ragg", quietly = TRUE)) {
+  options(summata.use_ragg = TRUE)
+}
+
+if (requireNamespace("ragg", quietly = TRUE)) {
   knitr::opts_chunk$set(
     dev = "ragg_png",
+    fig.retina = 1,
     collapse = TRUE,
-    comment = "#>",
+    comment = "##>",
     message = FALSE,
     warning = FALSE,
     fig.width = 10,
@@ -23,7 +28,7 @@ if (requireNamespace("ragg", quietly = TRUE)) {
 } else {
   knitr::opts_chunk$set(
     collapse = TRUE,
-    comment = "#>",
+    comment = "##>",
     message = FALSE,
     warning = FALSE,
     fig.width = 10,
@@ -43,23 +48,31 @@ if (save_figures && !dir.exists(fig_dir)) {
   dir.create(fig_dir, recursive = TRUE)
 }
 
-## Set up device for proper font rendering
-png_device <- if (requireNamespace("ragg", quietly = TRUE)) {
-  ragg::agg_png
-} else {
-  "png"
-}
-
 ## Function for saving/displaying plots
 ## For pkgdown: saves PNG and returns path for include_graphics
 ## For CRAN: just prints the plot and returns empty string
 save_example_plot <- function(plot, filename, width = 10, height = 5) {
   if (save_figures) {
     filepath <- file.path(fig_dir, filename)
-    ggplot2::ggsave(filepath, plot, 
-                    width = attr(plot, "recommended_dims")$width %||% width, 
-                    height = attr(plot, "recommended_dims")$height %||% height, 
-                    dpi = 96, device = png_device)
+    final_width <- attr(plot, "recommended_dims")$width %||% width
+    final_height <- attr(plot, "recommended_dims")$height %||% height
+    
+    if (requireNamespace("ragg", quietly = TRUE)) {
+      ## Use ragg directly - it uses 'res' not 'dpi', and defaults to 72
+      ## Scale dimensions to achieve effective 96 dpi appearance
+      ragg::agg_png(filepath, 
+                    width = final_width, 
+                    height = final_height, 
+                    units = "in",
+                    res = 96)
+      print(plot)
+      grDevices::dev.off()
+    } else {
+      ggplot2::ggsave(filepath, plot, 
+                      width = final_width, 
+                      height = final_height, 
+                      dpi = 96)
+    }
     return(filepath)
   } else {
     print(plot)
@@ -76,13 +89,13 @@ show_plot <- function(plot, filename, width = 10, height = 5) {
 }
 ```
 
-*Multivariate* analysis—in the sense employed here—refers to the simultaneous examination of a single predictor across multiple outcome variables. This approach inverts the typical regression paradigm: rather than testing multiple predictors against one outcome (as in `uniscreen()`), multivariate analysis tests one predictor against multiple outcomes. This design is particularly useful when a key exposure or intervention must be evaluated against several endpoints simultaneously.
+Multivariate analysis—in the sense employed here—refers to the simultaneous examination of a single independent variable across multiple dependent variables. This approach inverts the typical regression paradigm: rather than testing multiple predictors against one outcome (as in `uniscreen()`), multivariate analysis tests one predictor against multiple outcomes. This design is particularly useful when a key exposure or intervention must be evaluated against several endpoints simultaneously.
 
-The `multifit()` function implements this workflow, supporting all model types available in `summata` with optional covariate adjustment, interaction terms, and mixed-effects specifications. Results can be visualized using `multiforest()` and exported using standard export functions.
+The `multifit()` function implements this workflow, supporting all model types available in `summata` with optional covariate adjustment, interaction terms, and mixed-effects specifications. Results can be visualized using `multiforest()` and exported using standard table export functions.
 
 ---
 
-## Preliminaries
+# Preliminaries
 
 The examples in this vignette use the `clintrial` dataset included with `summata`:
 
@@ -99,56 +112,30 @@ The `clintrial` dataset includes multiple outcome types suitable for multivariat
  
 | Outcome Type | Variables | Model |
 |:-------------|:----------|:------|
-| Binary | `any_complication`, `wound_infection`, `readmission_30d`, `icu_admission` | `glm` (binomial) |
-| Time-to-event | `Surv(pfs_months, pfs_status)`, `Surv(os_months, os_status)` | `coxph` |
 | Continuous | `los_days`, `pain_score`, `recovery_days` | `lm` |
+| Binary | `any_complication`, `wound_infection`, `readmission_30d`, `icu_admission` | `glm` (binomial) |
+| Count (equidispersed) | `fu_count` | `glm` (poisson) |
+| Count (overdispersed) | `ae_count` | `negbin` or `quasipoisson` |
+| Time-to-event | `Surv(pfs_months, pfs_status)`, `Surv(os_months, os_status)` | `coxph` |
 
 ---
 
-## Theoretical Framework
+# Multivariate vs. Univariable Screening
 
-### The Multivariate Paradigm
-
-Let *X* denote a predictor of interest and $Y_1, \ldots, Y_K$ denote *K* outcome variables. The multivariate approach fits *K* separate regression models:
-
-$$Y_k = f_k(X, \mathbf{Z}), \quad k = 1, \ldots, K$$
-
-where **Z** represents optional adjustment covariates. This produces *K* effect estimates for the single predictor *X*, enabling systematic comparison of effects across outcomes.
-
-### Comparison with Univariable Screening
-
-The following table clarifies the distinction between `uniscreen()` and `multifit()`:
+The distinction between `multifit()` and `uniscreen()` is important:
 
 | Function | Tests | Use Case |
 |:---------|:------|:---------|
 | `uniscreen()` | Multiple predictors → One outcome | Variable screening, risk factor identification |
 | `multifit()` | One predictor → Multiple outcomes | Exposure effects, intervention evaluation |
 
-### Outcome Homogeneity
-
-All outcomes in a single `multifit()` call should be of the same type (all binary, all continuous, or all survival). Mixing outcome types produces tables with incompatible effect measures—for example, odds ratios alongside regression coefficients—which can mislead readers.
-
-The function validates outcome compatibility and issues a warning when mixed types are detected. For analyses involving multiple outcome types, use separate `multifit()` calls:
-
-```{r, eval = FALSE}
-## Binary outcomes → odds ratios
-binary_results <- multifit(data, outcomes = c("death", "readmission"),
-                           predictor = "treatment", model_type = "glm")
-
-## Continuous outcomes → coefficients
-continuous_results <- multifit(data, outcomes = c("los_days", "cost"),
-                               predictor = "treatment", model_type = "lm")
-
-## Survival outcomes → hazard ratios
-survival_results <- multifit(data, outcomes = c("Surv(time, status)"),
-                             predictor = "treatment", model_type = "coxph")
-```
+All outcomes in a single `multifit()` call should be of the same type (all binary, all continuous, or all survival). Mixing outcome types produces tables with incompatible effect measures. The function validates outcome compatibility and issues a warning when mixed types are detected.
 
 ---
 
-## Basic Usage
+# Basic Usage
 
-### Function Signature
+## Function Signature
 
 The function takes data as the first argument, followed by outcomes, predictor, and optional covariates:
 
@@ -156,7 +143,7 @@ The function takes data as the first argument, followed by outcomes, predictor, 
 multifit(data, outcomes, predictor, covariates, model_type, ...)
 ```
 
-### Example 1: Unadjusted Analysis
+## Example 1: Unadjusted Analysis
 
 Test a single predictor against multiple binary outcomes:
 
@@ -165,7 +152,7 @@ example1 <- multifit(
   data = clintrial,
   outcomes = c("any_complication", "wound_infection",
                "readmission_30d", "icu_admission"),
-  predictor = "treatment",
+  predictor = "surgery",
   labels = clintrial_labels,
   parallel = FALSE
 )
@@ -175,7 +162,7 @@ example1
 
 Each row shows the effect of the predictor on a specific outcome. For categorical predictors, each non-reference level appears separately.
 
-### Example 2: Adjusted Analysis
+## Example 2: Adjusted Analysis
 
 Include covariates for confounding control:
 
@@ -184,8 +171,8 @@ example2 <- multifit(
   data = clintrial,
   outcomes = c("any_complication", "wound_infection",
                "readmission_30d", "icu_admission"),
-  predictor = "treatment",
-  covariates = c("age", "sex", "diabetes", "surgery"),
+  predictor = "surgery",
+  covariates = c("age", "sex", "smoking", "diabetes"),
   labels = clintrial_labels,
   parallel = FALSE
 )
@@ -193,7 +180,7 @@ example2 <- multifit(
 example2
 ```
 
-### Example 3: Unadjusted and Adjusted Comparison
+## Example 3: Unadjusted and Adjusted Comparison
 
 Use `columns = "both"` to display unadjusted and adjusted results side-by-side:
 
@@ -202,7 +189,7 @@ example3 <- multifit(
   data = clintrial,
   outcomes = c("any_complication", "wound_infection",
                "readmission_30d", "icu_admission"),
-  predictor = "treatment",
+  predictor = "surgery",
   covariates = c("age", "sex", "diabetes", "surgery"),
   columns = "both",
   labels = clintrial_labels,
@@ -216,9 +203,9 @@ Comparing columns reveals confounding (large differences) or robust associations
 
 ---
 
-## Predictor Types
+# Predictor Types
 
-### Continuous Predictors
+## **Example 4:** Continuous Predictors
 
 For continuous predictors, one row appears per outcome:
 
@@ -237,16 +224,16 @@ example4
 
 The effect estimate represents the change in log-odds per one-unit increase in the predictor.
 
-### Binary Predictors
+## **Example 5:** Multilevel Categorical Predictors
 
-For binary predictors with standard coding (Yes/No, 1/0), the display is condensed:
+For categorical predictors with multiple levels, the display is expanded:
 
 ```{r}
 example5 <- multifit(
   data = clintrial,
   outcomes = c("any_complication", "wound_infection",
                "readmission_30d", "icu_admission"),
-  predictor = "diabetes",
+  predictor = "treatment",
   covariates = c("age", "sex", "surgery"),
   labels = clintrial_labels,
   parallel = FALSE
@@ -257,9 +244,9 @@ example5
 
 ---
 
-## Model Types
+# Model Types
 
-### Cox Regression
+## **Example 6:** Cox Regression
 
 For time-to-event outcomes, use `model_type = "coxph"`:
 
@@ -278,14 +265,14 @@ example6 <- multifit(
 example6
 ```
 
-### Linear Regression
+## **Example 7:** Linear Regression
 
 For continuous outcomes, use `model_type = "lm"`:
 
 ```{r}
 example7 <- multifit(
   data = clintrial,
-  outcomes = c("pain_score", "recovery_days", "los_days"),
+  outcomes = c("los_days", "pain_score", "recovery_days"),
   predictor = "treatment",
   covariates = c("age", "sex", "surgery"),
   model_type = "lm",
@@ -296,18 +283,18 @@ example7 <- multifit(
 example7
 ```
 
-### Poisson Regression
+## **Example 8:** Mixed-Effects Models
 
-For count outcomes, use `model_type = "glm"` with `family = "poisson"`:
+Account for clustering using random effects:
 
 ```{r}
 example8 <- multifit(
   data = clintrial,
-  outcomes = c("los_days"),
+  outcomes = c("any_complication", "wound_infection"),
   predictor = "treatment",
-  covariates = c("age", "sex", "stage"),
-  model_type = "glm",
-  family = "poisson",
+  covariates = c("age", "sex"),
+  random = "(1|site)",
+  model_type = "glmer",
   labels = clintrial_labels,
   parallel = FALSE
 )
@@ -317,20 +304,19 @@ example8
 
 ---
 
-## Advanced Features
+# Advanced Features
 
-### Stratified Cox Models
+## **Example 9:** Interaction Terms
 
-Use `strata` to create separate baseline hazards:
+Interaction terms can be added to test effect modification:
 
 ```{r}
 example9 <- multifit(
   data = clintrial,
-  outcomes = c("Surv(os_months, os_status)"),
+  outcomes = c("any_complication", "wound_infection"),
   predictor = "treatment",
   covariates = c("age", "sex"),
-  strata = "site",
-  model_type = "coxph",
+  interactions = c("treatment:sex"),
   labels = clintrial_labels,
   parallel = FALSE
 )
@@ -338,18 +324,18 @@ example9 <- multifit(
 example9
 ```
 
-### Clustered Standard Errors
+## **Example 10:** Filtering by p-value
 
-Use `cluster` for robust standard errors when observations are correlated within groups:
+Outputs can be filtered to retain only significant associations:
 
 ```{r}
 example10 <- multifit(
   data = clintrial,
-  outcomes = c("Surv(os_months, os_status)"),
+  outcomes = c("any_complication", "wound_infection",
+               "readmission_30d", "icu_admission"),
   predictor = "treatment",
-  covariates = c("age", "sex", "stage"),
-  cluster = "site",
-  model_type = "coxph",
+  covariates = c("age", "sex", "surgery"),
+  p_threshold = 0.10,
   labels = clintrial_labels,
   parallel = FALSE
 )
@@ -357,52 +343,37 @@ example10 <- multifit(
 example10
 ```
 
-### Interaction Terms
+## **Example 11:** Accessing Model Objects
 
-Include interaction terms to test effect modification:
-
-```{r}
-example11 <- multifit(
-  data = clintrial,
-  outcomes = c("any_complication", "icu_admission"),
-  predictor = "treatment",
-  covariates = c("age", "sex", "surgery"),
-  interactions = c("treatment:surgery"),
-  labels = clintrial_labels,
-  parallel = FALSE
-)
-
-example11
-```
-
-### Mixed-Effects Models
-
-For clustered data, use mixed-effects models with random intercepts:
+Underlying model objects are stored as attributes for additional analysis:
 
 ```{r}
-example12 <- multifit(
+result <- multifit(
   data = clintrial,
-  outcomes = c("surgery", "readmission_30d"),
+  outcomes = c("any_complication", "wound_infection"),
   predictor = "treatment",
   covariates = c("age", "sex"),
-  random = "(1|site)",
-  model_type = "glmer",
   labels = clintrial_labels,
   parallel = FALSE
 )
 
-example12
+# Access individual models
+models <- attr(result, "models")
+names(models)
+
+# Examine a specific model
+summary(models[["any_complication"]])
 ```
 
 ---
 
-## Forest Plot Visualization
+# Visualization with multiforest()
 
-The `multiforest()` function visualizes multivariate results.
+The `multiforest()` function creates forest plots from `multifit()` results.
 
-### Basic Forest Plot
+## **Example 12:** Basic Forest Plot
 
-Create a forest plot from `multifit()` output:
+Results from `multifit()` can be directly inserted into the `multiforest()` function to generate a forest plot:
 
 ```{r}
 result <- multifit(
@@ -415,7 +386,7 @@ result <- multifit(
   parallel = FALSE
 )
 
-example13 <- multiforest(
+example12 <- multiforest(
   result,
   title = "Treatment Effects Across Outcomes",
   indent_predictor = TRUE,
@@ -424,15 +395,15 @@ example13 <- multiforest(
 ```
 
 ```{r, echo = FALSE, out.width = "100%"}
-show_plot(example13, "multi_ex13.png")
+show_plot(example12, "multi_ex12.png")
 ```
 
-### Customization Options
+## **Example 13:** Customization Options
 
-Customize the appearance of the forest plot:
+Customize the appearance of the forest plot by adjusting function parameters:
 
 ```{r}
-example14 <- multiforest(
+example13 <- multiforest(
   result,
   title = "Effect Estimates",
   column = "adjusted",
@@ -444,12 +415,12 @@ example14 <- multiforest(
 ```
 
 ```{r, echo = FALSE, out.width = "100%"}
-show_plot(example14, "multi_ex14.png")
+show_plot(example13, "multi_ex13.png")
 ```
 
-### Forest Plot for Survival Outcomes
+## **Example 14:** Forest Plot for Survival Outcomes
 
-Create forest plots for time-to-event analyses:
+The `multiforest()` function supports multiple `model_type` outputs from `multifit()`. In addition, variable labels can be applied to `multiforest()` outputs similarly to other forest plot functions:
 
 ```{r}
 cox_result <- multifit(
@@ -459,23 +430,23 @@ cox_result <- multifit(
   predictor = "treatment",
   covariates = c("age", "sex", "stage"),
   model_type = "coxph",
-  labels = clintrial_labels,
   parallel = FALSE
 )
 
-example15 <- multiforest(
+example14 <- multiforest(
   cox_result,
   title = "Treatment Effects on Survival Outcomes",
   indent_predictor = TRUE,
-  zebra_stripes = TRUE
+  zebra_stripes = TRUE,
+  labels = clintrial_labels
 )
 ```
 
 ```{r, echo = FALSE, out.width = "100%"}
-show_plot(example15, "multi_ex15.png")
+show_plot(example14, "multi_ex14.png")
 ```
 
-### Forest Plot for Continuous Outcomes
+## **Example 15:** Forest Plot for Continuous Outcomes
 
 Create forest plots for continuous outcomes:
 
@@ -486,27 +457,27 @@ lm_result <- multifit(
   predictor = "treatment",
   covariates = c("age", "sex", "surgery"),
   model_type = "lm",
-  labels = clintrial_labels,
   parallel = FALSE
 )
 
-example16 <- multiforest(
+example15 <- multiforest(
   lm_result,
   title = "Treatment Effects on Recovery Metrics",
   show_predictor = FALSE,
-  covariates_footer = TRUE
+  covariates_footer = TRUE,
+  labels = clintrial_labels
 )
 ```
 
 ```{r, echo = FALSE, out.width = "100%"}
-show_plot(example16, "multi_ex16.png")
+show_plot(example15, "multi_ex15.png")
 ```
 
 ---
 
-## Exporting Results
+# Exporting Results
 
-### Tables
+## Tables
 
 Export tables using standard export functions:
 
@@ -524,7 +495,7 @@ table2pdf(
 )
 ```
 
-### Forest Plots
+## Forest Plots
 
 Save forest plots using `ggsave()`:
 
@@ -669,7 +640,7 @@ clintrial$treatment_binary <- ifelse(clintrial$treatment == "Control",
 
 ### Categorical Outcomes with More Than Two Levels
 
-`multifit()` supports binary outcomes (via logistic regression) but not multinomial or ordinal outcomes. If you include a categorical outcome with three or more levels (e.g., treatment group with "Control", "Drug A", "Drug B"), the function will issue a warning because binomial GLM coerces such variables to binary (first level vs all others).
+`multifit()` supports binary outcomes (via logistic regression) but not multinomial or ordinal outcomes. If you include a categorical outcome with three or more levels (e.g., treatment group with "Control", "Drug A", "Drug B"), the function will issue a warning because binomial GLM coerces such variables to binary (first level *vs.* all others).
 
 For multi-level categorical outcomes, use dedicated packages outside of `summata`:
 
@@ -687,6 +658,7 @@ model <- polr(grade ~ age + sex + stage, data = clintrial, Hess = TRUE)
 
 ## Further Reading
 
+- [Statistical Foundations](statistical_foundations.html): Mathematical details for all model types
 - [Descriptive Tables](descriptive_tables.html): `desctable()` for baseline characteristics
 - [Regression Modeling](regression_modeling.html): `fit()`, `uniscreen()`, and `fullfit()`
 - [Model Comparison](model_comparison.html): `compfit()` for comparing models

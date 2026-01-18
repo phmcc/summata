@@ -419,11 +419,12 @@ linear_model <- fit(
 )
 print(linear_model)
 
-# Example 8: Poisson regression for count data
+# Example 8: Poisson regression for equidispersed count data
+# fu_count has variance ≈ mean, appropriate for standard Poisson
 poisson_model <- fit(
     data = clintrial,
-    outcome = "los_days",
-    predictors = c("age", "treatment", "surgery", "stage"),
+    outcome = "fu_count",
+    predictors = c("age", "stage", "treatment", "surgery"),
     model_type = "glm",
     family = "poisson",
     labels = clintrial_labels
@@ -432,11 +433,12 @@ print(poisson_model)
 # Returns rate ratios (RR/aRR)
 
 # Example 9: Negative binomial regression for overdispersed counts
+# ae_count has variance > mean (overdispersed), use negbin or quasipoisson
 if (requireNamespace("MASS", quietly = TRUE)) {
     nb_result <- fit(
         data = clintrial,
-        outcome = "los_days",
-        predictors = c("age", "sex", "treatment", "stage"),
+        outcome = "ae_count",
+        predictors = c("age", "treatment", "diabetes", "surgery"),
         model_type = "negbin",
         labels = clintrial_labels
     )

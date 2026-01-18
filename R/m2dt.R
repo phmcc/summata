@@ -1109,10 +1109,27 @@ m2dt <- function(data,
             dt <- data.table::rbindlist(list(dt, ref_rows_dt), use.names = TRUE, fill = TRUE)
             
             ## Sort to put reference rows in correct positions
-            ## Within each variable, reference row comes first
+            ## Within each variable, reference row comes first, then levels in original order
             dt[, .is_ref := reference == reference_label]
-            data.table::setorder(dt, variable, -.is_ref, group)
-            dt[, .is_ref := NULL]
+            
+            ## Create group order based on original factor levels from xlevels
+            ## This ensures levels appear in their defined order, not alphabetically
+            dt[, .group_order := {
+                order_val <- rep(NA_integer_, .N)
+                for (var in names(xlevels_ref)) {
+                    var_mask <- variable == var
+                    if (any(var_mask)) {
+                        lvls <- xlevels_ref[[var]]
+                        order_val[var_mask] <- match(group[var_mask], lvls)
+                    }
+                }
+                ## For non-factor variables (NA order), use 0 to sort first
+                order_val[is.na(order_val)] <- 0L
+                order_val
+            }]
+            
+            data.table::setorder(dt, variable, -.is_ref, .group_order)
+            dt[, c(".is_ref", ".group_order") := NULL]
         }
     }
 
@@ -1184,11 +1201,32 @@ m2dt <- function(data,
         dt[, variable := as.character(variable)]
         
         ## If reference rows exist, ensure they come first within each variable
+        ## and levels appear in their original order (not alphabetically)
         if ("reference" %in% names(dt)) {
             dt[, .temp_var_order := match(variable, final_order)]
             dt[, .is_ref := reference != ""]
-            data.table::setorder(dt, .temp_var_order, -.is_ref, group)
-            dt[, c(".temp_var_order", ".is_ref") := NULL]
+            
+            ## Create group order based on original factor levels from xlevels
+            if (!is.null(xlevels) && length(xlevels) > 0) {
+                dt[, .group_order := {
+                    order_val <- rep(NA_integer_, .N)
+                    for (var in names(xlevels)) {
+                        var_mask <- variable == var
+                        if (any(var_mask)) {
+                            lvls <- xlevels[[var]]
+                            order_val[var_mask] <- match(group[var_mask], lvls)
+                        }
+                    }
+                    ## For non-factor variables (NA order), use 0 to sort first
+                    order_val[is.na(order_val)] <- 0L
+                    order_val
+                }]
+                data.table::setorder(dt, .temp_var_order, -.is_ref, .group_order)
+                dt[, c(".temp_var_order", ".is_ref", ".group_order") := NULL]
+            } else {
+                data.table::setorder(dt, .temp_var_order, -.is_ref, group)
+                dt[, c(".temp_var_order", ".is_ref") := NULL]
+            }
         }
     }
     

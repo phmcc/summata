@@ -13,7 +13,8 @@ format_model_table(
   show_n = TRUE,
   show_events = TRUE,
   reference_label = "reference",
-  exponentiate = NULL
+  exponentiate = NULL,
+  conf_level = 0.95
 )
 }
 \arguments{

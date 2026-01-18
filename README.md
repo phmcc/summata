@@ -1,7 +1,10 @@
-# <span class="pkg-name">summata</span> <a href="https://phmcc.github.io/summata/"><img src="man/figures/logo.svg" align="right" height="139" alt="summata website" /></a>
+# <span class="pkg-name">summata</span> <a href="https://phmcc.github.io/summata/"><img src="man/figures/summata.svg" align="right" height="139" alt="summata website" /></a>
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/phmcc/summata/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/phmcc/summata/actions/workflows/R-CMD-check.yaml)
+[![test-coverage](https://github.com/phmcc/summata/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/phmcc/summata/actions/workflows/test-coverage.yaml)
+[![lint](https://github.com/phmcc/summata/actions/workflows/lint.yaml/badge.svg)](https://github.com/phmcc/summata/actions/workflows/lint.yaml)
+[![Codecov test coverage](https://codecov.io/gh/phmcc/summata/branch/main/graph/badge.svg)](https://codecov.io/gh/phmcc/summata?branch=main)
 [![CRAN status](https://www.r-pkg.org/badges/version/summata)](https://CRAN.R-project.org/package=summata)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
@@ -14,11 +17,11 @@
 
 The `summata` package provides a comprehensive framework for generating summary tables and visualizations from statistical analyses. Built on `data.table` for computational efficiency, it streamlines the workflow from descriptive statistics through regression modeling to final output—all using a unified interface with standardized, presentation-ready results.
 
-<img src="assets/images/README_coxforest.png" alt="Cox regression forest plot" width="100%">
+<img src="man/figures/README_coxforest.png" alt="Cox regression forest plot" width="100%">
 
 ## Installation
 
-The package may be installed from GitHub (stable) or Codeberg (development):
+Install this package from GitHub (stable) or Codeberg (development):
 
 ```r
 # Stable release
@@ -43,8 +46,12 @@ The architecture of `summata` reflects three guiding principles:
 These principles manifest in the standard calling convention:
 
 ``` r
-result <- fullfit(data, outcome, c("covar1", "covar2", ..., "covarN"), ...)
+result <- fit(data, variable, c("covar1", "covar2", ..., "covarN"), ...)
+```
 
+where `data` is the dataset, `variable` is the variable of interest (dependent variable, endpoint/outcome, stratification/grouping variable, *etc.*), and `c("covar1", "covar2", ..., "covarN")`is a vector of covariates (independent variables, model predictors, compared/explanatory factors, *etc.*). The result is a formatted table for export, with readily accessible attributes for further analysis.
+
+``` r
 # The formatted table
 print(result)
 
@@ -55,62 +62,48 @@ model <- attr(result, "model")
 raw <- attr(result, "raw_data")
 ```
 
-### Supported Model Classes
+### Functional Reference
 
-The package provides unified handling for the following regression models. Specify the model using the `model_type` parameter:
+This package provides a variety of functions for different stages of statistical analysis:
 
-| Model Class | Shorthand | Function | Effect Measure |
-|:------------|:----------|:---------|:---------------|
-| Linear regression | `lm` | `stats::lm()` | *β* coefficient |
-| Logistic regression | `glm`, `family = binomial` | `stats::glm()` | Odds ratio |
-| Logistic (overdispersed) | `glm`, `family = quasibinomial` | `stats::glm()` | Odds ratio |
-| Poisson regression | `glm`, `family = poisson` | `stats::glm()` | Rate ratio |
-| Poisson (overdispersed) | `glm`, `family = quasipoisson` | `stats::glm()` | Rate ratio |
-| Negative binomial | `glm.nb` | `MASS::glm.nb()` | Rate ratio |
-| Gaussian (via GLM) | `glm`, `family = gaussian` | `stats::glm()` | *β* coefficient |
-| Gamma regression | `glm`, `family = Gamma` | `stats::glm()` | Ratio* |
-| Inverse Gaussian | `glm`, `family = inverse.gaussian` | `stats::glm()` | Ratio* |
-| Cox proportional hazards | `coxph` | `survival::coxph()` | Hazard ratio |
-| Conditional logistic | `clogit` | `survival::clogit()` | Odds ratio |
-| Linear mixed effects | `lmer` | `lme4::lmer()` | *β* coefficient |
-| Generalized linear mixed effects | `glmer` | `lme4::glmer()` | Odds/rate ratio |
-| Cox mixed effects | `coxme` | `coxme::coxme()` | Hazard ratio |
+#### Descriptive analysis
 
-*With log link; coefficient with identity link
-
-## Functional Reference
-
-### Primary Analysis Functions
-
-The core analytical functions implement standard statistical workflows:
+Tables to provide quick summary data and comparison tests between different groups.
 
 | Function | Purpose |
 |:---------|:--------|
 | `desctable()` | Descriptive statistics with stratification and hypothesis testing |
 | `survtable()` | Survival probability estimates at specified time points |
+
+#### Predictive analysis
+
+Fitted univariable and multivariable regression results for predictive modeling.
+
+| Function | Purpose |
+|:---------|:--------|
 | `uniscreen()` | Systematic univariable analysis across multiple predictors |
 | `fit()` | Single regression model with formatted coefficient extraction |
 | `fullfit()` | Integrated univariable screening with multivariable regression |
-| `compfit()` | Nested model comparison with likelihood ratio tests and information criteria |
-| `multifit()` | Single predictor evaluated against multiple outcomes |
+| `compfit()` | Nested model comparison with composite scoring |
+| `multifit()` | Multivariate analysis with a single predictor evaluated against multiple outcomes |
 
-### Export Functions
+#### Table export
 
-Tables may be rendered to multiple output formats:
+Export of finalized tables to various commonly used formats.
 
 | Function | Format | Dependency |
 |:---------|:-------|:-----------|
 | `autoexport()` | Auto-detect from file extension | Varies |
-| `table2pdf()` | PDF | xtable, LaTeX distribution |
-| `table2docx()` | Microsoft Word | officer, flextable |
-| `table2pptx()` | Microsoft PowerPoint | officer, flextable |
-| `table2html()` | HTML | xtable |
-| `table2tex()` | LaTeX source | xtable |
-| `table2rtf()` | Rich Text Format | officer, flextable |
+| `table2pdf()` | PDF | `xtable`, LaTeX distribution |
+| `table2html()` | HTML | `xtable` |
+| `table2tex()` | LaTeX source | `xtable` |
+| `table2docx()` | Microsoft Word | `officer`, `flextable` |
+| `table2pptx()` | Microsoft PowerPoint | `officer`, `flextable` |
+| `table2rtf()` | Rich Text Format | `officer`, `flextable` |
 
-### Visualization Functions
+#### Data visualization
 
-Forest plots may be generated directly from model objects or analysis results:
+Generation of publication-ready forest plot graphics to summarize regression models.
 
 | Function | Application |
 |:---------|:------------|
@@ -119,7 +112,30 @@ Forest plots may be generated directly from model objects or analysis results:
 | `glmforest()` | Generalized linear models |
 | `coxforest()` | Proportional hazards models |
 | `uniforest()` | Univariable screening results |
-| `multiforest()` | Multi-outcome analysis results |
+| `multiforest()` | Multivariate analysis results |
+
+### Supported Model Classes
+
+The following regression models are currently supported by `summata`. Specify the model using the `model_type` parameter in the appropriate regression function (`uniscreen()`, `fit()`, `fullfit()`, `compfit()`, or `multifit()`):
+
+| Model Class | `model_type` | Function | Effect Measure |
+|:------------|:----------|:---------|:---------------|
+| Linear regression | `lm` | `stats::lm()` | *β* coefficient |
+| Logistic regression | `glm`, `family = "binomial"` | `stats::glm()` | Odds ratio |
+| Logistic (overdispersed) | `glm`, `family = "quasibinomial"` | `stats::glm()` | Odds ratio |
+| Poisson regression | `glm`, `family = "poisson"` | `stats::glm()` | Rate ratio |
+| Poisson (overdispersed) | `glm`, `family = "quasipoisson"` | `stats::glm()` | Rate ratio |
+| Gaussian (via GLM) | `glm`, `family = "gaussian"` | `stats::glm()` | *β* coefficient |
+| Gamma regression | `glm`, `family = "Gamma"` | `stats::glm()` | Ratio* |
+| Inverse Gaussian | `glm`, `family = "inverse.gaussian"` | `stats::glm()` | Ratio* |
+| Cox proportional hazards | `coxph` | `survival::coxph()` | Hazard ratio |
+| Conditional logistic | `clogit` | `survival::clogit()` | Odds ratio |
+| Negative binomial | `negbin` | `MASS::glm.nb()` | Rate ratio |
+| Linear mixed effects | `lmer` | `lme4::lmer()` | *β* coefficient |
+| Generalized linear mixed effects | `glmer` | `lme4::glmer()` | Odds/rate ratio |
+| Cox mixed effects | `coxme` | `coxme::coxme()` | Hazard ratio |
+
+*with log link; coefficient with identity link
 
 ## Comparison with Related Packages
 
@@ -135,19 +151,19 @@ The R ecosystem includes several established packages for regression table gener
 | Integrated forest plots | ✓ | ◐ | ✓ | — |
 | Model comparison | ✓ | ✓ | ◐ | — |
 | Mixed-effects models | ✓ | ◐ | ◐ | — |
-| Multi-outcome analysis | ✓ | — | — | — |
+| Multivariate analysis | ✓ | — | — | — |
 
 <sub>✓ Full support | ◐ Partial support | — Not available</sub>
 
-A detailed feature comparison is available in the [package documentation](https://phmcc.github.io/summata/articles/feature_comparison.html).
+A detailed feature comparison is available in the [package documentation](articles/benchmarks.html).
 
 ## Illustrative Example
 
-The `clintrial` dataset included with this package provides simulated clinical trial data comprising patient identifiers, baseline characteristics, therapeutic interventions, short-term outcomes, and long-term survival statistics. In the following example, we analyze perioperative factors affecting 30-day hospital readmission:
+The `clintrial` dataset included with this package provides simulated clinical trial data comprising patient identifiers, baseline characteristics, therapeutic interventions, short-term outcomes, and long-term survival statistics. The following example demonstrates how `summata` functions can be used to analyze perioperative factors affecting 30-day hospital readmission.
 
-### Data Preparation
+### **Step 0:** Data Preparation
 
-First, load the dataset, apply labels, and define predictors:
+Prior to analysis, load the dataset, apply labels, and define predictors:
 
 ``` r
 library(summata)
@@ -184,11 +200,7 @@ table2pdf(table1, "table1.pdf",
           )
 ```
 
-<details>
-<summary><strong>Figure 1.</strong> Descriptive statistics table</summary>
-<br>
-<img src="assets/images/README_desctable.png" alt="Descriptive statistics table" width="100%">
-</details>
+<img src="man/figures/README_desctable.png" alt="Descriptive statistics table" width="100%">
 
 ### **Step 2:** Regression Analysis
 
@@ -213,11 +225,7 @@ table2pdf(table2, "table2.pdf",
           zebra_stripes = TRUE)
 ```
 
-<details>
-<summary><strong>Figure 2.</strong> Logistic regression with univariable screening</summary>
-<br>
-<img src="assets/images/README_fullfit.png" alt="Regression table" width="100%">
-</details>
+<img src="man/figures/README_fullfit.png" alt="Regression table" width="100%">
 
 ### **Step 3:** Forest Plot
 
@@ -236,22 +244,18 @@ ggsave("forest_30d.pdf", forest_30d,
        units = "in")
 ```
 
-<details>
-<summary><strong>Figure 3.</strong> Multivariable GLM forest plot</summary>
-<br>
-<img src="assets/images/README_glmforest.png" alt="Forest plot" width="100%">
-</details>
+<img src="man/figures/README_glmforest.png" alt="Forest plot" width="100%">
 
 ## Development
 
 ### Repository
 
 - **Primary development**: [codeberg.org/phmcc/summata](https://codeberg.org/phmcc/summata)
-- **GitHub mirror**: [github.com/phmcc/summata](https://github.com/phmcc/summata)
+- **GitHub releases**: [github.com/phmcc/summata](https://github.com/phmcc/summata)
 
 ### Contributing
 
-Bug reports and feature requests may be submitted via the [issue tracker](https://codeberg.org/phmcc/summata/issues). Contributions are welcome; please consult the contributing guidelines prior to submitting pull requests.
+Bug reports and feature requests may be submitted via the [issue tracker](https://github.com/phmcc/summata/issues). Contributions are welcome; please consult the contributing guidelines prior to submitting pull requests.
 
 ## Acknowledgments
 
@@ -273,7 +277,7 @@ citation("summata")
 
 To cite summata in publications, use:
 
-  McClelland PH (2026). _summata: Publication-Ready Summary Tables and Forest Plots_. R package version 0.9.5, <https://phmcc.github.io/summata/>.
+  McClelland PH (2026). _summata: Publication-Ready Summary Tables and Forest Plots_. R package version 1.0.0, <https://phmcc.github.io/summata/>.
 
 A BibTeX entry for LaTeX users is
 
@@ -281,16 +285,16 @@ A BibTeX entry for LaTeX users is
     title = {summata: Publication-Ready Summary Tables and Forest Plots},
     author = {Paul Hsin-ti McClelland},
     year = {2026},
-    note = {R package version 0.9.5},
+    note = {R package version 1.0.0},
     url = {https://phmcc.github.io/summata/},
   }
 ```
 
 ## Further Resources
 
-- **Function documentation**: `?function_name` or the [reference index](https://phmcc.github.io/summata/reference/)
-- **Vignettes**: `vignette("summata")` or [online articles](https://phmcc.github.io/summata/articles/)
-- **Issue tracker**: [Codeberg Issues](https://codeberg.org/phmcc/summata/issues)
+- **Function documentation**: `?function_name` or the [reference index](reference/index.html)
+- **Vignettes**: `vignette("summata")` or [online articles](articles/index.html)
+- **Issue tracker**: [GitHub Issues](https://github.com/phmcc/summata/issues)
 
 ---
 

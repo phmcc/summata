@@ -10,7 +10,8 @@ finalize_column_names(
   multi_raw,
   exponentiate,
   columns,
-  metrics
+  metrics,
+  conf_level = 0.95
 )
 }
 \arguments{

@@ -121,7 +121,10 @@ Default is \code{TRUE}.}
 
 \item{color}{Character string specifying the color for point estimates in 
 the forest plot. Default is \code{NULL}, which auto-selects based on
-model type (purple for Cox, teal for GLM, blue for Poisson, green for LM).
+effect type: purple (\code{"#8A61D8"}) for hazard ratios (Cox), teal 
+(\code{"#3C8D9C"}) for odds ratios (logistic), blue (\code{"#3064A6"}) for 
+rate/risk ratios (Poisson, Gamma, etc.), and green (\code{"#5A8F5A"}) for 
+coefficients (linear models).
 Use hex codes or R color names for custom colors.}
 
 \item{null_line}{Numeric value for the reference line position. Default is 

@@ -499,12 +499,13 @@
 #' print(linear_result)
 #' # Returns coefficient estimates, not ratios
 #' 
-#' # Example 10: Poisson regression for count outcomes
+#' # Example 10: Poisson regression for equidispersed count outcomes
+#' # fu_count has variance ≈ mean, appropriate for standard Poisson
 #' poisson_result <- multifit(
 #'     data = clintrial,
-#'     outcomes = c("los_days"),
+#'     outcomes = c("fu_count"),
 #'     predictor = "treatment",
-#'     covariates = c("age", "sex", "stage"),
+#'     covariates = c("age", "stage"),
 #'     model_type = "glm",
 #'     family = "poisson",
 #'     labels = clintrial_labels,
@@ -512,6 +513,7 @@
 #' )
 #' print(poisson_result)
 #' # Returns rate ratios (RR)
+#' # For overdispersed counts (ae_count), use model_type = "negbin" instead
 #' 
 #' # Example 11: Filter to significant results only
 #' sig_results <- multifit(
@@ -1018,7 +1020,8 @@ multifit <- function(data,
         labels = labels,
         predictor_label = predictor_label,
         include_predictor = include_predictor,
-        exponentiate = exponentiate
+        exponentiate = exponentiate,
+        conf_level = conf_level
     )
     
     ## Attach attributes
@@ -1083,13 +1086,12 @@ format_interaction_term <- function(term, labels = NULL) {
             var_name <- substr(part, 1, var_len)
             level <- substr(part, var_len + 1, nchar(part))
             
-            ## Apply label if available
+            ## Apply label if available, otherwise use raw variable name
             if (!is.null(labels) && var_name %in% names(labels)) {
                 var_display <- labels[[var_name]]
             } else {
-                ## Convert to title case
-                var_display <- paste0(toupper(substr(var_name, 1, 1)), 
-                                      substr(var_name, 2, nchar(var_name)))
+                ## Use raw variable name (consistent with fit() and other functions)
+                var_display <- var_name
             }
             
             if (nchar(level) > 0) {
@@ -1201,7 +1203,7 @@ extract_predictor_effects <- function(model, predictor, outcome,
     ## Extract predictor coefficients
     pred_coefs <- coef_summary[predictor_rows, , drop = FALSE]
     
-    ## Get sample size and events
+    ## Get total sample size and events (will be replaced with group-specific values for factors)
     if (is_merMod) {
         n_obs <- nrow(model@frame)
     } else if (is_coxme) {
@@ -1210,35 +1212,35 @@ extract_predictor_effects <- function(model, predictor, outcome,
         n_obs <- stats::nobs(model)
     }
     
-    events <- NA_integer_
+    total_events <- NA_integer_
     if (model_class == "glm") {
         if (model$family$family %in% c("binomial", "quasibinomial")) {
             ## Binary outcome - count events (1s)
             if (!is.null(model$y)) {
-                events <- sum(model$y, na.rm = TRUE)
+                total_events <- sum(model$y, na.rm = TRUE)
             }
         } else if (model$family$family %in% c("poisson", "quasipoisson")) {
             ## Count outcome - sum total events
             if (!is.null(model$y)) {
-                events <- sum(model$y, na.rm = TRUE)
+                total_events <- sum(model$y, na.rm = TRUE)
             }
         }
     } else if (model_class == "negbin") {
         ## Negative binomial count outcome - sum total events
         if (!is.null(model$y)) {
-            events <- sum(model$y, na.rm = TRUE)
+            total_events <- sum(model$y, na.rm = TRUE)
         }
     } else if (model_class == "coxph") {
-        events <- model$nevent
+        total_events <- model$nevent
     } else if (is_coxme) {
-        events <- sum(model$y[, "status"], na.rm = TRUE)
+        total_events <- sum(model$y[, "status"], na.rm = TRUE)
     } else if (inherits(model, "glmerMod")) {
         ## For glmer models - check family
         resp <- model@resp$y
         if (!is.null(resp)) {
             fam <- family(model)$family
             if (fam %in% c("binomial", "poisson", "quasipoisson")) {
-                events <- sum(resp, na.rm = TRUE)
+                total_events <- sum(resp, na.rm = TRUE)
             }
         }
     }
@@ -1256,6 +1258,92 @@ extract_predictor_effects <- function(model, predictor, outcome,
             ## Main effect - extract level name
             group_names[i] <- sub(paste0("^", predictor), "", term)
             if (group_names[i] == "") group_names[i] <- "-"  # Continuous predictor
+        }
+    }
+    
+    ## Calculate group-specific n and events for factor predictors
+    n_values <- rep(n_obs, length(group_names))
+    events_values <- rep(total_events, length(group_names))
+    
+    ## Check if this is a factor predictor (has non-"-" group names that aren't interaction terms)
+    is_factor_predictor <- any(group_names != "-" & !grepl(":", group_names, fixed = TRUE))
+    
+    if (is_factor_predictor) {
+        ## Get model data to calculate group-specific counts
+        ## Use model$model or model.frame() which contains only complete cases used in fitting
+        model_data <- NULL
+        outcome_col <- NULL
+        
+        if (is_merMod) {
+            model_data <- model@frame
+            ## First column is the outcome
+            outcome_col <- model_data[[1]]
+        } else if (is_coxme) {
+            ## For coxme, use the model's y component for events
+            if (!is.null(model$data) && predictor %in% names(model$data)) {
+                ## Need to get the subset of data used in model
+                model_data <- model$data[!is.na(model$data[[predictor]]), ]
+            }
+            if (!is.null(model$y)) {
+                outcome_col <- model$y[, "status"]
+            }
+        } else if (model_class == "coxph") {
+            ## For coxph, model$model contains Surv object - extract status from model$y
+            if (!is.null(model$model)) {
+                model_data <- model$model
+            }
+            if (!is.null(model$y)) {
+                ## model$y is a Surv object - extract status column
+                outcome_col <- model$y[, "status"]
+            }
+        } else if (!is.null(model$model)) {
+            ## model$model contains the model frame with only complete cases
+            model_data <- model$model
+            ## First column is the outcome
+            outcome_col <- model_data[[1]]
+        } else {
+            ## Fallback: try to get model frame
+            tryCatch({
+                model_data <- stats::model.frame(model)
+                outcome_col <- model_data[[1]]
+            }, error = function(e) NULL)
+        }
+        
+        if (!is.null(model_data) && predictor %in% names(model_data)) {
+            pred_col <- model_data[[predictor]]
+            
+            ## Convert outcome to numeric if it's a factor (for binary outcomes stored as factors)
+            if (!is.null(outcome_col) && is.factor(outcome_col)) {
+                ## For factors, the second level is typically the "event" (1)
+                ## Convert to 0/1 numeric
+                outcome_col <- as.numeric(outcome_col) - 1
+            }
+            
+            ## Handle Surv objects (shouldn't happen now but just in case)
+            if (!is.null(outcome_col) && inherits(outcome_col, "Surv")) {
+                outcome_col <- outcome_col[, "status"]
+            }
+            
+            for (i in seq_along(group_names)) {
+                grp <- group_names[i]
+                if (grepl(":", grp, fixed = TRUE)) {
+                    ## This is an interaction term - set n/Events to NA
+                    ## (group-specific counts don't make sense for interactions)
+                    n_values[i] <- NA_integer_
+                    events_values[i] <- NA_integer_
+                } else if (grp != "-") {
+                    ## This is a factor level - calculate group-specific counts
+                    grp_mask <- pred_col == grp
+                    if (any(grp_mask, na.rm = TRUE)) {
+                        n_values[i] <- sum(grp_mask, na.rm = TRUE)
+                        
+                        ## Calculate events for this group if outcome available
+                        if (!is.null(outcome_col) && !is.na(total_events)) {
+                            events_values[i] <- sum(outcome_col[grp_mask], na.rm = TRUE)
+                        }
+                    }
+                }
+            }
         }
     }
     
@@ -1345,8 +1433,8 @@ extract_predictor_effects <- function(model, predictor, outcome,
                           outcome = outcome,
                           predictor = predictor,
                           group = group_names,
-                          n = n_obs,
-                          events = events,
+                          n = n_values,
+                          events = events_values,
                           coefficient = coefficients,
                           se = se_values,
                           exp_coef = exp_coef,
@@ -1479,7 +1567,8 @@ format_multifit_table <- function(data,
                                   labels = NULL,
                                   predictor_label = NULL,
                                   include_predictor = TRUE,
-                                  exponentiate = NULL) {
+                                  exponentiate = NULL,
+                                  conf_level = 0.95) {
     
     if (nrow(data) == 0) {
         return(data.table::data.table())
@@ -1554,6 +1643,10 @@ format_multifit_table <- function(data,
         show_events <- FALSE
     }
     
+    ## Format confidence level for display (e.g., 0.95 -> "95%", 0.90 -> "90%")
+    ci_pct <- round(conf_level * 100)
+    ci_label <- paste0(ci_pct, "% CI")
+    
     ## Format effect columns based on columns parameter
     if (columns == "both") {
         ## Effect type label is already correct (Coefficient for linear models)
@@ -1561,7 +1654,7 @@ format_multifit_table <- function(data,
         
         ## Format unadjusted effects - simple label without "Univariable" prefix
         if ("exp_coef_unadj" %in% names(result)) {
-            unadj_label <- paste0(effect_display, " (95% CI)")
+            unadj_label <- paste0(effect_display, " (", ci_label, ")")
             
             if (effect_type %in% c("OR", "HR", "RR")) {
                 result[, (unadj_label) := fix_negative_zero_multifit(sprintf("%.*f (%.*f-%.*f)", 
@@ -1586,7 +1679,7 @@ format_multifit_table <- function(data,
                                  "RR" = "aRR",
                                  "Adj. Coefficient"
                                  )
-            adj_label <- paste0(adj_effect, " (95% CI)")
+            adj_label <- paste0(adj_effect, " (", ci_label, ")")
             
             if (effect_type %in% c("OR", "HR", "RR")) {
                 result[, (adj_label) := fix_negative_zero_multifit(sprintf("%.*f (%.*f-%.*f)", 
@@ -1623,9 +1716,9 @@ format_multifit_table <- function(data,
                                  "Coefficient" = "Adj. Coefficient",
                                  "Adj. Coefficient"
                                  )
-            effect_label <- paste0(adj_effect, " (95% CI)")
+            effect_label <- paste0(adj_effect, " (", ci_label, ")")
         } else {
-            effect_label <- paste0(effect_display, " (95% CI)")
+            effect_label <- paste0(effect_display, " (", ci_label, ")")
         }
         
         ## Format effect with CI
@@ -1649,7 +1742,7 @@ format_multifit_table <- function(data,
     ## Format n and events
     if ("n" %in% names(result)) {
         result[, n := data.table::fcase(
-                                      is.na(n), NA_character_,
+                                      is.na(n), "-",
                                       n >= 1000, format(n, big.mark = ","),
                                       default = as.character(n)
                                   )]
@@ -1657,7 +1750,7 @@ format_multifit_table <- function(data,
     
     if ("events" %in% names(result)) {
         result[, events := data.table::fcase(
-                                           is.na(events), NA_character_,
+                                           is.na(events), "-",
                                            events >= 1000, format(events, big.mark = ","),
                                            default = as.character(events)
                                        )]
@@ -1673,9 +1766,9 @@ format_multifit_table <- function(data,
     ## Add effect and p-value columns based on layout
     if (columns == "both") {
         effect_display <- effect_type
-        unadj_label <- paste0(effect_display, " (95% CI)")
+        unadj_label <- paste0(effect_display, " (", ci_label, ")")
         adj_effect <- switch(effect_type, "OR" = "aOR", "HR" = "aHR", "RR" = "aRR", "Coefficient" = "Adj. Coefficient", "Adj. Coefficient")
-        adj_label <- paste0(adj_effect, " (95% CI)")
+        adj_label <- paste0(adj_effect, " (", ci_label, ")")
         
         if (unadj_label %in% names(result)) display_cols <- c(display_cols, unadj_label)
         if ("Uni p" %in% names(result)) display_cols <- c(display_cols, "Uni p")
@@ -1685,9 +1778,9 @@ format_multifit_table <- function(data,
         effect_display <- effect_type
         if (columns == "adjusted") {
             adj_effect <- switch(effect_type, "OR" = "aOR", "HR" = "aHR", "RR" = "aRR", "Coefficient" = "Adj. Coefficient", "Adj. Coefficient")
-            effect_label <- paste0(adj_effect, " (95% CI)")
+            effect_label <- paste0(adj_effect, " (", ci_label, ")")
         } else {
-            effect_label <- paste0(effect_display, " (95% CI)")
+            effect_label <- paste0(effect_display, " (", ci_label, ")")
         }
         
         if (effect_label %in% names(result)) display_cols <- c(display_cols, effect_label)

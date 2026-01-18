@@ -8,12 +8,17 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
-# Use ragg for better font rendering if available
+## Use ragg for better font rendering if available
+if (requireNamespace("ragg", quietly = TRUE)) {
+  options(summata.use_ragg = TRUE)
+}
+
 if (requireNamespace("ragg", quietly = TRUE)) {
   knitr::opts_chunk$set(
     dev = "ragg_png",
+    fig.retina = 1,
     collapse = TRUE,
-    comment = "#>",
+    comment = "##>",
     message = FALSE,
     warning = FALSE,
     fig.width = 10,
@@ -23,7 +28,7 @@ if (requireNamespace("ragg", quietly = TRUE)) {
 } else {
   knitr::opts_chunk$set(
     collapse = TRUE,
-    comment = "#>",
+    comment = "##>",
     message = FALSE,
     warning = FALSE,
     fig.width = 10,
@@ -33,33 +38,41 @@ if (requireNamespace("ragg", quietly = TRUE)) {
 }
 options(width = 180)
 
-# Only save figures when building pkgdown site (not for CRAN)
+## Only save figures when building pkgdown site (not for CRAN)
 save_figures <- identical(Sys.getenv("IN_PKGDOWN"), "true") || 
                 dir.exists("../docs")  # pkgdown output directory exists
 
-# Use vignettes/figures for generated plots (pkgdown only)
+## Use vignettes/figures for generated plots (pkgdown only)
 fig_dir <- "figures"
 if (save_figures && !dir.exists(fig_dir)) {
   dir.create(fig_dir, recursive = TRUE)
 }
 
-# Set up device for proper font rendering
-png_device <- if (requireNamespace("ragg", quietly = TRUE)) {
-  ragg::agg_png
-} else {
-  "png"
-}
-
-# Function for saving/displaying plots
-# For pkgdown: saves PNG and returns path for include_graphics
-# For CRAN: just prints the plot and returns empty string
+## Function for saving/displaying plots
+## For pkgdown: saves PNG and returns path for include_graphics
+## For CRAN: just prints the plot and returns empty string
 save_example_plot <- function(plot, filename, width = 10, height = 5) {
   if (save_figures) {
     filepath <- file.path(fig_dir, filename)
-    ggplot2::ggsave(filepath, plot, 
-                    width = attr(plot, "recommended_dims")$width %||% width, 
-                    height = attr(plot, "recommended_dims")$height %||% height, 
-                    dpi = 96, device = png_device)
+    final_width <- attr(plot, "recommended_dims")$width %||% width
+    final_height <- attr(plot, "recommended_dims")$height %||% height
+    
+    if (requireNamespace("ragg", quietly = TRUE)) {
+      ## Use ragg directly - it uses 'res' not 'dpi', and defaults to 72
+      ## Scale dimensions to achieve effective 96 dpi appearance
+      ragg::agg_png(filepath, 
+                    width = final_width, 
+                    height = final_height, 
+                    units = "in",
+                    res = 96)
+      print(plot)
+      grDevices::dev.off()
+    } else {
+      ggplot2::ggsave(filepath, plot, 
+                      width = final_width, 
+                      height = final_height, 
+                      dpi = 96)
+    }
     return(filepath)
   } else {
     print(plot)
@@ -67,7 +80,7 @@ save_example_plot <- function(plot, filename, width = 10, height = 5) {
   }
 }
 
-# Wrapper for include_graphics that handles NULL (CRAN case)
+## Wrapper for include_graphics that handles NULL (CRAN case)
 show_plot <- function(plot, filename, width = 10, height = 5) {
   path <- save_example_plot(plot, filename, width, height)
   if (!is.null(path)) {
@@ -77,6 +90,8 @@ show_plot <- function(plot, filename, width = 10, height = 5) {
 ```
 
 Standard regression analysis assumes independent observations and constant effects across subgroups. In practice, these assumptions often fail: observations may be clustered (e.g., subjects within study sites), effects may vary by subgroup (interaction), or the baseline hazard may differ across strata. This vignette demonstrates advanced analytical techniques to address these complexities.
+
+For mathematical details on the methods covered here, see the [Statistical Foundations](statistical_foundations.html) article.
 
 ---
 
@@ -102,11 +117,7 @@ The `clintrial` dataset includes 10 study sites, providing a natural clustering 
 
 # Interaction Effects
 
-Interaction analysis tests whether the association between a predictor and outcome varies across levels of another variable. Let *X* be the primary predictor and *Z* the effect modifier. The interaction model is:
-
-$$g(E[Y]) = \beta_0 + \beta_1 X + \beta_2 Z + \beta_3 (X \times Z)$$
-
-where *β*₃ quantifies the modification of the *X*–*Y* relationship by *Z*. Interactions are specified using colon notation in the `interactions` parameter; main effects are automatically included alongside the interaction term.
+Interaction analysis tests whether the association between a predictor and outcome varies across levels of another variable. Interactions are specified using colon notation in the `interactions` parameter; main effects are automatically included alongside the interaction term.
 
 ## **Example 1:** Two-Way Interaction
 
@@ -234,21 +245,15 @@ show_plot(example6, "adv_ex6.png")
 
 # Mixed-Effects Models
 
-Mixed-effects models (multilevel or hierarchical models) account for correlation within clusters by incorporating random effects. For observations *i* within clusters *j*:
+Mixed-effects models (multilevel or hierarchical models) account for correlation within clusters by incorporating random effects. The `summata` package supports linear mixed models (`lmer`), generalized linear mixed models (`glmer`), and Cox mixed models (`coxme`).
 
-$$g(E[Y_{ij}]) = \mathbf{X}_{ij}\boldsymbol{\beta} + \mathbf{Z}_{ij}\mathbf{u}_j$$
+Random effects are specified using lme4 syntax within the `predictors` parameter:
 
-where ***β*** are fixed effects, $\mathbf{u}_j \sim N(0, \boldsymbol{\Sigma})$ are random effects, and **Z**ᵢⱼ is the random effects design matrix.
-
-The `summata` package supports:
-
-| Model Type | Function | Package |
-|:-----------|:---------|:--------|
-| Linear mixed | `lmer` | lme4 |
-| Generalized linear mixed | `glmer` | lme4 |
-| Cox mixed | `coxme` | coxme |
-
-Random effects are specified using lme4 syntax within the `predictors` parameter. The notation `(1|group)` specifies random intercepts, while `(x|group)` specifies random slopes.
+| Syntax | Meaning |
+|:-------|:--------|
+| `(1\|group)` | Random intercepts by group |
+| `(x\|group)` | Random intercepts and slopes for *x* |
+| `(1\|g1) + (1\|g2)` | Crossed random effects |
 
 ## **Example 7:** Random Intercepts (Linear Mixed)
 
@@ -298,7 +303,7 @@ example9 <- fit(
 example9
 ```
 
-## **Example 10:** Cox Mixed Model
+## **Example 10:** Cox Mixed-Effects Model
 
 For survival outcomes with clustering:
 
@@ -314,42 +319,14 @@ example10 <- fit(
 example10
 ```
 
-## **Example 11:** Comparing Fixed vs. Mixed Models
+## **Example 11:** Forest Plot from Mixed Model
 
-Use `compfit()` to compare model specifications:
-
-```{r}
-example11 <- compfit(
-  data = clintrial,
-  outcome = "los_days",
-  model_list = list(
-    "Fixed Effects" = c("age", "sex", "treatment", "stage"),
-    "Random Intercepts" = c("age", "sex", "treatment", "stage", "(1|site)"),
-    "Random Slopes" = c("age", "sex", "treatment", "stage", "(1 + treatment|site)")
-  ),
-  model_type = "lmer",
-  labels = clintrial_labels
-)
-
-example11
-```
-
-## **Example 12:** Forest Plot from Mixed Model
-
-Create forest plots from mixed-effects models (fixed effects only are displayed):
+Visualize fixed effects from mixed-effects models:
 
 ```{r}
-mixed_model <- fit(
-  data = clintrial,
-  outcome = "los_days",
-  predictors = c("age", "sex", "treatment", "stage", "(1|site)"),
-  model_type = "lmer",
-  labels = clintrial_labels
-)
-
-example12 <- lmforest(
-  x = attr(mixed_model, "model"),
-  title = "Mixed-Effects Model Results",
+example11 <- glmforest(
+  x = attr(example8, "model"),
+  title = "Logistic Mixed Model (Fixed Effects)",
   labels = clintrial_labels,
   indent_groups = TRUE,
   zebra_stripes = TRUE
@@ -357,18 +334,37 @@ example12 <- lmforest(
 ```
 
 ```{r, echo = FALSE, out.width = "100%"}
-show_plot(example12, "adv_ex12.png")
+show_plot(example11, "adv_ex11.png")
+```
+
+## **Example 12:** Comparing Random-Effects Specifications
+
+Use `compfit()` to compare different random-effects structures:
+
+```{r}
+example12 <- compfit(
+  data = clintrial,
+  outcome = "los_days",
+  model_list = list(
+    "Random Intercepts" = c("age", "sex", "treatment", "stage", "(1|site)"),
+    "Random Slopes" = c("age", "sex", "treatment", "stage", "(1 + treatment|site)")
+  ),
+  model_type = "lmer",
+  labels = clintrial_labels
+)
+
+example12
 ```
 
 ---
 
-# Cox Model Extensions
+# Stratification and Clustering
 
-The Cox proportional hazards model can be extended to handle complex data structures, including stratification for non-proportional baseline hazards and cluster-robust standard errors for correlated observations.
+Cox models support stratification (separate baseline hazards) and clustered standard errors (robust variance estimation).
 
-## **Example 13:** Stratification
+## **Example 13:** Stratified Cox Model
 
-Stratification allows separate baseline hazards for each stratum while estimating common coefficients. Use the `strata` parameter to specify stratification variables:
+Stratification allows nonproportional hazards across strata without estimating stratum effects. Use the `strata` parameter:
 
 ```{r}
 example13 <- fit(
@@ -676,6 +672,7 @@ Forest plots display all terms including interactions. For complex interaction p
 
 # Further Reading
 
+- [Statistical Foundations](statistical_foundations.html): Mathematical details for all model types
 - [Descriptive Tables](descriptive_tables.html): `desctable()` for baseline characteristics
 - [Regression Modeling](regression_modeling.html): `fit()`, `uniscreen()`, and `fullfit()`
 - [Model Comparison](model_comparison.html): `compfit()` for comparing models

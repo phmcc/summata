@@ -8,12 +8,17 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
-# Use ragg for better font rendering if available
+## Use ragg for better font rendering if available
+if (requireNamespace("ragg", quietly = TRUE)) {
+  options(summata.use_ragg = TRUE)
+}
+
 if (requireNamespace("ragg", quietly = TRUE)) {
   knitr::opts_chunk$set(
     dev = "ragg_png",
+    fig.retina = 1,
     collapse = TRUE,
-    comment = "#>",
+    comment = "##>",
     message = FALSE,
     warning = FALSE,
     fig.width = 10,
@@ -23,7 +28,7 @@ if (requireNamespace("ragg", quietly = TRUE)) {
 } else {
   knitr::opts_chunk$set(
     collapse = TRUE,
-    comment = "#>",
+    comment = "##>",
     message = FALSE,
     warning = FALSE,
     fig.width = 10,
@@ -33,33 +38,41 @@ if (requireNamespace("ragg", quietly = TRUE)) {
 }
 options(width = 180)
 
-# Only save figures when building pkgdown site (not for CRAN)
+## Only save figures when building pkgdown site (not for CRAN)
 save_figures <- identical(Sys.getenv("IN_PKGDOWN"), "true") || 
                 dir.exists("../docs")  # pkgdown output directory exists
 
-# Use vignettes/figures for generated plots (pkgdown only)
+## Use vignettes/figures for generated plots (pkgdown only)
 fig_dir <- "figures"
 if (save_figures && !dir.exists(fig_dir)) {
   dir.create(fig_dir, recursive = TRUE)
 }
 
-# Set up device for proper font rendering
-png_device <- if (requireNamespace("ragg", quietly = TRUE)) {
-  ragg::agg_png
-} else {
-  "png"
-}
-
-# Function for saving/displaying plots
-# For pkgdown: saves PNG and returns path for include_graphics
-# For CRAN: just prints the plot and returns empty string
+## Function for saving/displaying plots
+## For pkgdown: saves PNG and returns path for include_graphics
+## For CRAN: just prints the plot and returns empty string
 save_example_plot <- function(plot, filename, width = 10, height = 5) {
   if (save_figures) {
     filepath <- file.path(fig_dir, filename)
-    ggplot2::ggsave(filepath, plot, 
-                    width = attr(plot, "recommended_dims")$width %||% width, 
-                    height = attr(plot, "recommended_dims")$height %||% height, 
-                    dpi = 96, device = png_device)
+    final_width <- attr(plot, "recommended_dims")$width %||% width
+    final_height <- attr(plot, "recommended_dims")$height %||% height
+    
+    if (requireNamespace("ragg", quietly = TRUE)) {
+      ## Use ragg directly - it uses 'res' not 'dpi', and defaults to 72
+      ## Scale dimensions to achieve effective 96 dpi appearance
+      ragg::agg_png(filepath, 
+                    width = final_width, 
+                    height = final_height, 
+                    units = "in",
+                    res = 96)
+      print(plot)
+      grDevices::dev.off()
+    } else {
+      ggplot2::ggsave(filepath, plot, 
+                      width = final_width, 
+                      height = final_height, 
+                      dpi = 96)
+    }
     return(filepath)
   } else {
     print(plot)
@@ -67,7 +80,7 @@ save_example_plot <- function(plot, filename, width = 10, height = 5) {
   }
 }
 
-# Wrapper for include_graphics that handles NULL (CRAN case)
+## Wrapper for include_graphics that handles NULL (CRAN case)
 show_plot <- function(plot, filename, width = 10, height = 5) {
   path <- save_example_plot(plot, filename, width, height)
   if (!is.null(path)) {
@@ -106,7 +119,7 @@ data(clintrial)
 data(clintrial_labels)
 ```
 
-Moreover, note that all plots in this vignette are generated using the `ggsave()` function with recommended dimensions—i.e.,
+Moreover, note that all plots in this vignette are generated using the `ggsave()` function with recommended dimensions—*i.e.*,
 
 ```{r, eval = FALSE}
 ggsave("output.png", plot, 
@@ -208,7 +221,7 @@ show_plot(example4, "forest_ex4.png")
 
 ---
 
-# Creating Forest Plots from summata Output
+# Creating Forest Plots from *summata* Output
 
 Forest plots integrate seamlessly with `fit()` and `fullfit()` output by extracting the attached model object.
 
@@ -463,9 +476,9 @@ Adjust text size with the `font_size` multiplier:
 ```{r}
 example16 <- glmforest(
   x = attr(table_logistic, "model"),
-  title = "Larger Font (1.2×)",
+  title = "Larger Font (1.5×)",
   labels = clintrial_labels,
-  font_size = 1.2,
+  font_size = 1.5,
   indent_groups = TRUE
 )
 ```
@@ -496,9 +509,9 @@ show_plot(example17a, "forest_ex17a.png")
 # Narrow table (emphasizes forest plot)
 example17b <- glmforest(
   x = attr(table_logistic, "model"),
-  title = "Narrow Table (60%)",
+  title = "Narrow Table (50%)",
   labels = clintrial_labels,
-  table_width = 0.60
+  table_width = 0.50
 )
 ```
 
@@ -624,16 +637,17 @@ show_plot(example21_modified, "forest_ex21.png")
 
 ---
 
-# Poisson Regression
+# Extended GLM Families
 
-For count outcomes, use `glmforest()` with a Poisson model:
+The `glmforest()` function supports all GLM families. The `clintrial` dataset includes two count variables designed for different regression approaches: `fu_count` (equidispersed, for Poisson) and `ae_count` (overdispersed, for negative binomial).
+
+## **Example 22:** Poisson Regression
+
+For equidispersed count outcomes (variance ≈ mean), use Poisson regression:
 
 ```{r}
-# Create count outcome for demonstration
-clintrial$event_count <- rpois(nrow(clintrial), lambda = 2)
-
 poisson_model <- glm(
-  event_count ~ age + sex + stage + treatment,
+  fu_count ~ age + stage + treatment + surgery,
   data = clintrial,
   family = poisson
 )
@@ -641,15 +655,63 @@ poisson_model <- glm(
 example22 <- glmforest(
   x = poisson_model,
   data = clintrial,
-  title = "Poisson Regression: Event Counts",
-  labels = clintrial_labels,
-  effect_label = "Rate Ratio"
+  title = "Poisson Regression: Follow-Up Visits",
+  labels = clintrial_labels
 )
 ```
 
 ```{r, echo = FALSE, out.width = "100%"}
 show_plot(example22, "forest_ex22.png")
 ```
+
+## **Example 23:** Negative Binomial Regression
+
+For overdispersed count outcomes (variance > mean), negative binomial regression is preferred. Using `fit()` ensures proper handling:
+
+```{r}
+nb_result <- fit(
+  data = clintrial,
+  outcome = "ae_count",
+  predictors = c("age", "treatment", "diabetes", "surgery"),
+  model_type = "negbin",
+  labels = clintrial_labels
+)
+
+example23 <- glmforest(
+  x = nb_result,
+  title = "Negative Binomial: Adverse Events"
+)
+```
+
+```{r, echo = FALSE, out.width = "100%"}
+show_plot(example23, "forest_ex23.png")
+```
+
+## **Example 24:** Gamma Regression
+
+For positive continuous outcomes with right skew (e.g., costs, length of stay), Gamma regression with log link produces multiplicative effects:
+
+```{r}
+gamma_result <- fit(
+  data = clintrial,
+  outcome = "los_days",
+  predictors = c("age", "stage", "treatment", "surgery"),
+  model_type = "glm",
+  family = "Gamma",
+  labels = clintrial_labels
+)
+
+example24 <- glmforest(
+  x = gamma_result,
+  title = "Gamma Regression: Length of Stay"
+)
+```
+
+```{r, echo = FALSE, out.width = "100%"}
+show_plot(example24, "forest_ex24.png")
+```
+
+All ratio-type models (Poisson, negative binomial, Gamma with log link) display rate ratios with blue coloring by default, while coefficient models use green. See [Regression Modeling](regression_modeling.html) for the full list of supported model types.
 
 ---
 
@@ -669,7 +731,7 @@ show_plot(example22, "forest_ex22.png")
 | `digits` | Decimal places for estimates | `2` |
 | `ref_label` | Label for reference categories | `"reference"` |
 | `effect_label` | Column header for effect measure | Model-dependent |
-| `color` | Color for points and lines | `"#2171B5"` |
+| `color` | Color for points and lines | Effect-type dependent |
 | `font_size` | Text size multiplier | `1.0` |
 | `table_width` | Proportion of width for table | `0.55` |
 

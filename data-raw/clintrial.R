@@ -5,7 +5,7 @@
 #' site-level clustering, and a comprehensive set of outcomes suitable for 
 #' demonstrating regression analysis, survival modeling, and multi-outcome analyses.
 #'
-#' @format A data frame with 850 rows and 30 variables:
+#' @format A data frame with 850 rows and 32 variables:
 #' \describe{
 #'   \item{patient_id}{Character. Unique patient identifier (PT0001-PT0850)}
 #'   
@@ -42,7 +42,7 @@
 #'   \item{los_days}{Numeric. Length of hospital stay in days}
 #'   
 #'   \strong{Complication Outcomes:}
-#'   \item{postop_complication}{Factor. Any complication occurred (No, Yes)}
+#'   \item{any_complication}{Factor. Any complication occurred (No, Yes)}
 #'   \item{wound_infection}{Factor. Wound or site infection (No, Yes)}
 #'   \item{readmission_30d}{Factor. 30-day hospital readmission (No, Yes)}
 #'   \item{icu_admission}{Factor. ICU admission required (No, Yes)}
@@ -50,6 +50,14 @@
 #'   \strong{Recovery Outcomes:}
 #'   \item{pain_score}{Numeric. Postoperative pain score on 0-10 visual analog scale}
 #'   \item{recovery_days}{Numeric. Days to functional recovery}
+#'   
+#'   \strong{Count Outcomes:}
+#'   \item{ae_count}{Integer. Number of adverse events during study period. 
+#'     Overdispersed count suitable for negative binomial or quasipoisson regression.
+#'     Associated with age, ECOG, diabetes, treatment, surgery, and stage.}
+#'   \item{fu_count}{Integer. Number of follow-up clinic visits. Equidispersed
+#'     count suitable for standard Poisson regression. Associated with stage, ECOG,
+#'     treatment, and surgery.}
 #'   
 #'   \strong{Survival Outcomes:}
 #'   \item{pfs_months}{Numeric. Progression-free survival time in months}
@@ -64,9 +72,19 @@
 #' \strong{Treatment Effects:}
 #' \itemize{
 #'   \item Drug A generally shows protective effects (reduced complications, 
-#'     faster recovery, improved survival)
-#'   \item Drug B shows increased toxicity (more complications, longer recovery)
+#'     faster recovery, improved survival, fewer adverse events)
+#'   \item Drug B shows increased toxicity (more complications, longer recovery,
+#'     more adverse events)
 #'   \item Treatment effects vary by disease stage (interaction effects)
+#' }
+#' 
+#' \strong{Count Outcomes:}
+#' \itemize{
+#'   \item \code{ae_count}: Generated using negative binomial distribution with
+#'     overdispersion (variance > mean). Use for demonstrating quasipoisson or
+#'     negative binomial regression.
+#'   \item \code{fu_count}: Generated using Poisson distribution (variance ≈ mean).
+#'     Use for demonstrating standard Poisson regression.
 #' }
 #' 
 #' \strong{Site Clustering:}
@@ -87,7 +105,7 @@
 #' }
 #' 
 #' \strong{Missing Data:}
-#' \itemize
+#' \itemize{
 #'   \item Realistic missing data patterns (~2\% across most variables)
 #'   \item Some outcomes have outcome-specific missingness (e.g., LOS for 
 #'     outpatient procedures)
@@ -352,6 +370,83 @@ create_clintrial <- function() {
     
     ## Add some missing values for LOS (e.g., outpatient procedures)
     los_days[sample(which(surgery == "No"), size = 20)] <- NA
+
+    ## Site-specific AE reporting vigilance (some sites report more/fewer AEs)
+    site_ae_effect <- rnorm(n_sites, mean = 0, sd = 0.25)
+    names(site_ae_effect) <- site_names
+    
+    ## ae_count - overdispersed count suitable for negative binomial or quasipoisson
+    ## Risk factors: age, ECOG, diabetes, treatment, surgery, stage
+    ae_lambda <- exp(
+        0.7 +  # Baseline log-rate (~2 AEs on average)
+        
+        ## Demographics
+        (age - 60) * 0.012 +  # Older patients have more AEs
+        
+        ## Clinical factors
+        as.numeric(ecog) * 0.15 +  # Higher ECOG = more AEs
+        (diabetes == "Yes") * 0.25 +  # Diabetes increases AEs
+        (hypertension == "Yes") * 0.10 +
+        
+        ## Treatment effects (key associations)
+        (treatment == "Drug A") * (-0.15) +  # Drug A slightly protective
+        (treatment == "Drug B") * 0.35 +  # Drug B has more AEs (toxicity)
+        
+        ## Surgery effect
+        (surgery == "Yes") * 0.30 +
+        
+        ## Disease severity
+        (stage == "III") * 0.15 +
+        (stage == "IV") * 0.25 +
+        
+        ## Interaction: Drug B + diabetes = synergistic toxicity
+        ((treatment == "Drug B") & (diabetes == "Yes")) * 0.20 +
+        
+        ## Interaction: elderly + Drug B = more AEs
+        ((age > 70) & (treatment == "Drug B")) * 0.15 +
+        
+        ## Site clustering (vigilance in AE reporting)
+        site_ae_effect[as.character(site)] +
+        
+        ## Random noise
+        rnorm(n, 0, 0.1)
+    )
+    
+    ## Generate counts using negative binomial for realistic overdispersion
+    ## size parameter controls overdispersion (smaller = more overdispersion)
+    ae_count <- as.integer(rnbinom(n, mu = ae_lambda, size = 3))
+    
+    ## fu_count - equidispersed count suitable for standard Poisson regression
+    ## Mean ~ variance (Poisson assumption satisfied)
+    ## Risk factors: stage, ECOG, treatment, surgery
+    visit_lambda <- exp(
+        1.4 +  # Baseline log-rate (~4 visits on average)
+        
+        ## Disease severity drives visit frequency
+        (stage == "II") * 0.10 +
+        (stage == "III") * 0.20 +
+        (stage == "IV") * 0.35 +
+        
+        ## Performance status
+        as.numeric(ecog) * 0.08 +
+        
+        ## Treatment protocol differences
+        (treatment == "Drug A") * 0.05 +  # Slightly more monitoring
+        (treatment == "Drug B") * 0.12 +  # More monitoring for toxicity
+        
+        ## Surgery requires follow-up
+        (surgery == "Yes") * 0.15 +
+        
+        ## Minimal noise to maintain equidispersion
+        rnorm(n, 0, 0.02)
+    )
+    
+    ## Generate counts using Poisson (equidispersed by definition)
+    fu_count <- as.integer(rpois(n, lambda = visit_lambda))
+    
+    ## Add small amount of missing data
+    ae_count[sample(n, size = 10)] <- NA
+    fu_count[sample(n, size = 8)] <- NA
 
     ## Generate site-specific complication rates (some sites have better/worse outcomes)
     site_complication_effect <- rnorm(n_sites, mean = 0, sd = 0.4)
@@ -771,6 +866,9 @@ create_clintrial <- function() {
         readmission_30d = readmission_30d,
         los_days = los_days,
         recovery_days = recovery_days,
+        ## Count outcomes
+        ae_count = ae_count,
+        fu_count = fu_count,
         ## Survival outcomes
         pfs_months = pfs_time,
         pfs_status = pfs_status,
@@ -858,6 +956,9 @@ clintrial_labels <- c(
     "readmission_30d" = "30-Day Readmission",
     "los_days" = "Length of Hospital Stay (days)",
     "recovery_days" = "Days to Functional Recovery",
+    ## Count outcomes
+    "ae_count" = "Adverse Event Count",
+    "fu_count" = "Follow-Up Visit Count",
     ## Survival outcomes
     "pfs_months" = "Progression-Free Survival Time (months)",
     "pfs_status" = "Progression or Death Event",

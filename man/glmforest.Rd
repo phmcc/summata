@@ -141,10 +141,14 @@ values are the labels to display. Example:
 (use original variable names).}
 
 \item{color}{Character string specifying the color for effect estimate point 
-markers in the forest plot. Use hex codes or R color names. Default is 
-\code{NULL}, which auto-selects based on model family: \code{"#3C8D9C"} 
-(teal) for binomial/logistic models, \code{"#3064A6"} (blue) for Poisson 
-models. Choose colors that contrast well with black error bars.}
+  markers in the forest plot. Use hex codes or R color names. Default is 
+  \code{NULL}, which auto-selects based on effect type: \code{"#3C8D9C"} 
+  (teal) for odds ratios (binomial/quasibinomial with logit link), 
+  \code{"#3064A6"} (blue) for rate/risk ratios (Poisson, Gamma, inverse 
+
+  Gaussian with log link), and \code{"#5A8F5A"} (green) for coefficients 
+  (Gaussian/identity link). This scheme matches \code{uniforest()} and 
+  \code{multiforest()}. Choose colors that contrast well with black error bars.}
 
 \item{exponentiate}{Logical. If \code{TRUE}, exponentiates coefficients to 
 display odds ratios, risk ratios, etc. If \code{FALSE}, shows raw 
@@ -416,51 +420,64 @@ plot10 <- glmforest(
 )
 
 # Example 11: Poisson regression for count data
-model11 <- glm(los_days ~ age + treatment + surgery + stage,
+model11 <- glm(ae_count ~ age + treatment + diabetes + surgery,
                data = clintrial,
                family = poisson)
 
 plot11 <- glmforest(
     x = model11,
     data = clintrial,
-    title = "Rate Ratios for Length of Stay",
-    effect_label = "Rate Ratio",
+    title = "Rate Ratios for Adverse Events",
     labels = clintrial_labels
 )
 print(plot11)
-# Shows rate ratios instead of odds ratios
+# Shows rate ratios with blue color for count models
 
-# Example 12: Force display of raw coefficients
+# Example 12: Gamma regression for positive continuous outcomes
+model12 <- glm(los_days ~ age + treatment + surgery + stage,
+               data = clintrial,
+               family = Gamma(link = "log"))
+
 plot12 <- glmforest(
+    x = model12,
+    data = clintrial,
+    title = "Multiplicative Effects on Length of Stay",
+    labels = clintrial_labels
+)
+print(plot12)
+# Shows ratios with blue color (same as other ratio models)
+
+# Example 13: Force display of raw coefficients
+plot13 <- glmforest(
     x = model1,
     data = clintrial,
     exponentiate = FALSE,  # Show log odds
     effect_label = "Log Odds",
     labels = clintrial_labels
 )
-print(plot12)
+print(plot13)
 # Reference line at 0 instead of 1
 
-# Example 13: Custom reference label
-plot13 <- glmforest(
+# Example 14: Custom reference label
+plot14 <- glmforest(
     x = model1,
     data = clintrial,
     ref_label = "1.00 (ref)",
     labels = clintrial_labels
 )
-print(plot13)
+print(plot14)
 
-# Example 14: Adjust font sizes for presentations
-plot14 <- glmforest(
+# Example 15: Adjust font sizes for presentations
+plot15 <- glmforest(
     x = model1,
     data = clintrial,
     font_size = 1.5,      # 50\% larger
     title_size = 30,      # Larger title
     labels = clintrial_labels
 )
-print(plot14)
+print(plot15)
 
-# Example 15: Complete publication-ready plot
+# Example 16: Complete publication-ready plot
 final_model <- glm(
     os_status ~ age + sex + bmi + smoking + hypertension + 
         diabetes + treatment + stage,

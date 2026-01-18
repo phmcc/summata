@@ -1,3 +1,13 @@
+# *summata* 0.10.5 (2026-01-18)
+
+* Add count outcomes (`ae_count` and `fu_count`) to `clintrial` mock dataset
+* Fix color coding in forest plots
+* Fix `glmforest()` to correctly extract values from `MASS::glm.nb()`
+* Fix regression functions to respect level order in categorical functions
+* Fix bug in `uniscreen()` where specified `p_threshold` values were not generating screened outputs
+* Fixes to print outputs in regression functions
+* Multiple `multifit()` revisions, including improved "n" and "Events" column handling and interaction effect formatting
+
 # *summata* 0.10.4 (2026-01-15)
 
 * Revise and standardize documentation

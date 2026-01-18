@@ -24,7 +24,7 @@ if (requireNamespace("ragg", quietly = TRUE)) {
 options(width = 180)
 ```
 
-Survival analysis requires specialized summary tables that report time-to-event outcomes in formats appropriate for clinical research. While `desctable()` includes basic survival summaries (median with 95% CI), detailed survival analysis often requires more comprehensive reporting: survival probabilities at specified time points, multiple quantiles, and group comparisons with appropriate statistical tests.
+Survival analysis requires specialized summary tables that report time-to-event outcomes in formats appropriate for longitudinal research. While `desctable()` includes basic survival summaries (median with 95% CI), detailed survival analysis often requires more comprehensive reporting: survival probabilities at specified time points, multiple quantiles, and group comparisons with appropriate statistical tests.
  
 The `survtable()` function generates publication-ready survival tables with flexible output options. This vignette demonstrates its capabilities using the included sample dataset.
 
@@ -56,13 +56,13 @@ The `survtable()` function uses the familiar `Surv()` syntax for specifying surv
 survtable(data, outcome, by, times, probs, ...)
 ```
 
-Here `data` is the dataset, `outcome` specifies the survival endpoint using `Surv()` notation, `by` defines the grouping variable, `times` specifies landmark time points, and `probs` specifies survival quantiles to report.
+where `data` is the dataset, `outcome` specifies the survival endpoint using `Surv()` notation, `by` defines the grouping variable, `times` specifies landmark time points, and `probs` specifies survival quantiles to report.
 
 ---
 
 # Landmark Survival Estimates
 
-Landmark survival estimates report the probability of survival at specific time points, commonly used in oncology trials (e.g., 1-year, 2-year survival rates).
+Landmark survival estimates report the probability of survival at specific time points (*e.g.*, 1-year, 2-year survival rates).
 
 ## **Example 1:** Basic Landmark Analysis
 
@@ -98,18 +98,36 @@ example2 <- survtable(
 example2
 ```
 
+## **Example 3:** Remove Median Survival Column
+
+By default, a column showing median survival is displayed (`probs = 0.5`). To remove it, set `probs = NULL`.
+
+```{r}
+example3 <- survtable(
+  data = clintrial,
+  outcome = "Surv(os_months, os_status)",
+  by = "treatment",
+  times = c(12, 24),
+  probs = NULL,
+  time_unit = "months",
+  total = FALSE
+)
+
+example3
+```
+
 ---
 
 # Survival Quantiles
 
 Survival quantiles report the time at which a specified proportion of subjects have experienced the event. The median survival time (50th percentile) is the most common, but other quantiles provide additional context.
 
-## **Example 3:** Survival Quartiles
+## **Example 4:** Survival Quartiles
 
 Report multiple survival quantiles by specifying the `probs` parameter:
 
 ```{r}
-example3 <- survtable(
+example4 <- survtable(
   data = clintrial,
   outcome = "Surv(os_months, os_status)",
   by = "stage",
@@ -118,7 +136,7 @@ example3 <- survtable(
   labels = clintrial_labels
 )
 
-example3
+example4
 ```
 
 ---
@@ -127,12 +145,12 @@ example3
 
 Studies often include multiple time-to-event outcomes, such as progression-free survival (PFS) and overall survival (OS). The `survtable()` function handles multiple endpoints in a single call.
 
-## **Example 4:** PFS and OS Comparison
+## **Example 5:** PFS and OS Comparison
 
 Pass a vector of outcomes to compare multiple survival endpoints:
 
 ```{r}
-example4 <- survtable(
+example5 <- survtable(
   data = clintrial,
   outcome = c("Surv(pfs_months, pfs_status)", "Surv(os_months, os_status)"),
   by = "treatment",
@@ -146,19 +164,19 @@ example4 <- survtable(
   )
 )
 
-example4
+example5
 ```
 
 ---
 
 # Output Variations
 
-## **Example 5:** Cumulative Event Rates
+## **Example 6:** Cumulative Event Rates
 
 For competing risks analyses or when reporting event rates rather than survival probabilities, use `type = "risk"` to display cumulative incidence (1 − survival):
 
 ```{r}
-example5 <- survtable(
+example6 <- survtable(
   data = clintrial,
   outcome = "Surv(os_months, os_status)",
   by = "treatment",
@@ -167,15 +185,15 @@ example5 <- survtable(
   time_unit = "months"
 )
 
-example5
+example6
 ```
 
-## **Example 6:** Including At-Risk Counts
+## **Example 7:** Including At-Risk Counts
 
 The number at risk at each time point provides context for the precision of survival estimates:
 
 ```{r}
-example6 <- survtable(
+example7 <- survtable(
   data = clintrial,
   outcome = "Surv(os_months, os_status)",
   by = "treatment",
@@ -185,7 +203,7 @@ example6 <- survtable(
   total = FALSE
 )
 
-example6
+example7
 ```
 
 ---
@@ -194,7 +212,7 @@ example6
 
 Survival tables are often presented alongside Kaplan-Meier curves in publications. While `summata` focuses on tabular output, the `survminer` and `ggsurvfit` packages provide excellent options for survival curves.
 
-## **Example 7:** Coordinated Figure-Table Output
+## **Example 8:** Coordinated Figure-Table Output
 
 The following workflow produces a matched figure-table pair suitable for publication:
 

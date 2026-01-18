@@ -14,4 +14,9 @@ Checks for commonly available sans-serif fonts in order of preference
 (Helvetica, Arial, Helvetica Neue) and returns the first available one.
 Falls back to "sans" if none are found or if systemfonts is unavailable.
 }
+\details{
+When ragg is being used as the graphics device (detected via options or
+knitr settings), font detection works in non-interactive sessions since
+ragg handles font rendering independently of the R graphics system.
+}
 \keyword{internal}

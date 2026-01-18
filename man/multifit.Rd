@@ -528,12 +528,13 @@ linear_result <- multifit(
 print(linear_result)
 # Returns coefficient estimates, not ratios
 
-# Example 10: Poisson regression for count outcomes
+# Example 10: Poisson regression for equidispersed count outcomes
+# fu_count has variance ≈ mean, appropriate for standard Poisson
 poisson_result <- multifit(
     data = clintrial,
-    outcomes = c("los_days"),
+    outcomes = c("fu_count"),
     predictor = "treatment",
-    covariates = c("age", "sex", "stage"),
+    covariates = c("age", "stage"),
     model_type = "glm",
     family = "poisson",
     labels = clintrial_labels,
@@ -541,6 +542,7 @@ poisson_result <- multifit(
 )
 print(poisson_result)
 # Returns rate ratios (RR)
+# For overdispersed counts (ae_count), use model_type = "negbin" instead
 
 # Example 11: Filter to significant results only
 sig_results <- multifit(

@@ -43,7 +43,8 @@ format_model_table <- function(data,
                                show_n = TRUE,
                                show_events = TRUE,
                                reference_label = "reference",
-                               exponentiate = NULL) {
+                               exponentiate = NULL,
+                               conf_level = 0.95) {
     
     ## Determine which columns we actually need to avoid copying everything
     ## Start with columns that will be in output
@@ -240,10 +241,14 @@ format_model_table <- function(data,
     ## Create effect column label based on model scope
     model_scope <- if ("model_scope" %in% names(result)) result$model_scope[1] else "Effect"
     
+    ## Format confidence level for display (e.g., 0.95 -> "95%", 0.90 -> "90%")
+    ci_pct <- round(conf_level * 100)
+    ci_label <- paste0(ci_pct, "% CI")
+    
     ## Create appropriate label
     if (model_scope == "Univariable") {
         ## Univariable: OR, HR, RR, Coefficient
-        effect_label <- paste0(effect_col, " (95% CI)")
+        effect_label <- paste0(effect_col, " (", ci_label, ")")
     } else if (model_scope == "Multivariable") {
         ## Multivariable: aOR, aHR, aRR, Adj. Coefficient
         adjusted_col <- switch(effect_col,
@@ -253,9 +258,9 @@ format_model_table <- function(data,
                                "Coefficient" = "Adj. Coefficient",
                                paste0("Adj. ", effect_col)
                                )
-        effect_label <- paste0(adjusted_col, " (95% CI)")
+        effect_label <- paste0(adjusted_col, " (", ci_label, ")")
     } else {
-        effect_label <- paste0(effect_col, " (95% CI)")
+        effect_label <- paste0(effect_col, " (", ci_label, ")")
     }
     
     ## Format effect sizes with CI

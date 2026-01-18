@@ -98,10 +98,9 @@
 #'   
 #'   See \code{\link[stats]{family}} for additional details and options.
 #'   
-#' @param p_threshold Numeric value between 0 and 1 specifying a p-value threshold 
-#'   for filtering results. Only predictors with p-value ≤ threshold in their 
-#'   univariable model are included in the output. Default is 1 (no filtering, 
-#'   all predictors returned). Common values: 0.05, 0.10, 0.20 for screening.
+#' @param p_threshold Numeric value between 0 and 1 specifying the p-value threshold 
+#'   used to count significant predictors in the printed summary. All predictors
+#'   are always included in the output table. Default is 0.05.
 #'   
 #' @param conf_level Numeric confidence level for confidence intervals. Must be 
 #'   between 0 and 1. Default is 0.95 (95\% confidence intervals).
@@ -203,7 +202,6 @@
 #'     \code{outcome ~ predictor}
 #'   \item Extracts coefficients, confidence intervals, and p-values from each model
 #'   \item Combines results into a single table for easy comparison
-#'   \item Optionally filters results based on \code{p_threshold}
 #'   \item Formats output for publication with appropriate effect measures
 #' }
 #' 
@@ -219,7 +217,7 @@
 #'   \item \strong{Understanding crude associations}: Report unadjusted effects 
 #'     alongside adjusted estimates
 #'   \item \strong{Variable reduction}: Use p-value thresholds (e.g., p < 0.20) 
-#'     to reduce the number of candidates for multivariable modeling
+#'     to identify candidates for multivariable modeling
 #'   \item \strong{Checking multicollinearity}: Compare univariable and 
 #'     multivariable effects to identify potential collinearity
 #' }
@@ -234,17 +232,11 @@
 #'   \item Group-specific sample sizes and event counts are calculated
 #' }
 #' 
-#' \strong{P-value Filtering:}
+#' \strong{P-value Threshold:}
 #' 
-#' The \code{p_threshold} parameter enables automatic filtering:
-#' \itemize{
-#'   \item Only predictors with at least one significant term (p ≤ threshold) 
-#'     are retained
-#'   \item For factor variables, if any level is significant, all levels are kept
-#'   \item Common thresholds: 0.05 (strict), 0.10 (moderate), 0.20 (liberal screening)
-#'   \item When \code{keep_models = TRUE}, non-significant models are also removed 
-#'     from the models list
-#' }
+#' The \code{p_threshold} parameter controls the significance threshold used 
+#' in the printed summary to count how many predictors are significant. All
+#' predictors are always included in the output table regardless of this setting.
 #' 
 #' \strong{Effect Measures by Model Type:}
 #' \itemize{
@@ -357,12 +349,12 @@
 #' )
 #' print(linear_screen)
 #' 
-#' # Example 7: Poisson regression for count outcomes
-#' clintrial$event_count <- rpois(nrow(clintrial), lambda = 3)
+#' # Example 7: Poisson regression for equidispersed count outcomes
+#' # fu_count has variance ≈ mean, appropriate for standard Poisson
 #' poisson_screen <- uniscreen(
 #'     data = clintrial,
-#'     outcome = "event_count",
-#'     predictors = c("age", "sex", "treatment", "surgery", "stage"),
+#'     outcome = "fu_count",
+#'     predictors = c("age", "stage", "treatment", "surgery"),
 #'     model_type = "glm",
 #'     family = "poisson",
 #'     labels = clintrial_labels,
@@ -372,11 +364,12 @@
 #' # Returns rate ratios (RR)
 #' 
 #' # Example 8: Negative binomial for overdispersed counts
+#' # ae_count has variance > mean (overdispersed), use negbin
 #' if (requireNamespace("MASS", quietly = TRUE)) {
 #'     nb_screen <- uniscreen(
 #'         data = clintrial,
-#'         outcome = "event_count",
-#'         predictors = c("age", "sex", "treatment", "surgery"),
+#'         outcome = "ae_count",
+#'         predictors = c("age", "treatment", "diabetes", "surgery"),
 #'         model_type = "negbin",
 #'         labels = clintrial_labels,
 #'         parallel = FALSE
@@ -565,7 +558,7 @@ uniscreen <- function(data,
                       model_type = "glm",
                       family = "binomial",
                       random = NULL,
-                      p_threshold = 1,
+                      p_threshold = 0.05,
                       conf_level = 0.95,
                       reference_rows = TRUE,
                       show_n = TRUE,
@@ -774,15 +767,7 @@ uniscreen <- function(data,
         models <- models[!vapply(models, is.null, logical(1))]
     }
     
-    ## Filter by p-value if requested
-    if (p_threshold < 1) {
-        passing_predictors <- unique(combined_raw[p_value <= p_threshold]$predictor)
-        combined_raw <- combined_raw[predictor %in% passing_predictors]
-        
-        if (keep_models) {
-            models <- models[names(models) %in% passing_predictors]
-        }
-    }
+    ## Note: p_threshold is used for reporting "Significant" count, not filtering
     
     ## Format results
     formatted <- format_model_table(
@@ -792,7 +777,8 @@ uniscreen <- function(data,
         digits = digits,
         p_digits = p_digits,
         labels = labels,
-        exponentiate = exponentiate
+        exponentiate = exponentiate,
+        conf_level = conf_level
     )
     
     ## Attach attributes
@@ -806,6 +792,7 @@ uniscreen <- function(data,
     data.table::setattr(formatted, "model_type", unique(combined_raw$model_type)[1])
     data.table::setattr(formatted, "model_scope", "Univariable")
     data.table::setattr(formatted, "screening_type", "univariable")
+    data.table::setattr(formatted, "p_threshold", p_threshold)
     
     class(formatted) <- c("uniscreen_result", class(formatted))
     
@@ -825,10 +812,13 @@ print.uniscreen_result <- function(x, ...) {
     cat("Predictors Screened: ", n_predictors, "\n", sep = "")
     
     raw <- attr(x, "raw_data")
+    p_thresh <- attr(x, "p_threshold")
+    if (is.null(p_thresh)) p_thresh <- 0.05
+    
     if (!is.null(raw) && "p_value" %in% names(raw)) {
-        sig_predictors <- unique(raw[p_value < 0.05]$predictor)
+        sig_predictors <- unique(raw[p_value < p_thresh]$predictor)
         n_sig <- length(sig_predictors)
-        cat("Significant (p < 0.05): ", n_sig, "\n", sep = "")
+        cat("Significant (p < ", p_thresh, "): ", n_sig, "\n", sep = "")
     }
     
     if (!is.null(attr(x, "models"))) {

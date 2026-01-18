@@ -33,10 +33,10 @@ The `summata` package provides three functions for regression analysis:
 | Function | Purpose |
 |:---------|:--------|
 | `uniscreen()` | Univariable screening of multiple predictors |
-| `fit()` | Single multivariable model |
+| `fit()` | Single univariable/multivariable model |
 | `fullfit()` | Combined univariable and multivariable analysis |
 
-All functions support linear models, generalized linear models (logistic, Poisson), and Cox proportional hazards models, with consistent syntax and publication-ready output.
+All functions support a wide range of model types including linear models, generalized linear models (logistic, Poisson, Gaussian, Gamma, negative binomial), Cox proportional hazards models, and mixed-effects models, with consistent syntax and publication-ready output. For a more thorough treatment of the statistical methods underlying these models, see the [Statistical Foundations](statistical_foundations.html) article.
 
 ---
 
@@ -46,52 +46,50 @@ The examples in this vignette use the `clintrial` dataset included with `summata
 
 ```{r setup}
 library(summata)
+library(survival)
 
 data(clintrial)
 data(clintrial_labels)
 ```
 
-The `clintrial` dataset includes variables suitable for different regression approaches:
+The `clintrial` dataset simulates a multi-site oncology clinical trial with realistic outcomes and site-level clustering. Variables suitable for different regression approaches include:
 
 | Variable | Type | Application |
 |:---------|:-----|:------------|
-| `surgery` | Binary | Logistic regression |
-| `los_days` | Continuous | Linear regression |
-| `event_count` | Count | Poisson regression |
+| `pain_score` | Continuous | Linear regression |
+| `readmission_30d` | Binary | Logistic regression |
+| `any_complication` | Binary | Logistic regression |
+| `los_days` | Continuous (positive) | Linear or Gamma regression |
+| `recovery_days` | Continuous (positive) | Linear or Gamma regression |
+| `ae_count` | Count (overdispersed) | Negative binomial / quasipoisson |
+| `fu_count` | Count (equidispersed) | Poisson regression |
+| `pfs_months`, `pfs_status` | Time-to-event | Cox regression |
 | `os_months`, `os_status` | Time-to-event | Cox regression |
+| `site` | Clustering variable | Mixed-effects models |
 
 ---
 
-# Theoretical Background
+# Supported Model Types
 
-## Model Specifications
+The following table summarizes all supported model types (`model_type`) and families/links (`family`). Effect measures are displayed by default; set `exponentiate = FALSE` to display raw coefficients.
 
-Let *Y* denote the response and $X_1, \ldots, X_p$ the predictors. The supported model classes are:
-
-**Linear regression** (*Y* continuous):
-$$E[Y | X] = \beta_0 + \beta_1 X_1 + \cdots + \beta_p X_p$$
-
-**Logistic regression** (*Y* binary):
-$$\log\left(\frac{P(Y=1|X)}{1-P(Y=1|X)}\right) = \beta_0 + \beta_1 X_1 + \cdots + \beta_p X_p$$
-
-**Poisson regression** (*Y* count):
-$$\log(E[Y | X]) = \beta_0 + \beta_1 X_1 + \cdots + \beta_p X_p$$
-
-**Cox proportional hazards** (*Y* time-to-event):
-$$h(t|X) = h_0(t) \exp(\beta_1 X_1 + \cdots + \beta_p X_p)$$
-
-## Effect Measures
-
-The interpretation of coefficients depends on the model class:
-
-| Model | Raw Coefficient | Exponentiated |
-|:------|:----------------|:--------------|
-| Linear | *β* (mean difference) | — |
-| Logistic | Log-odds ratio | Odds ratio (OR) |
-| Poisson | Log-rate ratio | Rate ratio (RR) |
-| Cox | Log-hazard ratio | Hazard ratio (HR) |
-
-By default, logistic, Poisson, and Cox models display exponentiated coefficients.
+| `model_type` | `family` | Outcome | Effect Measure | Package |
+|:-------------|:------------|:--------|:---------------|:--------|
+| `"lm"` | — | Continuous | *β* coefficient | `stats` |
+| `"glm"` | `"binomial"` | Binary | Odds ratio | `stats` |
+| `"glm"` | `"quasibinomial"` | Binary (overdispersed) | Odds ratio | `stats` |
+| `"glm"` | `"poisson"` | Count | Rate ratio | `stats` |
+| `"glm"` | `"quasipoisson"` | Count (overdispersed) | Rate ratio | `stats` |
+| `"glm"` | `"gaussian"` | Continuous | *β* coefficient | `stats` |
+| `"glm"` | `"Gamma"` | Positive continuous | Ratio (log link) | `stats` |
+| `"glm"` | `"inverse.gaussian"` | Positive continuous | Ratio | `stats` |
+| `"negbin"` | — | Count (overdispersed) | Rate ratio | `MASS` |
+| `"coxph"` | — | Time-to-event | Hazard ratio | `survival` |
+| `"clogit"` | — | Matched binary | Odds ratio | `survival` |
+| `"lmer"` | — | Continuous (clustered) | *β* coefficient | `lme4` |
+| `"glmer"` | `"binomial"` | Binary (clustered) | Odds ratio | `lme4` |
+| `"glmer"` | `"poisson"` | Count (clustered) | Rate ratio | `lme4` |
+| `"coxme"` | — | Time-to-event (clustered) | Hazard ratio | `coxme` |
 
 ---
 
@@ -109,7 +107,7 @@ uniscreen(data, outcome, predictors, model_type, ...)
 
 ## **Example 1:** Binary Outcome (Logistic Regression)
 
-For binary outcomes, use `model_type = "glm"` (logistic regression is the default family):
+For binary outcomes, use `model_type = "glm"` (logistic regression is the default family). Here we examine predictors of 30-day hospital readmission:
 
 ```{r}
 screening_vars <- c("age", "sex", "race", "bmi", "smoking", 
@@ -117,7 +115,7 @@ screening_vars <- c("age", "sex", "race", "bmi", "smoking",
 
 example1 <- uniscreen(
   data = clintrial,
-  outcome = "surgery",
+  outcome = "readmission_30d",
   predictors = screening_vars,
   model_type = "glm",
   labels = clintrial_labels
@@ -126,19 +124,19 @@ example1 <- uniscreen(
 example1
 ```
 
-Each row represents a separate univariable model. For categorical predictors, each non-reference level appears as a separate row.
+Each entry represents a separate univariable model. For categorical predictors, each non-reference level appears as a separate row.
 
-## **Example 2:** Filtering by *p*-Value
+## **Example 2:** Filtering by *p*-value
 
 The `p_threshold` parameter retains only predictors meeting a significance criterion:
 
 ```{r}
 example2 <- uniscreen(
   data = clintrial,
-  outcome = "surgery",
+  outcome = "readmission_30d",
   predictors = screening_vars,
   model_type = "glm",
-  p_threshold = 0.20,
+  p_threshold = 0.01,
   labels = clintrial_labels
 )
 
@@ -169,7 +167,7 @@ For continuous outcomes, specify `model_type = "lm"`:
 example4 <- uniscreen(
   data = clintrial,
   outcome = "los_days",
-  predictors = c("age", "sex", "stage", "surgery", "ecog"),
+  predictors = c("age", "sex", "stage", "diabetes", "ecog"),
   model_type = "lm",
   labels = clintrial_labels
 )
@@ -184,7 +182,7 @@ Setting `keep_models = TRUE` stores the fitted model objects for diagnostics:
 ```{r}
 example5 <- uniscreen(
   data = clintrial,
-  outcome = "surgery",
+  outcome = "readmission_30d",
   predictors = c("age", "sex", "stage"),
   model_type = "glm",
   keep_models = TRUE
@@ -219,8 +217,8 @@ For binary outcomes with multiple predictors:
 ```{r}
 example6 <- fit(
   data = clintrial,
-  outcome = "surgery",
-  predictors = c("age", "sex", "treatment", "stage"),
+  outcome = "readmission_30d",
+  predictors = c("age", "sex", "treatment", "stage", "diabetes"),
   model_type = "glm",
   labels = clintrial_labels
 )
@@ -262,22 +260,22 @@ example8
 
 ## **Example 9:** Poisson Regression
 
-For count outcomes, use `model_type = "glm"` with `family = "poisson"`:
-
+For count outcomes where variance approximately equals the mean, use `model_type = "glm"` with `family = "poisson"`. The `fu_count` variable represents the number of follow-up clinic visits, which is equidispersed (suitable for standard Poisson):
+  
 ```{r}
-# Create count outcome for demonstration
-clintrial$event_count <- rpois(nrow(clintrial), lambda = 2)
-
 example9 <- fit(
   data = clintrial,
-  outcome = "event_count",
-  predictors = c("age", "sex", "treatment"),
+  outcome = "fu_count",
+  predictors = c("age", "stage", "treatment", "surgery"),
   model_type = "glm",
-  family = "poisson"
+  family = "poisson",
+  labels = clintrial_labels
 )
 
 example9
 ```
+
+Output displays rate ratios (RR). A rate ratio of 1.10 indicates a 10% higher event rate compared to the reference group. For overdispersed counts (variance > mean), consider negative binomial or quasipoisson regression instead (see Example 18).
 
 ## **Example 10:** Toggling Reference Rows for Factors
 
@@ -286,7 +284,7 @@ By default, reference rows are shown in output tables (`reference_rows = TRUE`).
 ```{r}
 example10 <- fit(
   data = clintrial,
-  outcome = "surgery",
+  outcome = "readmission_30d",
   predictors = c("sex", "stage", "treatment"),
   model_type = "glm",
   reference_rows = FALSE,
@@ -303,7 +301,7 @@ The `conf_level` parameter adjusts the confidence interval width:
 ```{r}
 example11 <- fit(
   data = clintrial,
-  outcome = "surgery",
+  outcome = "readmission_30d",
   predictors = c("age", "sex", "stage"),
   model_type = "glm",
   conf_level = 0.90
@@ -314,12 +312,12 @@ example11
 
 ## **Example 12:** Raw Coefficients
 
-For logistic and Cox models, set `exponentiate = FALSE` to display log-scale coefficients (*β* rather than exp(*β*)):
+For logistic and Cox models, set `exponentiate = FALSE` to display log-scale coefficients (*β* rather than *e^β^*):
 
 ```{r}
 example12 <- fit(
   data = clintrial,
-  outcome = "surgery",
+  outcome = "readmission_30d",
   predictors = c("age", "sex", "stage"),
   model_type = "glm",
   exponentiate = FALSE
@@ -359,12 +357,12 @@ The default `method = "screen"` approach specifies that only predictors with uni
 ```{r}
 example13 <- fullfit(
   data = clintrial,
-  outcome = "surgery",
+  outcome = "readmission_30d",
   predictors = c("age", "sex", "bmi", "smoking", "diabetes",
                  "stage", "treatment"),
   model_type = "glm",
   method = "screen",
-  p_threshold = 0.20,
+  p_threshold = 0.05,
   labels = clintrial_labels
 )
 
@@ -378,7 +376,7 @@ The `method = "all"` approach includes the same predictors in both univariable a
 ```{r}
 example14 <- fullfit(
   data = clintrial,
-  outcome = "surgery",
+  outcome = "any_complication",
   predictors = c("age", "sex", "treatment", "stage"),
   model_type = "glm",
   method = "all",
@@ -395,7 +393,7 @@ The `method = "custom"` approach allows explicit specification of multivariable 
 ```{r}
 example15 <- fullfit(
   data = clintrial,
-  outcome = "surgery",
+  outcome = "icu_admission",
   predictors = c("age", "sex", "bmi", "smoking", "stage", "treatment"),
   model_type = "glm",
   method = "custom",
@@ -414,7 +412,7 @@ The `columns` parameter controls which results are displayed:
 # Univariable only
 example16a <- fullfit(
   data = clintrial,
-  outcome = "surgery",
+  outcome = "wound_infection",
   predictors = c("age", "sex", "stage"),
   model_type = "glm",
   columns = "uni"
@@ -425,7 +423,7 @@ example16a
 # Multivariable only
 example16b <- fullfit(
   data = clintrial,
-  outcome = "surgery",
+  outcome = "wound_infection",
   predictors = c("age", "sex", "stage"),
   model_type = "glm",
   columns = "multi"
@@ -454,17 +452,170 @@ example17
 
 ---
 
-# Supported Model Types
+# Extended Model Types
 
-The following table summarizes all supported model types:
+The `summata` package supports several additional model types for specialized analyses. These require external packages that are suggested dependencies.
 
-| `model_type` | Model | Outcome | Effect Measure |
-|:-------------|:------|:--------|:---------------|
-| `"lm"` | Linear | Continuous | Coefficient (*β*) |
-| `"glm"` | Logistic | Binary | Odds ratio |
-| `"glm"` + `family = "poisson"` | Poisson | Count | Rate ratio |
-| `"coxph"` | Cox PH | Time-to-event | Hazard ratio |
-| `"clogit"` | Conditional logistic | Matched binary | Odds ratio |
+## **Example 18:** Negative Binomial
+
+Negative binomial models are appropriate for overdispersed count data where the variance exceeds the mean—a common violation of the Poisson assumption. This model type requires the `MASS` package. The `ae_count` variable in `clintrial` is generated with overdispersion, making it ideal for this demonstration.
+
+```{r}
+example18 <- fit(
+  data = clintrial,
+  outcome = "ae_count",
+  predictors = c("age", "sex", "diabetes", "treatment"),
+  model_type = "negbin",
+  labels = clintrial_labels
+)
+
+example18
+```
+
+## **Example 19:** Gamma Regression
+
+Gamma regression is appropriate for positive, continuous, right-skewed outcomes. In the `clintrial` dataset, length of hospital stay (`los_days`) fits this description. By default, the log link is used, and exponentiated coefficients represent multiplicative effects.
+
+```{r}
+example19 <- fit(
+  data = clintrial,
+  outcome = "los_days",
+  predictors = c("age", "ecog", "stage", "treatment"),
+  model_type = "glm",
+  family = "Gamma",
+  labels = clintrial_labels
+)
+
+example19
+```
+
+## **Example 20:** Random-Intercept Model
+
+Linear mixed-effects models (LMMs) account for hierarchical or clustered data structures. The `clintrial` dataset includes a `site` variable representing the study site, making it suitable for demonstrating random effects. This model type requires the `lme4` package.
+
+Include random intercepts for study site using `(1|site)` notation in the predictors:
+
+```{r, eval = requireNamespace("lme4", quietly = TRUE)}
+example20 <- fit(
+  data = clintrial,
+  outcome = "los_days",
+  predictors = c("age", "sex", "treatment", "stage", "(1|site)"),
+  model_type = "lmer",
+  labels = clintrial_labels
+)
+
+example20
+```
+
+## **Example 21:** GLMM for Binary Outcome
+
+Generalized linear mixed-effects models (GLMMs) extend mixed-effects models to non-normal outcomes (binary, count). This model type also requires the `lme4` package.
+
+Model 30-day readmission with site-level random effects:
+
+```{r, eval = requireNamespace("lme4", quietly = TRUE)}
+example21 <- fit(
+  data = clintrial,
+  outcome = "readmission_30d",
+  predictors = c("age", "sex", "diabetes", "treatment", "(1|site)"),
+  model_type = "glmer",
+  family = "binomial",
+  labels = clintrial_labels
+)
+
+example21
+```
+
+## **Example 22:** GLMM for Count Outcome
+
+For count outcomes with clustering, use `fu_count` (equidispersed) with site-level random effects. Standard Poisson GLMMs assume equidispersion:
+
+```{r, eval = requireNamespace("lme4", quietly = TRUE)}
+example22 <- fit(
+  data = clintrial,
+  outcome = "fu_count",
+  predictors = c("age", "stage", "treatment", "(1|site)"),
+  model_type = "glmer",
+  family = "poisson",
+  labels = clintrial_labels
+)
+
+example22
+```
+
+## **Example 23:** Cox Mixed-Effects Model
+
+Cox mixed-effects models account for within-cluster correlation in survival outcomes. This is useful when patients are nested within sites or physicians and outcomes may be correlated within clusters. This model type requires the `coxme` package. Model overall survival with site-level random effects:
+  
+```{r, eval = requireNamespace("coxme", quietly = TRUE)}
+example23 <- fit(
+  data = clintrial,
+  outcome = "Surv(os_months, os_status)",
+  predictors = c("age", "sex", "treatment", "stage", "(1|site)"),
+  model_type = "coxme",
+  labels = clintrial_labels
+)
+
+example23
+```
+
+## **Example 24:** Quasibinomial for Overdispersed Binary Data
+
+When binary or count data exhibit overdispersion (residual deviance >> residual degrees of freedom), quasi-likelihood models provide more appropriate standard errors.
+
+```{r}
+example24 <- fit(
+  data = clintrial,
+  outcome = "any_complication",
+  predictors = c("age", "sex", "diabetes", "stage"),
+  model_type = "glm",
+  family = "quasibinomial",
+  labels = clintrial_labels
+)
+
+example24
+```
+
+## **Example 25:** Conditional Logistic Model for Matched Data
+
+Conditional logistic regression is used for matched case-control studies where cases and controls are matched within strata. The stratification variable should be specified using the `strata` parameter. This model type requires the `survival` package.
+
+Since `clintrial` is not structured as matched data, we create a small example dataset with 1:1 matching on age group:
+
+```{r}
+# Create minimal matched case-control dataset (30 pairs)
+# Cases and controls matched on age group, but differ on exposures
+set.seed(42)
+matched_data <- data.frame(
+  match_id = rep(1:30, each = 2),
+  case = rep(c(1, 0), 30),
+  # Exposure: cases more likely exposed (OR ≈ 3)
+  smoking = c(1,0, 1,1, 1,0, 0,0, 1,0, 1,0, 1,1, 0,0, 1,0, 1,0,
+              1,0, 1,0, 0,0, 1,0, 1,1, 1,0, 0,0, 1,0, 1,0, 1,1,
+              1,0, 1,0, 0,1, 1,0, 1,0, 0,0, 1,1, 1,0, 1,0, 1,0),
+  # Alcohol: moderate association (OR ≈ 2)
+  alcohol = c(1,0, 0,0, 1,1, 1,0, 0,0, 1,0, 1,0, 0,0, 1,1, 1,0,
+              0,0, 1,0, 1,0, 0,1, 1,0, 1,1, 0,0, 1,0, 0,0, 1,0,
+              1,1, 0,0, 1,0, 1,0, 0,0, 1,1, 1,0, 0,0, 1,0, 1,1),
+  # BMI: continuous, slight difference between cases/controls
+  bmi = round(c(28,25, 31,27, 26,25, 29,26, 27,26, 32,28, 25,24, 30,27,
+                27,25, 29,28, 26,25, 33,29, 28,26, 27,27, 31,28, 26,24,
+                29,27, 28,26, 30,28, 27,25, 32,29, 26,25, 29,27, 28,26,
+                31,28, 27,26, 30,27, 25,24, 29,28, 33,30), 1)
+)
+
+example24 <- fit(
+  data = matched_data,
+  outcome = "case",
+  predictors = c("smoking", "alcohol", "bmi"),
+  model_type = "clogit",
+  strata = "match_id"
+)
+
+example24
+```
+
+The output shows odds ratios conditional on the matching strata. Note that variables used for matching (here, age) typically show attenuated effects.
 
 ---
 
@@ -501,6 +652,23 @@ See the [Table Export](table_export.html) vignette for comprehensive documentati
 3. **Confirmatory analysis**: Use `fit()` with pre-specified predictors
 4. **Sensitivity analysis**: Compare specifications with `compfit()`
 
+## Choosing the Right Model
+
+| Outcome Type | Characteristics | Recommended Model |
+|:-------------|:----------------|:------------------|
+| Binary | Independent observations | `glm` with `binomial` |
+| Binary | Overdispersed | `glm` with `quasibinomial` |
+| Binary | Clustered/hierarchical | `glmer` with `binomial` |
+| Binary | Matched case-control | `clogit` |
+| Count | Mean ≈ variance | `glm` with `poisson` |
+| Count | Variance > mean | `negbin` or `quasipoisson` |
+| Count | Clustered | `glmer` with `poisson` |
+| Continuous | Symmetric, normal errors | `lm` |
+| Continuous | Positive, right-skewed | `glm` with `Gamma` |
+| Continuous | Clustered | `lmer` |
+| Time-to-event | Independent | `coxph` |
+| Time-to-event | Clustered | `coxme` |
+
 ## Interpreting Results
 
 The comparison between univariable and multivariable estimates reveals confounding:
@@ -515,6 +683,7 @@ Adequate events per predictor are required for stable estimation:
 
 - Logistic/Cox models: ≥10 events per predictor (rule of thumb)
 - Linear models: ≥10–20 observations per predictor
+- Mixed-effects models: ≥5–10 clusters recommended
 - Use `method = "screen"` to reduce predictors when sample size is limited
 
 ---
@@ -530,7 +699,7 @@ Regression functions use complete-case analysis by default:
 sapply(clintrial[, c("age", "sex", "stage")], function(x) sum(is.na(x)))
 
 # Create complete-case dataset explicitly
-complete_data <- na.omit(clintrial[, c("surgery", "age", "sex", "stage")])
+complete_data <- na.omit(clintrial[, c("readmission_30d", "age", "sex", "stage")])
 ```
 
 ## Factor Reference Levels
@@ -558,35 +727,46 @@ model$converged
 coef(model)
 ```
 
-## Multinomial and Ordinal Outcomes
+## Overdispersion Diagnostics
 
-The `summata` package currently supports binary outcomes (via logistic regression) but not multinomial or ordinal outcomes with more than two categories. If you attempt to use a categorical outcome with three or more levels, `summata` will issue a warning because binomial GLM coerces such outcomes to binary (first level vs all others combined).
-
-For categorical outcomes with more than two levels, use dedicated packages:
+To check for overdispersion in Poisson or binomial models:
 
 ```{r, eval = FALSE}
-## Multinomial regression (unordered categories)
-library(nnet)
-model <- multinom(outcome ~ predictor1 + predictor2, data = mydata)
-summary(model)
+# Fit Poisson model
+result <- fit(data, outcome, predictors, model_type = "glm", family = "poisson")
+model <- attr(result, "model")
 
-## Ordinal regression (ordered categories)
-library(MASS)
-model <- polr(outcome ~ predictor1 + predictor2, data = mydata, Hess = TRUE)
-summary(model)
-
-## Alternative ordinal package
-library(ordinal)
-model <- clm(outcome ~ predictor1 + predictor2, data = mydata)
-summary(model)
+# Dispersion estimate (should be ~1 for no overdispersion)
+sum(residuals(model, type = "pearson")^2) / model$df.residual
 ```
 
-Note that `gtsummary::tbl_regression()` provides limited support for formatting `nnet::multinom` output, though with caveats about the different underlying model structure.
+If the dispersion is substantially greater than 1, consider using `quasipoisson`, `quasibinomial`, or `negbin` instead.
+
+## Mixed-Effects Model Convergence
+
+Mixed-effects models can be sensitive to starting values and optimization:
+
+```{r, eval = FALSE}
+# Increase iterations
+result <- fit(
+  data = clintrial,
+  outcome = "readmission_30d",
+  predictors = c("age", "treatment", "(1|site)"),
+  model_type = "glmer",
+  family = "binomial",
+  control = lme4::glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 100000))
+)
+```
+
+## Multinomial and Ordinal Outcomes
+
+The `summata` package currently supports binary outcomes (via logistic regression) but not multinomial or ordinal outcomes with more than two categories. For categorical outcomes with more than two levels, use dedicated packages such as `nnet::multinom()` for multinomial regression or `MASS::polr()` for ordinal regression.
 
 ---
 
 # Further Reading
 
+- [Statistical Foundations](statistical_foundations.html): Mathematical details for all supported models
 - [Descriptive Tables](descriptive_tables.html): `desctable()` for baseline characteristics
 - [Model Comparison](model_comparison.html): `compfit()` for comparing models
 - [Table Export](table_export.html): Export to PDF, Word, and other formats

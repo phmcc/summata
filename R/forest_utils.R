@@ -30,11 +30,22 @@ convert_units <- function(value, from = "in", to = "in", dpi = 96) {
 #' (Helvetica, Arial, Helvetica Neue) and returns the first available one.
 #' Falls back to "sans" if none are found or if systemfonts is unavailable.
 #' 
+#' When ragg is being used as the graphics device (detected via options or
+#' knitr settings), font detection works in non-interactive sessions since
+#' ragg handles font rendering independently of the R graphics system.
+#' 
 #' @return Character string with the font family name to use.
 #' @keywords internal
 detect_plot_font <- function() {
     
-    if (!interactive()) {
+    ## Check if ragg is being used - if so, can detect fonts even in
+    ## non-interactive sessions since ragg handles fonts via systemfonts
+    ragg_in_use <- isTRUE(getOption("summata.use_ragg")) ||
+        identical(knitr::opts_chunk$get("dev"), "ragg_png") ||
+        identical(knitr::opts_chunk$get("dev"), "agg_png")
+    
+    ## Only fall back to "sans" in non-interactive sessions when ragg is not in use
+    if (!interactive() && !ragg_in_use) {
         return("sans")
     }
     
