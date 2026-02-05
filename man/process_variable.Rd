@@ -11,6 +11,7 @@ process_variable(
   stats_continuous,
   stats_categorical,
   digits,
+  conf_level = 0.95,
   na_include,
   na_label,
   test,
@@ -36,6 +37,8 @@ process_variable(
 \item{stats_categorical}{Character vector of statistics for categorical variables.}
 
 \item{digits}{Integer number of decimal places for continuous statistics.}
+
+\item{conf_level}{Numeric confidence level for survival confidence intervals.}
 
 \item{na_include}{Logical whether to include missing values as a category.}
 

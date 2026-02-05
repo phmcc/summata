@@ -21,8 +21,8 @@ if (requireNamespace("ragg", quietly = TRUE)) {
     comment = "##>",
     message = FALSE,
     warning = FALSE,
-    fig.width = 10,
-    fig.height = 6,
+    fig.width = 8,
+    fig.height = 5,
     out.width = "100%"
   )
 } else {
@@ -31,16 +31,15 @@ if (requireNamespace("ragg", quietly = TRUE)) {
     comment = "##>",
     message = FALSE,
     warning = FALSE,
-    fig.width = 10,
-    fig.height = 6,
+    fig.width = 8,
+    fig.height = 5,
     out.width = "100%"
   )
 }
 options(width = 180)
 
 ## Only save figures when building pkgdown site (not for CRAN)
-save_figures <- identical(Sys.getenv("IN_PKGDOWN"), "true") || 
-                dir.exists("../docs")  # pkgdown output directory exists
+save_figures <- identical(Sys.getenv("IN_PKGDOWN"), "true")
 
 ## Use vignettes/figures for generated plots (pkgdown only)
 fig_dir <- "figures"
@@ -51,7 +50,7 @@ if (save_figures && !dir.exists(fig_dir)) {
 ## Function for saving/displaying plots
 ## For pkgdown: saves PNG and returns path for include_graphics
 ## For CRAN: just prints the plot and returns empty string
-save_example_plot <- function(plot, filename, width = 10, height = 5) {
+save_example_plot <- function(plot, filename, width = 8, height = 5) {
   if (save_figures) {
     filepath <- file.path(fig_dir, filename)
     final_width <- attr(plot, "recommended_dims")$width %||% width
@@ -59,19 +58,18 @@ save_example_plot <- function(plot, filename, width = 10, height = 5) {
     
     if (requireNamespace("ragg", quietly = TRUE)) {
       ## Use ragg directly - it uses 'res' not 'dpi', and defaults to 72
-      ## Scale dimensions to achieve effective 96 dpi appearance
       ragg::agg_png(filepath, 
                     width = final_width, 
                     height = final_height, 
                     units = "in",
-                    res = 96)
+                    res = 72)
       print(plot)
       grDevices::dev.off()
     } else {
       ggplot2::ggsave(filepath, plot, 
                       width = final_width, 
                       height = final_height, 
-                      dpi = 96)
+                      dpi = 72)
     }
     return(filepath)
   } else {
@@ -81,7 +79,10 @@ save_example_plot <- function(plot, filename, width = 10, height = 5) {
 }
 
 ## Wrapper for include_graphics that handles NULL (CRAN case)
-show_plot <- function(plot, filename, width = 10, height = 5) {
+show_plot <- function(plot, filename, width = 8, height = 5) {
+  if (!save_figures) {
+    return(invisible(NULL))  # Do not render anything for CRAN
+  }
   path <- save_example_plot(plot, filename, width, height)
   if (!is.null(path)) {
     knitr::include_graphics(path)

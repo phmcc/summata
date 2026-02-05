@@ -10,6 +10,7 @@ process_survival(
   var_label,
   group_var,
   digits,
+  conf_level = 0.95,
   na_include,
   na_label,
   test,
@@ -29,6 +30,8 @@ process_survival(
 
 \item{digits}{Integer number of decimal places.}
 
+\item{conf_level}{Numeric confidence level for confidence intervals.}
+
 \item{na_include}{Logical whether to include missing values.}
 
 \item{na_label}{Character string label for missing values.}
@@ -45,7 +48,7 @@ process_survival(
 List with 'formatted' and 'raw' data.table components.
 }
 \description{
-Calculates survival statistics including median survival times with 95%
+Calculates survival statistics including median survival times with
 confidence intervals, with optional grouping and log-rank testing. Parses
 Surv() expressions and uses \pkg{survival} package functions.
 }

@@ -12,6 +12,7 @@ desctable(
   stats_categorical = "n_percent",
   digits = 1,
   p_digits = 3,
+  conf_level = 0.95,
   p_per_stat = FALSE,
   na_include = FALSE,
   na_label = "Unknown",
@@ -69,6 +70,10 @@ regardless of decimal setting. Default is 1.}
 \item{p_digits}{Integer specifying the number of decimal places for p-values. 
 P-values smaller than \code{10^(-p_digits)} are displayed as 
 "< 0.001", "< 0.01", etc. Default is 3.}
+
+\item{conf_level}{Numeric confidence level for confidence intervals used in
+survival variable summaries (median survival time with CI). Must be between
+0 and 1. Default is 0.95 (95\% confidence intervals).}
 
 \item{p_per_stat}{Logical. If \code{TRUE}, displays p-values on each row 
 (per statistic) rather than only on the first row of each variable. 
@@ -188,7 +193,8 @@ summaries:
   \item \strong{Categorical}: Character, factor, or logical variables receive 
     frequency counts and percentages
   \item \strong{Time-to-Event}: Variables specified as \code{Surv(time, event)} 
-    display median survival with 95\% confidence intervals
+    display median survival with confidence intervals (level controlled by
+    \code{conf_level})
 }
 
 \strong{Statistical Testing:}

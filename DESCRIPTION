@@ -1,7 +1,7 @@
 Package: summata
 Type: Package
 Title: Publication-Ready Summary Tables and Forest Plots
-Version: 0.10.6
+Version: 0.10.7
 Authors@R: c(
     person(
         given = c("Paul", "Hsin-ti"), 
@@ -23,7 +23,7 @@ License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 URL: https://phmcc.github.io/summata/
-BugReports: https://codeberg.org/phmcc/summata/issues
+BugReports: https://github.com/phmcc/summata/issues
 Imports:
     data.table,
     survival,
