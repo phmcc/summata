@@ -22,7 +22,7 @@ model. Required for computing group-level sample sizes and event counts.}
 
 \item{model}{Fitted model object. Supported classes include:
 \itemize{
-  \item \code{glm} - Generalized linear models (logistic, Poisson, etc.)
+  \item \code{glm} - Generalized linear models (logistic, Poisson, \emph{etc.})
   \item \code{lm} - Linear models
   \item \code{coxph} - Cox proportional hazards models
   \item \code{clogit} - Conditional logistic regression
@@ -43,7 +43,7 @@ in output. If \code{FALSE}, removes the intercept row from results. Useful
 for creating cleaner presentation tables. Default is \code{TRUE}.}
 
 \item{terms_to_exclude}{Character vector of term names to exclude from output.
-Useful for removing specific unwanted parameters (e.g., nuisance variables,
+Useful for removing specific unwanted parameters (\emph{e.g.,} nuisance variables,
 spline terms). Default is \code{NULL}. Note: If \code{include_intercept = FALSE}, 
 "(Intercept)" is automatically added to this list.}
 
@@ -65,8 +65,8 @@ A \code{data.table} containing extracted model information with the
   \describe{
     \item{model_scope}{Character. Either "Univariable" (unadjusted model with 
       single predictor) or "Multivariable" (adjusted model with multiple predictors)}
-    \item{model_type}{Character. Type of regression (e.g., "Logistic", "Linear", 
-      "Cox PH", "Poisson", etc.)}
+    \item{model_type}{Character. Type of regression (\emph{e.g.,} "Logistic", "Linear", 
+      "Cox PH", "Poisson", \emph{etc.})}
     \item{variable}{Character. Variable name (for factor variables, the base 
       variable name without the level)}
     \item{group}{Character. Group/level name for factor variables; empty string 
@@ -79,7 +79,7 @@ A \code{data.table} containing extracted model information with the
     \item{events_group}{Integer. Number of events for this specific variable 
       level (for survival and logistic models with factor variables)}
     \item{coefficient}{Numeric. Raw regression coefficient (log odds, log hazard, 
-      etc.)}
+      \emph{etc.})}
     \item{se}{Numeric. Standard error of the coefficient}
     \item{OR/HR/RR/Coefficient}{Numeric. Effect estimate - column name depends on 
       model type:
@@ -92,10 +92,10 @@ A \code{data.table} containing extracted model information with the
     \item{ci_lower}{Numeric. Lower bound of confidence interval for effect estimate}
     \item{ci_upper}{Numeric. Upper bound of confidence interval for effect estimate}
     \item{statistic}{Numeric. Test statistic (z-value for GLM/Cox, t-value for LM)}
-    \item{p_value}{Numeric. P-value for coefficient test}
-    \item{sig}{Character. Significance markers: "***" (p<0.001), "**" (p < 0.01), 
-      "*" (p < 0.05), "." (p < 0.10), "" (p ≥ 0.10)}
-    \item{sig_binary}{Logical. Binary indicator: \code{TRUE} if p < 0.05, 
+    \item{p_value}{Numeric. \emph{p}-value for coefficient test}
+    \item{sig}{Character. Significance markers: "***" (p<0.001), "**" (\emph{p} < 0.01), 
+      "*" (\emph{p} < 0.05), "." (\emph{p} < 0.10), "" (p ≥ 0.10)}
+    \item{sig_binary}{Logical. Binary indicator: \code{TRUE} if \emph{p} < 0.05, 
       \code{FALSE} otherwise}
     \item{reference}{Character. Contains \code{reference_label} for reference 
       category rows when \code{reference_rows = TRUE}, empty string otherwise}
@@ -136,6 +136,7 @@ glm_result <- m2dt(clintrial, glm_model)
 glm_result
 
 \donttest{
+  options(width = 180)
 # Example 2: Extract from linear model
 lm_model <- lm(los_days ~ age + sex + surgery, data = clintrial)
 
@@ -166,3 +167,4 @@ result_90ci
 \code{\link{glmforest}}, \code{\link{coxforest}}, \code{\link{lmforest}} for
 forest plot visualization
 }
+\concept{utility functions}

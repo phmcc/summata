@@ -50,7 +50,7 @@ The `compfit()` function reports several metrics for comparing models. For mathe
 | AIC | Information criterion balancing fit and complexity | Lower |
 | BIC | Information criterion with stronger complexity penalty | Lower |
 | Concordance | Discrimination ability (0.5 = random, 1.0 = perfect) | Higher |
-| Pseudo-*R²* | Proportion of variation explained (GLMs) | Higher |
+| Pseudo-*R*² | Proportion of variation explained (GLMs) | Higher |
 | Brier Score | Prediction accuracy for binary outcomes | Lower |
 
 ---

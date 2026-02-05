@@ -1,3 +1,15 @@
+# *summata* 0.10.6 (2026-01-20)
+
+* Fix "n" and "Events" counts in regression summary tables for extended GLM families
+* Improve clogit example in "Regression Modeling" vignette
+* Fix errors in `condense_table` logic in table export and forest plot functions
+* Fix `variable_padding` in table export functions, ensure consistent behavior with `zebra_stripes`
+* Lighten forest plot colors
+* Change *n*/*N* labeling for consistency
+* Expanded documentation examples for interaction effects, mixed effects, and extended GLM families
+* Diversify use of `random` parameter in regression models
+* Documentation cleaning
+
 # *summata* 0.10.5 (2026-01-18)
 
 * Add count outcomes (`ae_count` and `fu_count`) to `clintrial` mock dataset

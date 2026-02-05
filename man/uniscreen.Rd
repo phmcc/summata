@@ -116,7 +116,11 @@ See \code{\link[stats]{family}} for additional details and options.}
 mixed-effects models (\code{glmer}, \code{lmer}, \code{coxme}). Use standard
 lme4/coxme syntax, e.g., \code{"(1|site)"} for random intercepts by site,
 \code{"(1|site/patient)"} for nested random effects. Required when 
-\code{model_type} is a mixed-effects model type. Default is \code{NULL}.}
+\code{model_type} is a mixed-effects model type unless random effects are
+included in the \code{predictors} vector. Alternatively, random effects 
+can be included directly in the \code{predictors} vector using the same 
+syntax (e.g., \code{predictors = c("age", "sex", "(1|site)")}), though 
+they will not be iterated over as predictors. Default is \code{NULL}.}
 
 \item{p_threshold}{Numeric value between 0 and 1 specifying the p-value threshold 
 used to count significant predictors in the printed summary. All predictors
@@ -571,6 +575,44 @@ if (requireNamespace("lme4", quietly = TRUE)) {
         parallel = FALSE
     )
 }
+
+# Example 22: Quasipoisson for overdispersed count data
+# Alternative to negative binomial when MASS not available
+quasi_screen <- uniscreen(
+    data = clintrial,
+    outcome = "ae_count",
+    predictors = c("age", "treatment", "diabetes", "surgery", "stage"),
+    model_type = "glm",
+    family = "quasipoisson",
+    labels = clintrial_labels,
+    parallel = FALSE
+)
+print(quasi_screen)
+# Adjusts standard errors for overdispersion
+
+# Example 23: Quasibinomial for overdispersed binary data
+quasibin_screen <- uniscreen(
+    data = clintrial,
+    outcome = "any_complication",
+    predictors = c("age", "bmi", "diabetes", "surgery", "ecog"),
+    model_type = "glm",
+    family = "quasibinomial",
+    labels = clintrial_labels,
+    parallel = FALSE
+)
+print(quasibin_screen)
+
+# Example 24: Inverse Gaussian for highly skewed positive data
+invgauss_screen <- uniscreen(
+    data = clintrial,
+    outcome = "recovery_days",
+    predictors = c("age", "surgery", "pain_score", "los_days"),
+    model_type = "glm",
+    family = inverse.gaussian(link = "log"),
+    labels = clintrial_labels,
+    parallel = FALSE
+)
+print(invgauss_screen)
 }
 
 }
@@ -579,4 +621,16 @@ if (requireNamespace("lme4", quietly = TRUE)) {
 \code{\link{fullfit}} for complete univariable-to-multivariable workflow,
 \code{\link{compfit}} for comparing multiple models,
 \code{\link{m2dt}} for converting individual models to tables
+
+Other regression functions: 
+\code{\link{compfit}()},
+\code{\link{fit}()},
+\code{\link{fullfit}()},
+\code{\link{multifit}()},
+\code{\link{print.compfit_result}()},
+\code{\link{print.fit_result}()},
+\code{\link{print.fullfit_result}()},
+\code{\link{print.multifit_result}()},
+\code{\link{print.uniscreen_result}()}
 }
+\concept{regression functions}

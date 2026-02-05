@@ -331,6 +331,7 @@
 #'
 #' @examples
 #' \dontrun{
+#'   options(width = 180)
 #' # Load data
 #' data(clintrial)
 #' data(clintrial_labels)
@@ -414,6 +415,7 @@
 #'          p_threshold = 0.01)
 #' }
 #'
+#' @family export functions
 #' @export
 table2docx <- function(table,
                        file,
@@ -531,6 +533,7 @@ table2docx <- function(table,
 
 #' Print method for table2docx results
 #' @keywords internal
+#' @family export functions
 #' @export
 print.table2docx_result <- function(x, ...) {
     cat("Table exported to:", x$file, "\n")

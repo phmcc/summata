@@ -9,4 +9,10 @@
 \description{
 Print method for survtable
 }
+\seealso{
+Other descriptive functions: 
+\code{\link{desctable}()},
+\code{\link{survtable}()}
+}
+\concept{descriptive functions}
 \keyword{internal}

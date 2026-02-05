@@ -9,4 +9,17 @@
 \description{
 Print method for table2docx results
 }
+\seealso{
+Other export functions: 
+\code{\link{autoexport}()},
+\code{\link{print.table2pptx_result}()},
+\code{\link{print.table2rtf_result}()},
+\code{\link{table2docx}()},
+\code{\link{table2html}()},
+\code{\link{table2pdf}()},
+\code{\link{table2pptx}()},
+\code{\link{table2rtf}()},
+\code{\link{table2tex}()}
+}
+\concept{export functions}
 \keyword{internal}

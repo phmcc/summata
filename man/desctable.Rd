@@ -63,7 +63,7 @@ categorical variable summaries:
 }}
 
 \item{digits}{Integer specifying the number of decimal places for continuous 
-statistics. Values >= 1000 are automatically formatted with commas 
+statistics. Values ≥ 1,000 are automatically formatted with commas 
 regardless of decimal setting. Default is 1.}
 
 \item{p_digits}{Integer specifying the number of decimal places for p-values. 
@@ -155,7 +155,7 @@ A data.table with S3 class \code{"desctable"} containing formatted
   
   The first row always shows sample sizes for each column.
   
-  Numeric values >= 1000 are formatted with commas for readability 
+  Numeric values ≥ 1,000 are formatted with commas for readability 
   (e.g., "1,245" instead of "1245").
   
   The returned object includes the following attributes accessible via 
@@ -223,8 +223,8 @@ Missing values are handled differently by variable type:
   \item Median (Range): "38.0 (18.0-75.0)"
   \item Range: "18.0-75.0" or "18.0 to 75.0" (for negative numbers)
   \item Survival: "24.5 (21.2-28.9)" months [median (95\% CI)]
-  \item Counts >= 1000: Formatted with commas (e.g., "1,234")
-  \item P-values: Formatted to specified decimal places; very small values 
+  \item Counts ≥ 1000: Formatted with commas (e.g., "1,234")
+  \item \emph{p}-values: Formatted to specified decimal places; very small values 
     shown as "< 0.001"
 }
 }
@@ -408,4 +408,9 @@ print(table1)
 \seealso{
 \code{\link{fit}} for regression modeling, 
 \code{\link{table2pdf}} for exporting to PDF
+
+Other descriptive functions: 
+\code{\link{print.survtable}()},
+\code{\link{survtable}()}
 }
+\concept{descriptive functions}

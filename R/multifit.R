@@ -33,7 +33,10 @@
 #' @param random Optional character string specifying random effects formula for
 #'   mixed effects models (e.g., \code{"(1|hospital)"} or \code{"(1|site/patient)"}).
 #'   Required when \code{model_type} is \code{"glmer"}, \code{"lmer"}, or 
-#'   \code{"coxme"}. Default is \code{NULL}.
+#'   \code{"coxme"} unless random effects are included in the \code{covariates}
+#'   vector. Alternatively, random effects can be included directly in the 
+#'   \code{covariates} vector using the same syntax (e.g., 
+#'   \code{covariates = c("age", "sex", "(1|site)")}). Default is \code{NULL}.
 #'
 #' @param strata Optional character string naming the stratification variable for
 #'   Cox or conditional logistic models. Creates separate baseline hazards for 
@@ -634,13 +637,88 @@
 #'     parallel = FALSE
 #' )
 #' 
-#' # Create forest plot (requires ggplot2)
+#' # Create forest plot (requires \pkg{ggplot2})
 #' # p <- multiforest(result_forest, 
 #' #                  title = "Treatment Effects Across Outcomes")
 #' # print(p)
+#' 
+#' # Example 20: Gamma regression for positive continuous outcomes
+#' gamma_result <- multifit(
+#'     data = clintrial,
+#'     outcomes = c("los_days", "recovery_days"),
+#'     predictor = "treatment",
+#'     covariates = c("age", "surgery"),
+#'     model_type = "glm",
+#'     family = Gamma(link = "log"),
+#'     labels = clintrial_labels,
+#'     parallel = FALSE
+#' )
+#' print(gamma_result)
+#' # Returns multiplicative effects on positive continuous data
+#' 
+#' # Example 21: Quasipoisson for overdispersed counts
+#' quasi_result <- multifit(
+#'     data = clintrial,
+#'     outcomes = c("ae_count"),
+#'     predictor = "treatment",
+#'     covariates = c("age", "diabetes"),
+#'     model_type = "glm",
+#'     family = "quasipoisson",
+#'     labels = clintrial_labels,
+#'     parallel = FALSE
+#' )
+#' print(quasi_result)
+#' # Adjusts standard errors for overdispersion
+#' 
+#' # Example 22: Generalized linear mixed effects (GLMER)
+#' # Test treatment across outcomes with site clustering
+#' if (requireNamespace("lme4", quietly = TRUE)) {
+#'     glmer_result <- multifit(
+#'         data = clintrial,
+#'         outcomes = c("surgery", "pfs_status", "os_status"),
+#'         predictor = "treatment",
+#'         covariates = c("age", "sex"),
+#'         random = "(1|site)",
+#'         model_type = "glmer",
+#'         family = "binomial",
+#'         labels = clintrial_labels,
+#'         parallel = FALSE
+#'     )
+#'     print(glmer_result)
+#' }
+#' 
+#' # Example 23: Cox mixed effects with random site effects
+#' if (requireNamespace("coxme", quietly = TRUE)) {
+#'     coxme_result <- multifit(
+#'         data = clintrial,
+#'         outcomes = c("Surv(pfs_months, pfs_status)", 
+#'                      "Surv(os_months, os_status)"),
+#'         predictor = "treatment",
+#'         covariates = c("age", "sex", "stage"),
+#'         random = "(1|site)",
+#'         model_type = "coxme",
+#'         labels = clintrial_labels,
+#'         parallel = FALSE
+#'     )
+#'     print(coxme_result)
+#' }
+#' 
+#' # Example 24: Multiple interactions across outcomes
+#' multi_int <- multifit(
+#'     data = clintrial,
+#'     outcomes = c("surgery", "pfs_status", "os_status"),
+#'     predictor = "treatment",
+#'     covariates = c("age", "sex", "stage"),
+#'     interactions = c("treatment:stage", "treatment:sex"),
+#'     labels = clintrial_labels,
+#'     parallel = FALSE
+#' )
+#' print(multi_int)
+#' # Shows how treatment effects vary by stage and sex across outcomes
 #'
 #' }
 #'
+#' @family regression functions
 #' @export
 multifit <- function(data,
                      outcomes,
@@ -680,9 +758,38 @@ multifit <- function(data,
     
     ## Validate model_type for mixed effects
     mixed_types <- c("glmer", "lmer", "coxme")
+    
+    ## Check for random effects embedded in covariates
+    has_random_in_covariates <- !is.null(covariates) && any(grepl("\\|", covariates))
+    
     if (!is.null(random) && !(model_type %in% mixed_types)) {
-        stop("'random' effects require model_type to be one of: ", 
-             paste(mixed_types, collapse = ", "))
+        warning("'random' parameter is ignored for non-mixed-effects models (", model_type, ").")
+        random <- NULL
+    }
+    
+    ## Extract random effects from covariates if present (for mixed-effects models)
+    random_in_covs <- NULL
+    if (model_type %in% mixed_types && has_random_in_covariates) {
+        random_mask <- grepl("\\|", covariates)
+        random_in_covs <- covariates[random_mask]
+        covariates <- covariates[!random_mask]
+        if (length(covariates) == 0) covariates <- NULL
+        
+        ## Combine explicit random with embedded random (if both provided)
+        if (!is.null(random)) {
+            message("Note: Random effects specified in both 'random' parameter and 'covariates'. ",
+                    "Combining: ", random, " + ", paste(random_in_covs, collapse = " + "))
+            random <- paste(c(random, random_in_covs), collapse = " + ")
+        } else {
+            random <- paste(random_in_covs, collapse = " + ")
+        }
+    }
+    
+    ## Validate that random is provided for mixed-effects models
+    if (model_type %in% mixed_types && is.null(random)) {
+        stop("'random' parameter is required for mixed-effects models (", model_type, ").\n",
+             "Example: random = \"(1|site)\" for random intercepts by site.\n",
+             "Alternatively, include random effects in 'covariates' using the same syntax.")
     }
     
     ## Validate strata/cluster usage
@@ -1239,7 +1346,7 @@ extract_predictor_effects <- function(model, predictor, outcome,
         resp <- model@resp$y
         if (!is.null(resp)) {
             fam <- family(model)$family
-            if (fam %in% c("binomial", "poisson", "quasipoisson")) {
+            if (fam %in% c("binomial", "quasibinomial", "poisson", "quasipoisson")) {
                 total_events <- sum(resp, na.rm = TRUE)
             }
         }
@@ -1837,6 +1944,7 @@ fix_negative_zero_multifit <- function(x) {
 
 #' Print method for multifit results
 #' @keywords internal
+#' @family regression functions
 #' @export
 print.multifit_result <- function(x, ...) {
     cat("\nMultivariate Analysis Results\n")

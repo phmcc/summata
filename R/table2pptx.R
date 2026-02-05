@@ -320,6 +320,7 @@
 #'
 #' @examples
 #' \dontrun{
+#'   options(width = 180)
 #' # Load data
 #' data(clintrial)
 #' data(clintrial_labels)
@@ -408,6 +409,7 @@
 #'          condense_table = TRUE)
 #' }
 #'
+#' @family export functions
 #' @export
 table2pptx <- function(table,
                        file,
@@ -558,6 +560,7 @@ table2pptx <- function(table,
 
 #' Print method for table2pptx results
 #' @keywords internal
+#' @family export functions
 #' @export
 print.table2pptx_result <- function(x, ...) {
     cat("Table exported to:", x$file, "\n")

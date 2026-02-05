@@ -13,18 +13,18 @@
 #'   
 #' @param effect_label Character string for the effect measure label on the 
 #'   forest plot axis. Default is \code{NULL}, which auto-detects based on 
-#'   model type (e.g., "Odds Ratio", "Hazard Ratio", "Rate Ratio", "Coefficient").
+#'   model type (\emph{e.g.,} "Odds Ratio", "Hazard Ratio", "Rate Ratio", "Coefficient").
 #'   
 #' @param digits Integer specifying the number of decimal places for effect 
 #'   estimates and confidence intervals. Default is 2.
 #'
-#' @param p_digits Integer specifying the number of decimal places for p-values.
-#'   P-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001" 
+#' @param p_digits Integer specifying the number of decimal places for \emph{p}-values.
+#'   \emph{p}-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001" 
 #'   (for \code{p_digits = 3}). Default is 3.
 #'
 #' @param conf_level Numeric confidence level for confidence intervals. Must be
 #'   between 0 and 1. Default is 0.95 (95\% confidence intervals). The CI
-#'   percentage is automatically displayed in column headers (e.g., "90\% CI"
+#'   percentage is automatically displayed in column headers (\emph{e.g.,} "90\% CI"
 #'   when \code{conf_level = 0.90}). Note: This parameter affects display only;
 #'   the underlying CIs come from the uniscreen result.
 #'   
@@ -82,8 +82,8 @@
 #' @param color Character string specifying the color for point estimates in 
 #'   the forest plot. Default is \code{NULL}, which auto-selects based on
 #'   effect type: purple (\code{"#8A61D8"}) for hazard ratios (Cox), teal 
-#'   (\code{"#3C8D9C"}) for odds ratios (logistic), blue (\code{"#3064A6"}) for 
-#'   rate/risk ratios (Poisson, Gamma, etc.), and green (\code{"#5A8F5A"}) for 
+#'   (\code{"#4BA6B6"}) for odds ratios (logistic), blue (\code{"#3F87EE"}) for 
+#'   rate/risk ratios (Poisson, Gamma, \emph{etc.}), and green (\code{"#5A8F5A"}) for 
 #'   coefficients (linear models).
 #'   Use hex codes or R color names for custom colors.
 #'   
@@ -156,6 +156,7 @@
 #' uniforest(uni_results, title = "Univariable Associations with Mortality")
 #' 
 #' \donttest{
+#'   options(width = 180)
 #' # Example 2: Survival analysis
 #' library(survival)
 #' surv_results <- uniscreen(
@@ -202,6 +203,7 @@
 #' # ggsave("univariable_forest.pdf", p, width = dims$width, height = dims$height)
 #' }
 #'
+#' @family visualization functions
 #' @export
 uniforest <- function(x,
                       title = "Univariable Screening",
@@ -323,8 +325,8 @@ uniforest <- function(x,
     if (is.null(color)) {
         color <- switch(effect_type,
                         "HR" = "#8A61D8",
-                        "OR" = "#3C8D9C",
-                        "RR" = "#3064A6",
+                        "OR" = "#4BA6B6",
+                        "RR" = "#3F87EE",
                         "#5A8F5A")
     }
     
@@ -487,7 +489,7 @@ uniforest <- function(x,
                                                                )]
     }
     
-    ## Format p-values
+    ## Format \emph{p}-values
     p_threshold <- 10^(-p_digits)
     p_threshold_str <- paste0("< ", format(p_threshold, scientific = FALSE))
     
@@ -938,7 +940,7 @@ uniforest <- function(x,
                      outcome_display <- labels[[us_outcome]]
                  } else {
                      ## For Surv() outcomes, try to extract and label component variables
-                     ## e.g., "Surv(os_months, os_status)" -> check for os_months, os_status labels
+                     ## \emph{e.g.,}, "Surv(os_months, os_status)" -> check for os_months, os_status labels
                      if (grepl("^Surv\\(", us_outcome)) {
                          ## Extract variable names from Surv()
                          surv_vars <- gsub("^Surv\\(|\\)$", "", us_outcome)

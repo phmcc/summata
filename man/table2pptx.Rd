@@ -345,6 +345,7 @@ For professional presentations:
 }
 \examples{
 \dontrun{
+  options(width = 180)
 # Load data
 data(clintrial)
 data(clintrial_labels)
@@ -441,4 +442,16 @@ table2pptx(results, "conference.pptx",
 \code{\link{table2tex}} for LaTeX output,
 \code{\link[flextable]{flextable}} for table customization,
 \code{\link[officer]{read_pptx}} for PowerPoint manipulation
+
+Other export functions: 
+\code{\link{autoexport}()},
+\code{\link{print.table2docx_result}()},
+\code{\link{print.table2pptx_result}()},
+\code{\link{print.table2rtf_result}()},
+\code{\link{table2docx}()},
+\code{\link{table2html}()},
+\code{\link{table2pdf}()},
+\code{\link{table2rtf}()},
+\code{\link{table2tex}()}
 }
+\concept{export functions}

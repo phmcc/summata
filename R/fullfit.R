@@ -62,11 +62,19 @@
 #'       survival analysis. Requires \code{Surv()} outcome syntax.
 #'     \item \code{"clogit"} - Conditional logistic regression for matched 
 #'       case-control studies.
+#'     \item \code{"glmer"} - Generalized linear mixed-effects model for hierarchical 
+#'       or clustered data with non-normal outcomes (requires \pkg{lme4} package and 
+#'       \code{random} parameter).
+#'     \item \code{"lmer"} - Linear mixed-effects model for hierarchical or clustered 
+#'       data with continuous outcomes (requires \pkg{lme4} package and \code{random} 
+#'       parameter).
+#'     \item \code{"coxme"} - Cox mixed-effects model for clustered survival data 
+#'       (requires coxme package and \code{random} parameter).
 #'   }
 #'   
-#' @param family For GLM models, specifies the error distribution and link function. 
-#'   Can be a character string, a family function, or a family object.
-#'   Ignored for non-GLM models.
+#' @param family For GLM and GLMER models, specifies the error distribution and link 
+#'   function. Can be a character string, a family function, or a family object.
+#'   Ignored for non-GLM/GLMER models.
 #'   
 #'   \strong{Binary/Binomial outcomes:}
 #'   \itemize{
@@ -110,6 +118,16 @@
 #'   \code{model_type = "negbin"} instead of the \code{family} parameter.
 #'   
 #'   See \code{\link[stats]{family}} for additional details and options.
+#'
+#' @param random Character string specifying the random effects formula for 
+#'   mixed-effects models (\code{glmer}, \code{lmer}, \code{coxme}). Use standard
+#'   lme4/coxme syntax, e.g., \code{"(1|site)"} for random intercepts by site,
+#'   \code{"(1|site/patient)"} for nested random effects. Required when 
+#'   \code{model_type} is a mixed-effects model type unless random effects are
+#'   included in the \code{predictors} vector. Alternatively, random effects 
+#'   can be included directly in the \code{predictors} vector using the same 
+#'   syntax (e.g., \code{predictors = c("age", "sex", "(1|site)")}), though 
+#'   they will not be screened as predictors. Default is \code{NULL}.
 #'   
 #' @param conf_level Numeric confidence level for confidence intervals. Must be 
 #'   between 0 and 1. Default is 0.95 (95\% CI).
@@ -503,8 +521,66 @@
 #' # Can export directly to PDF/LaTeX/HTML for publication
 #' # table2pdf(final_table, "regression_results.pdf")
 #' # table2docx(final_table, "regression_results.docx")
+#' 
+#' # Example 17: Gamma regression with screening
+#' gamma_result <- fullfit(
+#'     data = clintrial,
+#'     outcome = "los_days",
+#'     predictors = c("age", "treatment", "surgery", "any_complication", 
+#'                   "stage", "ecog"),
+#'     model_type = "glm",
+#'     family = Gamma(link = "log"),
+#'     method = "screen",
+#'     p_threshold = 0.10,
+#'     labels = clintrial_labels
+#' )
+#' print(gamma_result)
+#' 
+#' # Example 18: Quasipoisson for overdispersed counts
+#' quasi_result <- fullfit(
+#'     data = clintrial,
+#'     outcome = "ae_count",
+#'     predictors = c("age", "treatment", "diabetes", "surgery", 
+#'                   "stage", "ecog"),
+#'     model_type = "glm",
+#'     family = "quasipoisson",
+#'     method = "screen",
+#'     p_threshold = 0.20,
+#'     labels = clintrial_labels
+#' )
+#' print(quasi_result)
+#' 
+#' # Example 19: Linear mixed effects with site clustering
+#' if (requireNamespace("lme4", quietly = TRUE)) {
+#'     lmer_result <- fullfit(
+#'         data = clintrial,
+#'         outcome = "los_days",
+#'         predictors = c("age", "treatment", "surgery", "stage"),
+#'         random = "(1|site)",
+#'         model_type = "lmer",
+#'         method = "all",
+#'         labels = clintrial_labels
+#'     )
+#'     print(lmer_result)
+#' }
+#' 
+#' # Example 20: Cox mixed effects with site clustering
+#' if (requireNamespace("coxme", quietly = TRUE)) {
+#'     coxme_result <- fullfit(
+#'         data = clintrial,
+#'         outcome = "Surv(os_months, os_status)",
+#'         predictors = c("age", "treatment", "stage", "grade"),
+#'         random = "(1|site)",
+#'         model_type = "coxme",
+#'         method = "screen",
+#'         p_threshold = 0.10,
+#'         labels = clintrial_labels
+#'     )
+#'     print(coxme_result)
+#' }
 #' }
 #'
+#' @family regression functions
 #' @export
 fullfit <- function(data,
                     outcome, 
@@ -515,6 +591,7 @@ fullfit <- function(data,
                     columns = "both",
                     model_type = "glm",
                     family = "binomial",
+                    random = NULL,
                     conf_level = 0.95,
                     reference_rows = TRUE,
                     show_n = TRUE,
@@ -566,6 +643,41 @@ fullfit <- function(data,
     if (validation$auto_corrected) {
         model_type <- validation$model_type
     }
+    
+    ## Handle random effects - support both explicit parameter and embedded in predictors
+    mixed_types <- c("glmer", "lmer", "coxme")
+    has_random_in_predictors <- any(grepl("\\|", predictors))
+    
+    if (model_type %in% mixed_types && has_random_in_predictors) {
+        random_mask <- grepl("\\|", predictors)
+        random_in_preds <- predictors[random_mask]
+        predictors <- predictors[!random_mask]
+        
+        ## Combine explicit random with embedded random (if both provided)
+        if (!is.null(random)) {
+            message("Note: Random effects specified in both 'random' parameter and 'predictors'. ",
+                    "Combining: ", random, " + ", paste(random_in_preds, collapse = " + "))
+            random <- paste(c(random, random_in_preds), collapse = " + ")
+        } else {
+            random <- paste(random_in_preds, collapse = " + ")
+        }
+        
+        if (length(predictors) == 0) {
+            stop("No fixed-effect predictors specified. Random effects should be specified ",
+                 "via the 'random' parameter or alongside fixed-effect predictors.")
+        }
+    }
+    
+    ## Validate random is provided for mixed-effects models
+    if (model_type %in% mixed_types && is.null(random)) {
+        stop("'random' parameter is required for mixed-effects models (", model_type, ").\n",
+             "Example: random = \"(1|site)\" for random intercepts by site.\n",
+             "Alternatively, include random effects in 'predictors' using the same syntax.")
+    }
+    if (!is.null(random) && !model_type %in% mixed_types) {
+        warning("'random' parameter is ignored for non-mixed-effects models (", model_type, ").")
+        random <- NULL
+    }
 
     ## Step 1: Univariable analysis (if needed)
     uni_results <- NULL
@@ -579,6 +691,7 @@ fullfit <- function(data,
             predictors = predictors,
             model_type = model_type,
             family = family,
+            random = random,
             conf_level = conf_level,
             reference_rows = reference_rows,
             show_n = show_n,
@@ -609,7 +722,8 @@ fullfit <- function(data,
                 ## Need to run univariable if not already done
                 ## Only need p-values for screening, so skip counts for efficiency
                 uni_temp <- uniscreen(data, outcome, predictors, model_type, 
-                                      family, conf_level = conf_level,
+                                      family, random = random,
+                                      conf_level = conf_level,
                                       reference_rows = FALSE,
                                       show_n = FALSE,
                                       show_events = FALSE,
@@ -646,6 +760,7 @@ fullfit <- function(data,
                 predictors = multi_vars,
                 model_type = model_type,
                 family = family,
+                random = random,
                 conf_level = conf_level,
                 show_n = show_n,
                 show_events = show_events,
@@ -694,6 +809,10 @@ fullfit <- function(data,
     data.table::setattr(result, "multi_raw", multi_raw)
     data.table::setattr(result, "p_threshold", p_threshold)
     data.table::setattr(result, "n_screened", length(predictors))
+    
+    if (!is.null(random)) {
+        data.table::setattr(result, "random", random)
+    }
 
     if (!is.null(multi_model)) {
         data.table::setattr(result, "model", multi_model)
@@ -962,6 +1081,7 @@ determine_effect_type <- function(uni_raw, multi_raw, exponentiate, adjusted = F
 #' @param ... Additional arguments passed to print methods.
 #' @return Invisibly returns the input object.
 #' @keywords internal
+#' @family regression functions
 #' @export
 print.fullfit_result <- function(x, ...) {
     cat("\nFullfit Analysis Results\n")

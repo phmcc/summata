@@ -81,8 +81,8 @@ The following table summarizes all supported model types (`model_type`) and fami
 | `"glm"` | `"poisson"` | Count | Rate ratio | `stats` |
 | `"glm"` | `"quasipoisson"` | Count (overdispersed) | Rate ratio | `stats` |
 | `"glm"` | `"gaussian"` | Continuous | *β* coefficient | `stats` |
-| `"glm"` | `"Gamma"` | Positive continuous | Ratio (log link) | `stats` |
-| `"glm"` | `"inverse.gaussian"` | Positive continuous | Ratio | `stats` |
+| `"glm"` | `"Gamma"` | Positive continuous | Ratio (with log link) | `stats` |
+| `"glm"` | `"inverse.gaussian"` | Positive continuous | Coefficient | `stats` |
 | `"negbin"` | — | Count (overdispersed) | Rate ratio | `MASS` |
 | `"coxph"` | — | Time-to-event | Hazard ratio | `survival` |
 | `"clogit"` | — | Matched binary | Odds ratio | `survival` |
@@ -474,7 +474,7 @@ example18
 
 ## **Example 19:** Gamma Regression
 
-Gamma regression is appropriate for positive, continuous, right-skewed outcomes. In the `clintrial` dataset, length of hospital stay (`los_days`) fits this description. By default, the log link is used, and exponentiated coefficients represent multiplicative effects.
+Gamma regression is appropriate for positive, continuous, right-skewed outcomes. In the `clintrial` dataset, length of hospital stay (`los_days`) fits this description. Note that the default link for Gamma is the *inverse* link, which produces coefficients on a difficult-to-interpret scale. The log link is generally preferred for interpretability—exponentiated coefficients then represent multiplicative effects on the mean.
 
 ```{r}
 example19 <- fit(
@@ -482,7 +482,7 @@ example19 <- fit(
   outcome = "los_days",
   predictors = c("age", "ecog", "stage", "treatment"),
   model_type = "glm",
-  family = "Gamma",
+  family = Gamma(link = "log"),
   labels = clintrial_labels
 )
 
@@ -580,42 +580,35 @@ example24
 
 Conditional logistic regression is used for matched case-control studies where cases and controls are matched within strata. The stratification variable should be specified using the `strata` parameter. This model type requires the `survival` package.
 
-Since `clintrial` is not structured as matched data, we create a small example dataset with 1:1 matching on age group:
-
 ```{r}
-# Create minimal matched case-control dataset (30 pairs)
-# Cases and controls matched on age group, but differ on exposures
-set.seed(42)
-matched_data <- data.frame(
-  match_id = rep(1:30, each = 2),
-  case = rep(c(1, 0), 30),
-  # Exposure: cases more likely exposed (OR ≈ 3)
-  smoking = c(1,0, 1,1, 1,0, 0,0, 1,0, 1,0, 1,1, 0,0, 1,0, 1,0,
-              1,0, 1,0, 0,0, 1,0, 1,1, 1,0, 0,0, 1,0, 1,0, 1,1,
-              1,0, 1,0, 0,1, 1,0, 1,0, 0,0, 1,1, 1,0, 1,0, 1,0),
-  # Alcohol: moderate association (OR ≈ 2)
-  alcohol = c(1,0, 0,0, 1,1, 1,0, 0,0, 1,0, 1,0, 0,0, 1,1, 1,0,
-              0,0, 1,0, 1,0, 0,1, 1,0, 1,1, 0,0, 1,0, 0,0, 1,0,
-              1,1, 0,0, 1,0, 1,0, 0,0, 1,1, 1,0, 0,0, 1,0, 1,1),
-  # BMI: continuous, slight difference between cases/controls
-  bmi = round(c(28,25, 31,27, 26,25, 29,26, 27,26, 32,28, 25,24, 30,27,
-                27,25, 29,28, 26,25, 33,29, 28,26, 27,27, 31,28, 26,24,
-                29,27, 28,26, 30,28, 27,25, 32,29, 26,25, 29,27, 28,26,
-                31,28, 27,26, 30,27, 25,24, 29,28, 33,30), 1)
-)
+# Matched case-control dataset (100 pairs)
+set.seed(456)
+n_pairs <- 100
+matched_data <- do.call(rbind, lapply(1:n_pairs, function(i) {
+  base_bmi <- rnorm(1, 27, 4)
+  data.frame(
+    match_id = i,
+    case = c(1, 0),
+    smoking = factor(c(rbinom(1, 1, 0.45), rbinom(1, 1, 0.30)), 
+                     levels = c(0, 1), labels = c("No", "Yes")),
+    diabetes = factor(c(rbinom(1, 1, 0.30), rbinom(1, 1, 0.20)), 
+                      levels = c(0, 1), labels = c("No", "Yes")),
+    bmi = c(base_bmi + rnorm(1, 1.5, 2), base_bmi + rnorm(1, -0.5, 2))
+  )
+}))
 
-example24 <- fit(
+example25 <- fit(
   data = matched_data,
   outcome = "case",
-  predictors = c("smoking", "alcohol", "bmi"),
+  predictors = c("smoking", "diabetes", "bmi"),
   model_type = "clogit",
   strata = "match_id"
 )
 
-example24
+example25
 ```
 
-The output shows odds ratios conditional on the matching strata. Note that variables used for matching (here, age) typically show attenuated effects.
+The output shows odds ratios conditional on the matching strata.
 
 ---
 

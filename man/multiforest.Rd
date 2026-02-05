@@ -43,7 +43,7 @@ multiforest(
 
 \item{effect_label}{Character string for the effect measure label on the 
 forest plot axis. Default is \code{NULL}, which auto-detects based on 
-model type (e.g., "Odds Ratio", "Hazard Ratio", "Rate Ratio", "Estimate").}
+model type (\emph{e.g.,} "Odds Ratio", "Hazard Ratio", "Rate Ratio", "Estimate").}
 
 \item{column}{Character string specifying which column to plot when both 
 univariable and multivariable results are present. Options are 
@@ -53,13 +53,13 @@ When \code{"both"}, shows side-by-side forest plots.}
 \item{digits}{Integer specifying the number of decimal places for effect 
 estimates and confidence intervals. Default is 2.}
 
-\item{p_digits}{Integer specifying the number of decimal places for p-values.
-P-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001" 
+\item{p_digits}{Integer specifying the number of decimal places for \emph{p}-values.
+\emph{p}-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001" 
 (for \code{p_digits = 3}). Default is 3.}
 
 \item{conf_level}{Numeric confidence level for confidence intervals. Must be
 between 0 and 1. Default is 0.95 (95\% confidence intervals). The CI
-percentage is automatically displayed in column headers (e.g., "90\% CI"
+percentage is automatically displayed in column headers (\emph{e.g.,} "90\% CI"
 when \code{conf_level = 0.90}).}
 
 \item{font_size}{Numeric multiplier controlling the base font size for all 
@@ -122,8 +122,8 @@ Default is \code{TRUE}.}
 \item{color}{Character string specifying the color for point estimates in 
 the forest plot. Default is \code{NULL}, which auto-selects based on
 effect type: purple (\code{"#8A61D8"}) for hazard ratios (Cox), teal 
-(\code{"#3C8D9C"}) for odds ratios (logistic), blue (\code{"#3064A6"}) for 
-rate/risk ratios (Poisson, Gamma, etc.), and green (\code{"#5A8F5A"}) for 
+(\code{"#4BA6B6"}) for odds ratios (logistic), blue (\code{"#3F87EE"}) for 
+rate/risk ratios (Poisson, Gamma, \emph{etc.}), and green (\code{"#5A8F5A"}) for 
 coefficients (linear models).
 Use hex codes or R color names for custom colors.}
 
@@ -211,6 +211,7 @@ plot1 <- multiforest(result)
 print(plot1)
 
 \donttest{
+  options(width = 180)
 # Example 2: With custom title and labels
 plot2 <- multiforest(
     result,
@@ -258,4 +259,12 @@ dims <- attr(plot5, "recommended_dims")
 \code{\link{glmforest}} for single GLM forest plots,
 \code{\link{coxforest}} for single Cox model forest plots,
 \code{\link{autoforest}} for automatic model detection
+
+Other visualization functions: 
+\code{\link{autoforest}()},
+\code{\link{coxforest}()},
+\code{\link{glmforest}()},
+\code{\link{lmforest}()},
+\code{\link{uniforest}()}
 }
+\concept{visualization functions}

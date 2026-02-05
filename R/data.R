@@ -52,6 +52,7 @@
 #' - Median follow-up is approximately 30 months
 #' 
 #' @source Simulated data for demonstration purposes
+#' @family sample data
 #' 
 #' @examples
 #' data(clintrial)
@@ -97,5 +98,6 @@
 #' in the clinical_trial dataset. Use with labels parameter in functions.
 #'
 #' @format Named character vector with 24 elements
+#' @family sample data
 #' @seealso \code{\link{clintrial}}
 "clintrial_labels"

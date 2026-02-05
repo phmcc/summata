@@ -10,7 +10,7 @@
 #'
 #' @param model Fitted model object. Supported classes include:
 #'   \itemize{
-#'     \item \code{glm} - Generalized linear models (logistic, Poisson, etc.)
+#'     \item \code{glm} - Generalized linear models (logistic, Poisson, \emph{etc.})
 #'     \item \code{lm} - Linear models
 #'     \item \code{coxph} - Cox proportional hazards models
 #'     \item \code{clogit} - Conditional logistic regression
@@ -31,7 +31,7 @@
 #'   for creating cleaner presentation tables. Default is \code{TRUE}.
 #'   
 #' @param terms_to_exclude Character vector of term names to exclude from output.
-#'   Useful for removing specific unwanted parameters (e.g., nuisance variables,
+#'   Useful for removing specific unwanted parameters (\emph{e.g.,} nuisance variables,
 #'   spline terms). Default is \code{NULL}. Note: If \code{include_intercept = FALSE}, 
 #'   "(Intercept)" is automatically added to this list.
 #'   
@@ -52,8 +52,8 @@
 #'   \describe{
 #'     \item{model_scope}{Character. Either "Univariable" (unadjusted model with 
 #'       single predictor) or "Multivariable" (adjusted model with multiple predictors)}
-#'     \item{model_type}{Character. Type of regression (e.g., "Logistic", "Linear", 
-#'       "Cox PH", "Poisson", etc.)}
+#'     \item{model_type}{Character. Type of regression (\emph{e.g.,} "Logistic", "Linear", 
+#'       "Cox PH", "Poisson", \emph{etc.})}
 #'     \item{variable}{Character. Variable name (for factor variables, the base 
 #'       variable name without the level)}
 #'     \item{group}{Character. Group/level name for factor variables; empty string 
@@ -66,7 +66,7 @@
 #'     \item{events_group}{Integer. Number of events for this specific variable 
 #'       level (for survival and logistic models with factor variables)}
 #'     \item{coefficient}{Numeric. Raw regression coefficient (log odds, log hazard, 
-#'       etc.)}
+#'       \emph{etc.})}
 #'     \item{se}{Numeric. Standard error of the coefficient}
 #'     \item{OR/HR/RR/Coefficient}{Numeric. Effect estimate - column name depends on 
 #'       model type:
@@ -79,10 +79,10 @@
 #'     \item{ci_lower}{Numeric. Lower bound of confidence interval for effect estimate}
 #'     \item{ci_upper}{Numeric. Upper bound of confidence interval for effect estimate}
 #'     \item{statistic}{Numeric. Test statistic (z-value for GLM/Cox, t-value for LM)}
-#'     \item{p_value}{Numeric. P-value for coefficient test}
-#'     \item{sig}{Character. Significance markers: "***" (p<0.001), "**" (p < 0.01), 
-#'       "*" (p < 0.05), "." (p < 0.10), "" (p ≥ 0.10)}
-#'     \item{sig_binary}{Logical. Binary indicator: \code{TRUE} if p < 0.05, 
+#'     \item{p_value}{Numeric. \emph{p}-value for coefficient test}
+#'     \item{sig}{Character. Significance markers: "***" (p<0.001), "**" (\emph{p} < 0.01), 
+#'       "*" (\emph{p} < 0.05), "." (\emph{p} < 0.10), "" (p ≥ 0.10)}
+#'     \item{sig_binary}{Logical. Binary indicator: \code{TRUE} if \emph{p} < 0.05, 
 #'       \code{FALSE} otherwise}
 #'     \item{reference}{Character. Contains \code{reference_label} for reference 
 #'       category rows when \code{reference_rows = TRUE}, empty string otherwise}
@@ -122,6 +122,7 @@
 #' glm_result
 #' 
 #' \donttest{
+#'   options(width = 180)
 #' # Example 2: Extract from linear model
 #' lm_model <- lm(los_days ~ age + sex + surgery, data = clintrial)
 #' 
@@ -146,6 +147,7 @@
 #'
 #' }
 #'
+#' @family utility functions
 #' @export
 m2dt <- function(data,
                  model,
@@ -253,6 +255,16 @@ m2dt <- function(data,
                         dt[, events := sum(outcome_col, na.rm = TRUE)]
                     }
                 }
+            }
+        }
+        
+        ## Handle negative binomial models (MASS::glm.nb)
+        if (model_class == "negbin") {
+            if (!is.null(model$y)) {
+                dt[, events := sum(model$y, na.rm = TRUE)]
+            } else if (!is.null(model$model)) {
+                outcome_col <- model$model[[1]]
+                dt[, events := sum(outcome_col, na.rm = TRUE)]
             }
         }
         
@@ -596,12 +608,12 @@ m2dt <- function(data,
                     dt[, statistic := coefficient / se]
                 }
                 
-                ## Check if p-values are provided
+                ## Check if \emph{p}-values are provided
                 p_col <- grep("^Pr\\(", colnames(coef_summary))
                 if (length(p_col) > 0) {
                     dt[, p_value := coef_summary[, p_col[1]]]
                 } else {
-                    ## Calculate p-values from z/t statistics
+                    ## Calculate \emph{p}-values from z/t statistics
                     dt[, p_value := 2 * (1 - stats::pnorm(abs(statistic)))]
                 }
             } else {
@@ -714,8 +726,31 @@ m2dt <- function(data,
     if (!skip_counts) {
         
         ## Prepare data for group counting
+        ## Use model's internal data (complete cases only) for accurate counts
         if (!is.null(xlevels) || model_class == "coxme") {
-            data_source <- model_data
+            ## Try to get the model's data (complete cases used in fitting)
+            data_source <- NULL
+            
+            if (model_class %in% c("glm", "lm", "negbin")) {
+                ## For glm/lm/negbin, model$model contains complete cases
+                if (!is.null(model$model)) {
+                    data_source <- model$model
+                }
+            } else if (inherits(model, "merMod")) {
+                ## For lme4 models, use the frame
+                data_source <- model@frame
+            } else if (model_class == "coxph") {
+                ## For coxph, try model$model first
+                if (!is.null(model$model)) {
+                    data_source <- model$model
+                }
+            }
+            
+            ## Fallback to model_data if model's internal data not available
+            if (is.null(data_source)) {
+                data_source <- model_data
+            }
+            
             data_dt <- if (data.table::is.data.table(data_source)) data_source else data.table::as.data.table(data_source)
             
             ## For coxme, reconstruct xlevels from the data if needed
@@ -737,16 +772,39 @@ m2dt <- function(data,
             }
             
             ## Determine outcome and event variables
+            ## Events only make sense for binomial, poisson, quasipoisson, quasibinomial, negbin
+            ## NOT for gaussian, Gamma, inverse.gaussian (continuous outcomes)
             outcome_var <- NULL
             event_var <- NULL
             
-            if (model_class %in% c("glm", "negbin") && !isS4(model)) {
-                outcome_var <- all.vars(model$formula)[1]
+            ## Define families that should have events calculated
+            event_families <- c("binomial", "quasibinomial", "poisson", "quasipoisson")
+            
+            if (model_class == "negbin" && !isS4(model)) {
+                ## Negative binomial always has events (count data)
+                if (!is.null(model$formula)) {
+                    outcome_var <- all.vars(model$formula)[1]
+                } else {
+                    outcome_var <- all.vars(stats::formula(model))[1]
+                }
+            } else if (model_class == "glm" && !isS4(model)) {
+                ## Only set outcome_var for GLM families with meaningful events
+                family_name <- model$family$family
+                if (family_name %in% event_families) {
+                    if (!is.null(model$formula)) {
+                        outcome_var <- all.vars(model$formula)[1]
+                    } else {
+                        outcome_var <- all.vars(stats::formula(model))[1]
+                    }
+                }
             } else if (model_class %in% c("lmer", "lmerMod", "glmer", "glmerMod") && inherits(model, "merMod")) {
-                ## For mixed models, get the response variable name from the formula
-                formula_obj <- model@call$formula
-                if (!is.null(formula_obj)) {
-                    outcome_var <- all.vars(formula_obj)[1]
+                ## For mixed models, only calculate events for binomial/poisson families
+                fam <- tryCatch(family(model)$family, error = function(e) "gaussian")
+                if (fam %in% event_families) {
+                    formula_obj <- model@call$formula
+                    if (!is.null(formula_obj)) {
+                        outcome_var <- all.vars(formula_obj)[1]
+                    }
                 }
             } else if (model_class %in% c("coxph", "clogit", "coxme")) {
                 ## For all survival models, use the unified helper function
@@ -794,13 +852,14 @@ m2dt <- function(data,
                                            events_group = i.events_group
                                        ), on = .(variable, group)]
                         
-                    } else if (!is.null(outcome_var) && outcome_var %in% names(data_dt)) {
-                        ## For GLM/GLMER models
+                    } else if (!is.null(outcome_var) && outcome_var %in% names(long_dt)) {
+                        ## For GLM/GLMER/negbin models - calculate events from outcome
+                        ## Use get() to handle column name as string
                         outcome_col <- long_dt[[outcome_var]]
                         if (is.factor(outcome_col)) {
                             long_dt[, .events_calc := as.numeric(outcome_col) == 2]
                         } else {
-                            long_dt[, .events_calc := outcome_col]
+                            long_dt[, .events_calc := get(outcome_var)]
                         }
                         
                         all_counts <- long_dt[, .(
@@ -838,17 +897,40 @@ m2dt <- function(data,
             }
             
             ## Determine event variable for survival models
+            ## Events only make sense for binomial, poisson, quasipoisson, quasibinomial, negbin
             event_var <- NULL
             outcome_var <- NULL
             
+            ## Define families that should have events calculated
+            event_families <- c("binomial", "quasibinomial", "poisson", "quasipoisson")
+            
             if (model_class %in% c("coxph", "clogit", "coxme")) {
                 event_var <- get_event_variable(model, model_class)
-            } else if (model_class %in% c("glm", "negbin") && !isS4(model)) {
-                outcome_var <- all.vars(model$formula)[1]
+            } else if (model_class == "negbin" && !isS4(model)) {
+                ## Negative binomial always has events (count data)
+                if (!is.null(model$formula)) {
+                    outcome_var <- all.vars(model$formula)[1]
+                } else {
+                    outcome_var <- all.vars(stats::formula(model))[1]
+                }
+            } else if (model_class == "glm" && !isS4(model)) {
+                ## Only set outcome_var for GLM families with meaningful events
+                family_name <- model$family$family
+                if (family_name %in% event_families) {
+                    if (!is.null(model$formula)) {
+                        outcome_var <- all.vars(model$formula)[1]
+                    } else {
+                        outcome_var <- all.vars(stats::formula(model))[1]
+                    }
+                }
             } else if (model_class %in% c("lmer", "lmerMod", "glmer", "glmerMod") && inherits(model, "merMod")) {
-                formula_obj <- model@call$formula
-                if (!is.null(formula_obj)) {
-                    outcome_var <- all.vars(formula_obj)[1]
+                ## For mixed models, only calculate events for binomial/poisson families
+                fam <- tryCatch(family(model)$family, error = function(e) "gaussian")
+                if (fam %in% event_families) {
+                    formula_obj <- model@call$formula
+                    if (!is.null(formula_obj)) {
+                        outcome_var <- all.vars(formula_obj)[1]
+                    }
                 }
             }
             
@@ -856,7 +938,7 @@ m2dt <- function(data,
             for (row_idx in interaction_rows) {
                 term_name <- dt$term[row_idx]
                 
-                ## Split interaction term into components (e.g., "treatmentDrug A:stageII" -> c("treatmentDrug A", "stageII"))
+                ## Split interaction term into components (\emph{e.g.,} "treatmentDrug A:stageII" -> c("treatmentDrug A", "stageII"))
                 components <- strsplit(term_name, ":", fixed = TRUE)[[1]]
                 
                 ## Parse each component into variable and level
@@ -987,11 +1069,26 @@ m2dt <- function(data,
                 ref_level <- ref_levels[i]
                 if (var %in% names(data_dt)) {
                     if (!is.null(event_var) && event_var %in% names(data_dt)) {
+                        ## Survival models - use event_var
                         data_dt[get(var) == ref_level & !is.na(get(var)), .(
                                                                               variable = var,
                                                                               group = ref_level,
                                                                               n_group = .N,
                                                                               events_group = sum(get(event_var), na.rm = TRUE)
+                                                                          )]
+                    } else if (!is.null(outcome_var) && outcome_var %in% names(data_dt)) {
+                        ## GLM/negbin models - use outcome_var
+                        outcome_col <- data_dt[[outcome_var]]
+                        if (is.factor(outcome_col)) {
+                            events_sum <- sum((as.numeric(outcome_col) == 2)[data_dt[[var]] == ref_level & !is.na(data_dt[[var]])], na.rm = TRUE)
+                        } else {
+                            events_sum <- sum(outcome_col[data_dt[[var]] == ref_level & !is.na(data_dt[[var]])], na.rm = TRUE)
+                        }
+                        data_dt[get(var) == ref_level & !is.na(get(var)), .(
+                                                                              variable = var,
+                                                                              group = ref_level,
+                                                                              n_group = .N,
+                                                                              events_group = events_sum
                                                                           )]
                     } else {
                         data_dt[get(var) == ref_level & !is.na(get(var)), .(

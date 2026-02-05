@@ -412,6 +412,7 @@
 #' # \end{landscape}
 #' }
 #'
+#' @family export functions
 #' @export
 table2tex <- function (table,
                        file,
@@ -573,11 +574,17 @@ table2tex <- function (table,
         ## Check if table has been indented
         is_indented <- indent_groups || condense_table || condense_quantitative
         
+        ## Identify padding rows (all cells empty) - these should not be striped
+        is_padding_row <- apply(df, 1, function(row) {
+            all(is.na(row) | row == "" | row == " ")
+        })
+        
         if (is_indented) {
             ## For indented tables - look for rows where Variable is not empty and not indented
             var_starts <- which(!grepl("\\\\hspace", df$Variable) & 
                                 df$Variable != "" & 
-                                !is.na(df$Variable))
+                                !is.na(df$Variable) &
+                                !is_padding_row)
             
             commands <- character()
             positions <- numeric()
@@ -596,7 +603,8 @@ table2tex <- function (table,
                                }
                     
                     for (row in start_idx:end_idx) {
-                        if (!is.na(df$Variable[row])) {
+                        ## Skip padding rows
+                        if (!is.na(df$Variable[row]) && !is_padding_row[row]) {
                             commands <- c(commands, paste0("\\rowcolor{", stripe_color, "}"))
                             positions <- c(positions, row - 1)
                         }
@@ -609,7 +617,7 @@ table2tex <- function (table,
             }
         } else if ("Group" %in% names(df)) {
             ## For non-indented tables with Group column
-            var_starts <- which(df$Variable != "" & !is.na(df$Variable))
+            var_starts <- which(df$Variable != "" & !is.na(df$Variable) & !is_padding_row)
             
             commands <- character()
             positions <- numeric()
@@ -628,7 +636,8 @@ table2tex <- function (table,
                                }
                     
                     for (row in start_idx:end_idx) {
-                        if (!is.na(df$Variable[row])) {
+                        ## Skip padding rows
+                        if (!is.na(df$Variable[row]) && !is_padding_row[row]) {
                             commands <- c(commands, paste0("\\rowcolor{", stripe_color, "}"))
                             positions <- c(positions, row - 1)
                         }
@@ -645,7 +654,8 @@ table2tex <- function (table,
             positions <- numeric()
             
             for (i in seq_len(nrow(df))) {
-                if (var_groups[i] %% 2 != 0 && var_groups[i] > 0) {
+                ## Skip padding rows (var_groups == 0 or is_padding_row)
+                if (var_groups[i] %% 2 != 0 && var_groups[i] > 0 && !is_padding_row[i]) {
                     commands <- c(commands, paste0("\\rowcolor{", stripe_color, "}"))
                     positions <- c(positions, i - 1)
                 }

@@ -100,4 +100,9 @@ fullfit(clintrial,
         labels = clintrial_labels)
         
 }
+\seealso{
+Other sample data: 
+\code{\link{clintrial_labels}}
+}
+\concept{sample data}
 \keyword{datasets}

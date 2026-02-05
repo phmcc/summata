@@ -4,7 +4,7 @@
 #' with a graphical representation of effect estimates (odds ratios, risk ratios, 
 #' or coefficients) from a generalized linear model. The plot integrates variable 
 #' names, group levels, sample sizes, effect estimates with confidence intervals, 
-#' p-values, and model diagnostics in a single comprehensive visualization designed 
+#' \emph{p}-values, and model diagnostics in a single comprehensive visualization designed 
 #' for manuscripts and presentations.
 #'
 #' @param x Either a fitted GLM object (class \code{glm} or \code{glmerMod}), 
@@ -32,14 +32,14 @@
 #' @param digits Integer specifying the number of decimal places for effect 
 #'   estimates and confidence intervals in the data table. Default is 2.
 #'
-#' @param p_digits Integer specifying the number of decimal places for p-values.
-#'   P-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001" 
-#'   (for \code{p_digits = 3}), "< 0.0001" (for \code{p_digits = 4}), etc. 
+#' @param p_digits Integer specifying the number of decimal places for \emph{p}-values.
+#'   \emph{p}-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001" 
+#'   (for \code{p_digits = 3}), "< 0.0001" (for \code{p_digits = 4}), \emph{etc.} 
 #'   Default is 3.
 #'
 #' @param conf_level Numeric confidence level for confidence intervals. Must be
 #'   between 0 and 1. Default is 0.95 (95\% confidence intervals). The CI
-#'   percentage is automatically displayed in column headers (e.g., "90\% CI"
+#'   percentage is automatically displayed in column headers (\emph{e.g.,} "90\% CI"
 #'   when \code{conf_level = 0.90}).
 #'   
 #' @param font_size Numeric multiplier controlling the base font size for all 
@@ -52,7 +52,7 @@
 #'   Adjust relative to \code{font_size}.
 #'   
 #' @param header_size Numeric value controlling the relative font size for 
-#'   column headers ("Variable", "Group", "n", etc.). Default is 5.82. Headers 
+#'   column headers ("Variable", "Group", "n", \emph{etc.}). Default is 5.82. Headers 
 #'   are typically larger than annotations for hierarchy.
 #'   
 #' @param title_size Numeric value controlling the relative font size for the 
@@ -114,16 +114,16 @@
 #'   
 #' @param color Character string specifying the color for effect estimate point 
 #'   markers in the forest plot. Use hex codes or R color names. Default is 
-#'   \code{NULL}, which auto-selects based on effect type: \code{"#3C8D9C"} 
+#'   \code{NULL}, which auto-selects based on effect type: \code{"#4BA6B6"} 
 #'   (teal) for odds ratios (binomial/quasibinomial with logit link), 
-#'   \code{"#3064A6"} (blue) for rate/risk ratios (Poisson, Gamma, inverse 
+#'   \code{"#3F87EE"} (blue) for rate/risk ratios (Poisson, Gamma, inverse 
 #'
 #'   Gaussian with log link), and \code{"#5A8F5A"} (green) for coefficients 
 #'   (Gaussian/identity link). This scheme matches \code{uniforest()} and 
 #'   \code{multiforest()}. Choose colors that contrast well with black error bars.
 #'   
 #' @param exponentiate Logical. If \code{TRUE}, exponentiates coefficients to 
-#'   display odds ratios, risk ratios, etc. If \code{FALSE}, shows raw 
+#'   display odds ratios, risk ratios, \emph{etc.} If \code{FALSE}, shows raw 
 #'   coefficients. Default is \code{NULL}, which automatically exponentiates 
 #'   for logit, log, and cloglog links, and shows raw coefficients for identity 
 #'   link.
@@ -169,7 +169,7 @@
 #'       \item Group: Factor levels (optional, hidden when indenting)
 #'       \item n: Sample sizes by group (optional)
 #'       \item Events: Event counts by group (optional)
-#'       \item Effect (95\% CI); \emph{p}-value: Formatted estimates with p-values
+#'       \item Effect (95\% CI); \emph{p}-value: Formatted estimates with \emph{p}-values
 #'     }
 #'   \item \strong{Forest Plot} (right side): Graphical display with:
 #'     \itemize{
@@ -182,7 +182,7 @@
 #'   \item \strong{Model Statistics} (footer): Summary of:
 #'     \itemize{
 #'       \item Observations analyzed (with percentage of total data)
-#'       \item Model family (Binomial, Poisson, etc.)
+#'       \item Model family (Binomial, Poisson, \emph{etc.})
 #'       \item Deviance statistics
 #'       \item Pseudo-R² (McFadden)
 #'       \item AIC
@@ -208,7 +208,7 @@
 #' alphabetically for character variables) serves as the reference category:
 #' \itemize{
 #'   \item Displayed with the \code{ref_label} instead of an estimate
-#'   \item No confidence interval or p-value shown
+#'   \item No confidence interval or \emph{p}-value shown
 #'   \item Visually aligned with other categories
 #'   \item When \code{condense_table = TRUE}, reference-only variables may be 
 #'     omitted entirely
@@ -295,6 +295,7 @@
 #' print(plot1)
 #' 
 #' \donttest{
+#'   options(width = 180)
 #' # Example 2: With custom variable labels
 #' plot2 <- glmforest(
 #'     x = model1,
@@ -462,7 +463,7 @@
 #'     labels = clintrial_labels,
 #'     indent_groups = TRUE,
 #'     zebra_stripes = TRUE,
-#'     color = "#3C8D9C",
+#'     color = "#4BA6B6",
 #'     font_size = 1.0,
 #'     digits = 2
 #' )
@@ -475,6 +476,7 @@
 #' #        width = dims$width, height = dims$height, dpi = 300)
 #' }
 #'
+#' @family visualization functions
 #' @export
 glmforest <- function(x, data = NULL,
                       title = "Generalized Linear Model",
@@ -611,10 +613,27 @@ Received class: ", paste(class(x), collapse = ", "))
         }
     }
     
+    ## Automatically disable show_events for continuous outcome families
+    ## Events only make sense for binomial, poisson, quasibinomial, quasipoisson, negbin
+    if (show_events) {
+        if (is_lme4) {
+            fam_for_events <- model@resp$family$family
+        } else if (inherits(model, "negbin")) {
+            fam_for_events <- "negbin"
+        } else {
+            fam_for_events <- model$family$family
+        }
+        
+        event_families <- c("binomial", "quasibinomial", "poisson", "quasipoisson", "negbin")
+        if (!fam_for_events %in% event_families) {
+            show_events <- FALSE
+        }
+    }
+    
     ## Set default color based on effect type (consistent with uniforest/multiforest)
     ## Color scheme based on what the effect measure represents:
-    ##   - Odds ratios (OR): Teal #3C8D9C - binomial/quasibinomial with logit link
-    ##   - Rate/risk ratios (RR): Blue #3064A6 - poisson, Gamma, inverse.gaussian with log link
+    ##   - Odds ratios (OR): Teal #4BA6B6 - binomial/quasibinomial with logit link
+    ##   - Rate/risk ratios (RR): Blue #3F87EE - poisson, Gamma, inverse.gaussian with log link
     ##   - Coefficients: Green #5A8F5A - gaussian, identity link models
     if (is.null(color)) {
         if (is_lme4) {
@@ -628,9 +647,9 @@ Received class: ", paste(class(x), collapse = ", "))
         if (family_name == "gaussian" || link_func == "identity") {
             color <- "#5A8F5A"  # Green for coefficient models
         } else if (family_name %in% c("binomial", "quasibinomial") && link_func == "logit") {
-            color <- "#3C8D9C"  # Teal for odds ratio models
+            color <- "#4BA6B6"  # Teal for odds ratio models
         } else {
-            color <- "#3064A6"  # Blue for all ratio models (Poisson, Gamma, etc.)
+            color <- "#3F87EE"  # Blue for all ratio models (Poisson, Gamma, \emph{etc.})
         }
     }
     
@@ -728,7 +747,7 @@ Received class: ", paste(class(x), collapse = ", "))
         } else {
             ## Fallback: calculate z/t values manually from estimate and SE
             z_values <- coef_summary[, "Estimate"] / coef_summary[, "Std. Error"]
-            ## Use normal approximation for p-values
+            ## Use normal approximation for \emph{p}-values
             p_values <- 2 * pnorm(abs(z_values), lower.tail = FALSE)
         }
     }
@@ -888,21 +907,27 @@ Received class: ", paste(class(x), collapse = ", "))
     all_terms_df <- data.table::rbindlist(all_terms)
     data.table::setnames(all_terms_df, c("var", "level", "N", "pos", "var_order"))
 
-    ## Add events for binomial and poisson models
+    ## Add events for binomial, poisson, quasibinomial, quasipoisson, and negative binomial models
+    ## NOT for gaussian, Gamma, inverse.gaussian (continuous outcomes)
     if (is_lme4) {
         family_name <- model@resp$family$family
+    } else if (inherits(model, "negbin")) {
+        family_name <- "negbin"
     } else {
         family_name <- model$family$family
     }
 
-    if (family_name %in% c("binomial", "poisson")) {
+    ## Families where events are meaningful
+    event_families <- c("binomial", "quasibinomial", "poisson", "quasipoisson", "negbin")
+    
+    if (family_name %in% event_families) {
         outcome_data <- NULL
         
         if (is_lme4) {
             ## For lme4 models, extract outcome from the response
             outcome_data <- model@resp$y
         } else {
-            ## For regular GLMs, get outcome from model data
+            ## For regular GLMs and negbin, get outcome from model data
             outcome_var <- all.vars(stats::formula(model))[1]
             
             if (!outcome_var %in% names(model_data)) {
@@ -911,7 +936,7 @@ Received class: ", paste(class(x), collapse = ", "))
                 outcome_data <- model_data[[outcome_var]]
                 
                 ## For binomial with factor outcome, convert to 0/1
-                if (family_name == "binomial" && is.factor(outcome_data)) {
+                if (family_name %in% c("binomial", "quasibinomial") && is.factor(outcome_data)) {
                     outcome_data <- as.numeric(outcome_data) == 2
                 }
             }
@@ -950,7 +975,7 @@ Received class: ", paste(class(x), collapse = ", "))
             int_term <- interaction_terms[idx]
             
             ## Parse the interaction term to create a readable label
-            ## e.g., "treatmentDrug A:stageII" -> "Treatment Group (Drug A) × Disease Stage (II)"
+            ## \emph{e.g.,}, "treatmentDrug A:stageII" -> "Treatment Group (Drug A) × Disease Stage (II)"
             int_parts <- strsplit(int_term, ":", fixed = TRUE)[[1]]
             
             ## Build readable variable name from parts
@@ -1085,44 +1110,62 @@ Received class: ", paste(class(x), collapse = ", "))
                 is_binary <- nrow(var_rows) == 2
                 
                 if (condense_table && is_binary) {
-                    ## Use safer reference detection based on NA estimates
-                    non_ref_idx <- find_non_reference_row(var_rows, "estimate")
+                    ## Detect reference row by checking if level is first in xlevels
+                    ## (first level is always reference in R factor contrasts)
+                    ref_level <- NULL
+                    if (!is.null(xlevels) && v %in% names(xlevels)) {
+                        ref_level <- xlevels[[v]][1]
+                    }
                     
-                    if (!is.null(non_ref_idx)) {
-                        non_ref_row <- var_rows[non_ref_idx]
-                        ref_idx <- setdiff(1:2, non_ref_idx)
-                        ref_row <- var_rows[ref_idx]
-                        
-                        condensed_row <- data.table::copy(non_ref_row)
-                        non_ref_category <- condensed_row$level
-                        ref_category <- ref_row$level
-                        
-                        ## Look up label for smarter condensing detection
-                        var_label <- if (!is.null(labels) && v %in% names(labels)) {
-                                         labels[[v]]
-                                     } else if (v %in% names(model_data) && 
-                                                !is.null(attr(model_data[[v]], "label"))) {
-                                         attr(model_data[[v]], "label")
-                                     } else {
-                                         v
-                                     }
-                        
-                        ## Use greedy approach: condense if EITHER category is recognized
-                        if (should_condense_binary(ref_category, non_ref_category, var_label)) {
-                            condensed_row[, var := v]
-                        } else {
-                            condensed_row[, var := paste0(v, " (", non_ref_category, ")")]
-                        }
-                        condensed_row[, level := "-"]
-                        processed_rows[[row_counter]] <- condensed_row
-                        row_counter <- row_counter + 1
-                    } else {
-                        ## Cannot determine reference - fall back to indent_groups behavior
-                        for (i in seq_len(nrow(var_rows))) {
-                            processed_rows[[row_counter]] <- var_rows[i]
-                            row_counter <- row_counter + 1
+                    ## Find non-reference row
+                    non_ref_idx <- NULL
+                    if (!is.null(ref_level)) {
+                        ref_idx <- which(var_rows$level == ref_level)
+                        if (length(ref_idx) == 1) {
+                            non_ref_idx <- setdiff(1:2, ref_idx)
                         }
                     }
+                    
+                    ## Fallback to estimate-based detection if available
+                    if (is.null(non_ref_idx) && "estimate" %in% names(var_rows)) {
+                        non_ref_idx <- find_non_reference_row(var_rows, "estimate")
+                    }
+                    
+                    ## Final fallback: assume row 2 is non-reference
+                    if (is.null(non_ref_idx) || length(non_ref_idx) != 1) {
+                        non_ref_idx <- 2L
+                        ref_idx <- 1L
+                    } else {
+                        ref_idx <- setdiff(1:2, non_ref_idx)
+                    }
+                    
+                    non_ref_row <- var_rows[non_ref_idx]
+                    ref_row <- var_rows[ref_idx]
+                    
+                    condensed_row <- data.table::copy(non_ref_row)
+                    non_ref_category <- condensed_row$level
+                    ref_category <- ref_row$level
+                    
+                    ## Look up label for smarter condensing detection
+                    var_label <- if (!is.null(labels) && v %in% names(labels)) {
+                                     labels[[v]]
+                                 } else if (v %in% names(model_data) && 
+                                            !is.null(attr(model_data[[v]], "label"))) {
+                                     attr(model_data[[v]], "label")
+                                 } else {
+                                     v
+                                 }
+                    
+                    ## Use greedy approach: condense if EITHER category is recognized
+                    if (should_condense_binary(ref_category, non_ref_category, var_label)) {
+                        condensed_row[, var := v]
+                    } else {
+                        condensed_row[, var := paste0(v, " (", non_ref_category, ")")]
+                    }
+                    condensed_row[, level := "-"]
+                    processed_rows[[row_counter]] <- condensed_row
+                    row_counter <- row_counter + 1
+                    
                 } else {
                     if (indent_groups) {
                         header_row <- data.table::data.table(
@@ -1276,7 +1319,7 @@ Received class: ", paste(class(x), collapse = ", "))
     ## Format CI percentage for display in headers
     ci_pct <- round(conf_level * 100)
 
-    ## Format p-values using p_digits parameter
+    ## Format \emph{p}-values using p_digits parameter
     p_threshold <- 10^(-p_digits)
     p_threshold_str <- paste0("< ", format(p_threshold, scientific = FALSE))
     

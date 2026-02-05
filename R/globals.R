@@ -52,8 +52,10 @@ utils::globalVariables(c(
            "p-value",
            
            ## Variables used in analysis functions
+           "CMS",
            ".int_term",
            ".is_ref",
+           ".group_order",
            ".orig_order",
            ".row_in_var",
            ".temp_var_order",

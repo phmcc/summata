@@ -17,6 +17,13 @@
 #'   Use NULL for models without interactions. Use colon notation for interactions
 #'   (e.g., c("age:treatment")). If NULL, no interactions are added to any model.
 #'   Default is NULL.
+#' @param random Character string specifying the random effects formula for 
+#'   mixed-effects models (\code{glmer}, \code{lmer}, \code{coxme}). Use standard
+#'   lme4/coxme syntax, e.g., \code{"(1|site)"} for random intercepts by site.
+#'   This random effects formula is applied to all models in the comparison.
+#'   Alternatively, random effects can be included directly in the predictor 
+#'   vectors within \code{model_list} using the same syntax, which allows
+#'   different random effects structures across models. Default is \code{NULL}.
 #' @param model_type Character string specifying model type. If "auto", detects
 #'   based on outcome. Options include:
 #'   \itemize{
@@ -34,7 +41,7 @@
 #'     \item \code{"negbin"} - Negative binomial regression for overdispersed counts 
 #'       (requires MASS package)
 #'   }
-#' @param family For GLM models, specifies the error distribution and link function.
+#' @param family For GLM and GLMER models, specifies the error distribution and link function.
 #'   Common options include:
 #'   \itemize{
 #'     \item \code{"binomial"} - Logistic regression for binary outcomes (default)
@@ -63,7 +70,7 @@
 #' @return A data.table with class "compfit_result" containing:
 #'   \describe{
 #'     \item{Model}{Model name/identifier}
-#'     \item{Summata Score}{Composite metric for model selection (higher is better)}
+#'     \item{CMS}{Composite Mean Score for model selection (higher is better)}
 #'     \item{N}{Sample size}
 #'     \item{Events}{Number of events (for survival/logistic)}
 #'     \item{Predictors}{Number of predictors}
@@ -85,7 +92,7 @@
 #'
 #' @details
 #' This function fits all specified models and computes comprehensive quality
-#' metrics for comparison. It generates a composite score (Summata Score) that 
+#' metrics for comparison. It generates a Composite Mean Score (CMS) that 
 #' combines multiple metrics: lower AIC/BIC (information criteria), higher 
 #' concordance (discrimination), and model convergence status.
 #' 
@@ -200,12 +207,14 @@
 #'
 #' }
 #'
+#' @family regression functions
 #' @export
 compfit <- function(data,
                     outcome,
                     model_list,
                     model_names = NULL,
                     interactions_list = NULL,
+                    random = NULL,
                     model_type = "auto",
                     family = "binomial",
                     conf_level = 0.95,
@@ -221,9 +230,18 @@ compfit <- function(data,
 
     ## Check if any model has random effects (for auto-detection)
     ## Random effects are specified with | syntax, e.g., "(1|site)"
-    has_any_random_effects <- any(sapply(model_list, function(preds) {
+    ## Check both model_list and the random parameter
+    has_random_in_models <- any(sapply(model_list, function(preds) {
         any(grepl("\\|", preds))
     }))
+    has_any_random_effects <- !is.null(random) || has_random_in_models
+    
+    ## Note if random effects specified in both places
+    if (!is.null(random) && has_random_in_models) {
+        message("Note: Random effects specified in both 'random' parameter and 'model_list'. ",
+                "The 'random' parameter (", random, ") will be applied to all models, ",
+                "combined with any model-specific random effects in the predictor lists.")
+    }
 
     ## Auto-detect model type if requested
     if (model_type == "auto") {
@@ -256,6 +274,13 @@ compfit <- function(data,
         } else {
             stop("Cannot auto-detect model type for outcome: ", outcome)
         }
+    }
+    
+    ## Validate random parameter for non-mixed-effects models
+    mixed_types <- c("glmer", "lmer", "coxme")
+    if (!is.null(random) && !model_type %in% mixed_types) {
+        warning("'random' parameter is ignored for non-mixed-effects models (", model_type, ").")
+        random <- NULL
     }
 
     ## Set model names if not provided
@@ -319,6 +344,7 @@ compfit <- function(data,
                 predictors = model_list[[i]],
                 model_type = model_type,
                 family = family,
+                random = random,
                 conf_level = conf_level,
                 labels = labels,
                 keep_qc_stats = TRUE,
@@ -450,8 +476,8 @@ compfit <- function(data,
     ## Build final column order: Model, Score, then preferred columns, then extras
     existing_preferred <- intersect(preferred_order, all_cols)
     existing_preferred <- setdiff(existing_preferred, "Model")
-    other_cols <- setdiff(all_cols, c(preferred_order, "Summata Score"))
-    final_order <- c("Model", "Summata Score", existing_preferred, other_cols)
+    other_cols <- setdiff(all_cols, c(preferred_order, "CMS"))
+    final_order <- c("Model", "CMS", existing_preferred, other_cols)
     
     ## Only reorder columns that actually exist
     final_order <- intersect(final_order, all_cols)
@@ -461,6 +487,10 @@ compfit <- function(data,
     data.table::setattr(comparison, "models", models)
     data.table::setattr(comparison, "model_type", model_type)
     data.table::setattr(comparison, "outcome", outcome)
+    
+    if (!is.null(random)) {
+        data.table::setattr(comparison, "random", random)
+    }
 
     if (include_coefficients && length(coef_results) > 0) {
         coef_table <- combine_coefficient_tables(coef_results, model_names)
@@ -479,6 +509,7 @@ compfit <- function(data,
 
 #' Print method showing scoring methodology
 #' @keywords internal
+#' @family regression functions
 #' @export
 print.compfit_result <- function(x, ...) {
     cat("\nModel Comparison Results\n")
@@ -488,7 +519,7 @@ print.compfit_result <- function(x, ...) {
     ## Show scoring weights
     weights <- attr(x, "weights")
     if (!is.null(weights)) {
-        cat("\nSummata Score Weights:\n")
+        cat("\nCMS Weights:\n")
         for (metric in names(weights)) {
             ## Formatting for metric names
             display_name <- switch(metric,
@@ -515,13 +546,13 @@ print.compfit_result <- function(x, ...) {
     ## Identify best model
     if (nrow(x) > 0) {
         best_model <- x$Model[1]  # Already sorted by score
-        cat("\nRecommended Model: ", best_model, " (Summata Score: ", x$`Summata Score`[1], ")\n", sep = "")
+        cat("\nRecommended Model: ", best_model, " (CMS: ", x$CMS[1], ")\n", sep = "")
     }
     
     cat("\nModels ranked by selection score:\n")
     NextMethod("print", x)
 
-    cat("\nSummata Score interpretation: 85+ Excellent, 75-84 Very Good, 65-74 Good, 55-64 Fair, < 55 Poor\n")
+    cat("\nCMS interpretation: 85+ Excellent, 75-84 Very Good, 65-74 Good, 55-64 Fair, < 55 Poor\n")
     
     if (!is.null(attr(x, "coefficients"))) {
         cat("\nNote: Coefficient comparison available via attr(result, 'coefficients')\n")

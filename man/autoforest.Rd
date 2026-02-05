@@ -9,7 +9,7 @@ autoforest(x, data = NULL, title = NULL, ...)
 \arguments{
 \item{x}{One of the following:
 \itemize{
-  \item A fitted model object: \code{glm}, \code{lm}, \code{coxph}, etc.
+  \item A fitted model object: \code{glm}, \code{lm}, \code{coxph}, \emph{etc.}
   \item A \code{fit_result} object from \code{fit()}
   \item A \code{fullfit_result} object from \code{fullfit()}
   \item A \code{uniscreen_result} object from \code{uniscreen()}
@@ -37,7 +37,7 @@ Common arguments include:
 \describe{
   \item{labels}{Named character vector for variable labels}
   \item{digits}{Number of decimal places for estimates (default 2)}
-  \item{p_digits}{Number of decimal places for p-values (default 3)}
+  \item{p_digits}{Number of decimal places for \emph{p}-values (default 3)}
   \item{conf_level}{Confidence level for intervals (default 0.95)}
   \item{show_n}{Logical, show sample sizes (default TRUE)}
   \item{show_events}{Logical, show event counts (default TRUE for survival/binomial)}
@@ -102,6 +102,7 @@ print(plot1)
 # Automatically detects GLM and routes to glmforest()
 
 \donttest{
+  options(width = 180)
 # Example 2: Cox proportional hazards model
 cox_model <- coxph(Surv(os_months, os_status) ~ age + sex + treatment + stage,
                    data = clintrial)
@@ -265,4 +266,12 @@ print(plots$linear)
 \code{\link{fullfit}} for combined univariable/multivariable regression,
 \code{\link{uniscreen}} for univariable screening,
 \code{\link{multifit}} for Multivariate analysis
+
+Other visualization functions: 
+\code{\link{coxforest}()},
+\code{\link{glmforest}()},
+\code{\link{lmforest}()},
+\code{\link{multiforest}()},
+\code{\link{uniforest}()}
 }
+\concept{visualization functions}

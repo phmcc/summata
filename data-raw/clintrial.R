@@ -158,670 +158,406 @@
 #' @keywords datasets
 NULL
 
-set.seed(71)  # For reproducibility
+set.seed(71)
 n <- 850
 
 create_clintrial <- function() {
 
-    ## ------------------------
-    ## Baseline characteristics
-    ## ------------------------
+    # ============================================================================
+    # SITE AND CLUSTERING STRUCTURE
+    # ============================================================================
     
-    ## Site (generate early for clustering effects)
+    # Site assignment
     greek_letters <- c("Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta", "Iota", "Kappa")
     site <- factor(
         paste0("Site ", sample(greek_letters, n, replace = TRUE)),
         levels = paste0("Site ", greek_letters))
     
-    ## Generate site-specific random effects
+    # Site-level random effects
     n_sites <- length(unique(site))
     site_names <- levels(site)
-    
-    ## Site random intercepts (some sites have better/worse outcomes)
     site_intercepts <- rnorm(n_sites, mean = 0, sd = 0.5)
-    names(site_intercepts) <- site_names
-    
-    ## Site-specific treatment effects (some sites better with Drug A, others with Drug B)
     site_drugA_effect <- rnorm(n_sites, mean = 0, sd = 0.3)
     site_drugB_effect <- rnorm(n_sites, mean = 0, sd = 0.3)
+    site_age_slope <- rnorm(n_sites, mean = 1, sd = 0.2)
+    names(site_intercepts) <- site_names
     names(site_drugA_effect) <- site_names
     names(site_drugB_effect) <- site_names
-    
-    ## Site-specific age effects (age matters more at some sites)
-    site_age_slope <- rnorm(n_sites, mean = 1, sd = 0.2)
     names(site_age_slope) <- site_names
     
-    ## Basic demographics
+    # ============================================================================
+    # DEMOGRAPHICS
+    # ============================================================================
+    
+    # Age
     age <- round(rnorm(n, mean = 60, sd = 12))
     age[age < 18] <- 18
     age[age > 90] <- 90
     
-    sex <- factor(sample(c("Female", "Male"), n, replace = TRUE, prob = c(0.55, 0.45)))
+    # Sex
+    sex <- factor(sample(c("Female", "Male"), n, replace = TRUE, prob = c(0.48, 0.52)),
+                  levels = c("Female", "Male"))
     
-    race <- factor(sample(c("White", "Black", "Asian", "Other"), n, 
-                          replace = TRUE, prob = c(0.70, 0.15, 0.10, 0.05)),
+    # Race
+    race <- factor(sample(c("White", "Black", "Asian", "Other"), n, replace = TRUE,
+                          prob = c(0.65, 0.20, 0.10, 0.05)),
                    levels = c("White", "Black", "Asian", "Other"))
     
-    ethnicity <- factor(sample(c("Non-Hispanic", "Hispanic"), n, 
-                               replace = TRUE, prob = c(0.88, 0.12)),
+    # Ethnicity
+    ethnicity <- factor(sample(c("Non-Hispanic", "Hispanic"), n, replace = TRUE, prob = c(0.85, 0.15)),
                         levels = c("Non-Hispanic", "Hispanic"))
     
-    ## Clinical characteristics
-    bmi <- round(rnorm(n, mean = 28, sd = 5), 1)
+    # ============================================================================
+    # CLINICAL CHARACTERISTICS
+    # ============================================================================
+    
+    # BMI (correlated with age and diabetes risk)
+    bmi <- round(rnorm(n, mean = 27 + (age - 60) * 0.05, sd = 5), 1)
     bmi[bmi < 15] <- 15
     bmi[bmi > 50] <- 50
     
-    smoking <- factor(sample(c("Never", "Former", "Current"), n,
-                             replace = TRUE, prob = c(0.45, 0.35, 0.20)),
-                      levels = c("Never", "Former", "Current"))
+    # Smoking
+    smoke_prob <- ifelse(sex == "Male", 0.35, 0.25)
+    smoking <- factor(
+        sample(c("Never", "Former", "Current"), n, replace = TRUE,
+               prob = c(0.45, 0.35, 0.20)),
+        levels = c("Never", "Former", "Current"))
     
-    hypertension <- factor(sample(c("No", "Yes"), n, replace = TRUE,
-                                  prob = c(0.60, 0.40)))
+    # Hypertension (correlated with age and BMI)
+    htn_prob <- pmin(0.9, plogis(-2 + 0.04 * age + 0.03 * bmi))
+    hypertension <- factor(ifelse(runif(n) < htn_prob, "Yes", "No"), levels = c("No", "Yes"))
     
-    diabetes <- factor(sample(c("No", "Yes"), n, replace = TRUE, 
-                              prob = c(0.75, 0.25)))
+    # Diabetes (correlated with age, BMI, and race)
+    dm_prob <- pmin(0.9, plogis(-3.5 + 0.03 * age + 0.08 * bmi +
+                                    (race == "Black") * 0.5 + (race == "Asian") * 0.3))
+    diabetes <- factor(ifelse(runif(n) < dm_prob, "Yes", "No"), levels = c("No", "Yes"))
     
-    ## Performance status (generate early for use in other variables)
-    ecog <- factor(sample(0:3, n, replace = TRUE, 
-                          prob = c(0.30, 0.40, 0.25, 0.05)),
-                   levels = 0:3)
+    # ECOG performance status (correlated with age)
+    ecog_base_prob <- plogis(-2 + 0.03 * age)
+    ecog_probs <- cbind(
+        1 - ecog_base_prob * 1.5,
+        ecog_base_prob * 0.8,
+        ecog_base_prob * 0.5,
+        ecog_base_prob * 0.2
+    )
+    ecog_probs <- ecog_probs / rowSums(ecog_probs)
+    ecog <- factor(apply(ecog_probs, 1, function(p) sample(0:3, 1, prob = p)), levels = 0:3)
     
-    ## Disease characteristics
-    grade <- factor(sample(c("Well-differentiated", "Moderately differentiated", 
-                             "Poorly differentiated"), n,
-                           replace = TRUE, prob = c(0.20, 0.50, 0.30)),
-                    levels = c("Well-differentiated", "Moderately differentiated", 
-                               "Poorly differentiated"))
-
-    stage <- factor(sample(c("I", "II", "III", "IV"), n,
-                           replace = TRUE, prob = c(0.25, 0.30, 0.30, 0.15)),
-                    levels = c("I", "II", "III", "IV"))
+    # ============================================================================
+    # LABORATORY VALUES
+    # ============================================================================
     
-    ## Biomarkers (continuous with some correlation to outcome)
-    biomarker_x <- round(rgamma(n, shape = 2, rate = 0.5) + 
-                         as.numeric(stage) * 0.5 + 
-                         (age > 65) * 2 +
-                         rnorm(n, 0, 0.5), 2)
+    # Creatinine (correlated with age and diabetes)
+    creatinine <- round(pmax(0.5, rnorm(n, mean = 0.9 + 0.008 * age + 
+                                            (diabetes == "Yes") * 0.3 + 
+                                            (sex == "Male") * 0.15, sd = 0.25)), 2)
     
-    biomarker_y <- round(rlnorm(n, meanlog = 3, sdlog = 1) + 
-                         (sex == "Male") * 20 + rnorm(n, 0, 10), 1)
-    biomarker_y[biomarker_y < 0] <- 0
-
-    ## Laboratory values
-    creatinine <- round(rlnorm(n, meanlog = 0, sdlog = 0.3), 2)
-    creatinine[creatinine > 5] <- 5
-
-    hemoglobin <- round(rnorm(n, mean = 13, sd = 2), 1)
+    # Hemoglobin (correlated with sex)
+    hemoglobin <- round(rnorm(n, mean = ifelse(sex == "Male", 14.5, 13.0), sd = 1.5), 1)
     hemoglobin[hemoglobin < 7] <- 7
     hemoglobin[hemoglobin > 18] <- 18
-
-    ## -------------
-    ## Interventions
-    ## -------------
     
-    ## Treatment assignment with bias for Drug B
-    treatment <- character(n)
-    for (i in 1:n) {
-        ## Drug B biased toward older, sicker patients (max additional 0.2)
-        drug_b_bias <- 0
-        drug_b_bias <- drug_b_bias + (age[i] > 65) * 0.10
-        drug_b_bias <- drug_b_bias + (as.numeric(ecog[i]) >= 3) * 0.10
-        drug_b_bias <- drug_b_bias + (grade[i] == "Poorly differentiated") * 0.05
-        drug_b_bias <- drug_b_bias + (stage[i] %in% c("III", "IV")) * 0.10
-        
-        ## Drug A has slight opposite bias (max additional 0.1)
-        drug_a_bias <- 0
-        drug_a_bias <- drug_a_bias + (age[i] <= 55) * 0.05
-        drug_a_bias <- drug_a_bias + (as.numeric(ecog[i]) <= 2) * 0.05
-        
-        ## Base probabilities
-        base_prob <- 1/3
-        
-        ## Calculate final probabilities (ensuring they sum to 1)
-        probs <- c(
-            Control = base_prob - drug_a_bias/2 - drug_b_bias/2,
-            DrugA = base_prob + drug_a_bias,
-            DrugB = base_prob + drug_b_bias
-        )
-        
-        ## Ensure no negative probabilities
-        probs[probs < 0.05] <- 0.05  # Minimum 5% chance for each
-        probs <- probs / sum(probs)  # Normalize to sum to 1
-        
-        treatment[i] <- sample(c("Control", "Drug A", "Drug B"), 1, prob = probs)
-    }
-    treatment <- factor(treatment, levels = c("Control", "Drug A", "Drug B"))
+    # Biomarker X (log-normal distribution, correlated with stage)
+    biomarker_x_base <- rlnorm(n, meanlog = 2, sdlog = 0.8)
+    biomarker_x <- round(biomarker_x_base, 1)
     
-    ## Surgery (biased toward younger, healthier patients)
-    surgery_prob <- plogis(-1 + 
-                           (65 - age) * 0.05 +  # Younger more likely
-                           (ecog == "0") * 1.2 +  # ECOG 0 much more likely
-                           (ecog == "1") * 0.6 +  # ECOG 1 somewhat more likely
-                           (ecog == "2") * (-0.5) +  # ECOG 2 less likely
-                                         (ecog == "3") * (-2) +  # ECOG 3 very unlikely
-                                                       (treatment == "Drug A") * 0.8 +  # Drug A more likely
-                                                       (treatment == "Drug B") * (-0.8) +  # Drug B less likely
-                                                                               (stage == "I") * 1 +  # Stage I more likely
-                                                                               (stage == "II") * 0.5 +  #  Stage II slightly more likely
-                                                                               (stage == "IV") * (-1.5) +  # Stage IV stage less likely
-                                                                                               rnorm(n, 0, 0.3))
+    # Biomarker Y (correlated with age and will be correlated with stage)
+    biomarker_y_base <- round(rlnorm(n, meanlog = 3 + 0.01 * age, sdlog = 0.6), 1)
+    biomarker_y <- biomarker_y_base
     
-    surgery <- factor(ifelse(runif(n) < surgery_prob, "Yes", "No"),
-                      levels = c("No", "Yes"))
-
-    ## -----------------------
-    ## Post-treatment outcomes
-    ## -----------------------
+    # ============================================================================
+    # DISEASE CHARACTERISTICS
+    # ============================================================================
     
-    ## Hospital length of stay in days (influenced by multiple factors with interactions)
-    los_days <- 5 +  # Baseline stay
-        ## Demographics
-        (age - 60) * 0.1 +  # Older patients stay longer
-        (sex == "Male") * 0.5 +  # Males slightly longer stay
-        
-        ## Clinical factors (STRONG effects)
-        as.numeric(ecog) * 2.5 +  # Performance status major factor
-        (smoking == "Current") * 1.2 +
-        (smoking == "Former") * 0.5 +
-        (diabetes == "Yes") * 1.8 +  # Diabetes increases LOS
-        (hypertension == "Yes") * 0.8 +
-        
-        ## Disease characteristics
-        (stage == "II") * 1.5 +
-        (stage == "III") * 3.0 +
-        (stage == "IV") * 4.5 +
-        (grade == "Moderately differentiated") * 1.0 +
-        (grade == "Poorly differentiated") * 2.0 +
-        
-        ## Treatment effects
-        (surgery == "Yes") * 4.5 +  # Surgery increases LOS significantly
-        (treatment == "Drug A") * (-0.8) +  # Drug A reduces LOS slightly
-                                    (treatment == "Drug B") * 1.2 +  # Drug B increases LOS (side effects)
-                                    
-                                    ## INTERACTION EFFECTS
-                                        # Treatment × Stage interactions
-                                    (treatment == "Drug A" & stage %in% c("III", "IV")) * (-2.0) +  # Drug A particularly effective in late stage
-                                                                                            (treatment == "Drug B" & stage %in% c("III", "IV")) * 1.5 +  # Drug B less effective in late stage
-                                                                                            
-                                        # Age × Diabetes interaction
-                                            ((age > 70) & (diabetes == "Yes")) * 3.0 +  # Elderly diabetics stay much longer
-                                            
-                                        # Sex × Treatment interaction
-                                        ((sex == "Male") & (treatment == "Drug B")) * 1.8 +  # Males have more side effects with Drug B
-                                        
-                                        ## Lab values
-                                        (creatinine - 1) * 1.5 +  # Higher creatinine = longer stay
-                                        (13 - hemoglobin) * 0.4 +  # Lower hemoglobin = longer stay
-                                        
-                                        ## Biomarkers with age interaction
-                                        biomarker_x * 0.3 +
-                                        ((age > 65) * biomarker_x * 0.2) +  # Biomarker X matters more in elderly
-                                        
-                                        ## Site clustering effect
-                                        site_intercepts[as.character(site)] * 2 +  # Site random effect
-                                        
-                                        ## Random variation
-                                        rnorm(n, 0, 2)
-    
-    ## Clean up LOS values
-    los_days <- round(los_days, 1)
-    los_days[los_days < 1] <- 1  # Minimum 1 day
-    los_days[los_days > 60] <- 60  # Cap at 60 days
-    
-    ## Add some missing values for LOS (e.g., outpatient procedures)
-    los_days[sample(which(surgery == "No"), size = 20)] <- NA
-
-    ## Site-specific AE reporting vigilance (some sites report more/fewer AEs)
-    site_ae_effect <- rnorm(n_sites, mean = 0, sd = 0.25)
-    names(site_ae_effect) <- site_names
-    
-    ## ae_count - overdispersed count suitable for negative binomial or quasipoisson
-    ## Risk factors: age, ECOG, diabetes, treatment, surgery, stage
-    ae_lambda <- exp(
-        0.7 +  # Baseline log-rate (~2 AEs on average)
-        
-        ## Demographics
-        (age - 60) * 0.012 +  # Older patients have more AEs
-        
-        ## Clinical factors
-        as.numeric(ecog) * 0.15 +  # Higher ECOG = more AEs
-        (diabetes == "Yes") * 0.25 +  # Diabetes increases AEs
-        (hypertension == "Yes") * 0.10 +
-        
-        ## Treatment effects (key associations)
-        (treatment == "Drug A") * (-0.15) +  # Drug A slightly protective
-        (treatment == "Drug B") * 0.35 +  # Drug B has more AEs (toxicity)
-        
-        ## Surgery effect
-        (surgery == "Yes") * 0.30 +
-        
-        ## Disease severity
-        (stage == "III") * 0.15 +
-        (stage == "IV") * 0.25 +
-        
-        ## Interaction: Drug B + diabetes = synergistic toxicity
-        ((treatment == "Drug B") & (diabetes == "Yes")) * 0.20 +
-        
-        ## Interaction: elderly + Drug B = more AEs
-        ((age > 70) & (treatment == "Drug B")) * 0.15 +
-        
-        ## Site clustering (vigilance in AE reporting)
-        site_ae_effect[as.character(site)] +
-        
-        ## Random noise
-        rnorm(n, 0, 0.1)
+    # Tumor grade (correlated with biomarker X)
+    grade_prob_well <- pmax(0.1, 0.6 - 0.05 * log(biomarker_x))
+    grade_prob_poor <- pmin(0.5, 0.1 + 0.04 * log(biomarker_x))
+    grade_prob_mod <- 1 - grade_prob_well - grade_prob_poor
+    grade_probs <- cbind(grade_prob_well, grade_prob_mod, grade_prob_poor)
+    grade <- factor(
+        apply(grade_probs, 1, function(p) {
+            sample(c("Well-differentiated", "Moderately differentiated", "Poorly differentiated"),
+                   1, prob = p)
+        }),
+        levels = c("Well-differentiated", "Moderately differentiated", "Poorly differentiated")
     )
     
-    ## Generate counts using negative binomial for realistic overdispersion
-    ## size parameter controls overdispersion (smaller = more overdispersion)
-    ae_count <- as.integer(rnbinom(n, mu = ae_lambda, size = 3))
+    # Disease stage (correlated with grade, age, biomarkers)
+    stage_logit <- -2 +
+        (grade == "Moderately differentiated") * 0.5 +
+        (grade == "Poorly differentiated") * 1.2 +
+        0.02 * age +
+        0.15 * log(biomarker_x) +
+        0.1 * log(biomarker_y)
+    stage_prob <- plogis(stage_logit)
+    stage_cats <- cut(stage_prob, breaks = c(0, 0.25, 0.50, 0.75, 1.0),
+                      labels = c("I", "II", "III", "IV"), include.lowest = TRUE)
+    stage <- factor(stage_cats, levels = c("I", "II", "III", "IV"))
     
-    ## fu_count - equidispersed count suitable for standard Poisson regression
-    ## Mean ~ variance (Poisson assumption satisfied)
-    ## Risk factors: stage, ECOG, treatment, surgery
-    visit_lambda <- exp(
-        1.4 +  # Baseline log-rate (~4 visits on average)
-        
-        ## Disease severity drives visit frequency
-        (stage == "II") * 0.10 +
-        (stage == "III") * 0.20 +
-        (stage == "IV") * 0.35 +
-        
-        ## Performance status
-        as.numeric(ecog) * 0.08 +
-        
-        ## Treatment protocol differences
-        (treatment == "Drug A") * 0.05 +  # Slightly more monitoring
-        (treatment == "Drug B") * 0.12 +  # More monitoring for toxicity
-        
-        ## Surgery requires follow-up
-        (surgery == "Yes") * 0.15 +
-        
-        ## Minimal noise to maintain equidispersion
-        rnorm(n, 0, 0.02)
-    )
+    # Update biomarker Y to reflect final stage assignment
+    biomarker_y <- round(biomarker_y_base * 
+                             ifelse(stage == "I", 0.7,
+                                    ifelse(stage == "II", 1.0,
+                                           ifelse(stage == "III", 1.4, 2.0))), 1)
     
-    ## Generate counts using Poisson (equidispersed by definition)
-    fu_count <- as.integer(rpois(n, lambda = visit_lambda))
+    # ============================================================================
+    # TREATMENT ASSIGNMENT
+    # ============================================================================
     
-    ## Add small amount of missing data
-    ae_count[sample(n, size = 10)] <- NA
-    fu_count[sample(n, size = 8)] <- NA
-
-    ## Generate site-specific complication rates (some sites have better/worse outcomes)
-    site_complication_effect <- rnorm(n_sites, mean = 0, sd = 0.4)
-    names(site_complication_effect) <- site_names
+    # Treatment (stratified randomization by stage)
+    treatment_list <- lapply(levels(stage), function(s) {
+        n_stage <- sum(stage == s, na.rm = TRUE)
+        sample(c("Control", "Drug A", "Drug B"), n_stage, replace = TRUE)
+    })
+    treatment <- factor(unsplit(treatment_list, stage), levels = c("Control", "Drug A", "Drug B"))
     
-    ## Any Postoperative Complication (composite)
-    ## Strong associations with: age, ECOG, diabetes, surgery, treatment
-    complication_prob <- plogis(-2.0 +
-                                ## Demographics
-                                (age - 60) * 0.025 +  # Older = higher risk
-                                (sex == "Male") * 0.2 +
-                                
-                                ## Comorbidities (STRONG effects)
-                                (diabetes == "Yes") * 0.6 +  # Diabetes major risk factor
-                                (hypertension == "Yes") * 0.3 +
-                                (smoking == "Current") * 0.5 +
-                                (smoking == "Former") * 0.2 +
-                                as.numeric(ecog) * 0.4 +  # Poor performance status = higher risk
-                                
-                                ## Disease characteristics
-                                (stage == "III") * 0.3 +
-                                (stage == "IV") * 0.6 +
-                                
-                                ## Treatment effects
-                                (surgery == "Yes") * 1.2 +  # Surgery is major risk factor
-                                (treatment == "Drug A") * (-0.3) +  # Drug A protective
-                                                        (treatment == "Drug B") * 0.4 +  # Drug B increases complications
-                                                        
-                                                        ## Lab values
-                                                        (creatinine - 1) * 0.5 +  # Renal function
-                                                        (13 - hemoglobin) * 0.15 +  # Anemia
-                                                        
-                                                        ## INTERACTIONS
-                                                        ((age > 70) & (diabetes == "Yes")) * 0.5 +  # Elderly diabetics highest risk
-                                                        ((surgery == "Yes") & (treatment == "Drug B")) * 0.4 +  # Drug B + surgery = more complications
-                                                        ((smoking == "Current") & (surgery == "Yes")) * 0.3 +  # Smokers + surgery
-                                                        
-                                                        ## Site clustering
-                                                        site_complication_effect[as.character(site)] +
-                                                        
-                                                        rnorm(n, 0, 0.2))
+    # Surgery (correlated with stage and ECOG)
+    surgery_prob <- plogis(-1 + (stage == "I") * 1.5 + (stage == "II") * 1.0 +
+                               (stage == "III") * 0.3 - as.numeric(ecog) * 0.4)
+    surgery <- factor(ifelse(runif(n) < surgery_prob, "Yes", "No"), levels = c("No", "Yes"))
     
-    any_complication <- factor(ifelse(runif(n) < complication_prob, "Any complication", "No complication"),
-                               levels = c("No complication", "Any complication"))
-    ## Note: All patients can have complications (surgical or treatment-related)
-    ## Surgery is already accounted for in the probability model
+    # ============================================================================
+    # ICU ADMISSION
+    # ============================================================================
     
-    ## Wound Infection (SSI)
-    ## Subset of complications, more specific risk factors
-    wound_prob <- plogis(-3.5 +
-                         ## Demographics  
-                         (age - 60) * 0.015 +
-                         
-                         ## Strong risk factors for SSI
-                         (diabetes == "Yes") * 0.8 +  # Diabetes = major SSI risk
-                         (bmi - 28) * 0.05 +  # Obesity increases risk
-                         (smoking == "Current") * 0.7 +  # Smoking impairs healing
+    icu_logit <- -3.5 +
+        0.04 * age +
+        (sex == "Male") * 0.2 +
+        (diabetes == "Yes") * 0.8 +
+        (smoking == "Current") * 0.5 +
+        as.numeric(ecog) * 0.6 +
+        (stage == "III") * 0.4 +
+        (stage == "IV") * 0.8 +
+        (treatment == "Drug A") * (-0.4) +
+        (treatment == "Drug B") * 0.3 +
+        (surgery == "Yes") * 1.2 +
+        site_intercepts[as.character(site)] * 0.5
+    
+    icu_prob <- plogis(icu_logit)
+    icu_admission <- factor(ifelse(runif(n) < icu_prob, "Yes", "No"), levels = c("No", "Yes"))
+    
+    # ============================================================================
+    # PAIN SCORE
+    # ============================================================================
+    
+    pain_score_mean <- 3 +
+        (surgery == "Yes") * 2.5 +
+        (sex == "Female") * 0.5 +
+        as.numeric(ecog) * 0.3 +
+        (treatment == "Drug A") * (-0.5) +
+        (treatment == "Drug B") * 0.4 +
+        site_intercepts[as.character(site)] * 0.3
+    
+    pain_score <- round(pmax(0, pmin(10, rnorm(n, mean = pain_score_mean, sd = 1.5))), 1)
+    
+    # ============================================================================
+    # WOUND INFECTION
+    # ============================================================================
+    
+    wound_logit <- -4.0 +
+        0.03 * age +
+        (diabetes == "Yes") * 1.5 +
+        (smoking == "Current") * 0.7 +
+        0.05 * bmi +
+        (surgery == "Yes") * 1.8 +
+        (treatment == "Drug A") * (-0.3) +
+        (treatment == "Drug B") * 0.5 +
+        site_intercepts[as.character(site)] * 0.4
+    
+    wound_prob <- plogis(wound_logit)
+    wound_infection <- factor(ifelse(runif(n) < wound_prob, "Yes", "No"), levels = c("No", "Yes"))
+    
+    # ============================================================================
+    # ANY COMPLICATION
+    # ============================================================================
+    
+    comp_logit <- -3.2 +
+        0.04 * age +
+        (diabetes == "Yes") * 1.2 +
+        (hypertension == "Yes") * 0.5 +
+        (smoking == "Current") * 0.6 +
+        as.numeric(ecog) * 0.7 +
+        (stage == "III") * 0.3 +
+        (stage == "IV") * 0.6 +
+        (surgery == "Yes") * 1.5 +
+        (treatment == "Drug A") * (-0.5) +
+        (treatment == "Drug B") * 0.6 +
+        (wound_infection == "Yes") * 2.0 +
+        (icu_admission == "Yes") * 1.5 +
+        site_intercepts[as.character(site)] * 0.6
+    
+    comp_prob <- plogis(comp_logit)
+    any_complication <- factor(ifelse(runif(n) < comp_prob, "Yes", "No"), levels = c("No", "Yes"))
+    
+    # ============================================================================
+    # 30-DAY READMISSION
+    # ============================================================================
+    
+    readm_logit <- -3.8 +
+        0.03 * age +
+        (sex == "Male") * 0.3 +
+        (diabetes == "Yes") * 1.0 +
+        (smoking == "Current") * 0.5 +
+        as.numeric(ecog) * 0.5 +
+        (stage == "III") * 0.4 +
+        (stage == "IV") * 0.8 +
+        (treatment == "Drug A") * (-0.2) +
+        (treatment == "Drug B") * 0.4 +
+        (surgery == "Yes") * 0.6 +
+        (any_complication == "Yes") * 1.8 +
+        (wound_infection == "Yes") * 1.2 +
+        site_intercepts[as.character(site)] * 0.5
+    
+    readm_prob <- plogis(readm_logit)
+    readmission_30d <- factor(ifelse(runif(n) < readm_prob, "Yes", "No"), levels = c("No", "Yes"))
+    
+    # ============================================================================
+    # LENGTH OF STAY
+    # ============================================================================
+    
+    los_mean <- exp(1.5 +
+                        (surgery == "Yes") * 0.6 +
+                        0.008 * age +
+                        (diabetes == "Yes") * 0.3 +
+                        as.numeric(ecog) * 0.2 +
+                        (any_complication == "Yes") * 0.5 +
+                        (icu_admission == "Yes") * 0.7 +
+                        (treatment == "Drug A") * (-0.15) +
+                        (treatment == "Drug B") * 0.2 +
+                        site_intercepts[as.character(site)] * 0.3)
+    
+    los_days <- round(pmax(0, rnorm(n, mean = los_mean, sd = los_mean * 0.3)), 1)
+    los_days[surgery == "No" & runif(n) < 0.3] <- NA
+    
+    # ============================================================================
+    # RECOVERY DAYS
+    # ============================================================================
+    
+    recovery_mean <- exp(2.5 +
+                             (surgery == "Yes") * 0.5 +
+                             0.01 * age +
+                             (diabetes == "Yes") * 0.3 +
+                             as.numeric(ecog) * 0.3 +
+                             (any_complication == "Yes") * 0.4 +
+                             (treatment == "Drug A") * (-0.2) +
+                             (treatment == "Drug B") * 0.25 +
+                             site_intercepts[as.character(site)] * 0.3)
+    
+    recovery_days <- round(pmax(1, rnorm(n, mean = recovery_mean, sd = recovery_mean * 0.25)))
+    
+    # ============================================================================
+    # ADVERSE EVENT COUNT (overdispersed)
+    # ============================================================================
+    
+    ae_lambda <- exp(0.5 +
+                         0.015 * age +
+                         as.numeric(ecog) * 0.3 +
+                         (diabetes == "Yes") * 0.4 +
+                         (stage == "II") * 0.2 +
+                         (stage == "III") * 0.4 +
+                         (stage == "IV") * 0.6 +
+                         (treatment == "Drug A") * (-0.3) +
+                         (treatment == "Drug B") * 0.5 +
+                         (surgery == "Yes") * 0.3 +
+                         site_intercepts[as.character(site)] * 0.4)
+    
+    theta <- 2
+    ae_count <- rnbinom(n, size = theta, mu = ae_lambda)
+    
+    # ============================================================================
+    # FOLLOW-UP VISIT COUNT (equidispersed)
+    # ============================================================================
+    
+    fu_lambda <- exp(1.8 +
+                         (stage == "II") * 0.15 +
+                         (stage == "III") * 0.3 +
+                         (stage == "IV") * 0.5 +
+                         as.numeric(ecog) * 0.15 +
+                         (treatment == "Drug A") * 0.1 +
+                         (treatment == "Drug B") * 0.15 +
+                         (surgery == "Yes") * 0.2)
+    
+    fu_count <- rpois(n, lambda = fu_lambda)
+    
+    # ============================================================================
+    # OVERALL SURVIVAL
+    # ============================================================================
+    
+    os_hazard <- exp(-1.5 +
+                         site_age_slope[as.character(site)] * 0.04 * age +
+                         (sex == "Male") * 0.25 +
+                         (diabetes == "Yes") * 0.4 +
+                         (smoking == "Current") * 0.5 +
                          (smoking == "Former") * 0.2 +
-                         
-                         ## Surgery-related
-                         (surgery == "Yes") * 2.0 +  # Only surgical patients get SSI
-                         
-                         ## Treatment
-                         (treatment == "Drug B") * 0.4 +  # Drug B immunosuppressive
-                         
-                         ## Lab values
-                         (hemoglobin < 10) * 0.5 +  # Severe anemia
-                         
-                         ## INTERACTIONS
-                         ((diabetes == "Yes") & (bmi > 35)) * 0.6 +  # Obese diabetics
-                         ((smoking == "Current") & (diabetes == "Yes")) * 0.4 +
-                         
-                         ## Site clustering (some sites have better sterile technique)
-                         site_complication_effect[as.character(site)] * 0.8 +
-                         
-                         rnorm(n, 0, 0.15))
+                         as.numeric(ecog) * 0.6 +
+                         (grade == "Moderately differentiated") * 0.3 +
+                         (grade == "Poorly differentiated") * 0.7 +
+                         (stage == "II") * 0.4 +
+                         (stage == "III") * 0.9 +
+                         (stage == "IV") * 1.5 +
+                         0.3 * log(biomarker_x) +
+                         0.15 * log(biomarker_y) +
+                         (surgery == "Yes") * (-0.6) +
+                         (treatment == "Drug A") * (-0.5 + site_drugA_effect[as.character(site)]) +
+                         (treatment == "Drug B") * (0.1 + site_drugB_effect[as.character(site)]) +
+                         ((treatment == "Drug A") & (stage %in% c("III", "IV"))) * (-0.4) +
+                         ((treatment == "Drug B") & (stage == "I")) * (-0.3) +
+                         (age > 70 & diabetes == "Yes") * 0.6 +
+                         (as.numeric(ecog) >= 3 & treatment == "Drug A") * 0.4 +
+                         site_intercepts[as.character(site)] +
+                         rnorm(n, 0, 0.3))
     
-    wound_infection <- factor(ifelse(runif(n) < wound_prob, "Wound infection", "No wound infection"),
-                              levels = c("No wound infection", "Wound infection"))
-    ## Note: Non-surgical patients have very low SSI risk (from procedures, lines, etc.)
-    ## Surgery effect is captured in the probability model (+2.0 log-odds)
+    os_months_raw <- round(rexp(n, rate = os_hazard) * 12, 1)
     
-    ## 30-Day Readmission
-    ## Related to complications but also social/system factors
-    ## NOTE: Strengthened effects to ensure detectable associations in regression
-    readmit_prob <- plogis(-2.8 +
-                           ## Demographics (stronger effects)
-                           (age - 60) * 0.035 +  # Age effect strengthened
-                           (sex == "Male") * 0.35 +  # Male sex increases risk
-                           
-                           ## Clinical factors (stronger effects)
-                           (diabetes == "Yes") * 0.7 +  # Diabetes strongly predicts readmission
-                           (hypertension == "Yes") * 0.25 +
-                           as.numeric(ecog) * 0.45 +  # ECOG performance status
-                           (smoking == "Current") * 0.5 +  # Current smoking
-                           (smoking == "Former") * 0.15 +
-                           
-                           ## Prior complications increase readmission
-                           (any_complication == "Yes") * 1.2 +  # Strong predictor
-                           (wound_infection == "Yes") * 0.9 +
-                           
-                           ## Disease severity (stronger stage effects)
-                           (stage == "II") * 0.2 +
-                           (stage == "III") * 0.5 +
-                           (stage == "IV") * 0.85 +
-                           
-                           ## Treatment effects (more differentiated)
-                           (treatment == "Drug A") * (-0.4) +  # Drug A patients do better
-                                                   (treatment == "Drug B") * 0.5 +  # Drug B increases readmission
-                                                   
-                                                   ## Surgery effect
-                                                   (surgery == "Yes") * 0.6 +  # Surgical patients more likely to be readmitted
-                                                   
-                                                   ## Lab values
-                                                   (creatinine - 1) * 0.4 +  # Renal function matters
-                                                   (hemoglobin < 10) * 0.35 +  # Anemia
-                                                   
-                                                   ## LOS effect (very short or very long LOS = readmission risk)
-                                                   ifelse(!is.na(los_days), (abs(los_days - 7) * 0.04), 0) +
-                                                   
-                                                   ## INTERACTION EFFECTS
-                                                   ((diabetes == "Yes") & (age > 70)) * 0.4 +  # Elderly diabetics
-                                                   ((surgery == "Yes") & (stage %in% c("III", "IV"))) * 0.35 +
-                                                   
-                                                   ## Site clustering (some sites have better discharge planning)
-                                                   site_complication_effect[as.character(site)] * 0.7 +
-                                                   
-                                                   rnorm(n, 0, 0.15))
+    censor_time <- runif(n, min = 12, max = 60)
+    os_time <- pmin(os_months_raw, censor_time)
+    os_status <- as.numeric(os_months_raw <= censor_time)
     
-    readmission_30d <- factor(ifelse(runif(n) < readmit_prob, "30-day readmission", "No 30-day readmission"),
-                              levels = c("No 30-day readmission", "30-day readmission"))
+    # ============================================================================
+    # PROGRESSION-FREE SURVIVAL
+    # ============================================================================
     
-    ## ICU Admission
-    ## More severe outcome, stronger associations
-    icu_prob <- plogis(-3.0 +
-                       ## Demographics
-                       (age - 60) * 0.03 +  # Age is important
-                       
-                       ## Clinical factors (STRONG)
-                       as.numeric(ecog) * 0.5 +
-                       (diabetes == "Yes") * 0.4 +
-                       (hypertension == "Yes") * 0.3 +
-                       
-                       ## Disease severity
-                       (stage == "III") * 0.5 +
-                       (stage == "IV") * 1.0 +
-                       (grade == "Poorly differentiated") * 0.3 +
-                       
-                       ## Surgery major factor
-                       (surgery == "Yes") * 1.5 +
-                       
-                       ## Treatment
-                       (treatment == "Drug B") * 0.5 +  # Drug B more toxic
-                       
-                       ## Lab values
-                       (creatinine - 1) * 0.8 +  # Renal function critical
-                       (hemoglobin < 9) * 0.6 +  # Severe anemia
-                       
-                       ## INTERACTIONS
-                       ((age > 75) & (surgery == "Yes")) * 0.6 +  # Elderly surgical patients
-                       ((stage == "IV") & (surgery == "Yes")) * 0.5 +
-                       
-                       ## Site clustering
-                       site_complication_effect[as.character(site)] * 0.5 +
-                       
-                       rnorm(n, 0, 0.15))
+    pfs_hazard <- exp(-1.2 +
+                          site_age_slope[as.character(site)] * 0.035 * age +
+                          (sex == "Male") * 0.2 +
+                          (diabetes == "Yes") * 0.3 +
+                          (smoking == "Current") * 0.4 +
+                          as.numeric(ecog) * 0.5 +
+                          (grade == "Moderately differentiated") * 0.35 +
+                          (grade == "Poorly differentiated") * 0.8 +
+                          (stage == "II") * 0.5 +
+                          (stage == "III") * 1.0 +
+                          (stage == "IV") * 1.6 +
+                          0.12 * biomarker_x +
+                          (surgery == "Yes") * (-0.5) +
+                          (treatment == "Drug A") * (-0.4 + site_drugA_effect[as.character(site)]) +
+                          (treatment == "Drug B") * (-0.1 + site_drugB_effect[as.character(site)]) +
+                          ((treatment == "Drug A") & (stage %in% c("III", "IV"))) * (-0.3) +
+                          ((treatment == "Drug B") & (stage == "I")) * (-0.2) +
+                          (as.numeric(ecog) >= 3 & treatment == "Drug A") * 0.5 +
+                          site_intercepts[as.character(site)] * 0.8 +
+                          rnorm(n, 0, 0.3))
     
-    icu_admission <- factor(ifelse(runif(n) < icu_prob, "ICU admission", "No ICU admission"),
-                            levels = c("No ICU admission", "ICU admission"))
-    
-    ## Postoperative Pain Score (0-10)
-    ## Visual analog scale, varies by patient and treatment
-    pain_score <- 4.0 +  # Baseline moderate pain
-        ## Demographics
-        (age - 60) * (-0.02) +  # Older patients report less pain (counterintuitive but observed)
-                       (sex == "Female") * 0.5 +  # Women report more pain
-                       
-                       ## Clinical factors
-                       as.numeric(ecog) * 0.3 +
-                       (smoking == "Current") * 0.4 +
-                       
-                       ## Disease/procedure factors
-                       (surgery == "Yes") * 2.0 +  # Surgery = more pain
-                       (stage == "III") * 0.3 +
-                       (stage == "IV") * 0.5 +
-                       
-                       ## Treatment effects
-                       (treatment == "Drug A") * (-0.8) +  # Drug A has analgesic properties
-                                                   (treatment == "Drug B") * 0.5 +  # Drug B causes more pain
-                                                   
-                                                   ## Complications increase pain
-                                                   ifelse(!is.na(any_complication) & any_complication == "Yes", 1.5, 0) +
-                                                   ifelse(!is.na(wound_infection) & wound_infection == "Yes", 1.0, 0) +
-                                                   
-                                                   ## INTERACTIONS
-                                                   ((sex == "Female") & (treatment == "Drug B")) * 0.4 +  # Women + Drug B
-                                                   ((surgery == "Yes") & (stage == "IV")) * 0.5 +
-                                                   
-                                                   ## Site clustering (some sites have better pain management)
-                                                   site_intercepts[as.character(site)] * (-0.5) +
-                                                                                           
-                                                                                           rnorm(n, 0, 1.5)
-    
-    ## Clean up pain scores
-    pain_score <- round(pain_score, 1)
-    pain_score[pain_score < 0] <- 0
-    pain_score[pain_score > 10] <- 10
-    
-    ## Days to Functional Recovery
-    ## Time to return to baseline function, log-normal distribution
-    recovery_days <- exp(2.0 +  # Baseline ~7 days
-                         ## Demographics
-                         (age - 60) * 0.015 +  # Older = slower recovery
-                         
-                         ## Clinical factors
-                         as.numeric(ecog) * 0.15 +  # Baseline function matters
-                         (diabetes == "Yes") * 0.2 +
-                         (smoking == "Current") * 0.15 +
-                         
-                         ## Disease/procedure factors
-                         (surgery == "Yes") * 0.5 +  # Surgery extends recovery
-                         (stage == "III") * 0.1 +
-                         (stage == "IV") * 0.2 +
-                         
-                         ## Treatment effects
-                         (treatment == "Drug A") * (-0.15) +  # Drug A faster recovery
-                                                 (treatment == "Drug B") * 0.2 +  # Drug B slower recovery
-                                                 
-                                                 ## Complications extend recovery significantly
-                                                 ifelse(!is.na(any_complication) & any_complication == "Yes", 0.4, 0) +
-                                                 ifelse(!is.na(wound_infection) & wound_infection == "Yes", 0.5, 0) +
-                                                 (icu_admission == "Yes") * 0.6 +
-                                                 
-                                                 ## INTERACTIONS
-                                                 ((age > 70) & (surgery == "Yes")) * 0.2 +  # Elderly surgical patients
-                                                 ((diabetes == "Yes") & (wound_infection == "Yes")) * 0.3 +
-                                                 
-                                                 ## Site clustering
-                                                 site_intercepts[as.character(site)] * 0.2 +
-                                                 
-                                                 rnorm(n, 0, 0.3))
-    
-    ## Clean up recovery days
-    recovery_days <- round(recovery_days, 0)
-    recovery_days[recovery_days < 1] <- 1
-    recovery_days[recovery_days > 90] <- 90
-    
-    ## Add some missing values for recovery (lost to follow-up)
-    recovery_days[sample(n, size = 15)] <- NA
-    pain_score[sample(n, size = 10)] <- NA
-
-    ## -----------------
-    ## Survival outcomes
-    ## -----------------
-    
-    ## Survival outcomes (correlated with predictors including interactions)
-    hazard <- exp(-3 + 
-                  ## Disease characteristics (STRONGER effects)
-                  (stage == "II") * 0.4 +
-                  (stage == "III") * 0.8 +  
-                  (stage == "IV") * 1.5 +   
-                  (grade == "Moderately differentiated") * 0.3 +
-                  (grade == "Poorly differentiated") * 0.6 +  
-                  
-                  ## Demographics and clinical
-                  (age - 60) * 0.02 * site_age_slope[as.character(site)] +  # Age effect varies by site
-                  as.numeric(ecog) * 0.3 +
-                  (sex == "Male") * 0.15 +
-                  (smoking == "Current") * 0.25 +
-                  
-                  ## Biomarkers
-                  biomarker_x * 0.1 +
-                  
-                  ## Treatments (ENSURE Drug A benefit)
-                  (surgery == "Yes") * (-0.6) +
-                                     (treatment == "Drug A") * (-0.5 + site_drugA_effect[as.character(site)]) +  # Drug A effect varies by site
-                                                             (treatment == "Drug B") * (-0.15 + site_drugB_effect[as.character(site)]) +  # Drug B effect varies by site
-                                                                                     
-                                                                                     ## INTERACTION EFFECTS for survival
-                                        # Treatment × Stage interaction (Drug A works better in advanced stages)
-                                        ((treatment == "Drug A") & (stage %in% c("III", "IV"))) * (-0.4) +
-                                                                                                ((treatment == "Drug B") & (stage %in% c("III", "IV"))) * 0.3 +
-                                                                                                
-                                        # Sex × Treatment interaction
-                                        ((sex == "Male") & (treatment == "Drug A")) * 0.2 +  # Drug A less effective in males
-                                        ((sex == "Female") & (treatment == "Drug B")) * (-0.3) +  # Drug B more effective in females
-                                                                                      
-                                        # Age × Biomarker interaction
-                                        ((age > 65) * (biomarker_x > median(biomarker_x, na.rm = TRUE))) * 0.5 +  # High biomarker worse in elderly
-                                        
-                                        # Smoking × Diabetes interaction
-                                        ((smoking == "Current") & (diabetes == "Yes")) * 0.4 +  # Compound risk
-                                        
-                                        ## Site clustering effect
-                                        site_intercepts[as.character(site)] +  # Site random intercept
-                                        
-                                        rnorm(n, 0, 0.3))
-    
-    ## Generate survival times
-    surv_months <- round(rexp(n, rate = hazard) * 12, 1)
-    surv_months[surv_months > 120] <- 120  # Cap at 10 years
-    
-    ## Generate censoring (administrative at 60 months + random)
-    censor_time <- pmin(60, rexp(n, rate = 0.02) * 12)
-    
-    ## Observed time and status
-    os_time <- pmin(surv_months, censor_time)
-    os_status <- as.numeric(surv_months <= censor_time)
-    
-    ## Progression-free survival (PFS must be <= OS)
-    ## PFS hazard is higher than OS hazard (progression happens before death)
-    pfs_hazard <- exp(-2.5 +  # Higher baseline hazard than OS
-                      ## Disease characteristics (similar effects as OS)
-                      (stage == "II") * 0.45 +
-                      (stage == "III") * 0.9 +
-                      (stage == "IV") * 1.7 +
-                      (grade == "Moderately differentiated") * 0.35 +
-                      (grade == "Poorly differentiated") * 0.7 +
-                      
-                      ## Demographics and clinical
-                      (age - 60) * 0.015 * site_age_slope[as.character(site)] +  # Site-specific age effect
-                      as.numeric(ecog) * 0.35 +
-                      (sex == "Male") * 0.1 +
-                      (smoking == "Current") * 0.2 +
-                      
-                      ## Biomarkers
-                      biomarker_x * 0.12 +
-                      
-                      ## Treatments (Drug A shows benefit on PFS)
-                      (surgery == "Yes") * (-0.5) +
-                                         (treatment == "Drug A") * (-0.4 + site_drugA_effect[as.character(site)]) +  # Site-specific effect
-                                                                 (treatment == "Drug B") * (-0.1 + site_drugB_effect[as.character(site)]) +  # Site-specific effect
-                                                                                         
-                                                                                         ## INTERACTION EFFECTS for PFS
-                                        # Treatment × Stage interaction
-                                        ((treatment == "Drug A") & (stage %in% c("III", "IV"))) * (-0.3) +
-                                                                                                ((treatment == "Drug B") & (stage == "I")) * (-0.2) +  # Drug B works better in early stage
-                                                                                                                                           
-                                        # ECOG × Treatment interaction
-                                        (as.numeric(ecog) >= 3 & treatment == "Drug A") * 0.5 +  # Drug A less effective in poor PS
-                                        
-                                        ## Site clustering effect
-                                        site_intercepts[as.character(site)] * 0.8 +  # Site effect (slightly dampened vs OS)
-                                        
-                                        rnorm(n, 0, 0.3))
-    
-    ## Generate progression times
     pfs_months_raw <- round(rexp(n, rate = pfs_hazard) * 12, 1)
-    
-    ## Generate PFS censoring (same as OS censoring)
     pfs_censor_time <- censor_time
-    
-    ## Observed PFS time and status
     pfs_time_initial <- pmin(pfs_months_raw, pfs_censor_time)
     pfs_status_initial <- as.numeric(pfs_months_raw <= pfs_censor_time)
     
-    ## Ensure PFS time is always <= OS time
-    ## For patients with progression events, PFS must be before OS
+    # Ensure PFS <= OS
     pfs_time <- ifelse(pfs_status_initial == 1 & pfs_time_initial > os_time,
-                       os_time * runif(n, 0.5, 0.95),  # Set PFS to 50-95% of OS time
+                       os_time * runif(n, 0.5, 0.95),
                        pfs_time_initial)
-    
-    ## Also ensure no PFS time exceeds OS time even for censored observations
     pfs_time <- pmin(pfs_time, os_time)
-    
-    ## Update PFS status: if OS event occurred and PFS time equals OS time, patient died without documented progression
     pfs_status <- ifelse(pfs_time == os_time & os_status == 1 & pfs_status_initial == 0,
-                         0,  # Died without progression
+                         0,
                          pfs_status_initial)
-    
-    ## Round final PFS time
     pfs_time <- round(pfs_time, 1)
     
-    ## * Add some missing values realistically
-    missing_idx <- sample(n, size = n * 0.02)  # 2% missing
+    # ============================================================================
+    # MISSING DATA
+    # ============================================================================
+    
+    missing_idx <- sample(n, size = n * 0.02)
     bmi[sample(missing_idx, 12)] <- NA
     smoking[sample(missing_idx, 17)] <- NA
     hypertension[sample(missing_idx, 15)] <- NA
@@ -834,12 +570,13 @@ create_clintrial <- function() {
     grade[sample(missing_idx, 10)] <- NA
     stage[sample(missing_idx, 3)] <- NA
     
-    ## * Create dataset
+    # ============================================================================
+    # ASSEMBLE DATASET
+    # ============================================================================
+    
     trial_data <- data.frame(
-        ## Identifiers
         patient_id = sprintf("PT%04d", 1:n),
         site = site,
-        ## Baseline characteristics
         age = age,
         sex = sex,
         race = race,
@@ -855,10 +592,8 @@ create_clintrial <- function() {
         biomarker_y = biomarker_y,
         grade = grade,
         stage = stage,
-        ## Interventions
         treatment = treatment,
         surgery = surgery,
-        ## Post-treatment outcomes
         icu_admission = icu_admission,
         pain_score = pain_score,
         wound_infection = wound_infection,
@@ -866,10 +601,8 @@ create_clintrial <- function() {
         readmission_30d = readmission_30d,
         los_days = los_days,
         recovery_days = recovery_days,
-        ## Count outcomes
         ae_count = ae_count,
         fu_count = fu_count,
-        ## Survival outcomes
         pfs_months = pfs_time,
         pfs_status = pfs_status,
         os_months = round(os_time, 1),
@@ -880,7 +613,6 @@ create_clintrial <- function() {
     return(trial_data)
 }
 
-## Create the dataset
 clintrial <- create_clintrial()
 
 #' Variable Labels for Clinical Trial Dataset
@@ -924,12 +656,9 @@ clintrial <- create_clintrial()
 #' @keywords datasets
 NULL
 
-## Create variable labels
 clintrial_labels <- c(
-    ## Identifiers
     "patient_id" = "Patient ID",
     "site" = "Study Site",
-    ## Baseline characteristics
     "age" = "Age (years)",
     "sex" = "Sex",
     "race" = "Race",
@@ -945,10 +674,8 @@ clintrial_labels <- c(
     "biomarker_y" = "Biomarker Y (U/L)",
     "grade" = "Tumor Grade",
     "stage" = "Disease Stage",
-    ## Interventions
     "treatment" = "Treatment Group",
     "surgery" = "Surgical Resection",
-    ## Post-treatment outcomes
     "icu_admission" = "ICU Admission Required",
     "pain_score" = "Postoperative Pain Score (0-10)",
     "wound_infection" = "Wound/Site Infection",
@@ -956,10 +683,8 @@ clintrial_labels <- c(
     "readmission_30d" = "30-Day Readmission",
     "los_days" = "Length of Hospital Stay (days)",
     "recovery_days" = "Days to Functional Recovery",
-    ## Count outcomes
     "ae_count" = "Adverse Event Count",
     "fu_count" = "Follow-Up Visit Count",
-    ## Survival outcomes
     "pfs_months" = "Progression-Free Survival Time (months)",
     "pfs_status" = "Progression or Death Event",
     "os_months" = "Overall Survival Time (months)",
@@ -968,6 +693,5 @@ clintrial_labels <- c(
     "Surv(os_months, os_status)" = "Overall Survival (months)"
 )
 
-## Save both objects to "data/" directory
 usethis::use_data(clintrial, overwrite = TRUE)
 usethis::use_data(clintrial_labels, overwrite = TRUE)

@@ -91,7 +91,7 @@ Fitted univariable and multivariable regression results for predictive modeling.
 
 Export of finalized tables to various commonly used formats.
 
-| Function | Format | Dependency |
+| Function | Format | Dependencies |
 |:---------|:-------|:-----------|
 | `autoexport()` | Auto-detect from file extension | Varies |
 | `table2pdf()` | PDF | `xtable`, LaTeX distribution |
@@ -168,7 +168,7 @@ Prior to analysis, load the dataset, apply labels, and define predictors:
 ``` r
 library(summata)
 
-# Load example data
+# Load example data ≥
 data("clintrial")
 data("clintrial_labels")
 
@@ -189,7 +189,7 @@ table1 <- desctable(
     by = "readmission_30d",
     variables = predictors,
     labels = clintrial_labels
-    )
+)
 
 table2pdf(table1, "table1.pdf",
           caption = "\\textbf{Table 1} - Baseline characteristics by 30-day readmission status",
@@ -197,7 +197,7 @@ table2pdf(table1, "table1.pdf",
           condense_table = TRUE,
           dark_header = TRUE,
           zebra_stripes = TRUE
-          )
+)
 ```
 
 <img src="man/figures/README_desctable.png" alt="Descriptive statistics table" width="100%">
@@ -222,7 +222,8 @@ table2pdf(table2, "table2.pdf",
           paper = "auto",
           condense_table = TRUE,
           dark_header = TRUE,
-          zebra_stripes = TRUE)
+          zebra_stripes = TRUE
+)
 ```
 
 <img src="man/figures/README_fullfit.png" alt="Regression table" width="100%">

@@ -10,6 +10,7 @@
 #' @param stats_continuous Character vector of statistics for continuous variables.
 #' @param stats_categorical Character vector of statistics for categorical variables.
 #' @param digits Integer number of decimal places for continuous statistics.
+#' @param conf_level Numeric confidence level for survival confidence intervals.
 #' @param na_include Logical whether to include missing values as a category.
 #' @param na_label Character string label for missing values.
 #' @param test Logical whether to perform statistical tests.
@@ -26,7 +27,7 @@
 #' @keywords internal
 process_variable <- function(data, var, group_var = NULL, 
                              stats_continuous, stats_categorical,
-                             digits, na_include, na_label,
+                             digits, conf_level = 0.95, na_include, na_label,
                              test, test_continuous, test_categorical,
                              total, total_label, labels, na_percent, 
                              p_per_stat = FALSE, ...) {
@@ -46,6 +47,7 @@ process_variable <- function(data, var, group_var = NULL,
             var_label = var_label,
             group_var = group_var,
             digits = digits,
+            conf_level = conf_level,
             na_include = na_include,
             na_label = na_label,
             test = test,
@@ -732,7 +734,7 @@ format_categorical_stat <- function(n, total, stat_type) {
 
 #' Process survival variable
 #' 
-#' Calculates survival statistics including median survival times with 95%
+#' Calculates survival statistics including median survival times with
 #' confidence intervals, with optional grouping and log-rank testing. Parses
 #' Surv() expressions and uses \pkg{survival} package functions.
 #' 
@@ -741,6 +743,7 @@ format_categorical_stat <- function(n, total, stat_type) {
 #' @param var_label Character string label for display.
 #' @param group_var Optional character string naming the grouping variable.
 #' @param digits Integer number of decimal places.
+#' @param conf_level Numeric confidence level for confidence intervals.
 #' @param na_include Logical whether to include missing values.
 #' @param na_label Character string label for missing values.
 #' @param test Logical whether to perform log-rank test.
@@ -750,7 +753,8 @@ format_categorical_stat <- function(n, total, stat_type) {
 #' @return List with 'formatted' and 'raw' data.table components.
 #' @keywords internal
 process_survival <- function(data, var, var_label, group_var, digits,
-                             na_include, na_label, test, total, total_label, ...) {
+                             conf_level = 0.95, na_include, na_label, 
+                             test, total, total_label, ...) {
     
     ## Parse Surv() expression
     surv_match <- regexec("Surv\\(([^,]+),\\s*([^)]+)\\)", var)
@@ -766,6 +770,14 @@ process_survival <- function(data, var, var_label, group_var, digits,
     if (!requireNamespace("survival", quietly = TRUE)) {
         stop("Package 'survival' required for survival analysis")
     }
+    
+    ## Build CI label based on conf_level
+    ci_pct <- round(conf_level * 100)
+    ci_label <- paste0("Median (", ci_pct, "% CI)")
+    
+    ## Build CI column name suffixes for extracting from survfit summary
+    ci_lower_name <- paste0("0.", sprintf("%02d", round((1 - conf_level) / 2 * 100)), "LCL")
+    ci_upper_name <- paste0("0.", sprintf("%02d", round((1 + conf_level) / 2 * 100)), "UCL")
     
     fmt_str <- paste0("%.", digits, "f")
     
@@ -790,7 +802,7 @@ process_survival <- function(data, var, var_label, group_var, digits,
         
         formatted_row <- list(
             variable = var_label,
-            level = "Median (95% CI)"
+            level = ci_label
         )
         
         raw_row <- list(
@@ -802,17 +814,17 @@ process_survival <- function(data, var, var_label, group_var, digits,
         ## Add total column
         if (!isFALSE(total)) {
             surv_obj <- survival::Surv(data[[time_var]], data[[status_var]])
-            fit <- survival::survfit(surv_obj ~ 1)
+            fit <- survival::survfit(surv_obj ~ 1, conf.int = conf_level)
             table <- summary(fit)$table
             
             formatted_row[[total_label]] <- sprintf(
                 paste0(fmt_str, " (", fmt_str, "-", fmt_str, ")"),
-                table["median"], table["0.95LCL"], table["0.95UCL"]
+                table["median"], table[ci_lower_name], table[ci_upper_name]
             )
             
             raw_row[[total_label]] <- table["median"]
-            raw_row[[paste0(total_label, "_ci_lower")]] <- table["0.95LCL"]
-            raw_row[[paste0(total_label, "_ci_upper")]] <- table["0.95UCL"]
+            raw_row[[paste0(total_label, "_ci_lower")]] <- table[ci_lower_name]
+            raw_row[[paste0(total_label, "_ci_upper")]] <- table[ci_upper_name]
         }
         
         ## Add group columns
@@ -823,17 +835,17 @@ process_survival <- function(data, var, var_label, group_var, digits,
             grp_status <- data[[status_var]][grp_idx]
             
             surv_obj <- survival::Surv(grp_time, grp_status)
-            fit <- survival::survfit(surv_obj ~ 1)
+            fit <- survival::survfit(surv_obj ~ 1, conf.int = conf_level)
             table <- summary(fit)$table
             
             formatted_row[[grp_col]] <- sprintf(
                 paste0(fmt_str, " (", fmt_str, "-", fmt_str, ")"),
-                table["median"], table["0.95LCL"], table["0.95UCL"]
+                table["median"], table[ci_lower_name], table[ci_upper_name]
             )
             
             raw_row[[grp_col]] <- table["median"]
-            raw_row[[paste0(grp_col, "_ci_lower")]] <- table["0.95LCL"]
-            raw_row[[paste0(grp_col, "_ci_upper")]] <- table["0.95UCL"]
+            raw_row[[paste0(grp_col, "_ci_lower")]] <- table[ci_lower_name]
+            raw_row[[paste0(grp_col, "_ci_upper")]] <- table[ci_upper_name]
         }
         
         if (test && !is.null(p_value)) {
@@ -847,7 +859,7 @@ process_survival <- function(data, var, var_label, group_var, digits,
     } else {
         formatted_row <- list(
             variable = var_label,
-            level = "Median (95% CI)"
+            level = ci_label
         )
         
         raw_row <- list(
@@ -858,17 +870,17 @@ process_survival <- function(data, var, var_label, group_var, digits,
         
         if (!isFALSE(total)) {
             surv_obj <- survival::Surv(data[[time_var]], data[[status_var]])
-            fit <- survival::survfit(surv_obj ~ 1)
+            fit <- survival::survfit(surv_obj ~ 1, conf.int = conf_level)
             table <- summary(fit)$table
             
             formatted_row[[total_label]] <- sprintf(
                 paste0(fmt_str, " (", fmt_str, "-", fmt_str, ")"),
-                table["median"], table["0.95LCL"], table["0.95UCL"]
+                table["median"], table[ci_lower_name], table[ci_upper_name]
             )
             
             raw_row[[total_label]] <- table["median"]
-            raw_row[[paste0(total_label, "_ci_lower")]] <- table["0.95LCL"]
-            raw_row[[paste0(total_label, "_ci_upper")]] <- table["0.95UCL"]
+            raw_row[[paste0(total_label, "_ci_lower")]] <- table[ci_lower_name]
+            raw_row[[paste0(total_label, "_ci_upper")]] <- table[ci_upper_name]
         }
         
         formatted_result <- data.table::as.data.table(formatted_row)

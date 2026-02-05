@@ -3,7 +3,7 @@
 #' Generates a publication-ready forest plot that combines a formatted data table 
 #' with a graphical representation of regression coefficients from a linear model. 
 #' The plot integrates variable names, group levels, sample sizes, coefficients 
-#' with confidence intervals, p-values, and model diagnostics (R², F-statistic, 
+#' with confidence intervals, \emph{p}-values, and model diagnostics (R², F-statistic, 
 #' AIC) in a single comprehensive visualization designed for manuscripts and 
 #' presentations.
 #'
@@ -24,19 +24,19 @@
 #'   
 #' @param effect_label Character string for the effect measure label on the 
 #'   forest plot axis. Default is \code{"Coefficient"}. Could be customized to 
-#'   reflect units (e.g., "Change in BMI (kg/m²)").
+#'   reflect units (\emph{e.g.,} "Change in BMI (kg/m²)").
 #'   
 #' @param digits Integer specifying the number of decimal places for coefficients 
 #'   and confidence intervals. Default is 2.
 #'
-#' @param p_digits Integer specifying the number of decimal places for p-values.
-#'   P-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001" 
-#'   (for \code{p_digits = 3}), "< 0.0001" (for \code{p_digits = 4}), etc. 
+#' @param p_digits Integer specifying the number of decimal places for \emph{p}-values.
+#'   \emph{p}-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001" 
+#'   (for \code{p_digits = 3}), "< 0.0001" (for \code{p_digits = 4}), \emph{etc.} 
 #'   Default is 3.
 #'
 #' @param conf_level Numeric confidence level for confidence intervals. Must be
 #'   between 0 and 1. Default is 0.95 (95\% confidence intervals). The CI
-#'   percentage is automatically displayed in column headers (e.g., "90\% CI"
+#'   percentage is automatically displayed in column headers (\emph{e.g.,} "90\% CI"
 #'   when \code{conf_level = 0.90}).
 #'   
 #' @param font_size Numeric multiplier controlling the base font size for all 
@@ -135,7 +135,7 @@
 #'       \item Variable: Predictor names
 #'       \item Group: Factor levels (if applicable)
 #'       \item n: Sample sizes by group
-#'       \item Coefficient (95\% CI); \emph{p}-value: Raw coefficients with CIs and p-values
+#'       \item Coefficient (95\% CI); \emph{p}-value: Raw coefficients with CIs and \emph{p}-values
 #'     }
 #'   \item \strong{Forest Plot} (right):
 #'     \itemize{
@@ -148,7 +148,7 @@
 #'     \itemize{
 #'       \item Observations analyzed (with percentage of total data)
 #'       \item R² and adjusted R²
-#'       \item F-statistic with degrees of freedom and p-value
+#'       \item F-statistic with degrees of freedom and \emph{p}-value
 #'       \item AIC
 #'     }
 #' }
@@ -189,7 +189,7 @@
 #'   \item \strong{F-statistic}: Tests null hypothesis that all coefficients = 0
 #'     \itemize{
 #'       \item Degrees of freedom: df1 = # predictors, df2 = # observations - # predictors - 1
-#'       \item Significant p-value indicates model explains variance better than intercept-only
+#'       \item Significant \emph{p}-value indicates model explains variance better than intercept-only
 #'     }
 #'   \item \strong{AIC}: For model comparison (lower is better)
 #' }
@@ -254,6 +254,7 @@
 #' print(plot1)
 #' 
 #' \donttest{
+#'   options(width = 180)
 #' # Example 2: With custom labels and title
 #' plot2 <- lmforest(
 #'     x = model1,
@@ -435,6 +436,7 @@
 #' #        width = dims$width, height = dims$height, dpi = 300)
 #' }
 #'
+#' @family visualization functions
 #' @export
 lmforest <- function(x, data = NULL,
                      title = "Linear Model",
@@ -630,14 +632,14 @@ Received class: ", paste(class(x), collapse = ", "))
         })
         
         ## Extract t values and p values
-        ## Note: lme4 may or may not provide p-values depending on the package
+        ## Note: lme4 may or may not provide \emph{p}-values depending on the package
         if ("Pr(>|t|)" %in% colnames(coef_summary)) {
             t_values <- coef_summary[, "t value"]
             p_values <- coef_summary[, "Pr(>|t|)"]
         } else {
-            ## Calculate p-values using normal approximation if not provided
+            ## Calculate \emph{p}-values using normal approximation if not provided
             t_values <- coef_summary[, "t value"]
-            ## Approximate df for p-value calculation
+            ## Approximate df for \emph{p}-value calculation
             df_resid <- summary(model)$devcomp$dims["n"] - 
                                      summary(model)$devcomp$dims["p"]
             p_values <- 2 * stats::pt(abs(t_values), df = df_resid, lower.tail = FALSE)
@@ -716,7 +718,7 @@ Received class: ", paste(class(x), collapse = ", "))
             AIC = stats::AIC(model)
         )
         
-        ## Calculate F-test p-value
+        ## Calculate F-test \emph{p}-value
         gmodel$f_pvalue <- pf(gmodel$f_statistic, gmodel$f_df1, gmodel$f_df2, 
                               lower.tail = FALSE)
     }
@@ -948,44 +950,62 @@ Received class: ", paste(class(x), collapse = ", "))
                 is_binary <- nrow(var_rows) == 2
                 
                 if (condense_table && is_binary) {
-                    ## Use safer reference detection based on NA estimates
-                    non_ref_idx <- find_non_reference_row(var_rows, "estimate")
+                    ## Detect reference row by checking if level is first in xlevels
+                    ## (first level is always reference in R factor contrasts)
+                    ref_level <- NULL
+                    if (!is.null(xlevels) && v %in% names(xlevels)) {
+                        ref_level <- xlevels[[v]][1]
+                    }
                     
-                    if (!is.null(non_ref_idx)) {
-                        non_ref_row <- var_rows[non_ref_idx]
-                        ref_idx <- setdiff(1:2, non_ref_idx)
-                        ref_row <- var_rows[ref_idx]
-                        
-                        condensed_row <- data.table::copy(non_ref_row)
-                        non_ref_category <- condensed_row$level
-                        ref_category <- ref_row$level
-                        
-                        ## Look up label for smarter condensing detection
-                        var_label <- if (!is.null(labels) && v %in% names(labels)) {
-                                         labels[[v]]
-                                     } else if (v %in% names(model_data) && 
-                                                !is.null(attr(model_data[[v]], "label"))) {
-                                         attr(model_data[[v]], "label")
-                                     } else {
-                                         v
-                                     }
-                        
-                        ## Use greedy approach: condense if EITHER category is recognized
-                        if (should_condense_binary(ref_category, non_ref_category, var_label)) {
-                            condensed_row[, var := v]
-                        } else {
-                            condensed_row[, var := paste0(v, " (", non_ref_category, ")")]
-                        }
-                        condensed_row[, level := "-"]
-                        processed_rows[[row_counter]] <- condensed_row
-                        row_counter <- row_counter + 1
-                    } else {
-                        ## Cannot determine reference - fall back to standard layout
-                        for (i in seq_len(nrow(var_rows))) {
-                            processed_rows[[row_counter]] <- var_rows[i]
-                            row_counter <- row_counter + 1
+                    ## Find non-reference row
+                    non_ref_idx <- NULL
+                    if (!is.null(ref_level)) {
+                        ref_idx <- which(var_rows$level == ref_level)
+                        if (length(ref_idx) == 1) {
+                            non_ref_idx <- setdiff(1:2, ref_idx)
                         }
                     }
+                    
+                    ## Fallback to estimate-based detection if available
+                    if (is.null(non_ref_idx) && "estimate" %in% names(var_rows)) {
+                        non_ref_idx <- find_non_reference_row(var_rows, "estimate")
+                    }
+                    
+                    ## Final fallback: assume row 2 is non-reference
+                    if (is.null(non_ref_idx) || length(non_ref_idx) != 1) {
+                        non_ref_idx <- 2L
+                        ref_idx <- 1L
+                    } else {
+                        ref_idx <- setdiff(1:2, non_ref_idx)
+                    }
+                    
+                    non_ref_row <- var_rows[non_ref_idx]
+                    ref_row <- var_rows[ref_idx]
+                    
+                    condensed_row <- data.table::copy(non_ref_row)
+                    non_ref_category <- condensed_row$level
+                    ref_category <- ref_row$level
+                    
+                    ## Look up label for smarter condensing detection
+                    var_label <- if (!is.null(labels) && v %in% names(labels)) {
+                                     labels[[v]]
+                                 } else if (v %in% names(model_data) && 
+                                            !is.null(attr(model_data[[v]], "label"))) {
+                                     attr(model_data[[v]], "label")
+                                 } else {
+                                     v
+                                 }
+                    
+                    ## Use greedy approach: condense if EITHER category is recognized
+                    if (should_condense_binary(ref_category, non_ref_category, var_label)) {
+                        condensed_row[, var := v]
+                    } else {
+                        condensed_row[, var := paste0(v, " (", non_ref_category, ")")]
+                    }
+                    condensed_row[, level := "-"]
+                    processed_rows[[row_counter]] <- condensed_row
+                    row_counter <- row_counter + 1
+                    
                 } else if (indent_groups) {
                     ## Add header for any multi-level variable when indenting
                     header_row <- data.table::data.table(
@@ -1117,7 +1137,7 @@ Received class: ", paste(class(x), collapse = ", "))
     ## Format CI percentage for display in headers
     ci_pct <- round(conf_level * 100)
 
-    ## Format p-values using p_digits parameter
+    ## Format \emph{p}-values using p_digits parameter
     p_threshold <- 10^(-p_digits)
     p_threshold_str <- paste0("< ", format(p_threshold, scientific = FALSE))
     

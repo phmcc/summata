@@ -410,6 +410,7 @@
 #'            font_size = 10)  # Note: font_size not in this function,
 #'                             # adjust in CSS if needed
 #' }
+#' @family export functions
 #' @export
 table2html <- function(table,
                        file,
@@ -446,11 +447,7 @@ table2html <- function(table,
         df <- df[-1, ]
     }
 
-    ## Apply transformations first
-    if (variable_padding && !condense_table && !condense_quantitative && ("Variable" %in% names(df) || "variable" %in% names(df))) {
-        df <- add_variable_padding(df)
-    }
-
+    ## Apply condense/indent transformations first
     if (condense_table) {
         indent_groups <- TRUE
         df <- condense_table_rows(df, indent_groups = indent_groups)
@@ -463,6 +460,11 @@ table2html <- function(table,
         df <- format_indented_groups(df, indent_string = "&nbsp;&nbsp;&nbsp;&nbsp;")
     } else if (indent_groups) {
         df <- format_indented_groups(df, indent_string = "&nbsp;&nbsp;&nbsp;&nbsp;")
+    }
+
+    ## Apply variable padding AFTER all other transformations
+    if (variable_padding && ("Variable" %in% names(df) || "variable" %in% names(df))) {
+        df <- add_variable_padding(df)
     }
 
     ## Bold variable names (non-indented rows in Variable column)
@@ -484,14 +486,21 @@ table2html <- function(table,
     ## Calculate var_groups on the FINAL data frame structure
     var_groups <- NULL
     if (zebra_stripes && "Variable" %in% names(df)) {
+        ## Identify padding rows (all cells empty) - these should not be striped
+        is_padding_row <- apply(df, 1, function(row) {
+            all(is.na(row) | row == "" | row == " ")
+        })
+        
         ## For indented tables, non-indented rows mark variable starts
         if (indent_groups || condense_table || condense_quantitative) {
             var_starts <- which(!grepl("^&nbsp;", df$Variable) & 
+                                !grepl("^<b>&nbsp;", df$Variable) &
                                 df$Variable != "" & 
-                                !is.na(df$Variable))
+                                !is.na(df$Variable) &
+                                !is_padding_row)
         } else {
             ## For regular tables, any non-empty Variable marks a start
-            var_starts <- which(df$Variable != "" & !is.na(df$Variable))
+            var_starts <- which(df$Variable != "" & !is.na(df$Variable) & !is_padding_row)
         }
         
         if (length(var_starts) > 0) {
@@ -505,6 +514,9 @@ table2html <- function(table,
                            }
                 var_groups[start_idx:end_idx] <- i
             }
+            
+            ## Mark padding rows with 0 so they don't get striped
+            var_groups[is_padding_row] <- 0L
             
             ## Apply zebra stripes by tracking groups
             df$.zebra_group <- var_groups

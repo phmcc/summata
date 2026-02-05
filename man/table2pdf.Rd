@@ -431,4 +431,16 @@ if (nzchar(Sys.which("pdflatex"))) {
 \code{\link{table2pptx}} for PowerPoint,
 \code{\link{desctable}} for descriptive tables,
 \code{\link{fit}} for regression tables
+
+Other export functions: 
+\code{\link{autoexport}()},
+\code{\link{print.table2docx_result}()},
+\code{\link{print.table2pptx_result}()},
+\code{\link{print.table2rtf_result}()},
+\code{\link{table2docx}()},
+\code{\link{table2html}()},
+\code{\link{table2pptx}()},
+\code{\link{table2rtf}()},
+\code{\link{table2tex}()}
 }
+\concept{export functions}

@@ -321,6 +321,7 @@
 #'
 #' }
 #'
+#' @family descriptive functions
 #' @export
 survtable <- function(data,
                       outcome,
@@ -732,6 +733,7 @@ process_single_outcome <- function(data,
 
 
 #' Print method for survtable
+#' @family descriptive functions
 #' @export
 #' @keywords internal
 print.survtable <- function(x, ...) {

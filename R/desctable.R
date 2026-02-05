@@ -43,12 +43,16 @@
 #'   }
 #'   
 #' @param digits Integer specifying the number of decimal places for continuous 
-#'   statistics. Values >= 1000 are automatically formatted with commas 
+#'   statistics. Values ≥ 1,000 are automatically formatted with commas 
 #'   regardless of decimal setting. Default is 1.
 #'   
 #' @param p_digits Integer specifying the number of decimal places for p-values. 
 #'   P-values smaller than \code{10^(-p_digits)} are displayed as 
 #'   "< 0.001", "< 0.01", etc. Default is 3.
+#'
+#' @param conf_level Numeric confidence level for confidence intervals used in
+#'   survival variable summaries (median survival time with CI). Must be between
+#'   0 and 1. Default is 0.95 (95\% confidence intervals).
 #'
 #' @param p_per_stat Logical. If \code{TRUE}, displays p-values on each row 
 #'   (per statistic) rather than only on the first row of each variable. 
@@ -134,7 +138,7 @@
 #'   
 #'   The first row always shows sample sizes for each column.
 #'   
-#'   Numeric values >= 1000 are formatted with commas for readability 
+#'   Numeric values ≥ 1,000 are formatted with commas for readability 
 #'   (e.g., "1,245" instead of "1245").
 #'   
 #'   The returned object includes the following attributes accessible via 
@@ -160,7 +164,8 @@
 #'   \item \strong{Categorical}: Character, factor, or logical variables receive 
 #'     frequency counts and percentages
 #'   \item \strong{Time-to-Event}: Variables specified as \code{Surv(time, event)} 
-#'     display median survival with 95\% confidence intervals
+#'     display median survival with confidence intervals (level controlled by
+#'     \code{conf_level})
 #' }
 #' 
 #' \strong{Statistical Testing:}
@@ -195,8 +200,8 @@
 #'   \item Median (Range): "38.0 (18.0-75.0)"
 #'   \item Range: "18.0-75.0" or "18.0 to 75.0" (for negative numbers)
 #'   \item Survival: "24.5 (21.2-28.9)" months [median (95\% CI)]
-#'   \item Counts >= 1000: Formatted with commas (e.g., "1,234")
-#'   \item P-values: Formatted to specified decimal places; very small values 
+#'   \item Counts ≥ 1000: Formatted with commas (e.g., "1,234")
+#'   \item \emph{p}-values: Formatted to specified decimal places; very small values 
 #'     shown as "< 0.001"
 #' }
 #'
@@ -380,6 +385,7 @@
 #' )
 #' print(table1)
 #' }
+#' @family descriptive functions
 #' @export
 desctable <- function(data,
                       by = NULL,
@@ -388,6 +394,7 @@ desctable <- function(data,
                     stats_categorical = "n_percent",
                     digits = 1,
                     p_digits = 3,
+                    conf_level = 0.95,
                     p_per_stat = FALSE,
                     na_include = FALSE,
                     na_label = "Unknown",
@@ -433,6 +440,7 @@ desctable <- function(data,
             stats_categorical = stats_categorical,
             digits = digits,
             p_digits = p_digits,
+            conf_level = conf_level,
             p_per_stat = p_per_stat,
             na_include = na_include,
             na_label = na_label,

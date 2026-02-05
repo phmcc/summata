@@ -60,10 +60,20 @@ format_model_table <- function(data,
     ## Make a shallow copy to avoid modifying original
     result <- data.table::copy(result)
 
-    ## Disallow "Events" column if linear model 
+    ## Disallow "Events" column for models where events don't make sense
+    ## This includes linear models and GLMs with continuous distributions
     if ("model_type" %in% names(result)) {
         model_type <- result$model_type[1]
-        if (grepl("Linear", model_type, ignore.case = TRUE)) {
+        ## Linear, Gamma, Gaussian, and Inverse Gaussian models don't have meaningful events
+        continuous_patterns <- c("Linear", "Gamma", "Gaussian", "Inverse")
+        if (any(vapply(continuous_patterns, function(p) grepl(p, model_type, ignore.case = TRUE), logical(1)))) {
+            show_events <- FALSE
+        }
+    }
+    
+    ## Also check if all events are NA - if so, don't show the column
+    if (show_events && "events" %in% names(result)) {
+        if (all(is.na(result$events))) {
             show_events <- FALSE
         }
     }

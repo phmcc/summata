@@ -56,14 +56,14 @@ forest plot axis. Default is \code{"Hazard Ratio"}. Alternatives might include
 \item{digits}{Integer specifying the number of decimal places for hazard ratios 
 and confidence intervals. Default is 2.}
 
-\item{p_digits}{Integer specifying the number of decimal places for p-values.
-P-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001" 
-(for \code{p_digits = 3}), "< 0.0001" (for \code{p_digits = 4}), etc. 
+\item{p_digits}{Integer specifying the number of decimal places for \emph{p}-values.
+\emph{p}-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001" 
+(for \code{p_digits = 3}), "< 0.0001" (for \code{p_digits = 4}), \emph{etc.} 
 Default is 3.}
 
 \item{conf_level}{Numeric confidence level for confidence intervals. Must be
 between 0 and 1. Default is 0.95 (95\% confidence intervals). The CI
-percentage is automatically displayed in column headers (e.g., "90\% CI"
+percentage is automatically displayed in column headers (\emph{e.g.,} "90\% CI"
 when \code{conf_level = 0.90}).}
 
 \item{font_size}{Numeric multiplier controlling the base font size for all 
@@ -102,7 +102,7 @@ their parent variable, creating hierarchical structure. The "Group" column
 is hidden when \code{TRUE}. Default is \code{FALSE}.}
 
 \item{condense_table}{Logical. If \code{TRUE}, condenses binary variables to 
-show only the non-reference level (e.g., "Yes" for Yes/No variables), with 
+show only the non-reference level (\emph{e.g.,} "Yes" for Yes/No variables), with 
 the variable name indicating the displayed level. This creates a more compact 
 table for models with many binary predictors. Default is \code{FALSE}.}
 
@@ -129,7 +129,7 @@ estimates in the forest plot. Default is \code{"#8A61D8"} (purple). Use
 hex codes or R color names.}
 
 \item{qc_footer}{Logical. If \code{TRUE}, displays model quality control
-statistics in the footer (events analyzed, global log-rank p-value,
+statistics in the footer (events analyzed, global log-rank \emph{p}-value,
 concordance index, AIC). Default is \code{TRUE}.}
 
 \item{units}{Character string specifying units for plot dimensions: 
@@ -152,7 +152,7 @@ A \code{ggplot} object containing the complete forest plot. The plot
 Generates a publication-ready forest plot that combines a formatted data table 
 with a graphical representation of hazard ratios from a Cox proportional hazards 
 survival model. The plot integrates variable names, group levels, sample sizes, 
-event counts, hazard ratios with confidence intervals, p-values, and model 
+event counts, hazard ratios with confidence intervals, \emph{p}-values, and model 
 diagnostics in a single comprehensive visualization designed for manuscripts 
 and presentations.
 }
@@ -167,7 +167,7 @@ The Cox forest plot includes several survival analysis-specific components:
     interpreted as the multiplicative change in hazard
   \item \strong{Log scale}: Forest plot uses log scale for HR (reference line at 1)
   \item \strong{Model diagnostics}: Includes concordance (C-index), global 
-    log-rank test p-value, and AIC
+    log-rank test \emph{p}-value, and AIC
 }
 
 \strong{Plot Components:}
@@ -179,7 +179,7 @@ The Cox forest plot includes several survival analysis-specific components:
       \item Variable and Group columns
       \item n: Sample sizes by group
       \item Events: Event counts by group (critical for survival)
-      \item aHR (95\% CI); \emph{p}-value: Adjusted hazard ratios with CIs and p-values
+      \item aHR (95\% CI); \emph{p}-value: Adjusted hazard ratios with CIs and \emph{p}-values
     }
   \item \strong{Forest Plot} (right):
     \itemize{
@@ -191,7 +191,7 @@ The Cox forest plot includes several survival analysis-specific components:
   \item \strong{Model Statistics} (footer):
     \itemize{
       \item Events analyzed (with percentage of total)
-      \item Global log-rank test p-value
+      \item Global log-rank test \emph{p}-value
       \item Concordance (C-index) with standard error
       \item AIC
     }
@@ -231,9 +231,9 @@ The concordance statistic displayed in the footer indicates discrimination:
 
 \strong{Global Log-Rank Test:}
 
-The global p-value tests the null hypothesis that all coefficients are zero:
+The global \emph{p}-value tests the null hypothesis that all coefficients are zero:
 \itemize{
-  \item Significant p-value (< 0.05) indicates the model as a whole predicts survival
+  \item Significant \emph{p}-value (< 0.05) indicates the model as a whole predicts survival
   \item Non-significant global test doesn't preclude significant individual 
     predictors
   \item Based on the score (log-rank) test
@@ -274,6 +274,7 @@ plot1 <- coxforest(model1, data = clintrial)
 print(plot1)
 
 \donttest{
+  options(width = 180)
 # Example 2: With custom labels and title
 plot2 <- coxforest(
     x = model1,
@@ -458,4 +459,12 @@ dims <- attr(final_plot, "recommended_dims")
 \code{\link[survival]{coxph}} for fitting Cox models,
 \code{\link[survival]{cox.zph}} for testing proportional hazards assumption,
 \code{\link{fit}} for fullfit regression modeling
+
+Other visualization functions: 
+\code{\link{autoforest}()},
+\code{\link{glmforest}()},
+\code{\link{lmforest}()},
+\code{\link{multiforest}()},
+\code{\link{uniforest}()}
 }
+\concept{visualization functions}

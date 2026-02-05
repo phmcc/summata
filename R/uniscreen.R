@@ -47,7 +47,11 @@
 #'   mixed-effects models (\code{glmer}, \code{lmer}, \code{coxme}). Use standard
 #'   lme4/coxme syntax, e.g., \code{"(1|site)"} for random intercepts by site,
 #'   \code{"(1|site/patient)"} for nested random effects. Required when 
-#'   \code{model_type} is a mixed-effects model type. Default is \code{NULL}.
+#'   \code{model_type} is a mixed-effects model type unless random effects are
+#'   included in the \code{predictors} vector. Alternatively, random effects 
+#'   can be included directly in the \code{predictors} vector using the same 
+#'   syntax (e.g., \code{predictors = c("age", "sex", "(1|site)")}), though 
+#'   they will not be iterated over as predictors. Default is \code{NULL}.
 #'   
 #' @param family For GLM and GLMER models, specifies the error distribution and link 
 #'   function. Can be a character string, a family function, or a family object.
@@ -549,8 +553,47 @@
 #'         parallel = FALSE
 #'     )
 #' }
+#' 
+#' # Example 22: Quasipoisson for overdispersed count data
+#' # Alternative to negative binomial when MASS not available
+#' quasi_screen <- uniscreen(
+#'     data = clintrial,
+#'     outcome = "ae_count",
+#'     predictors = c("age", "treatment", "diabetes", "surgery", "stage"),
+#'     model_type = "glm",
+#'     family = "quasipoisson",
+#'     labels = clintrial_labels,
+#'     parallel = FALSE
+#' )
+#' print(quasi_screen)
+#' # Adjusts standard errors for overdispersion
+#' 
+#' # Example 23: Quasibinomial for overdispersed binary data
+#' quasibin_screen <- uniscreen(
+#'     data = clintrial,
+#'     outcome = "any_complication",
+#'     predictors = c("age", "bmi", "diabetes", "surgery", "ecog"),
+#'     model_type = "glm",
+#'     family = "quasibinomial",
+#'     labels = clintrial_labels,
+#'     parallel = FALSE
+#' )
+#' print(quasibin_screen)
+#' 
+#' # Example 24: Inverse Gaussian for highly skewed positive data
+#' invgauss_screen <- uniscreen(
+#'     data = clintrial,
+#'     outcome = "recovery_days",
+#'     predictors = c("age", "surgery", "pain_score", "los_days"),
+#'     model_type = "glm",
+#'     family = inverse.gaussian(link = "log"),
+#'     labels = clintrial_labels,
+#'     parallel = FALSE
+#' )
+#' print(invgauss_screen)
 #' }
 #'
+#' @family regression functions
 #' @export
 uniscreen <- function(data,
                       outcome,
@@ -597,13 +640,48 @@ uniscreen <- function(data,
     }
     
     ## Validate random effects for mixed-effects models
+    ## Support both explicit 'random' parameter AND random effects embedded in predictors
     mixed_types <- c("glmer", "lmer", "coxme")
-    if (model_type %in% mixed_types && is.null(random)) {
+    has_random_in_predictors <- any(grepl("\\|", predictors))
+    
+    if (model_type %in% mixed_types && is.null(random) && !has_random_in_predictors) {
         stop("'random' parameter is required for mixed-effects models (", model_type, ").\n",
-             "Example: random = \"(1|site)\" for random intercepts by site.")
+             "Example: random = \"(1|site)\" for random intercepts by site.\n",
+             "Alternatively, include random effects in 'predictors' using the same syntax.")
     }
     if (!is.null(random) && !model_type %in% mixed_types) {
         warning("'random' parameter is ignored for non-mixed-effects models (", model_type, ").")
+        random <- NULL
+    }
+    
+    ## Extract random effects from predictors if present (for mixed-effects models)
+    ## These will be used in formula building but not iterated over as predictors
+    random_in_preds <- NULL
+    fixed_predictors <- predictors
+    if (model_type %in% mixed_types && has_random_in_predictors) {
+        random_mask <- grepl("\\|", predictors)
+        random_in_preds <- predictors[random_mask]
+        fixed_predictors <- predictors[!random_mask]
+        
+        ## Combine explicit random with embedded random (if both provided)
+        if (!is.null(random)) {
+            ## User provided both - combine them
+            message("Note: Random effects specified in both 'random' parameter and 'predictors'. ",
+                    "Combining: ", random, " + ", paste(random_in_preds, collapse = " + "))
+            all_random <- paste(c(random, random_in_preds), collapse = " + ")
+            random <- all_random
+        } else {
+            ## Only embedded random effects
+            random <- paste(random_in_preds, collapse = " + ")
+        }
+        
+        ## Update predictors to only include fixed effects for iteration
+        predictors <- fixed_predictors
+        
+        if (length(predictors) == 0) {
+            stop("No fixed-effect predictors specified. Random effects should be specified ",
+                 "via the 'random' parameter or alongside fixed-effect predictors.")
+        }
     }
     
     ## Define model fitting function (used by lapply/mclapply)
@@ -802,6 +880,7 @@ uniscreen <- function(data,
 
 #' Print method for uniscreen results
 #' @keywords internal
+#' @family regression functions
 #' @export
 print.uniscreen_result <- function(x, ...) {
     cat("\nUnivariable Screening Results\n")

@@ -11,6 +11,7 @@ fit(
   model = NULL,
   model_type = "glm",
   family = "binomial",
+  random = NULL,
   interactions = NULL,
   strata = NULL,
   cluster = NULL,
@@ -125,6 +126,15 @@ For negative binomial regression (overdispersed counts), use
 \code{model_type = "negbin"} instead of the \code{family} parameter.
 
 See \code{\link[stats]{family}} for additional details and options.}
+
+\item{random}{Character string specifying the random effects formula for 
+mixed-effects models (\code{glmer}, \code{lmer}, \code{coxme}). Use standard
+lme4/coxme syntax, e.g., \code{"(1|site)"} for random intercepts by site,
+\code{"(1|site/patient)"} for nested random effects, or 
+\code{"(1|site) + (1|doctor)"} for crossed random effects. Required when 
+\code{model_type} is a mixed-effects model type. Alternatively, random 
+effects can be included directly in the \code{predictors} vector using the
+same syntax. Default is \code{NULL}.}
 
 \item{interactions}{Character vector of interaction terms using colon 
 notation (e.g., \code{c("age:sex", "treatment:stage")}). Interaction terms 
@@ -531,32 +541,134 @@ cat("BIC:", raw$BIC[1], "\n")
 cat("C-statistic:", raw$c_statistic[1], "\n")
 }
 
-# Example 18: Linear mixed effects model with site random effects
-# (Requires \pkg{lme4} package)
-\dontrun{
-library(lme4)
-lmer_model <- fit(
+\donttest{
+  options(width = 180)
+# Example 18: Interaction effects - treatment effect modified by stage
+interaction_model <- fit(
+    data = clintrial,
+    outcome = "Surv(os_months, os_status)",
+    predictors = c("age", "treatment", "stage"),
+    interactions = c("treatment:stage"),
+    model_type = "coxph",
+    labels = clintrial_labels
+)
+print(interaction_model)
+# Shows main effects plus all treatment×stage interaction terms
+
+# Example 19: Multiple interactions in logistic regression
+multi_interaction <- fit(
+    data = clintrial,
+    outcome = "readmission_30d",
+    predictors = c("age", "sex", "surgery", "diabetes"),
+    interactions = c("surgery:diabetes", "age:sex"),
+    labels = clintrial_labels
+)
+print(multi_interaction)
+
+# Example 20: Quasipoisson for overdispersed count data
+# Alternative to negative binomial when MASS not available
+quasi_model <- fit(
+    data = clintrial,
+    outcome = "ae_count",
+    predictors = c("age", "treatment", "diabetes", "surgery"),
+    model_type = "glm",
+    family = "quasipoisson",
+    labels = clintrial_labels
+)
+print(quasi_model)
+# Adjusts standard errors for overdispersion
+
+# Example 21: Quasibinomial for overdispersed binary data
+quasi_logistic <- fit(
+    data = clintrial,
+    outcome = "any_complication",
+    predictors = c("age", "bmi", "diabetes", "surgery"),
+    model_type = "glm",
+    family = "quasibinomial",
+    labels = clintrial_labels
+)
+print(quasi_logistic)
+
+# Example 22: Gamma regression with identity link for additive effects
+gamma_identity <- fit(
     data = clintrial,
     outcome = "los_days",
-    predictors = c("age", "treatment", "stage", "(1|site)"),
-    model_type = "lmer"
+    predictors = c("age", "treatment", "surgery", "any_complication"),
+    model_type = "glm",
+    family = Gamma(link = "identity"),
+    labels = clintrial_labels
 )
-print(lmer_model)
+print(gamma_identity)
+# Shows additive effects (coefficients) instead of multiplicative (ratios)
 
-# With random slopes for treatment effect by site
-lmer_slopes <- fit(
+# Example 23: Inverse Gaussian regression for highly skewed data
+inverse_gaussian <- fit(
     data = clintrial,
-    outcome = "los_days", 
-    predictors = c("age", "treatment", "stage", "(treatment|site)"),
-    model_type = "lmer"
+    outcome = "recovery_days",
+    predictors = c("age", "surgery", "pain_score"),
+    model_type = "glm",
+    family = inverse.gaussian(link = "log"),
+    labels = clintrial_labels
 )
-print(lmer_slopes)
+print(inverse_gaussian)
 
-# Example 19: Format a pre-fitted model (model-based workflow)
+# Example 24: Linear mixed effects with random intercepts
+# Accounts for clustering of patients within sites
+if (requireNamespace("lme4", quietly = TRUE)) {
+    lmer_model <- fit(
+        data = clintrial,
+        outcome = "los_days",
+        predictors = c("age", "treatment", "stage", "(1|site)"),
+        model_type = "lmer",
+        labels = clintrial_labels
+    )
+    print(lmer_model)
+}
+
+# Example 25: Generalized linear mixed effects (logistic with random effects)
+if (requireNamespace("lme4", quietly = TRUE)) {
+    glmer_model <- fit(
+        data = clintrial,
+        outcome = "readmission_30d",
+        predictors = c("age", "surgery", "los_days", "(1|site)"),
+        model_type = "glmer",
+        family = "binomial",
+        labels = clintrial_labels
+    )
+    print(glmer_model)
+}
+
+# Example 26: Cox mixed effects for clustered survival data
+if (requireNamespace("coxme", quietly = TRUE)) {
+    coxme_model <- fit(
+        data = clintrial,
+        outcome = "Surv(os_months, os_status)",
+        predictors = c("age", "treatment", "stage", "(1|site)"),
+        model_type = "coxme",
+        labels = clintrial_labels
+    )
+    print(coxme_model)
+}
+
+# Example 27: Random slopes - treatment effect varies by site
+if (requireNamespace("lme4", quietly = TRUE)) {
+    random_slopes <- fit(
+        data = clintrial,
+        outcome = "los_days",
+        predictors = c("age", "treatment", "stage", "(treatment|site)"),
+        model_type = "lmer",
+        labels = clintrial_labels
+    )
+    print(random_slopes)
+}
+
+# Example 28: Format a pre-fitted model (model-based workflow)
 # Useful for models fitted outside of fit(), like MASS::glm.nb()
 pre_fitted <- glm(os_status ~ age + sex + treatment,
                   family = binomial, data = clintrial)
-result <- fit(model = pre_fitted, labels = clintrial_labels)
+result <- fit(model = pre_fitted, 
+              data = clintrial,
+              labels = clintrial_labels)
 print(result)
 }
 
@@ -566,4 +678,16 @@ print(result)
 \code{\link{fullfit}} for complete univariable-to-multivariable workflow,
 \code{\link{compfit}} for comparing multiple models,
 \code{\link{m2dt}} for model-to-table conversion
+
+Other regression functions: 
+\code{\link{compfit}()},
+\code{\link{fullfit}()},
+\code{\link{multifit}()},
+\code{\link{print.compfit_result}()},
+\code{\link{print.fit_result}()},
+\code{\link{print.fullfit_result}()},
+\code{\link{print.multifit_result}()},
+\code{\link{print.uniscreen_result}()},
+\code{\link{uniscreen}()}
 }
+\concept{regression functions}

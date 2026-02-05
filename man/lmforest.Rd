@@ -50,19 +50,19 @@ Default is \code{"Linear Model"}. Use descriptive titles for publication.}
 
 \item{effect_label}{Character string for the effect measure label on the 
 forest plot axis. Default is \code{"Coefficient"}. Could be customized to 
-reflect units (e.g., "Change in BMI (kg/m²)").}
+reflect units (\emph{e.g.,} "Change in BMI (kg/m²)").}
 
 \item{digits}{Integer specifying the number of decimal places for coefficients 
 and confidence intervals. Default is 2.}
 
-\item{p_digits}{Integer specifying the number of decimal places for p-values.
-P-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001" 
-(for \code{p_digits = 3}), "< 0.0001" (for \code{p_digits = 4}), etc. 
+\item{p_digits}{Integer specifying the number of decimal places for \emph{p}-values.
+\emph{p}-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001" 
+(for \code{p_digits = 3}), "< 0.0001" (for \code{p_digits = 4}), \emph{etc.} 
 Default is 3.}
 
 \item{conf_level}{Numeric confidence level for confidence intervals. Must be
 between 0 and 1. Default is 0.95 (95\% confidence intervals). The CI
-percentage is automatically displayed in column headers (e.g., "90\% CI"
+percentage is automatically displayed in column headers (\emph{e.g.,} "90\% CI"
 when \code{conf_level = 0.90}).}
 
 \item{font_size}{Numeric multiplier controlling the base font size for all 
@@ -144,7 +144,7 @@ A \code{ggplot} object containing the complete forest plot. The plot
 Generates a publication-ready forest plot that combines a formatted data table 
 with a graphical representation of regression coefficients from a linear model. 
 The plot integrates variable names, group levels, sample sizes, coefficients 
-with confidence intervals, p-values, and model diagnostics (R², F-statistic, 
+with confidence intervals, \emph{p}-values, and model diagnostics (R², F-statistic, 
 AIC) in a single comprehensive visualization designed for manuscripts and 
 presentations.
 }
@@ -170,7 +170,7 @@ The linear model forest plot differs from logistic and Cox plots in several ways
       \item Variable: Predictor names
       \item Group: Factor levels (if applicable)
       \item n: Sample sizes by group
-      \item Coefficient (95\% CI); \emph{p}-value: Raw coefficients with CIs and p-values
+      \item Coefficient (95\% CI); \emph{p}-value: Raw coefficients with CIs and \emph{p}-values
     }
   \item \strong{Forest Plot} (right):
     \itemize{
@@ -183,7 +183,7 @@ The linear model forest plot differs from logistic and Cox plots in several ways
     \itemize{
       \item Observations analyzed (with percentage of total data)
       \item R² and adjusted R²
-      \item F-statistic with degrees of freedom and p-value
+      \item F-statistic with degrees of freedom and \emph{p}-value
       \item AIC
     }
 }
@@ -224,7 +224,7 @@ The footer displays key diagnostics:
   \item \strong{F-statistic}: Tests null hypothesis that all coefficients = 0
     \itemize{
       \item Degrees of freedom: df1 = # predictors, df2 = # observations - # predictors - 1
-      \item Significant p-value indicates model explains variance better than intercept-only
+      \item Significant \emph{p}-value indicates model explains variance better than intercept-only
     }
   \item \strong{AIC}: For model comparison (lower is better)
 }
@@ -282,6 +282,7 @@ plot1 <- lmforest(model1, data = clintrial)
 print(plot1)
 
 \donttest{
+  options(width = 180)
 # Example 2: With custom labels and title
 plot2 <- lmforest(
     x = model1,
@@ -470,4 +471,12 @@ dims <- attr(final_plot, "recommended_dims")
 \code{\link[stats]{lm}} for fitting linear models,
 \code{\link{fit}} for fullfit regression modeling,
 \code{\link[stats]{plot.lm}} for diagnostic plots
+
+Other visualization functions: 
+\code{\link{autoforest}()},
+\code{\link{coxforest}()},
+\code{\link{glmforest}()},
+\code{\link{multiforest}()},
+\code{\link{uniforest}()}
 }
+\concept{visualization functions}

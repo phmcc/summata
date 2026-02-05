@@ -643,7 +643,7 @@ format_model_comparison <- function(comparison) {
 }
 
 
-#' Calculate Summata Scores for model comparison
+#' Calculate Composite Mean Scores (CMS) for model comparison
 #' 
 #' Computes composite Score based on weighted combination of model
 #' quality metrics. Weights vary by model type to reflect academic consensus
@@ -653,7 +653,7 @@ format_model_comparison <- function(comparison) {
 #' @param model_type Character string indicating model type.
 #' @param scoring_weights Optional named list of custom weights. If NULL,
 #'   uses default weights for the model type.
-#' @return Data.table with Summata Score column added, sorted by score.
+#' @return Data.table with CMS column added, sorted by score.
 #' @keywords internal
 calculate_model_scores <- function(comparison, model_type, scoring_weights = NULL) {
     
@@ -876,10 +876,10 @@ calculate_model_scores <- function(comparison, model_type, scoring_weights = NUL
     }
     
     ## Add final score to comparison table using := for efficiency
-    comparison[, `Summata Score` := round(scores$total, 1)]
+    comparison[, CMS := round(scores$total, 1)]
     
     ## Sort by score (highest first)
-    data.table::setorder(comparison, -`Summata Score`)
+    data.table::setorder(comparison, -CMS)
     
     ## Store detailed scores as attribute
     data.table::setattr(comparison, "detailed_scores", scores)
@@ -1342,25 +1342,25 @@ order_comparison_columns <- function(comparison, model_type) {
     col_order <- switch(model_type,
                         "glm" = c("Model", "N", "Events", "Predictors", "Converged",
                                   "AIC", "BIC", "Pseudo-R\u00b2", "Concordance", "Brier Score",
-                                  "Global p", "Summata Score"),
+                                  "Global p", "CMS"),
                         "coxph" = c("Model", "N", "Events", "Predictors", "Converged",
                                     "AIC", "BIC", "Pseudo-R\u00b2", "Concordance",
-                                    "Global p", "Summata Score"),
+                                    "Global p", "CMS"),
                         "lm" = c("Model", "N", "Predictors", "Converged",
-                                 "AIC", "BIC", "Pseudo-R\u00b2", "Global p", "Summata Score"),
+                                 "AIC", "BIC", "Pseudo-R\u00b2", "Global p", "CMS"),
                         "lmer" = c("Model", "N", "Groups", "Predictors", "Converged",
                                    "AIC", "BIC", "Marginal R\u00b2", "Conditional R\u00b2", "ICC",
-                                   "RMSE", "Global p", "Summata Score"),
+                                   "RMSE", "Global p", "CMS"),
                         "glmer" = c("Model", "N", "Events", "Groups", "Predictors", "Converged",
                                     "AIC", "BIC", "Concordance", "Marginal R\u00b2", "Conditional R\u00b2",
-                                    "ICC", "Brier Score", "Global p", "Summata Score"),
+                                    "ICC", "Brier Score", "Global p", "CMS"),
                         "coxme" = c("Model", "N", "Events", "Groups", "Predictors", "Converged",
                                     "AIC", "BIC", "Concordance", "Pseudo-R\u00b2", "ICC",
-                                    "Global p", "Summata Score"),
+                                    "Global p", "CMS"),
                         ## Default fallback
                         c("Model", "N", "Events", "Predictors", "Converged",
                           "AIC", "BIC", "Pseudo-R\u00b2", "Concordance",
-                          "Global p", "Summata Score")
+                          "Global p", "CMS")
                         )
     
     existing_cols <- intersect(col_order, names(comparison))

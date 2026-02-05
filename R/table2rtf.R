@@ -308,6 +308,7 @@
 #'
 #' @examples
 #' \dontrun{
+#'   options(width = 180)
 #' # Load data
 #' data(clintrial)
 #' data(clintrial_labels)
@@ -414,6 +415,7 @@
 #'         condense_table = TRUE)
 #' }
 #'
+#' @family export functions
 #' @export
 table2rtf <- function(table,
                       file,
@@ -435,6 +437,13 @@ table2rtf <- function(table,
                     align = NULL,
                     return_ft = FALSE,
                     ...) {
+    
+    ## Warn about unused arguments
+    dots <- list(...)
+    if (length(dots) > 0) {
+        warning("Unknown arguments ignored: ", paste(names(dots), collapse = ", "), 
+                call. = FALSE)
+    }
     
     if (!requireNamespace("flextable", quietly = TRUE)) {
         stop("Package 'flextable' required. Install with: install.packages('flextable')")
@@ -601,6 +610,7 @@ table2rtf <- function(table,
 
 #' Print method for table2rtf results
 #' @keywords internal
+#' @family export functions
 #' @export
 print.table2rtf_result <- function(x, ...) {
     cat("Table exported to:", x$file, "\n")

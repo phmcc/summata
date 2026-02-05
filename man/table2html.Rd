@@ -436,4 +436,16 @@ Generated HTML works in all modern browsers:
 \code{\link{table2pptx}} for PowerPoint,
 \code{\link{fit}} for regression tables,
 \code{\link{desctable}} for descriptive tables
+
+Other export functions: 
+\code{\link{autoexport}()},
+\code{\link{print.table2docx_result}()},
+\code{\link{print.table2pptx_result}()},
+\code{\link{print.table2rtf_result}()},
+\code{\link{table2docx}()},
+\code{\link{table2pdf}()},
+\code{\link{table2pptx}()},
+\code{\link{table2rtf}()},
+\code{\link{table2tex}()}
 }
+\concept{export functions}

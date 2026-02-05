@@ -3,7 +3,7 @@
 #' Generates a publication-ready forest plot that combines a formatted data table 
 #' with a graphical representation of hazard ratios from a Cox proportional hazards 
 #' survival model. The plot integrates variable names, group levels, sample sizes, 
-#' event counts, hazard ratios with confidence intervals, p-values, and model 
+#' event counts, hazard ratios with confidence intervals, \emph{p}-values, and model 
 #' diagnostics in a single comprehensive visualization designed for manuscripts 
 #' and presentations.
 #'
@@ -29,14 +29,14 @@
 #' @param digits Integer specifying the number of decimal places for hazard ratios 
 #'   and confidence intervals. Default is 2.
 #'
-#' @param p_digits Integer specifying the number of decimal places for p-values.
-#'   P-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001" 
-#'   (for \code{p_digits = 3}), "< 0.0001" (for \code{p_digits = 4}), etc. 
+#' @param p_digits Integer specifying the number of decimal places for \emph{p}-values.
+#'   \emph{p}-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001" 
+#'   (for \code{p_digits = 3}), "< 0.0001" (for \code{p_digits = 4}), \emph{etc.} 
 #'   Default is 3.
 #'
 #' @param conf_level Numeric confidence level for confidence intervals. Must be
 #'   between 0 and 1. Default is 0.95 (95\% confidence intervals). The CI
-#'   percentage is automatically displayed in column headers (e.g., "90\% CI"
+#'   percentage is automatically displayed in column headers (\emph{e.g.,} "90\% CI"
 #'   when \code{conf_level = 0.90}).
 #'   
 #' @param font_size Numeric multiplier controlling the base font size for all 
@@ -75,7 +75,7 @@
 #'   is hidden when \code{TRUE}. Default is \code{FALSE}.
 #'
 #' @param condense_table Logical. If \code{TRUE}, condenses binary variables to 
-#'   show only the non-reference level (e.g., "Yes" for Yes/No variables), with 
+#'   show only the non-reference level (\emph{e.g.,} "Yes" for Yes/No variables), with 
 #'   the variable name indicating the displayed level. This creates a more compact 
 #'   table for models with many binary predictors. Default is \code{FALSE}.
 #'   
@@ -102,7 +102,7 @@
 #'   hex codes or R color names.
 #'
 #' @param qc_footer Logical. If \code{TRUE}, displays model quality control
-#'   statistics in the footer (events analyzed, global log-rank p-value,
+#'   statistics in the footer (events analyzed, global log-rank \emph{p}-value,
 #'   concordance index, AIC). Default is \code{TRUE}.
 #'   
 #' @param units Character string specifying units for plot dimensions: 
@@ -131,7 +131,7 @@
 #'     interpreted as the multiplicative change in hazard
 #'   \item \strong{Log scale}: Forest plot uses log scale for HR (reference line at 1)
 #'   \item \strong{Model diagnostics}: Includes concordance (C-index), global 
-#'     log-rank test p-value, and AIC
+#'     log-rank test \emph{p}-value, and AIC
 #' }
 #' 
 #' \strong{Plot Components:}
@@ -143,7 +143,7 @@
 #'       \item Variable and Group columns
 #'       \item n: Sample sizes by group
 #'       \item Events: Event counts by group (critical for survival)
-#'       \item aHR (95\% CI); \emph{p}-value: Adjusted hazard ratios with CIs and p-values
+#'       \item aHR (95\% CI); \emph{p}-value: Adjusted hazard ratios with CIs and \emph{p}-values
 #'     }
 #'   \item \strong{Forest Plot} (right):
 #'     \itemize{
@@ -155,7 +155,7 @@
 #'   \item \strong{Model Statistics} (footer):
 #'     \itemize{
 #'       \item Events analyzed (with percentage of total)
-#'       \item Global log-rank test p-value
+#'       \item Global log-rank test \emph{p}-value
 #'       \item Concordance (C-index) with standard error
 #'       \item AIC
 #'     }
@@ -195,9 +195,9 @@
 #' 
 #' \strong{Global Log-Rank Test:}
 #' 
-#' The global p-value tests the null hypothesis that all coefficients are zero:
+#' The global \emph{p}-value tests the null hypothesis that all coefficients are zero:
 #' \itemize{
-#'   \item Significant p-value (< 0.05) indicates the model as a whole predicts survival
+#'   \item Significant \emph{p}-value (< 0.05) indicates the model as a whole predicts survival
 #'   \item Non-significant global test doesn't preclude significant individual 
 #'     predictors
 #'   \item Based on the score (log-rank) test
@@ -245,6 +245,7 @@
 #' print(plot1)
 #' 
 #' \donttest{
+#'   options(width = 180)
 #' # Example 2: With custom labels and title
 #' plot2 <- coxforest(
 #'     x = model1,
@@ -422,6 +423,7 @@
 #' #        width = dims$width, height = dims$height, dpi = 300)
 #' }
 #'
+#' @family visualization functions
 #' @export
 coxforest <- function(x, data = NULL,
                       title = "Cox Proportional Hazards Model",
@@ -574,7 +576,7 @@ Received class: ", paste(class(x), collapse = ", "))
         n_fixed <- length(fixed_effects)
         se_values <- sqrt(diag(as.matrix(model$variance))[1:n_fixed])
         
-        ## Calculate z-statistics and p-values
+        ## Calculate z-statistics and \emph{p}-values
         z_values <- fixed_effects / se_values
         p_values <- 2 * pnorm(abs(z_values), lower.tail = FALSE)
         
@@ -664,7 +666,7 @@ Received class: ", paste(class(x), collapse = ", "))
                          NA
                      }
         
-        ## Calculate likelihood ratio test p-value
+        ## Calculate likelihood ratio test \emph{p}-value
         p_value_log <- if (!is.null(model$loglik) && length(model$loglik) >= 2) {
                            lr_stat <- 2 * (model$loglik[2] - model$loglik[1])
                            lr_df <- model$df[1]
@@ -733,7 +735,7 @@ Received class: ", paste(class(x), collapse = ", "))
         gmodel$concordance.upper <- NA
     }
 
-    ## Format the global p-value for display using p_digits
+    ## Format the global \emph{p}-value for display using p_digits
     global_p_threshold <- 10^(-p_digits)
     global_p_threshold_str <- paste0("< ", format(global_p_threshold, scientific = FALSE))
     global_p_formatted <- if(as.numeric(gmodel$p_value_log) < global_p_threshold) {
@@ -865,7 +867,7 @@ Received class: ", paste(class(x), collapse = ", "))
             int_term <- interaction_terms[idx]
             
             ## Parse the interaction term to create a readable label
-            ## e.g., "treatmentDrug A:stageII" -> "Treatment Group (Drug A) × Disease Stage (II)"
+            ## \emph{e.g.,}, "treatmentDrug A:stageII" -> "Treatment Group (Drug A) × Disease Stage (II)"
             int_parts <- strsplit(int_term, ":", fixed = TRUE)[[1]]
             
             ## Build readable variable name from parts
@@ -995,44 +997,62 @@ Received class: ", paste(class(x), collapse = ", "))
                 is_binary <- nrow(var_rows) == 2
                 
                 if (condense_table && is_binary) {
-                    ## Use safer reference detection based on NA estimates
-                    non_ref_idx <- find_non_reference_row(var_rows, "estimate")
+                    ## Detect reference row by checking if level is first in model$xlevels
+                    ## (first level is always reference in R factor contrasts)
+                    ref_level <- NULL
+                    if (!is.null(model$xlevels) && v %in% names(model$xlevels)) {
+                        ref_level <- model$xlevels[[v]][1]
+                    }
                     
-                    if (!is.null(non_ref_idx)) {
-                        non_ref_row <- var_rows[non_ref_idx]
-                        ref_idx <- setdiff(1:2, non_ref_idx)
-                        ref_row <- var_rows[ref_idx]
-                        
-                        condensed_row <- data.table::copy(non_ref_row)
-                        non_ref_category <- condensed_row$level
-                        ref_category <- ref_row$level
-                        
-                        ## Look up label for smarter condensing detection
-                        var_label <- if (!is.null(labels) && v %in% names(labels)) {
-                                         labels[[v]]
-                                     } else if (v %in% names(data) && 
-                                                !is.null(attr(data[[v]], "label"))) {
-                                         attr(data[[v]], "label")
-                                     } else {
-                                         v
-                                     }
-                        
-                        ## Use greedy approach: condense if EITHER category is recognized
-                        if (should_condense_binary(ref_category, non_ref_category, var_label)) {
-                            condensed_row[, var := v]
-                        } else {
-                            condensed_row[, var := paste0(v, " (", non_ref_category, ")")]
-                        }
-                        condensed_row[, level := "-"]
-                        processed_rows[[row_counter]] <- condensed_row
-                        row_counter <- row_counter + 1
-                    } else {
-                        ## Cannot determine reference - fall back to indent_groups behavior
-                        for (i in seq_len(nrow(var_rows))) {
-                            processed_rows[[row_counter]] <- var_rows[i]
-                            row_counter <- row_counter + 1
+                    ## Find non-reference row
+                    non_ref_idx <- NULL
+                    if (!is.null(ref_level)) {
+                        ref_idx <- which(var_rows$level == ref_level)
+                        if (length(ref_idx) == 1) {
+                            non_ref_idx <- setdiff(1:2, ref_idx)
                         }
                     }
+                    
+                    ## Fallback to estimate-based detection if available
+                    if (is.null(non_ref_idx) && "estimate" %in% names(var_rows)) {
+                        non_ref_idx <- find_non_reference_row(var_rows, "estimate")
+                    }
+                    
+                    ## Final fallback: assume row 2 is non-reference
+                    if (is.null(non_ref_idx) || length(non_ref_idx) != 1) {
+                        non_ref_idx <- 2L
+                        ref_idx <- 1L
+                    } else {
+                        ref_idx <- setdiff(1:2, non_ref_idx)
+                    }
+                    
+                    non_ref_row <- var_rows[non_ref_idx]
+                    ref_row <- var_rows[ref_idx]
+                    
+                    condensed_row <- data.table::copy(non_ref_row)
+                    non_ref_category <- condensed_row$level
+                    ref_category <- ref_row$level
+                    
+                    ## Look up label for smarter condensing detection
+                    var_label <- if (!is.null(labels) && v %in% names(labels)) {
+                                     labels[[v]]
+                                 } else if (v %in% names(data) && 
+                                            !is.null(attr(data[[v]], "label"))) {
+                                     attr(data[[v]], "label")
+                                 } else {
+                                     v
+                                 }
+                    
+                    ## Use greedy approach: condense if EITHER category is recognized
+                    if (should_condense_binary(ref_category, non_ref_category, var_label)) {
+                        condensed_row[, var := v]
+                    } else {
+                        condensed_row[, var := paste0(v, " (", non_ref_category, ")")]
+                    }
+                    condensed_row[, level := "-"]
+                    processed_rows[[row_counter]] <- condensed_row
+                    row_counter <- row_counter + 1
+                    
                 } else {
                     if (indent_groups) {
                         header_row <- data.table::data.table(
@@ -1168,7 +1188,7 @@ Received class: ", paste(class(x), collapse = ", "))
                                                                    NA_character_,
                                                                    format_number(exp(conf_high), digits))]
 
-    ## Format p-values using p_digits parameter
+    ## Format \emph{p}-values using p_digits parameter
     p_threshold <- 10^(-p_digits)
     p_threshold_str <- paste0("< ", format(p_threshold, scientific = FALSE))
     

@@ -60,14 +60,14 @@ identity link.}
 \item{digits}{Integer specifying the number of decimal places for effect 
 estimates and confidence intervals in the data table. Default is 2.}
 
-\item{p_digits}{Integer specifying the number of decimal places for p-values.
-P-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001" 
-(for \code{p_digits = 3}), "< 0.0001" (for \code{p_digits = 4}), etc. 
+\item{p_digits}{Integer specifying the number of decimal places for \emph{p}-values.
+\emph{p}-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001" 
+(for \code{p_digits = 3}), "< 0.0001" (for \code{p_digits = 4}), \emph{etc.} 
 Default is 3.}
 
 \item{conf_level}{Numeric confidence level for confidence intervals. Must be
 between 0 and 1. Default is 0.95 (95\% confidence intervals). The CI
-percentage is automatically displayed in column headers (e.g., "90\% CI"
+percentage is automatically displayed in column headers (\emph{e.g.,} "90\% CI"
 when \code{conf_level = 0.90}).}
 
 \item{font_size}{Numeric multiplier controlling the base font size for all 
@@ -80,7 +80,7 @@ data annotations (variable names, values in table cells). Default is 3.88.
 Adjust relative to \code{font_size}.}
 
 \item{header_size}{Numeric value controlling the relative font size for 
-column headers ("Variable", "Group", "n", etc.). Default is 5.82. Headers 
+column headers ("Variable", "Group", "n", \emph{etc.}). Default is 5.82. Headers 
 are typically larger than annotations for hierarchy.}
 
 \item{title_size}{Numeric value controlling the relative font size for the 
@@ -142,16 +142,16 @@ values are the labels to display. Example:
 
 \item{color}{Character string specifying the color for effect estimate point 
   markers in the forest plot. Use hex codes or R color names. Default is 
-  \code{NULL}, which auto-selects based on effect type: \code{"#3C8D9C"} 
+  \code{NULL}, which auto-selects based on effect type: \code{"#4BA6B6"} 
   (teal) for odds ratios (binomial/quasibinomial with logit link), 
-  \code{"#3064A6"} (blue) for rate/risk ratios (Poisson, Gamma, inverse 
+  \code{"#3F87EE"} (blue) for rate/risk ratios (Poisson, Gamma, inverse 
 
   Gaussian with log link), and \code{"#5A8F5A"} (green) for coefficients 
   (Gaussian/identity link). This scheme matches \code{uniforest()} and 
   \code{multiforest()}. Choose colors that contrast well with black error bars.}
 
 \item{exponentiate}{Logical. If \code{TRUE}, exponentiates coefficients to 
-display odds ratios, risk ratios, etc. If \code{FALSE}, shows raw 
+display odds ratios, risk ratios, \emph{etc.} If \code{FALSE}, shows raw 
 coefficients. Default is \code{NULL}, which automatically exponentiates 
 for logit, log, and cloglog links, and shows raw coefficients for identity 
 link.}
@@ -191,7 +191,7 @@ Generates a publication-ready forest plot that combines a formatted data table
 with a graphical representation of effect estimates (odds ratios, risk ratios, 
 or coefficients) from a generalized linear model. The plot integrates variable 
 names, group levels, sample sizes, effect estimates with confidence intervals, 
-p-values, and model diagnostics in a single comprehensive visualization designed 
+\emph{p}-values, and model diagnostics in a single comprehensive visualization designed 
 for manuscripts and presentations.
 }
 \details{
@@ -206,7 +206,7 @@ The forest plot consists of several integrated components:
       \item Group: Factor levels (optional, hidden when indenting)
       \item n: Sample sizes by group (optional)
       \item Events: Event counts by group (optional)
-      \item Effect (95\% CI); \emph{p}-value: Formatted estimates with p-values
+      \item Effect (95\% CI); \emph{p}-value: Formatted estimates with \emph{p}-values
     }
   \item \strong{Forest Plot} (right side): Graphical display with:
     \itemize{
@@ -219,7 +219,7 @@ The forest plot consists of several integrated components:
   \item \strong{Model Statistics} (footer): Summary of:
     \itemize{
       \item Observations analyzed (with percentage of total data)
-      \item Model family (Binomial, Poisson, etc.)
+      \item Model family (Binomial, Poisson, \emph{etc.})
       \item Deviance statistics
       \item Pseudo-R² (McFadden)
       \item AIC
@@ -245,7 +245,7 @@ For factor variables, the first level (determined by factor ordering or
 alphabetically for character variables) serves as the reference category:
 \itemize{
   \item Displayed with the \code{ref_label} instead of an estimate
-  \item No confidence interval or p-value shown
+  \item No confidence interval or \emph{p}-value shown
   \item Visually aligned with other categories
   \item When \code{condense_table = TRUE}, reference-only variables may be 
     omitted entirely
@@ -325,6 +325,7 @@ plot1 <- glmforest(model1, data = clintrial)
 print(plot1)
 
 \donttest{
+  options(width = 180)
 # Example 2: With custom variable labels
 plot2 <- glmforest(
     x = model1,
@@ -492,7 +493,7 @@ final_plot <- glmforest(
     labels = clintrial_labels,
     indent_groups = TRUE,
     zebra_stripes = TRUE,
-    color = "#3C8D9C",
+    color = "#4BA6B6",
     font_size = 1.0,
     digits = 2
 )
@@ -512,4 +513,12 @@ dims <- attr(final_plot, "recommended_dims")
 \code{\link[stats]{glm}} for fitting GLMs,
 \code{\link{fit}} for fullfit regression modeling,
 \code{\link[ggplot2]{ggsave}} for saving plots
+
+Other visualization functions: 
+\code{\link{autoforest}()},
+\code{\link{coxforest}()},
+\code{\link{lmforest}()},
+\code{\link{multiforest}()},
+\code{\link{uniforest}()}
 }
+\concept{visualization functions}

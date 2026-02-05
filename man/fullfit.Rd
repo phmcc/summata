@@ -14,6 +14,7 @@ fullfit(
   columns = "both",
   model_type = "glm",
   family = "binomial",
+  random = NULL,
   conf_level = 0.95,
   reference_rows = TRUE,
   show_n = TRUE,
@@ -86,11 +87,19 @@ other methods.}
     survival analysis. Requires \code{Surv()} outcome syntax.
   \item \code{"clogit"} - Conditional logistic regression for matched 
     case-control studies.
+  \item \code{"glmer"} - Generalized linear mixed-effects model for hierarchical 
+    or clustered data with non-normal outcomes (requires \pkg{lme4} package and 
+    \code{random} parameter).
+  \item \code{"lmer"} - Linear mixed-effects model for hierarchical or clustered 
+    data with continuous outcomes (requires \pkg{lme4} package and \code{random} 
+    parameter).
+  \item \code{"coxme"} - Cox mixed-effects model for clustered survival data 
+    (requires coxme package and \code{random} parameter).
 }}
 
-\item{family}{For GLM models, specifies the error distribution and link function. 
-Can be a character string, a family function, or a family object.
-Ignored for non-GLM models.
+\item{family}{For GLM and GLMER models, specifies the error distribution and link 
+function. Can be a character string, a family function, or a family object.
+Ignored for non-GLM/GLMER models.
 
 \strong{Binary/Binomial outcomes:}
 \itemize{
@@ -134,6 +143,16 @@ For negative binomial regression (overdispersed counts), use
 \code{model_type = "negbin"} instead of the \code{family} parameter.
 
 See \code{\link[stats]{family}} for additional details and options.}
+
+\item{random}{Character string specifying the random effects formula for 
+mixed-effects models (\code{glmer}, \code{lmer}, \code{coxme}). Use standard
+lme4/coxme syntax, e.g., \code{"(1|site)"} for random intercepts by site,
+\code{"(1|site/patient)"} for nested random effects. Required when 
+\code{model_type} is a mixed-effects model type unless random effects are
+included in the \code{predictors} vector. Alternatively, random effects 
+can be included directly in the \code{predictors} vector using the same 
+syntax (e.g., \code{predictors = c("age", "sex", "(1|site)")}), though 
+they will not be screened as predictors. Default is \code{NULL}.}
 
 \item{conf_level}{Numeric confidence level for confidence intervals. Must be 
 between 0 and 1. Default is 0.95 (95\% CI).}
@@ -530,6 +549,63 @@ print(final_table)
 # Can export directly to PDF/LaTeX/HTML for publication
 # table2pdf(final_table, "regression_results.pdf")
 # table2docx(final_table, "regression_results.docx")
+
+# Example 17: Gamma regression with screening
+gamma_result <- fullfit(
+    data = clintrial,
+    outcome = "los_days",
+    predictors = c("age", "treatment", "surgery", "any_complication", 
+                  "stage", "ecog"),
+    model_type = "glm",
+    family = Gamma(link = "log"),
+    method = "screen",
+    p_threshold = 0.10,
+    labels = clintrial_labels
+)
+print(gamma_result)
+
+# Example 18: Quasipoisson for overdispersed counts
+quasi_result <- fullfit(
+    data = clintrial,
+    outcome = "ae_count",
+    predictors = c("age", "treatment", "diabetes", "surgery", 
+                  "stage", "ecog"),
+    model_type = "glm",
+    family = "quasipoisson",
+    method = "screen",
+    p_threshold = 0.20,
+    labels = clintrial_labels
+)
+print(quasi_result)
+
+# Example 19: Linear mixed effects with site clustering
+if (requireNamespace("lme4", quietly = TRUE)) {
+    lmer_result <- fullfit(
+        data = clintrial,
+        outcome = "los_days",
+        predictors = c("age", "treatment", "surgery", "stage"),
+        random = "(1|site)",
+        model_type = "lmer",
+        method = "all",
+        labels = clintrial_labels
+    )
+    print(lmer_result)
+}
+
+# Example 20: Cox mixed effects with site clustering
+if (requireNamespace("coxme", quietly = TRUE)) {
+    coxme_result <- fullfit(
+        data = clintrial,
+        outcome = "Surv(os_months, os_status)",
+        predictors = c("age", "treatment", "stage", "grade"),
+        random = "(1|site)",
+        model_type = "coxme",
+        method = "screen",
+        p_threshold = 0.10,
+        labels = clintrial_labels
+    )
+    print(coxme_result)
+}
 }
 
 }
@@ -538,4 +614,16 @@ print(final_table)
 \code{\link{fit}} for fitting a single multivariable model,
 \code{\link{compfit}} for comparing multiple models,
 \code{\link{desctable}} for descriptive statistics
+
+Other regression functions: 
+\code{\link{compfit}()},
+\code{\link{fit}()},
+\code{\link{multifit}()},
+\code{\link{print.compfit_result}()},
+\code{\link{print.fit_result}()},
+\code{\link{print.fullfit_result}()},
+\code{\link{print.multifit_result}()},
+\code{\link{print.uniscreen_result}()},
+\code{\link{uniscreen}()}
 }
+\concept{regression functions}

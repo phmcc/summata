@@ -10,6 +10,7 @@ compfit(
   model_list,
   model_names = NULL,
   interactions_list = NULL,
+  random = NULL,
   model_type = "auto",
   family = "binomial",
   conf_level = 0.95,
@@ -38,6 +39,14 @@ Use NULL for models without interactions. Use colon notation for interactions
 (e.g., c("age:treatment")). If NULL, no interactions are added to any model.
 Default is NULL.}
 
+\item{random}{Character string specifying the random effects formula for 
+mixed-effects models (\code{glmer}, \code{lmer}, \code{coxme}). Use standard
+lme4/coxme syntax, e.g., \code{"(1|site)"} for random intercepts by site.
+This random effects formula is applied to all models in the comparison.
+Alternatively, random effects can be included directly in the predictor 
+vectors within \code{model_list} using the same syntax, which allows
+different random effects structures across models. Default is \code{NULL}.}
+
 \item{model_type}{Character string specifying model type. If "auto", detects
 based on outcome. Options include:
 \itemize{
@@ -56,7 +65,7 @@ based on outcome. Options include:
     (requires MASS package)
 }}
 
-\item{family}{For GLM models, specifies the error distribution and link function.
+\item{family}{For GLM and GLMER models, specifies the error distribution and link function.
 Common options include:
 \itemize{
   \item \code{"binomial"} - Logistic regression for binary outcomes (default)
@@ -92,7 +101,7 @@ type. If NULL, uses sensible defaults. See Details for available metrics.}
 A data.table with class "compfit_result" containing:
   \describe{
     \item{Model}{Model name/identifier}
-    \item{Summata Score}{Composite metric for model selection (higher is better)}
+    \item{CMS}{Composite Mean Score for model selection (higher is better)}
     \item{N}{Sample size}
     \item{Events}{Number of events (for survival/logistic)}
     \item{Predictors}{Number of predictors}
@@ -120,7 +129,7 @@ rapid model comparison and selection.
 }
 \details{
 This function fits all specified models and computes comprehensive quality
-metrics for comparison. It generates a composite score (Summata Score) that 
+metrics for comparison. It generates a Composite Mean Score (CMS) that 
 combines multiple metrics: lower AIC/BIC (information criteria), higher 
 concordance (discrimination), and model convergence status.
 
@@ -235,4 +244,16 @@ cat("Recommended model:", best, "\n")
 \code{\link{fit}} for individual model fitting,
 \code{\link{fullfit}} for automated variable selection,
 \code{\link{table2pdf}} for exporting results
+
+Other regression functions: 
+\code{\link{fit}()},
+\code{\link{fullfit}()},
+\code{\link{multifit}()},
+\code{\link{print.compfit_result}()},
+\code{\link{print.fit_result}()},
+\code{\link{print.fullfit_result}()},
+\code{\link{print.multifit_result}()},
+\code{\link{print.uniscreen_result}()},
+\code{\link{uniscreen}()}
 }
+\concept{regression functions}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/comp_utils.R
 \name{calculate_model_scores}
 \alias{calculate_model_scores}
-\title{Calculate Summata Scores for model comparison}
+\title{Calculate Composite Mean Scores (CMS) for model comparison}
 \usage{
 calculate_model_scores(comparison, model_type, scoring_weights = NULL)
 }
@@ -15,7 +15,7 @@ calculate_model_scores(comparison, model_type, scoring_weights = NULL)
 uses default weights for the model type.}
 }
 \value{
-Data.table with Summata Score column added, sorted by score.
+Data.table with CMS column added, sorted by score.
 }
 \description{
 Computes composite Score based on weighted combination of model

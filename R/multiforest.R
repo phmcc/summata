@@ -13,7 +13,7 @@
 #'   
 #' @param effect_label Character string for the effect measure label on the 
 #'   forest plot axis. Default is \code{NULL}, which auto-detects based on 
-#'   model type (e.g., "Odds Ratio", "Hazard Ratio", "Rate Ratio", "Estimate").
+#'   model type (\emph{e.g.,} "Odds Ratio", "Hazard Ratio", "Rate Ratio", "Estimate").
 #'   
 #' @param column Character string specifying which column to plot when both 
 #'   univariable and multivariable results are present. Options are 
@@ -23,13 +23,13 @@
 #' @param digits Integer specifying the number of decimal places for effect 
 #'   estimates and confidence intervals. Default is 2.
 #'
-#' @param p_digits Integer specifying the number of decimal places for p-values.
-#'   P-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001" 
+#' @param p_digits Integer specifying the number of decimal places for \emph{p}-values.
+#'   \emph{p}-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001" 
 #'   (for \code{p_digits = 3}). Default is 3.
 #'
 #' @param conf_level Numeric confidence level for confidence intervals. Must be
 #'   between 0 and 1. Default is 0.95 (95\% confidence intervals). The CI
-#'   percentage is automatically displayed in column headers (e.g., "90\% CI"
+#'   percentage is automatically displayed in column headers (\emph{e.g.,} "90\% CI"
 #'   when \code{conf_level = 0.90}).
 #'   
 #' @param font_size Numeric multiplier controlling the base font size for all 
@@ -92,8 +92,8 @@
 #' @param color Character string specifying the color for point estimates in 
 #'   the forest plot. Default is \code{NULL}, which auto-selects based on
 #'   effect type: purple (\code{"#8A61D8"}) for hazard ratios (Cox), teal 
-#'   (\code{"#3C8D9C"}) for odds ratios (logistic), blue (\code{"#3064A6"}) for 
-#'   rate/risk ratios (Poisson, Gamma, etc.), and green (\code{"#5A8F5A"}) for 
+#'   (\code{"#4BA6B6"}) for odds ratios (logistic), blue (\code{"#3F87EE"}) for 
+#'   rate/risk ratios (Poisson, Gamma, \emph{etc.}), and green (\code{"#5A8F5A"}) for 
 #'   coefficients (linear models).
 #'   Use hex codes or R color names for custom colors.
 #'   
@@ -180,6 +180,7 @@
 #' print(plot1)
 #' 
 #' \donttest{
+#'   options(width = 180)
 #' # Example 2: With custom title and labels
 #' plot2 <- multiforest(
 #'     result,
@@ -221,6 +222,7 @@
 #' #        width = dims$width, height = dims$height)
 #' }
 #'
+#' @family visualization functions
 #' @export
 multiforest <- function(x,
                         title = "Multivariate Analysis",
@@ -322,10 +324,10 @@ multiforest <- function(x,
     
     if (effect_type %in% c("OR", "HR", "RR")) {
         adj_prefix <- if (is_adjusted) "a" else ""
-        effect_abbrev <- paste0(adj_prefix, effect_type)  # e.g., "aOR", "aHR", "HR", "OR"
+        effect_abbrev <- paste0(adj_prefix, effect_type)  # \emph{e.g.,}, "aOR", "aHR", "HR", "OR"
     } else {
         adj_prefix <- if (is_adjusted) "Adj. " else ""
-        effect_abbrev <- paste0(adj_prefix, "Coefficient")  # e.g., "Adj. Coefficient" or "Coefficient"
+        effect_abbrev <- paste0(adj_prefix, "Coefficient")  # \emph{e.g.,}, "Adj. Coefficient" or "Coefficient"
     }
     
     ## Set effect_label for axis (full name)
@@ -340,7 +342,7 @@ multiforest <- function(x,
     ## Format CI percentage for display in headers
     ci_pct <- round(conf_level * 100)
     
-    ## Create header label for the effect column with italic p (e.g., "aOR (95% CI); p-value")
+    ## Create header label for the effect column with italic p (\emph{e.g.,} "aOR (95% CI); \emph{p}-value")
     ## Format: bold('aOR (95% CI); '*bolditalic(p)*'-value')
     effect_header_expr <- paste0("bold('", effect_abbrev, " (", ci_pct, "% CI); '*bolditalic(p)*'-value')")
     
@@ -352,8 +354,8 @@ multiforest <- function(x,
     if (is.null(color)) {
         color <- switch(effect_type,
                         "HR" = "#8A61D8",
-                        "OR" = "#3C8D9C",
-                        "RR" = "#3064A6",
+                        "OR" = "#4BA6B6",
+                        "RR" = "#3F87EE",
                         "#5A8F5A")  # Default for Estimate/Coefficient
     }
     
@@ -500,7 +502,7 @@ multiforest <- function(x,
                                                                        format_number(conf_high, digits))]
     }
 
-    ## Format p-values using p_digits parameter
+    ## Format \emph{p}-values using p_digits parameter
     p_threshold <- 10^(-p_digits)
     p_threshold_str <- paste0("< ", format(p_threshold, scientific = FALSE))
     

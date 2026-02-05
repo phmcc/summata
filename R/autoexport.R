@@ -110,6 +110,7 @@
 #' \code{\link{table2pdf}}, \code{\link{table2docx}}, \code{\link{table2pptx}},
 #' \code{\link{table2html}}, \code{\link{table2rtf}}, \code{\link{table2tex}}
 #'
+#' @family export functions
 #' @export
 autoexport <- function(table, file, ...) {
     

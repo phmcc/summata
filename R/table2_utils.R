@@ -34,10 +34,21 @@ add_variable_padding <- function (df) {
                else NULL
     if (is.null(var_col)) 
         return(df)
-    var_starts <- which(df[[var_col]] != "" & !grepl("^\\\\hspace", 
-                                                     df[[var_col]]) & !grepl("^\\s+", df[[var_col]]))
+    
+    ## Find variable start rows - rows where Variable is not empty/NA and not indented
+    ## Check for various indentation patterns: spaces, &nbsp;, \hspace (LaTeX)
+    var_starts <- which(
+        df[[var_col]] != "" & 
+        !is.na(df[[var_col]]) &
+        !grepl("^\\\\hspace", df[[var_col]]) &      # LaTeX indent
+        !grepl("^\\s+", df[[var_col]]) &            # Space indent
+        !grepl("^&nbsp;", df[[var_col]]) &          # HTML indent
+        !grepl("^\\\\quad", df[[var_col]])          # LaTeX quad indent
+    )
+    
     if (length(var_starts) == 0) 
         return(df)
+    
     new_df <- data.table()
     padding_row <- df[1, ]
     padding_row[1, ] <- ""
@@ -469,7 +480,7 @@ format_column_headers_with_n_tex <- function(col_names, n_row_data) {
             ## Build the complex structure with already-sanitized name
             new_names[i] <- paste0("\\begin{tabular}{@{}c@{}}\\rule{0pt}{2.5ex}", 
                                    col_sanitized,  # Use sanitized version
-                                   "\\\\[-0ex] (\\textit{n} = ", 
+                                   "\\\\[-0ex] (\\textit{N} = ", 
                                    format(as.numeric(gsub(",", "", n_value)), big.mark = ","), 
                                    ")\\rule[-1ex]{0pt}{0pt}\\end{tabular}")
         } else {
@@ -504,9 +515,9 @@ format_column_headers_with_n_html <- function(col_names, n_row_data) {
         if (col %chin% names(n_row_data)) {
             n_value <- n_row_data[[col]]
             if (!is.na(n_value) && n_value != "" && n_value != "0") {
-                ## Format header with only n italicized
+                ## Format header with only N italicized
                 clean_col <- format_column_headers_html(col)
-                new_names[i] <- paste0(clean_col, "<br>(<i>n</i> = ", n_value, ")")
+                new_names[i] <- paste0(clean_col, "<br>(<i>N</i> = ", n_value, ")")
             } else {
                 new_names[i] <- format_column_headers_html(col)
             }
@@ -600,9 +611,22 @@ condense_table_rows <- function(df, indent_groups = TRUE) {
                 data_cols <- setdiff(names(result), c("Variable", "Group", "p-value", "p.value"))
                 
                 if (length(data_cols) > 0) {
-                    first_data_col <- data_cols[1]
+                    ## For regression tables, find the coefficient/effect column
+                    ## This is more reliable than using the first data column (often "n")
+                    effect_col <- NULL
+                    effect_patterns <- c("Coefficient", "OR", "HR", "RR", "Estimate", "aOR", "aHR", "aRR")
+                    for (col in data_cols) {
+                        if (any(vapply(effect_patterns, function(p) grepl(p, col, ignore.case = TRUE), logical(1)))) {
+                            effect_col <- col
+                            break
+                        }
+                    }
+                    
+                    ## Use effect column if found, otherwise fall back to first data column
+                    check_col <- if (!is.null(effect_col)) effect_col else data_cols[1]
+                    
                     ## Find non-reference row by checking for actual data (not "-", "reference", etc.)
-                    non_ref_idx <- which(!var_rows[[first_data_col]] %chin% c("-", "reference", "Reference", ""))
+                    non_ref_idx <- which(!var_rows[[check_col]] %chin% c("-", "reference", "Reference", ""))
                     
                     if (length(non_ref_idx) > 1) {
                         ## Multiple non-ref rows - take the first one
@@ -1091,24 +1115,32 @@ format_headers_ft <- function(ft, has_n_row, n_row_data) {
     for (i in seq_along(col_names)) {
         col <- col_names[i]
         
-        ## Skip Variable column for n count addition
+        ## Skip Variable column for N count addition
         if (col == "Variable") {
-            ## Just keep the original label without adding (n = N)
+            ## Just keep the original label without adding (N = X)
             next
         }
         
-        ## Italicize 'n' in headers
+        ## Italicize 'n' column header if present
         if (col == "n") {
             ft <- flextable::italic(ft, j = i, part = "header")
         }
         
-        ## Add n counts for data columns only (not Variable)
+        ## Add N counts for data columns only (not Variable)
         if (has_n_row && col %chin% names(n_row_data) && col != "Variable") {
             n_val <- n_row_data[[col]]
             if (!is.na(n_val) && n_val != "" && n_val != "0") {
-                new_label <- paste0(col, "\n(n = ", n_val, ")")
-                ft <- flextable::set_header_labels(ft, 
-                                                   values = setNames(list(new_label), col))
+                ## Use compose to italicize just the N
+                ft <- flextable::compose(
+                    ft, 
+                    j = i, 
+                    part = "header",
+                    value = flextable::as_paragraph(
+                        col, "\n(", 
+                        flextable::as_i("N"), 
+                        " = ", n_val, ")"
+                    )
+                )
             }
         }
     }

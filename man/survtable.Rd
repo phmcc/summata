@@ -355,4 +355,9 @@ survtable(
 \code{\link{fit}} for regression analysis,
 \code{\link[survival]{survfit}} for underlying survival estimation,
 \code{\link[survival]{survdiff}} for survival curve comparison tests
+
+Other descriptive functions: 
+\code{\link{desctable}()},
+\code{\link{print.survtable}()}
 }
+\concept{descriptive functions}

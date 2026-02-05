@@ -9,4 +9,17 @@
 \description{
 Print method showing scoring methodology
 }
+\seealso{
+Other regression functions: 
+\code{\link{compfit}()},
+\code{\link{fit}()},
+\code{\link{fullfit}()},
+\code{\link{multifit}()},
+\code{\link{print.fit_result}()},
+\code{\link{print.fullfit_result}()},
+\code{\link{print.multifit_result}()},
+\code{\link{print.uniscreen_result}()},
+\code{\link{uniscreen}()}
+}
+\concept{regression functions}
 \keyword{internal}
