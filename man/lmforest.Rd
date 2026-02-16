@@ -29,15 +29,15 @@ lmforest(
   labels = NULL,
   units = "in",
   color = "#5A8F5A",
-  qc_footer = TRUE
+  qc_footer = TRUE,
+  number_format = NULL
 )
 }
 \arguments{
 \item{x}{Either a fitted linear model object (class \code{lm} or \code{lmerMod}), 
 a \code{fit_result} object from \code{fit()}, or a \code{fullfit_result}
 object from \code{fullfit()}. When a \code{fit_result} or \code{fullfit_result}
-is provided, the model, data, and labels are automatically extracted.
-Note: GLM objects are not accepted - use \code{glmforest()} instead.}
+is provided, the model, data, and labels are automatically extracted.}
 
 \item{data}{Data frame or data.table containing the original data used to 
 fit the model. If \code{NULL} (default) and \code{x} is a model, the function 
@@ -46,19 +46,19 @@ data is extracted automatically. Providing data explicitly is recommended when
 passing a model directly.}
 
 \item{title}{Character string specifying the plot title displayed at the top. 
-Default is \code{"Linear Model"}. Use descriptive titles for publication.}
+Default is \code{"Linear Model"}.}
 
 \item{effect_label}{Character string for the effect measure label on the 
-forest plot axis. Default is \code{"Coefficient"}. Could be customized to 
-reflect units (\emph{e.g.,} "Change in BMI (kg/m²)").}
+forest plot axis. Default is \code{"Coefficient"}.}
 
 \item{digits}{Integer specifying the number of decimal places for coefficients 
 and confidence intervals. Default is 2.}
 
 \item{p_digits}{Integer specifying the number of decimal places for \emph{p}-values.
-\emph{p}-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001" 
-(for \code{p_digits = 3}), "< 0.0001" (for \code{p_digits = 4}), \emph{etc.} 
-Default is 3.}
+Values smaller than \code{10^(-p_digits)} are displayed as \code{"< 0.001"}
+(for \code{p_digits = 3}), \code{"< 0.0001"} (for \code{p_digits = 4}),
+\emph{etc.} The threshold string respects \code{number_format} (\emph{e.g.,}
+\code{"< 0,001"} for EU formatting). Default is 3.}
 
 \item{conf_level}{Numeric confidence level for confidence intervals. Must be
 between 0 and 1. Default is 0.95 (95\% confidence intervals). The CI
@@ -87,8 +87,7 @@ specified \code{units}. Default is \code{NULL} (automatic).}
 total plot width allocated to the data table. Default is 0.6.}
 
 \item{show_n}{Logical. If \code{TRUE}, includes a column showing group-specific 
-sample sizes. Note: Linear models don't have "events" so there's no 
-\code{show_events} parameter. Default is \code{TRUE}.}
+sample sizes. Default is \code{TRUE}.}
 
 \item{indent_groups}{Logical. If \code{TRUE}, indents factor levels under 
 their parent variable name, creating hierarchical structure. The "Group" 
@@ -123,15 +122,22 @@ estimates in the forest plot. Default is \code{"#5A8F5A"} (green). Use
 hex codes or R color names.}
 
 \item{qc_footer}{Logical. If \code{TRUE}, displays model quality control
-statistics in the footer (observations analyzed, R², adjusted R²,
-F-statistic, AIC). Default is \code{TRUE}.}
+statistics in the footer (observations analyzed, \emph{R}², adjusted
+\emph{R}², \emph{F}-statistic, AIC). Default is \code{TRUE}.}
+
+\item{number_format}{Character string or two-element character vector
+controlling thousand and decimal separators in formatted output. Named
+presets: \code{"us"} (default), \code{"eu"}, \code{"space"},
+\code{"none"}. Or a custom vector \code{c(big.mark, decimal.mark)}.
+When \code{NULL} (default), uses
+\code{getOption("summata.number_format", "us")}.}
 }
 \value{
 A \code{ggplot} object containing the complete forest plot. The plot 
   can be displayed, saved, or further customized.
   
-  The returned object includes an attribute \code{"recommended_dims"} 
-  accessible via \code{attr(plot, "recommended_dims")}, containing:
+  The returned object includes an attribute \code{"rec_dims"} 
+  accessible via \code{attr(plot, "rec_dims")}, containing:
   \describe{
     \item{width}{Numeric. Recommended plot width in specified units}
     \item{height}{Numeric. Recommended plot height in specified units}
@@ -144,9 +150,9 @@ A \code{ggplot} object containing the complete forest plot. The plot
 Generates a publication-ready forest plot that combines a formatted data table 
 with a graphical representation of regression coefficients from a linear model. 
 The plot integrates variable names, group levels, sample sizes, coefficients 
-with confidence intervals, \emph{p}-values, and model diagnostics (R², F-statistic, 
-AIC) in a single comprehensive visualization designed for manuscripts and 
-presentations.
+with confidence intervals, \emph{p}-values, and model diagnostics (\emph{R}²,
+\emph{F}-statistic, AIC) in a single comprehensive visualization designed for
+manuscripts and presentations.
 }
 \details{
 \strong{Linear Model-Specific Features:}
@@ -157,8 +163,8 @@ The linear model forest plot differs from logistic and Cox plots in several ways
   \item \strong{Reference line}: At coefficient = 0 (not at 1)
   \item \strong{Linear scale}: Forest plot uses linear scale (not log scale)
   \item \strong{No events column}: Only sample sizes shown (no event counts)
-  \item \strong{R² statistics}: Model fit assessed by R² and adjusted R²
-  \item \strong{F-test}: Overall model significance from F-statistic
+  \item \strong{\emph{R}² statistics}: Model fit assessed by \emph{R}² and adjusted \emph{R}²
+  \item \strong{\emph{F}-test}: Overall model significance from \emph{F}-statistic
 }
 
 \strong{Plot Components:}
@@ -169,7 +175,7 @@ The linear model forest plot differs from logistic and Cox plots in several ways
     \itemize{
       \item Variable: Predictor names
       \item Group: Factor levels (if applicable)
-      \item n: Sample sizes by group
+      \item \emph{n}: Sample sizes by group
       \item Coefficient (95\% CI); \emph{p}-value: Raw coefficients with CIs and \emph{p}-values
     }
   \item \strong{Forest Plot} (right):
@@ -182,8 +188,8 @@ The linear model forest plot differs from logistic and Cox plots in several ways
   \item \strong{Model Statistics} (footer):
     \itemize{
       \item Observations analyzed (with percentage of total data)
-      \item R² and adjusted R²
-      \item F-statistic with degrees of freedom and \emph{p}-value
+      \item \emph{R}² and adjusted \emph{R}²
+      \item \emph{F}-statistic with degrees of freedom and \emph{p}-value
       \item AIC
     }
 }
@@ -208,20 +214,20 @@ BMI increases by 0.50 kg/m² for each additional year of age.
 
 The footer displays key diagnostics:
 \itemize{
-  \item \strong{R²}: Proportion of variance explained (0 to 1)
+  \item \strong{\emph{R}²}: Proportion of variance explained (0 to 1)
     \itemize{
       \item 0.0-0.3: Weak explanatory power
       \item 0.3-0.5: Moderate
       \item 0.5-0.7: Good
       \item >0.7: Strong (rare in social/biological sciences)
     }
-  \item \strong{Adjusted R²}: R² penalized for number of predictors
+  \item \strong{Adjusted \emph{R}²}: \emph{R}² penalized for number of predictors
     \itemize{
-      \item Always ≤ R²
+      \item Always ≤ \emph{R}²
       \item Preferred for model comparison
       \item Accounts for model complexity
     }
-  \item \strong{F-statistic}: Tests null hypothesis that all coefficients = 0
+  \item \strong{\emph{F}-statistic}: Tests null hypothesis that all coefficients = 0
     \itemize{
       \item Degrees of freedom: df1 = # predictors, df2 = # observations - # predictors - 1
       \item Significant \emph{p}-value indicates model explains variance better than intercept-only
@@ -270,6 +276,7 @@ The "n" column shows:
 }
 }
 \examples{
+\dontshow{if (FALSE) withAutoprint(\{ # examplesIf}
 # Load example data
 data(clintrial)
 data(clintrial_labels)
@@ -281,7 +288,6 @@ model1 <- lm(bmi ~ age + sex + smoking,
 plot1 <- lmforest(model1, data = clintrial)
 print(plot1)
 
-\donttest{
   options(width = 180)
 # Example 2: With custom labels and title
 plot2 <- lmforest(
@@ -354,7 +360,7 @@ print(plot8)
 
 # Example 9: Get recommended dimensions
 plot9 <- lmforest(model1, data = clintrial)
-dims <- attr(plot9, "recommended_dims")
+dims <- attr(plot9, "rec_dims")
 cat("Recommended:", dims$width, "x", dims$height, dims$units, "\n")
 
 # Example 10: Specify exact dimensions
@@ -457,20 +463,21 @@ final_plot <- lmforest(
 )
 
 # Save for publication
-dims <- attr(final_plot, "recommended_dims")
+dims <- attr(final_plot, "rec_dims")
 # ggsave("figure3_linear.pdf", final_plot,
 #        width = dims$width, height = dims$height)
 # ggsave("figure3_linear.png", final_plot,
 #        width = dims$width, height = dims$height, dpi = 300)
-}
-
+\dontshow{\}) # examplesIf}
 }
 \seealso{
+\code{\link{autoforest}} for automatic model detection,
 \code{\link{glmforest}} for logistic/GLM forest plots,
 \code{\link{coxforest}} for Cox model forest plots,
+\code{\link{uniforest}} for univariable screening forest plots,
+\code{\link{multiforest}} for multi-outcome forest plots,
 \code{\link[stats]{lm}} for fitting linear models,
-\code{\link{fit}} for fullfit regression modeling,
-\code{\link[stats]{plot.lm}} for diagnostic plots
+\code{\link{fit}} for regression modeling
 
 Other visualization functions: 
 \code{\link{autoforest}()},

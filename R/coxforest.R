@@ -30,9 +30,10 @@
 #'   and confidence intervals. Default is 2.
 #'
 #' @param p_digits Integer specifying the number of decimal places for \emph{p}-values.
-#'   \emph{p}-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001" 
-#'   (for \code{p_digits = 3}), "< 0.0001" (for \code{p_digits = 4}), \emph{etc.} 
-#'   Default is 3.
+#'   Values smaller than \code{10^(-p_digits)} are displayed as \code{"< 0.001"}
+#'   (for \code{p_digits = 3}), \code{"< 0.0001"} (for \code{p_digits = 4}),
+#'   \emph{etc.} The threshold string respects \code{number_format} (\emph{e.g.,}
+#'   \code{"< 0,001"} for EU formatting). Default is 3.
 #'
 #' @param conf_level Numeric confidence level for confidence intervals. Must be
 #'   between 0 and 1. Default is 0.95 (95\% confidence intervals). The CI
@@ -108,11 +109,18 @@
 #' @param units Character string specifying units for plot dimensions: 
 #'   \code{"in"} (inches), \code{"cm"}, or \code{"mm"}. Default is \code{"in"}.
 #'
+#' @param number_format Character string or two-element character vector
+#'   controlling thousand and decimal separators in formatted output. Named
+#'   presets: \code{"us"} (default), \code{"eu"}, \code{"space"},
+#'   \code{"none"}. Or a custom vector \code{c(big.mark, decimal.mark)}.
+#'   When \code{NULL} (default), uses
+#'   \code{getOption("summata.number_format", "us")}.
+#'
 #' @return A \code{ggplot} object containing the complete forest plot. The plot 
 #'   can be displayed, saved, or further customized.
 #'   
-#'   The returned object includes an attribute \code{"recommended_dims"} 
-#'   accessible via \code{attr(plot, "recommended_dims")}, containing:
+#'   The returned object includes an attribute \code{"rec_dims"} 
+#'   accessible via \code{attr(plot, "rec_dims")}, containing:
 #'   \describe{
 #'     \item{width}{Numeric. Recommended plot width in specified units}
 #'     \item{height}{Numeric. Recommended plot height in specified units}
@@ -225,13 +233,15 @@
 #' }
 #'
 #' @seealso 
+#' \code{\link{autoforest}} for automatic model detection,
 #' \code{\link{glmforest}} for logistic/GLM forest plots,
 #' \code{\link{lmforest}} for linear model forest plots,
+#' \code{\link{uniforest}} for univariable screening forest plots,
+#' \code{\link{multiforest}} for multi-outcome forest plots,
 #' \code{\link[survival]{coxph}} for fitting Cox models,
-#' \code{\link[survival]{cox.zph}} for testing proportional hazards assumption,
-#' \code{\link{fit}} for fullfit regression modeling
+#' \code{\link{fit}} for regression modeling
 #'
-#' @examples
+#' @examplesIf FALSE
 #' # Load example data
 #' data(clintrial)
 #' data(clintrial_labels)
@@ -244,7 +254,6 @@
 #' plot1 <- coxforest(model1, data = clintrial)
 #' print(plot1)
 #' 
-#' \donttest{
 #'   options(width = 180)
 #' # Example 2: With custom labels and title
 #' plot2 <- coxforest(
@@ -325,7 +334,7 @@
 #' 
 #' # Example 9: Use recommended dimensions for saving
 #' plot9 <- coxforest(model1, data = clintrial)
-#' dims <- attr(plot9, "recommended_dims")
+#' dims <- attr(plot9, "rec_dims")
 #' 
 #' # Save to PDF
 #' # ggsave("survival_forest.pdf", plot9,
@@ -416,12 +425,11 @@
 #' # cox.zph(final_model)
 #' 
 #' # Save for publication
-#' dims <- attr(final_plot, "recommended_dims")
+#' dims <- attr(final_plot, "rec_dims")
 #' # ggsave("figure2_survival.pdf", final_plot,
 #' #        width = dims$width, height = dims$height)
 #' # ggsave("figure2_survival.png", final_plot,
 #' #        width = dims$width, height = dims$height, dpi = 300)
-#' }
 #'
 #' @family visualization functions
 #' @export
@@ -449,7 +457,8 @@ coxforest <- function(x, data = NULL,
                       labels = NULL,
                       color = "#8A61D8",
                       qc_footer = TRUE,
-                      units = "in") {
+                      units = "in",
+                      number_format = NULL) {
 
     ## Check for required packages
     if (!requireNamespace("data.table", quietly = TRUE)) {
@@ -461,6 +470,10 @@ coxforest <- function(x, data = NULL,
     if (!requireNamespace("grid", quietly = TRUE)) {
         stop("Package 'grid' is required but not installed.")
     }
+    
+    ## Resolve number formatting marks
+    validate_number_format(number_format)
+    marks <- resolve_number_marks(number_format)
     
     ## Handle input: accept either a model object or a fit_result/fullfit_result from fit()/fullfit()
     if (inherits(x, "fit_result") || inherits(x, "fullfit_result")) {
@@ -714,15 +727,17 @@ Received class: ", paste(class(x), collapse = ", "))
         gmodel$pct_events_analyzed <- NA
     }
     
-    ## Format events and AIC with commas
-    gmodel$nevent_formatted <- format(gmodel$nevent, big.mark = ",", scientific = FALSE)
+    ## Format events and AIC with locale-aware separators
+    gmodel$nevent_formatted <- format_count_forest(gmodel$nevent, marks)
     gmodel$nevent_with_pct <- if(!is.na(gmodel$pct_events_analyzed)) {
-                                  paste0(gmodel$nevent_formatted, " (", 
-                                         sprintf("%.1f%%", gmodel$pct_events_analyzed), ")")
+                                  pct_str <- sprintf("%.1f%%", gmodel$pct_events_analyzed)
+                                  if (marks$decimal.mark != ".") pct_str <- sub(".", marks$decimal.mark, pct_str, fixed = TRUE)
+                                  paste0(gmodel$nevent_formatted, " (", pct_str, ")")
                               } else {
                                   gmodel$nevent_formatted
                               }
-    gmodel$AIC_formatted <- format(round(gmodel$AIC, 2), big.mark = ",", scientific = FALSE, nsmall = 2)
+    aic_val <- format(round(gmodel$AIC, 2), big.mark = marks$big.mark, decimal.mark = marks$decimal.mark, scientific = FALSE, nsmall = 2)
+    gmodel$AIC_formatted <- trimws(aic_val)
 
     ## Calculate CI for concordance if both concordance and SE are available
     z_crit <- qnorm((1 + conf_level) / 2)
@@ -737,11 +752,15 @@ Received class: ", paste(class(x), collapse = ", "))
 
     ## Format the global \emph{p}-value for display using p_digits
     global_p_threshold <- 10^(-p_digits)
-    global_p_threshold_str <- paste0("< ", format(global_p_threshold, scientific = FALSE))
+    global_p_threshold_str <- if (!is.null(marks)) {
+                                  paste0("< 0", marks$decimal.mark, strrep("0", p_digits - 1), "1")
+                              } else {
+                                  paste0("< ", format(global_p_threshold, scientific = FALSE))
+                              }
     global_p_formatted <- if(as.numeric(gmodel$p_value_log) < global_p_threshold) {
                               global_p_threshold_str
                           } else {
-                              format(round(as.numeric(gmodel$p_value_log), p_digits), nsmall = p_digits)
+                              format_number(as.numeric(gmodel$p_value_log), p_digits, marks)
                           }
     
     ## Format CI percentage for display
@@ -1179,24 +1198,31 @@ Received class: ", paste(class(x), collapse = ", "))
                                                             "",  # Empty for header rows
                                                             data.table::fifelse(is.na(estimate), 
                                                                                 ref_label,
-                                                                                format_number(exp(estimate), digits)))]
+                                                                                format_number(exp(estimate), digits, marks)))]
 
     to_show_exp_clean[, conf_low_formatted := data.table::fifelse(is.na(conf_low), 
                                                                   NA_character_,
-                                                                  format_number(exp(conf_low), digits))]
+                                                                  format_number(exp(conf_low), digits, marks))]
     to_show_exp_clean[, conf_high_formatted := data.table::fifelse(is.na(conf_high), 
                                                                    NA_character_,
-                                                                   format_number(exp(conf_high), digits))]
+                                                                   format_number(exp(conf_high), digits, marks))]
 
     ## Format \emph{p}-values using p_digits parameter
     p_threshold <- 10^(-p_digits)
-    p_threshold_str <- paste0("< ", format(p_threshold, scientific = FALSE))
+    p_threshold_str <- if (!is.null(marks)) {
+                           paste0("< 0", marks$decimal.mark, strrep("0", p_digits - 1), "1")
+                       } else {
+                           paste0("< ", format(p_threshold, scientific = FALSE))
+                       }
     
     to_show_exp_clean[, p_formatted := data.table::fifelse(is.na(p_value), 
                                                            NA_character_,
                                                            data.table::fifelse(p_value < p_threshold, 
                                                                                p_threshold_str,
-                                                                               format_number(p_value, p_digits)))]
+                                                                               format_number(p_value, p_digits, marks)))]
+
+    ## Determine CI separator (HRs are always positive, but handle EU comma)
+    ci_separator <- forest_ci_separator(FALSE, marks)
 
     ## Create the combined HR string with expression for italic p
     to_show_exp_clean[, hr_string_expr := data.table::fifelse(
@@ -1206,16 +1232,18 @@ Received class: ", paste(class(x), collapse = ", "))
                                                                           is.na(estimate),
                                                                           paste0("'", ref_label, "'"),
                                                                           data.table::fifelse(p_value < p_threshold,
-                                                                                              paste0("'", hr_formatted, " (", conf_low_formatted, "-", 
+                                                                                              paste0("'", hr_formatted, " (", conf_low_formatted, ci_separator, 
                                                                                                      conf_high_formatted, "); '*~italic(p)~'", p_threshold_str, "'"),
-                                                                                              paste0("'", hr_formatted, " (", conf_low_formatted, "-", 
+                                                                                              paste0("'", hr_formatted, " (", conf_low_formatted, ci_separator, 
                                                                                                      conf_high_formatted, "); '*~italic(p)~'= ", p_formatted, "'"))
                                                                       )
                                                       )]
 
-    ## Format N and events with thousands separator
-    to_show_exp_clean[, n_formatted := data.table::fifelse(is.na(N), "", format(N, big.mark = ",", scientific = FALSE))]
-    to_show_exp_clean[, events_formatted := data.table::fifelse(is.na(Events), "", format(Events, big.mark = ",", scientific = FALSE))]
+    ## Format N and events with locale-aware thousands separator
+    to_show_exp_clean[, n_formatted := data.table::fifelse(is.na(N), "",
+        vapply(N, format_count_forest, character(1), marks = marks))]
+    to_show_exp_clean[, events_formatted := data.table::fifelse(is.na(Events), "",
+        vapply(Events, format_count_forest, character(1), marks = marks))]
     
     ## Clean up variable names for display
     to_show_exp_clean[, var_display := as.character(var)]
@@ -1522,7 +1550,7 @@ Received class: ", paste(class(x), collapse = ", "))
     
     ## Effect column - use dynamic CI percentage
     ggplot2::annotate(geom = "text", x = max(to_show_exp_clean$x_pos) + 1.4, y = exp(y_hr),
-                      label = paste0("bold('aHR (", ci_pct, "% CI); '*bolditalic(p)*'-value')"),
+                      label = paste0("bold('", effect_abbrev, " (", ci_pct, "% CI); '*bolditalic(p)*'-value')"),
                       hjust = 0, size = header_font, parse = TRUE) +
     
     ggplot2::annotate(geom = "text", x = to_show_exp_clean$x_pos, y = exp(y_hr),
@@ -1531,7 +1559,7 @@ Received class: ", paste(class(x), collapse = ", "))
     
     ## X-axis label
     ggplot2::annotate(geom = "text", x = -1.5, y = 1,
-                      label = "Hazard Ratio", fontface = "bold",
+                      label = effect_label, fontface = "bold",
                       hjust = 0.5, vjust = 2, size = annot_font * 1.5) +
     
     ## Model statistics footer (conditional)
@@ -1557,7 +1585,7 @@ Received class: ", paste(class(x), collapse = ", "))
     }
     
     ## Add recommended dimensions as an attribute
-    attr(p, "recommended_dims") <- list(width = rec_width, height = rec_height)
+    attr(p, "rec_dims") <- list(width = rec_width, height = rec_height)
 
     ## Return the plot
     return(p)

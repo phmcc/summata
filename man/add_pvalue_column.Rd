@@ -2,21 +2,24 @@
 % Please edit documentation in R/surv_utils.R
 \name{add_pvalue_column}
 \alias{add_pvalue_column}
-\title{Add p-value column to result table}
+\title{Add \emph{p}-value column to result table}
 \usage{
-add_pvalue_column(result, p_value, p_digits)
+add_pvalue_column(result, p_value, p_digits, marks = NULL)
 }
 \arguments{
 \item{result}{Data.table result.}
 
-\item{p_value}{Numeric p-value.}
+\item{p_value}{Numeric \emph{p}-value.}
 
-\item{p_digits}{Integer decimal places for p-value.}
+\item{p_digits}{Integer decimal places for \emph{p}-value.}
+
+\item{marks}{List with \code{big.mark} and \code{decimal.mark} as returned
+by \code{\link{resolve_number_marks}}.}
 }
 \value{
-Data.table with p-value column added.
+Data.table with \emph{p}-value column added.
 }
 \description{
-Adds formatted p-value column to the survtable result.
+Adds formatted \emph{p}-value column to the survtable result.
 }
 \keyword{internal}

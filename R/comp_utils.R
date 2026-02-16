@@ -651,7 +651,7 @@ format_model_comparison <- function(comparison) {
 #' 
 #' @param comparison Data.table with model comparison metrics.
 #' @param model_type Character string indicating model type.
-#' @param scoring_weights Optional named list of custom weights. If NULL,
+#' @param scoring_weights Optional named list of custom weights. If \code{NULL},
 #'   uses default weights for the model type.
 #' @return Data.table with CMS column added, sorted by score.
 #' @keywords internal
@@ -1085,7 +1085,7 @@ calculate_coxme_scores <- function(comparison, weights, scores, n_models) {
 #' 
 #' @param coef_list List of data.tables containing coefficient information.
 #' @param model_names Character vector of model names corresponding to coef_list.
-#' @return Combined data.table with Model column, or NULL if empty.
+#' @return Combined data.table with Model column, or \code{NULL} if empty.
 #' @keywords internal
 combine_coefficient_tables <- function(coef_list, model_names) {
     if (length(coef_list) == 0) return(NULL)
@@ -1168,7 +1168,7 @@ detect_model_type_auto <- function(data, outcome, has_random_effects, family = "
 #' Converts model class names to standardized model type strings.
 #' 
 #' @param model_type Character string of model type or class name.
-#' @return Normalized character string (e.g., "lmerMod" becomes "lmer").
+#' @return Normalized character string (\emph{e.g.,} "lmerMod" becomes "lmer").
 #' @keywords internal
 normalize_model_type <- function(model_type) {
     switch(model_type,
@@ -1184,7 +1184,7 @@ normalize_model_type <- function(model_type) {
 #' Stops with informative error if required packages are missing.
 #' 
 #' @param model_type Character string indicating model type.
-#' @return NULL (invisibly). Stops execution if packages missing.
+#' @return \code{NULL} (invisibly). Stops execution if packages missing.
 #' @keywords internal
 check_required_packages <- function(model_type) {
     
@@ -1269,7 +1269,7 @@ build_failed_model_row <- function(model_name, n, n_predictors, model_type) {
 #' @param model_type Character string indicating model type.
 #' @return Data.table with single row of formatted metrics.
 #' @keywords internal
-build_model_row <- function(model_name, n_predictors, converged, metrics, model_type) {
+build_model_row <- function(model_name, n_predictors, converged, metrics, model_type, marks = NULL) {
     
     ## Base columns for all models
     row <- data.table::data.table(
@@ -1283,7 +1283,7 @@ build_model_row <- function(model_name, n_predictors, converged, metrics, model_
                            `Pseudo-R^2` = safe_round(metrics$pseudo_r2, 3),
                            Concordance = safe_round(metrics$concordance, 3),
                            `Global p` = if (!is.null(metrics$global_p) && !is.na(metrics$global_p)) {
-                                            format_pvalues_fit(metrics$global_p, 3)
+                                            format_pvalues_fit(metrics$global_p, 3, marks)
                                         } else {
                                             NA_character_
                                         }
@@ -1313,13 +1313,13 @@ build_model_row <- function(model_name, n_predictors, converged, metrics, model_
 }
 
 
-#' Safe rounding that handles NULL and NA
+#' Safe rounding that handles \code{NULL} and NA
 #' 
-#' Rounds numeric values while gracefully handling NULL, empty, and NA inputs.
+#' Rounds numeric values while gracefully handling \code{NULL}, empty, and NA inputs.
 #' 
 #' @param x Numeric value to round.
 #' @param digits Integer number of decimal places.
-#' @return Rounded numeric value, or NA_real_ if input is NULL/NA/empty.
+#' @return Rounded numeric value, or NA_real_ if input is \code{NULL}/NA/empty.
 #' @keywords internal
 safe_round <- function(x, digits) {
     if (is.null(x) || length(x) == 0) return(NA_real_)

@@ -2,19 +2,22 @@
 % Please edit documentation in R/surv_utils.R
 \name{format_pvalue_survtable}
 \alias{format_pvalue_survtable}
-\title{Format p-value for survtable}
+\title{Format \emph{p}-value for survtable}
 \usage{
-format_pvalue_survtable(p, digits)
+format_pvalue_survtable(p, digits, marks = NULL)
 }
 \arguments{
-\item{p}{Numeric p-value.}
+\item{p}{Numeric \emph{p}-value.}
 
 \item{digits}{Integer decimal places.}
+
+\item{marks}{List with \code{big.mark} and \code{decimal.mark} as returned
+by \code{\link{resolve_number_marks}}.}
 }
 \value{
-Character formatted p-value.
+Character-formatted \emph{p}-value.
 }
 \description{
-Provides p-value formatting to the survtable result.
+Provides \emph{p}-value formatting to the survtable result.
 }
 \keyword{internal}

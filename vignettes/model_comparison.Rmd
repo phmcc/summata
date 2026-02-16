@@ -24,7 +24,15 @@ if (requireNamespace("ragg", quietly = TRUE)) {
 options(width = 180)
 ```
 
-Model selection is a fundamental problem in applied statistics. Given a set of candidate models, it is important to determine which specification best balances goodness-of-fit against parsimony. Traditional approaches rely on information criteria (AIC, BIC), discrimination metrics (C-statistic), and hypothesis tests for nested models. The `compfit()` function synthesizes these metrics to facilitate systematic model comparison.
+Model selection is a fundamental problem in applied statistics. Given a set of candidate models, it is important to determine which specification best balances goodness-of-fit against parsimony. Traditional approaches rely on information criteria (AIC, BIC), discrimination metrics (C-statistic), and hypothesis tests for nested models.
+
+The `compfit()` function synthesizes these metrics into a weighted Composite Model Score (CMS) to facilitate systematic comparison between models. Like other functions in this package, it follows the standard `summata` input paradigm, with an additional parameter to allow for multiple models:
+
+```{r, eval = FALSE}
+compfit(data, outcome, model_list, model_type, ...)
+```
+
+where `data` is the dataset, `outcome` is the common endpoint variable, `model_list` is a named list of predictor vectors (each representing a different model to be compared), and `model_type` is the type of model to be implemented. This vignette demonstrates the various capabilities of this function using the included sample dataset.
 
 ---
 
@@ -43,7 +51,7 @@ data(clintrial_labels)
 
 # Model Quality Metrics
 
-The `compfit()` function reports several metrics for comparing models. For mathematical details, see the [Statistical Foundations](statistical_foundations.html) article.
+The `compfit()` function uses several metrics for comparing models. For mathematical details, see the [Statistical Foundations](statistical_foundations.html) article.
 
 | Metric | Interpretation | Better |
 |:-------|:---------------|:-------|
@@ -56,14 +64,6 @@ The `compfit()` function reports several metrics for comparing models. For mathe
 ---
 
 # Basic Usage
-
-## Function Signature
-
-Models are specified as a named list of predictor vectors:
-
-```{r, eval = FALSE}
-compfit(data, outcome, model_list, model_type, ...)
-```
 
 ## **Example 1:** Nested Model Comparison
 
@@ -84,46 +84,12 @@ example1 <- compfit(
 example1
 ```
 
-The output includes the following metrics:
-
-| Metric | Interpretation |
-|:-------|:---------------|
-| Summata Score | Composite metric (0–100, higher is better) |
-| *n* | Sample size |
-| Events | Number of outcome events |
-| Predictors | Number of model parameters |
-| Converged | Convergence status |
-| AIC/BIC | Information criteria (lower is better) |
-| Pseudo-*R*² | Explained variation |
-| Concordance | Discrimination (higher is better) |
-| Brier Score | Prediction accuracy (lower is better) |
-| Global *p* | Overall model significance |
-
-## **Example 2:** Cox Regression Models
-
-For time-to-event outcomes, use `model_type = "coxph"`:
-
-```{r}
-example2 <- compfit(
-  data = clintrial,
-  outcome = "Surv(os_months, os_status)",
-  model_list = list(
-    "Unadjusted" = c("treatment"),
-    "Demographics" = c("treatment", "age", "sex"),
-    "Full" = c("treatment", "age", "sex", "stage", "ecog")
-  ),
-  model_type = "coxph"
-)
-
-example2
-```
-
-## **Example 3:** Linear Regression Models
+## **Example 2:** Linear Regression Models
 
 For continuous outcomes, use `model_type = "lm"`:
 
 ```{r}
-example3 <- compfit(
+example2 <- compfit(
   data = clintrial,
   outcome = "los_days",
   model_list = list(
@@ -134,12 +100,31 @@ example3 <- compfit(
   model_type = "lm"
 )
 
+example2
+```
+
+## **Example 3:** Cox Regression Models
+
+For time-to-event outcomes, use `model_type = "coxph"`:
+
+```{r}
+example3 <- compfit(
+  data = clintrial,
+  outcome = "Surv(os_months, os_status)",
+  model_list = list(
+    "Unadjusted" = c("treatment"),
+    "Demographics" = c("treatment", "age", "sex"),
+    "Full" = c("treatment", "age", "sex", "stage", "ecog")
+  ),
+  model_type = "coxph"
+)
+
 example3
 ```
 
-## **Example 4:** Count Models (Poisson Regression)
+## **Example 4:** Count Models
 
-For count outcomes, use `model_type = "glm"` with `family = "poisson"`. The `clintrial` dataset includes `fu_count` (equidispersed follow-up visits) suitable for Poisson regression:
+For count outcomes, use `model_type = "glm"` with a count model family (e.g., `family = "poisson"`):
 
 ```{r}
 example4 <- compfit(
@@ -157,8 +142,6 @@ example4 <- compfit(
 
 example4
 ```
-
-For overdispersed count data like `ae_count`, use `model_type = "negbin"` instead to properly account for extra-Poisson variation.
 
 ---
 
@@ -258,7 +241,7 @@ summary(models[["Model C"]])
 
 ## **Example 9:** Recommended Model
 
-The best-performing model is identified automatically based on the Summata Score:
+The best-performing model is identified automatically based on the Composite Model Score (CMS):
 
 ```{r}
 example9 <- compfit(
@@ -272,15 +255,15 @@ example9 <- compfit(
   model_type = "coxph"
 )
 
-recommended <- attr(example9, "recommended")
+recommended <- attr(example9, "best_model")
 cat("Recommended model:", recommended, "\n")
 ```
 
 ---
 
-# The Summata Score
+# The Composite Model Score (CMS)
 
-The Summata Score is a composite metric designed to facilitate rapid model comparison. It combines multiple quality indicators into a single value ranging from 0 to 100.
+The Composite Model Score (CMS) is a metric designed to facilitate rapid model comparison. It combines multiple quality indicators into a single value ranging from 0 to 100.
 
 ## Score Interpretation
 
@@ -296,7 +279,7 @@ The Summata Score is a composite metric designed to facilitate rapid model compa
 
 The score components and their default weights vary by model type.
 
-**Linear regression (`lm`):**
+**Linear regression:**
 
 | Component | Weight |
 |:----------|:-------|
@@ -305,7 +288,7 @@ The score components and their default weights vary by model type.
 | Adjusted *R²* | 45% |
 | RMSE | 15% |
 
-**Logistic regression (`glm`):**
+**Logistic regression:**
 
 | Component | Weight |
 |:----------|:-------|
@@ -315,7 +298,7 @@ The score components and their default weights vary by model type.
 | Pseudo-*R²* | 15% |
 | Brier Score | 5% |
 
-**Cox regression (`coxph`):**
+**Cox regression:**
 
 | Component | Weight |
 |:----------|:-------|
@@ -326,7 +309,7 @@ The score components and their default weights vary by model type.
 
 ## **Example 10:** Custom Weights
 
-Modify the scoring weights to emphasize specific metrics:
+Modify the CMS scoring weights to emphasize specific metrics:
 
 ```{r}
 example10 <- compfit(
@@ -394,7 +377,7 @@ screening <- uniscreen(
 )
 
 # Extract significant predictors
-sig_vars <- unique(attr(screening, "raw_data")$variable)
+sig_vars <- attr(screening, "significant")
 
 scenario2 <- compfit(
   data = clintrial,
@@ -474,14 +457,14 @@ table2pdf(
 
 ## Interpreting Results
 
-1. **Multiple metrics**: The Summata Score provides a summary, but examine individual metrics
+1. **Multiple metrics**: The Composite Model Score (CMS) provides a summary, but examine individual metrics
 2. **Practical significance**: Statistical improvement may not translate to meaningful differences
 3. **Sample size**: Complex models require larger samples
 4. **Convergence**: Non-converged models should be interpreted cautiously
 
 ## Limitations
 
-1. The Summata Score is a heuristic, not a formal statistical test
+1. The Composite Model Score (CMS) is a heuristic, not a formal statistical test
 2. Comparisons assume models are fit on identical observations
 3. Information criteria are most meaningful for nested models
 4. Small score differences may not be practically significant
@@ -504,6 +487,8 @@ comparison[, .(Model, Converged)]
 # 3. Examine predictor correlations
 ```
 
+When encountering non-converging models, consider reducing complexity, examining predictor correlations, and checking for perfect separation (primarily in logistic models).
+
 ## Differing Sample Sizes
 
 Models with missing data may have different sample sizes, which complicates comparison:
@@ -522,7 +507,7 @@ When scores are similar, prefer parsimony and consider domain knowledge:
 
 ```{r, eval = FALSE}
 # Examine individual metrics
-comparison[, .(Model, `Summata Score`, AIC, Concordance)]
+comparison[, .(Model, `Composite Model Score (CMS)`, AIC, Concordance)]
 
 # Prefer parsimony when scores are close
 # Consider interpretability

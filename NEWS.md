@@ -1,3 +1,14 @@
+# *summata* 0.10.8 (2026-02-09)
+
+* Add compatibility with US/EU locales and different big/small number marks
+* Add quiet vs. verbose settings to regression functions for warnings
+* Documentation and vignette updates
+
+# *summata* 0.10.7 (2026-02-05)
+
+* Add R-hub compatability
+* Documentation and vignette updates
+
 # *summata* 0.10.6 (2026-01-20)
 
 * Fix "n" and "Events" counts in regression summary tables for extended GLM families
@@ -110,7 +121,7 @@
 
 # *summata* 0.7.14 (2025-12-20)
 
-* Add `autoexport()` function
+* Add `autotable()` function
 
 # *summata* 0.7.13 (2025-12-19)
 

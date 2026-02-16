@@ -12,7 +12,7 @@ validate_predictors_exist(data, predictors)
 \item{predictors}{Character vector of predictor variable names.}
 }
 \value{
-Invisible TRUE if validation passes, otherwise stops with error.
+Invisible \code{TRUE} if validation passes, otherwise stops with error.
 }
 \description{
 Checks that all specified predictor variables exist in the dataset. Handles

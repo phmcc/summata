@@ -10,7 +10,7 @@ is_surv_outcome(outcome)
 \item{outcome}{Character string of the outcome specification.}
 }
 \value{
-Logical TRUE if outcome starts with "Surv(", FALSE otherwise.
+Logical \code{TRUE} if outcome starts with "Surv(", \code{FALSE} otherwise.
 }
 \description{
 Tests whether an outcome specification string represents a survival outcome

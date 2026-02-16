@@ -14,7 +14,9 @@ process_survival_probs(
   total_label,
   median_label,
   by,
-  data
+  data,
+  conf_level = 0.95,
+  marks = NULL
 )
 }
 \arguments{

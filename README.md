@@ -4,7 +4,6 @@
 [![R-CMD-check](https://github.com/phmcc/summata/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/phmcc/summata/actions/workflows/R-CMD-check.yaml)
 [![test-coverage](https://github.com/phmcc/summata/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/phmcc/summata/actions/workflows/test-coverage.yaml)
 [![lint](https://github.com/phmcc/summata/actions/workflows/lint.yaml/badge.svg)](https://github.com/phmcc/summata/actions/workflows/lint.yaml)
-[![Codecov test coverage](https://codecov.io/gh/phmcc/summata/branch/main/graph/badge.svg)](https://codecov.io/gh/phmcc/summata?branch=main)
 [![CRAN status](https://www.r-pkg.org/badges/version/summata)](https://CRAN.R-project.org/package=summata)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
@@ -15,13 +14,13 @@
 
 ## Overview
 
-The `summata` package provides a comprehensive framework for generating summary tables and visualizations from statistical analyses. Built on `data.table` for computational efficiency, it streamlines the workflow from descriptive statistics through regression modeling to final output—all using a unified interface with standardized, presentation-ready results.
+The `summata` package provides a comprehensive framework for generating summary tables and visualizations from statistical analyses. Built on `data.table` for computational efficiency, it streamlines the workflow from descriptive statistics, through regression modeling, to final output—all using a unified interface with standardized, presentation-ready results.
 
 <img src="man/figures/README_coxforest.png" alt="Cox regression forest plot" width="100%">
 
 ## Installation
 
-Install this package from GitHub (stable) or Codeberg (development):
+This package is not yet on CRAN.  Install it from GitHub (stable) or Codeberg (development):
 
 ```r
 # Stable release
@@ -37,7 +36,7 @@ devtools::install_git("https://codeberg.org/phmcc/summata.git")
 
 The architecture of `summata` reflects three guiding principles:
 
-1. **Consistent syntax.** All modeling functions share a common signature: data first, followed by the outcome or variable of interest, then additional covariates. This convention facilitates both pipe-based workflows and pedagogical clarity.
+1. **Consistent syntax.** All modeling functions share a common signature: data first, followed by the outcome or variable of interest, then constituent/modifying variables. This convention facilitates both pipe-based workflows and pedagogical clarity.
 
 2. **Transparent computation.** Functions attach their underlying model objects and raw numerical results as attributes, permitting verification of computations or extension of analyses beyond the formatted output.
    
@@ -46,10 +45,10 @@ The architecture of `summata` reflects three guiding principles:
 These principles manifest in the standard calling convention:
 
 ``` r
-result <- fit(data, variable, c("covar1", "covar2", ..., "covarN"), ...)
+result <- fit(data, variable, c("var1", "var2", ..., "varN"), ...)
 ```
 
-where `data` is the dataset, `variable` is the variable of interest (dependent variable, endpoint/outcome, stratification/grouping variable, *etc.*), and `c("covar1", "covar2", ..., "covarN")`is a vector of covariates (independent variables, model predictors, compared/explanatory factors, *etc.*). The result is a formatted table for export, with readily accessible attributes for further analysis.
+where `data` is the dataset, `variable` is the variable of interest (dependent variable, endpoint/outcome, stratification/grouping variable, *etc.*), and `c("var1", "var2", ..., "varN")`is a vector of constituent/modifying variables (independent variables, model covariates, compared/explanatory factors, *etc.*). The result is a formatted table for export, with readily accessible attributes for further analysis.
 
 ``` r
 # The formatted table
@@ -85,7 +84,7 @@ Fitted univariable and multivariable regression results for predictive modeling.
 | `fit()` | Single regression model with formatted coefficient extraction |
 | `fullfit()` | Integrated univariable screening with multivariable regression |
 | `compfit()` | Nested model comparison with composite scoring |
-| `multifit()` | Multivariate analysis with a single predictor evaluated against multiple outcomes |
+| `multifit()` | Multivariate regression analysis with a single predictor evaluated against multiple outcomes |
 
 #### Table export
 
@@ -93,10 +92,10 @@ Export of finalized tables to various commonly used formats.
 
 | Function | Format | Dependencies |
 |:---------|:-------|:-----------|
-| `autoexport()` | Auto-detect from file extension | Varies |
+| `autotable()` | Auto-detect from file extension | Varies |
 | `table2pdf()` | PDF | `xtable`, LaTeX distribution |
-| `table2html()` | HTML | `xtable` |
 | `table2tex()` | LaTeX source | `xtable` |
+| `table2html()` | HTML | `xtable` |
 | `table2docx()` | Microsoft Word | `officer`, `flextable` |
 | `table2pptx()` | Microsoft PowerPoint | `officer`, `flextable` |
 | `table2rtf()` | Rich Text Format | `officer`, `flextable` |
@@ -112,7 +111,7 @@ Generation of publication-ready forest plot graphics to summarize regression mod
 | `glmforest()` | Generalized linear models |
 | `coxforest()` | Proportional hazards models |
 | `uniforest()` | Univariable screening results |
-| `multiforest()` | Multivariate analysis results |
+| `multiforest()` | Multivariate regression analysis results |
 
 ### Supported Model Classes
 
@@ -151,11 +150,11 @@ The R ecosystem includes several established packages for regression table gener
 | Integrated forest plots | ✓ | ◐ | ✓ | — |
 | Model comparison | ✓ | ✓ | ◐ | — |
 | Mixed-effects models | ✓ | ◐ | ◐ | — |
-| Multivariate analysis | ✓ | — | — | — |
+| Multivariate regression analysis | ✓ | — | — | — |
 
 <sub>✓ Full support | ◐ Partial support | — Not available</sub>
 
-A detailed feature comparison is available in the [package documentation](articles/benchmarks.html).
+A detailed feature comparison is available in the [package documentation](articles/feature_comparison.html).
 
 ## Illustrative Example
 
@@ -168,7 +167,7 @@ Prior to analysis, load the dataset, apply labels, and define predictors:
 ``` r
 library(summata)
 
-# Load example data ≥
+# Load example data
 data("clintrial")
 data("clintrial_labels")
 
@@ -240,8 +239,8 @@ forest_30d <- glmforest(table2,
                         )
 
 ggsave("forest_30d.pdf", forest_30d,
-       width = attr(forest_30d, "recommended_dims")$width,
-       height = attr(forest_30d, "recommended_dims")$height, 
+       width = attr(forest_30d, "rec_dims")$width,
+       height = attr(forest_30d, "rec_dims")$height, 
        units = "in")
 ```
 

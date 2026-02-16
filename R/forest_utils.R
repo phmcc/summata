@@ -66,18 +66,86 @@ detect_plot_font <- function() {
 #' Format numeric value with fixed decimal places
 #' 
 #' Formats a numeric value to a specified number of decimal places, removing
-#' leading/trailing whitespace and fixing negative zero display (e.g., "-0.00"
-#' becomes "0.00").
+#' leading/trailing whitespace and fixing negative zero display (\emph{e.g.,} "-0.00"
+#' becomes "0.00"). When \code{marks} is supplied, applies locale-appropriate
+#' decimal mark substitution.
 #' 
 #' @param x Numeric value to format.
 #' @param digits Integer number of decimal places.
+#' @param marks Optional list with \code{big.mark} and \code{decimal.mark} as
+#'   returned by \code{\link{resolve_number_marks}}.
 #' @return Character string with formatted value.
 #' @keywords internal
-format_number <- function(x, digits) {
+format_number <- function(x, digits, marks = NULL) {
     result <- trimws(format(round(x, digits), nsmall = digits))
-    ## Fix negative zero: "-0.00" -> "0.00" (handles embedded occurrences too)
+    if (!is.null(marks)) {
+        return(apply_decimal_mark(result, marks))
+    }
+    ## Fallback: fix negative zero only (US locale)
     gsub("(?<![0-9])-0(\\.0+)(?![0-9])", "0\\1", result, perl = TRUE)
 }
+
+
+#' Determine CI separator for forest plot text annotations
+#'
+#' Returns the appropriate separator string between CI lower and upper bounds
+#' in forest plot annotations. Considers whether values may be negative and
+#' the current locale's decimal mark.
+#'
+#' @param has_negatives Logical indicating whether any CI bounds are negative.
+#' @param marks Optional list with \code{big.mark} and \code{decimal.mark} as
+#'   returned by \code{\link{resolve_number_marks}}.
+#' @return Character string separator.
+#' @keywords internal
+forest_ci_separator <- function(has_negatives, marks = NULL) {
+    if (has_negatives) return(", ")
+    if (!is.null(marks) && marks$decimal.mark == ",") return("\u2013")
+    "-"
+}
+
+
+#' Format an integer for forest plot annotations
+#'
+#' Applies thousands separator to an integer value. Respects locale marks
+#' when provided.
+#'
+#' @param x Integer value.
+#' @param marks Optional list with \code{big.mark} and \code{decimal.mark} as
+#'   returned by \code{\link{resolve_number_marks}}.
+#' @return Character string.
+#' @keywords internal
+format_count_forest <- function(x, marks = NULL) {
+    if (is.na(x)) return("")
+    if (!is.null(marks)) {
+        return(format_count(x, marks))
+    }
+    format(x, big.mark = ",", scientific = FALSE)
+}
+
+
+#' Format a p-value for forest plot annotations
+#'
+#' Returns a formatted p-value string suitable for forest plot display,
+#' using locale-aware decimal marks when \code{marks} is provided.
+#'
+#' @param p Numeric p-value.
+#' @param p_digits Integer decimal places.
+#' @param marks Optional list with \code{big.mark} and \code{decimal.mark} as
+#'   returned by \code{\link{resolve_number_marks}}.
+#' @return Character string.
+#' @keywords internal
+format_p_forest <- function(p, p_digits, marks = NULL) {
+    threshold <- 10^(-p_digits)
+    if (p < threshold) {
+        if (!is.null(marks)) {
+            return(paste0("< 0", marks$decimal.mark,
+                          strrep("0", p_digits - 1), "1"))
+        }
+        return(paste0("< ", format(threshold, scientific = FALSE)))
+    }
+    format_number(p, p_digits, marks)
+}
+
 
 #' Calculate table layout for forest plots
 #' 
@@ -203,9 +271,9 @@ calculate_forest_layout <- function(to_show_exp_clean, show_n, show_events,
 #' 
 #' @param var_rows Data.table containing rows for a single variable.
 #' @param estimate_col Character string naming the estimate column 
-#'   (e.g., "estimate", "coef"). Default is "estimate".
-#' @return Integer index of the non-reference row within var_rows, or NULL if
-#'   cannot be determined (e.g., no NA estimates found, or multiple non-NA rows).
+#'   (\emph{e.g.,} "estimate", "coef"). Default is "estimate".
+#' @return Integer index of the non-reference row within var_rows, or \code{NULL} if
+#'   cannot be determined (\emph{e.g.,} no NA estimates found, or multiple non-NA rows).
 #' @keywords internal
 find_non_reference_row <- function(var_rows, estimate_col = "estimate") {
     if (!estimate_col %in% names(var_rows)) {
@@ -310,14 +378,14 @@ is_reference_category <- function(category, label = NULL,
 #' Check if category name should be suppressed in condensed label
 #' 
 #' Determines whether a category name should be suppressed when condensing
-#' binary variables. Returns TRUE for standard affirmative values (e.g., "Yes", 
-#' "1", "Positive"), standard reference values (e.g., "No", "Absent", "None"),
+#' binary variables. Returns \code{TRUE} for standard affirmative values (\emph{e.g.,} "Yes", 
+#' "1", "Positive"), standard reference values (\emph{e.g.,} "No", "Absent", "None"),
 #' or when the category name essentially matches the variable label 
 #' (case-insensitive comparison).
 #' 
 #' @param category Character string with the category name.
 #' @param label Optional character string with the variable label. If provided,
-#'   returns TRUE when category is a case-insensitive match or substring.
+#'   returns \code{TRUE} when category is a case-insensitive match or substring.
 #' @param norm_category Optional pre-normalized category (lowercase, trimmed).
 #'   If provided, skips normalization for performance.
 #' @param norm_label Optional pre-normalized label (lowercase, trimmed).
@@ -379,7 +447,7 @@ is_affirmative_category <- function(category, label = NULL,
 #' Check if a binary variable should be condensed without category suffix
 #' 
 #' Uses a greedy/liberal approach to determine if a binary variable's condensed
-#' display should omit the category name. Returns TRUE if EITHER level of the
+#' display should omit the category name. Returns \code{TRUE} if EITHER level of the
 #' binary variable is a standard reference/affirmative value, OR if either level
 #' matches/contains the variable label.
 #' 
@@ -391,7 +459,7 @@ is_affirmative_category <- function(category, label = NULL,
 #' @param non_ref_category Character string with the non-reference category name
 #'   (the level with the actual estimate).
 #' @param label Optional character string with the variable label. Used for
-#'   intelligent matching (e.g., "30-Day Readmission" label with 
+#'   intelligent matching (\emph{e.g.,} "30-Day Readmission" label with 
 #'   "30-day readmission" / "No 30-day readmission" levels).
 #' @return Logical indicating whether the binary variable should be condensed
 #'   without appending the category name.

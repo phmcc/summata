@@ -154,7 +154,7 @@ test_that("desctable handles continuous variables correctly", {
     expect_desctable_result(result)
     
     ## Should have rows for each stat type
-    expect_true(any(result$Group == "Mean +/- SD"))
+    expect_true(any(result$Group == "Mean ± SD"))
     expect_true(any(result$Group == "Median [IQR]"))
 })
 
@@ -168,7 +168,7 @@ test_that("desctable stats_continuous='mean_sd' works", {
     )
     
     ## Should only have mean_sd row (plus N row)
-    expect_true(any(result$Group == "Mean +/- SD"))
+    expect_true(any(result$Group == "Mean ± SD"))
     expect_false(any(result$Group == "Median [IQR]"))
 })
 
@@ -220,7 +220,7 @@ test_that("desctable multiple stats_continuous creates multiple rows", {
     ## Age should have 3 rows (one for each stat)
     age_rows <- result[Variable == "age" | (Variable == "" & shift(Variable, fill = "age") == "age")]
     ## Count rows with stat labels
-    stat_rows <- sum(result$Group %in% c("Mean +/- SD", "Median [IQR]", "Range"))
+    stat_rows <- sum(result$Group %in% c("Mean ± SD", "Median [IQR]", "Range"))
     expect_equal(stat_rows, 3)
 })
 
@@ -666,8 +666,8 @@ test_that("desctable respects digits parameter", {
     )
     
     ## Extract mean values and check decimal places
-    mean_row_1 <- result_1dig[Group == "Mean +/- SD"]$Total
-    mean_row_2 <- result_2dig[Group == "Mean +/- SD"]$Total
+    mean_row_1 <- result_1dig[Group == "Mean ± SD"]$Total
+    mean_row_2 <- result_2dig[Group == "Mean ± SD"]$Total
     
     ## Count decimals (rough check)
     if (length(mean_row_1) > 0 && length(mean_row_2) > 0) {
@@ -691,7 +691,7 @@ test_that("desctable formats large numbers with commas", {
     )
     
     ## Values >= 1000 should have commas
-    mean_row <- result[Group == "Mean +/- SD"]$Total
+    mean_row <- result[Group == "Mean ± SD"]$Total
     if (length(mean_row) > 0) {
         expect_true(grepl(",", mean_row))
     }

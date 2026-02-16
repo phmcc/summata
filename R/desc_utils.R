@@ -20,8 +20,10 @@
 #' @param total_label Character string label for total column.
 #' @param labels Named character vector of variable labels.
 #' @param na_percent Logical whether to include NA in percentage denominators.
-#' @param p_per_stat Logical whether to show separate p-values per statistic for
-#'   continuous variables. Default FALSE for better performance.
+#' @param p_per_stat Logical whether to show separate \emph{p}-values per statistic for
+#'   continuous variables. Default \code{FALSE} for better performance.
+#' @param marks List with \code{big.mark} and \code{decimal.mark} as returned
+#'   by \code{\link{resolve_number_marks}}.
 #' @param ... Additional arguments passed to test functions.
 #' @return List with 'formatted' and 'raw' data.table components.
 #' @keywords internal
@@ -30,7 +32,7 @@ process_variable <- function(data, var, group_var = NULL,
                              digits, conf_level = 0.95, na_include, na_label,
                              test, test_continuous, test_categorical,
                              total, total_label, labels, na_percent, 
-                             p_per_stat = FALSE, ...) {
+                             p_per_stat = FALSE, marks = NULL, ...) {
     
     ## Get variable label
     var_label <- if (!is.null(labels) && var %chin% names(labels)) {
@@ -53,6 +55,7 @@ process_variable <- function(data, var, group_var = NULL,
             test = test,
             total = total,
             total_label = total_label,
+            marks = marks,
             ...
         ))
     } else if (is.numeric(data[[var]])) {
@@ -70,6 +73,7 @@ process_variable <- function(data, var, group_var = NULL,
             total = total,
             total_label = total_label,
             p_per_stat = p_per_stat,
+            marks = marks,
             ...
         ))
     } else {
@@ -86,6 +90,7 @@ process_variable <- function(data, var, group_var = NULL,
             total = total,
             total_label = total_label,
             na_percent = na_percent,
+            marks = marks,
             ...
         ))
     }
@@ -109,15 +114,16 @@ process_variable <- function(data, var, group_var = NULL,
 #' @param test_type Character string specifying test type.
 #' @param total Logical or character controlling total column display.
 #' @param total_label Character string label for total column.
-#' @param p_per_stat Logical. If TRUE, calculate separate p-values for each 
-#'   statistic type (e.g., t-test for means, Wilcoxon for medians). If FALSE
-#'   (default), calculate a single p-value based on the first statistic type.
+#' @param p_per_stat Logical. If TRUE, calculate separate \emph{p}-values for each 
+#'   statistic type (\emph{e.g.,} t-test for means, Wilcoxon for medians). If \code{FALSE}
+#'   (default), calculate a single \emph{p}-value based on the first statistic type.
 #' @param ... Additional arguments passed to test functions.
 #' @return List with 'formatted' and 'raw' data.table components.
 #' @keywords internal
 process_continuous <- function(data, var, var_label, group_var, stats, digits,
                                na_include, na_label, test, test_type,
-                               total, total_label, p_per_stat = FALSE, ...) {
+                               total, total_label, p_per_stat = FALSE,
+                               marks = NULL, ...) {
     
     ## Pre-extract the variable column
     var_vec <- data[[var]]
@@ -234,7 +240,7 @@ process_continuous <- function(data, var, var_label, group_var, stats, digits,
         ## Add total column
         if (!isFALSE(total)) {
             formatted_row[[total_label]] <- format_continuous_stat(
-                total_stats, stat_type, fmt_str)
+                total_stats, stat_type, fmt_str, marks)
             raw_row <- add_raw_stats(raw_row, total_label, total_stats, stat_type)
         }
         
@@ -244,7 +250,7 @@ process_continuous <- function(data, var, var_label, group_var, stats, digits,
                 grp_col <- as.character(g)
                 grp_stats <- group_stats_list[[grp_col]]
                 formatted_row[[grp_col]] <- format_continuous_stat(
-                    grp_stats, stat_type, fmt_str)
+                    grp_stats, stat_type, fmt_str, marks)
                 raw_row <- add_raw_stats(raw_row, grp_col, grp_stats, stat_type)
             }
             
@@ -273,7 +279,7 @@ process_continuous <- function(data, var, var_label, group_var, stats, digits,
         miss_raw <- list(variable = "", level = na_label, stat_type = "missing")
         
         if (!isFALSE(total)) {
-            miss_formatted[[total_label]] <- format_count(n_miss_total)
+            miss_formatted[[total_label]] <- format_count(n_miss_total, marks)
             miss_raw[[total_label]] <- n_miss_total
         }
         
@@ -282,7 +288,7 @@ process_continuous <- function(data, var, var_label, group_var, stats, digits,
             for (g in groups) {
                 grp_col <- as.character(g)
                 n_miss <- sum(!not_na & grp_vec == g, na.rm = TRUE)
-                miss_formatted[[grp_col]] <- format_count(n_miss)
+                miss_formatted[[grp_col]] <- format_count(n_miss, marks)
                 miss_raw[[grp_col]] <- n_miss
             }
         }
@@ -305,7 +311,7 @@ process_continuous <- function(data, var, var_label, group_var, stats, digits,
 #' 
 #' @param row Data.table row to modify.
 #' @param col Character string column name for the statistics.
-#' @param stats Named list of numeric statistics (mean, sd, median, etc.).
+#' @param stats Named list of numeric statistics (mean, sd, median, \emph{etc.}).
 #' @param stat_type Character string indicating which statistic is displayed.
 #' @return Modified row (by reference).
 #' @keywords internal
@@ -342,7 +348,7 @@ add_raw_stats <- function(row, col, stats, stat_type) {
 #' @param grp_vec Factor or character vector defining groups.
 #' @param test_type Character string: "parametric", "nonparametric", or "auto".
 #' @param stat_type Character string indicating primary statistic being tested.
-#' @return Numeric p-value from the hypothesis test.
+#' @return Numeric \emph{p}-value from the hypothesis test.
 #' @keywords internal
 perform_continuous_test <- function(var_vec, grp_vec, test_type, stat_type) {
     ## Remove NAs
@@ -383,76 +389,52 @@ perform_continuous_test <- function(var_vec, grp_vec, test_type, stat_type) {
 #' Format continuous statistic for display
 #' 
 #' Converts numeric summary statistics into formatted display strings following
-#' standard conventions (mean ± SD, median [IQR], range, etc.).
+#' standard conventions (mean ± SD, median [IQR], range, \emph{etc.}).
 #' 
 #' @param stats Named list of numeric statistics (mean, sd, median, q1, q3, min, max).
 #' @param stat_type Character string: "mean_sd", "median_iqr", "median_range", or "range".
 #' @param fmt_str Character string format specification for sprintf.
+#' @param marks List with \code{big.mark} and \code{decimal.mark} as returned
+#'   by \code{\link{resolve_number_marks}}.
 #' @return Character string with formatted statistic.
 #' @keywords internal
-format_continuous_stat <- function(stats, stat_type, fmt_str) {
+format_continuous_stat <- function(stats, stat_type, fmt_str, marks) {
     if (stats$n == 0) return("")
     
     switch(stat_type,
         "mean_sd" = paste0(
-            format_num(stats$mean, fmt_str), " \u00B1 ",
-            format_num(stats$sd, fmt_str)
+            format_num(stats$mean, fmt_str, marks), " \u00B1 ",
+            format_num(stats$sd, fmt_str, marks)
         ),
-        "median_iqr" = paste0(
-            format_num(stats$median, fmt_str), " [",
-            format_num(stats$q1, fmt_str), "-",
-            format_num(stats$q3, fmt_str), "]"
-        ),
-        "median_range" = {
-            sep <- if (stats$min < 0 || stats$max < 0) ", " else "-"
+        "median_iqr" = {
+            sep <- resolve_separator(stats$q1, stats$q3, marks)
             paste0(
-                format_num(stats$median, fmt_str), " (",
-                format_num(stats$min, fmt_str), sep,
-                format_num(stats$max, fmt_str), ")"
+                format_num(stats$median, fmt_str, marks), " [",
+                format_num(stats$q1, fmt_str, marks), sep,
+                format_num(stats$q3, fmt_str, marks), "]"
+            )
+        },
+        "median_range" = {
+            sep <- resolve_separator(stats$min, stats$max, marks)
+            paste0(
+                format_num(stats$median, fmt_str, marks), " (",
+                format_num(stats$min, fmt_str, marks), sep,
+                format_num(stats$max, fmt_str, marks), ")"
             )
         },
         "range" = {
-            sep <- if (stats$min < 0 || stats$max < 0) " to " else "-"
-            paste0(format_num(stats$min, fmt_str), sep, 
-                   format_num(stats$max, fmt_str))
+            sep <- resolve_separator(stats$min, stats$max, marks)
+            paste0(format_num(stats$min, fmt_str, marks), sep, 
+                   format_num(stats$max, fmt_str, marks))
         },
         ""
     )
 }
 
 
-#' Format numbers with appropriate precision
-#' 
-#' Formats numeric values using sprintf with automatic comma insertion for
-#' large values (>= 1000). Handles special cases for very small numbers.
-#' 
-#' @param x Numeric value to format.
-#' @param fmt_str Character string format specification for sprintf.
-#' @return Character string with formatted number.
-#' @keywords internal
-format_num <- function(x, fmt_str) {
-    if (is.na(x)) return("")
-    if (abs(x) >= 1000) {
-        format(round(x, 1), big.mark = ",")
-    } else {
-        result <- sprintf(fmt_str, x)
-        ## Fix negative zero: "-0.0", "-0.00", etc. -> "0.0", "0.00"
-        gsub("(?<![0-9])-0(\\.0+)(?![0-9])", "0\\1", result, perl = TRUE)
-    }
-}
-
-
-#' Format count values with comma separators
-#' 
-#' Converts integer counts to formatted strings with thousand separators
-#' for improved readability in tables.
-#' 
-#' @param n Integer count value.
-#' @return Character string with formatted count.
-#' @keywords internal
-format_count <- function(n) {
-    if (n >= 1000) format(n, big.mark = ",") else as.character(n)
-}
+# NOTE: format_num() and format_count() have been moved to number_format.R
+# as locale-aware versions that accept a 'marks' parameter.
+# See resolve_number_marks() for the locale resolution logic.
 
 
 #' Get display label for statistic type
@@ -462,7 +444,7 @@ format_count <- function(n) {
 #' 
 #' @param stat_type Character string: "mean_sd", "median_iqr", "median_range",
 #'   "range", "n_miss", or custom type.
-#' @return Character string with formatted label (e.g., "Mean ± SD").
+#' @return Character string with formatted label (\emph{e.g.,} "Mean ± SD").
 #' @keywords internal
 get_stat_label <- function(stat_type) {
     switch(stat_type,
@@ -499,7 +481,8 @@ get_stat_label <- function(stat_type) {
 #' @keywords internal
 process_categorical <- function(data, var, var_label, group_var, stats,
                                 na_include, na_label, test, test_type,
-                                total, total_label, na_percent, ...) {
+                                total, total_label, na_percent,
+                                marks = NULL, ...) {
     
     ## Pre-extract vectors
     var_vec <- data[[var]]
@@ -587,9 +570,16 @@ process_categorical <- function(data, var, var_label, group_var, stats,
             
             ## Add total column
             if (!isFALSE(total)) {
-                denom <- if (is.na(lvl)) sum(tab) else total_denom
+                ## NA row: use total denom if na_percent, otherwise count only
+                if (is.na(lvl)) {
+                    denom <- if (na_percent) total_denom else sum(tab)
+                    na_stat <- if (na_percent) stats else "n"
+                } else {
+                    denom <- total_denom
+                    na_stat <- stats
+                }
                 level_formatted[[total_label]] <- format_categorical_stat(
-                    as.integer(n_total), as.integer(denom), stats)
+                    as.integer(n_total), as.integer(denom), na_stat, marks)
                 level_raw[[total_label]] <- as.integer(n_total)
                 level_raw[[paste0(total_label, "_total")]] <- as.integer(denom)
             }
@@ -600,15 +590,17 @@ process_categorical <- function(data, var, var_label, group_var, stats,
                 
                 if (is.na(lvl)) {
                     n <- sum(tab[is.na(rownames(tab)), grp_col])
-                    denom <- grp_totals[grp_col]
+                    denom <- if (na_percent) grp_denoms[grp_col] else grp_totals[grp_col]
+                    na_stat <- if (na_percent) stats else "n"
                 } else {
                     n <- tab[lvl_char, grp_col]
                     if (is.na(n)) n <- 0L
                     denom <- grp_denoms[grp_col]
+                    na_stat <- stats
                 }
                 
                 level_formatted[[grp_col]] <- format_categorical_stat(
-                    as.integer(n), as.integer(denom), stats)
+                    as.integer(n), as.integer(denom), na_stat, marks)
                 level_raw[[grp_col]] <- as.integer(n)
                 level_raw[[paste0(grp_col, "_total")]] <- as.integer(denom)
             }
@@ -649,13 +641,15 @@ process_categorical <- function(data, var, var_label, group_var, stats,
             if (!isFALSE(total)) {
                 if (is.na(lvl)) {
                     n <- sum(is.na(var_vec))
+                    na_stat <- if (na_percent) stats else "n"
                 } else {
                     n <- total_tab[as.character(lvl)]
                     if (is.na(n)) n <- 0L
+                    na_stat <- stats
                 }
                 
                 level_formatted[[total_label]] <- format_categorical_stat(
-                    as.integer(n), as.integer(total_denom), stats)
+                    as.integer(n), as.integer(total_denom), na_stat, marks)
                 level_raw[[total_label]] <- as.integer(n)
                 level_raw[[paste0(total_label, "_total")]] <- as.integer(total_denom)
             }
@@ -681,7 +675,7 @@ process_categorical <- function(data, var, var_label, group_var, stats,
 #' @param tab Contingency table (matrix or table object).
 #' @param test_type Character string: "chisq" for chi-square, "fisher" for
 #'   Fisher's exact, or "auto" for automatic selection.
-#' @return Numeric p-value from the hypothesis test.
+#' @return Numeric \emph{p}-value from the hypothesis test.
 #' @keywords internal
 perform_categorical_test <- function(tab, test_type) {
     ## Remove NA rows for testing
@@ -708,28 +702,8 @@ perform_categorical_test <- function(tab, test_type) {
 }
 
 
-#' Format categorical statistic for display
-#' 
-#' Converts frequency counts into formatted display strings following
-#' standard conventions (n, n (%), % only).
-#' 
-#' @param n Integer count for the category.
-#' @param total Integer total count for percentage calculation.
-#' @param stat_type Character string: "n", "n_percent", or "percent".
-#' @return Character string with formatted statistic.
-#' @keywords internal
-format_categorical_stat <- function(n, total, stat_type) {
-    if (length(stat_type) > 1) stat_type <- stat_type[1]
-    
-    n_formatted <- if (n >= 1000) format(n, big.mark = ",") else as.character(n)
-    
-    switch(stat_type,
-           "n" = n_formatted,
-           "percent" = sprintf("%.1f%%", 100 * n / total),
-           "n_percent" = sprintf("%s (%.1f%%)", n_formatted, 100 * n / total),
-           n_formatted
-    )
-}
+# NOTE: format_categorical_stat() has been moved to number_format.R
+# as a locale-aware version that accepts a 'marks' parameter.
 
 
 #' Process survival variable
@@ -739,7 +713,7 @@ format_categorical_stat <- function(n, total, stat_type) {
 #' Surv() expressions and uses \pkg{survival} package functions.
 #' 
 #' @param data Data.table containing the survival variables.
-#' @param var Character string with Surv() expression (e.g., "Surv(time, status)").
+#' @param var Character string with Surv() expression (\emph{e.g.,} "Surv(time, status)").
 #' @param var_label Character string label for display.
 #' @param group_var Optional character string naming the grouping variable.
 #' @param digits Integer number of decimal places.
@@ -754,7 +728,7 @@ format_categorical_stat <- function(n, total, stat_type) {
 #' @keywords internal
 process_survival <- function(data, var, var_label, group_var, digits,
                              conf_level = 0.95, na_include, na_label, 
-                             test, total, total_label, ...) {
+                             test, total, total_label, marks = NULL, ...) {
     
     ## Parse Surv() expression
     surv_match <- regexec("Surv\\(([^,]+),\\s*([^)]+)\\)", var)
@@ -776,8 +750,9 @@ process_survival <- function(data, var, var_label, group_var, digits,
     ci_label <- paste0("Median (", ci_pct, "% CI)")
     
     ## Build CI column name suffixes for extracting from survfit summary
-    ci_lower_name <- paste0("0.", sprintf("%02d", round((1 - conf_level) / 2 * 100)), "LCL")
-    ci_upper_name <- paste0("0.", sprintf("%02d", round((1 + conf_level) / 2 * 100)), "UCL")
+    ## survfit names CI columns as e.g. "0.95LCL" and "0.95UCL" using conf.int value
+    ci_lower_name <- paste0(format(conf_level, nsmall = 2), "LCL")
+    ci_upper_name <- paste0(format(conf_level, nsmall = 2), "UCL")
     
     fmt_str <- paste0("%.", digits, "f")
     
@@ -817,9 +792,9 @@ process_survival <- function(data, var, var_label, group_var, digits,
             fit <- survival::survfit(surv_obj ~ 1, conf.int = conf_level)
             table <- summary(fit)$table
             
-            formatted_row[[total_label]] <- sprintf(
-                paste0(fmt_str, " (", fmt_str, "-", fmt_str, ")"),
-                table["median"], table[ci_lower_name], table[ci_upper_name]
+            formatted_row[[total_label]] <- format_survival_ci(
+                table["median"], table[ci_lower_name], table[ci_upper_name],
+                fmt_str, marks
             )
             
             raw_row[[total_label]] <- table["median"]
@@ -838,9 +813,9 @@ process_survival <- function(data, var, var_label, group_var, digits,
             fit <- survival::survfit(surv_obj ~ 1, conf.int = conf_level)
             table <- summary(fit)$table
             
-            formatted_row[[grp_col]] <- sprintf(
-                paste0(fmt_str, " (", fmt_str, "-", fmt_str, ")"),
-                table["median"], table[ci_lower_name], table[ci_upper_name]
+            formatted_row[[grp_col]] <- format_survival_ci(
+                table["median"], table[ci_lower_name], table[ci_upper_name],
+                fmt_str, marks
             )
             
             raw_row[[grp_col]] <- table["median"]
@@ -873,9 +848,9 @@ process_survival <- function(data, var, var_label, group_var, digits,
             fit <- survival::survfit(surv_obj ~ 1, conf.int = conf_level)
             table <- summary(fit)$table
             
-            formatted_row[[total_label]] <- sprintf(
-                paste0(fmt_str, " (", fmt_str, "-", fmt_str, ")"),
-                table["median"], table[ci_lower_name], table[ci_upper_name]
+            formatted_row[[total_label]] <- format_survival_ci(
+                table["median"], table[ci_lower_name], table[ci_upper_name],
+                fmt_str, marks
             )
             
             raw_row[[total_label]] <- table["median"]
@@ -891,20 +866,29 @@ process_survival <- function(data, var, var_label, group_var, digits,
 }
 
 
-#' Format p-values for descriptive tables
+#' Format \emph{p}-values for descriptive tables
 #' 
 #' Converts numeric p-values to formatted strings with appropriate precision.
-#' Handles very small p-values with threshold notation (e.g., "< 0.001").
+#' Handles very small p-values with threshold notation (\emph{e.g.,} "< 0.001").
 #' 
 #' @param result Data.table with 'p_value' column to format.
 #' @param p_digits Integer number of decimal places for p-values.
-#' @return Modified data.table with 'p-value' column (formatted strings).
+#' @param marks List with \code{big.mark} and \code{decimal.mark} as returned
+#'   by \code{\link{resolve_number_marks}}.
+#' @return Modified data.table with 'p_value' column (formatted strings).
 #' @keywords internal
-format_pvalues_desctable <- function(result, p_digits) {
+format_pvalues_desctable <- function(result, p_digits, marks) {
     if ("p_value" %chin% names(result)) {
         threshold <- 10^(-p_digits)
-        threshold_str <- paste0("< 0.", strrep("0", p_digits - 1), "1")
+        threshold_str <- paste0("< 0", marks$decimal.mark,
+                                strrep("0", p_digits - 1), "1")
         fmt_str <- paste0("%.", p_digits, "f")
+        
+        ## Format p-values vectorized
+        p_str <- sprintf(fmt_str, result$p_value)
+        if (marks$decimal.mark != ".") {
+            p_str <- sub(".", marks$decimal.mark, p_str, fixed = TRUE)
+        }
         
         result[, p_formatted := data.table::fifelse(
             is.na(p_value) | Variable == "N", 
@@ -912,7 +896,7 @@ format_pvalues_desctable <- function(result, p_digits) {
             data.table::fifelse(
                 p_value < threshold,
                 threshold_str,
-                sprintf(fmt_str, p_value)
+                p_str
             )
         )]
         
@@ -928,10 +912,10 @@ format_pvalues_desctable <- function(result, p_digits) {
 #' 
 #' Rearranges data.table columns to place the total column in the specified
 #' position (first, last, or default). Ensures proper ordering of Variable,
-#' Group, total, group columns, and p-value.
+#' Group, total, group columns, and \emph{p}-value.
 #' 
 #' @param result Data.table with columns to reorder.
-#' @param total Logical or character: TRUE/"first" (total first), "last" (total last).
+#' @param total Logical or character: \code{TRUE}/"first" (total first), "last" (total last).
 #' @param total_label Character string name of the total column.
 #' @return Modified data.table with reordered columns.
 #' @keywords internal

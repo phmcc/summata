@@ -15,7 +15,7 @@ is_affirmative_category(
 \item{category}{Character string with the category name.}
 
 \item{label}{Optional character string with the variable label. If provided,
-returns TRUE when category is a case-insensitive match or substring.}
+returns \code{TRUE} when category is a case-insensitive match or substring.}
 
 \item{norm_category}{Optional pre-normalized category (lowercase, trimmed).
 If provided, skips normalization for performance.}
@@ -28,8 +28,8 @@ Logical indicating whether category should be suppressed.
 }
 \description{
 Determines whether a category name should be suppressed when condensing
-binary variables. Returns TRUE for standard affirmative values (e.g., "Yes", 
-"1", "Positive"), standard reference values (e.g., "No", "Absent", "None"),
+binary variables. Returns \code{TRUE} for standard affirmative values (\emph{e.g.,} "Yes", 
+"1", "Positive"), standard reference values (\emph{e.g.,} "No", "Absent", "None"),
 or when the category name essentially matches the variable label 
 (case-insensitive comparison).
 }

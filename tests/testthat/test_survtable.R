@@ -681,9 +681,9 @@ test_that("survtable stats includes 'n_risk' adds n at risk", {
     
     expect_survtable_result(result)
     
-    ## Should contain n= in the output
+    ## Should contain "n =" in the output
     time_col <- names(result)[grepl("12", names(result))][1]
-    expect_true(any(grepl("n=", result[[time_col]])))
+    expect_true(any(grepl("n =", result[[time_col]])))
 })
 
 
@@ -698,9 +698,9 @@ test_that("survtable stats includes 'n_event' adds event count", {
     
     expect_survtable_result(result)
     
-    ## Should contain e= in the output
+    ## Should contain "e =" in the output
     time_col <- names(result)[grepl("12", names(result))][1]
-    expect_true(any(grepl("e=", result[[time_col]])))
+    expect_true(any(grepl("e =", result[[time_col]])))
 })
 
 

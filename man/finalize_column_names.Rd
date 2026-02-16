@@ -41,6 +41,6 @@ The input data.table with columns renamed
 \description{
 Renames internal column names (uni_effect, uni_p, multi_effect, multi_p) to
 publication-ready display names with appropriate effect measure labels
-(OR, HR, RR, aOR, aHR, aRR, Coefficient, etc.).
+(OR, HR, RR, aOR, aHR, aRR, Coefficient, \emph{etc.}).
 }
 \keyword{internal}

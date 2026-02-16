@@ -18,6 +18,7 @@ process_continuous(
   total,
   total_label,
   p_per_stat = FALSE,
+  marks = NULL,
   ...
 )
 }
@@ -46,9 +47,9 @@ process_continuous(
 
 \item{total_label}{Character string label for total column.}
 
-\item{p_per_stat}{Logical. If TRUE, calculate separate p-values for each 
-statistic type (e.g., t-test for means, Wilcoxon for medians). If FALSE
-(default), calculate a single p-value based on the first statistic type.}
+\item{p_per_stat}{Logical. If TRUE, calculate separate \emph{p}-values for each 
+statistic type (\emph{e.g.,} t-test for means, Wilcoxon for medians). If \code{FALSE}
+(default), calculate a single \emph{p}-value based on the first statistic type.}
 
 \item{...}{Additional arguments passed to test functions.}
 }

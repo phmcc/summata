@@ -42,13 +42,13 @@ expect_forest_plot <- function(p, has_dims = TRUE) {
                 info = "Forest plot should be a ggplot object")
     
     if (has_dims) {
-        dims <- attr(p, "recommended_dims")
+        dims <- attr(p, "rec_dims")
         expect_true(!is.null(dims), 
-                    info = "Forest plot should have recommended_dims attribute")
+                    info = "Forest plot should have rec_dims attribute")
         expect_true("width" %in% names(dims), 
-                    info = "recommended_dims should have width")
+                    info = "rec_dims should have width")
         expect_true("height" %in% names(dims), 
-                    info = "recommended_dims should have height")
+                    info = "rec_dims should have height")
         expect_true(dims$width > 0, info = "Width should be positive")
         expect_true(dims$height > 0, info = "Height should be positive")
     }
@@ -756,8 +756,8 @@ test_that("forest functions handle unit conversions", {
     expect_forest_plot(p_cm)
     
     ## Check that dimensions are appropriately scaled
-    dims_in <- attr(p_in, "recommended_dims")
-    dims_cm <- attr(p_cm, "recommended_dims")
+    dims_in <- attr(p_in, "rec_dims")
+    dims_cm <- attr(p_cm, "rec_dims")
     
     ## cm should be larger numbers (2.54x inches)
     expect_true(dims_cm$width > dims_in$width)
@@ -773,14 +773,14 @@ test_that("forest plots provide reasonable dimension recommendations", {
     ## Small model
     model_small <- glm(response ~ age + sex, data = clintrial, family = binomial)
     p_small <- suppressMessages(glmforest(model_small, data = clintrial))
-    dims_small <- attr(p_small, "recommended_dims")
+    dims_small <- attr(p_small, "rec_dims")
     
     ## Larger model
     model_large <- glm(response ~ age + sex + smoking + stage + treatment + 
                            diabetes + hypertension,
                        data = clintrial, family = binomial)
     p_large <- suppressMessages(glmforest(model_large, data = clintrial))
-    dims_large <- attr(p_large, "recommended_dims")
+    dims_large <- attr(p_large, "rec_dims")
     
     ## Larger model should have greater height
     expect_true(dims_large$height > dims_small$height,
@@ -957,8 +957,8 @@ test_that("autoforest produces same result as direct function call", {
     expect_forest_plot(p_auto)
     
     ## Both should have similar dimensions
-    dims_direct <- attr(p_direct, "recommended_dims")
-    dims_auto <- attr(p_auto, "recommended_dims")
+    dims_direct <- attr(p_direct, "rec_dims")
+    dims_auto <- attr(p_auto, "rec_dims")
     
     expect_equal(dims_direct$width, dims_auto$width, tolerance = 0.1)
     expect_equal(dims_direct$height, dims_auto$height, tolerance = 0.1)

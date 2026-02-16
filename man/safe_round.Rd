@@ -2,7 +2,7 @@
 % Please edit documentation in R/comp_utils.R
 \name{safe_round}
 \alias{safe_round}
-\title{Safe rounding that handles NULL and NA}
+\title{Safe rounding that handles \code{NULL} and NA}
 \usage{
 safe_round(x, digits)
 }
@@ -12,9 +12,9 @@ safe_round(x, digits)
 \item{digits}{Integer number of decimal places.}
 }
 \value{
-Rounded numeric value, or NA_real_ if input is NULL/NA/empty.
+Rounded numeric value, or NA_real_ if input is \code{NULL}/NA/empty.
 }
 \description{
-Rounds numeric values while gracefully handling NULL, empty, and NA inputs.
+Rounds numeric values while gracefully handling \code{NULL}, empty, and NA inputs.
 }
 \keyword{internal}

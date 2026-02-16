@@ -7,7 +7,7 @@
 check_latex()
 }
 \value{
-Logical TRUE if LaTeX is available, FALSE otherwise.
+Logical \code{TRUE} if LaTeX is available, \code{FALSE} otherwise.
 }
 \description{
 Verifies that a LaTeX distribution (pdflatex or xelatex) is available

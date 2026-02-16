@@ -32,8 +32,8 @@ table2pptx(
 }
 \arguments{
 \item{table}{Data frame, data.table, or matrix to export. Can be output from 
-\code{desctable()}, \code{fit()}, \code{uniscreen()}, 
-\code{fullfit()}, \code{compfit()}, or any tabular data.}
+\code{desctable()}, \code{survtable()}, \code{fit()}, \code{uniscreen()},
+\code{fullfit()}, \code{compfit()}, \code{multifit()}, or any tabular data.}
 
 \item{file}{Character string specifying the output PPTX filename. Must have 
 \code{.pptx} extension. Example: \code{"results.pptx"}, \code{"Slide1.pptx"}.}
@@ -50,18 +50,18 @@ installed on the system. Default is \code{"Arial"}. Common presentation
 fonts: \code{"Calibri"}, \code{"Helvetica"}, \code{"Arial"}.}
 
 \item{format_headers}{Logical. If \code{TRUE}, formats column headers by 
-italicizing statistical notation (\emph{n}, \emph{p}) and improving readability. 
+italicizing statistical notation ("\emph{n}", "\emph{p}") and improving readability. 
 Default is \code{TRUE}.}
 
 \item{bold_significant}{Logical. If \code{TRUE}, applies bold formatting to 
-p-values below the significance threshold. Makes important results stand 
+\emph{p}-values below the significance threshold. Makes important results stand 
 out in presentations. Default is \code{TRUE}.}
 
 \item{bold_variables}{Logical. If \code{TRUE}, variable names are displayed
 in bold. Default is \code{FALSE}.}
 
-\item{p_threshold}{Numeric. P-value threshold for bold formatting. 
-Default is 0.05.}
+\item{p_threshold}{Numeric. Threshold for bold \emph{p}-value formatting. Only 
+used when \code{bold_significant = TRUE}. Default is 0.05.}
 
 \item{indent_groups}{Logical. If \code{TRUE}, indents factor levels under 
 their parent variable, creating hierarchical display. Useful for categorical 
@@ -119,7 +119,8 @@ Adjust based on table size and layout.}
 
 \item{return_ft}{Logical. If \code{TRUE}, returns the \pkg{flextable} object 
 directly for further customization. If \code{FALSE} (default), returns 
-invisibly with metadata. Default is \code{FALSE}.}
+invisibly with \pkg{flextable} object as attribute. See Details for usage. 
+Default is \code{FALSE}.}
 
 \item{...}{Additional arguments passed to \code{\link[officer]{read_pptx}}.}
 }
@@ -140,14 +141,14 @@ Behavior depends on \code{return_ft}:
     \item{\code{return_ft = TRUE}}{Directly returns the \pkg{flextable} object}
   }
   
-  Always creates a .pptx file at the specified location.
+  Always creates a \code{.pptx} file at the specified location.
 }
 \description{
 Converts a data frame, data.table, or matrix to a Microsoft PowerPoint slide 
-(.pptx) with a formatted table using the \pkg{flextable} and \pkg{officer} packages.
-Creates presentation-ready slides with extensive control over table formatting,
-positioning, and layout. Tables can be further edited in PowerPoint after creation.
-Ideal for creating data-driven presentations and conference talks.
+(\code{.pptx}) with a formatted table using the \pkg{flextable} and \pkg{officer}
+packages. Creates presentation-ready slides with extensive control over table
+formatting, positioning, and layout. Tables can be further edited in PowerPoint
+after creation. Ideal for creating data-driven presentations and conference talks.
 }
 \details{
 \strong{Package Requirements:}
@@ -159,17 +160,6 @@ Requires:
 }
 
 Install: \code{install.packages(c("flextable", "officer"))}
-
-\strong{Presentation Considerations:}
-
-Tables in presentations differ from print:
-\itemize{
-  \item \strong{Larger fonts} - Visible from back of room (10-14pt minimum)
-  \item \strong{Less content} - Limit rows to fit slide (use \code{condense_table})
-  \item \strong{High contrast} - Consider \code{dark_header = TRUE}
-  \item \strong{Simple layout} - Avoid excessive detail
-  \item \strong{Key findings} - Show only essential results
-}
 
 \strong{Slide Dimensions:}
 
@@ -222,7 +212,7 @@ Different layouts serve different purposes:
   \item Good for custom layouts
 }
 
-\emph{Title Only:}
+\emph{Title-Only:}
 \itemize{
   \item Title area only
   \item Large space for table
@@ -232,48 +222,23 @@ Different layouts serve different purposes:
 \strong{Custom Templates:}
 
 Use organizational or conference templates:
-```r
+\preformatted{
 table2pptx(table, "branded.pptx",
          template = "company_template.pptx",
          layout = "Content Layout",  # Name from template
          master = "Company Theme")   # Name from template
-```
-
-To find layout and master names in template:
-```r
-pres <- officer::read_pptx("template.pptx")
-officer::layout_summary(pres)
-```
-
-\strong{Table Size Management:}
-
-Fitting tables on slides:
-\enumerate{
-  \item \strong{Condense content}: \code{condense_table = TRUE}
-  \item \strong{Reduce font}: \code{font_size = 9} or smaller
-  \item \strong{Limit rows}: Filter data before export
-  \item \strong{Limit columns}: Select key variables only
-  \item \strong{Split tables}: Multiple slides for large datasets
-  \item \strong{Adjust width}: \code{width = 9} for maximum
 }
 
-\strong{Visual Design Tips:}
-
-For effective presentation tables:
-\itemize{
-  \item Use \code{zebra_stripes = TRUE} to group related rows
-  \item Use \code{dark_header = TRUE} for emphasis
-  \item Bold significant results (\code{bold_significant = TRUE})
-  \item Limit to 5-8 rows maximum for readability
-  \item Use \code{indent_groups = TRUE} for hierarchy
-  \item Ensure sufficient contrast for projectors
-  \item Test visibility from distance
+To find layout and master names in template:
+\preformatted{
+pres <- officer::read_pptx("template.pptx")
+officer::layout_summary(pres)
 }
 
 \strong{Multiple Slides:}
 
 Creating presentations with multiple tables:
-```r
+\preformatted{
 # Each call creates new presentation - combine after
 table2pptx(table1, "slide1.pptx", caption = "Results Part 1")
 table2pptx(table2, "slide2.pptx", caption = "Results Part 2")
@@ -295,16 +260,16 @@ pres <- officer::ph_with(pres, ft2,
                          location = officer::ph_location(left = 0.5, top = 1.5))
 
 print(pres, target = "combined.pptx")
-```
+}
 
 \strong{Further Customization:}
 
-Access flextable for advanced formatting:
-```r
+Access the \code{flextable} object for advanced formatting:
+\preformatted{
 ft <- table2pptx(table, "base.pptx", return_ft = TRUE)
 
 # Customize
-ft <- flextable::color(ft, j = "p-value", color = "red")
+ft <- flextable::color(ft, j = "\emph{p}-value", color = "red")
 ft <- flextable::bg(ft, i = 1, bg = "yellow")
 ft <- flextable::bold(ft, i = ~ estimate > 0, j = "estimate")
 
@@ -314,48 +279,23 @@ pres <- officer::add_slide(pres)
 pres <- officer::ph_with(pres, ft, 
                          location = officer::ph_location(left = 0.5, top = 1.5))
 print(pres, target = "custom.pptx")
-```
+}
 
 \strong{Editability in PowerPoint:}
-
-Created tables are fully editable:
-\itemize{
-  \item Modify cell contents
-  \item Adjust column widths
-  \item Change colors and fonts
-  \item Add/remove rows or columns
-  \item Reposition on slide
-  \item Copy to other slides
-  \item Apply PowerPoint table styles
-}
-
-\strong{Best Practices:}
-
-For professional presentations:
-\enumerate{
-  \item Keep tables simple (5-8 rows maximum)
-  \item Use large fonts (≥10pt)
-  \item Highlight key findings with bold or color
-  \item Add clear, concise titles
-  \item Test visibility on projector
-  \item Consider audience distance
-  \item Use consistent styling across slides
-  \item Provide slide notes with details
-}
 }
 \examples{
-\dontrun{
-  options(width = 180)
+\dontshow{if (FALSE) withAutoprint(\{ # examplesIf}
+options(width = 180)
 # Load data
 data(clintrial)
 data(clintrial_labels)
 
 # Create regression table
 results <- fit(
-    data = clintrial,
-    outcome = "os_status",
-    predictors = c("age", "sex", "treatment"),
-    labels = clintrial_labels
+   data = clintrial,
+   outcome = "os_status",
+   predictors = c("age", "sex", "treatment"),
+   labels = clintrial_labels
 )
 
 # Example 1: Basic PowerPoint slide
@@ -363,39 +303,39 @@ table2pptx(results, "results.pptx")
 
 # Example 2: With title
 table2pptx(results, "titled.pptx",
-         caption = "Multivariable Regression Results")
+        caption = "Multivariable Regression Results")
 
 # Example 3: Larger font for visibility
 table2pptx(results, "large_font.pptx",
-         font_size = 12,
-         caption = "Main Findings")
+        font_size = 12,
+        caption = "Main Findings")
 
 # Example 4: Condensed for slide space
 table2pptx(results, "condensed.pptx",
-         condense_table = TRUE,
-         caption = "Key Results")
+        condense_table = TRUE,
+        caption = "Key Results")
 
 # Example 5: Dark header for emphasis
 table2pptx(results, "dark.pptx",
-         dark_header = TRUE,
-         caption = "Risk Factors")
+        dark_header = TRUE,
+        caption = "Risk Factors")
 
 # Example 6: With zebra stripes
 table2pptx(results, "striped.pptx",
-         zebra_stripes = TRUE)
+        zebra_stripes = TRUE)
 
 # Example 7: Blank layout with custom positioning
 table2pptx(results, "blank.pptx",
-         layout = "Blank",
-         left = 1,
-         top = 1.5,
-         width = 8)
+        layout = "Blank",
+        left = 1,
+        top = 1.5,
+        width = 8)
 
 # Example 8: Using company template
 table2pptx(results, "branded.pptx",
-         template = "company_template.pptx",
-         layout = "Data Slide",
-         caption = "Q4 Results")
+        template = "company_template.pptx",
+        layout = "Data Slide",
+        caption = "Q4 Results")
 
 # Example 9: Get flextable for customization
 ft <- table2pptx(results, "base.pptx", return_ft = TRUE)
@@ -406,48 +346,46 @@ ft <- flextable::bold(ft, i = ~ p_value < 0.01)
 
 # Example 10: Presentation-optimized table
 table2pptx(results, "presentation.pptx",
-         caption = "Main Analysis Results",
-         font_size = 11,
-         condense_table = TRUE,
-         zebra_stripes = TRUE,
-         dark_header = TRUE,
-         bold_significant = TRUE)
+        caption = "Main Analysis Results",
+        font_size = 11,
+        condense_table = TRUE,
+        zebra_stripes = TRUE,
+        dark_header = TRUE,
+        bold_significant = TRUE)
 
 # Example 11: Descriptive statistics slide
 desc <- desctable(
-    data = clintrial,
-    by = "treatment",
-    variables = c("age", "sex", "bmi"),
-    labels = clintrial_labels
+   data = clintrial,
+   by = "treatment",
+   variables = c("age", "sex", "bmi"),
+   labels = clintrial_labels
 )
 
 table2pptx(desc, "baseline.pptx",
-         caption = "Baseline Characteristics",
-         font_size = 10)
+        caption = "Baseline Characteristics",
+        font_size = 10)
 
 # Example 12: Conference presentation style
 table2pptx(results, "conference.pptx",
-         caption = "Study Outcomes",
-         font_family = "Calibri",
-         font_size = 14,  # Large for big rooms
-         dark_header = TRUE,
-         condense_table = TRUE)
-}
-
+        caption = "Study Outcomes",
+        font_family = "Calibri",
+        font_size = 14,  # Large for big rooms
+        dark_header = TRUE,
+        condense_table = TRUE)
+\dontshow{\}) # examplesIf}
 }
 \seealso{
+\code{\link{autotable}} for automatic format detection,
 \code{\link{table2docx}} for Word documents,
 \code{\link{table2pdf}} for PDF output,
 \code{\link{table2html}} for HTML tables,
+\code{\link{table2rtf}} for Rich Text Format,
 \code{\link{table2tex}} for LaTeX output,
 \code{\link[flextable]{flextable}} for table customization,
 \code{\link[officer]{read_pptx}} for PowerPoint manipulation
 
 Other export functions: 
-\code{\link{autoexport}()},
-\code{\link{print.table2docx_result}()},
-\code{\link{print.table2pptx_result}()},
-\code{\link{print.table2rtf_result}()},
+\code{\link{autotable}()},
 \code{\link{table2docx}()},
 \code{\link{table2html}()},
 \code{\link{table2pdf}()},

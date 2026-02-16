@@ -30,7 +30,8 @@ uniforest(
   log_scale = NULL,
   labels = NULL,
   show_footer = TRUE,
-  units = "in"
+  units = "in",
+  number_format = NULL
 )
 }
 \arguments{
@@ -48,8 +49,10 @@ model type (\emph{e.g.,} "Odds Ratio", "Hazard Ratio", "Rate Ratio", "Coefficien
 estimates and confidence intervals. Default is 2.}
 
 \item{p_digits}{Integer specifying the number of decimal places for \emph{p}-values.
-\emph{p}-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001" 
-(for \code{p_digits = 3}). Default is 3.}
+Values smaller than \code{10^(-p_digits)} are displayed as \code{"< 0.001"}
+(for \code{p_digits = 3}), \code{"< 0.0001"} (for \code{p_digits = 4}),
+\emph{etc.} The threshold string respects \code{number_format} (\emph{e.g.,}
+\code{"< 0,001"} for EU formatting). Default is 3.}
 
 \item{conf_level}{Numeric confidence level for confidence intervals. Must be
 between 0 and 1. Default is 0.95 (95\% confidence intervals). The CI
@@ -86,7 +89,7 @@ Default is \code{TRUE}.}
 
 \item{show_events}{Logical. If \code{TRUE}, includes a column showing the 
 number of events for each row. Default is \code{NULL}, which auto-detects
-based on model type (TRUE for binomial/survival, FALSE for linear).}
+based on model type (\code{TRUE} for binomial/survival, \code{FALSE} for linear).}
 
 \item{indent_groups}{Logical. If \code{TRUE}, indents factor levels
 under their parent variable name, creating a hierarchical display. If 
@@ -121,7 +124,7 @@ Use hex codes or R color names for custom colors.}
 coefficients.}
 
 \item{log_scale}{Logical. If \code{TRUE}, uses log scale for the x-axis.
-Default is \code{NULL}, which auto-detects (TRUE for OR/HR/RR, FALSE for
+Default is \code{NULL}, which auto-detects (\code{TRUE} for OR/HR/RR, \code{FALSE} for
 coefficients).}
 
 \item{labels}{Named character vector providing custom display labels for 
@@ -133,12 +136,19 @@ outcome variable name. Default is \code{TRUE}.}
 
 \item{units}{Character string specifying units for plot dimensions: 
 \code{"in"} (inches), \code{"cm"}, or \code{"mm"}. Default is \code{"in"}.}
+
+\item{number_format}{Character string or two-element character vector
+controlling thousand and decimal separators in formatted output. Named
+presets: \code{"us"} (default), \code{"eu"}, \code{"space"},
+\code{"none"}. Or a custom vector \code{c(big.mark, decimal.mark)}.
+When \code{NULL} (default), uses
+\code{getOption("summata.number_format", "us")}.}
 }
 \value{
 A \code{ggplot} object containing the complete forest plot.
   
-  The returned object includes an attribute \code{"recommended_dims"} 
-  accessible via \code{attr(plot, "recommended_dims")}, containing:
+  The returned object includes an attribute \code{"rec_dims"} 
+  accessible via \code{attr(plot, "rec_dims")}, containing:
   \describe{
     \item{width}{Numeric. Recommended plot width in specified units}
     \item{height}{Numeric. Recommended plot height in specified units}
@@ -170,6 +180,7 @@ The plot automatically handles:
 }
 }
 \examples{
+\dontshow{if (FALSE) withAutoprint(\{ # examplesIf}
 # Load example data
 data(clintrial)
 data(clintrial_labels)
@@ -185,7 +196,6 @@ uni_results <- uniscreen(
 
 uniforest(uni_results, title = "Univariable Associations with Mortality")
 
-\donttest{
   options(width = 180)
 # Example 2: Survival analysis
 library(survival)
@@ -229,12 +239,12 @@ uniforest(uni_results,
 
 # Example 6: Save with recommended dimensions
 p <- uniforest(uni_results)
-dims <- attr(p, "recommended_dims")
+dims <- attr(p, "rec_dims")
 # ggsave("univariable_forest.pdf", p, width = dims$width, height = dims$height)
-}
-
+\dontshow{\}) # examplesIf}
 }
 \seealso{
+\code{\link{autoforest}} for automatic model detection,
 \code{\link{uniscreen}} for generating univariable screening results,
 \code{\link{multiforest}} for multi-outcome forest plots,
 \code{\link{coxforest}}, \code{\link{glmforest}}, \code{\link{lmforest}} for

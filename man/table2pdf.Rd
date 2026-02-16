@@ -33,7 +33,7 @@ table2pdf(
 }
 \arguments{
 \item{table}{Data frame, data.table, or matrix to export. Can be output from 
-\code{desctable()}, \code{fit()}, \code{uniscreen()}, 
+\code{desctable()}, \code{survtable()}, \code{fit()}, \code{uniscreen()},
 \code{fullfit()}, \code{compfit()}, or any tabular data structure.}
 
 \item{file}{Character string specifying the output PDF filename. Must have 
@@ -66,17 +66,17 @@ values accommodate more content; larger values improve readability.
 Typical range: 6-12 points.}
 
 \item{caption}{Character string. Optional caption displayed below the table. 
-Supports LaTeX formatting for multi-line captions, superscripts, italics, etc. 
+Supports LaTeX formatting for multi-line captions, superscripts, italics, \emph{etc.} 
 See Details for formatting guidance. Default is \code{NULL}.}
 
 \item{caption_size}{Numeric. Caption font size in points. If \code{NULL} (default), 
-uses the base \code{font_size}. Set to a specific value (e.g., 6, 7, 8) to 
+uses the base \code{font_size}. Set to a specific value (\emph{e.g.,} 6, 7, 8) to 
 control caption size independently of table font size. Useful for fitting 
 captions on constrained page sizes. Typical range: 6-10 points.}
 
 \item{format_headers}{Logical. If \code{TRUE}, applies automatic formatting 
 to column headers: converts underscores to spaces, italicizes statistical 
-notation (\emph{n}, \emph{p}), and improves readability. Default is \code{TRUE}.}
+notation ("\emph{n}", "\emph{p}"), and improves readability. Default is \code{TRUE}.}
 
 \item{variable_padding}{Logical. If \code{TRUE}, adds vertical spacing between 
 different variables in the table, creating visual grouping. Particularly 
@@ -89,7 +89,7 @@ within table cells:
   \item \code{"normal"} - Standard padding [default]
   \item \code{"relaxed"} - Increased padding
   \item \code{"loose"} - Maximum padding
-  \item Numeric value - Custom multiplier (e.g., \code{1.5})
+  \item Numeric value - Custom multiplier (\emph{e.g.,} \code{1.5})
 }
 Adjusts \code{\\arraystretch} in LaTeX.}
 
@@ -100,9 +100,8 @@ out visually. Default is \code{TRUE}.}
 \item{bold_variables}{Logical. If \code{TRUE}, variable names are displayed
 in bold. Default is \code{FALSE}.}
 
-\item{p_threshold}{Numeric. P-value threshold for bold formatting. Only 
-used when \code{bold_significant = TRUE}. Default is 0.05. Common alternatives: 
-0.01, 0.10.}
+\item{p_threshold}{Numeric. Threshold for bold \emph{p}-value formatting. Only 
+used when \code{bold_significant = TRUE}. Default is 0.05.}
 
 \item{align}{Character string or vector specifying column alignment. Options:
 \itemize{
@@ -180,15 +179,15 @@ LaTeX availability and provides installation guidance if missing.
 
 \emph{Required LaTeX packages} (auto-installed with most distributions):
 \itemize{
-  \item fontenc, inputenc - Character encoding
-  \item array, booktabs, longtable - Table formatting
-  \item graphicx - Scaling tables
-  \item geometry - Page layout
-  \item pdflscape, lscape - Landscape orientation
-  \item helvet - Sans-serif fonts
-  \item standalone, varwidth - Auto-sizing (for \code{paper = "auto"})
-  \item float, caption - Floats and captions
-  \item xcolor, colortable - Colors (for \code{zebra_stripes} or \code{dark_header})
+  \item \code{fontenc}, \code{inputenc} - Character encoding
+  \item \code{array}, \code{booktabs}, \code{longtable} - Table formatting
+  \item \code{graphicx} - Scaling tables
+  \item \code{geometry} - Page layout
+  \item \code{pdflscape}, \code{lscape} - Landscape orientation
+  \item \code{helvet} - Sans-serif fonts
+  \item \code{standalone}, \code{varwidth} - Auto-sizing (for \code{paper = "auto"})
+  \item \code{float}, \code{caption} - Floats and captions
+  \item \code{xcolor}, \code{colortable} - Colors (for \code{zebra_stripes} or \code{dark_header})
 }
 
 \strong{Caption Formatting:}
@@ -208,21 +207,14 @@ caption = "Table 1: Results\\\\
 caption = "Results for income (in thousands)"
 }
 
-\strong{Auto-Sizing (paper = "auto"):}
+\strong{Auto-Sizing (\code{paper = "auto"}):}
 
 When \code{paper = "auto"}, the function attempts to create a minimal PDF 
 sized exactly to the table content:
 \enumerate{
-  \item Tries to use the \code{standalone} LaTeX class (cleanest output)
-  \item Falls back to \code{pdfcrop} utility if standalone unavailable
-  \item Falls back to minimal margins if neither available
-}
-
-Auto-sized PDFs are ideal for:
-\itemize{
-  \item Including in other documents
-  \item Flexible embedding in presentations
-  \item Maximum space efficiency
+  \item Using the \code{standalone} LaTeX class (cleanest output)
+  \item Fallback to \code{pdfcrop} utility if standalone unavailable
+  \item Fallback to minimal margins if neither available
 }
 
 \strong{Table Width Management:}
@@ -231,28 +223,8 @@ For wide tables that don't fit on the page:
 \enumerate{
   \item Use \code{orientation = "landscape"}
   \item Use \code{fit_to_page = TRUE} (default) to auto-scale
-  \item Reduce \code{font_size} (e.g., 7 or 6)
-  \item Use \code{condense_table = TRUE} to reduce columns/rows
+  \item Reduce \code{font_size} (\emph{e.g.,} 7 or 6)
   \item Consider \code{paper = "auto"} for maximum flexibility
-}
-
-\strong{Optimized for FastFit Tables:}
-
-This function is specifically designed for tables produced by:
-\itemize{
-  \item \code{desctable()} - Descriptive statistics tables
-  \item \code{fit()} - Single model regression tables
-  \item \code{uniscreen()} - Univariable screening tables
-  \item \code{fullfit()} - Combined univariable/multivariable tables
-  \item \code{compfit()} - Model comparison tables
-}
-
-The function automatically detects and formats these table types, including:
-\itemize{
-  \item Sample size rows (N = X)
-  \item Variable grouping
-  \item P-value highlighting
-  \item Proper alignment of estimates and CIs
 }
 
 \strong{Troubleshooting:}
@@ -271,172 +243,165 @@ If PDF compilation fails:
 }
 }
 \examples{
-\dontrun{
+\dontshow{if (FALSE) withAutoprint(\{ # examplesIf}
 # These examples require a LaTeX installation (pdflatex)
 # Install TinyTeX with: tinytex::install_tinytex()
 
-if (nzchar(Sys.which("pdflatex"))) {
-  # Load example data and create a regression table
-  data(clintrial)
-  data(clintrial_labels)
-  library(survival)
-  
-  # Create a regression table
-  results <- fit(
-      data = clintrial,
-      outcome = "os_status",
-      predictors = c("age", "sex", "treatment", "stage"),
-      labels = clintrial_labels
-  )
-  
-  # Example 1: Basic PDF export
-  table2pdf(results, "basic_results.pdf")
-  
-  # Example 2: Landscape orientation for wide tables
-  table2pdf(results, "wide_results.pdf",
-          orientation = "landscape")
-  
-  # Example 3: With caption
-  table2pdf(results, "captioned.pdf",
-          caption = "Table 1: Multivariable logistic regression results")
-  
-  # Example 4: Multi-line caption with formatting
-  table2pdf(results, "formatted_caption.pdf",
-          caption = "Table 1: Risk Factors for Mortality\\\\\\\\
-                    aOR = adjusted odds ratio; CI = confidence interval")
-  
-  # Example 5: Auto-sized PDF (no fixed page dimensions)
-  table2pdf(results, "autosize.pdf",
-          paper = "auto")
-  
-  # Example 6: A4 paper with custom margins
-  table2pdf(results, "a4_custom.pdf",
-          paper = "a4",
-          margins = c(0.75, 0.75, 0.75, 0.75))
-  
-  # Example 7: Larger font for readability
-  table2pdf(results, "large_font.pdf",
-          font_size = 11)
-  
-  # Example 8: Indented hierarchical display
-  table2pdf(results, "indented.pdf",
-          indent_groups = TRUE)
-  
-  # Example 9: Condensed table (reduced height)
-  table2pdf(results, "condensed.pdf",
-          condense_table = TRUE)
-  
-  # Example 10: With zebra stripes
-  table2pdf(results, "striped.pdf",
-          zebra_stripes = TRUE,
-          stripe_color = "gray!15")
-  
-  # Example 11: Dark header style
-  table2pdf(results, "dark_header.pdf",
-          dark_header = TRUE)
-  
-  # Example 12: Combination of formatting options
-  table2pdf(results, "publication_ready.pdf",
-          orientation = "portrait",
-          paper = "letter",
-          font_size = 9,
-          caption = "Table 2: Multivariable Analysis\\\\\\\\
-                    Model adjusted for age, sex, and clinical factors",
-          indent_groups = TRUE,
-          zebra_stripes = TRUE,
-          bold_significant = TRUE,
-          p_threshold = 0.05)
-  
-  # Example 13: Adjust cell padding
-  table2pdf(results, "relaxed_padding.pdf",
-          cell_padding = "relaxed")  # More spacious
-  
-  # Example 14: No scaling (natural table width)
-  table2pdf(results, "no_scale.pdf",
-          fit_to_page = FALSE,
-          font_size = 10)
-  
-  # Example 15: Hide significance bolding
-  table2pdf(results, "no_bold.pdf",
-          bold_significant = FALSE)
-  
-  # Example 16: Custom column alignment
-  table2pdf(results, "custom_align.pdf",
-          align = c("c", "c", "c", "c", "c", "c", "c"))
-  
-  # Example 17: Descriptive statistics table
-  desc_table <- desctable(
-      data = clintrial,
-      by = "treatment",
-      variables = c("age", "sex", "bmi", "stage"),
-      labels = clintrial_labels
-  )
-  
-  table2pdf(desc_table, "descriptive.pdf",
-          caption = "Table 1: Baseline Characteristics by Treatment Group",
-          orientation = "landscape")
-  
-  # Example 18: Model comparison table
-  models <- list(
-      base = c("age", "sex"),
-      full = c("age", "sex", "bmi", "treatment")
-  )
-  
-  comparison <- compfit(
-      data = clintrial,
-      outcome = "os_status",
-      model_list = models
-  )
-  
-  table2pdf(comparison, "model_comparison.pdf",
-          caption = "Table 3: Model Comparison Statistics")
-  
-  # Example 19: Very wide table with aggressive fitting
-  wide_model <- fit(
-      data = clintrial,
-      outcome = "os_status",
-      predictors = c("age", "sex", "race", "bmi", "smoking", 
-                    "hypertension", "diabetes", "treatment", "stage")
-  )
-  
-  table2pdf(wide_model, "very_wide.pdf",
-          orientation = "landscape",
-          paper = "legal",  # Even wider than letter
-          font_size = 7,
-          fit_to_page = TRUE,
-          condense_table = TRUE)
+# Load example data and create a regression table
+data(clintrial)
+data(clintrial_labels)
+library(survival)
 
-  # Example 20: With caption size control
-  table2pdf(results, "caption_size.pdf",
-          font_size = 8,
-          caption_size = 6,
-          caption = "Table 4: Results with Compact Caption\\\\\\\\
-                    Smaller caption fits better on constrained pages")
+# Create a regression table
+results <- fit(
+     data = clintrial,
+     outcome = "os_status",
+     predictors = c("age", "sex", "treatment", "stage"),
+     labels = clintrial_labels
+)
 
-  # Example 21: Troubleshooting - keep logs
-  table2pdf(results, "debug.pdf",
-          show_logs = TRUE)
-  # If it fails, check debug.log for error messages
-  } else {
-    message("pdflatex not found. Install LaTeX to run these examples.")
-    message("Recommended: tinytex::install_tinytex()")
-  }
-}
+# Example 1: Basic PDF export
+table2pdf(results, "basic_results.pdf")
 
+# Example 2: Landscape orientation for wide tables
+table2pdf(results, "wide_results.pdf",
+         orientation = "landscape")
+
+# Example 3: With caption
+table2pdf(results, "captioned.pdf",
+         caption = "Table 1: Multivariable logistic regression results")
+
+# Example 4: Multi-line caption with formatting
+table2pdf(results, "formatted_caption.pdf",
+         caption = "Table 1: Risk Factors for Mortality\\\\\\\\
+                   aOR = adjusted odds ratio; CI = confidence interval")
+
+# Example 5: Auto-sized PDF (no fixed page dimensions)
+table2pdf(results, "autosize.pdf",
+         paper = "auto")
+
+# Example 6: A4 paper with custom margins
+table2pdf(results, "a4_custom.pdf",
+         paper = "a4",
+         margins = c(0.75, 0.75, 0.75, 0.75))
+
+# Example 7: Larger font for readability
+table2pdf(results, "large_font.pdf",
+         font_size = 11)
+
+# Example 8: Indented hierarchical display
+table2pdf(results, "indented.pdf",
+         indent_groups = TRUE)
+
+# Example 9: Condensed table (reduced height)
+table2pdf(results, "condensed.pdf",
+         condense_table = TRUE)
+
+# Example 10: With zebra stripes
+table2pdf(results, "striped.pdf",
+         zebra_stripes = TRUE,
+         stripe_color = "gray!15")
+
+# Example 11: Dark header style
+table2pdf(results, "dark_header.pdf",
+         dark_header = TRUE)
+
+# Example 12: Combination of formatting options
+table2pdf(results, "publication_ready.pdf",
+         orientation = "portrait",
+         paper = "letter",
+         font_size = 9,
+         caption = "Table 2: Multivariable Analysis\\\\\\\\
+                   Model adjusted for age, sex, and clinical factors",
+         indent_groups = TRUE,
+         zebra_stripes = TRUE,
+         bold_significant = TRUE,
+         p_threshold = 0.05)
+
+# Example 13: Adjust cell padding
+table2pdf(results, "relaxed_padding.pdf",
+         cell_padding = "relaxed")  # More spacious
+
+# Example 14: No scaling (natural table width)
+table2pdf(results, "no_scale.pdf",
+         fit_to_page = FALSE,
+         font_size = 10)
+
+# Example 15: Hide significance bolding
+table2pdf(results, "no_bold.pdf",
+         bold_significant = FALSE)
+
+# Example 16: Custom column alignment
+table2pdf(results, "custom_align.pdf",
+         align = c("c", "c", "c", "c", "c", "c", "c"))
+
+# Example 17: Descriptive statistics table
+desc_table <- desctable(
+     data = clintrial,
+     by = "treatment",
+     variables = c("age", "sex", "bmi", "stage"),
+     labels = clintrial_labels
+)
+
+table2pdf(desc_table, "descriptive.pdf",
+         caption = "Table 1: Baseline Characteristics by Treatment Group",
+         orientation = "landscape")
+
+# Example 18: Model comparison table
+models <- list(
+     base = c("age", "sex"),
+     full = c("age", "sex", "bmi", "treatment")
+)
+
+comparison <- compfit(
+     data = clintrial,
+     outcome = "os_status",
+     model_list = models
+)
+
+table2pdf(comparison, "model_comparison.pdf",
+         caption = "Table 3: Model Comparison Statistics")
+
+# Example 19: Very wide table with aggressive fitting
+wide_model <- fit(
+     data = clintrial,
+     outcome = "os_status",
+     predictors = c("age", "sex", "race", "bmi", "smoking", 
+                   "hypertension", "diabetes", "treatment", "stage")
+)
+
+table2pdf(wide_model, "very_wide.pdf",
+         orientation = "landscape",
+         paper = "legal",  # Even wider than letter
+         font_size = 7,
+         fit_to_page = TRUE,
+         condense_table = TRUE)
+
+# Example 20: With caption size control
+table2pdf(results, "caption_size.pdf",
+         font_size = 8,
+         caption_size = 6,
+         caption = "Table 4: Results with Compact Caption\\\\\\\\
+                   Smaller caption fits better on constrained pages")
+
+# Example 21: Troubleshooting - keep logs
+table2pdf(results, "debug.pdf",
+         show_logs = TRUE)
+# If it fails, check debug.log for error messages
+\dontshow{\}) # examplesIf}
 }
 \seealso{
+\code{\link{autotable}} for automatic format detection,
 \code{\link{table2tex}} for LaTeX source files,
 \code{\link{table2html}} for HTML output,
 \code{\link{table2docx}} for Microsoft Word,
 \code{\link{table2pptx}} for PowerPoint,
+\code{\link{table2rtf}} for Rich Text Format,
 \code{\link{desctable}} for descriptive tables,
 \code{\link{fit}} for regression tables
 
 Other export functions: 
-\code{\link{autoexport}()},
-\code{\link{print.table2docx_result}()},
-\code{\link{print.table2pptx_result}()},
-\code{\link{print.table2rtf_result}()},
+\code{\link{autotable}()},
 \code{\link{table2docx}()},
 \code{\link{table2html}()},
 \code{\link{table2pptx}()},

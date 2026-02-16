@@ -19,8 +19,10 @@
 #'   estimates and confidence intervals. Default is 2.
 #'
 #' @param p_digits Integer specifying the number of decimal places for \emph{p}-values.
-#'   \emph{p}-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001" 
-#'   (for \code{p_digits = 3}). Default is 3.
+#'   Values smaller than \code{10^(-p_digits)} are displayed as \code{"< 0.001"}
+#'   (for \code{p_digits = 3}), \code{"< 0.0001"} (for \code{p_digits = 4}),
+#'   \emph{etc.} The threshold string respects \code{number_format} (\emph{e.g.,}
+#'   \code{"< 0,001"} for EU formatting). Default is 3.
 #'
 #' @param conf_level Numeric confidence level for confidence intervals. Must be
 #'   between 0 and 1. Default is 0.95 (95\% confidence intervals). The CI
@@ -57,7 +59,7 @@
 #'   
 #' @param show_events Logical. If \code{TRUE}, includes a column showing the 
 #'   number of events for each row. Default is \code{NULL}, which auto-detects
-#'   based on model type (TRUE for binomial/survival, FALSE for linear).
+#'   based on model type (\code{TRUE} for binomial/survival, \code{FALSE} for linear).
 #'   
 #' @param indent_groups Logical. If \code{TRUE}, indents factor levels
 #'   under their parent variable name, creating a hierarchical display. If 
@@ -92,7 +94,7 @@
 #'   coefficients.
 #'   
 #' @param log_scale Logical. If \code{TRUE}, uses log scale for the x-axis.
-#'   Default is \code{NULL}, which auto-detects (TRUE for OR/HR/RR, FALSE for
+#'   Default is \code{NULL}, which auto-detects (\code{TRUE} for OR/HR/RR, \code{FALSE} for
 #'   coefficients).
 #'   
 #' @param labels Named character vector providing custom display labels for 
@@ -105,10 +107,17 @@
 #' @param units Character string specifying units for plot dimensions: 
 #'   \code{"in"} (inches), \code{"cm"}, or \code{"mm"}. Default is \code{"in"}.
 #'
+#' @param number_format Character string or two-element character vector
+#'   controlling thousand and decimal separators in formatted output. Named
+#'   presets: \code{"us"} (default), \code{"eu"}, \code{"space"},
+#'   \code{"none"}. Or a custom vector \code{c(big.mark, decimal.mark)}.
+#'   When \code{NULL} (default), uses
+#'   \code{getOption("summata.number_format", "us")}.
+#'
 #' @return A \code{ggplot} object containing the complete forest plot.
 #'   
-#'   The returned object includes an attribute \code{"recommended_dims"} 
-#'   accessible via \code{attr(plot, "recommended_dims")}, containing:
+#'   The returned object includes an attribute \code{"rec_dims"} 
+#'   accessible via \code{attr(plot, "rec_dims")}, containing:
 #'   \describe{
 #'     \item{width}{Numeric. Recommended plot width in specified units}
 #'     \item{height}{Numeric. Recommended plot height in specified units}
@@ -134,12 +143,13 @@
 #' }
 #'
 #' @seealso 
+#' \code{\link{autoforest}} for automatic model detection,
 #' \code{\link{uniscreen}} for generating univariable screening results,
 #' \code{\link{multiforest}} for multi-outcome forest plots,
 #' \code{\link{coxforest}}, \code{\link{glmforest}}, \code{\link{lmforest}} for
 #' single-model forest plots
 #'
-#' @examples
+#' @examplesIf FALSE
 #' # Load example data
 #' data(clintrial)
 #' data(clintrial_labels)
@@ -155,7 +165,6 @@
 #' 
 #' uniforest(uni_results, title = "Univariable Associations with Mortality")
 #' 
-#' \donttest{
 #'   options(width = 180)
 #' # Example 2: Survival analysis
 #' library(survival)
@@ -199,9 +208,8 @@
 #' 
 #' # Example 6: Save with recommended dimensions
 #' p <- uniforest(uni_results)
-#' dims <- attr(p, "recommended_dims")
+#' dims <- attr(p, "rec_dims")
 #' # ggsave("univariable_forest.pdf", p, width = dims$width, height = dims$height)
-#' }
 #'
 #' @family visualization functions
 #' @export
@@ -230,7 +238,8 @@ uniforest <- function(x,
                       log_scale = NULL,
                       labels = NULL,
                       show_footer = TRUE,
-                      units = "in") {
+                      units = "in",
+                      number_format = NULL) {
     
     ## Input validation
     if (!requireNamespace("data.table", quietly = TRUE)) {
@@ -239,6 +248,10 @@ uniforest <- function(x,
     if (!requireNamespace("ggplot2", quietly = TRUE)) {
         stop("Package 'ggplot2' is required but not installed.")
     }
+    
+    ## Resolve number formatting marks
+    validate_number_format(number_format)
+    marks <- resolve_number_marks(number_format)
     
     ## Check if user passed correct input type
     if (!inherits(x, "uniscreen_result")) {
@@ -451,8 +464,10 @@ uniforest <- function(x,
     
     ## Calculate N and events formatting
     to_show[, N := n_obs]
-    to_show[, n_formatted := data.table::fifelse(is.na(n_obs), "", format(n_obs, big.mark = ","))]
-    to_show[, events_formatted := data.table::fifelse(is.na(n_events), "", format(n_events, big.mark = ","))]
+    to_show[, n_formatted := data.table::fifelse(is.na(n_obs), "",
+        vapply(n_obs, format_count_forest, character(1), marks = marks))]
+    to_show[, events_formatted := data.table::fifelse(is.na(n_events), "",
+        vapply(n_events, format_count_forest, character(1), marks = marks))]
     
     ## Format the values for display based on log_scale
     to_show_exp_clean <- data.table::copy(to_show)
@@ -462,47 +477,51 @@ uniforest <- function(x,
         to_show_exp_clean[, hr := data.table::fifelse(is.na(estimate), NA_real_, exp(estimate))]
         to_show_exp_clean[, hr_formatted := data.table::fifelse(
                                                             is.na(estimate), "",
-                                                            format_number(exp(estimate), digits)
+                                                            format_number(exp(estimate), digits, marks)
                                                         )]
         to_show_exp_clean[, conf_low_formatted := data.table::fifelse(
                                                                   is.na(conf_low), "",
-                                                                  format_number(exp(conf_low), digits)
+                                                                  format_number(exp(conf_low), digits, marks)
                                                               )]
         to_show_exp_clean[, conf_high_formatted := data.table::fifelse(
                                                                    is.na(conf_high), "",
-                                                                   format_number(exp(conf_high), digits)
+                                                                   format_number(exp(conf_high), digits, marks)
                                                                )]
     } else {
         ## Linear scale: use raw coefficients
         to_show_exp_clean[, hr := data.table::fifelse(is.na(estimate), NA_real_, estimate)]
         to_show_exp_clean[, hr_formatted := data.table::fifelse(
                                                             is.na(estimate), "",
-                                                            format_number(estimate, digits)
+                                                            format_number(estimate, digits, marks)
                                                         )]
         to_show_exp_clean[, conf_low_formatted := data.table::fifelse(
                                                                   is.na(conf_low), "",
-                                                                  format_number(conf_low, digits)
+                                                                  format_number(conf_low, digits, marks)
                                                               )]
         to_show_exp_clean[, conf_high_formatted := data.table::fifelse(
                                                                    is.na(conf_high), "",
-                                                                   format_number(conf_high, digits)
+                                                                   format_number(conf_high, digits, marks)
                                                                )]
     }
     
     ## Format \emph{p}-values
     p_threshold <- 10^(-p_digits)
-    p_threshold_str <- paste0("< ", format(p_threshold, scientific = FALSE))
+    p_threshold_str <- if (!is.null(marks)) {
+                           paste0("< 0", marks$decimal.mark, strrep("0", p_digits - 1), "1")
+                       } else {
+                           paste0("< ", format(p_threshold, scientific = FALSE))
+                       }
     
     to_show_exp_clean[, p_formatted := data.table::fifelse(
                                                        is.na(p_value), "",
                                                        data.table::fifelse(p_value < p_threshold, p_threshold_str,
-                                                                           format_number(p_value, p_digits))
+                                                                           format_number(p_value, p_digits, marks))
                                                    )]
     
     ## Determine if ANY coefficient or CI bound is negative (only relevant for linear scale)
     ## If so, use comma notation throughout for consistency
     use_comma_notation <- !log_scale && any(to_show_exp_clean$conf_low < 0 | to_show_exp_clean$conf_high < 0, na.rm = TRUE)
-    ci_separator <- if (use_comma_notation) ", " else "-"
+    ci_separator <- forest_ci_separator(use_comma_notation, marks)
     
     ## Create effect string with italic p
     to_show_exp_clean[, hr_string_expr := data.table::fifelse(
@@ -973,7 +992,7 @@ uniforest <- function(x,
     }
 
     ## Add recommended dimensions as attribute
-    attr(p, "recommended_dims") <- list(width = rec_width, height = rec_height)
+    attr(p, "rec_dims") <- list(width = rec_width, height = rec_height)
 
     return(p)
 }

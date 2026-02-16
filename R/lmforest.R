@@ -3,15 +3,14 @@
 #' Generates a publication-ready forest plot that combines a formatted data table 
 #' with a graphical representation of regression coefficients from a linear model. 
 #' The plot integrates variable names, group levels, sample sizes, coefficients 
-#' with confidence intervals, \emph{p}-values, and model diagnostics (R², F-statistic, 
-#' AIC) in a single comprehensive visualization designed for manuscripts and 
-#' presentations.
+#' with confidence intervals, \emph{p}-values, and model diagnostics (\emph{R}²,
+#' \emph{F}-statistic, AIC) in a single comprehensive visualization designed for
+#' manuscripts and presentations.
 #'
 #' @param x Either a fitted linear model object (class \code{lm} or \code{lmerMod}), 
 #'   a \code{fit_result} object from \code{fit()}, or a \code{fullfit_result}
 #'   object from \code{fullfit()}. When a \code{fit_result} or \code{fullfit_result}
 #'   is provided, the model, data, and labels are automatically extracted.
-#'   Note: GLM objects are not accepted - use \code{glmforest()} instead.
 #'   
 #' @param data Data frame or data.table containing the original data used to 
 #'   fit the model. If \code{NULL} (default) and \code{x} is a model, the function 
@@ -20,19 +19,19 @@
 #'   passing a model directly.
 #'   
 #' @param title Character string specifying the plot title displayed at the top. 
-#'   Default is \code{"Linear Model"}. Use descriptive titles for publication.
+#'   Default is \code{"Linear Model"}.
 #'   
 #' @param effect_label Character string for the effect measure label on the 
-#'   forest plot axis. Default is \code{"Coefficient"}. Could be customized to 
-#'   reflect units (\emph{e.g.,} "Change in BMI (kg/m²)").
+#'   forest plot axis. Default is \code{"Coefficient"}.
 #'   
 #' @param digits Integer specifying the number of decimal places for coefficients 
 #'   and confidence intervals. Default is 2.
 #'
 #' @param p_digits Integer specifying the number of decimal places for \emph{p}-values.
-#'   \emph{p}-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001" 
-#'   (for \code{p_digits = 3}), "< 0.0001" (for \code{p_digits = 4}), \emph{etc.} 
-#'   Default is 3.
+#'   Values smaller than \code{10^(-p_digits)} are displayed as \code{"< 0.001"}
+#'   (for \code{p_digits = 3}), \code{"< 0.0001"} (for \code{p_digits = 4}),
+#'   \emph{etc.} The threshold string respects \code{number_format} (\emph{e.g.,}
+#'   \code{"< 0,001"} for EU formatting). Default is 3.
 #'
 #' @param conf_level Numeric confidence level for confidence intervals. Must be
 #'   between 0 and 1. Default is 0.95 (95\% confidence intervals). The CI
@@ -61,8 +60,7 @@
 #'   specified \code{units}. Default is \code{NULL} (automatic).
 #'   
 #' @param show_n Logical. If \code{TRUE}, includes a column showing group-specific 
-#'   sample sizes. Note: Linear models don't have "events" so there's no 
-#'   \code{show_events} parameter. Default is \code{TRUE}.
+#'   sample sizes. Default is \code{TRUE}.
 #'   
 #' @param indent_groups Logical. If \code{TRUE}, indents factor levels under 
 #'   their parent variable name, creating hierarchical structure. The "Group" 
@@ -97,14 +95,21 @@
 #'   hex codes or R color names.
 #'
 #' @param qc_footer Logical. If \code{TRUE}, displays model quality control
-#'   statistics in the footer (observations analyzed, R², adjusted R²,
-#'   F-statistic, AIC). Default is \code{TRUE}.
+#'   statistics in the footer (observations analyzed, \emph{R}², adjusted
+#'   \emph{R}², \emph{F}-statistic, AIC). Default is \code{TRUE}.
+#'
+#' @param number_format Character string or two-element character vector
+#'   controlling thousand and decimal separators in formatted output. Named
+#'   presets: \code{"us"} (default), \code{"eu"}, \code{"space"},
+#'   \code{"none"}. Or a custom vector \code{c(big.mark, decimal.mark)}.
+#'   When \code{NULL} (default), uses
+#'   \code{getOption("summata.number_format", "us")}.
 #'
 #' @return A \code{ggplot} object containing the complete forest plot. The plot 
 #'   can be displayed, saved, or further customized.
 #'   
-#'   The returned object includes an attribute \code{"recommended_dims"} 
-#'   accessible via \code{attr(plot, "recommended_dims")}, containing:
+#'   The returned object includes an attribute \code{"rec_dims"} 
+#'   accessible via \code{attr(plot, "rec_dims")}, containing:
 #'   \describe{
 #'     \item{width}{Numeric. Recommended plot width in specified units}
 #'     \item{height}{Numeric. Recommended plot height in specified units}
@@ -122,8 +127,8 @@
 #'   \item \strong{Reference line}: At coefficient = 0 (not at 1)
 #'   \item \strong{Linear scale}: Forest plot uses linear scale (not log scale)
 #'   \item \strong{No events column}: Only sample sizes shown (no event counts)
-#'   \item \strong{R² statistics}: Model fit assessed by R² and adjusted R²
-#'   \item \strong{F-test}: Overall model significance from F-statistic
+#'   \item \strong{\emph{R}² statistics}: Model fit assessed by \emph{R}² and adjusted \emph{R}²
+#'   \item \strong{\emph{F}-test}: Overall model significance from \emph{F}-statistic
 #' }
 #' 
 #' \strong{Plot Components:}
@@ -134,7 +139,7 @@
 #'     \itemize{
 #'       \item Variable: Predictor names
 #'       \item Group: Factor levels (if applicable)
-#'       \item n: Sample sizes by group
+#'       \item \emph{n}: Sample sizes by group
 #'       \item Coefficient (95\% CI); \emph{p}-value: Raw coefficients with CIs and \emph{p}-values
 #'     }
 #'   \item \strong{Forest Plot} (right):
@@ -147,8 +152,8 @@
 #'   \item \strong{Model Statistics} (footer):
 #'     \itemize{
 #'       \item Observations analyzed (with percentage of total data)
-#'       \item R² and adjusted R²
-#'       \item F-statistic with degrees of freedom and \emph{p}-value
+#'       \item \emph{R}² and adjusted \emph{R}²
+#'       \item \emph{F}-statistic with degrees of freedom and \emph{p}-value
 #'       \item AIC
 #'     }
 #' }
@@ -173,20 +178,20 @@
 #' 
 #' The footer displays key diagnostics:
 #' \itemize{
-#'   \item \strong{R²}: Proportion of variance explained (0 to 1)
+#'   \item \strong{\emph{R}²}: Proportion of variance explained (0 to 1)
 #'     \itemize{
 #'       \item 0.0-0.3: Weak explanatory power
 #'       \item 0.3-0.5: Moderate
 #'       \item 0.5-0.7: Good
 #'       \item >0.7: Strong (rare in social/biological sciences)
 #'     }
-#'   \item \strong{Adjusted R²}: R² penalized for number of predictors
+#'   \item \strong{Adjusted \emph{R}²}: \emph{R}² penalized for number of predictors
 #'     \itemize{
-#'       \item Always ≤ R²
+#'       \item Always ≤ \emph{R}²
 #'       \item Preferred for model comparison
 #'       \item Accounts for model complexity
 #'     }
-#'   \item \strong{F-statistic}: Tests null hypothesis that all coefficients = 0
+#'   \item \strong{\emph{F}-statistic}: Tests null hypothesis that all coefficients = 0
 #'     \itemize{
 #'       \item Degrees of freedom: df1 = # predictors, df2 = # observations - # predictors - 1
 #'       \item Significant \emph{p}-value indicates model explains variance better than intercept-only
@@ -226,7 +231,7 @@
 #' 
 #' \strong{Sample Size Reporting:}
 #' 
-#' The "n" column shows:
+#' The "\emph{n}" column shows:
 #' \itemize{
 #'   \item For continuous variables: Total observations with non-missing data
 #'   \item For factor variables: Number of observations in each category
@@ -235,13 +240,15 @@
 #' }
 #'
 #' @seealso 
+#' \code{\link{autoforest}} for automatic model detection,
 #' \code{\link{glmforest}} for logistic/GLM forest plots,
 #' \code{\link{coxforest}} for Cox model forest plots,
+#' \code{\link{uniforest}} for univariable screening forest plots,
+#' \code{\link{multiforest}} for multi-outcome forest plots,
 #' \code{\link[stats]{lm}} for fitting linear models,
-#' \code{\link{fit}} for fullfit regression modeling,
-#' \code{\link[stats]{plot.lm}} for diagnostic plots
+#' \code{\link{fit}} for regression modeling
 #'
-#' @examples
+#' @examplesIf FALSE
 #' # Load example data
 #' data(clintrial)
 #' data(clintrial_labels)
@@ -253,7 +260,6 @@
 #' plot1 <- lmforest(model1, data = clintrial)
 #' print(plot1)
 #' 
-#' \donttest{
 #'   options(width = 180)
 #' # Example 2: With custom labels and title
 #' plot2 <- lmforest(
@@ -326,7 +332,7 @@
 #' 
 #' # Example 9: Get recommended dimensions
 #' plot9 <- lmforest(model1, data = clintrial)
-#' dims <- attr(plot9, "recommended_dims")
+#' dims <- attr(plot9, "rec_dims")
 #' cat("Recommended:", dims$width, "x", dims$height, dims$units, "\n")
 #' 
 #' # Example 10: Specify exact dimensions
@@ -429,12 +435,11 @@
 #' )
 #' 
 #' # Save for publication
-#' dims <- attr(final_plot, "recommended_dims")
+#' dims <- attr(final_plot, "rec_dims")
 #' # ggsave("figure3_linear.pdf", final_plot,
 #' #        width = dims$width, height = dims$height)
 #' # ggsave("figure3_linear.png", final_plot,
 #' #        width = dims$width, height = dims$height, dpi = 300)
-#' }
 #'
 #' @family visualization functions
 #' @export
@@ -461,7 +466,8 @@ lmforest <- function(x, data = NULL,
                      labels = NULL,
                      units = "in",
                      color = "#5A8F5A",
-                     qc_footer = TRUE) {
+                     qc_footer = TRUE,
+                     number_format = NULL) {
     
     ## Check for required packages
     if (!requireNamespace("data.table", quietly = TRUE)) {
@@ -473,6 +479,10 @@ lmforest <- function(x, data = NULL,
     if (!requireNamespace("grid", quietly = TRUE)) {
         stop("Package 'grid' is required but not installed.")
     }
+    
+    ## Resolve number formatting marks
+    validate_number_format(number_format)
+    marks <- resolve_number_marks(number_format)
     
     ## Handle input: accept either a model object or a fit_result/fullfit_result from fit()/fullfit()
     if (inherits(x, "fit_result") || inherits(x, "fullfit_result")) {
@@ -728,11 +738,12 @@ Received class: ", paste(class(x), collapse = ", "))
     gmodel$pct_analyzed <- (gmodel$nobs / total_obs) * 100
     
     ## Format for display
-    gmodel$nobs_formatted <- format(gmodel$nobs, big.mark = ",", scientific = FALSE)
-    gmodel$nobs_with_pct <- paste0(gmodel$nobs_formatted, " (", 
-                                   sprintf("%.1f%%", gmodel$pct_analyzed), ")")
-    gmodel$AIC_formatted <- format(round(gmodel$AIC, 2), big.mark = ",", 
-                                   scientific = FALSE, nsmall = 2)
+    gmodel$nobs_formatted <- format_count_forest(gmodel$nobs, marks)
+    pct_str <- sprintf("%.1f%%", gmodel$pct_analyzed)
+    if (marks$decimal.mark != ".") pct_str <- sub(".", marks$decimal.mark, pct_str, fixed = TRUE)
+    gmodel$nobs_with_pct <- paste0(gmodel$nobs_formatted, " (", pct_str, ")")
+    aic_val <- format(round(gmodel$AIC, 2), big.mark = marks$big.mark, decimal.mark = marks$decimal.mark, scientific = FALSE, nsmall = 2)
+    gmodel$AIC_formatted <- trimws(aic_val)
     
     ## Extract xlevels (factor levels) based on model type
     if (is_lme4) {
@@ -1126,31 +1137,35 @@ Received class: ", paste(class(x), collapse = ", "))
                                                                 "",
                                                                 data.table::fifelse(is.na(estimate), 
                                                                                     ref_label,
-                                                                                    format_number(estimate, digits)))]
+                                                                                    format_number(estimate, digits, marks)))]
     to_show_exp_clean[, conf_low_formatted := data.table::fifelse(is.na(conf_low), 
                                                                   NA_character_,
-                                                                  format_number(conf_low, digits))]
+                                                                  format_number(conf_low, digits, marks))]
     to_show_exp_clean[, conf_high_formatted := data.table::fifelse(is.na(conf_high), 
                                                                    NA_character_,
-                                                                   format_number(conf_high, digits))]
+                                                                   format_number(conf_high, digits, marks))]
     
     ## Format CI percentage for display in headers
     ci_pct <- round(conf_level * 100)
 
     ## Format \emph{p}-values using p_digits parameter
     p_threshold <- 10^(-p_digits)
-    p_threshold_str <- paste0("< ", format(p_threshold, scientific = FALSE))
+    p_threshold_str <- if (!is.null(marks)) {
+                           paste0("< 0", marks$decimal.mark, strrep("0", p_digits - 1), "1")
+                       } else {
+                           paste0("< ", format(p_threshold, scientific = FALSE))
+                       }
     
     to_show_exp_clean[, p_formatted := data.table::fifelse(is.na(p_value), 
                                                            NA_character_,
                                                            data.table::fifelse(p_value < p_threshold, 
                                                                                p_threshold_str,
-                                                                               format_number(p_value, p_digits)))]
+                                                                               format_number(p_value, p_digits, marks)))]
     
     ## Determine if ANY coefficient or CI bound is negative - if so, use comma notation throughout
     ## This ensures consistent formatting across all rows
     use_comma_notation <- any(to_show_exp_clean$conf_low < 0 | to_show_exp_clean$conf_high < 0, na.rm = TRUE)
-    ci_separator <- if (use_comma_notation) ", " else "-"
+    ci_separator <- forest_ci_separator(use_comma_notation, marks)
     
     ## Create the combined effect string with expression for italic p
     to_show_exp_clean[, effect_string_expr := data.table::fifelse(
@@ -1169,7 +1184,8 @@ Received class: ", paste(class(x), collapse = ", "))
                                                           )]
     
     ## Format N with thousands separator
-    to_show_exp_clean[, n_formatted := data.table::fifelse(is.na(N), "", format(N, big.mark = ",", scientific = FALSE))]
+    to_show_exp_clean[, n_formatted := data.table::fifelse(is.na(N), "",
+        vapply(N, format_count_forest, character(1), marks = marks))]
     
     ## Clean up variable names for display
     to_show_exp_clean[, var_display := as.character(var)]
@@ -1484,14 +1500,23 @@ Received class: ", paste(class(x), collapse = ", "))
         
         ## Model statistics at bottom (conditional)
         {if (qc_footer) {
+             r2_str <- format_number(gmodel$r_squared, 3, marks)
+             adj_r2_str <- format_number(gmodel$adj_r_squared, 3, marks)
+             ## Build footer - F-statistic may be NA for mixed models
+             if (!is.na(gmodel$f_statistic) && !is.na(gmodel$f_pvalue)) {
+                 f_stat_str <- format_number(gmodel$f_statistic, 2, marks)
+                 f_p_str <- if (gmodel$f_pvalue < p_threshold) p_threshold_str else paste0("= ", format_number(gmodel$f_pvalue, p_digits, marks))
+                 f_line <- paste0("\nF-statistic: ", f_stat_str,
+                                  " (df1 = ", gmodel$f_df1, ", df2 = ", gmodel$f_df2,
+                                  "); p ", f_p_str)
+             } else {
+                 f_line <- ""
+             }
              ggplot2::annotate(geom = "text", x = 0.5, y = y_variable,
                                label = paste0("Observations analyzed: ", gmodel$nobs_with_pct,
-                                              "\nR\u00b2: ", round(gmodel$r_squared, 3),
-                                              " (Adjusted: ", round(gmodel$adj_r_squared, 3), ")",
-                                              "\nF-statistic: ", round(gmodel$f_statistic, 2),
-                                              " (df1 = ", gmodel$f_df1, ", df2 = ", gmodel$f_df2,
-                                              "); p ", data.table::fifelse(gmodel$f_pvalue < p_threshold, p_threshold_str, 
-                                                                           paste0("= ", format(round(gmodel$f_pvalue, p_digits), nsmall = p_digits))),
+                                              "\nR\u00b2: ", r2_str,
+                                              " (Adjusted: ", adj_r2_str, ")",
+                                              f_line,
                                               "\nAIC: ", gmodel$AIC_formatted),
                                size = annot_font * 0.8, hjust = 0, vjust = 1.2, fontface = "italic")
         }}
@@ -1509,7 +1534,7 @@ Received class: ", paste(class(x), collapse = ", "))
     }
     
     ## Add recommended dimensions as an attribute
-    attr(p, "recommended_dims") <- list(width = rec_width, height = rec_height, units = units)
+    attr(p, "rec_dims") <- list(width = rec_width, height = rec_height, units = units)
 
     ## Return the plot
     return(p)

@@ -14,6 +14,6 @@ Character string with readable model type name.
 }
 \description{
 Converts model class names to human-readable descriptions. For GLMs,
-uses the family to provide specific names (e.g., "Logistic", "Poisson").
+uses the family to provide specific names (\emph{e.g.,} "Logistic", "Poisson").
 }
 \keyword{internal}

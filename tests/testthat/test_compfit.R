@@ -35,7 +35,7 @@ expect_compfit_result <- function(result) {
     expect_true("N" %in% names(result))
     expect_true("Converged" %in% names(result))
     expect_true("AIC" %in% names(result))
-    expect_true("Summata Score" %in% names(result))
+    expect_true("CMS" %in% names(result))
     
     ## Required attributes
     expect_true(!is.null(attr(result, "models")))
@@ -46,7 +46,7 @@ expect_compfit_result <- function(result) {
 
 ## Helper to check scores are valid
 expect_valid_scores <- function(result) {
-    scores <- result$`Summata Score`
+    scores <- result$`CMS`
     expect_true(all(scores >= 0 | is.na(scores)))
     expect_true(all(scores <= 100 | is.na(scores)))
     ## Should be sorted descending
@@ -512,7 +512,7 @@ test_that("compfit passes labels to underlying fit function", {
 ## SECTION 5: Scoring and Ranking Tests
 ## ============================================================================
 
-test_that("compfit ranks models by Summata Score in descending order", {
+test_that("compfit ranks models by CMS in descending order", {
     
     models <- list(
         minimal = c("age"),
@@ -527,7 +527,7 @@ test_that("compfit ranks models by Summata Score in descending order", {
         model_type = "coxph"
     )
     
-    scores <- result$`Summata Score`
+    scores <- result$`CMS`
     
     ## Scores should be in descending order (best first)
     expect_true(all(diff(scores) <= 0))
@@ -699,7 +699,7 @@ test_that("compfit handles missing data appropriately", {
     
     expect_compfit_result(result)
     
-    ## Get N values - note: results may be reordered by Summata Score
+    ## Get N values - note: results may be reordered by CMS
     ## Use which() to find the correct rows
     idx_missing <- which(result$Model == "has_missing")
     idx_complete <- which(result$Model == "complete")
@@ -744,7 +744,7 @@ test_that("compfit handles invalid model_type gracefully", {
 ## SECTION 8: Output Format Tests
 ## ============================================================================
 
-test_that("Summata Score is always the second column", {
+test_that("CMS is always the second column", {
     
     ## Test with GLM
     result_glm <- compfit(
@@ -753,7 +753,7 @@ test_that("Summata Score is always the second column", {
         model_list = list(simple = c("age", "sex")),
         model_type = "glm"
     )
-    expect_equal(names(result_glm)[2], "Summata Score")
+    expect_equal(names(result_glm)[2], "CMS")
     
     ## Test with LM
     result_lm <- compfit(
@@ -762,7 +762,7 @@ test_that("Summata Score is always the second column", {
         model_list = list(simple = c("age", "sex")),
         model_type = "lm"
     )
-    expect_equal(names(result_lm)[2], "Summata Score")
+    expect_equal(names(result_lm)[2], "CMS")
     
     ## Test with Cox
     result_cox <- compfit(
@@ -771,11 +771,11 @@ test_that("Summata Score is always the second column", {
         model_list = list(simple = c("age", "sex")),
         model_type = "coxph"
     )
-    expect_equal(names(result_cox)[2], "Summata Score")
+    expect_equal(names(result_cox)[2], "CMS")
 })
 
 
-test_that("Summata Score is second column for mixed models", {
+test_that("CMS is second column for mixed models", {
     
     skip_if_not_installed("lme4")
     skip_on_cran()
@@ -792,7 +792,7 @@ test_that("Summata Score is second column for mixed models", {
         REML = FALSE
     )
     
-    expect_equal(names(result)[2], "Summata Score")
+    expect_equal(names(result)[2], "CMS")
     
     gc()
 })
@@ -807,7 +807,7 @@ test_that("compfit column order is correct for GLM", {
         model_type = "glm"
     )
     
-    expected_order <- c("Model", "Summata Score", "N", "Events", "Predictors", "Converged",
+    expected_order <- c("Model", "CMS", "N", "Events", "Predictors", "Converged",
                        "AIC", "BIC", "Pseudo-R²", "Concordance", "Brier Score",
                        "Global p")
     
@@ -868,7 +868,7 @@ test_that("print.compfit_result works without error", {
     
     ## Should print without error
     expect_output(print(result), "Model Comparison Results")
-    expect_output(print(result), "Summata Score")
+    expect_output(print(result), "CMS")
     expect_output(print(result), "Recommended Model")
 })
 

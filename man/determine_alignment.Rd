@@ -10,7 +10,7 @@ determine_alignment(df)
 \item{df}{Data.frame or data.table to determine alignment for.}
 }
 \value{
-Character string with alignment codes (e.g., "rlcc").
+Character string with alignment codes (\emph{e.g.,} "rlcc").
 }
 \description{
 Creates column alignment string for LaTeX tables. Variable and Group

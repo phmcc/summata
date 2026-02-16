@@ -30,7 +30,8 @@ coxforest(
   labels = NULL,
   color = "#8A61D8",
   qc_footer = TRUE,
-  units = "in"
+  units = "in",
+  number_format = NULL
 )
 }
 \arguments{
@@ -57,9 +58,10 @@ forest plot axis. Default is \code{"Hazard Ratio"}. Alternatives might include
 and confidence intervals. Default is 2.}
 
 \item{p_digits}{Integer specifying the number of decimal places for \emph{p}-values.
-\emph{p}-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001" 
-(for \code{p_digits = 3}), "< 0.0001" (for \code{p_digits = 4}), \emph{etc.} 
-Default is 3.}
+Values smaller than \code{10^(-p_digits)} are displayed as \code{"< 0.001"}
+(for \code{p_digits = 3}), \code{"< 0.0001"} (for \code{p_digits = 4}),
+\emph{etc.} The threshold string respects \code{number_format} (\emph{e.g.,}
+\code{"< 0,001"} for EU formatting). Default is 3.}
 
 \item{conf_level}{Numeric confidence level for confidence intervals. Must be
 between 0 and 1. Default is 0.95 (95\% confidence intervals). The CI
@@ -134,13 +136,20 @@ concordance index, AIC). Default is \code{TRUE}.}
 
 \item{units}{Character string specifying units for plot dimensions: 
 \code{"in"} (inches), \code{"cm"}, or \code{"mm"}. Default is \code{"in"}.}
+
+\item{number_format}{Character string or two-element character vector
+controlling thousand and decimal separators in formatted output. Named
+presets: \code{"us"} (default), \code{"eu"}, \code{"space"},
+\code{"none"}. Or a custom vector \code{c(big.mark, decimal.mark)}.
+When \code{NULL} (default), uses
+\code{getOption("summata.number_format", "us")}.}
 }
 \value{
 A \code{ggplot} object containing the complete forest plot. The plot 
   can be displayed, saved, or further customized.
   
-  The returned object includes an attribute \code{"recommended_dims"} 
-  accessible via \code{attr(plot, "recommended_dims")}, containing:
+  The returned object includes an attribute \code{"rec_dims"} 
+  accessible via \code{attr(plot, "rec_dims")}, containing:
   \describe{
     \item{width}{Numeric. Recommended plot width in specified units}
     \item{height}{Numeric. Recommended plot height in specified units}
@@ -261,6 +270,7 @@ should verify this assumption using:
 }
 }
 \examples{
+\dontshow{if (FALSE) withAutoprint(\{ # examplesIf}
 # Load example data
 data(clintrial)
 data(clintrial_labels)
@@ -273,7 +283,6 @@ model1 <- coxph(Surv(os_months, os_status) ~ age + sex + treatment,
 plot1 <- coxforest(model1, data = clintrial)
 print(plot1)
 
-\donttest{
   options(width = 180)
 # Example 2: With custom labels and title
 plot2 <- coxforest(
@@ -354,7 +363,7 @@ plot8 <- coxforest(
 
 # Example 9: Use recommended dimensions for saving
 plot9 <- coxforest(model1, data = clintrial)
-dims <- attr(plot9, "recommended_dims")
+dims <- attr(plot9, "rec_dims")
 
 # Save to PDF
 # ggsave("survival_forest.pdf", plot9,
@@ -445,20 +454,21 @@ summary(final_model)
 # cox.zph(final_model)
 
 # Save for publication
-dims <- attr(final_plot, "recommended_dims")
+dims <- attr(final_plot, "rec_dims")
 # ggsave("figure2_survival.pdf", final_plot,
 #        width = dims$width, height = dims$height)
 # ggsave("figure2_survival.png", final_plot,
 #        width = dims$width, height = dims$height, dpi = 300)
-}
-
+\dontshow{\}) # examplesIf}
 }
 \seealso{
+\code{\link{autoforest}} for automatic model detection,
 \code{\link{glmforest}} for logistic/GLM forest plots,
 \code{\link{lmforest}} for linear model forest plots,
+\code{\link{uniforest}} for univariable screening forest plots,
+\code{\link{multiforest}} for multi-outcome forest plots,
 \code{\link[survival]{coxph}} for fitting Cox models,
-\code{\link[survival]{cox.zph}} for testing proportional hazards assumption,
-\code{\link{fit}} for fullfit regression modeling
+\code{\link{fit}} for regression modeling
 
 Other visualization functions: 
 \code{\link{autoforest}()},

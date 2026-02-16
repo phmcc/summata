@@ -1750,7 +1750,7 @@ test_that("uniforest creates forest plot from uniscreen result", {
     p <- uniforest(table, title = "Univariable Screening")
     
     expect_s3_class(p, "ggplot")
-    expect_true(!is.null(attr(p, "recommended_dims")))
+    expect_true(!is.null(attr(p, "rec_dims")))
 })
 
 
@@ -1907,7 +1907,7 @@ test_that("multiforest creates forest plot from multifit result", {
     p <- multiforest(table, title = "Multi-Outcome Analysis")
     
     expect_s3_class(p, "ggplot")
-    expect_true(!is.null(attr(p, "recommended_dims")))
+    expect_true(!is.null(attr(p, "rec_dims")))
 })
 
 
@@ -2122,11 +2122,10 @@ test_that("multifit validates predictor length", {
 })
 
 
-test_that("multifit warns on missing random for glmer", {
+test_that("multifit errors on missing random for glmer", {
     skip_if_not_installed("lme4")
     
-    ## multifit uses tryCatch and warns instead of erroring
-    expect_warning(
+    expect_error(
         multifit(
             data = clintrial,
             outcomes = c("surgery"),
@@ -2134,7 +2133,7 @@ test_that("multifit warns on missing random for glmer", {
             model_type = "glmer",
             parallel = FALSE
         ),
-        regexp = "random.*required|failed"
+        regexp = "random.*required"
     )
 })
 
@@ -2402,7 +2401,7 @@ test_that("multifit preserves all expected attributes", {
 })
 
 
-test_that("uniforest recommended_dims attribute present", {
+test_that("uniforest rec_dims attribute present", {
     skip_if_not_installed("ggplot2")
     
     table <- uniscreen(
@@ -2414,14 +2413,14 @@ test_that("uniforest recommended_dims attribute present", {
     
     p <- uniforest(table)
     
-    dims <- attr(p, "recommended_dims")
+    dims <- attr(p, "rec_dims")
     expect_true(!is.null(dims))
     expect_true("width" %in% names(dims))
     expect_true("height" %in% names(dims))
 })
 
 
-test_that("multiforest recommended_dims attribute present", {
+test_that("multiforest rec_dims attribute present", {
     skip_if_not_installed("ggplot2")
     
     table <- multifit(
@@ -2433,7 +2432,7 @@ test_that("multiforest recommended_dims attribute present", {
     
     p <- multiforest(table)
     
-    dims <- attr(p, "recommended_dims")
+    dims <- attr(p, "rec_dims")
     expect_true(!is.null(dims))
     expect_true("width" %in% names(dims))
     expect_true("height" %in% names(dims))

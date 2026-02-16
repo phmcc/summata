@@ -4,19 +4,23 @@
 \alias{format_number}
 \title{Format numeric value with fixed decimal places}
 \usage{
-format_number(x, digits)
+format_number(x, digits, marks = NULL)
 }
 \arguments{
 \item{x}{Numeric value to format.}
 
 \item{digits}{Integer number of decimal places.}
+
+\item{marks}{Optional list with \code{big.mark} and \code{decimal.mark} as
+returned by \code{\link{resolve_number_marks}}.}
 }
 \value{
 Character string with formatted value.
 }
 \description{
 Formats a numeric value to a specified number of decimal places, removing
-leading/trailing whitespace and fixing negative zero display (e.g., "-0.00"
-becomes "0.00").
+leading/trailing whitespace and fixing negative zero display (\emph{e.g.,} "-0.00"
+becomes "0.00"). When \code{marks} is supplied, applies locale-appropriate
+decimal mark substitution.
 }
 \keyword{internal}

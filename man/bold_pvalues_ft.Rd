@@ -2,7 +2,7 @@
 % Please edit documentation in R/table2_utils.R
 \name{bold_pvalues_ft}
 \alias{bold_pvalues_ft}
-\title{Bold significant p-values in DOCX}
+\title{Bold significant \emph{p}-values in DOCX}
 \usage{
 bold_pvalues_ft(ft, df, p_threshold = 0.05)
 }
@@ -11,13 +11,13 @@ bold_pvalues_ft(ft, df, p_threshold = 0.05)
 
 \item{df}{The source data.table.}
 
-\item{p_threshold}{Numeric p-value threshold for significance.}
+\item{p_threshold}{Numeric \emph{p}-value threshold for significance.}
 }
 \value{
-Flextable object with significant p-values bolded.
+Flextable object with significant \emph{p}-values bolded.
 }
 \description{
-Applies bold formatting to significant p-values in \pkg{flextable} objects
+Applies bold formatting to significant \emph{p}-values in \pkg{flextable} objects
 by detecting values below threshold or "< 0.001" patterns.
 }
 \keyword{internal}

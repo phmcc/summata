@@ -12,7 +12,7 @@ combine_coefficient_tables(coef_list, model_names)
 \item{model_names}{Character vector of model names corresponding to coef_list.}
 }
 \value{
-Combined data.table with Model column, or NULL if empty.
+Combined data.table with Model column, or \code{NULL} if empty.
 }
 \description{
 Merges coefficient tables from multiple fitted models into a single

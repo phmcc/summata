@@ -15,7 +15,7 @@ format_interaction_term(term, labels = NULL)
 Formatted interaction term string.
 }
 \description{
-Converts R's internal interaction term format (e.g., "treatmentDrug A:stageII")
-to a more readable format (e.g., "Treatment (Drug A) × Stage (II)").
+Converts R's internal interaction term format (\emph{e.g.,} "treatmentDrug A:stageII")
+to a more readable format (\emph{e.g.,} "Treatment (Drug A) × Stage (II)").
 }
 \keyword{internal}

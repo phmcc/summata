@@ -39,22 +39,22 @@ Common arguments include:
   \item{digits}{Number of decimal places for estimates (default 2)}
   \item{p_digits}{Number of decimal places for \emph{p}-values (default 3)}
   \item{conf_level}{Confidence level for intervals (default 0.95)}
-  \item{show_n}{Logical, show sample sizes (default TRUE)}
-  \item{show_events}{Logical, show event counts (default TRUE for survival/binomial)}
-  \item{qc_footnote}{Logical, show model QC stats in footer (default TRUE)}
-  \item{zebra_stripes}{Logical, alternating row shading (default TRUE)}
-  \item{indent_groups}{Logical, indent factor levels (default FALSE)}
+  \item{show_n}{Logical, show sample sizes (default \code{TRUE})}
+  \item{show_events}{Logical, show event counts (default \code{TRUE} for survival/binomial)}
+  \item{qc_footnote}{Logical, show model QC stats in footer (default \code{TRUE})}
+  \item{zebra_stripes}{Logical, alternating row shading (default \code{TRUE})}
+  \item{indent_groups}{Logical, indent factor levels (default \code{FALSE})}
   \item{color}{Color for point estimates}
   \item{table_width}{Proportion of width for table (default 0.6)}
   \item{plot_width, plot_height}{Explicit dimensions}
-  \item{units}{Dimension units: "in", "cm", or "mm"}
+  \item{units}{Dimension units: \code{"in"}, \code{"cm"}, or \code{"mm"}}
 }
 See the documentation for the specific forest function for all available options.}
 }
 \value{
 A \code{ggplot} object containing the forest plot. The returned object
-  includes an attribute \code{"recommended_dims"} accessible via 
-  \code{attr(plot, "recommended_dims")} containing recommended width and height.
+  includes an attribute \code{"rec_dims"} accessible via 
+  \code{attr(plot, "rec_dims")} containing recommended width and height.
 }
 \description{
 A convenience wrapper function that automatically detects the input type and
@@ -63,13 +63,14 @@ the need to remember which forest function to call for different model types
 or analysis objects, making it ideal for exploratory analysis and rapid prototyping.
 }
 \details{
-This function provides a convenient wrapper around format-specific export 
-functions, automatically routing to the appropriate function based on the 
-file extension. All parameters are passed through to the underlying function,
-so the full range of format-specific options remains available.
+This function provides a convenient wrapper around the specialized forest
+plot functions, automatically routing to the appropriate function based on
+the model class or result type. All parameters are passed through to the
+underlying function, so the full range of options remains available.
 
-For format-specific advanced features, you may prefer to use the individual
-export functions directly.
+For model-specific advanced features, you may prefer to call the individual
+forest functions directly.
+
 \strong{Automatic Detection Logic:}
 
 The function uses the following priority order for detection:
@@ -88,6 +89,7 @@ The function uses the following priority order for detection:
 }
 }
 \examples{
+\dontshow{if (FALSE) withAutoprint(\{ # examplesIf}
 # Load example data
 data(clintrial)
 data(clintrial_labels)
@@ -101,8 +103,6 @@ plot1 <- autoforest(glm_model, data = clintrial)
 print(plot1)
 # Automatically detects GLM and routes to glmforest()
 
-\donttest{
-  options(width = 180)
 # Example 2: Cox proportional hazards model
 cox_model <- coxph(Surv(os_months, os_status) ~ age + sex + treatment + stage,
                    data = clintrial)
@@ -207,7 +207,7 @@ print(plot11)
 
 # Example 12: Save with recommended dimensions
 plot12 <- autoforest(cox_model, data = clintrial, labels = clintrial_labels)
-dims <- attr(plot12, "recommended_dims")
+dims <- attr(plot12, "rec_dims")
 
 # Save to file
 # ggsave("forest_plot.pdf", plot12, width = dims$width, height = dims$height)
@@ -253,19 +253,18 @@ plots <- lapply(models, function(m) autoforest(m, data = clintrial))
 print(plots$logistic)
 print(plots$survival)
 print(plots$linear)
-}
-
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link{glmforest}} for GLM forest plots,
 \code{\link{coxforest}} for Cox model forest plots,
 \code{\link{lmforest}} for linear model forest plots,
 \code{\link{uniforest}} for univariable screening forest plots,
-\code{\link{multiforest}} for Multivariate forest plots,
+\code{\link{multiforest}} for multi-outcome forest plots,
 \code{\link{fit}} for single-model regression,
 \code{\link{fullfit}} for combined univariable/multivariable regression,
 \code{\link{uniscreen}} for univariable screening,
-\code{\link{multifit}} for Multivariate analysis
+\code{\link{multifit}} for multi-outcome analysis
 
 Other visualization functions: 
 \code{\link{coxforest}()},

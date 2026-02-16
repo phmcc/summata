@@ -16,7 +16,7 @@ perform_continuous_test(var_vec, grp_vec, test_type, stat_type)
 \item{stat_type}{Character string indicating primary statistic being tested.}
 }
 \value{
-Numeric p-value from the hypothesis test.
+Numeric \emph{p}-value from the hypothesis test.
 }
 \description{
 Conducts hypothesis tests comparing continuous variables across groups.

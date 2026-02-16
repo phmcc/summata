@@ -4,7 +4,7 @@
 \alias{format_continuous_stat}
 \title{Format continuous statistic for display}
 \usage{
-format_continuous_stat(stats, stat_type, fmt_str)
+format_continuous_stat(stats, stat_type, fmt_str, marks)
 }
 \arguments{
 \item{stats}{Named list of numeric statistics (mean, sd, median, q1, q3, min, max).}
@@ -12,12 +12,15 @@ format_continuous_stat(stats, stat_type, fmt_str)
 \item{stat_type}{Character string: "mean_sd", "median_iqr", "median_range", or "range".}
 
 \item{fmt_str}{Character string format specification for sprintf.}
+
+\item{marks}{List with \code{big.mark} and \code{decimal.mark} as returned
+by \code{\link{resolve_number_marks}}.}
 }
 \value{
 Character string with formatted statistic.
 }
 \description{
 Converts numeric summary statistics into formatted display strings following
-standard conventions (mean ± SD, median [IQR], range, etc.).
+standard conventions (mean ± SD, median [IQR], range, \emph{etc.}).
 }
 \keyword{internal}

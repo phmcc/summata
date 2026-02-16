@@ -24,25 +24,26 @@ survtable(
   total_label = "Total",
   time_unit = NULL,
   time_label = NULL,
-  median_label = "Median (95\% CI)",
+  median_label = NULL,
   labels = NULL,
   by_label = NULL,
   na_rm = TRUE,
+  number_format = NULL,
   ...
 )
 }
 \arguments{
 \item{data}{Data frame or data.table containing the survival dataset.
-The function automatically converts data frames to data.tables for
-efficient processing.}
+Automatically converted to a data.table for efficient processing.}
 
-\item{outcome}{Character string specifying the survival outcome using
-\code{Surv()} syntax (e.g., \code{"Surv(os_months, os_status)"}). This
-follows the same convention as other \pkg{summata} functions like \code{fit()}
-and \code{fullfit()}.}
+\item{outcome}{Character string or character vector specifying one or more
+survival outcomes using \code{Surv()} syntax (\emph{e.g.,}
+\code{"Surv(os_months, os_status)"}). When multiple outcomes are
+provided, results are stacked into a single table with outcome labels
+as row headers.}
 
 \item{by}{Character string specifying the column name of the stratifying
-variable for group comparisons (e.g., treatment arm, risk group). When
+variable for group comparisons (\emph{e.g.,} treatment arm, risk group). When
 \code{NULL} (default), produces overall survival summaries only.}
 
 \item{times}{Numeric vector of time points at which to estimate survival
@@ -51,34 +52,37 @@ survival when time is measured in months. Default is \code{NULL}.}
 
 \item{probs}{Numeric vector of survival probabilities for which to estimate
 corresponding survival times (quantiles). Values must be between 0 and 1.
-For example, \code{c(0.5)} returns median survival time, \code{c(0.25, 0.5, 0.75)}
-returns quartiles. Default is \code{0.5} (median only).}
+For example, \code{c(0.5)} returns median survival time,
+\code{c(0.25, 0.5, 0.75)} returns quartiles. Default is \code{0.5}
+(median only).}
 
 \item{stats}{Character vector specifying which statistics to display:
 \itemize{
   \item \code{"survival"} - Survival probability at specified times
   \item \code{"ci"} - Confidence interval for survival probability
   \item \code{"n_risk"} - Number at risk at each time point
-  \item \code{"n_event"} - Cumulative number of events by each time point
+  \item \code{"n_event"} - Cumulative number of events by each time
+    point
 }
 Default is \code{c("survival", "ci")}.}
 
 \item{type}{Character string specifying the type of probability to report:
 \itemize{
   \item \code{"survival"} - Survival probability S(t) [default]
-  \item \code{"risk"} - Cumulative incidence/risk 1-S(t)
+  \item \code{"risk"} - Cumulative incidence/risk 1 - S(t)
   \item \code{"cumhaz"} - Cumulative hazard -log(S(t))
 }}
 
-\item{conf_level}{Numeric confidence level for confidence intervals. Must be
-between 0 and 1. Default is 0.95 (95\% confidence intervals).}
+\item{conf_level}{Numeric confidence level for confidence intervals. Must
+be between 0 and 1. Default is 0.95 (95\% confidence intervals).}
 
 \item{conf_type}{Character string specifying the confidence interval type
-for survival estimates. Options include:
+for survival estimates:
 \itemize{
   \item \code{"log"} - Log transformation (default, recommended)
   \item \code{"log-log"} - Log-log transformation
-  \item \code{"plain"} - Linear/identity (can produce CIs outside [0,1])
+  \item \code{"plain"} - Linear/identity (can produce CIs outside
+    [0, 1])
   \item \code{"logit"} - Logit transformation
   \item \code{"arcsin"} - Arcsin square root transformation
 }}
@@ -89,17 +93,20 @@ probabilities (as percentages). Default is 0 (whole percentages).}
 \item{time_digits}{Integer specifying the number of decimal places for
 survival time estimates (median, quantiles). Default is 1.}
 
-\item{p_digits}{Integer specifying the number of decimal places for p-values.
-P-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001", etc.
+\item{p_digits}{Integer specifying the number of decimal places for
+\emph{p}-values. Values smaller than \code{10^(-p_digits)} are displayed
+as \code{"< 0.001"} (for \code{p_digits = 3}), \code{"< 0.0001"} (for
+\code{p_digits = 4}), \emph{etc.} The threshold string respects
+\code{number_format} (\emph{e.g.,} \code{"< 0,001"} for EU formatting).
 Default is 3.}
 
-\item{percent}{Logical. If \code{TRUE} (default), displays survival probabilities
-as percentages (e.g., "85\%"). If \code{FALSE}, displays as proportions
-(e.g., "0.85").}
+\item{percent}{Logical. If \code{TRUE} (default), displays survival
+probabilities as percentages (\emph{e.g.,} \code{"85\%"}). If \code{FALSE},
+displays as proportions (\emph{e.g.,} \code{"0.85"}).}
 
-\item{test}{Logical. If \code{TRUE} (default), performs log-rank test for
-group comparisons and adds a p-value column. Requires \code{by} to be
-specified.}
+\item{test}{Logical. If \code{TRUE} (default), performs a survival curve
+comparison test and adds a \emph{p}-value column. Requires \code{by}
+to be specified.}
 
 \item{test_type}{Character string specifying the statistical test for
 comparing survival curves:
@@ -110,43 +117,69 @@ comparing survival curves:
   \item \code{"petopeto"} - Peto-Peto test
 }}
 
-\item{total}{Logical or character string controlling the total/overall column:
+\item{total}{Logical or character string controlling the total/overall
+column:
 \itemize{
-  \item \code{TRUE} or \code{"first"} - Include total column first [default]
-  \item \code{"last"} - Include total column last (before p-value)
-  \item \code{FALSE} - Exclude total column entirely
+  \item \code{TRUE} or \code{"first"} - Include total column first
+    [default]
+  \item \code{"last"} - Include total column last (before
+    \emph{p}-value)
+  \item \code{FALSE} - Exclude total column
 }}
 
 \item{total_label}{Character string for the total/overall row label.
 Default is \code{"Total"}.}
 
 \item{time_unit}{Character string specifying the time unit for display
-in column headers and labels (e.g., \code{"months"}, \code{"days"}, 
-\code{"years"}). When specified, time column headers become 
-"\{time\} \{time_unit\}" (e.g., "12 months"). Default is \code{NULL} (no unit shown).}
+in column headers and labels (\emph{e.g.,} \code{"months"}, \code{"days"},
+\code{"years"}). When specified, time column headers become
+"\{time\} \{time_unit\}" (\emph{e.g.,} "12 months"). Default is \code{NULL}
+(no unit shown).}
 
 \item{time_label}{Character string template for time column headers when
-\code{times} is specified. Use \code{"\{time\}"} as placeholder for the
-time value and \code{"\{unit\}"} for the time unit. 
-Default is \code{"\{time\} \{unit\}"} when \code{time_unit} is specified,
+\code{times} is specified. Use \code{"\{time\}"} as placeholder for
+the time value and \code{"\{unit\}"} for the time unit. Default is
+\code{"\{time\} \{unit\}"} when \code{time_unit} is specified,
 otherwise just \code{"\{time\}"}.}
 
 \item{median_label}{Character string for the median survival row label.
-Default is \code{"Median (95\% CI)"}.}
+Default is \code{NULL}, which auto-constructs from \code{conf_level}
+(\emph{e.g.,} \code{"Median (95\% CI)"} for \code{conf_level = 0.95}).}
 
 \item{labels}{Named character vector or list providing custom display
-labels for stratifying variable levels. Names should match level values,
-values are the display labels. Default is \code{NULL}.}
+labels. For stratified analyses, names should match levels of the
+\code{by} variable. For multiple outcomes, names should match the
+\code{Surv()} expressions. Default is \code{NULL}.}
 
-\item{by_label}{Character string providing a custom label for the stratifying
-variable (used in output attributes and potentially headers).
+\item{by_label}{Character string providing a custom label for the
+stratifying variable (used in output attributes and headers).
 Default is \code{NULL} (uses variable name).}
 
-\item{na_rm}{Logical. If \code{TRUE} (default
-), observations with missing
-  values in time, status, or the stratifying variable are excluded.}
+\item{na_rm}{Logical. If \code{TRUE} (default), observations with missing
+values in time, status, or the stratifying variable are excluded.}
 
-\item{...}{Additional arguments passed to \code{\link[survival]{survfit}}.}
+\item{number_format}{Character string or two-element character vector
+  controlling thousand and decimal separators in formatted output. Named
+  presets:
+  \itemize{
+    \item \code{"us"} - Comma thousands, period decimal: \code{1,234.56} [default]
+    \item \code{"eu"} - Period thousands, comma decimal: \code{1.234,56}
+    \item \code{"space"} - Thin-space thousands, period decimal: \code{1 234.56}
+      (SI/ISO 31-0)
+    \item \code{"none"} - No thousands separator: \code{1234.56}
+  }
+  Or provide a custom two-element vector \code{c(big.mark, decimal.mark)},
+  \emph{e.g.}, \code{c("'", ".")} for Swiss-style: \verb{1'234.56}.
+
+  When \code{NULL} (default), uses
+  \code{getOption("summata.number_format", "us")}. Set the global option
+  once per session to avoid passing this argument repeatedly:
+  \preformatted{
+    options(summata.number_format = "eu")
+  }}
+
+\item{...}{Additional arguments passed to
+\code{\link[survival]{survfit}}.}
 }
 \value{
 A data.table with S3 class \code{"survtable"} containing formatted
@@ -154,17 +187,23 @@ A data.table with S3 class \code{"survtable"} containing formatted
 
   \strong{When \code{times} is specified (survival at time points):}
   \describe{
-    \item{Variable/Group}{Row identifier - stratifying variable levels}
+    \item{Variable/Group}{Row identifier -- stratifying variable levels}
     \item{Time columns}{Survival statistics at each requested time point}
-    \item{p-value}{Log-rank test p-value (if \code{test = TRUE} and \code{by} specified)}
+    \item{\emph{p}-value}{Test \emph{p}-value (if \code{test = TRUE} and
+      \code{by} specified)}
   }
 
   \strong{When only \code{probs} is specified (survival quantiles):}
   \describe{
-    \item{Variable/Group}{Row identifier - stratifying variable levels}
+    \item{Variable/Group}{Row identifier -- stratifying variable levels}
     \item{Quantile columns}{Time to reach each survival probability}
-    \item{p-value}{Log-rank test p-value (if \code{test = TRUE} and \code{by} specified)}
+    \item{\emph{p}-value}{Test \emph{p}-value (if \code{test = TRUE} and
+      \code{by} specified)}
   }
+
+  All numeric output (probabilities, times, counts, \emph{p}-values)
+  respects the \code{number_format} setting for locale-appropriate
+  formatting.
 
   The returned object includes the following attributes:
   \describe{
@@ -178,9 +217,10 @@ A data.table with S3 class \code{"survtable"} containing formatted
 }
 \description{
 Generates comprehensive survival summary tables with survival probabilities
-at specified time points, median survival times, and optional group comparisons
-with statistical testing. Designed for creating survival summaries commonly
-used in clinical and epidemiological research publications.
+at specified time points, median survival times, and optional group
+comparisons with statistical testing. Designed for creating survival
+summaries commonly used in clinical and epidemiological research
+publications.
 }
 \details{
 \strong{Survival Probability Estimation:}
@@ -203,16 +243,27 @@ are identical across groups. Alternative tests weight different parts of
 the survival curve:
 \itemize{
   \item Log-rank: Equal weights (best for proportional hazards)
-  \item Wilcoxon: Weights by number at risk (sensitive to early differences)
+  \item Wilcoxon: Weights by number at risk (sensitive to early
+    differences)
   \item Tarone-Ware: Weights by square root of number at risk
   \item Peto-Peto: Modified Wilcoxon weights
 }
 
 \strong{Formatting:}
 
-Survival probabilities are displayed as percentages by default with the
-format "XX\% (XX\%-XX\%)" showing estimate and confidence interval.
-Median survival times use the format "XX.X (XX.X-XX.X)".
+All numeric output respects the \code{number_format} parameter.
+Separators within confidence intervals adapt automatically to avoid
+ambiguity:
+\itemize{
+  \item Survival probabilities: \code{"85\% (80\%-89\%)"} (US) or
+    \code{"85\% (80\%–89\%)"} (EU, en-dash separator)
+  \item Median survival: \code{"24.5 (21.2-28.9)"} (US) or
+    \code{"24,5 (21,2–28,9)"} (EU)
+  \item Counts ≥ 1000: \code{"1,234"} (US) or
+    \code{"1.234"} (EU)
+  \item \emph{p}-values: \code{"< 0.001"} (US) or
+    \code{"< 0,001"} (EU)
+}
 }
 \examples{
 # Load example data
@@ -347,12 +398,23 @@ survtable(
     )
 )
 
+# Example 15: European number formatting
+survtable(
+    data = clintrial,
+    outcome = "Surv(os_months, os_status)",
+    by = "treatment",
+    times = c(12, 24),
+    number_format = "eu"
+)
+
 }
 
 }
 \seealso{
 \code{\link{desctable}} for baseline characteristics tables,
 \code{\link{fit}} for regression analysis,
+\code{\link{table2pdf}} for PDF export,
+\code{\link{table2docx}} for Word export,
 \code{\link[survival]{survfit}} for underlying survival estimation,
 \code{\link[survival]{survdiff}} for survival curve comparison tests
 

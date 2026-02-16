@@ -18,7 +18,8 @@ process_survival_times(
   time_label,
   time_unit,
   by,
-  data
+  data,
+  marks = NULL
 )
 }
 \arguments{

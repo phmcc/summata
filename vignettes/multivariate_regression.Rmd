@@ -1,8 +1,8 @@
 ---
-title: "Multivariate Analysis"
+title: "Multivariate Regression"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Multivariate Analysis}
+  %\VignetteIndexEntry{Multivariate Regression}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -53,8 +53,8 @@ if (save_figures && !dir.exists(fig_dir)) {
 save_example_plot <- function(plot, filename, width = 8, height = 5) {
   if (save_figures) {
     filepath <- file.path(fig_dir, filename)
-    final_width <- attr(plot, "recommended_dims")$width %||% width
-    final_height <- attr(plot, "recommended_dims")$height %||% height
+    final_width <- attr(plot, "rec_dims")$width %||% width
+    final_height <- attr(plot, "rec_dims")$height %||% height
     
     if (requireNamespace("ragg", quietly = TRUE)) {
       ## Use ragg directly - it uses 'res' not 'dpi', and defaults to 72
@@ -90,9 +90,17 @@ show_plot <- function(plot, filename, width = 8, height = 5) {
 }
 ```
 
-Multivariate analysis—in the sense employed here—refers to the simultaneous examination of a single independent variable across multiple dependent variables. This approach inverts the typical regression paradigm: rather than testing multiple predictors against one outcome (as in `uniscreen()`), multivariate analysis tests one predictor against multiple outcomes. This design is particularly useful when a key exposure or intervention must be evaluated against several endpoints simultaneously.
+Multivariate regression refers to the simultaneous examination of a single independent variable across multiple dependent variables. This approach inverts the typical regression paradigm: rather than testing multiple predictors against one outcome (as in `uniscreen()`), multivariate analysis tests one predictor against multiple outcomes. This design is particularly useful when a key exposure or intervention must be evaluated against several endpoints simultaneously.
 
 The `multifit()` function implements this workflow, supporting all model types available in `summata` with optional covariate adjustment, interaction terms, and mixed-effects specifications. Results can be visualized using `multiforest()` and exported using standard table export functions.
+
+As with other `summata` functions, this function adheres to the standard `summata` calling convention:
+
+```{r, eval = FALSE}
+multifit(data, outcomes, predictor, covariates, model_type, ...)
+```
+
+where `data` is the dataset, `outcomes` is a vector of screened outcome variables, `predictor` is the predicting variable under examination, `covariates` is a vector of simultaneous independent predicting variables (i.e., potential confounders), and `model_type` is the type of model to be implemented. This vignette demonstrates the various capabilities of this function using the included sample dataset.
 
 ---
 
@@ -121,30 +129,9 @@ The `clintrial` dataset includes multiple outcome types suitable for multivariat
 
 ---
 
-# Multivariate vs. Univariable Screening
-
-The distinction between `multifit()` and `uniscreen()` is important:
-
-| Function | Tests | Use Case |
-|:---------|:------|:---------|
-| `uniscreen()` | Multiple predictors → One outcome | Variable screening, risk factor identification |
-| `multifit()` | One predictor → Multiple outcomes | Exposure effects, intervention evaluation |
-
-All outcomes in a single `multifit()` call should be of the same type (all binary, all continuous, or all survival). Mixing outcome types produces tables with incompatible effect measures. The function validates outcome compatibility and issues a warning when mixed types are detected.
-
----
-
 # Basic Usage
 
-## Function Signature
-
-The function takes data as the first argument, followed by outcomes, predictor, and optional covariates:
-
-```{r, eval = FALSE}
-multifit(data, outcomes, predictor, covariates, model_type, ...)
-```
-
-## Example 1: Unadjusted Analysis
+## **Example 1:** Unadjusted Analysis
 
 Test a single predictor against multiple binary outcomes:
 
@@ -163,7 +150,7 @@ example1
 
 Each row shows the effect of the predictor on a specific outcome. For categorical predictors, each non-reference level appears separately.
 
-## Example 2: Adjusted Analysis
+## **Example 2:** Adjusted Analysis
 
 Include covariates for confounding control:
 
@@ -181,7 +168,7 @@ example2 <- multifit(
 example2
 ```
 
-## Example 3: Unadjusted and Adjusted Comparison
+## **Example 3:** Unadjusted and Adjusted Comparison
 
 Use `columns = "both"` to display unadjusted and adjusted results side-by-side:
 
@@ -336,7 +323,7 @@ example10 <- multifit(
                "readmission_30d", "icu_admission"),
   predictor = "treatment",
   covariates = c("age", "sex", "surgery"),
-  p_threshold = 0.10,
+  p_threshold = 0.01,
   labels = clintrial_labels,
   parallel = FALSE
 )
@@ -355,6 +342,7 @@ result <- multifit(
   predictor = "treatment",
   covariates = c("age", "sex"),
   labels = clintrial_labels,
+  keep_models = TRUE,
   parallel = FALSE
 )
 
@@ -368,11 +356,11 @@ summary(models[["any_complication"]])
 
 ---
 
-# Visualization with multiforest()
+# Forest Plot Visualization
 
 The `multiforest()` function creates forest plots from `multifit()` results.
 
-## **Example 12:** Basic Forest Plot
+## **Example 12:** Forest Plot for Logistic (Binary) Outcomes
 
 Results from `multifit()` can be directly inserted into the `multiforest()` function to generate a forest plot:
 
@@ -419,7 +407,34 @@ example13 <- multiforest(
 show_plot(example13, "multi_ex13.png")
 ```
 
-## **Example 14:** Forest Plot for Survival Outcomes
+## **Example 14:** Forest Plot for Continuous Outcomes
+
+Create forest plots for continuous outcomes:
+
+```{r}
+lm_result <- multifit(
+  data = clintrial,
+  outcomes = c("pain_score", "recovery_days", "los_days"),
+  predictor = "treatment",
+  covariates = c("age", "sex", "surgery"),
+  model_type = "lm",
+  parallel = FALSE
+)
+
+example14 <- multiforest(
+  lm_result,
+  title = "Treatment Effects on Recovery Metrics",
+  show_predictor = FALSE,
+  covariates_footer = TRUE,
+  labels = clintrial_labels
+)
+```
+
+```{r, echo = FALSE, out.width = "100%"}
+show_plot(example14, "multi_ex14.png")
+```
+
+## **Example 15:** Forest Plot for Survival Outcomes
 
 The `multiforest()` function supports multiple `model_type` outputs from `multifit()`. In addition, variable labels can be applied to `multiforest()` outputs similarly to other forest plot functions:
 
@@ -434,38 +449,11 @@ cox_result <- multifit(
   parallel = FALSE
 )
 
-example14 <- multiforest(
+example15 <- multiforest(
   cox_result,
   title = "Treatment Effects on Survival Outcomes",
   indent_predictor = TRUE,
   zebra_stripes = TRUE,
-  labels = clintrial_labels
-)
-```
-
-```{r, echo = FALSE, out.width = "100%"}
-show_plot(example14, "multi_ex14.png")
-```
-
-## **Example 15:** Forest Plot for Continuous Outcomes
-
-Create forest plots for continuous outcomes:
-
-```{r}
-lm_result <- multifit(
-  data = clintrial,
-  outcomes = c("pain_score", "recovery_days", "los_days"),
-  predictor = "treatment",
-  covariates = c("age", "sex", "surgery"),
-  model_type = "lm",
-  parallel = FALSE
-)
-
-example15 <- multiforest(
-  lm_result,
-  title = "Treatment Effects on Recovery Metrics",
-  show_predictor = FALSE,
-  covariates_footer = TRUE,
   labels = clintrial_labels
 )
 ```
@@ -502,15 +490,12 @@ Save forest plots using `ggsave()`:
 
 ```{r, eval = FALSE}
 p <- multiforest(result, title = "Effect Estimates")
-dims <- attr(p, "recommended_dims")
+dims <- attr(p, "rec_dims")
 
-ggsave(
-  "multioutcome_forest.pdf",
-  plot = p,
-  width = dims$width,
-  height = dims$height,
-  units = "in"
-)
+ggsave("multioutcome_forest.pdf", p,
+       width = attr(result, "rec_dims")$width,
+       height = attr(result, "rec_dims")$height, 
+       units = "in")
 ```
 
 ---
@@ -557,7 +542,8 @@ forest_plot <- multiforest(
   column = "adjusted",
   indent_predictor = TRUE,
   zebra_stripes = TRUE,
-  table_width = 0.65
+  table_width = 0.65,
+  labels = clintrial_labels
 )
 ```
 
@@ -587,21 +573,21 @@ show_plot(forest_plot, "multi_workflow_forest.png")
 
 ---
 
-## Best Practices
+# Best Practices
 
-### Outcome Selection
+## Outcome Selection
 
 1. Use compatible outcome types within a single analysis
 2. Group conceptually related outcomes
 3. Consider multiple testing adjustments when testing many outcomes
 
-### Adjustment Strategy
+## Adjustment Strategy
 
 1. Pre-specify covariates based on domain knowledge
 2. Use `columns = "both"` to assess confounding
 3. Apply consistent covariates across outcomes for comparability
 
-### Interpretation
+## Interpretation
 
 1. Focus on effect magnitude and precision, not only *p*-values
 2. Look for consistent patterns across related outcomes
@@ -609,9 +595,9 @@ show_plot(forest_plot, "multi_workflow_forest.png")
 
 ---
 
-## Common Issues
+# Common Issues
 
-### Empty Results
+## Empty Results
 
 If results are empty, verify:
 
@@ -619,7 +605,7 @@ If results are empty, verify:
 - Outcomes are correctly specified (`Surv()` syntax for survival)
 - Model type matches outcome type
 
-### Convergence Warnings
+## Convergence Warnings
 
 For mixed-effects models, simplify the random effects structure:
 
@@ -630,7 +616,7 @@ multifit(data, outcomes, predictor,
          model_type = "glmer")
 ```
 
-### Many Factor Levels
+## Many Factor Levels
 
 For predictors with many levels, consider collapsing categories:
 
@@ -639,7 +625,22 @@ clintrial$treatment_binary <- ifelse(clintrial$treatment == "Control",
                                       "Control", "Active")
 ```
 
-### Categorical Outcomes with More Than Two Levels
+---
+
+# Other Considerations
+
+## Multivariate vs. Univariable Screening
+
+The distinction between `multifit()` and `uniscreen()` is important:
+
+| Function | Tests | Use Case |
+|:---------|:------|:---------|
+| `uniscreen()` | Multiple predictors → One outcome | Variable screening, risk factor identification |
+| `multifit()` | One predictor → Multiple outcomes | Exposure effects, intervention evaluation |
+
+All outcomes in a single `multifit()` call should be of the same type (all binary, all continuous, or all survival). Mixing outcome types produces tables with incompatible effect measures. The function validates outcome compatibility and issues a warning when mixed types are detected.
+
+## Categorical Outcomes with More Than Two Levels
 
 `multifit()` supports binary outcomes (via logistic regression) but not multinomial or ordinal outcomes. If you include a categorical outcome with three or more levels (e.g., treatment group with "Control", "Drug A", "Drug B"), the function will issue a warning because binomial GLM coerces such variables to binary (first level *vs.* all others).
 

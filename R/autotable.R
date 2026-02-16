@@ -5,29 +5,36 @@
 #' for table export across all supported formats.
 #'
 #' @param table Data frame, data.table, or matrix to export. Can be output from 
-#'   \code{desctable()}, \code{fit()}, \code{uniscreen()}, \code{fullfit()},
-#'   \code{compfit()}, or any tabular data structure.
+#'   \code{desctable()}, \code{survtable()}, \code{fit()}, \code{uniscreen()},
+#'   \code{fullfit()}, \code{compfit()}, \code{multifit()}, or any tabular data
+#'   structure.
 #'   
 #' @param file Character string specifying the output filename. The file extension
 #'   determines the export format:
 #'   \itemize{
 #'     \item \code{.pdf} - PDF via LaTeX (uses \code{table2pdf()})
 #'     \item \code{.docx} - Microsoft Word (uses \code{table2docx()})
-#'     \item \code{.pptx} - Microsoft PowerPoint (uses \code{table2pptx()})
 #'     \item \code{.html} or \code{.htm} - HTML (uses \code{table2html()})
-#'     \item \code{.rtf} - Rich Text Format (uses \code{table2rtf()})
+#'     \item \code{.pptx} - Microsoft PowerPoint (uses \code{table2pptx()})
 #'     \item \code{.tex} - LaTeX source (uses \code{table2tex()})
+#'     \item \code{.rtf} - Rich Text Format (uses \code{table2rtf()})
 #'   }
 #'   
 #' @param ... Additional arguments passed to the format-specific function. See
 #'   the documentation for individual functions for available parameters:
 #'   \describe{
-#'     \item{PDF}{\code{table2pdf()} - orientation, paper, margins, fit_to_page, etc.}
-#'     \item{DOCX}{\code{table2docx()} - font_size, font_family, caption, etc.}
-#'     \item{PPTX}{\code{table2pptx()} - font_size, font_family, caption, etc.}
-#'     \item{HTML}{\code{table2html()} - format_headers, zebra_stripes, etc.}
-#'     \item{RTF}{\code{table2rtf()} - font_size, font_family, caption, etc.}
-#'     \item{TEX}{\code{table2tex()} - caption, format_headers, align, etc.}
+#'     \item{PDF}{\code{table2pdf()} - \code{orientation}, \code{paper}, \code{margins},
+#'                \code{fit_to_page}, \emph{etc.}}
+#'     \item{DOCX}{\code{table2docx()} - \code{font_size}, \code{font_family},
+#'                \code{caption}, \emph{etc.}}
+#'     \item{HTML}{\code{table2html()} - \code{format_headers}, \code{zebra_stripes},
+#'                \emph{etc.}}
+#'     \item{PPTX}{\code{table2pptx()} - \code{font_size}, \code{font_family},
+#'                \code{caption}, \emph{etc.}}
+#'     \item{TEX}{\code{table2tex()} - \code{caption}, \code{format_headers},
+#'                \code{align}, \emph{etc.}}
+#'     \item{RTF}{\code{table2rtf()} - \code{font_size}, \code{font_family},
+#'                \code{caption}, \emph{etc.}}
 #'   }
 #'   
 #'   Common parameters across formats include:
@@ -35,8 +42,8 @@
 #'     \item{\code{caption}}{Table caption (supported by most formats)}
 #'     \item{\code{font_size}}{Base font size in points (PDF, DOCX, PPTX, RTF)}
 #'     \item{\code{format_headers}}{Format column headers (all formats)}
-#'     \item{\code{bold_significant}}{Bold significant p-values (all formats)}
-#'     \item{\code{p_threshold}}{P-value threshold for bolding (all formats)}
+#'     \item{\code{bold_significant}}{Bold significant \emph{p}-values (all formats)}
+#'     \item{\code{p_threshold}}{Threshold for \emph{p}-value bolding (all formats)}
 #'     \item{\code{indent_groups}}{Indent factor levels (all formats)}
 #'     \item{\code{condense_table}}{Condense to essential rows (all formats)}
 #'     \item{\code{zebra_stripes}}{Alternating background colors (most formats)}
@@ -60,51 +67,58 @@
 #'   \item TeX generates standalone LaTeX source with booktabs styling
 #' }
 #'
-#' @examples
-#' \dontrun{
+#' @examplesIf FALSE
 #' # Load example data
 #' data(clintrial)
+#' data(clintrial_labels)
 #' 
 #' # Create a regression table
-#' mod <- glm(outcome ~ age + gender + treatment, 
-#'            family = binomial, 
-#'            data = clintrial)
-#' table <- fit(mod, data = clintrial)
+#' results <- fit(
+#'     data = clintrial,
+#'     outcome = "os_status",
+#'     predictors = c("age", "sex", "treatment"),
+#'     labels = clintrial_labels
+#' )
 #' 
 #' # Export automatically detects format from extension
-#' autoexport(table, "results.pdf")   # Creates PDF
-#' autoexport(table, "results.docx")  # Creates Word document
-#' autoexport(table, "results.pptx")  # Creates PowerPoint slide
-#' autoexport(table, "results.html")  # Creates HTML file
-#' autoexport(table, "results.rtf")   # Creates RTF document
-#' autoexport(table, "results.tex")   # Creates LaTeX source
+#' autotable(results, "results.pdf")   # Creates PDF
+#' autotable(results, "results.docx")  # Creates Word document
+#' autotable(results, "results.html")  # Creates HTML file
+#' autotable(results, "results.pptx")  # Creates PowerPoint slide
+#' autotable(results, "results.tex")   # Creates LaTeX source
+#' autotable(results, "results.rtf")   # Creates RTF document
 #' 
 #' # Pass format-specific parameters
-#' autoexport(table, "results.pdf", 
+#' autotable(results, "results.pdf", 
 #'            orientation = "landscape",
 #'            paper = "a4",
 #'            font_size = 10)
 #' 
-#' autoexport(table, "results.docx",
+#' autotable(results, "results.docx",
 #'            caption = "Table 1: Logistic Regression Results",
 #'            font_family = "Times New Roman",
 #'            condense_table = TRUE)
 #' 
-#' autoexport(table, "results.html",
+#' autotable(results, "results.html",
 #'            zebra_stripes = TRUE,
-#'            style = "modern",
+#'            dark_header = TRUE,
 #'            bold_significant = TRUE)
 #' 
-#' # Works with any tabular output
-#' desc <- desctable(clintrial, strata = "treatment")
-#' autoexport(desc, "demographics.pdf")
+#' # Works with any summata table output
+#' desc <- desctable(clintrial,
+#'                   by = "treatment",
+#'                   variables = c("age", "sex", "bmi"))
+#' autotable(desc, "demographics.pdf")
 #' 
-#' comp <- compfit(
-#'   fit(glm(outcome ~ age, family = binomial, data = clintrial)),
-#'   fit(glm(outcome ~ age + gender, family = binomial, data = clintrial))
+#' comparison <- compfit(
+#'     data = clintrial,
+#'     outcome = "os_status",
+#'     model_list = list(
+#'         base = c("age", "sex"),
+#'         full = c("age", "sex", "treatment", "stage")
+#'     )
 #' )
-#' autoexport(comp, "model_comparison.docx")
-#' }
+#' autotable(comparison, "model_comparison.docx")
 #'
 #' @seealso
 #' \code{\link{table2pdf}}, \code{\link{table2docx}}, \code{\link{table2pptx}},
@@ -112,7 +126,7 @@
 #'
 #' @family export functions
 #' @export
-autoexport <- function(table, file, ...) {
+autotable <- function(table, file, ...) {
     
     if (missing(table) || missing(file)) {
         stop("Both 'table' and 'file' arguments are required")

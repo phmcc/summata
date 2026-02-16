@@ -1,10 +1,3 @@
-## Note: is_reference_category(), is_affirmative_category(), and should_condense_binary()
-## are defined in forest_utils.R as the canonical location. They are also used by 
-## condense_table_rows() below. Since R packages load all files in the R/ directory, 
-## these functions will be available when the package is loaded. For standalone use 
-## of this file, ensure forest_utils.R is sourced first.
-
-
 #' Add padding to exported table headers
 #' 
 #' Adds LaTeX vertical spacing rules to column headers for proper vertical
@@ -73,7 +66,7 @@ add_variable_padding <- function (df) {
 #' Verifies that a LaTeX distribution (pdflatex or xelatex) is available
 #' on the system for PDF compilation.
 #' 
-#' @return Logical TRUE if LaTeX is available, FALSE otherwise.
+#' @return Logical \code{TRUE} if LaTeX is available, \code{FALSE} otherwise.
 #' @keywords internal
 check_latex <- function () {
     pdflatex_check <- Sys.which("pdflatex")
@@ -91,7 +84,7 @@ check_latex <- function () {
 #' columns are left-aligned; all others are centered.
 #' 
 #' @param df Data.frame or data.table to determine alignment for.
-#' @return Character string with alignment codes (e.g., "rlcc").
+#' @return Character string with alignment codes (\emph{e.g.,} "rlcc").
 #' @keywords internal
 determine_alignment <- function(df) {
     align <- "r"  # Start with row numbers column (if any)
@@ -149,7 +142,7 @@ format_column_headers_html <- function (col_names) {
 #' 
 #' Transforms tables with Variable/Group columns into indented format where
 #' group levels appear as indented rows under variable names. Handles both
-#' regression and descriptive tables with appropriate p-value placement.
+#' regression and descriptive tables with appropriate \emph{p}-value placement.
 #' 
 #' @param df Data.table with Variable and Group columns.
 #' @param indent_string Character string to use for indentation.
@@ -270,14 +263,14 @@ format_indented_groups <- function (df, indent_string = "    ") {
     return(new_df)
 }
 
-#' Format p-values for exported tables
+#' Format \emph{p}-values for exported tables
 #' 
-#' Applies bold formatting to significant p-values in LaTeX tables using
+#' Applies bold formatting to significant \emph{p}-values in LaTeX tables using
 #' the textbf command.
 #' 
-#' @param df Data.table containing p-value columns.
+#' @param df Data.table containing \emph{p}-value columns.
 #' @param p_threshold Numeric threshold for significance (default 0.05).
-#' @return Data.table with significant p-values wrapped in LaTeX bold commands.
+#' @return Data.table with significant \emph{p}-values wrapped in LaTeX bold commands.
 #' @keywords internal
 format_pvalues_export_tex <- function (df, p_threshold = 0.05) {
     for (col in names(df)) {
@@ -311,14 +304,14 @@ format_pvalues_export_tex <- function (df, p_threshold = 0.05) {
     return(df)
 }
 
-#' Format p-values for exported tables (HTML)
+#' Format \emph{p}-values for exported tables (HTML)
 #' 
-#' Applies bold formatting to significant p-values in HTML tables using
+#' Applies bold formatting to significant \emph{p}-values in HTML tables using
 #' the b tag.
 #' 
-#' @param df Data.table containing p-value columns.
+#' @param df Data.table containing \emph{p}-value columns.
 #' @param p_threshold Numeric threshold for significance (default 0.05).
-#' @return Data.table with significant p-values wrapped in HTML bold tags.
+#' @return Data.table with significant \emph{p}-values wrapped in HTML bold tags.
 #' @keywords internal
 format_pvalues_export_html <- function (df, p_threshold = 0.05) {
     for (col in names(df)) {
@@ -481,7 +474,7 @@ format_column_headers_with_n_tex <- function(col_names, n_row_data) {
             new_names[i] <- paste0("\\begin{tabular}{@{}c@{}}\\rule{0pt}{2.5ex}", 
                                    col_sanitized,  # Use sanitized version
                                    "\\\\[-0ex] (\\textit{N} = ", 
-                                   format(as.numeric(gsub(",", "", n_value)), big.mark = ","), 
+                                   n_value, 
                                    ")\\rule[-1ex]{0pt}{0pt}\\end{tabular}")
         } else {
             new_names[i] <- format_column_headers(col_sanitized)
@@ -798,8 +791,8 @@ condense_quantitative_rows <- function(df, indent_groups = TRUE) {
 #' @param font_size Numeric font size in points.
 #' @param font_family Character string font family name.
 #' @param format_headers Logical whether to format headers.
-#' @param bold_significant Logical whether to bold significant p-values.
-#' @param p_threshold Numeric p-value threshold for significance.
+#' @param bold_significant Logical whether to bold significant \emph{p}-values.
+#' @param p_threshold Numeric \emph{p}-value threshold for significance.
 #' @param indent_groups Logical whether to indent group levels.
 #' @param condense_table Logical whether to condense all variable types.
 #' @param condense_quantitative Logical whether to condense only continuous/survival.
@@ -1151,15 +1144,15 @@ format_headers_ft <- function(ft, has_n_row, n_row_data) {
     return(ft)
 }
 
-#' Bold significant p-values in DOCX
+#' Bold significant \emph{p}-values in DOCX
 #' 
-#' Applies bold formatting to significant p-values in \pkg{flextable} objects
+#' Applies bold formatting to significant \emph{p}-values in \pkg{flextable} objects
 #' by detecting values below threshold or "< 0.001" patterns.
 #' 
 #' @param ft \pkg{flextable} object.
 #' @param df The source data.table.
-#' @param p_threshold Numeric p-value threshold for significance.
-#' @return Flextable object with significant p-values bolded.
+#' @param p_threshold Numeric \emph{p}-value threshold for significance.
+#' @return Flextable object with significant \emph{p}-values bolded.
 #' @keywords internal
 bold_pvalues_ft <- function(ft, df, p_threshold = 0.05) {
     p_cols <- grep("p-value|p value|Uni p|Multi p|pvalue", names(df), 

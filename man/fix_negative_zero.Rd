@@ -4,10 +4,14 @@
 \alias{fix_negative_zero}
 \title{Fix negative zero in formatted strings}
 \usage{
-fix_negative_zero(x)
+fix_negative_zero(x, marks = NULL)
 }
 \arguments{
 \item{x}{Character vector of formatted numbers.}
+
+\item{marks}{Optional list with \code{big.mark} and \code{decimal.mark} as
+returned by \code{\link{resolve_number_marks}}. When \code{NULL}, uses
+the default US period decimal.}
 }
 \value{
 Character vector with negative zeros corrected.
@@ -15,7 +19,11 @@ Character vector with negative zeros corrected.
 \description{
 Corrects floating-point rounding artifacts that produce "-0.00" or similar
 negative zero strings. Works on character vectors, replacing patterns like
-"-0.00", "-0.000", etc. with their positive equivalents, even when embedded
-within larger strings (e.g., "(-0.00, 1.23)" becomes "(0.00, 1.23)").
+"-0.00", "-0.000", \emph{etc.} with their positive equivalents, even when embedded
+within larger strings (\emph{e.g.,} "(-0.00, 1.23)" becomes "(0.00, 1.23)").
+}
+\details{
+When \code{marks} is supplied, also replaces the period decimal mark with
+the locale-appropriate decimal mark.
 }
 \keyword{internal}

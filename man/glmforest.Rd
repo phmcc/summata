@@ -31,7 +31,8 @@ glmforest(
   color = NULL,
   exponentiate = NULL,
   qc_footer = TRUE,
-  units = "in"
+  units = "in",
+  number_format = NULL
 )
 }
 \arguments{
@@ -61,9 +62,10 @@ identity link.}
 estimates and confidence intervals in the data table. Default is 2.}
 
 \item{p_digits}{Integer specifying the number of decimal places for \emph{p}-values.
-\emph{p}-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001" 
-(for \code{p_digits = 3}), "< 0.0001" (for \code{p_digits = 4}), \emph{etc.} 
-Default is 3.}
+Values smaller than \code{10^(-p_digits)} are displayed as \code{"< 0.001"}
+(for \code{p_digits = 3}), \code{"< 0.0001"} (for \code{p_digits = 4}),
+\emph{etc.} The threshold string respects \code{number_format} (\emph{e.g.,}
+\code{"< 0,001"} for EU formatting). Default is 3.}
 
 \item{conf_level}{Numeric confidence level for confidence intervals. Must be
 between 0 and 1. Default is 0.95 (95\% confidence intervals). The CI
@@ -158,12 +160,19 @@ link.}
 
 \item{qc_footer}{Logical. If \code{TRUE}, displays model quality control
 statistics in the footer (observations analyzed, model family, deviance,
-pseudo-R², AIC). Default is \code{TRUE}.}
+pseudo-\emph{R}², AIC). Default is \code{TRUE}.}
 
 \item{units}{Character string specifying the units for plot dimensions. 
 Options: \code{"in"} (inches), \code{"cm"} (centimeters), \code{"mm"} 
 (millimeters). Default is \code{"in"}. Affects interpretation of 
 \code{plot_width} and \code{plot_height}.}
+
+\item{number_format}{Character string or two-element character vector
+controlling thousand and decimal separators in formatted output. Named
+presets: \code{"us"} (default), \code{"eu"}, \code{"space"},
+\code{"none"}. Or a custom vector \code{c(big.mark, decimal.mark)}.
+When \code{NULL} (default), uses
+\code{getOption("summata.number_format", "us")}.}
 }
 \value{
 A \code{ggplot} object containing the complete forest plot. The plot 
@@ -174,8 +183,8 @@ A \code{ggplot} object containing the complete forest plot. The plot
     \item Further customized with ggplot2 functions
   }
   
-  The returned object includes an attribute \code{"recommended_dims"} 
-  accessible via \code{attr(plot, "recommended_dims")}, which is a list 
+  The returned object includes an attribute \code{"rec_dims"} 
+  accessible via \code{attr(plot, "rec_dims")}, which is a list 
   containing:
   \describe{
     \item{width}{Numeric. Recommended plot width in specified units}
@@ -221,7 +230,7 @@ The forest plot consists of several integrated components:
       \item Observations analyzed (with percentage of total data)
       \item Model family (Binomial, Poisson, \emph{etc.})
       \item Deviance statistics
-      \item Pseudo-R² (McFadden)
+      \item Pseudo-\emph{R}² (McFadden)
       \item AIC
     }
 }
@@ -290,7 +299,7 @@ The footer shows key diagnostic information:
   \item \strong{Observations analyzed}: Total N and percentage of original 
     data (accounting for missing values)
   \item \strong{Null/Residual Deviance}: Model fit improvement
-  \item \strong{Pseudo-R²}: McFadden R² = 1 - (log L_1 / log L_2)
+  \item \strong{Pseudo-\emph{R}²}: McFadden \emph{R}² = 1 - (log L_1 / log L_2)
   \item \strong{AIC}: For model comparison (lower is better)
 }
 
@@ -302,7 +311,7 @@ if available.
 Use \code{ggplot2::ggsave()} with recommended dimensions:
 ```r
 p <- glmforest(model, data)
-dims <- attr(p, "recommended_dims")
+dims <- attr(p, "rec_dims")
 ggsave("forest.pdf", p, width = dims$width, height = dims$height)
 ```
 
@@ -312,6 +321,7 @@ ggsave("forest.png", p, width = 12, height = 8, dpi = 300)
 ```
 }
 \examples{
+\dontshow{if (FALSE) withAutoprint(\{ # examplesIf}
 # Load example data
 data(clintrial)
 data(clintrial_labels)
@@ -324,7 +334,6 @@ model1 <- glm(os_status ~ age + sex + bmi + treatment,
 plot1 <- glmforest(model1, data = clintrial)
 print(plot1)
 
-\donttest{
   options(width = 180)
 # Example 2: With custom variable labels
 plot2 <- glmforest(
@@ -394,7 +403,7 @@ print(plot7)
 # Example 8: Get and use recommended dimensions
 plot8 <- glmforest(model1, data = clintrial)
 
-dims <- attr(plot8, "recommended_dims")
+dims <- attr(plot8, "rec_dims")
 cat("Recommended: ", dims$width, "x", dims$height, "inches\n")
 
 # Save with recommended dimensions
@@ -499,20 +508,21 @@ final_plot <- glmforest(
 )
 
 # Save for publication
-dims <- attr(final_plot, "recommended_dims")
+dims <- attr(final_plot, "rec_dims")
 # ggsave("figure1.pdf", final_plot, 
 #        width = dims$width, height = dims$height)
 # ggsave("figure1.png", final_plot,
 #        width = dims$width, height = dims$height, dpi = 300)
-}
-
+\dontshow{\}) # examplesIf}
 }
 \seealso{
+\code{\link{autoforest}} for automatic model detection,
 \code{\link{coxforest}} for Cox proportional hazards forest plots,
 \code{\link{lmforest}} for linear model forest plots,
+\code{\link{uniforest}} for univariable screening forest plots,
+\code{\link{multiforest}} for multi-outcome forest plots,
 \code{\link[stats]{glm}} for fitting GLMs,
-\code{\link{fit}} for fullfit regression modeling,
-\code{\link[ggplot2]{ggsave}} for saving plots
+\code{\link{fit}} for regression modeling
 
 Other visualization functions: 
 \code{\link{autoforest}()},

@@ -26,9 +26,9 @@ if (requireNamespace("ragg", quietly = TRUE)) {
 options(width = 180)
 ```
 
-Regression analysis quantifies the relationship between a response variable and one or more predictors while accounting for potential confounding. The standard analytical workflow proceeds in two phases: *univariable* (unadjusted) analysis examines each predictor independently, whereas *multivariable* (adjusted) analysis estimates effects conditional on other predictors. Comparing these estimates reveals the extent of confounding and identifies independent predictors of a given outcome.
+Regression analysis quantifies the relationship between a response variable and one or more predictors while accounting for potential confounding. The standard analytical workflow proceeds in two phases: *univariable* (unadjusted) analysis, in which each predictor is examined independently; and *multivariable* (adjusted) analysis, in which effects conditional on other predictors are examined collectively. Comparing these estimates found in these analyses reveals the extent of confounding and identifies independent predictors of a given outcome.
 
-The `summata` package provides three functions for regression analysis:
+The `summata` package provides three principal functions for regression analysis:
 
 | Function | Purpose |
 |:---------|:--------|
@@ -36,7 +36,15 @@ The `summata` package provides three functions for regression analysis:
 | `fit()` | Single univariable/multivariable model |
 | `fullfit()` | Combined univariable and multivariable analysis |
 
-All functions support a wide range of model types including linear models, generalized linear models (logistic, Poisson, Gaussian, Gamma, negative binomial), Cox proportional hazards models, and mixed-effects models, with consistent syntax and publication-ready output. For a more thorough treatment of the statistical methods underlying these models, see the [Statistical Foundations](statistical_foundations.html) article.
+All functions support a wide range of model types including linear models, generalized linear models (logistic, Poisson, Gaussian, Gamma, negative binomial), Cox proportional hazards models, and mixed-effects models, with consistent syntax and formatted output. For a more thorough treatment of the statistical methods underlying these models, see the [Statistical Foundations](statistical_foundations.html) article.
+
+As with other `summata` functions, these functions adhere to the standard `summata` calling convention:
+
+```{r, eval = FALSE}
+fullfit(data, outcome, predictors, model_type, ...)
+```
+
+where `data` is the dataset, `outcome` is the outcome variable, `predictors` is a vector of predicting variables, and `model_type` is the type of model to be implemented. This vignette demonstrates the various capabilities of these functions using the included sample dataset.
 
 ---
 
@@ -52,26 +60,26 @@ data(clintrial)
 data(clintrial_labels)
 ```
 
-The `clintrial` dataset simulates a multi-site oncology clinical trial with realistic outcomes and site-level clustering. Variables suitable for different regression approaches include:
+The `clintrial` dataset simulates a multisite oncology clinical trial with realistic outcomes and site-level clustering. Variables suitable for different regression approaches include:
 
-| Variable | Type | Application |
-|:---------|:-----|:------------|
-| `pain_score` | Continuous | Linear regression |
-| `readmission_30d` | Binary | Logistic regression |
-| `any_complication` | Binary | Logistic regression |
-| `los_days` | Continuous (positive) | Linear or Gamma regression |
-| `recovery_days` | Continuous (positive) | Linear or Gamma regression |
-| `ae_count` | Count (overdispersed) | Negative binomial / quasipoisson |
-| `fu_count` | Count (equidispersed) | Poisson regression |
-| `pfs_months`, `pfs_status` | Time-to-event | Cox regression |
-| `os_months`, `os_status` | Time-to-event | Cox regression |
-| `site` | Clustering variable | Mixed-effects models |
+| Variable | Description | Type | Application |
+|:---------|:------------|:-----|:------------|
+| `pain_score` | Postoperative Pain Score (0-10) | Continuous | Linear regression |
+| `readmission_30d` | 30-Day Readmission | Binary | Logistic regression |
+| `any_complication` | Any Complication | Binary | Logistic regression |
+| `los_days` | Length of Hospital Stay (days) | Continuous (positive) | Linear or Gamma regression |
+| `recovery_days` | Days to Functional Recovery | Continuous (positive) | Linear or Gamma regression |
+| `ae_count` | Adverse Event Count | Count (overdispersed) | Negative binomial / quasipoisson |
+| `fu_count` | Follow-Up Visit Count | Count (equidispersed) | Poisson regression |
+| `pfs_months`, `pfs_status` | Progression-Free Survival Time (months) | Time-to-event | Cox regression |
+| `os_months`, `os_status` | Overall Survival Time (months) | Time-to-event | Cox regression |
+| `site` | Study Site | Clustering variable | Mixed-effects models |
 
 ---
 
 # Supported Model Types
 
-The following table summarizes all supported model types (`model_type`) and families/links (`family`). Effect measures are displayed by default; set `exponentiate = FALSE` to display raw coefficients.
+The following table summarizes all supported model types (`model_type`) and families/links (`family`). For most estimates, effect measures are displayed by default; set `exponentiate = FALSE` to display raw coefficients.
 
 | `model_type` | `family` | Outcome | Effect Measure | Package |
 |:-------------|:------------|:--------|:---------------|:--------|
@@ -97,15 +105,7 @@ The following table summarizes all supported model types (`model_type`) and fami
 
 The `uniscreen()` function fits separate regression models for each predictor, combining results into a single table. This approach identifies candidate predictors for multivariable modeling.
 
-## Function Signature
-
-The function takes data as the first argument, followed by the outcome, predictors, and model type:
-
-```{r, eval = FALSE}
-uniscreen(data, outcome, predictors, model_type, ...)
-```
-
-## **Example 1:** Binary Outcome (Logistic Regression)
+## **Example 1:** Binary Outcome Screen (Logistic Regression)
 
 For binary outcomes, use `model_type = "glm"` (logistic regression is the default family). Here we examine predictors of 30-day hospital readmission:
 
@@ -126,7 +126,7 @@ example1
 
 Each entry represents a separate univariable model. For categorical predictors, each non-reference level appears as a separate row.
 
-## **Example 2:** Filtering by *p*-value
+## **Example 2:** Filtering Screen by *p*-value
 
 The `p_threshold` parameter retains only predictors meeting a significance criterion:
 
@@ -143,23 +143,7 @@ example2 <- uniscreen(
 example2
 ```
 
-## **Example 3:** Time-to-Event Outcome (Cox Regression)
-
-For survival outcomes, specify the outcome using `Surv()` notation and set `model_type = "coxph"`:
-
-```{r}
-example3 <- uniscreen(
-  data = clintrial,
-  outcome = "Surv(os_months, os_status)",
-  predictors = c("age", "sex", "treatment", "stage", "ecog"),
-  model_type = "coxph",
-  labels = clintrial_labels
-)
-
-example3
-```
-
-## **Example 4:** Continuous Outcome (Linear Regression)
+## **Example 3:** Continuous Outcome Screen (Linear Regression)
 
 For continuous outcomes, specify `model_type = "lm"`:
 
@@ -173,6 +157,22 @@ example4 <- uniscreen(
 )
 
 example4
+```
+
+## **Example 4:** Time-to-Event Outcome Screen (Cox Regression)
+
+For survival outcomes, specify the outcome using `Surv()` notation and set `model_type = "coxph"`:
+
+```{r}
+example3 <- uniscreen(
+  data = clintrial,
+  outcome = "Surv(os_months, os_status)",
+  predictors = c("age", "sex", "treatment", "stage", "ecog"),
+  model_type = "coxph",
+  labels = clintrial_labels
+)
+
+example3
 ```
 
 ## **Example 5:** Retaining Model Objects
@@ -200,15 +200,7 @@ summary(models[["age"]])
 
 # Multivariable Modeling
 
-The `fit()` function estimates a single regression model with multiple predictors, producing adjusted effect estimates.
-
-## Function Signature
-
-The function follows the same convention as other `summata` functions:
-
-```{r, eval = FALSE}
-fit(data, outcome, predictors, model_type, ...)
-```
+The `fit()` function estimates a single regression model with multiple predictors, producing adjusted effect estimates. It is effectively a wrapper for existing model functions in R and other supported packages that enforces `summata` syntax for more consistent function calling.
 
 ## **Example 6:** Logistic Regression
 
@@ -226,22 +218,6 @@ example6 <- fit(
 example6
 ```
 
-## **Example 7:** Cox Regression
-
-For time-to-event outcomes:
-
-```{r}
-example7 <- fit(
-  data = clintrial,
-  outcome = "Surv(os_months, os_status)",
-  predictors = c("age", "sex", "treatment", "stage"),
-  model_type = "coxph",
-  labels = clintrial_labels
-)
-
-example7
-```
-
 ## **Example 8:** Linear Regression
 
 For continuous outcomes:
@@ -256,6 +232,22 @@ example8 <- fit(
 )
 
 example8
+```
+
+## **Example 7:** Cox Regression
+
+For time-to-event outcomes:
+
+```{r}
+example7 <- fit(
+  data = clintrial,
+  outcome = "Surv(os_months, os_status)",
+  predictors = c("age", "sex", "treatment", "stage"),
+  model_type = "coxph",
+  labels = clintrial_labels
+)
+
+example7
 ```
 
 ## **Example 9:** Poisson Regression
@@ -328,21 +320,17 @@ example12
 
 ---
 
-# Combined Analysis with fullfit()
+# Combined Analysis
 
 The `fullfit()` function integrates univariable screening and multivariable modeling into a single workflow, producing a combined table with both unadjusted and adjusted estimates.
 
-## Function Signature
-
-The function extends `fit()` with additional parameters for variable selection:
+This function extends `fit()` with an additional parameter (`method`) for variable selection:
 
 ```{r, eval = FALSE}
 fullfit(data, outcome, predictors, model_type, method, ...)
 ```
 
-## Variable Selection Methods
-
-The `method` parameter controls which predictors enter the multivariable model:
+For the `method` parameter, the following options are available. Setting `method` to one of the following options controls the predictors entering the multivariable model:
 
 | Method | Description |
 |:-------|:------------|
@@ -643,7 +631,7 @@ See the [Table Export](table_export.html) vignette for comprehensive documentati
 1. **Exploratory phase**: Use `uniscreen()` with liberal *p*-threshold (e.g., 0.20)
 2. **Model building**: Use `fullfit()` with `method = "screen"` or `method = "custom"`
 3. **Confirmatory analysis**: Use `fit()` with pre-specified predictors
-4. **Sensitivity analysis**: Compare specifications with `compfit()`
+4. **Sensitivity analysis**: Compare specifications with `compfit()` (*see* [Model Comparison](model_comparison.html))
 
 ## Choosing the Right Model
 

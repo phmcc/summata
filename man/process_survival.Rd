@@ -16,13 +16,14 @@ process_survival(
   test,
   total,
   total_label,
+  marks = NULL,
   ...
 )
 }
 \arguments{
 \item{data}{Data.table containing the survival variables.}
 
-\item{var}{Character string with Surv() expression (e.g., "Surv(time, status)").}
+\item{var}{Character string with Surv() expression (\emph{e.g.,} "Surv(time, status)").}
 
 \item{var_label}{Character string label for display.}
 

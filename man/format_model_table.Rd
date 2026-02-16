@@ -14,18 +14,19 @@ format_model_table(
   show_events = TRUE,
   reference_label = "reference",
   exponentiate = NULL,
-  conf_level = 0.95
+  conf_level = 0.95,
+  marks = NULL
 )
 }
 \arguments{
 \item{data}{Data.table containing raw model results with coefficient columns.}
 
 \item{effect_col}{Optional character string specifying the effect column name.
-If NULL, auto-detects from OR, HR, RR, or Estimate columns.}
+If \code{NULL}, auto-detects from OR, HR, RR, or Estimate columns.}
 
 \item{digits}{Integer number of decimal places for effect estimates.}
 
-\item{p_digits}{Integer number of decimal places for p-values.}
+\item{p_digits}{Integer number of decimal places for \emph{p}-values.}
 
 \item{labels}{Optional named character vector mapping variable names to display labels.
 Supports automatic labeling of interaction terms.}
@@ -37,7 +38,7 @@ Supports automatic labeling of interaction terms.}
 \item{reference_label}{Character string to display for reference categories.}
 
 \item{exponentiate}{Optional logical to force exponentiated (TRUE) or raw (FALSE)
-coefficient display. If NULL, uses existing columns.}
+coefficient display. If \code{NULL}, uses existing columns.}
 }
 \value{
 Formatted data.table with publication-ready columns.
@@ -45,7 +46,7 @@ Formatted data.table with publication-ready columns.
 \description{
 Transforms raw model coefficient data into a formatted table suitable for
 publication. Handles effect measure formatting (OR, HR, RR, Estimate),
-confidence intervals, p-values, sample sizes, and variable labels.
+confidence intervals, \emph{p}-values, sample sizes, and variable labels.
 Supports interaction terms and mixed-effects models.
 }
 \keyword{internal}

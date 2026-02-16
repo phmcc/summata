@@ -2,20 +2,20 @@
 % Please edit documentation in R/table2_utils.R
 \name{format_pvalues_export_html}
 \alias{format_pvalues_export_html}
-\title{Format p-values for exported tables (HTML)}
+\title{Format \emph{p}-values for exported tables (HTML)}
 \usage{
 format_pvalues_export_html(df, p_threshold = 0.05)
 }
 \arguments{
-\item{df}{Data.table containing p-value columns.}
+\item{df}{Data.table containing \emph{p}-value columns.}
 
 \item{p_threshold}{Numeric threshold for significance (default 0.05).}
 }
 \value{
-Data.table with significant p-values wrapped in HTML bold tags.
+Data.table with significant \emph{p}-values wrapped in HTML bold tags.
 }
 \description{
-Applies bold formatting to significant p-values in HTML tables using
+Applies bold formatting to significant \emph{p}-values in HTML tables using
 the b tag.
 }
 \keyword{internal}

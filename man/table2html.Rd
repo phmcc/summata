@@ -25,8 +25,8 @@ table2html(
 }
 \arguments{
 \item{table}{Data frame, data.table, or matrix to export. Can be output from 
-\code{desctable()}, \code{fit()}, \code{uniscreen()}, 
-\code{fullfit()}, \code{compfit()}, or any tabular data.}
+\code{desctable()}, \code{survtable()}, \code{fit()}, \code{uniscreen()},
+\code{fullfit()}, \code{compfit()}, \code{multifit()}, or any tabular data.}
 
 \item{file}{Character string specifying the output HTML filename. Must have 
 \code{.html} or \code{.htm} extension. Example: \code{"results.html"}.}
@@ -36,21 +36,21 @@ Supports basic HTML formatting. Default is \code{NULL}.}
 
 \item{format_headers}{Logical. If \code{TRUE}, formats column headers by 
 converting underscores to spaces and applying proper casing. Wraps statistical 
-notation (\emph{n}, \emph{p}) in \code{<i>} tags. Default is \code{TRUE}.}
+notation ("\emph{n}", "\emph{p}") in \code{<i>} tags. Default is \code{TRUE}.}
 
 \item{variable_padding}{Logical. If \code{TRUE}, adds vertical spacing around 
 variable groups for improved readability. Particularly useful for multi-row 
 factor variables. Default is \code{FALSE}.}
 
-\item{bold_significant}{Logical. If \code{TRUE}, wraps significant p-values 
+\item{bold_significant}{Logical. If \code{TRUE}, wraps significant \emph{p}-values 
 in \code{<b>} tags for bold display. Makes important results stand out 
 visually. Default is \code{TRUE}.}
 
 \item{bold_variables}{Logical. If \code{TRUE}, variable names are displayed
 in bold. Default is \code{FALSE}.}
 
-\item{p_threshold}{Numeric. P-value threshold for significance highlighting. 
-Only used when \code{bold_significant = TRUE}. Default is 0.05.}
+\item{p_threshold}{Numeric. Threshold for bold \emph{p}-value formatting. Only 
+used when \code{bold_significant = TRUE}. Default is 0.05.}
 
 \item{indent_groups}{Logical. If \code{TRUE}, indents grouped rows using 
 non-breaking spaces (\code{&nbsp;}) for hierarchical display. Useful for 
@@ -157,64 +157,39 @@ When \code{include_css = TRUE}, the function applies professional styling:
 
 The \code{indent_groups} option creates visual hierarchy using HTML 
 non-breaking spaces:
-```html
+\preformatted{
 <td><b>Treatment</b></td>  <!-- Variable name -->
 <td>&nbsp;&nbsp;&nbsp;&nbsp;Control</td>  <!-- Indented level -->
 <td>&nbsp;&nbsp;&nbsp;&nbsp;Active</td>   <!-- Indented level -->
-```
-
-Benefits:
-\itemize{
-  \item Clear parent-child relationships
-  \item Professional appearance
-  \item Easy to scan and interpret
-  \item Works across all browsers
-}
-
-\strong{Responsive Design:}
-
-The default CSS supports responsive display:
-\itemize{
-  \item Tables scroll horizontally on narrow screens
-  \item Maintains formatting across devices
-  \item Mobile-friendly viewing
-  \item Print-friendly styling
-}
-
-For better mobile support, consider:
-\itemize{
-  \item Using \code{condense_table = TRUE} to reduce width
-  \item Adding viewport meta tag: 
-    \code{<meta name="viewport" content="width=device-width, initial-scale=1">}
-  \item Wrapping in responsive container: \code{<div style="overflow-x:auto;">}
 }
 
 \strong{Integration with R Markdown/Quarto:}
 
 For R Markdown or Quarto documents:
-```r
+\preformatted{
 # Generate HTML fragment (no CSS)
 table2html(results, "table.html", include_css = FALSE)
+}
 
-# Include in document with results='asis'
+Then include in your document chunk with \code{results='asis'}:
 \preformatted{
-  cat(readLines("table.html"), sep = "\\n")
+cat(readLines("table.html"), sep = "\n")
 }
 
 Or directly render without file:
-```r
+\preformatted{
 # For inline display
 htmltools::HTML(
   capture.output(
     print(xtable::xtable(results), type = "html")
   )
 )
-```
+}
 
 \strong{Integration with Shiny:}
 
 For Shiny applications:
-```r
+\preformatted{
 # In server function
 output$results_table <- renderUI(\{
   table2html(results_data(), "temp.html", include_css = FALSE)
@@ -225,26 +200,7 @@ output$results_table <- renderUI(\{
 output$interactive_table <- DT::renderDT(\{
   results_data()
 \})
-```
-
-\strong{Customizing Appearance:}
-
-To customize beyond built-in options:
-
-\emph{Option 1: Modify generated HTML}
-```r
-table2html(results, "table.html", include_css = FALSE)
-# Add custom CSS in parent HTML document
-```
-
-\emph{Option 2: Post-process with HTML/CSS tools}
-```r
-# Generate table
-table2html(results, "table.html")
-
-# Edit table.html to add custom classes or styles
-# Use CSS to apply custom formatting
-```
+}
 
 \strong{Accessibility:}
 
@@ -256,192 +212,151 @@ The generated HTML follows accessibility best practices:
   \item Adequate color contrast (when using default styles)
   \item Screen reader friendly markup
 }
-
-For enhanced accessibility:
-\itemize{
-  \item Add descriptive caption
-  \item Ensure sufficient color contrast if customizing
-  \item Consider adding \code{summary} attribute for complex tables
-  \item Test with screen readers
-}
-
-\strong{Performance:}
-
-HTML tables are efficient for web display:
-\itemize{
-  \item Fast rendering in modern browsers
-  \item Small file sizes (text-based)
-  \item No external dependencies required
-  \item Can be cached effectively
-}
-
-For very large tables (>1000 rows):
-\itemize{
-  \item Consider pagination or virtual scrolling
-  \item Use interactive table libraries (DT, reactable)
-  \item Consider server-side rendering for dynamic data
-}
-
-\strong{Browser Compatibility:}
-
-Generated HTML works in all modern browsers:
-\itemize{
-  \item Chrome, Firefox, Safari, Edge (latest versions)
-  \item Mobile browsers (iOS Safari, Chrome Mobile)
-  \item Internet Explorer 11+ (with minor styling differences)
-}
 }
 \examples{
-\dontrun{
-  # Load data and create table
-  data(clintrial)
-  data(clintrial_labels)
-  
-  results <- fit(
-      data = clintrial,
-      outcome = "os_status",
-      predictors = c("age", "sex", "treatment", "stage"),
-      labels = clintrial_labels
-  )
-  
-  # Example 1: Basic HTML export (standalone)
-  table2html(results, "results.html")
-  # Open results.html in web browser
-  
-  # Example 2: With caption
-  table2html(results, "captioned.html",
-           caption = "Table 1: Multivariable Logistic Regression Results")
-  
-  # Example 3: For embedding (no CSS)
-  table2html(results, "embed.html",
-           include_css = FALSE)
-  # Include in your HTML document
-  
-  # Example 4: Hierarchical display
-  table2html(results, "indented.html",
-           indent_groups = TRUE)
-  
-  # Example 5: Condensed table
-  table2html(results, "condensed.html",
-           condense_table = TRUE)
-  
-  # Example 6: With zebra stripes
-  table2html(results, "striped.html",
-           zebra_stripes = TRUE,
-           stripe_color = "#F0F0F0")
-  
-  # Example 7: Dark header style
-  table2html(results, "dark.html",
-           dark_header = TRUE)
-  
-  # Example 8: Combination styling
-  table2html(results, "styled.html",
-           zebra_stripes = TRUE,
-           dark_header = TRUE,
-           bold_significant = TRUE)
-  
-  # Example 9: Custom stripe color
-  table2html(results, "blue_stripes.html",
-           zebra_stripes = TRUE,
-           stripe_color = "#E3F2FD")  # Light blue
-  
-  # Example 10: Disable significance bolding
-  table2html(results, "no_bold.html",
-           bold_significant = FALSE)
-  
-  # Example 11: Stricter significance threshold
-  table2html(results, "strict.html",
-           bold_significant = TRUE,
-           p_threshold = 0.01)
-  
-  # Example 12: No header formatting
-  table2html(results, "raw_headers.html",
-           format_headers = FALSE)
-  
-  # Example 13: Descriptive statistics table
-  desc_table <- desctable(
-      data = clintrial,
-      by = "treatment",
-      variables = c("age", "sex", "bmi"),
-      labels = clintrial_labels
-  )
-  
-  table2html(desc_table, "baseline.html",
-           caption = "Table 1: Baseline Characteristics by Treatment Group")
-  
-  # Example 14: For R Markdown (no CSS, for inline display)
-  table2html(results, "rmd_table.html",
-           include_css = FALSE,
-           indent_groups = TRUE)
-  
-  # Then in R Markdown:
-  # ```{r results='asis', echo=FALSE}
-  # cat(readLines("rmd_table.html"), sep = "\n")
-  # ```
-  
-  # Example 15: Email-friendly version
-  table2html(results, "email.html",
-           include_css = TRUE,  # Self-contained
-           zebra_stripes = TRUE,
-           caption = "Regression Results - See Attached")
-  # Can be directly included in HTML emails
-  
-  # Example 16: Publication-ready web version
-  table2html(results, "publication.html",
-           caption = "Table 2: Multivariable Analysis of Risk Factors",
-           indent_groups = TRUE,
-           zebra_stripes = FALSE,  # Clean look
-           bold_significant = TRUE,
-           dark_header = FALSE)
-  
-  # Example 17: Modern dark theme
-  table2html(results, "dark_theme.html",
-           dark_header = TRUE,
-           stripe_color = "#2A2A2A",  # Dark gray stripes
-           zebra_stripes = TRUE)
-  
-  # Example 18: Minimal styling for custom CSS
-  table2html(results, "minimal.html",
-           include_css = FALSE,
-           format_headers = FALSE,
-           bold_significant = FALSE)
-  # Apply your own CSS classes and styling
-  
-  # Example 19: Model comparison table
-  models <- list(
-      base = c("age", "sex"),
-      full = c("age", "sex", "treatment", "stage")
-  )
-  
-  comparison <- compfit(
-      data = clintrial,
-      outcome = "os_status",
-      model_list = models
-  )
-  
-  table2html(comparison, "comparison.html",
-           caption = "Model Comparison Statistics")
-  
-  # Example 20: Mobile-optimized table
-  table2html(results, "mobile.html",
-           condense_table = TRUE,  # Reduce width
-           font_size = 10)  # Note: font_size not in this function,
-                            # adjust in CSS if needed
-}
+\dontshow{if (FALSE) withAutoprint(\{ # examplesIf}
+# Load data and create table
+data(clintrial)
+data(clintrial_labels)
+
+results <- fit(
+     data = clintrial,
+     outcome = "os_status",
+     predictors = c("age", "sex", "treatment", "stage"),
+     labels = clintrial_labels
+)
+
+# Example 1: Basic HTML export (standalone)
+table2html(results, "results.html")
+# Open results.html in web browser
+
+# Example 2: With caption
+table2html(results, "captioned.html",
+          caption = "Table 1: Multivariable Logistic Regression Results")
+
+# Example 3: For embedding (no CSS)
+table2html(results, "embed.html",
+          include_css = FALSE)
+# Include in your HTML document
+
+# Example 4: Hierarchical display
+table2html(results, "indented.html",
+          indent_groups = TRUE)
+
+# Example 5: Condensed table
+table2html(results, "condensed.html",
+          condense_table = TRUE)
+
+# Example 6: With zebra stripes
+table2html(results, "striped.html",
+          zebra_stripes = TRUE,
+          stripe_color = "#F0F0F0")
+
+# Example 7: Dark header style
+table2html(results, "dark.html",
+          dark_header = TRUE)
+
+# Example 8: Combination styling
+table2html(results, "styled.html",
+          zebra_stripes = TRUE,
+          dark_header = TRUE,
+          bold_significant = TRUE)
+
+# Example 9: Custom stripe color
+table2html(results, "blue_stripes.html",
+          zebra_stripes = TRUE,
+          stripe_color = "#E3F2FD")  # Light blue
+
+# Example 10: Disable significance bolding
+table2html(results, "no_bold.html",
+          bold_significant = FALSE)
+
+# Example 11: Stricter significance threshold
+table2html(results, "strict.html",
+          bold_significant = TRUE,
+          p_threshold = 0.01)
+
+# Example 12: No header formatting
+table2html(results, "raw_headers.html",
+          format_headers = FALSE)
+
+# Example 13: Descriptive statistics table
+desc_table <- desctable(
+     data = clintrial,
+     by = "treatment",
+     variables = c("age", "sex", "bmi"),
+     labels = clintrial_labels
+)
+
+table2html(desc_table, "baseline.html",
+          caption = "Table 1: Baseline Characteristics by Treatment Group")
+
+# Example 14: For R Markdown (no CSS, for inline display)
+table2html(results, "rmd_table.html",
+          include_css = FALSE,
+          indent_groups = TRUE)
+
+# Then in R Markdown:
+# ```{r results='asis', echo=FALSE}
+# cat(readLines("rmd_table.html"), sep = "\n")
+# ```
+
+# Example 15: Email-friendly version
+table2html(results, "email.html",
+          include_css = TRUE,  # Self-contained
+          zebra_stripes = TRUE,
+          caption = "Regression Results - See Attached")
+# Can be directly included in HTML emails
+
+# Example 16: Publication-ready web version
+table2html(results, "publication.html",
+          caption = "Table 2: Multivariable Analysis of Risk Factors",
+          indent_groups = TRUE,
+          zebra_stripes = FALSE,  # Clean look
+          bold_significant = TRUE,
+          dark_header = FALSE)
+
+# Example 17: Modern dark theme
+table2html(results, "dark_theme.html",
+          dark_header = TRUE,
+          stripe_color = "#2A2A2A",  # Dark gray stripes
+          zebra_stripes = TRUE)
+
+# Example 18: Minimal styling for custom CSS
+table2html(results, "minimal.html",
+          include_css = FALSE,
+          format_headers = FALSE,
+          bold_significant = FALSE)
+# Apply your own CSS classes and styling
+
+# Example 19: Model comparison table
+models <- list(
+     base = c("age", "sex"),
+     full = c("age", "sex", "treatment", "stage")
+)
+
+comparison <- compfit(
+     data = clintrial,
+     outcome = "os_status",
+     model_list = models
+)
+
+table2html(comparison, "comparison.html",
+          caption = "Model Comparison Statistics")
+\dontshow{\}) # examplesIf}
 }
 \seealso{
+\code{\link{autotable}} for automatic format detection,
 \code{\link{table2pdf}} for PDF output,
 \code{\link{table2tex}} for LaTeX output,
 \code{\link{table2docx}} for Word documents,
 \code{\link{table2pptx}} for PowerPoint,
+\code{\link{table2rtf}} for Rich Text Format,
 \code{\link{fit}} for regression tables,
 \code{\link{desctable}} for descriptive tables
 
 Other export functions: 
-\code{\link{autoexport}()},
-\code{\link{print.table2docx_result}()},
-\code{\link{print.table2pptx_result}()},
-\code{\link{print.table2rtf_result}()},
+\code{\link{autotable}()},
 \code{\link{table2docx}()},
 \code{\link{table2pdf}()},
 \code{\link{table2pptx}()},

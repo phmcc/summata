@@ -17,6 +17,7 @@ process_categorical(
   total,
   total_label,
   na_percent,
+  marks = NULL,
   ...
 )
 }

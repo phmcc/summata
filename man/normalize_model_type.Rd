@@ -10,7 +10,7 @@ normalize_model_type(model_type)
 \item{model_type}{Character string of model type or class name.}
 }
 \value{
-Normalized character string (e.g., "lmerMod" becomes "lmer").
+Normalized character string (\emph{e.g.,} "lmerMod" becomes "lmer").
 }
 \description{
 Converts model class names to standardized model type strings.

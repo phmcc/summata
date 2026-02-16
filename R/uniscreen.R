@@ -4,7 +4,7 @@
 #' separate models for each predictor against a single outcome. This function is 
 #' designed for initial variable screening, hypothesis generation, and understanding 
 #' crude associations before multivariable modeling. Returns publication-ready 
-#' formatted results with optional p-value filtering.
+#' formatted results with optional \emph{p}-value filtering.
 #'
 #' @param data Data frame or data.table containing the analysis dataset. The 
 #'   function automatically converts data frames to data.tables for efficient 
@@ -12,7 +12,7 @@
 #'   
 #' @param outcome Character string specifying the outcome variable name. For 
 #'   survival analysis, use \code{Surv()} syntax from the \pkg{survival} package 
-#'   (e.g., \code{"Surv(time, status)"} or \code{"Surv(os_months, os_status)"}).
+#'   (\emph{e.g.,} \code{"Surv(time, status)"} or \code{"Surv(os_months, os_status)"}).
 #'   
 #' @param predictors Character vector of predictor variable names to screen. Each 
 #'   predictor is tested independently in its own univariable model. Can include 
@@ -43,14 +43,14 @@
 #'       (requires coxme package and \code{random} parameter).
 #'   }
 #'
-#' @param random Character string specifying the random effects formula for 
+#' @param random Character string specifying the random-effects formula for 
 #'   mixed-effects models (\code{glmer}, \code{lmer}, \code{coxme}). Use standard
-#'   lme4/coxme syntax, e.g., \code{"(1|site)"} for random intercepts by site,
-#'   \code{"(1|site/patient)"} for nested random effects. Required when 
-#'   \code{model_type} is a mixed-effects model type unless random effects are
-#'   included in the \code{predictors} vector. Alternatively, random effects 
-#'   can be included directly in the \code{predictors} vector using the same 
-#'   syntax (e.g., \code{predictors = c("age", "sex", "(1|site)")}), though 
+#'   \pkg{lme4}/\pkg{coxme} syntax, \emph{e.g.,} \code{"(1|site)"} for random
+#'   intercepts by site, \code{"(1|site/patient)"} for nested random effects.
+#'   Required when \code{model_type} is a mixed-effects model type unless random
+#'   effects are included in the \code{predictors} vector. Alternatively, random
+#'   effects can be included directly in the \code{predictors} vector using the same 
+#'   syntax (\emph{e.g.,} \code{predictors = c("age", "sex", "(1|site)")}), though 
 #'   they will not be iterated over as predictors. Default is \code{NULL}.
 #'   
 #' @param family For GLM and GLMER models, specifies the error distribution and link 
@@ -88,7 +88,7 @@
 #'   \strong{Positive continuous outcomes:}
 #'   \itemize{
 #'     \item \code{"Gamma"} or \code{Gamma()} - Gamma distribution for positive, 
-#'       right-skewed continuous data (e.g., costs, lengths of stay). Default log link.
+#'       right-skewed continuous data (\emph{e.g.,} costs, lengths of stay). Default log link.
 #'     \item \code{Gamma(link = "inverse")} - Gamma with inverse (canonical) link.
 #'     \item \code{Gamma(link = "identity")} - Gamma with identity link for additive 
 #'       effects on positive outcomes.
@@ -102,7 +102,7 @@
 #'   
 #'   See \code{\link[stats]{family}} for additional details and options.
 #'   
-#' @param p_threshold Numeric value between 0 and 1 specifying the p-value threshold 
+#' @param p_threshold Numeric value between 0 and 1 specifying the \emph{p}-value threshold 
 #'   used to count significant predictors in the printed summary. All predictors
 #'   are always included in the output table. Default is 0.05.
 #'   
@@ -124,10 +124,12 @@
 #' @param digits Integer specifying the number of decimal places for effect 
 #'   estimates (OR, HR, RR, coefficients). Default is 2.
 #'   
-#' @param p_digits Integer specifying the number of decimal places for p-values. 
-#'   P-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001", 
-#'   "< 0.01", etc. Default is 3.
-#'   
+#' @param p_digits Integer specifying the number of decimal places for \emph{p}-values.
+#'   Values smaller than \code{10^(-p_digits)} are displayed as \code{"< 0.001"}
+#'   (for \code{p_digits = 3}), \code{"< 0.0001"} (for \code{p_digits = 4}),
+#'   \emph{etc.} The threshold string respects \code{number_format} (\emph{e.g.,}
+#'   \code{"< 0,001"} for EU formatting). Default is 3.
+#'
 #' @param labels Named character vector or list providing custom display 
 #'   labels for variables. Names should match predictor names, values are the 
 #'   display labels. Predictors not in \code{labels} use their original names. 
@@ -156,10 +158,36 @@
 #'   cores and uses \code{detectCores() - 1}. During R CMD check, the number 
 #'   of cores is automatically limited to 2 per CRAN policy. Ignored when 
 #'   \code{parallel = FALSE}.
-#'   
+#'
+#' @param number_format Character string or two-element character vector
+#'   controlling thousand and decimal separators in formatted output. Named
+#'   presets:
+#'   \itemize{
+#'     \item \code{"us"} - Comma thousands, period decimal: \code{1,234.56} [default]
+#'     \item \code{"eu"} - Period thousands, comma decimal: \code{1.234,56}
+#'     \item \code{"space"} - Thin-space thousands, period decimal: \code{1 234.56}
+#'       (SI/ISO 31-0)
+#'     \item \code{"none"} - No thousands separator: \code{1234.56}
+#'   }
+#'   Or provide a custom two-element vector \code{c(big.mark, decimal.mark)},
+#'   \emph{e.g.}, \code{c("'", ".")} for Swiss-style: \verb{1'234.56}.
+#'
+#'   When \code{NULL} (default), uses
+#'   \code{getOption("summata.number_format", "us")}. Set the global option
+#'   once per session to avoid passing this argument repeatedly:
+#'   \preformatted{
+#'     options(summata.number_format = "eu")
+#'   }
+#'
+#' @param verbose Logical. If \code{TRUE}, displays model fitting warnings
+#'   (\emph{e.g.,} singular fit, convergence issues). If \code{FALSE} (default),
+#'   routine fitting messages are suppressed while unexpected warnings are
+#'   preserved. When \code{NULL}, uses
+#'   \code{getOption("summata.verbose", FALSE)}.
+#'
 #' @param ... Additional arguments passed to the underlying model fitting functions 
 #'   (\code{\link[stats]{glm}}, \code{\link[stats]{lm}}, 
-#'   \code{\link[survival]{coxph}}, etc.). Common options include \code{weights}, 
+#'   \code{\link[survival]{coxph}}, \emph{etc.}). Common options include \code{weights}, 
 #'   \code{subset}, \code{na.action}, and model-specific control parameters.
 #'
 #' @return A data.table with S3 class \code{"uniscreen_result"} containing formatted 
@@ -177,17 +205,17 @@
 #'       level (factor variables only)}
 #'     \item{OR/HR/RR/Coefficient (95\% CI)}{Character. Formatted effect 
 #'       estimate with confidence interval. Column name depends on model type:
-#'       "OR (95\% CI)" for logistic, "HR (95\% CI)" for Cox, 
-#'       "RR (95\% CI)" for Poisson, "Coefficient (95\% CI)" for linear models}
-#'     \item{p-value}{Character. Formatted p-value from the Wald test}
+#'       "OR (95\% CI)" for logistic, "HR (95\% CI)" for survival, 
+#'       "RR (95\% CI)" for counts, "Coefficient (95\% CI)" for linear models}
+#'     \item{\emph{p}-value}{Character. Formatted \emph{p}-value from the Wald test}
 #'   }
 #'   
 #'   The returned object includes the following attributes accessible via \code{attr()}:
 #'   \describe{
 #'     \item{raw_data}{data.table. Unformatted numeric results with separate 
 #'       columns for coefficients, standard errors, confidence interval bounds, 
-#'       etc. Suitable for further statistical analysis or custom formatting}
-#'     \item{models}{list (if \code{keep_models = TRUE}). Named list of fitted 
+#'       \emph{etc.} Suitable for further statistical analysis or custom formatting}
+#'     \item{models}{List (if \code{keep_models = TRUE}). Named list of fitted 
 #'       model objects, with predictor names as list names. Access specific models 
 #'       via \code{attr(result, "models")[["predictor_name"]]}}
 #'     \item{outcome}{Character. The outcome variable name used}
@@ -195,6 +223,10 @@
 #'     \item{model_scope}{Character. Always "Univariable" for screening results}
 #'     \item{screening_type}{Character. Always "univariable" to identify the 
 #'       analysis type}
+#'     \item{p_threshold}{Numeric. The \emph{p}-value threshold used for significance}
+#'     \item{significant}{Character vector. Names of predictors with \emph{p}-value 
+#'       below the screening threshold, suitable for passing directly to 
+#'       downstream modeling functions}
 #'   }
 #'
 #' @details
@@ -204,7 +236,7 @@
 #' \enumerate{
 #'   \item For each predictor in \code{predictors}, fits a separate model: 
 #'     \code{outcome ~ predictor}
-#'   \item Extracts coefficients, confidence intervals, and p-values from each model
+#'   \item Extracts coefficients, confidence intervals, and \emph{p}-values from each model
 #'   \item Combines results into a single table for easy comparison
 #'   \item Formats output for publication with appropriate effect measures
 #' }
@@ -220,23 +252,13 @@
 #'     exploratory analyses
 #'   \item \strong{Understanding crude associations}: Report unadjusted effects 
 #'     alongside adjusted estimates
-#'   \item \strong{Variable reduction}: Use p-value thresholds (e.g., p < 0.20) 
-#'     to identify candidates for multivariable modeling
+#'   \item \strong{Variable reduction}: Use \emph{p}-value thresholds (\emph{e.g.,}
+#'     \emph{p} < 0.20) to identify candidates for multivariable modeling
 #'   \item \strong{Checking multicollinearity}: Compare univariable and 
 #'     multivariable effects to identify potential collinearity
 #' }
 #' 
-#' \strong{Factor Variables and Reference Categories:}
-#' 
-#' When \code{reference_rows = TRUE} (default):
-#' \itemize{
-#'   \item Reference categories are explicitly shown with OR/HR/RR = 1.00
-#'   \item The reference row displays "(Reference)" instead of an effect estimate
-#'   \item P-values are shown only for non-reference categories
-#'   \item Group-specific sample sizes and event counts are calculated
-#' }
-#' 
-#' \strong{P-value Threshold:}
+#' \strong{Threshold for \emph{p}-values:}
 #' 
 #' The \code{p_threshold} parameter controls the significance threshold used 
 #' in the printed summary to count how many predictors are significant. All
@@ -260,7 +282,7 @@
 #' 
 #' When \code{keep_models = FALSE} (default), fitted models are discarded after 
 #' extracting results to conserve memory. Set \code{keep_models = TRUE} only when 
-#' you need:
+#' the following are needed:
 #' \itemize{
 #'   \item Model diagnostic plots
 #'   \item Predictions from individual models
@@ -307,7 +329,7 @@
 #'     data = clintrial,
 #'     outcome = "os_status",
 #'     predictors = c("age", "sex", "bmi", "smoking", "hypertension", 
-#'                   "diabetes", "ecog", "stage"),
+#'                   "diabetes", "stage"),
 #'     p_threshold = 0.20,
 #'     labels = clintrial_labels,
 #'     parallel = FALSE
@@ -381,7 +403,7 @@
 #'     print(nb_screen)
 #' }
 #' 
-#' # Example 9: Gamma regression for positive continuous outcomes (e.g., costs)
+#' # Example 9: Gamma regression for positive continuous outcomes (\emph{e.g.,} costs)
 #' gamma_screen <- uniscreen(
 #'     data = clintrial,
 #'     outcome = "los_days",
@@ -434,7 +456,7 @@
 #' )
 #' raw_data <- attr(screen13, "raw_data")
 #' print(raw_data)
-#' # Contains unformatted coefficients, SEs, CIs, etc.
+#' # Contains unformatted coefficients, SEs, CIs, \emph{etc.}
 #' 
 #' # Example 14: Force coefficient display instead of OR
 #' screen14 <- uniscreen(
@@ -484,8 +506,8 @@
 #'     parallel = FALSE
 #' )
 #' 
-#' # Step 2: Extract significant predictor names from raw data
-#' sig_predictors <- unique(attr(candidates, "raw_data")$variable)
+#' # Step 2: Extract significant predictor names
+#' sig_predictors <- attr(candidates, "significant")
 #' 
 #' # Step 3: Fit multivariable model with selected predictors
 #' multi_model <- fit(
@@ -613,12 +635,17 @@ uniscreen <- function(data,
                       exponentiate = NULL,
                       parallel = TRUE,
                       n_cores = NULL,
+                      number_format = NULL,
+                      verbose = NULL,
                       ...) {
     
     ## Convert to data.table once at the start
     if (!data.table::is.data.table(data)) {
         data <- data.table::as.data.table(data)
     }
+    
+    ## Resolve verbose setting
+    verbose <- if (is.null(verbose)) getOption("summata.verbose", FALSE) else verbose
     
     ## Validate inputs and auto-correct model type if needed
     validation <- validate_fit_inputs(
@@ -695,49 +722,51 @@ uniscreen <- function(data,
         
         ## Fit model based on type
         ## Use model=FALSE for glm/lm when not keeping models to save memory
-        model <- switch(model_type,
-                        "glm" = stats::glm(formula, data = data, family = family, 
-                                           model = keep_models, x = FALSE, y = TRUE, ...),
-                        "negbin" = {
-                            if (!requireNamespace("MASS", quietly = TRUE))
-                                stop("Package 'MASS' required for negative binomial models")
-                            MASS::glm.nb(formula, data = data, 
-                                          model = keep_models, x = FALSE, y = TRUE, ...)
-                        },
-                        "lm" = stats::lm(formula, data = data, 
-                                         model = keep_models, x = FALSE, y = TRUE, ...),
-                        "coxph" = {
-                            if (!requireNamespace("survival", quietly = TRUE)) 
-                                stop("Package 'survival' required for Cox models")
-                            survival::coxph(formula, data = data, 
-                                            model = keep_models, x = FALSE, y = TRUE, ...)
-                        },
-                        "clogit" = {
-                            if (!requireNamespace("survival", quietly = TRUE))
-                                stop("Package 'survival' required for conditional logistic regression")
-                            survival::clogit(formula, data = data, ...)
-                        },
-                        "glmer" = {
-                            if (!requireNamespace("lme4", quietly = TRUE))
-                                stop("Package 'lme4' required for glmer models")
-                            lme4::glmer(formula, data = data, family = family, ...)
-                        },
-                        "lmer" = {
-                            if (!requireNamespace("lme4", quietly = TRUE))
-                                stop("Package 'lme4' required for lmer models")
-                            lme4::lmer(formula, data = data, ...)
-                        },
-                        "coxme" = {
-                            if (!requireNamespace("coxme", quietly = TRUE))
-                                stop("Package 'coxme' required for coxme models")
-                            if (!requireNamespace("survival", quietly = TRUE))
-                                stop("Package 'survival' required for coxme models")
-                            ## coxme uses different formula syntax - random in formula
-                            coxme_formula <- stats::as.formula(paste(outcome, "~", pred, "+", random))
-                            coxme::coxme(coxme_formula, data = data, ...)
-                        },
-                        stop("Unsupported model type: ", model_type)
-                        )
+        model <- quiet_fit(quote(
+            switch(model_type,
+                   "glm" = stats::glm(formula, data = data, family = family, 
+                                      model = keep_models, x = FALSE, y = TRUE, ...),
+                   "negbin" = {
+                       if (!requireNamespace("MASS", quietly = TRUE))
+                           stop("Package 'MASS' required for negative binomial models")
+                       MASS::glm.nb(formula, data = data, 
+                                     model = keep_models, x = FALSE, y = TRUE, ...)
+                   },
+                   "lm" = stats::lm(formula, data = data, 
+                                    model = keep_models, x = FALSE, y = TRUE, ...),
+                   "coxph" = {
+                       if (!requireNamespace("survival", quietly = TRUE)) 
+                           stop("Package 'survival' required for Cox models")
+                       survival::coxph(formula, data = data, 
+                                       model = keep_models, x = FALSE, y = TRUE, ...)
+                   },
+                   "clogit" = {
+                       if (!requireNamespace("survival", quietly = TRUE))
+                           stop("Package 'survival' required for conditional logistic regression")
+                       survival::clogit(formula, data = data, ...)
+                   },
+                   "glmer" = {
+                       if (!requireNamespace("lme4", quietly = TRUE))
+                           stop("Package 'lme4' required for glmer models")
+                       lme4::glmer(formula, data = data, family = family, ...)
+                   },
+                   "lmer" = {
+                       if (!requireNamespace("lme4", quietly = TRUE))
+                           stop("Package 'lme4' required for lmer models")
+                       lme4::lmer(formula, data = data, ...)
+                   },
+                   "coxme" = {
+                       if (!requireNamespace("coxme", quietly = TRUE))
+                           stop("Package 'coxme' required for coxme models")
+                       if (!requireNamespace("survival", quietly = TRUE))
+                           stop("Package 'survival' required for coxme models")
+                       ## coxme uses different formula syntax - random in formula
+                       coxme_formula <- stats::as.formula(paste(outcome, "~", pred, "+", random))
+                       coxme::coxme(coxme_formula, data = data, ...)
+                   },
+                   stop("Unsupported model type: ", model_type)
+                   )
+        ), verbose = verbose)
         
         raw_result <- m2dt(
             data = data,
@@ -848,6 +877,9 @@ uniscreen <- function(data,
     ## Note: p_threshold is used for reporting "Significant" count, not filtering
     
     ## Format results
+    validate_number_format(number_format)
+    marks <- resolve_number_marks(number_format)
+    
     formatted <- format_model_table(
         combined_raw,
         show_n = show_n,
@@ -856,7 +888,8 @@ uniscreen <- function(data,
         p_digits = p_digits,
         labels = labels,
         exponentiate = exponentiate,
-        conf_level = conf_level
+        conf_level = conf_level,
+        marks = marks
     )
     
     ## Attach attributes
@@ -871,6 +904,14 @@ uniscreen <- function(data,
     data.table::setattr(formatted, "model_scope", "Univariable")
     data.table::setattr(formatted, "screening_type", "univariable")
     data.table::setattr(formatted, "p_threshold", p_threshold)
+    
+    ## Extract significant predictor names
+    if ("p_value" %in% names(combined_raw)) {
+        sig_predictors <- unique(
+            combined_raw[!is.na(p_value) & p_value < p_threshold]$predictor
+        )
+        data.table::setattr(formatted, "significant", sig_predictors)
+    }
     
     class(formatted) <- c("uniscreen_result", class(formatted))
     

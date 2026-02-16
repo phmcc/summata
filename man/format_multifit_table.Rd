@@ -15,7 +15,8 @@ format_multifit_table(
   predictor_label = NULL,
   include_predictor = TRUE,
   exponentiate = NULL,
-  conf_level = 0.95
+  conf_level = 0.95,
+  marks = NULL
 )
 }
 \arguments{
@@ -37,7 +38,7 @@ format_multifit_table(
 
 \item{include_predictor}{Logical for including predictor column.}
 
-\item{exponentiate}{Logical or NULL for coefficient handling.}
+\item{exponentiate}{Logical or \code{NULL} for coefficient handling.}
 }
 \value{
 Formatted data.table.

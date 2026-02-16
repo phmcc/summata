@@ -9,7 +9,7 @@ reorder_total_column(result, total, total_label)
 \arguments{
 \item{result}{Data.table with columns to reorder.}
 
-\item{total}{Logical or character: TRUE/"first" (total first), "last" (total last).}
+\item{total}{Logical or character: \code{TRUE}/"first" (total first), "last" (total last).}
 
 \item{total_label}{Character string name of the total column.}
 }
@@ -19,6 +19,6 @@ Modified data.table with reordered columns.
 \description{
 Rearranges data.table columns to place the total column in the specified
 position (first, last, or default). Ensures proper ordering of Variable,
-Group, total, group columns, and p-value.
+Group, total, group columns, and \emph{p}-value.
 }
 \keyword{internal}

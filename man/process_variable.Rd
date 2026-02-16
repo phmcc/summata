@@ -22,6 +22,7 @@ process_variable(
   labels,
   na_percent,
   p_per_stat = FALSE,
+  marks = NULL,
   ...
 )
 }
@@ -58,8 +59,11 @@ process_variable(
 
 \item{na_percent}{Logical whether to include NA in percentage denominators.}
 
-\item{p_per_stat}{Logical whether to show separate p-values per statistic for
-continuous variables. Default FALSE for better performance.}
+\item{p_per_stat}{Logical whether to show separate \emph{p}-values per statistic for
+continuous variables. Default \code{FALSE} for better performance.}
+
+\item{marks}{List with \code{big.mark} and \code{decimal.mark} as returned
+by \code{\link{resolve_number_marks}}.}
 
 \item{...}{Additional arguments passed to test functions.}
 }

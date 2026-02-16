@@ -53,8 +53,8 @@ if (save_figures && !dir.exists(fig_dir)) {
 save_example_plot <- function(plot, filename, width = 8, height = 5) {
   if (save_figures) {
     filepath <- file.path(fig_dir, filename)
-    final_width <- attr(plot, "recommended_dims")$width %||% width
-    final_height <- attr(plot, "recommended_dims")$height %||% height
+    final_width <- attr(plot, "rec_dims")$width %||% width
+    final_height <- attr(plot, "rec_dims")$height %||% height
     
     if (requireNamespace("ragg", quietly = TRUE)) {
       ## Use ragg directly - it uses 'res' not 'dpi', and defaults to 72
@@ -103,7 +103,15 @@ The `summata` package provides specialized forest plot functions for each model 
 | `multiforest()` | Multi-outcome analysis | Model-dependent |
 | `autoforest()` | Auto-detect | Auto-detect |
 
-All functions produce `ggplot2` objects that can be further customized.
+These functions follow a standard syntax when called:
+
+``` r
+forest_plot <- autoforest(x, data, ...)
+```
+
+where `x` is either a model or a `summata` fitted output (e.g., from `uniscreen()`, `fit()`, `fullfit()`, or `multifit()`), and `data` is the name of the dataset used. The `data` argument is optional and is primarily used to derive *n* and Events counts for various groups/subgroups.
+
+All forest plot functions produce `ggplot2` objects that can be further customized. This vignette demonstrates the various capabilities of these functions using the included sample dataset.
 
 ---
 
@@ -124,8 +132,8 @@ Moreover, note that all plots in this vignette are generated using the `ggsave()
 
 ```{r, eval = FALSE}
 ggsave("output.png", plot, 
-       width = attr(plot, "recommended_dims")$width, 
-       height = attr(plot, "recommended_dims")$height, 
+       width = attr(plot, "rec_dims")$width, 
+       height = attr(plot, "rec_dims")$height, 
        units = "in")
 ```
 
@@ -160,29 +168,7 @@ example1 <- glmforest(
 show_plot(example1, "forest_ex1.png")
 ```
 
-## **Example 2:** Cox Regression
-
-For survival models, use `coxforest()`:
-
-```{r}
-cox_model <- coxph(
-  Surv(os_months, os_status) ~ age + sex + stage + treatment + ecog,
-  data = clintrial
-)
-
-example2 <- coxforest(
-  x = cox_model,
-  data = clintrial,
-  title = "Cox Regression: Survival Analysis",
-  labels = clintrial_labels
-)
-```
-
-```{r, echo = FALSE, out.width = "100%"}
-show_plot(example2, "forest_ex2.png")
-```
-
-## **Example 3:** Linear Regression
+## **Example 2:** Linear Regression
 
 For continuous outcomes, use `lmforest()`:
 
@@ -192,10 +178,32 @@ linear_model <- lm(
   data = clintrial
 )
 
-example3 <- lmforest(
+example2 <- lmforest(
   x = linear_model,
   data = clintrial,
   title = "Linear Regression: Length of Stay",
+  labels = clintrial_labels
+)
+```
+
+```{r, echo = FALSE, out.width = "100%"}
+show_plot(example2, "forest_ex2.png")
+```
+
+## **Example 3:** Cox Regression
+
+For survival models, use `coxforest()`:
+
+```{r}
+cox_model <- coxph(
+  Surv(os_months, os_status) ~ age + sex + stage + treatment + ecog,
+  data = clintrial
+)
+
+example3 <- coxforest(
+  x = cox_model,
+  data = clintrial,
+  title = "Cox Regression: Survival Analysis",
   labels = clintrial_labels
 )
 ```
@@ -226,32 +234,7 @@ show_plot(example4, "forest_ex4.png")
 
 Forest plots integrate seamlessly with `fit()` and `fullfit()` output by extracting the attached model object.
 
-## **Example 5:** From fit() Output
-
-Use `attr()` to extract the model object from `fit()` output:
-
-```{r}
-table_result <- fit(
-  data = clintrial,
-  outcome = "los_days",
-  predictors = c("age", "sex", "stage", "surgery", "ecog", "treatment"),
-  model_type = "lm",
-  labels = clintrial_labels
-)
-
-example5 <- lmforest(
-  x = attr(table_result, "model"),
-  title = "Factors Affecting Length of Stay",
-  labels = clintrial_labels,
-  zebra_stripes = TRUE
-)
-```
-
-```{r, echo = FALSE, out.width = "100%"}
-show_plot(example5, "forest_ex5.png")
-```
-
-## **Example 6:** Logistic Model from fit()
+## **Example 5:** Direct Extraction from Fit Output
 
 The same approach works for logistic models:
 
@@ -264,7 +247,7 @@ table_logistic <- fit(
   labels = clintrial_labels
 )
 
-example6 <- glmforest(
+example5 <- glmforest(
   x = attr(table_logistic, "model"),
   title = "Predictors of Surgical Intervention",
   labels = clintrial_labels,
@@ -273,10 +256,10 @@ example6 <- glmforest(
 ```
 
 ```{r, echo = FALSE, out.width = "100%"}
-show_plot(example6, "forest_ex6.png")
+show_plot(example5, "forest_ex5.png")
 ```
 
-## **Example 7:** Cox Model from fit()
+## **Example 6:** Model Attribute from Fit Output
 
 And for Cox models:
 
@@ -289,7 +272,7 @@ table_cox <- fit(
   labels = clintrial_labels
 )
 
-example7 <- coxforest(
+example6 <- coxforest(
   x = attr(table_cox, "model"),
   title = "Predictors of Overall Survival",
   labels = clintrial_labels,
@@ -298,19 +281,19 @@ example7 <- coxforest(
 ```
 
 ```{r, echo = FALSE, out.width = "100%"}
-show_plot(example7, "forest_ex7.png")
+show_plot(example6, "forest_ex6.png")
 ```
 
 ---
 
 # Display Options
 
-## **Example 8:** Indenting Factor Levels
+## **Example 7:** Indenting Factor Levels
 
 The `indent_groups` parameter creates hierarchical display for a more compact aesthetic:
 
 ```{r}
-example8 <- glmforest(
+example7 <- glmforest(
   x = attr(table_logistic, "model"),
   title = "Indented Factor Levels",
   labels = clintrial_labels,
@@ -319,15 +302,15 @@ example8 <- glmforest(
 ```
 
 ```{r, echo = FALSE, out.width = "100%"}
-show_plot(example8, "forest_ex8.png")
+show_plot(example7, "forest_ex7.png")
 ```
 
-## **Example 9:** Condensing Binary Variables
+## **Example 8:** Condensing Binary Variables
 
-The `condense_table` parameter displays binary variables on single rows:
+The `condense_table` parameter displays binary variables on single rows. Group indenting is applied automatically:
 
 ```{r}
-example9 <- glmforest(
+example8 <- glmforest(
   x = attr(table_logistic, "model"),
   title = "Condensed Display",
   labels = clintrial_labels,
@@ -336,15 +319,15 @@ example9 <- glmforest(
 ```
 
 ```{r, echo = FALSE, out.width = "100%"}
-show_plot(example9, "forest_ex9.png")
+show_plot(example8, "forest_ex8.png")
 ```
 
-## **Example 10:** Toggle Zebra Striping
+## **Example 9:** Toggle Zebra Striping
 
 Zebra striping is enabled by default. It can be disabled via `zebra_stripes = FALSE`:
 
 ```{r}
-example10 <- glmforest(
+example9 <- glmforest(
   x = attr(table_logistic, "model"),
   title = "Without Zebra Striping",
   labels = clintrial_labels,
@@ -353,17 +336,17 @@ example10 <- glmforest(
 )
 ```
 
-```{r, echo = FALSE, out.width = "100%"}
-show_plot(example10, "forest_ex10.png")
+```{r, echo = FALSE, out.width = "90%"}
+show_plot(example9, "forest_ex9.png")
 ```
 
-## **Example 11:** Sample Size and Event Columns
+## **Example 10:** Sample Size and Event Columns
 
 Control display of sample size (*n*) and event counts:
 
 ```{r}
 # Show both n and events
-example11a <- coxforest(
+example10a <- coxforest(
   x = attr(table_cox, "model"),
   title = "With Sample Size and Events",
   labels = clintrial_labels,
@@ -375,12 +358,12 @@ example11a <- coxforest(
 ```
 
 ```{r, echo = FALSE, out.width = "100%"}
-show_plot(example11a, "forest_ex11a.png")
+show_plot(example10a, "forest_ex10a.png")
 ```
 
 ```{r}
 # Minimal display
-example11b <- coxforest(
+example10b <- coxforest(
   x = attr(table_cox, "model"),
   title = "Minimal Display",
   labels = clintrial_labels,
@@ -391,19 +374,19 @@ example11b <- coxforest(
 ```
 
 ```{r, echo = FALSE, out.width = "100%"}
-show_plot(example11b, "forest_ex11b.png")
+show_plot(example10b, "forest_ex10b.png")
 ```
 
 ---
 
 # Formatting Options
 
-## Numeric Precision
+## **Example 11:** Adjusting Numeric Precision
 
 The `digits` parameter controls decimal places for effect estimates and confidence intervals:
 
 ```{r}
-example12 <- glmforest(
+example11 <- glmforest(
   x = attr(table_logistic, "model"),
   title = "Custom Precision (3 decimal places)",
   labels = clintrial_labels,
@@ -413,15 +396,15 @@ example12 <- glmforest(
 ```
 
 ```{r, echo = FALSE, out.width = "100%"}
-show_plot(example12, "forest_ex12.png")
+show_plot(example11, "forest_ex11.png")
 ```
 
-## Reference Label
+## **Example 12:** Custom Reference Label
 
 Customize the label shown for reference categories:
 
 ```{r}
-example13 <- glmforest(
+example12 <- glmforest(
   x = attr(table_logistic, "model"),
   title = "Custom Reference Label",
   labels = clintrial_labels,
@@ -431,33 +414,33 @@ example13 <- glmforest(
 ```
 
 ```{r, echo = FALSE, out.width = "100%"}
-show_plot(example13, "forest_ex13.png")
+show_plot(example12, "forest_ex12.png")
 ```
 
-## Effect Measure Label
+## **Example 13:** Custom Effect Measure Label
 
 Change the column header for the effect measure:
 
 ```{r}
-example14 <- coxforest(
+example13 <- coxforest(
   x = attr(table_cox, "model"),
   title = "Custom Effect Label",
   labels = clintrial_labels,
-  effect_label = "HR (95% CI)",
+  effect_label = "Effect (95% CI)",
   indent_groups = TRUE
 )
 ```
 
 ```{r, echo = FALSE, out.width = "100%"}
-show_plot(example14, "forest_ex14.png")
+show_plot(example13, "forest_ex13.png")
 ```
 
-## Custom Colors
+## **Example 14:** Custom Colors
 
 The `color` parameter changes the point and line color:
 
 ```{r}
-example15 <- glmforest(
+example14 <- glmforest(
   x = attr(table_logistic, "model"),
   title = "Custom Color",
   labels = clintrial_labels,
@@ -467,15 +450,15 @@ example15 <- glmforest(
 ```
 
 ```{r, echo = FALSE, out.width = "100%"}
-show_plot(example15, "forest_ex15.png")
+show_plot(example14, "forest_ex14.png")
 ```
 
-## Font Sizes
+## **Example 15:** Change Font Sizes
 
 Adjust text size with the `font_size` multiplier:
 
 ```{r}
-example16 <- glmforest(
+example15 <- glmforest(
   x = attr(table_logistic, "model"),
   title = "Larger Font (1.5×)",
   labels = clintrial_labels,
@@ -485,16 +468,16 @@ example16 <- glmforest(
 ```
 
 ```{r, echo = FALSE, out.width = "100%"}
-show_plot(example16, "forest_ex16.png")
+show_plot(example15, "forest_ex15.png")
 ```
 
-## Table Width
+## **Example 16:** Table Width
 
 The `table_width` parameter adjusts the proportion of space allocated to the table vs. the forest plot:
 
 ```{r}
 # Wide table (for long variable names)
-example17a <- glmforest(
+example16a <- glmforest(
   x = attr(table_logistic, "model"),
   title = "Wide Table (75%)",
   labels = clintrial_labels,
@@ -503,12 +486,12 @@ example17a <- glmforest(
 ```
 
 ```{r, echo = FALSE, out.width = "100%"}
-show_plot(example17a, "forest_ex17a.png")
+show_plot(example16a, "forest_ex16a.png")
 ```
 
 ```{r}
 # Narrow table (emphasizes forest plot)
-example17b <- glmforest(
+example16b <- glmforest(
   x = attr(table_logistic, "model"),
   title = "Narrow Table (50%)",
   labels = clintrial_labels,
@@ -517,16 +500,16 @@ example17b <- glmforest(
 ```
 
 ```{r, echo = FALSE, out.width = "100%"}
-show_plot(example17b, "forest_ex17b.png")
+show_plot(example16b, "forest_ex16b.png")
 ```
 
 ---
 
 # Saving Forest Plots
 
-Forest plots include a `recommended_dims` attribute for optimal sizing when saving to files.
+Forest plots include a `rec_dims` attribute for optimal sizing when saving to files.
 
-## **Example 18:** Recommended Dimensions
+## **Example 17:** Recommended Dimensions
 
 Use the recommended dimensions for optimal output:
 
@@ -540,7 +523,7 @@ p <- glmforest(
 )
 
 # Get recommended dimensions
-dims <- attr(p, "recommended_dims")
+dims <- attr(p, "rec_dims")
 cat("Width:", dims$width, "inches\n")
 cat("Height:", dims$height, "inches\n")
 
@@ -554,7 +537,7 @@ ggsave(
 )
 ```
 
-## **Example 19:** Multiple Formats
+## **Example 18:** Multiple Formats
 
 Export to different formats as needed:
 
@@ -565,7 +548,7 @@ p <- glmforest(
   labels = clintrial_labels
 )
 
-dims <- attr(p, "recommended_dims")
+dims <- attr(p, "rec_dims")
 
 # PDF (vector, best for publications)
 # ggsave("forest.pdf", p, width = dims$width, height = dims$height)
@@ -586,12 +569,12 @@ dims <- attr(p, "recommended_dims")
 
 Forest plots support extensive customization for publication requirements.
 
-## **Example 20:** Combined Options
+## **Example 19:** Combined Options
 
 Combine multiple options for publication-ready output:
 
 ```{r}
-example20 <- coxforest(
+example19 <- coxforest(
   x = attr(table_cox, "model"),
   title = "Comprehensive Survival Analysis",
   labels = clintrial_labels,
@@ -610,39 +593,39 @@ example20 <- coxforest(
 ```
 
 ```{r, echo = FALSE, out.width = "100%"}
-show_plot(example20, "forest_ex20.png")
+show_plot(example19, "forest_ex19.png")
 ```
 
-## **Example 21:** ggplot2 Extensions
+## **Example 20:** Extensions with ggplot2
 
 Forest plots are `ggplot2` objects and can be modified further:
 
 ```{r}
-example21 <- glmforest(
+example20 <- glmforest(
   x = attr(table_logistic, "model"),
   title = "Extended with ggplot2",
   labels = clintrial_labels,
   indent_groups = TRUE
 )
 
-example21_modified <- example21 +
+example20_modified <- example20 +
   theme(
-    plot.title = element_text(face = "italic"),
+    plot.title = element_text(face = "italic", color = "#A72727"),
     plot.background = element_rect(fill = "white", color = NA)
   )
 ```
 
 ```{r, echo = FALSE, out.width = "100%"}
-show_plot(example21_modified, "forest_ex21.png")
+show_plot(example20_modified, "forest_ex20.png")
 ```
 
 ---
 
-# Extended GLM Families
+# Additional GLM Families
 
-The `glmforest()` function supports all GLM families. The `clintrial` dataset includes two count variables designed for different regression approaches: `fu_count` (equidispersed, for Poisson) and `ae_count` (overdispersed, for negative binomial).
+The `glmforest()` function supports all GLM families. These can be plotted in a similar fashion to standard logistic regression forest plots. See [Regression Modeling](regression_modeling.html) for the full list of supported model types.
 
-## **Example 22:** Poisson Regression
+## **Example 21:** Poisson Regression
 
 For equidispersed count outcomes (variance ≈ mean), use Poisson regression:
 
@@ -653,7 +636,7 @@ poisson_model <- glm(
   family = poisson
 )
 
-example22 <- glmforest(
+example21 <- glmforest(
   x = poisson_model,
   data = clintrial,
   title = "Poisson Regression: Follow-Up Visits",
@@ -662,10 +645,10 @@ example22 <- glmforest(
 ```
 
 ```{r, echo = FALSE, out.width = "100%"}
-show_plot(example22, "forest_ex22.png")
+show_plot(example21, "forest_ex21.png")
 ```
 
-## **Example 23:** Negative Binomial Regression
+## **Example 22:** Negative Binomial Regression
 
 For overdispersed count outcomes (variance > mean), negative binomial regression is preferred. Using `fit()` ensures proper handling:
 
@@ -678,45 +661,19 @@ nb_result <- fit(
   labels = clintrial_labels
 )
 
-example23 <- glmforest(
+example22 <- glmforest(
   x = nb_result,
   title = "Negative Binomial: Adverse Events"
 )
 ```
 
 ```{r, echo = FALSE, out.width = "100%"}
-show_plot(example23, "forest_ex23.png")
+show_plot(example22, "forest_ex22.png")
 ```
-
-## **Example 24:** Gamma Regression
-
-For positive continuous outcomes with right skew (e.g., costs, length of stay), Gamma regression with log link produces multiplicative effects:
-
-```{r}
-gamma_result <- fit(
-  data = clintrial,
-  outcome = "los_days",
-  predictors = c("age", "stage", "treatment", "surgery"),
-  model_type = "glm",
-  family = "Gamma",
-  labels = clintrial_labels
-)
-
-example24 <- glmforest(
-  x = gamma_result,
-  title = "Gamma Regression: Length of Stay"
-)
-```
-
-```{r, echo = FALSE, out.width = "100%"}
-show_plot(example24, "forest_ex24.png")
-```
-
-All ratio-type models (Poisson, negative binomial, Gamma with log link) display rate ratios with blue coloring by default, while coefficient models use green. See [Regression Modeling](regression_modeling.html) for the full list of supported model types.
 
 ---
 
-# Function Summary
+# Function Parameter Summary
 
 | Parameter | Description | Default |
 |:----------|:------------|:--------|
@@ -750,13 +707,13 @@ All ratio-type models (Poisson, negative binomial, Gamma with log link) display 
 ## Visual Design
 
 1. Use `indent_groups = TRUE` for cleaner presentation of categorical variables
-2. Match `table_width` to your variable name lengths
+2. Match `table_width` to variable name lengths
 3. Consider `condense_table = TRUE` for binary predictors
 4. Use consistent colors across related figures
 
 ## Publication Preparation
 
-1. Use `recommended_dims` attribute for optimal sizing
+1. Use `rec_dims` attribute for optimal sizing
 2. Save as PDF for vector graphics in print
 3. Use 300+ DPI for raster formats
 4. Check that reference lines and confidence intervals are clearly visible
@@ -799,7 +756,10 @@ p <- glmforest(model, labels = labels)
 
 # Further Reading
 
+- [Descriptive Tables](descriptive_tables.html): `desctable()` for baseline characteristics
+- [Survival Tables](survival_tables.html): `survtable()` for time-to-event summaries
 - [Regression Modeling](regression_modeling.html): `fit()`, `uniscreen()`, and `fullfit()`
-- [Multivariate Analysis](multivariate_analysis.html): `multifit()` and `multiforest()`
+- [Model Comparison](model_comparison.html): `compfit()` for comparing models
+- [Table Export](table_export.html): Export to PDF, Word, and other formats
+- [Multivariate Analysis](multivariate_analysis.html): `multifit()` for multi-outcome analysis
 - [Advanced Workflows](advanced_workflows.html): Interactions and mixed-effects models
-- [Table Export](table_export.html): Export tables to PDF, Word, and other formats

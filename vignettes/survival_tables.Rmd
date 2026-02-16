@@ -26,7 +26,13 @@ options(width = 180)
 
 Survival analysis requires specialized summary tables that report time-to-event outcomes in formats appropriate for longitudinal research. While `desctable()` includes basic survival summaries (median with 95% CI), detailed survival analysis often requires more comprehensive reporting: survival probabilities at specified time points, multiple quantiles, and group comparisons with appropriate statistical tests.
  
-The `survtable()` function generates publication-ready survival tables with flexible output options. This vignette demonstrates its capabilities using the included sample dataset.
+The `survtable()` function generates publication-ready survival tables with flexible output options. It uses the familiar `Surv()` syntax for specifying survival outcomes and adheres to the standard `summata` calling convention:
+
+```{r, eval = FALSE}
+survtable(data, outcome, by, times, probs, ...)
+```
+
+where `data` is the dataset, `outcome` specifies the survival endpoint using `Surv()` notation, `by` defines the grouping variable, `times` specifies landmark time points, and `probs` specifies survival quantiles to report.
 
 ---
 
@@ -46,27 +52,13 @@ The `clintrial` dataset contains `r nrow(clintrial)` observations with time-to-e
 
 ---
 
-# Basic Usage
-
-## Function Signature
-
-The `survtable()` function uses the familiar `Surv()` syntax for specifying survival outcomes:
-
-```{r, eval = FALSE}
-survtable(data, outcome, by, times, probs, ...)
-```
-
-where `data` is the dataset, `outcome` specifies the survival endpoint using `Surv()` notation, `by` defines the grouping variable, `times` specifies landmark time points, and `probs` specifies survival quantiles to report.
-
----
-
 # Landmark Survival Estimates
 
 Landmark survival estimates report the probability of survival at specific time points (*e.g.*, 1-year, 2-year survival rates).
 
 ## **Example 1:** Basic Landmark Analysis
 
-The following example reports survival probabilities at 12, 24, and 36 months:
+The following example reports survival probabilities at 12, 24, and 36 months (with the default median survival reporting included):
 
 ```{r}
 example1 <- survtable(
@@ -80,30 +72,12 @@ example1 <- survtable(
 example1
 ```
 
-## **Example 2:** Combining Time Points and Median Survival
-
-A common reporting format includes both landmark survival rates and median survival time:
-
-```{r}
-example2 <- survtable(
-  data = clintrial,
-  outcome = "Surv(os_months, os_status)",
-  by = "treatment",
-  times = c(12, 24),
-  probs = 0.5,
-  time_unit = "months",
-  total = FALSE
-)
-
-example2
-```
-
-## **Example 3:** Remove Median Survival Column
+## **Example 2:** Remove Median Survival Column
 
 By default, a column showing median survival is displayed (`probs = 0.5`). To remove it, set `probs = NULL`.
 
 ```{r}
-example3 <- survtable(
+example2 <- survtable(
   data = clintrial,
   outcome = "Surv(os_months, os_status)",
   by = "treatment",
@@ -113,7 +87,7 @@ example3 <- survtable(
   total = FALSE
 )
 
-example3
+example2
 ```
 
 ---
@@ -122,12 +96,12 @@ example3
 
 Survival quantiles report the time at which a specified proportion of subjects have experienced the event. The median survival time (50th percentile) is the most common, but other quantiles provide additional context.
 
-## **Example 4:** Survival Quartiles
+## **Example 3:** Survival Quartiles
 
 Report multiple survival quantiles by specifying the `probs` parameter:
 
 ```{r}
-example4 <- survtable(
+example3 <- survtable(
   data = clintrial,
   outcome = "Surv(os_months, os_status)",
   by = "stage",
@@ -136,7 +110,7 @@ example4 <- survtable(
   labels = clintrial_labels
 )
 
-example4
+example3
 ```
 
 ---
@@ -145,12 +119,12 @@ example4
 
 Studies often include multiple time-to-event outcomes, such as progression-free survival (PFS) and overall survival (OS). The `survtable()` function handles multiple endpoints in a single call.
 
-## **Example 5:** PFS and OS Comparison
+## **Example 4:** PFS and OS Comparison
 
 Pass a vector of outcomes to compare multiple survival endpoints:
 
 ```{r}
-example5 <- survtable(
+example4 <- survtable(
   data = clintrial,
   outcome = c("Surv(pfs_months, pfs_status)", "Surv(os_months, os_status)"),
   by = "treatment",
@@ -164,19 +138,19 @@ example5 <- survtable(
   )
 )
 
-example5
+example4
 ```
 
 ---
 
 # Output Variations
 
-## **Example 6:** Cumulative Event Rates
+## **Example 5:** Cumulative Event Rates
 
 For competing risks analyses or when reporting event rates rather than survival probabilities, use `type = "risk"` to display cumulative incidence (1 − survival):
 
 ```{r}
-example6 <- survtable(
+example5 <- survtable(
   data = clintrial,
   outcome = "Surv(os_months, os_status)",
   by = "treatment",
@@ -185,15 +159,15 @@ example6 <- survtable(
   time_unit = "months"
 )
 
-example6
+example5
 ```
 
-## **Example 7:** Including At-Risk Counts
+## **Example 6:** Including At-Risk Counts
 
 The number at risk at each time point provides context for the precision of survival estimates:
 
 ```{r}
-example7 <- survtable(
+example6 <- survtable(
   data = clintrial,
   outcome = "Surv(os_months, os_status)",
   by = "treatment",
@@ -203,7 +177,7 @@ example7 <- survtable(
   total = FALSE
 )
 
-example7
+example6
 ```
 
 ---
@@ -212,7 +186,7 @@ example7
 
 Survival tables are often presented alongside Kaplan-Meier curves in publications. While `summata` focuses on tabular output, the `survminer` and `ggsurvfit` packages provide excellent options for survival curves.
 
-## **Example 8:** Coordinated Figure-Table Output
+## **Example 7:** Coordinated Figure-Table Output
 
 The following workflow produces a matched figure-table pair suitable for publication:
 
@@ -301,6 +275,9 @@ When selecting landmark time points, consider the following:
 # Further Reading
 
 - [Descriptive Tables](descriptive_tables.html): `desctable()` for baseline characteristics
-- [Regression Modeling](regression_modeling.html): Cox regression with `fit()` and `fullfit()`
-- [Forest Plots](forest_plots.html): Visualization of hazard ratios
+- [Regression Modeling](regression_modeling.html): `fit()`, `uniscreen()`, and `fullfit()`
+- [Model Comparison](model_comparison.html): `compfit()` for comparing models
 - [Table Export](table_export.html): Export to PDF, Word, and other formats
+- [Forest Plots](forest_plots.html): Visualization of regression results
+- [Multivariate Analysis](multivariate_analysis.html): `multifit()` for multi-outcome analysis
+- [Advanced Workflows](advanced_workflows.html): Interactions and mixed-effects models

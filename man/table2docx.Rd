@@ -29,8 +29,8 @@ table2docx(
 }
 \arguments{
 \item{table}{Data frame, data.table, or matrix to export. Can be output from 
-\code{desctable()}, \code{fit()}, \code{uniscreen()}, 
-\code{fullfit()}, \code{compfit()}, or any tabular data.}
+\code{desctable()}, \code{survtable()}, \code{fit()}, \code{uniscreen()},
+\code{fullfit()}, \code{compfit()}, \code{multifit()}, or any tabular data.}
 
 \item{file}{Character string specifying the output DOCX filename. Must have 
 \code{.docx} extension. Example: \code{"results.docx"}, \code{"Table1.docx"}.}
@@ -46,17 +46,17 @@ a font installed on the system. Default is \code{"Arial"}. Common options:
 \code{"Times New Roman"}, \code{"Calibri"}, \code{"Helvetica"}.}
 
 \item{format_headers}{Logical. If \code{TRUE}, formats column headers by 
-italicizing statistical notation (\emph{n}, \emph{p}), converting underscores 
+italicizing statistical notation ("\emph{n}", "\emph{p}"), converting underscores 
 to spaces, and improving readability. Default is \code{TRUE}.}
 
 \item{bold_significant}{Logical. If \code{TRUE}, applies bold formatting to 
-p-values below the significance threshold. Makes significant results stand 
+\emph{p}-values below the significance threshold. Makes significant results stand 
 out. Default is \code{TRUE}.}
 
 \item{bold_variables}{Logical. If \code{TRUE}, variable names are displayed
 in bold. Default is \code{FALSE}.}
 
-\item{p_threshold}{Numeric. P-value threshold for bold formatting. Only 
+\item{p_threshold}{Numeric. Threshold for bold \emph{p}-value formatting. Only 
 used when \code{bold_significant = TRUE}. Default is 0.05.}
 
 \item{indent_groups}{Logical. If \code{TRUE}, indents factor levels under 
@@ -106,7 +106,7 @@ Example: \code{c("left", "left", "center", "right", "right")}.}
 
 \item{return_ft}{Logical. If \code{TRUE}, returns the \pkg{flextable} object 
 directly for further customization. If \code{FALSE} (default), returns 
-invisibly with flextable as attribute. See Details for usage. 
+invisibly with \pkg{flextable} object as attribute. See Details for usage. 
 Default is \code{FALSE}.}
 
 \item{...}{Additional arguments passed to \code{\link[officer]{read_docx}} 
@@ -126,14 +126,14 @@ Behavior depends on \code{return_ft}:
       immediate further customization}
   }
   
-  In both cases, creates a .docx file at the specified location.
+  In both cases, creates a \code{.docx} file at the specified location.
 }
 \description{
 Converts a data frame, data.table, or matrix to a fully editable Microsoft Word 
-document (.docx) using the \pkg{flextable} and \pkg{officer} packages. Creates
-publication-ready tables with extensive formatting options including typography, 
-alignment, colors, and page layout. Tables can be further edited in Microsoft 
-Word after creation.
+document (\code{.docx}) using the \pkg{flextable} and \pkg{officer} packages.
+Creates publication-ready tables with extensive formatting options including
+typography, alignment, colors, and page layout. Tables can be further edited in
+Microsoft Word after creation.
 }
 \details{
 \strong{Package Requirements:}
@@ -145,9 +145,9 @@ This function requires:
 }
 
 Install if needed:
-```r
+\preformatted{
 install.packages(c("flextable", "officer"))
-```
+}
 
 \strong{Output Features:}
 
@@ -161,29 +161,14 @@ The generated Word document contains:
   \item Compatible with Word 2007 and later
 }
 
-\strong{Editability in Word:}
-
-Once created, you can edit the table in Microsoft Word:
-\itemize{
-  \item Modify cell contents
-  \item Adjust column widths
-  \item Change fonts and colors
-  \item Add/remove rows or columns
-  \item Apply Word table styles
-  \item Copy/paste into other documents
-  \item Convert to plain text or other formats
-}
-
-This makes the function ideal for creating initial drafts that require 
-manual refinement.
-
-\strong{Further Customization with Flextable:}
+\strong{Further Customization:}
 
 For programmatic customization beyond the built-in options, access the 
-\pkg{flextable} object:
+\code{flextable} object:
 
 \emph{Method 1: Via attribute (default)}
-```r
+
+\preformatted{
 result <- table2docx(table, "output.docx")
 ft <- attr(result, "flextable")
 
@@ -195,10 +180,11 @@ ft <- flextable::color(ft, i = 2, j = 3, color = "red")
 doc <- officer::read_docx()
 doc <- flextable::body_add_flextable(doc, ft)
 print(doc, target = "customized.docx")
-```
+}
 
 \emph{Method 2: Direct return}
-```r
+
+\preformatted{
 ft <- table2docx(table, "output.docx", return_ft = TRUE)
 
 # Customize immediately
@@ -209,7 +195,7 @@ ft <- flextable::autofit(ft)
 doc <- officer::read_docx()
 doc <- flextable::body_add_flextable(doc, ft)
 print(doc, target = "custom.docx")
-```
+}
 
 \strong{Page Layout:}
 
@@ -291,79 +277,34 @@ When \code{dark_header = TRUE}:
 \strong{Integration with R Markdown/Quarto:}
 
 For R Markdown/Quarto Word output:
-```r
+
+\preformatted{
 # Create flextable for inline display
 ft <- table2docx(results, "temp.docx", return_ft = TRUE)
 
 # Display in R Markdown chunk
 ft  # Renders in Word output
-```
+}
 
-Or use flextable directly in chunks:
+Or use \code{flextable} directly in chunks:
 
 \preformatted{
-  flextable::flextable(results)
-}
-
-\strong{Optimized for FastFit Tables:}
-
-Specifically designed for tables from:
-\itemize{
-  \item \code{desctable()} - Descriptive statistics
-  \item \code{fit()} - Regression results
-  \item \code{uniscreen()} - Univariable screening
-  \item \code{fullfit()} - Combined analyses
-  \item \code{compfit()} - Model comparisons
-}
-
-Automatic handling of:
-\itemize{
-  \item Sample size rows (N = X)
-  \item Variable grouping
-  \item P-value formatting and bolding
-  \item Confidence intervals
-  \item Multi-level categorical variables
-}
-
-\strong{Troubleshooting:}
-
-Common issues and solutions:
-
-\emph{Table too wide:}
-\itemize{
-  \item Use \code{orientation = "landscape"}
-  \item Reduce \code{font_size}
-  \item Use \code{condense_table = TRUE}
-  \item Manually adjust column widths in Word
-}
-
-\emph{Font not displaying correctly:}
-\itemize{
-  \item Ensure font is installed on system
-  \item Use common fonts (Arial, Times, Calibri)
-  \item Check font name spelling
-}
-
-\emph{Need more customization:}
-\itemize{
-  \item Use \code{return_ft = TRUE}
-  \item Modify \pkg{flextable} object with flextable package functions
-  \item Edit directly in Word after creation
+flextable::flextable(results)
 }
 }
 \examples{
-\dontrun{
-  options(width = 180)
+\dontshow{if (FALSE) withAutoprint(\{ # examplesIf}
+options(width = 180)
 # Load data
 data(clintrial)
 data(clintrial_labels)
 
 # Create regression table
 results <- fit(
-    data = clintrial,
-    outcome = "os_status",
-    predictors = c("age", "sex", "treatment", "stage"),
-    labels = clintrial_labels
+   data = clintrial,
+   outcome = "os_status",
+   predictors = c("age", "sex", "treatment", "stage"),
+   labels = clintrial_labels
 )
 
 # Example 1: Basic Word export
@@ -371,36 +312,36 @@ table2docx(results, "results.docx")
 
 # Example 2: With caption
 table2docx(results, "captioned.docx",
-         caption = "Table 1: Multivariable Logistic Regression Results")
+        caption = "Table 1: Multivariable Logistic Regression Results")
 
 # Example 3: Landscape orientation for wide tables
 table2docx(results, "wide.docx",
-         orientation = "landscape")
+        orientation = "landscape")
 
 # Example 4: Custom font and size
 table2docx(results, "custom_font.docx",
-         font_family = "Times New Roman",
-         font_size = 11)
+        font_family = "Times New Roman",
+        font_size = 11)
 
 # Example 5: Hierarchical display
 table2docx(results, "indented.docx",
-         indent_groups = TRUE)
+        indent_groups = TRUE)
 
 # Example 6: Condensed table
 table2docx(results, "condensed.docx",
-         condense_table = TRUE)
+        condense_table = TRUE)
 
 # Example 7: With zebra stripes
 table2docx(results, "striped.docx",
-         zebra_stripes = TRUE)
+        zebra_stripes = TRUE)
 
 # Example 8: Dark header style
 table2docx(results, "dark.docx",
-         dark_header = TRUE)
+        dark_header = TRUE)
 
 # Example 9: A4 paper for international journals
 table2docx(results, "a4.docx",
-         paper = "a4")
+        paper = "a4")
 
 # Example 10: Get flextable for customization
 result <- table2docx(results, "base.docx")
@@ -416,41 +357,39 @@ ft <- flextable::bg(ft, bg = "yellow", part = "header")
 
 # Example 12: Publication-ready table
 table2docx(results, "publication.docx",
-         caption = "Table 2: Adjusted Odds Ratios for Mortality",
-         font_family = "Times New Roman",
-         font_size = 10,
-         indent_groups = TRUE,
-         zebra_stripes = FALSE,
-         bold_significant = TRUE)
+        caption = "Table 2: Adjusted Odds Ratios for Mortality",
+        font_family = "Times New Roman",
+        font_size = 10,
+        indent_groups = TRUE,
+        zebra_stripes = FALSE,
+        bold_significant = TRUE)
 
 # Example 13: Custom column alignment
 table2docx(results, "aligned.docx",
-         align = c("left", "left", "center", "right", "right"))
+        align = c("left", "left", "center", "right", "right"))
 
 # Example 14: Disable significance bolding
 table2docx(results, "no_bold.docx",
-         bold_significant = FALSE)
+        bold_significant = FALSE)
 
 # Example 15: Stricter significance threshold
 table2docx(results, "strict.docx",
-         bold_significant = TRUE,
-         p_threshold = 0.01)
-}
-
+        bold_significant = TRUE,
+        p_threshold = 0.01)
+\dontshow{\}) # examplesIf}
 }
 \seealso{
+\code{\link{autotable}} for automatic format detection,
 \code{\link{table2pptx}} for PowerPoint slides,
 \code{\link{table2pdf}} for PDF output,
 \code{\link{table2html}} for HTML tables,
+\code{\link{table2rtf}} for Rich Text Format,
 \code{\link{table2tex}} for LaTeX output,
 \code{\link[flextable]{flextable}} for the underlying table object,
 \code{\link[officer]{read_docx}} for Word document manipulation
 
 Other export functions: 
-\code{\link{autoexport}()},
-\code{\link{print.table2docx_result}()},
-\code{\link{print.table2pptx_result}()},
-\code{\link{print.table2rtf_result}()},
+\code{\link{autotable}()},
 \code{\link{table2html}()},
 \code{\link{table2pdf}()},
 \code{\link{table2pptx}()},

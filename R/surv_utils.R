@@ -5,7 +5,7 @@
 #' @param surv_obj Survival object created by Surv().
 #' @param group_var Vector of group assignments.
 #' @param test_type Character string specifying test type.
-#' @return List with test statistic, p-value, and test type.
+#' @return List with test statistic, \emph{p}-value, and test type.
 #' @keywords internal
 perform_survival_test <- function(surv_obj, group_var, test_type) {
     ## Map test type to survdiff rho parameter
@@ -72,7 +72,8 @@ process_survival_times <- function(survfit_objects,
                                    time_label,
                                    time_unit,
                                    by,
-                                   data) {
+                                   data,
+                                   marks = NULL) {
 
     ## Build column headers for times (must use vapply since gsub doesn't vectorize replacement)
     time_cols <- vapply(times, function(t) {
@@ -87,13 +88,15 @@ process_survival_times <- function(survfit_objects,
 
     n_times <- length(times)
 
-    ## Pre-compute format strings
+    ## Pre-compute format strings (separator handled inside formatter)
     if (percent) {
         fmt_est <- paste0("%.", digits, "f%%")
-        fmt_ci <- paste0("(%.", digits, "f-%.", digits, "f%%)")
+        fmt_ci_lower <- paste0("%.", digits, "f")
+        fmt_ci_upper <- paste0("%.", digits, "f%%")
     } else {
         fmt_est <- paste0("%.", digits + 2L, "f")
-        fmt_ci <- paste0("(%.", digits + 2L, "f-%.", digits + 2L, "f)")
+        fmt_ci_lower <- paste0("%.", digits + 2L, "f")
+        fmt_ci_upper <- paste0("%.", digits + 2L, "f")
     }
 
     ## Extract all survival data at once from stratified fit
@@ -190,9 +193,9 @@ process_survival_times <- function(survfit_objects,
         n_event_vec <- n_event_mat[, j]
 
         ## Vectorized cell formatting
-        formatted_list[[j + 1L]] <- format_survival_cells_vectorized(
+        formatted_list[[j + 1L]] <- format_survival_cells(
             est_vec, lower_vec, upper_vec, n_risk_vec, n_event_vec,
-            stats, fmt_est, fmt_ci, percent
+            stats, fmt_est, fmt_ci_lower, fmt_ci_upper, percent, marks
         )
         names(formatted_list)[j + 1L] <- col_name
 
@@ -239,10 +242,10 @@ process_survival_times <- function(survfit_objects,
 
         for (j in seq_len(n_times)) {
             col_name <- time_cols[j]
-            overall_formatted[[col_name]] <- format_survival_cells_vectorized(
+            overall_formatted[[col_name]] <- format_survival_cells(
                 est_overall[j], lower_overall[j], upper_overall[j],
                 n_risk_overall[j], n_event_overall[j],
-                stats, fmt_est, fmt_ci, percent
+                stats, fmt_est, fmt_ci_lower, fmt_ci_upper, percent, marks
             )
 
             overall_raw[[paste0(col_name, "_estimate")]] <- est_overall[j]
@@ -271,7 +274,9 @@ process_survival_times <- function(survfit_objects,
 
 #' Vectorized survival cell formatting
 #'
-#' Formats survival probability cells for multiple rows at once.
+#' Formats survival probability cells for multiple rows at once. Uses
+#' locale-aware decimal marks and safe CI separators that avoid ambiguity
+#' with negative values or decimal commas.
 #'
 #' @param est Numeric vector of estimates.
 #' @param lower Numeric vector of lower CI bounds.
@@ -280,12 +285,17 @@ process_survival_times <- function(survfit_objects,
 #' @param n_event Integer vector of event counts.
 #' @param stats Character vector of statistics to include.
 #' @param fmt_est Format string for estimate.
-#' @param fmt_ci Format string for CI.
+#' @param fmt_ci_lower Format string for lower CI bound.
+#' @param fmt_ci_upper Format string for upper CI bound.
 #' @param percent Logical whether percentages.
+#' @param marks List with \code{big.mark} and \code{decimal.mark} as returned
+#'   by \code{\link{resolve_number_marks}}.
 #' @return Character vector of formatted cells.
 #' @keywords internal
-format_survival_cells_vectorized <- function(est, lower, upper, n_risk, n_event,
-                                             stats, fmt_est, fmt_ci, percent) {
+format_survival_cells <- function(est, lower, upper, n_risk, n_event,
+                                             stats, fmt_est, fmt_ci_lower,
+                                             fmt_ci_upper, percent,
+                                             marks = NULL) {
     n <- length(est)
     result <- character(n)
 
@@ -309,28 +319,57 @@ format_survival_cells_vectorized <- function(est, lower, upper, n_risk, n_event,
         upper_vals <- upper[valid_idx]
     }
 
+    ## Format individual components
+    est_fmt <- sprintf(fmt_est, est_vals)
+    lower_fmt <- sprintf(fmt_ci_lower, lower_vals)
+    upper_fmt <- sprintf(fmt_ci_upper, upper_vals)
+
+    ## Apply locale decimal mark and fix negative zeros
+    if (!is.null(marks)) {
+        est_fmt <- apply_decimal_mark(est_fmt, marks)
+        lower_fmt <- apply_decimal_mark(lower_fmt, marks)
+        upper_fmt <- apply_decimal_mark(upper_fmt, marks)
+    }
+
+    ## Determine CI separator (consistent within column)
+    any_negative <- any(lower_vals < 0, upper_vals < 0, na.rm = TRUE)
+    if (any_negative) {
+        sep <- " to "
+    } else if (!is.null(marks) && marks$decimal.mark == ",") {
+        sep <- "\u2013"
+    } else {
+        sep <- "-"
+    }
+
     ## Build formatted strings
     if ("survival" %in% stats && "ci" %in% stats) {
-        formatted <- paste0(
-            sprintf(fmt_est, est_vals), " ",
-            sprintf(fmt_ci, lower_vals, upper_vals)
-        )
+        formatted <- paste0(est_fmt, " (", lower_fmt, sep, upper_fmt, ")")
     } else if ("survival" %in% stats) {
-        formatted <- sprintf(fmt_est, est_vals)
+        formatted <- est_fmt
     } else if ("ci" %in% stats) {
-        formatted <- sprintf(fmt_ci, lower_vals, upper_vals)
+        formatted <- paste0("(", lower_fmt, sep, upper_fmt, ")")
     } else {
-        formatted <- sprintf(fmt_est, est_vals)
+        formatted <- est_fmt
     }
 
     ## Add n_risk if requested
     if ("n_risk" %in% stats) {
-        formatted <- paste0(formatted, " [n = ", n_risk[valid_idx], "]")
+        n_risk_fmt <- if (!is.null(marks)) {
+            vapply(n_risk[valid_idx], format_count, character(1), marks = marks)
+        } else {
+            as.character(n_risk[valid_idx])
+        }
+        formatted <- paste0(formatted, " [n = ", n_risk_fmt, "]")
     }
 
     ## Add n_event if requested
     if ("n_event" %in% stats) {
-        formatted <- paste0(formatted, " [e = ", n_event[valid_idx], "]")
+        n_event_fmt <- if (!is.null(marks)) {
+            vapply(n_event[valid_idx], format_count, character(1), marks = marks)
+        } else {
+            as.character(n_event[valid_idx])
+        }
+        formatted <- paste0(formatted, " [e = ", n_event_fmt, "]")
     }
 
     result[valid_idx] <- formatted
@@ -366,13 +405,16 @@ process_survival_probs <- function(survfit_objects,
                                    total_label,
                                    median_label,
                                    by,
-                                   data) {
+                                   data,
+                                   conf_level = 0.95,
+                                   marks = NULL) {
 
     ## Build column headers for quantiles (vectorized)
+    ci_pct <- round(conf_level * 100)
     quantile_cols <- ifelse(
         probs == 0.5,
         median_label,
-        sprintf("%d%% Survival Time (95%% CI)", round((1 - probs) * 100))
+        sprintf("%d%% Survival Time (%d%% CI)", round((1 - probs) * 100), ci_pct)
     )
 
     n_probs <- length(probs)
@@ -428,8 +470,8 @@ process_survival_probs <- function(survfit_objects,
         upper_vec <- upper_mat[, j]
 
         ## Vectorized cell formatting
-        formatted_list[[j + 1L]] <- format_quantile_cells_vectorized(
-            est_vec, lower_vec, upper_vec, fmt_str
+        formatted_list[[j + 1L]] <- format_quantile_cells(
+            est_vec, lower_vec, upper_vec, fmt_str, marks
         )
         names(formatted_list)[j + 1L] <- col_name
 
@@ -459,8 +501,8 @@ process_survival_probs <- function(survfit_objects,
 
         for (j in seq_len(n_probs)) {
             col_name <- quantile_cols[j]
-            overall_formatted[[col_name]] <- format_quantile_cells_vectorized(
-                est_overall[j], lower_overall[j], upper_overall[j], fmt_str
+            overall_formatted[[col_name]] <- format_quantile_cells(
+                est_overall[j], lower_overall[j], upper_overall[j], fmt_str, marks
             )
 
             overall_raw[[paste0(col_name, "_estimate")]] <- est_overall[j]
@@ -493,9 +535,12 @@ process_survival_probs <- function(survfit_objects,
 #' @param lower Numeric vector of lower CI bounds.
 #' @param upper Numeric vector of upper CI bounds.
 #' @param fmt_str Format string for numeric values.
+#' @param marks List with \code{big.mark} and \code{decimal.mark} as returned
+#'   by \code{\link{resolve_number_marks}}.
 #' @return Character vector of formatted cells.
 #' @keywords internal
-format_quantile_cells_vectorized <- function(est, lower, upper, fmt_str) {
+format_quantile_cells <- function(est, lower, upper, fmt_str,
+                                             marks = NULL) {
     n <- length(est)
     result <- character(n)
 
@@ -513,43 +558,77 @@ format_quantile_cells_vectorized <- function(est, lower, upper, fmt_str) {
     lower_fmt <- ifelse(is.na(lower[valid_idx]), "NR", sprintf(fmt_str, lower[valid_idx]))
     upper_fmt <- ifelse(is.na(upper[valid_idx]), "NR", sprintf(fmt_str, upper[valid_idx]))
 
-    result[valid_idx] <- paste0(est_fmt, " (", lower_fmt, "-", upper_fmt, ")")
+    if (!is.null(marks)) {
+        ## Apply locale decimal mark and fix negative zeros
+        est_fmt <- apply_decimal_mark(est_fmt, marks)
+        lower_fmt <- ifelse(lower_fmt == "NR", "NR",
+                            apply_decimal_mark(lower_fmt, marks))
+        upper_fmt <- ifelse(upper_fmt == "NR", "NR",
+                            apply_decimal_mark(upper_fmt, marks))
+
+        ## Determine CI separator: per-element for vectorized context
+        ## Use worst-case across all valid elements for consistency within a column
+        any_negative <- any(lower[valid_idx] < 0, upper[valid_idx] < 0, na.rm = TRUE)
+        if (any_negative) {
+            sep <- " to "
+        } else if (marks$decimal.mark == ",") {
+            sep <- "\u2013"
+        } else {
+            sep <- "-"
+        }
+    } else {
+        ## Fallback: check for negatives only
+        any_negative <- any(lower[valid_idx] < 0, upper[valid_idx] < 0, na.rm = TRUE)
+        sep <- if (any_negative) " to " else "-"
+    }
+
+    result[valid_idx] <- paste0(est_fmt, " (", lower_fmt, sep, upper_fmt, ")")
     result[na_mask] <- "NR"
 
     result
 }
 
 
-#' Add p-value column to result table
+#' Add \emph{p}-value column to result table
 #'
-#' Adds formatted p-value column to the survtable result.
+#' Adds formatted \emph{p}-value column to the survtable result.
 #'
 #' @param result Data.table result.
-#' @param p_value Numeric p-value.
-#' @param p_digits Integer decimal places for p-value.
-#' @return Data.table with p-value column added.
+#' @param p_value Numeric \emph{p}-value.
+#' @param p_digits Integer decimal places for \emph{p}-value.
+#' @param marks List with \code{big.mark} and \code{decimal.mark} as returned
+#'   by \code{\link{resolve_number_marks}}.
+#' @return Data.table with \emph{p}-value column added.
 #' @keywords internal
-add_pvalue_column <- function(result, p_value, p_digits) {
+add_pvalue_column <- function(result, p_value, p_digits, marks = NULL) {
     n_rows <- nrow(result)
-    p_col <- c(format_pvalue_survtable(p_value, p_digits), rep("", n_rows - 1L))
+    p_col <- c(format_pvalue_survtable(p_value, p_digits, marks), rep("", n_rows - 1L))
     result[, `p-value` := p_col]
     result
 }
 
 
-#' Format p-value for survtable
+#' Format \emph{p}-value for survtable
 #'
-#' Provides p-value formatting to the survtable result.
+#' Provides \emph{p}-value formatting to the survtable result.
 #'
-#' @param p Numeric p-value.
+#' @param p Numeric \emph{p}-value.
 #' @param digits Integer decimal places.
-#' @return Character formatted p-value.
+#' @param marks List with \code{big.mark} and \code{decimal.mark} as returned
+#'   by \code{\link{resolve_number_marks}}.
+#' @return Character-formatted \emph{p}-value.
 #' @keywords internal
-format_pvalue_survtable <- function(p, digits) {
+format_pvalue_survtable <- function(p, digits, marks = NULL) {
     if (is.na(p)) {
         return("-")
     }
 
+    ## Use marks-aware formatter if available
+    if (!is.null(marks)) {
+        return(format_pvalue(p, digits, marks))
+    }
+
+    ## Fallback (e.g., from print method without marks)
     threshold <- 10^(-digits)
     if (p < threshold) {
         return(paste0("< ", format(threshold, scientific = FALSE)))

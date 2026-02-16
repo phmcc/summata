@@ -11,7 +11,7 @@ add_raw_stats(row, col, stats, stat_type)
 
 \item{col}{Character string column name for the statistics.}
 
-\item{stats}{Named list of numeric statistics (mean, sd, median, etc.).}
+\item{stats}{Named list of numeric statistics (mean, sd, median, \emph{etc.}).}
 
 \item{stat_type}{Character string indicating which statistic is displayed.}
 }

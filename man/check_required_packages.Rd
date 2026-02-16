@@ -10,7 +10,7 @@ check_required_packages(model_type)
 \item{model_type}{Character string indicating model type.}
 }
 \value{
-NULL (invisibly). Stops execution if packages missing.
+\code{NULL} (invisibly). Stops execution if packages missing.
 }
 \description{
 Verifies that necessary packages are installed for the specified model type.

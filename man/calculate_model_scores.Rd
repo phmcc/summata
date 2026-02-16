@@ -11,7 +11,7 @@ calculate_model_scores(comparison, model_type, scoring_weights = NULL)
 
 \item{model_type}{Character string indicating model type.}
 
-\item{scoring_weights}{Optional named list of custom weights. If NULL,
+\item{scoring_weights}{Optional named list of custom weights. If \code{NULL},
 uses default weights for the model type.}
 }
 \value{

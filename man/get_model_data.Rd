@@ -10,7 +10,7 @@ get_model_data(model)
 \item{model}{Fitted model object (S3 or S4).}
 }
 \value{
-Data frame or data.table used to fit the model, or NULL if unavailable.
+Data frame or data.table used to fit the model, or \code{NULL} if unavailable.
 }
 \description{
 Retrieves the original data used to fit a model. Checks multiple locations

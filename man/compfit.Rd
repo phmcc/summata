@@ -18,6 +18,8 @@ compfit(
   include_coefficients = FALSE,
   scoring_weights = NULL,
   labels = NULL,
+  number_format = NULL,
+  verbose = NULL,
   ...
 )
 }
@@ -25,29 +27,29 @@ compfit(
 \item{data}{Data frame or data.table containing the dataset.}
 
 \item{outcome}{Character string specifying the outcome variable. For survival
-analysis, use Surv() syntax (e.g., "Surv(time, status)").}
+analysis, use \code{Surv()} syntax (\emph{e.g.,} \code{"Surv(time, status)"}).}
 
 \item{model_list}{List of character vectors, each containing predictor names
 for one model. Can also be a single character vector to auto-generate nested models.}
 
-\item{model_names}{Character vector of names for each model. If NULL, uses
-"Model 1", "Model 2", etc. Default is NULL.}
+\item{model_names}{Character vector of names for each model. If \code{NULL}, uses
+"Model 1", "Model 2", \emph{etc.} Default is \code{NULL}.}
 
 \item{interactions_list}{List of character vectors specifying interaction
 terms for each model. Each element corresponds to one model in model_list.
-Use NULL for models without interactions. Use colon notation for interactions
-(e.g., c("age:treatment")). If NULL, no interactions are added to any model.
-Default is NULL.}
+Use \code{NULL} for models without interactions. Use colon notation for interactions
+(\emph{e.g.,} \code{c("age:treatment")}). If \code{NULL}, no interactions are added to
+any model. Default is \code{NULL}.}
 
-\item{random}{Character string specifying the random effects formula for 
+\item{random}{Character string specifying the random-effects formula for 
 mixed-effects models (\code{glmer}, \code{lmer}, \code{coxme}). Use standard
-lme4/coxme syntax, e.g., \code{"(1|site)"} for random intercepts by site.
-This random effects formula is applied to all models in the comparison.
-Alternatively, random effects can be included directly in the predictor 
+\code{lme4}/\code{coxme} syntax, \emph{e.g.,} \code{"(1|site)"} for random
+intercepts by site. This random effects formula is applied to all models in the
+comparison. Alternatively, random effects can be included directly in the predictor 
 vectors within \code{model_list} using the same syntax, which allows
 different random effects structures across models. Default is \code{NULL}.}
 
-\item{model_type}{Character string specifying model type. If "auto", detects
+\item{model_type}{Character string specifying model type. If \code{"auto"}, detects
 based on outcome. Options include:
 \itemize{
   \item \code{"auto"} - Automatically detect based on outcome type (default)
@@ -55,14 +57,14 @@ based on outcome. Options include:
     Gamma, Gaussian via \code{family} parameter.
   \item \code{"lm"} - Linear regression for continuous outcomes
   \item \code{"coxph"} - Cox proportional hazards for survival analysis
+  \item \code{"negbin"} - Negative binomial regression for overdispersed counts 
+    (requires MASS package)
   \item \code{"lmer"} - Mixed-effects linear regression for clustered continuous
     outcomes
   \item \code{"glmer"} - Mixed-effects logistic regression for clustered
     categorical outcomes
   \item \code{"coxme"} - Mixed-effects Cox regression for clustered time-to-event
     outcomes
-  \item \code{"negbin"} - Negative binomial regression for overdispersed counts 
-    (requires MASS package)
 }}
 
 \item{family}{For GLM and GLMER models, specifies the error distribution and link function.
@@ -81,19 +83,47 @@ See \code{\link[stats]{family}} for all options.}
 
 \item{conf_level}{Numeric confidence level for intervals. Default is 0.95.}
 
-\item{p_digits}{Integer specifying the number of decimal places for p-values.
-P-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001"
-(for \code{p_digits = 3}), "< 0.0001" (for \code{p_digits = 4}), etc.
-Default is 3.}
+\item{p_digits}{Integer specifying the number of decimal places for \emph{p}-values.
+Values smaller than \code{10^(-p_digits)} are displayed as \code{"< 0.001"}
+(for \code{p_digits = 3}), \code{"< 0.0001"} (for \code{p_digits = 4}),
+\emph{etc.} The threshold string respects \code{number_format} (\emph{e.g.,}
+\code{"< 0,001"} for EU formatting). Default is 3.}
 
 \item{include_coefficients}{Logical. If TRUE, includes a second table with
 coefficient estimates. Default is FALSE.}
 
 \item{scoring_weights}{Named list of scoring weights. Each weight should be
 between 0 and 1, and they should sum to 1. Available metrics depend on model
-type. If NULL, uses sensible defaults. See Details for available metrics.}
+type. If \code{NULL}, uses sensible defaults. See Details for available metrics.}
 
-\item{labels}{Named character vector for custom variable labels. Default is NULL.}
+\item{labels}{Named character vector providing custom display labels for
+variables. Default is \code{NULL}.}
+
+\item{number_format}{Character string or two-element character vector
+  controlling thousand and decimal separators in formatted output. Named
+  presets:
+  \itemize{
+    \item \code{"us"} - Comma thousands, period decimal: \code{1,234.56} [default]
+    \item \code{"eu"} - Period thousands, comma decimal: \code{1.234,56}
+    \item \code{"space"} - Thin-space thousands, period decimal: \code{1 234.56}
+      (SI/ISO 31-0)
+    \item \code{"none"} - No thousands separator: \code{1234.56}
+  }
+  Or provide a custom two-element vector \code{c(big.mark, decimal.mark)},
+  \emph{e.g.}, \code{c("'", ".")} for Swiss-style: \verb{1'234.56}.
+
+  When \code{NULL} (default), uses
+  \code{getOption("summata.number_format", "us")}. Set the global option
+  once per session to avoid passing this argument repeatedly:
+  \preformatted{
+    options(summata.number_format = "eu")
+  }}
+
+\item{verbose}{Logical. If \code{TRUE}, displays model fitting warnings
+(\emph{e.g.,} singular fit, convergence issues). If \code{FALSE} (default),
+routine fitting messages are suppressed while unexpected warnings are
+preserved. When \code{NULL}, uses
+\code{getOption("summata.verbose", FALSE)}.}
 
 \item{...}{Additional arguments passed to model fitting functions.}
 }
@@ -101,17 +131,17 @@ type. If NULL, uses sensible defaults. See Details for available metrics.}
 A data.table with class "compfit_result" containing:
   \describe{
     \item{Model}{Model name/identifier}
-    \item{CMS}{Composite Mean Score for model selection (higher is better)}
+    \item{CMS}{Composite Model Score for model selection (higher is better)}
     \item{N}{Sample size}
     \item{Events}{Number of events (for survival/logistic)}
     \item{Predictors}{Number of predictors}
     \item{Converged}{Whether model converged properly}
     \item{AIC}{Akaike Information Criterion}
     \item{BIC}{Bayesian Information Criterion}
-    \item{Pseudo-R²}{McFadden's pseudo-R-squared (GLM)}
+    \item{Pseudo-\emph{R}²}{McFadden's pseudo-R-squared (GLM)}
     \item{Concordance}{C-statistic (logistic/survival)}
     \item{Brier Score}{Brier accuracy score (logistic)}
-    \item{Global p}{Overall model p-value}
+    \item{Global \emph{p}}{Overall model \emph{p}-value}
   }
   
   Attributes include:
@@ -129,12 +159,12 @@ rapid model comparison and selection.
 }
 \details{
 This function fits all specified models and computes comprehensive quality
-metrics for comparison. It generates a Composite Mean Score (CMS) that 
+metrics for comparison. It generates a Composite Model Score (CMS) that 
 combines multiple metrics: lower AIC/BIC (information criteria), higher 
 concordance (discrimination), and model convergence status.
 
 For GLMs, McFadden's pseudo-R-squared is calculated as 1 - (logLik/logLik_null).
-For survival models, the global p-value comes from the log-rank test.
+For survival models, the global \emph{p}-value comes from the log-rank test.
 
 Models that fail to converge are flagged and penalized in the composite score.
 
@@ -144,23 +174,23 @@ When \code{interactions_list} is provided, each element specifies the
 interaction terms for the corresponding model in \code{model_list}. This is
 particularly useful for testing whether adding interactions improves model fit:
 \itemize{
-  \item Use NULL for models without interactions
-  \item Specify interactions using colon notation: c("age:treatment", "sex:stage")
+  \item Use \code{NULL} for models without interactions
+  \item Specify interactions using colon notation: \code{c("age:treatment", "sex:stage")}
   \item Main effects for all variables in interactions must be in the predictor list
   \item Common pattern: Compare main effects model vs model with interactions
 }
 
 Scoring weights can be customized based on model type:
 \itemize{
-  \item GLM: "convergence", "aic", "concordance", "pseudo_r2", "brier" 
-  \item Cox: "convergence", "aic", "concordance", "global_p"
-  \item Linear: "convergence", "aic", "pseudo_r2", "rmse"
+  \item GLM: \code{"convergence"}, \code{"aic"}, \code{"concordance"}, \code{"pseudo_r2"}, \code{"brier"} 
+  \item Cox: \code{"convergence"}, \code{"aic"}, \code{"concordance"}, \code{"global_p"}
+  \item Linear: \code{"convergence"}, \code{"aic"}, \code{"pseudo_r2"}, \code{"rmse"}
 }
 Default weights emphasize discrimination (concordance) and model fit (AIC).
 
 The composite score is designed as a tool to quickly rank models by their 
 quality metrics. It should be used alongside traditional model selection 
-criteria rather than as a definitive selection method.
+criteria rather than as a definitive model selection method.
 }
 \examples{
 # Load example data

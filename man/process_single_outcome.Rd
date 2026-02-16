@@ -27,6 +27,7 @@ process_single_outcome(
   median_label,
   labels,
   na_rm,
+  marks = NULL,
   ...
 )
 }

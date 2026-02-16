@@ -32,9 +32,9 @@ validate_fit_inputs(
 
 \item{digits}{Integer number of decimal places for effect estimates.}
 
-\item{p_digits}{Integer number of decimal places for p-values.}
+\item{p_digits}{Integer number of decimal places for \emph{p}-values.}
 
-\item{p_threshold}{Numeric p-value threshold for significance highlighting.}
+\item{p_threshold}{Numeric \emph{p}-value threshold for significance highlighting.}
 
 \item{auto_correct_model}{Logical whether to auto-correct model type mismatches.}
 }

@@ -1,12 +1,12 @@
 Package: summata
 Type: Package
 Title: Publication-Ready Summary Tables and Forest Plots
-Version: 0.10.7
+Version: 0.10.8
 Authors@R: c(
     person(
         given = c("Paul", "Hsin-ti"), 
         family = "McClelland", 
-        role = c("aut", "cre"), 
+        role = c("aut", "cre", "cph"), 
         email = "PaulHMcClelland@protonmail.com",
         comment = c(ORCID = "0000-0002-3119-6531")
     ))

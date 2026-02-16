@@ -5,7 +5,7 @@
 #' is tested against multiple endpoints, such as complication screening, biomarker 
 #' associations, or phenome-wide association studies. Returns publication-ready 
 #' formatted results with optional covariate adjustment. Supports interactions,
-#' mixed effects models, stratification, and clustered standard errors.
+#' mixed-effects models, stratification, and clustered standard errors.
 #'
 #' @param data Data frame or data.table containing the analysis dataset. The 
 #'   function automatically converts data frames to data.tables for efficient 
@@ -14,7 +14,7 @@
 #' @param outcomes Character vector of outcome variable names to analyze. Each 
 #'   outcome is tested in its own model with the predictor. For time-to-event
 #'   analysis, use \code{Surv()} syntax for the outcome variable
-#'   (e.g., \code{c("Surv(time1, status1)", "Surv(time2, status2)")}).
+#'   (\emph{e.g.,} \code{c("Surv(time1, status1)", "Surv(time2, status2)")}).
 #'   
 #' @param predictor Character string specifying the predictor (exposure) variable 
 #'   name. This variable is tested against each outcome. Can be continuous or 
@@ -26,16 +26,16 @@
 #'   predictor effect is reported. Default is \code{NULL} (unadjusted models).
 #'
 #' @param interactions Optional character vector of interaction terms to include
-#'   in adjusted models, using colon notation (e.g., \code{c("predictor:sex")}).
+#'   in adjusted models, using colon notation (\emph{e.g.,} \code{c("predictor:sex")}).
 #'   Interactions involving the predictor will have their effects extracted and
 #'   reported. Default is \code{NULL}.
 #'
 #' @param random Optional character string specifying random effects formula for
-#'   mixed effects models (e.g., \code{"(1|hospital)"} or \code{"(1|site/patient)"}).
+#'   mixed effects models (\emph{e.g.,} \code{"(1|hospital)"} or \code{"(1|site/patient)"}).
 #'   Required when \code{model_type} is \code{"glmer"}, \code{"lmer"}, or 
 #'   \code{"coxme"} unless random effects are included in the \code{covariates}
 #'   vector. Alternatively, random effects can be included directly in the 
-#'   \code{covariates} vector using the same syntax (e.g., 
+#'   \code{covariates} vector using the same syntax (\emph{e.g.,} 
 #'   \code{covariates = c("age", "sex", "(1|site)")}). Default is \code{NULL}.
 #'
 #' @param strata Optional character string naming the stratification variable for
@@ -104,7 +104,7 @@
 #'   \strong{Positive continuous outcomes:}
 #'   \itemize{
 #'     \item \code{"Gamma"} or \code{Gamma()} - Gamma distribution for positive, 
-#'       right-skewed continuous data (e.g., costs, lengths of stay). Default log link.
+#'       right-skewed continuous data (\emph{e.g.,} costs, lengths of stay). Default log link.
 #'     \item \code{Gamma(link = "inverse")} - Gamma with inverse (canonical) link.
 #'     \item \code{Gamma(link = "identity")} - Gamma with identity link for additive 
 #'       effects on positive outcomes.
@@ -118,7 +118,7 @@
 #'   See \code{\link[stats]{family}} for additional details and options.
 #'   
 #' @param columns Character string specifying which result columns to display when 
-#'   both unadjusted and adjusted models are fit (i.e., when \code{covariates} is 
+#'   both unadjusted and adjusted models are fit (\emph{i.e.,} when \code{covariates} is 
 #'   specified):
 #'   \itemize{
 #'     \item \code{"adjusted"} - Show only adjusted (covariate-controlled) results [default]
@@ -127,9 +127,9 @@
 #'   }
 #'   Ignored when \code{covariates = NULL}.
 #'   
-#' @param p_threshold Numeric value between 0 and 1 specifying a p-value threshold 
-#'   for filtering results. Only outcomes with p-value <= threshold are included 
-#'   in the output. Default is 1 (no filtering, all outcomes returned).
+#' @param p_threshold Numeric value between 0 and 1 specifying a \emph{p}-value threshold 
+#'   for filtering results. Only outcomes with \emph{p}-value less than or equal to the
+#'   threshold are included in the output. Default is 1 (no filtering; all outcomes returned).
 #'   
 #' @param conf_level Numeric confidence level for confidence intervals. Must be 
 #'   between 0 and 1. Default is 0.95 (95\% confidence intervals).
@@ -144,10 +144,12 @@
 #' @param digits Integer specifying the number of decimal places for effect 
 #'   estimates (OR, HR, RR, coefficients). Default is 2.
 #'   
-#' @param p_digits Integer specifying the number of decimal places for p-values. 
-#'   P-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001", 
-#'   etc. Default is 3.
-#'   
+#' @param p_digits Integer specifying the number of decimal places for \emph{p}-values.
+#'   Values smaller than \code{10^(-p_digits)} are displayed as \code{"< 0.001"}
+#'   (for \code{p_digits = 3}), \code{"< 0.0001"} (for \code{p_digits = 4}),
+#'   \emph{etc.} The threshold string respects \code{number_format} (\emph{e.g.,}
+#'   \code{"< 0,001"} for EU formatting). Default is 3.
+#'
 #' @param labels Named character vector or list providing custom display 
 #'   labels for variables. Can include labels for outcomes, predictors, and 
 #'   covariates. Names should match variable names, values are the display labels.
@@ -171,21 +173,48 @@
 #'   in the output as an attribute. Models are accessible via 
 #'   \code{attr(result, "models")}. Default is \code{FALSE}.
 #'   
-#' @param exponentiate Logical. Whether to exponentiate coefficients (display 
-#'   OR/HR/RR instead of log odds/log hazards). Default is \code{NULL}, which 
-#'   automatically exponentiates for logistic, Poisson, and Cox models, and 
-#'   displays raw coefficients for linear models.
+#' @param exponentiate Logical. Whether to exponentiate coefficients (display
+#'     OR/HR/RR instead of log odds/log hazards). Default is \code{NULL}, which
+#'     automatically displays raw coefficients for linear models and
+#'     exponentiates for logistic, Poisson, and Cox models.
 #'   
-#' @param parallel Logical. If \code{TRUE}, fits models in parallel for improved 
-#'   performance with many outcomes. Default is \code{TRUE}.
+#' @param parallel Logical. If \code{TRUE} (default), fits models in parallel
+#'   for improved performance with many outcomes.
 #'   
-#' @param n_cores Integer. Number of cores for parallel processing. Default is 
-#'   \code{NULL} (auto-detect: uses number of available cores - 1).
-#'   
+#' @param n_cores Integer specifying the number of CPU cores to use for
+#'   parallel processing. Default is \code{NULL} (auto-detect: uses
+#'   \code{detectCores() - 1}). Ignored when \code{parallel = FALSE}.
+#'
+#' @param number_format Character string or two-element character vector
+#'   controlling thousand and decimal separators in formatted output. Named
+#'   presets:
+#'   \itemize{
+#'     \item \code{"us"} - Comma thousands, period decimal: \code{1,234.56} [default]
+#'     \item \code{"eu"} - Period thousands, comma decimal: \code{1.234,56}
+#'     \item \code{"space"} - Thin-space thousands, period decimal: \code{1 234.56}
+#'       (SI/ISO 31-0)
+#'     \item \code{"none"} - No thousands separator: \code{1234.56}
+#'   }
+#'   Or provide a custom two-element vector \code{c(big.mark, decimal.mark)},
+#'   \emph{e.g.}, \code{c("'", ".")} for Swiss-style: \verb{1'234.56}.
+#'
+#'   When \code{NULL} (default), uses
+#'   \code{getOption("summata.number_format", "us")}. Set the global option
+#'   once per session to avoid passing this argument repeatedly:
+#'   \preformatted{
+#'     options(summata.number_format = "eu")
+#'   }
+#'
+#' @param verbose Logical. If \code{TRUE}, displays model fitting warnings
+#'   (\emph{e.g.,} singular fit, convergence issues). If \code{FALSE} (default),
+#'   routine fitting messages are suppressed while unexpected warnings are
+#'   preserved. When \code{NULL}, uses
+#'   \code{getOption("summata.verbose", FALSE)}.
+#'
 #' @param ... Additional arguments passed to the underlying model fitting functions.
 #'
 #' @return A data.table with S3 class \code{"multifit_result"} containing formatted 
-#'   multivariate results. The table structure includes:
+#'   multivariate regression results. The table structure includes:
 #'   \describe{
 #'     \item{Outcome}{Character. Outcome variable name or custom label}
 #'     \item{Predictor}{Character. For factor predictors: formatted as 
@@ -193,14 +222,14 @@
 #'       For binary variables where the non-reference level is an affirmative
 #'       value (Yes, 1, True, Present, Positive, +), shows just "Variable".
 #'       For continuous predictors: the variable name. For interactions: the
-#'       formatted interaction term (e.g., "Treatment (Drug A) × Sex (Male)")}
+#'       formatted interaction term (\emph{e.g.,} "Treatment (Drug A) × Sex (Male)")}
 #'     \item{n}{Integer. Sample size used in the model (if \code{show_n = TRUE})}
 #'     \item{Events}{Integer. Number of events (if \code{show_events = TRUE})}
 #'     \item{OR/HR/RR/Coefficient (95\% CI)}{Character. Unadjusted effect 
 #'       estimate with CI (if \code{columns = "unadjusted"} or \code{"both"})}
 #'     \item{aOR/aHR/aRR/Adj. Coefficient (95\% CI)}{Character. Adjusted 
 #'       effect estimate with CI (if \code{columns = "adjusted"} or \code{"both"})}
-#'     \item{Uni p / Multi p / p-value}{Character. Formatted p-value(s). Column 
+#'     \item{Uni \emph{p} / Multi \emph{p} / \emph{p}-value}{Character. Formatted \emph{p}-value(s). Column 
 #'       names depend on \code{columns} setting}
 #'   }
 #'   
@@ -208,20 +237,22 @@
 #'   \describe{
 #'     \item{raw_data}{data.table. Unformatted numeric results with separate 
 #'       columns for effect estimates, standard errors, confidence intervals, 
-#'       and p-values. Suitable for custom analysis or visualization}
+#'       and \emph{p}-values. Suitable for custom analysis or visualization}
 #'     \item{models}{list (if \code{keep_models = TRUE}). Named list of fitted 
 #'       model objects, with outcome names as list names. Each element contains
 #'       \code{$unadjusted} and/or \code{$adjusted} models depending on settings}
 #'     \item{predictor}{Character. The predictor variable name}
 #'     \item{outcomes}{Character vector. The outcome variable names}
-#'     \item{covariates}{Character vector or NULL. The covariate variable names}
-#'     \item{interactions}{Character vector or NULL. The interaction terms}
-#'     \item{random}{Character or NULL. The random effects formula}
-#'     \item{strata}{Character or NULL. The stratification variable}
-#'     \item{cluster}{Character or NULL. The clustering variable}
+#'     \item{covariates}{Character vector or \code{NULL}. The covariate variable names}
+#'     \item{interactions}{Character vector or \code{NULL}. The interaction terms}
+#'     \item{random}{Character or \code{NULL}. The random effects formula}
+#'     \item{strata}{Character or \code{NULL}. The stratification variable}
+#'     \item{cluster}{Character or \code{NULL}. The clustering variable}
 #'     \item{model_type}{Character. The regression model type used}
 #'     \item{columns}{Character. Which columns were displayed}
-#'     \item{analysis_type}{Character. "multi_outcome" to identify analysis type}
+#'     \item{analysis_type}{Character. \code{"multi_outcome"} to identify analysis type}
+#'     \item{significant}{Character vector. Names of outcomes with \emph{p} < 0.05
+#'       for the predictor (uses adjusted \emph{p}-values when available)}
 #'   }
 #'
 #' @details
@@ -237,16 +268,16 @@
 #'   \item Extracts only the predictor effect(s) from each model, ignoring 
 #'     covariate coefficients
 #'   \item Combines results into a single table for comparison across outcomes
-#'   \item Optionally filters by p-value threshold
+#'   \item Optionally filters by \emph{p}-value threshold
 #' }
 #' 
 #' This is conceptually opposite to \code{uniscreen()}, which tests multiple 
-#' predictors against a single outcome. Use \code{multifit} when you have one 
+#' predictors against a single outcome. Use \code{multifit()} when you have one 
 #' exposure of interest and want to screen across multiple endpoints.
 #' 
-#' \strong{When to Use Multivariate Analysis:}
+#' \strong{When to Use Multivariate Regression Analysis:}
 #' \itemize{
-#'   \item \strong{Complication screening}: Test one exposure (e.g., operative time, 
+#'   \item \strong{Complication screening}: Test one exposure (\emph{e.g.,} operative time, 
 #'     BMI, biomarker level) against multiple postoperative complications
 #'   \item \strong{Treatment effects}: Test one treatment against multiple efficacy 
 #'     and safety endpoints simultaneously
@@ -265,10 +296,10 @@
 #'   \item Each non-reference level gets its own row for each outcome
 #'   \item Reference category is determined by factor level ordering
 #'   \item The Predictor column shows "Variable (Level)" format 
-#'     (e.g., "Treatment (Drug A)", "Treatment (Drug B)")
+#'     (\emph{e.g.,} "Treatment (Drug A)", "Treatment (Drug B)")
 #'   \item For binary variables with affirmative non-reference levels 
 #'     (Yes, 1, True, Present, Positive, +), shows just "Variable" 
-#'     (e.g., "Diabetes" instead of "Diabetes (Yes)")
+#'     (\emph{e.g.,} "Diabetes" instead of "Diabetes (Yes)")
 #'   \item Effect estimates compare each level to the reference
 #' }
 #' 
@@ -278,9 +309,9 @@
 #' extracts predictor effects:
 #' \itemize{
 #'   \item \code{columns = "adjusted"}: Reports only covariate-adjusted effects.
-#'     Column labeled "Multivariable aOR/aHR" etc.
+#'     Column labeled "aOR/aHR," \emph{etc.}
 #'   \item \code{columns = "unadjusted"}: Reports only crude effects. Column 
-#'     labeled "Univariable OR/HR" etc.
+#'     labeled "OR/HR," \emph{etc.}
 #'   \item \code{columns = "both"}: Reports both side-by-side. Useful for 
 #'     identifying confounding (large change in effect) or independent effects 
 #'     (similar estimates)
@@ -292,14 +323,14 @@
 #' \itemize{
 #'   \item Main effect of predictor is always reported
 #'   \item Interaction effects are extracted and displayed with formatted names
-#'   \item Format: "Variable (Level) × Variable (Level)" using multiplication sign notation
-#'   \item Useful for testing effect modification (e.g., does treatment effect 
+#'   \item Format: \code{Variable (Level) × Variable (Level)} using multiplication sign notation
+#'   \item Useful for testing effect modification (\emph{e.g.,} does treatment effect 
 #'     differ by sex?)
 #' }
 #' 
-#' \strong{Mixed Effects Models:}
+#' \strong{Mixed-Effects Models:}
 #' 
-#' For clustered or hierarchical data (e.g., patients within hospitals):
+#' For clustered or hierarchical data (\emph{e.g.,} patients within hospitals):
 #' \itemize{
 #'   \item Use \code{model_type = "glmer"} with \code{random = "(1|cluster)"} for 
 #'     random intercept models
@@ -313,18 +344,18 @@
 #' For Cox proportional hazards models:
 #' \itemize{
 #'   \item \code{strata}: Creates separate baseline hazards for each stratum level.
-#'     Use when hazards are non-proportional across strata but you don't want to 
-#'     estimate stratum effects
+#'     Use when hazards are non-proportional across strata but stratum effects do
+#'     not need to be estimated
 #'   \item \code{cluster}: Computes robust (sandwich) standard errors accounting 
 #'     for within-cluster correlation. Alternative to mixed effects when only 
 #'     robust SEs are needed
 #' }
 #' 
-#' \strong{P-value Filtering:}
+#' \strong{Filtering based on \emph{p}-value:}
 #' 
 #' The \code{p_threshold} parameter filters results after fitting all models:
 #' \itemize{
-#'   \item Only outcomes with p <= threshold are retained in output
+#'   \item Only outcomes with \emph{p} less than or equal to the threshold are retained in output
 #'   \item For factor predictors, outcome is kept if any level is significant
 #'   \item Useful for focusing on significant associations in exploratory analyses
 #'   \item Default is 1 (no filtering) - recommended for confirmatory analyses
@@ -334,7 +365,7 @@
 #' 
 #' All outcomes in a single \code{multifit()} call should be of the same type
 #' (all binary, all continuous, or all survival). Mixing outcome types produces
-#' tables with incompatible effect measures (e.g., odds ratios alongside regression
+#' tables with incompatible effect measures (\emph{e.g.,} odds ratios alongside regression
 #' coefficients), which can mislead readers. The function validates outcome
 #' compatibility and issues a warning when mixed types are detected.
 #' 
@@ -359,7 +390,7 @@
 #'   \item \strong{Poisson} (\code{model_type = "glm"}, \code{family = "poisson"}): 
 #'     Rate ratios (RR/aRR)
 #'   \item \strong{Linear} (\code{model_type = "lm"}): Coefficient estimates
-#'   \item \strong{Mixed effects}: Same as fixed effects counterparts
+#'   \item \strong{Mixed effects}: Same as fixed-effects counterparts
 #' }
 #' 
 #' \strong{Memory and Performance:}
@@ -574,7 +605,7 @@
 #' # Get unformatted results for custom analysis
 #' raw_data <- attr(result, "raw_data")
 #' print(raw_data)
-#' # Contains exp_coef, ci_lower, ci_upper, p_value, etc.
+#' # Contains exp_coef, ci_lower, ci_upper, p_value, \emph{etc.}
 #' 
 #' # Example 15: Hide sample size and event columns
 #' result_minimal <- multifit(
@@ -744,6 +775,8 @@ multifit <- function(data,
                      exponentiate = NULL,
                      parallel = TRUE,
                      n_cores = NULL,
+                     number_format = NULL,
+                     verbose = NULL,
                      ...) {
     
     ## Validate inputs
@@ -755,6 +788,9 @@ multifit <- function(data,
     
     ## Validate columns parameter
     columns <- match.arg(columns, c("adjusted", "unadjusted", "both"))
+    
+    ## Resolve verbose setting
+    verbose <- if (is.null(verbose)) getOption("summata.verbose", FALSE) else verbose
     
     ## Validate model_type for mixed effects
     mixed_types <- c("glmer", "lmer", "coxme")
@@ -849,64 +885,66 @@ multifit <- function(data,
         ## Fit unadjusted model if needed
         if (columns %in% c("unadjusted", "both")) {
             unadj_model <- tryCatch({
-                switch(model_type,
-                       "glm" = stats::glm(unadj_formula, data = .data, family = family,
-                                          model = keep_models, x = FALSE, y = TRUE, ...),
-                       "negbin" = {
-                           if (!requireNamespace("MASS", quietly = TRUE))
-                               stop("Package 'MASS' required for negative binomial models")
-                           MASS::glm.nb(unadj_formula, data = .data,
-                                         model = keep_models, x = FALSE, y = TRUE, ...)
-                       },
-                       "lm" = stats::lm(unadj_formula, data = .data,
-                                        model = keep_models, x = FALSE, y = TRUE, ...),
-                       "coxph" = {
-                           if (!requireNamespace("survival", quietly = TRUE)) 
-                               stop("Package 'survival' required for Cox models")
-                           if (!is.null(cluster)) {
-                               survival::coxph(unadj_formula, data = .data, 
-                                               cluster = .data[[cluster]],
-                                               model = keep_models, x = FALSE, y = TRUE, ...)
-                           } else {
-                               survival::coxph(unadj_formula, data = .data,
-                                               model = keep_models, x = FALSE, y = TRUE, ...)
-                           }
-                       },
-                       "clogit" = {
-                           if (!requireNamespace("survival", quietly = TRUE))
-                               stop("Package 'survival' required for conditional logistic regression")
-                           survival::clogit(unadj_formula, data = .data, ...)
-                       },
-                       ## Mixed effects models - univariable still includes random effects
-                       "glmer" = {
-                           if (!requireNamespace("lme4", quietly = TRUE))
-                               stop("Package 'lme4' required for mixed effects models")
-                           if (is.null(random)) stop("'random' is required for glmer models")
-                           unadj_me_formula <- stats::as.formula(
-                                                          paste(outcome, "~", predictor, "+", random)
-                                                      )
-                           lme4::glmer(unadj_me_formula, data = .data, family = family, ...)
-                       },
-                       "lmer" = {
-                           if (!requireNamespace("lme4", quietly = TRUE))
-                               stop("Package 'lme4' required for mixed effects models")
-                           if (is.null(random)) stop("'random' is required for lmer models")
-                           unadj_me_formula <- stats::as.formula(
-                                                          paste(outcome, "~", predictor, "+", random)
-                                                      )
-                           lme4::lmer(unadj_me_formula, data = .data, ...)
-                       },
-                       "coxme" = {
-                           if (!requireNamespace("coxme", quietly = TRUE))
-                               stop("Package 'coxme' required for mixed effects Cox models")
-                           if (is.null(random)) stop("'random' is required for coxme models")
-                           unadj_me_formula <- stats::as.formula(
-                                                          paste(outcome, "~", predictor, "+", random)
-                                                      )
-                           coxme::coxme(unadj_me_formula, data = .data, ...)
-                       },
-                       stop("Unsupported model type: ", model_type)
-                       )
+                quiet_fit(quote(
+                    switch(model_type,
+                           "glm" = stats::glm(unadj_formula, data = .data, family = family,
+                                              model = keep_models, x = FALSE, y = TRUE, ...),
+                           "negbin" = {
+                               if (!requireNamespace("MASS", quietly = TRUE))
+                                   stop("Package 'MASS' required for negative binomial models")
+                               MASS::glm.nb(unadj_formula, data = .data,
+                                             model = keep_models, x = FALSE, y = TRUE, ...)
+                           },
+                           "lm" = stats::lm(unadj_formula, data = .data,
+                                            model = keep_models, x = FALSE, y = TRUE, ...),
+                           "coxph" = {
+                               if (!requireNamespace("survival", quietly = TRUE)) 
+                                   stop("Package 'survival' required for Cox models")
+                               if (!is.null(cluster)) {
+                                   survival::coxph(unadj_formula, data = .data, 
+                                                   cluster = .data[[cluster]],
+                                                   model = keep_models, x = FALSE, y = TRUE, ...)
+                               } else {
+                                   survival::coxph(unadj_formula, data = .data,
+                                                   model = keep_models, x = FALSE, y = TRUE, ...)
+                               }
+                           },
+                           "clogit" = {
+                               if (!requireNamespace("survival", quietly = TRUE))
+                                   stop("Package 'survival' required for conditional logistic regression")
+                               survival::clogit(unadj_formula, data = .data, ...)
+                           },
+                           ## Mixed effects models - univariable still includes random effects
+                           "glmer" = {
+                               if (!requireNamespace("lme4", quietly = TRUE))
+                                   stop("Package 'lme4' required for mixed effects models")
+                               if (is.null(random)) stop("'random' is required for glmer models")
+                               unadj_me_formula <- stats::as.formula(
+                                                              paste(outcome, "~", predictor, "+", random)
+                                                          )
+                               lme4::glmer(unadj_me_formula, data = .data, family = family, ...)
+                           },
+                           "lmer" = {
+                               if (!requireNamespace("lme4", quietly = TRUE))
+                                   stop("Package 'lme4' required for mixed effects models")
+                               if (is.null(random)) stop("'random' is required for lmer models")
+                               unadj_me_formula <- stats::as.formula(
+                                                              paste(outcome, "~", predictor, "+", random)
+                                                          )
+                               lme4::lmer(unadj_me_formula, data = .data, ...)
+                           },
+                           "coxme" = {
+                               if (!requireNamespace("coxme", quietly = TRUE))
+                                   stop("Package 'coxme' required for mixed effects Cox models")
+                               if (is.null(random)) stop("'random' is required for coxme models")
+                               unadj_me_formula <- stats::as.formula(
+                                                              paste(outcome, "~", predictor, "+", random)
+                                                          )
+                               coxme::coxme(unadj_me_formula, data = .data, ...)
+                           },
+                           stop("Unsupported model type: ", model_type)
+                           )
+                ), verbose = verbose)
             }, error = function(e) {
                 warning("Model failed for outcome '", outcome, "': ", e$message)
                 return(NULL)
@@ -956,51 +994,53 @@ multifit <- function(data,
             adj_formula <- stats::as.formula(adj_formula_str)
             
             adj_model <- tryCatch({
-                switch(model_type,
-                       "glm" = stats::glm(adj_formula, data = .data, family = family,
-                                          model = keep_models, x = FALSE, y = TRUE, ...),
-                       "negbin" = {
-                           if (!requireNamespace("MASS", quietly = TRUE))
-                               stop("Package 'MASS' required for negative binomial models")
-                           MASS::glm.nb(adj_formula, data = .data,
-                                         model = keep_models, x = FALSE, y = TRUE, ...)
-                       },
-                       "lm" = stats::lm(adj_formula, data = .data,
-                                        model = keep_models, x = FALSE, y = TRUE, ...),
-                       "coxph" = {
-                           if (!requireNamespace("survival", quietly = TRUE)) 
-                               stop("Package 'survival' required for Cox models")
-                           if (!is.null(cluster)) {
-                               survival::coxph(adj_formula, data = .data, 
-                                               cluster = .data[[cluster]],
-                                               model = keep_models, x = FALSE, y = TRUE, ...)
-                           } else {
-                               survival::coxph(adj_formula, data = .data,
-                                               model = keep_models, x = FALSE, y = TRUE, ...)
-                           }
-                       },
-                       "clogit" = {
-                           if (!requireNamespace("survival", quietly = TRUE))
-                               stop("Package 'survival' required for conditional logistic regression")
-                           survival::clogit(adj_formula, data = .data, ...)
-                       },
-                       "glmer" = {
-                           if (!requireNamespace("lme4", quietly = TRUE))
-                               stop("Package 'lme4' required for mixed effects models")
-                           lme4::glmer(adj_formula, data = .data, family = family, ...)
-                       },
-                       "lmer" = {
-                           if (!requireNamespace("lme4", quietly = TRUE))
-                               stop("Package 'lme4' required for mixed effects models")
-                           lme4::lmer(adj_formula, data = .data, ...)
-                       },
-                       "coxme" = {
-                           if (!requireNamespace("coxme", quietly = TRUE))
-                               stop("Package 'coxme' required for mixed effects Cox models")
-                           coxme::coxme(adj_formula, data = .data, ...)
-                       },
-                       stop("Unsupported model type: ", model_type)
-                       )
+                quiet_fit(quote(
+                    switch(model_type,
+                           "glm" = stats::glm(adj_formula, data = .data, family = family,
+                                              model = keep_models, x = FALSE, y = TRUE, ...),
+                           "negbin" = {
+                               if (!requireNamespace("MASS", quietly = TRUE))
+                                   stop("Package 'MASS' required for negative binomial models")
+                               MASS::glm.nb(adj_formula, data = .data,
+                                             model = keep_models, x = FALSE, y = TRUE, ...)
+                           },
+                           "lm" = stats::lm(adj_formula, data = .data,
+                                            model = keep_models, x = FALSE, y = TRUE, ...),
+                           "coxph" = {
+                               if (!requireNamespace("survival", quietly = TRUE)) 
+                                   stop("Package 'survival' required for Cox models")
+                               if (!is.null(cluster)) {
+                                   survival::coxph(adj_formula, data = .data, 
+                                                   cluster = .data[[cluster]],
+                                                   model = keep_models, x = FALSE, y = TRUE, ...)
+                               } else {
+                                   survival::coxph(adj_formula, data = .data,
+                                                   model = keep_models, x = FALSE, y = TRUE, ...)
+                               }
+                           },
+                           "clogit" = {
+                               if (!requireNamespace("survival", quietly = TRUE))
+                                   stop("Package 'survival' required for conditional logistic regression")
+                               survival::clogit(adj_formula, data = .data, ...)
+                           },
+                           "glmer" = {
+                               if (!requireNamespace("lme4", quietly = TRUE))
+                                   stop("Package 'lme4' required for mixed effects models")
+                               lme4::glmer(adj_formula, data = .data, family = family, ...)
+                           },
+                           "lmer" = {
+                               if (!requireNamespace("lme4", quietly = TRUE))
+                                   stop("Package 'lme4' required for mixed effects models")
+                               lme4::lmer(adj_formula, data = .data, ...)
+                           },
+                           "coxme" = {
+                               if (!requireNamespace("coxme", quietly = TRUE))
+                                   stop("Package 'coxme' required for mixed effects Cox models")
+                               coxme::coxme(adj_formula, data = .data, ...)
+                           },
+                           stop("Unsupported model type: ", model_type)
+                           )
+                ), verbose = verbose)
             }, error = function(e) {
                 warning("Adjusted model failed for outcome '", outcome, "': ", e$message)
                 return(NULL)
@@ -1117,6 +1157,9 @@ multifit <- function(data,
     }
     
     ## Format results for publication
+    validate_number_format(number_format)
+    marks <- resolve_number_marks(number_format)
+    
     formatted <- format_multifit_table(
         combined_raw,
         columns = columns,
@@ -1128,7 +1171,8 @@ multifit <- function(data,
         predictor_label = predictor_label,
         include_predictor = include_predictor,
         exponentiate = exponentiate,
-        conf_level = conf_level
+        conf_level = conf_level,
+        marks = marks
     )
     
     ## Attach attributes
@@ -1150,6 +1194,17 @@ multifit <- function(data,
     data.table::setattr(formatted, "include_predictor", include_predictor)
     data.table::setattr(formatted, "analysis_type", "multi_outcome")
     
+    ## Extract significant outcome names (p < 0.05)
+    if (nrow(combined_raw) > 0 && "outcome" %in% names(combined_raw)) {
+        p_col <- if ("p_adj" %in% names(combined_raw)) "p_adj" else "p_value"
+        if (p_col %in% names(combined_raw)) {
+            sig_outcomes <- unique(
+                combined_raw[!is.na(get(p_col)) & get(p_col) < 0.05]$outcome
+            )
+            data.table::setattr(formatted, "significant", sig_outcomes)
+        }
+    }
+    
     class(formatted) <- c("multifit_result", class(formatted))
     
     return(formatted)
@@ -1158,8 +1213,8 @@ multifit <- function(data,
 
 #' Format interaction term for display
 #' 
-#' Converts R's internal interaction term format (e.g., "treatmentDrug A:stageII")
-#' to a more readable format (e.g., "Treatment (Drug A) × Stage (II)").
+#' Converts R's internal interaction term format (\emph{e.g.,} "treatmentDrug A:stageII")
+#' to a more readable format (\emph{e.g.,} "Treatment (Drug A) × Stage (II)").
 #' 
 #' @param term Character string of the interaction term from model coefficients.
 #' @param labels Optional named vector of labels for variable names.
@@ -1662,7 +1717,7 @@ combine_multifit_results <- function(all_results, columns) {
 #' @param labels Named vector of labels for outcomes and predictors.
 #' @param predictor_label Label for predictor variable.
 #' @param include_predictor Logical for including predictor column.
-#' @param exponentiate Logical or NULL for coefficient handling.
+#' @param exponentiate Logical or \code{NULL} for coefficient handling.
 #' @return Formatted data.table.
 #' @keywords internal
 format_multifit_table <- function(data, 
@@ -1675,7 +1730,8 @@ format_multifit_table <- function(data,
                                   predictor_label = NULL,
                                   include_predictor = TRUE,
                                   exponentiate = NULL,
-                                  conf_level = 0.95) {
+                                  conf_level = 0.95,
+                                  marks = NULL) {
     
     if (nrow(data) == 0) {
         return(data.table::data.table())
@@ -1754,6 +1810,34 @@ format_multifit_table <- function(data,
     ci_pct <- round(conf_level * 100)
     ci_label <- paste0(ci_pct, "% CI")
     
+    ## Helper: format effect + CI columns using locale-aware marks
+    format_effect_ci <- function(eff_vals, low_vals, hi_vals, digs, etype, mks) {
+        fmt_s <- paste0("%.", digs, "f")
+        e_fmt <- sprintf(fmt_s, eff_vals)
+        l_fmt <- sprintf(fmt_s, low_vals)
+        h_fmt <- sprintf(fmt_s, hi_vals)
+        
+        if (!is.null(mks)) {
+            e_fmt <- apply_decimal_mark(e_fmt, mks)
+            l_fmt <- apply_decimal_mark(l_fmt, mks)
+            h_fmt <- apply_decimal_mark(h_fmt, mks)
+            any_neg <- any(low_vals < 0 | hi_vals < 0, na.rm = TRUE)
+            ci_sep <- if (any_neg) " to " else if (mks$decimal.mark == ",") "\u2013" else "-"
+        } else {
+            e_fmt <- fix_negative_zero(e_fmt)
+            l_fmt <- fix_negative_zero(l_fmt)
+            h_fmt <- fix_negative_zero(h_fmt)
+            ci_sep <- if (etype %in% c("OR", "HR", "RR")) "-" else ", "
+        }
+        
+        ## For non-exponentiated models without marks, use comma+space
+        if (is.null(mks) && !etype %in% c("OR", "HR", "RR")) {
+            paste0(e_fmt, " (", l_fmt, ", ", h_fmt, ")")
+        } else {
+            paste0(e_fmt, " (", l_fmt, ci_sep, h_fmt, ")")
+        }
+    }
+    
     ## Format effect columns based on columns parameter
     if (columns == "both") {
         ## Effect type label is already correct (Coefficient for linear models)
@@ -1763,19 +1847,15 @@ format_multifit_table <- function(data,
         if ("exp_coef_unadj" %in% names(result)) {
             unadj_label <- paste0(effect_display, " (", ci_label, ")")
             
-            if (effect_type %in% c("OR", "HR", "RR")) {
-                result[, (unadj_label) := fix_negative_zero_multifit(sprintf("%.*f (%.*f-%.*f)", 
-                                                  digits, exp_coef_unadj, digits, ci_lower_unadj, digits, ci_upper_unadj))]
-            } else {
-                result[, (unadj_label) := fix_negative_zero_multifit(sprintf("%.*f (%.*f, %.*f)", 
-                                                  digits, exp_coef_unadj, digits, ci_lower_unadj, digits, ci_upper_unadj))]
-            }
+            result[, (unadj_label) := format_effect_ci(
+                exp_coef_unadj, ci_lower_unadj, ci_upper_unadj,
+                digits, effect_type, marks)]
             result[is.na(exp_coef_unadj), (unadj_label) := "-"]
         }
         
         ## Format unadjusted p-values
         if ("p_unadj" %in% names(result)) {
-            result[, `Uni p` := format_pvalues_multifit(p_unadj, p_digits)]
+            result[, `Uni p` := format_pvalues_multifit(p_unadj, p_digits, marks)]
         }
         
         ## Format adjusted effects - use aOR/aHR/aRR/Adj. Coefficient without "Multivariable" prefix
@@ -1788,19 +1868,15 @@ format_multifit_table <- function(data,
                                  )
             adj_label <- paste0(adj_effect, " (", ci_label, ")")
             
-            if (effect_type %in% c("OR", "HR", "RR")) {
-                result[, (adj_label) := fix_negative_zero_multifit(sprintf("%.*f (%.*f-%.*f)", 
-                                                digits, exp_coef_adj, digits, ci_lower_adj, digits, ci_upper_adj))]
-            } else {
-                result[, (adj_label) := fix_negative_zero_multifit(sprintf("%.*f (%.*f, %.*f)", 
-                                                digits, exp_coef_adj, digits, ci_lower_adj, digits, ci_upper_adj))]
-            }
+            result[, (adj_label) := format_effect_ci(
+                exp_coef_adj, ci_lower_adj, ci_upper_adj,
+                digits, effect_type, marks)]
             result[is.na(exp_coef_adj), (adj_label) := "-"]
         }
         
         ## Format adjusted p-values
         if ("p_adj" %in% names(result)) {
-            result[, `Multi p` := format_pvalues_multifit(p_adj, p_digits)]
+            result[, `Multi p` := format_pvalues_multifit(p_adj, p_digits, marks)]
         }
         
     } else {
@@ -1830,37 +1906,45 @@ format_multifit_table <- function(data,
         
         ## Format effect with CI
         if (effect_col %in% names(result)) {
-            if (effect_type %in% c("OR", "HR", "RR")) {
-                result[, (effect_label) := fix_negative_zero_multifit(sprintf("%.*f (%.*f-%.*f)", 
-                                                   digits, get(effect_col), digits, get(ci_lower_col), digits, get(ci_upper_col)))]
-            } else {
-                result[, (effect_label) := fix_negative_zero_multifit(sprintf("%.*f (%.*f, %.*f)", 
-                                                   digits, get(effect_col), digits, get(ci_lower_col), digits, get(ci_upper_col)))]
-            }
+            result[, (effect_label) := format_effect_ci(
+                get(effect_col), get(ci_lower_col), get(ci_upper_col),
+                digits, effect_type, marks)]
             result[is.na(get(effect_col)), (effect_label) := "-"]
         }
         
         ## Format p-value
         if (p_col %in% names(result)) {
-            result[, `p-value` := format_pvalues_multifit(get(p_col), p_digits)]
+            result[, `p-value` := format_pvalues_multifit(get(p_col), p_digits, marks)]
         }
     }
     
     ## Format n and events
     if ("n" %in% names(result)) {
-        result[, n := data.table::fcase(
-                                      is.na(n), "-",
-                                      n >= 1000, format(n, big.mark = ","),
-                                      default = as.character(n)
-                                  )]
+        n_str <- as.character(result$n)
+        big_n <- which(!is.na(result$n) & result$n >= 1000)
+        if (length(big_n) > 0) {
+            if (!is.null(marks)) {
+                n_str[big_n] <- vapply(result$n[big_n], format_count, character(1), marks = marks)
+            } else {
+                n_str[big_n] <- format(result$n[big_n], big.mark = ",")
+            }
+        }
+        n_str[is.na(result$n)] <- "-"
+        result[, n := n_str]
     }
     
     if ("events" %in% names(result)) {
-        result[, events := data.table::fcase(
-                                           is.na(events), "-",
-                                           events >= 1000, format(events, big.mark = ","),
-                                           default = as.character(events)
-                                       )]
+        evt_str <- as.character(result$events)
+        big_e <- which(!is.na(result$events) & result$events >= 1000)
+        if (length(big_e) > 0) {
+            if (!is.null(marks)) {
+                evt_str[big_e] <- vapply(result$events[big_e], format_count, character(1), marks = marks)
+            } else {
+                evt_str[big_e] <- format(result$events[big_e], big.mark = ",")
+            }
+        }
+        evt_str[is.na(result$events)] <- "-"
+        result[, events := evt_str]
         data.table::setnames(result, "events", "Events")
     }
     
@@ -1905,40 +1989,18 @@ format_multifit_table <- function(data,
 #' 
 #' Converts numeric p-values to formatted character strings. Values below the 
 #' threshold (determined by digits parameter) display as "< 0.001" (for digits=3),
-#' "< 0.0001" (for digits=4), etc. NA values display as "-".
+#' "< 0.0001" (for digits=4), \emph{etc.} NA values display as "-".
 #' 
 #' @param p Numeric vector of p-values.
 #' @param digits Integer number of decimal places. Also determines the threshold
 #'   for "less than" display: threshold = 10^(-digits). Default is 3.
+#' @param marks Optional list with \code{big.mark} and \code{decimal.mark} as
+#'   returned by \code{\link{resolve_number_marks}}.
 #' @return Character vector of formatted p-values.
 #' @keywords internal
-format_pvalues_multifit <- function(p, digits = 3) {
-    ## Calculate threshold based on digits
-    threshold <- 10^(-digits)
-    less_than_string <- paste0("< ", format(threshold, scientific = FALSE))
-    
-    ## Pre-compute format string
-    fmt_str <- paste0("%.", digits, "f")
-    
-    ## Vectorized formatting (faster than fcase for simple conditions)
-    result <- sprintf(fmt_str, p)
-    result <- fix_negative_zero_multifit(result)
-    result[is.na(p)] <- "-"
-    result[!is.na(p) & p < threshold] <- less_than_string
-    
-    result
-}
-
-#' Fix negative zero in formatted strings
-#' 
-#' Corrects floating-point rounding artifacts that produce "-0.00" or similar
-#' negative zero strings, even when embedded within larger strings.
-#' 
-#' @param x Character vector of formatted numbers.
-#' @return Character vector with negative zeros corrected.
-#' @keywords internal
-fix_negative_zero_multifit <- function(x) {
-    gsub("(?<![0-9])-0(\\.0+)(?![0-9])", "0\\1", x, perl = TRUE)
+format_pvalues_multifit <- function(p, digits = 3, marks = NULL) {
+    ## Delegate to the shared p-value formatter in fit_utils
+    format_pvalues_fit(p, digits, marks)
 }
 
 
@@ -1993,14 +2055,14 @@ print.multifit_result <- function(x, ...) {
 #' 
 #' Checks whether all outcomes in a multifit analysis are compatible with the
 #' specified model type. Issues a warning when outcomes appear to be of mixed
-#' types (e.g., binary and continuous outcomes in the same analysis), which
+#' types (\emph{e.g.,} binary and continuous outcomes in the same analysis), which
 #' would produce tables with incompatible effect measures.
 #' 
 #' @param data Data.table containing the analysis data.
 #' @param outcomes Character vector of outcome variable names.
 #' @param model_type Character string specifying the model type.
 #' @param family Character string specifying the GLM family (for glm/glmer).
-#' @return Invisible NULL. Issues warnings if problems are detected.
+#' @return Invisible \code{NULL}. Issues warnings if problems are detected.
 #' @keywords internal
 validate_outcome_homogeneity <- function(data, outcomes, model_type, family = "binomial") {
     

@@ -29,8 +29,8 @@ table2rtf(
 }
 \arguments{
 \item{table}{Data frame, data.table, or matrix to export. Can be output from 
-\code{desctable()}, \code{fit()}, \code{uniscreen()}, 
-\code{fullfit()}, \code{compfit()}, or any tabular data.}
+\code{desctable()}, \code{survtable()}, \code{fit()}, \code{uniscreen()},
+\code{fullfit()}, \code{compfit()}, \code{multifit()}, or any tabular data.}
 
 \item{file}{Character string specifying the output RTF filename. Must have 
 \code{.rtf} extension. Example: \code{"results.rtf"}, \code{"Table1.rtf"}.}
@@ -46,17 +46,17 @@ a font installed on the system. Default is \code{"Arial"}. Common options:
 \code{"Times New Roman"}, \code{"Calibri"}, \code{"Courier New"}.}
 
 \item{format_headers}{Logical. If \code{TRUE}, formats column headers by 
-italicizing statistical notation (\emph{n}, \emph{p}), converting underscores 
+italicizing statistical notation ("\emph{n}", "\emph{p}"), converting underscores 
 to spaces, and improving readability. Default is \code{TRUE}.}
 
 \item{bold_significant}{Logical. If \code{TRUE}, applies bold formatting to 
-p-values below the significance threshold. Makes significant results stand 
+\emph{p}-values below the significance threshold. Makes significant results stand 
 out. Default is \code{TRUE}.}
 
 \item{bold_variables}{Logical. If \code{TRUE}, variable names are displayed
 in bold. Default is \code{FALSE}.}
 
-\item{p_threshold}{Numeric. P-value threshold for bold formatting. Only 
+\item{p_threshold}{Numeric. Threshold for bold \emph{p}-value formatting. Only 
 used when \code{bold_significant = TRUE}. Default is 0.05.}
 
 \item{indent_groups}{Logical. If \code{TRUE}, indents factor levels under 
@@ -128,9 +128,9 @@ Behavior depends on \code{return_ft}:
   In both cases, creates a .rtf file at the specified location.
 }
 \description{
-Converts a data frame, data.table, or matrix to a Rich Text Format (.rtf) 
+Converts a data frame, data.table, or matrix to a Rich Text Format (\code{.rtf}) 
 document using the \pkg{flextable} and \pkg{officer} packages. Creates 
-widely-compatible tables with extensive formatting options. RTF files can be 
+widely compatible tables with extensive formatting options. RTF files can be 
 opened and edited in Microsoft Word, LibreOffice, WordPad, and many other word 
 processors. Particularly useful for regulatory submissions, cross-platform 
 compatibility, and when maximum editability is required.
@@ -145,9 +145,9 @@ This function requires:
 }
 
 Install if needed:
-```r
+\preformatted{
 install.packages(c("flextable", "officer"))
-```
+}
 
 \strong{RTF Format Advantages:}
 
@@ -174,21 +174,6 @@ Applications that can open RTF files:
   \item Many other word processors
 }
 
-\strong{Regulatory Submissions:}
-
-RTF is commonly used for regulatory submissions because:
-\itemize{
-  \item Accepted by FDA, EMA, PMDA, and other agencies
-  \item Format specification is open and stable
-  \item No proprietary dependencies
-  \item Tables remain editable for reviewers
-  \item Consistent rendering across platforms
-  \item Can be validated programmatically
-}
-
-For clinical trial reporting (ICH E3 guidelines), RTF tables are often preferred 
-over PDF because reviewers can extract data, add comments, and compare versions.
-
 \strong{Output Features:}
 
 The generated RTF document contains:
@@ -201,29 +186,13 @@ The generated RTF document contains:
   \item Compatible with RTF 1.5 specification
 }
 
-\strong{Editability:}
-
-Once created, you can edit the RTF table in any word processor:
-\itemize{
-  \item Modify cell contents
-  \item Adjust column widths
-  \item Change fonts and colors
-  \item Add/remove rows or columns
-  \item Apply different table styles
-  \item Copy/paste into other documents
-  \item Convert to other formats (DOCX, PDF, HTML)
-}
-
-This makes RTF ideal for creating tables that require review, approval, or 
-modification by multiple stakeholders across different platforms.
-
-\strong{Further Customization with Flextable:}
+\strong{Further Customization:}
 
 For programmatic customization beyond the built-in options, access the 
-\pkg{flextable} object:
+\code{flextable} object:
 
 \emph{Method 1: Via attribute (default)}
-```r
+\preformatted{
 result <- table2rtf(table, "output.rtf")
 ft <- attr(result, "flextable")
 
@@ -233,10 +202,10 @@ ft <- flextable::color(ft, i = 2, j = 3, color = "red")
 
 # Re-save if needed
 flextable::save_as_rtf(ft, path = "customized.rtf")
-```
+}
 
 \emph{Method 2: Direct return}
-```r
+\preformatted{
 ft <- table2rtf(table, "output.rtf", return_ft = TRUE)
 
 # Customize immediately
@@ -245,7 +214,7 @@ ft <- flextable::autofit(ft)
 
 # Save to new file
 flextable::save_as_rtf(ft, path = "custom.rtf")
-```
+}
 
 \strong{Page Layout:}
 
@@ -294,52 +263,20 @@ The function applies professional typography:
   \item Consistent spacing: Adequate padding in cells
   \item Statistical notation: Italicized appropriately
 }
-
-\strong{Format Comparison:}
-
-Choose the right export format for your needs:
-
-\strong{RTF (\code{table2rtf}):}
-\itemize{
-  \item \strong{Best for:} Regulatory submissions, cross-platform compatibility
-  \item \strong{Pros:} Universal compatibility, fully editable, lightweight
-  \item \strong{Cons:} Limited advanced formatting compared to DOCX
-}
-
-\strong{DOCX (\code{table2docx}):}
-\itemize{
-  \item \strong{Best for:} Modern Word workflows, internal documents
-  \item \strong{Pros:} Rich formatting, native Word format
-  \item \strong{Cons:} Requires Office/compatible software
-}
-
-\strong{PDF (\code{table2pdf}):}
-\itemize{
-  \item \strong{Best for:} Final publications, fixed layout
-  \item \strong{Pros:} Professional appearance, consistent rendering
-  \item \strong{Cons:} Not editable without special tools
-}
-
-\strong{PPTX (\code{table2pptx}):}
-\itemize{
-  \item \strong{Best for:} Presentations, talks, meetings
-  \item \strong{Pros:} Designed for projection, large fonts
-  \item \strong{Cons:} Limited page layout options
-}
 }
 \examples{
-\dontrun{
-  options(width = 180)
+\dontshow{if (FALSE) withAutoprint(\{ # examplesIf}
+options(width = 180)
 # Load data
 data(clintrial)
 data(clintrial_labels)
 
 # Create regression table
 results <- fit(
-    data = clintrial,
-    outcome = "os_status",
-    predictors = c("age", "sex", "treatment", "stage"),
-    labels = clintrial_labels
+   data = clintrial,
+   outcome = "os_status",
+   predictors = c("age", "sex", "treatment", "stage"),
+   labels = clintrial_labels
 )
 
 # Example 1: Basic RTF export
@@ -347,36 +284,36 @@ table2rtf(results, "results.rtf")
 
 # Example 2: With caption
 table2rtf(results, "captioned.rtf",
-        caption = "Table 1: Multivariable Logistic Regression Results")
+       caption = "Table 1: Multivariable Logistic Regression Results")
 
 # Example 3: Landscape orientation for wide tables
 table2rtf(results, "wide.rtf",
-        orientation = "landscape")
+       orientation = "landscape")
 
 # Example 4: Custom font and size
 table2rtf(results, "custom_font.rtf",
-        font_family = "Times New Roman",
-        font_size = 11)
+       font_family = "Times New Roman",
+       font_size = 11)
 
 # Example 5: Hierarchical display
 table2rtf(results, "indented.rtf",
-        indent_groups = TRUE)
+       indent_groups = TRUE)
 
 # Example 6: Condensed table
 table2rtf(results, "condensed.rtf",
-        condense_table = TRUE)
+       condense_table = TRUE)
 
 # Example 7: With zebra stripes
 table2rtf(results, "striped.rtf",
-        zebra_stripes = TRUE)
+       zebra_stripes = TRUE)
 
 # Example 8: Dark header style
 table2rtf(results, "dark.rtf",
-        dark_header = TRUE)
+       dark_header = TRUE)
 
 # Example 9: A4 paper for international submissions
 table2rtf(results, "a4.rtf",
-        paper = "a4")
+       paper = "a4")
 
 # Example 10: Get flextable for customization
 result <- table2rtf(results, "base.rtf")
@@ -395,49 +332,49 @@ ft <- flextable::bg(ft, bg = "yellow", part = "header")
 
 # Example 12: Regulatory submission table
 table2rtf(results, "submission.rtf",
-        caption = "Table 2: Adjusted Odds Ratios for Mortality",
-        font_family = "Times New Roman",
-        font_size = 10,
-        indent_groups = TRUE,
-        zebra_stripes = FALSE,
-        bold_significant = TRUE)
+       caption = "Table 2: Adjusted Odds Ratios for Mortality",
+       font_family = "Times New Roman",
+       font_size = 10,
+       indent_groups = TRUE,
+       zebra_stripes = FALSE,
+       bold_significant = TRUE)
 
 # Example 13: Custom column alignment
 table2rtf(results, "aligned.rtf",
-        align = c("left", "left", "center", "right", "right"))
+       align = c("left", "left", "center", "right", "right"))
 
 # Example 14: Disable significance bolding
 table2rtf(results, "no_bold.rtf",
-        bold_significant = FALSE)
+       bold_significant = FALSE)
 
 # Example 15: Stricter significance threshold
 table2rtf(results, "strict.rtf",
-        bold_significant = TRUE,
-        p_threshold = 0.01)
+       bold_significant = TRUE,
+       p_threshold = 0.01)
 
 # Example 16: Descriptive statistics for baseline characteristics
 desc <- desctable(
-    data = clintrial,
-    by = "treatment",
-    variables = c("age", "sex", "bmi", "stage"),
-    labels = clintrial_labels
+   data = clintrial,
+   by = "treatment",
+   variables = c("age", "sex", "bmi", "stage"),
+   labels = clintrial_labels
 )
 
 table2rtf(desc, "baseline.rtf",
-        caption = "Table 1: Baseline Patient Characteristics",
-        zebra_stripes = TRUE)
+       caption = "Table 1: Baseline Patient Characteristics",
+       zebra_stripes = TRUE)
 
 # Example 17: Clinical trial efficacy table
 table2rtf(results, "efficacy.rtf",
-        caption = "Table 3: Primary Efficacy Analysis - Intent to Treat Population",
-        font_family = "Courier New",  # Monospace for alignment
-        paper = "letter",
-        orientation = "landscape",
-        condense_table = TRUE)
-}
-
+       caption = "Table 3: Primary Efficacy Analysis - Intent to Treat Population",
+       font_family = "Courier New",  # Monospace for alignment
+       paper = "letter",
+       orientation = "landscape",
+       condense_table = TRUE)
+\dontshow{\}) # examplesIf}
 }
 \seealso{
+\code{\link{autotable}} for automatic format detection,
 \code{\link{table2docx}} for Word documents,
 \code{\link{table2pptx}} for PowerPoint slides,
 \code{\link{table2pdf}} for PDF output,
@@ -447,10 +384,7 @@ table2rtf(results, "efficacy.rtf",
 \code{\link[flextable]{save_as_rtf}} for direct RTF export
 
 Other export functions: 
-\code{\link{autoexport}()},
-\code{\link{print.table2docx_result}()},
-\code{\link{print.table2pptx_result}()},
-\code{\link{print.table2rtf_result}()},
+\code{\link{autotable}()},
 \code{\link{table2docx}()},
 \code{\link{table2html}()},
 \code{\link{table2pdf}()},

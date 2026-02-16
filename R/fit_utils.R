@@ -2,15 +2,23 @@
 #' 
 #' Corrects floating-point rounding artifacts that produce "-0.00" or similar
 #' negative zero strings. Works on character vectors, replacing patterns like
-#' "-0.00", "-0.000", etc. with their positive equivalents, even when embedded
-#' within larger strings (e.g., "(-0.00, 1.23)" becomes "(0.00, 1.23)").
+#' "-0.00", "-0.000", \emph{etc.} with their positive equivalents, even when embedded
+#' within larger strings (\emph{e.g.,} "(-0.00, 1.23)" becomes "(0.00, 1.23)").
+#' 
+#' When \code{marks} is supplied, also replaces the period decimal mark with
+#' the locale-appropriate decimal mark.
 #' 
 #' @param x Character vector of formatted numbers.
+#' @param marks Optional list with \code{big.mark} and \code{decimal.mark} as
+#'   returned by \code{\link{resolve_number_marks}}. When \code{NULL}, uses
+#'   the default US period decimal.
 #' @return Character vector with negative zeros corrected.
 #' @keywords internal
-fix_negative_zero <- function(x) {
-    ## Match -0 followed by decimal point and zeros, with word boundaries
-    ## Handles: "-0.0", "-0.00", "-0.000", etc. anywhere in string
+fix_negative_zero <- function(x, marks = NULL) {
+    if (!is.null(marks)) {
+        return(apply_decimal_mark(x, marks))
+    }
+    ## Fallback: US locale (period decimal)
     gsub("(?<![0-9])-0(\\.0+)(?![0-9])", "0\\1", x, perl = TRUE)
 }
 
@@ -18,21 +26,21 @@ fix_negative_zero <- function(x) {
 #' 
 #' Transforms raw model coefficient data into a formatted table suitable for
 #' publication. Handles effect measure formatting (OR, HR, RR, Estimate),
-#' confidence intervals, p-values, sample sizes, and variable labels.
+#' confidence intervals, \emph{p}-values, sample sizes, and variable labels.
 #' Supports interaction terms and mixed-effects models.
 #' 
 #' @param data Data.table containing raw model results with coefficient columns.
 #' @param effect_col Optional character string specifying the effect column name.
-#'   If NULL, auto-detects from OR, HR, RR, or Estimate columns.
+#'   If \code{NULL}, auto-detects from OR, HR, RR, or Estimate columns.
 #' @param digits Integer number of decimal places for effect estimates.
-#' @param p_digits Integer number of decimal places for p-values.
+#' @param p_digits Integer number of decimal places for \emph{p}-values.
 #' @param labels Optional named character vector mapping variable names to display labels.
 #'   Supports automatic labeling of interaction terms.
 #' @param show_n Logical whether to include sample size column.
 #' @param show_events Logical whether to include events column (ignored for linear models).
 #' @param reference_label Character string to display for reference categories.
 #' @param exponentiate Optional logical to force exponentiated (TRUE) or raw (FALSE)
-#'   coefficient display. If NULL, uses existing columns.
+#'   coefficient display. If \code{NULL}, uses existing columns.
 #' @return Formatted data.table with publication-ready columns.
 #' @keywords internal
 format_model_table <- function(data, 
@@ -44,7 +52,8 @@ format_model_table <- function(data,
                                show_events = TRUE,
                                reference_label = "reference",
                                exponentiate = NULL,
-                               conf_level = 0.95) {
+                               conf_level = 0.95,
+                               marks = NULL) {
     
     ## Determine which columns we actually need to avoid copying everything
     ## Start with columns that will be in output
@@ -212,7 +221,11 @@ format_model_table <- function(data,
         
         ## Vectorized formatting
         result[, n := as.character(n_vals)]
-        result[n_vals >= 1000, n := format(n_vals[n_vals >= 1000], big.mark = ",")]
+        if (!is.null(marks)) {
+            result[n_vals >= 1000, n := vapply(n_vals[n_vals >= 1000], format_count, character(1), marks = marks)]
+        } else {
+            result[n_vals >= 1000, n := format(n_vals[n_vals >= 1000], big.mark = ",")]
+        }
         result[is.na(n_vals), n := NA_character_]
     }
 
@@ -230,12 +243,18 @@ format_model_table <- function(data,
             event_vals <- as.numeric(result$events)
         }
         
-        ## Vectorized formatting using fifelse to avoid subsetting issues
-        result[, events := data.table::fcase(
-                                           is.na(event_vals), NA_character_,
-                                           event_vals >= 1000, format(round(event_vals), big.mark = ",", scientific = FALSE),
-                                           default = as.character(round(event_vals))
-                                       )]
+        ## Vectorized formatting
+        evt_str <- as.character(round(event_vals))
+        big_idx <- which(!is.na(event_vals) & event_vals >= 1000)
+        if (length(big_idx) > 0) {
+            if (!is.null(marks)) {
+                evt_str[big_idx] <- vapply(round(event_vals[big_idx]), format_count, character(1), marks = marks)
+            } else {
+                evt_str[big_idx] <- format(round(event_vals[big_idx]), big.mark = ",", scientific = FALSE)
+            }
+        }
+        evt_str[is.na(event_vals)] <- NA_character_
+        result[, events := evt_str]
     }
     
     ## Eliminate repeated variable names
@@ -285,16 +304,40 @@ format_model_table <- function(data,
         ci_lower_vals <- result$ci_lower
         ci_upper_vals <- result$ci_upper
         
-        ## Pre-compute format string once
-        if (effect_col %in% c("OR", "HR", "RR")) {
-            fmt_str <- paste0("%.", digits, "f (%.", digits, "f-%.", digits, "f)")
+        ## Determine CI separator based on locale and values
+        if (!is.null(marks)) {
+            any_negative <- any(ci_lower_vals < 0 | ci_upper_vals < 0, na.rm = TRUE)
+            ci_sep <- if (any_negative) " to " else if (marks$decimal.mark == ",") "\u2013" else "-"
         } else {
-            fmt_str <- paste0("%.", digits, "f (%.", digits, "f, %.", digits, "f)")
+            ci_sep <- if (effect_col %in% c("OR", "HR", "RR")) "-" else ", "
         }
         
-        ## Vectorized sprintf is faster than per-row fcase with sprintf
-        formatted_effects <- sprintf(fmt_str, effect_vals, ci_lower_vals, ci_upper_vals)
-        formatted_effects <- fix_negative_zero(formatted_effects)
+        ## Pre-compute format strings for individual components
+        fmt_single <- paste0("%.", digits, "f")
+        
+        ## Vectorized sprintf for components
+        eff_fmt <- sprintf(fmt_single, effect_vals)
+        low_fmt <- sprintf(fmt_single, ci_lower_vals)
+        hi_fmt  <- sprintf(fmt_single, ci_upper_vals)
+        
+        ## Apply locale decimal mark and fix negative zeros
+        if (!is.null(marks)) {
+            eff_fmt <- apply_decimal_mark(eff_fmt, marks)
+            low_fmt <- apply_decimal_mark(low_fmt, marks)
+            hi_fmt  <- apply_decimal_mark(hi_fmt, marks)
+        } else {
+            eff_fmt <- fix_negative_zero(eff_fmt)
+            low_fmt <- fix_negative_zero(low_fmt)
+            hi_fmt  <- fix_negative_zero(hi_fmt)
+        }
+        
+        ## Assemble: "effect (lower-upper)" or "effect (lower, upper)"
+        ## For non-exponentiated models without marks, use comma+space as separator
+        if (is.null(marks) && !effect_col %in% c("OR", "HR", "RR")) {
+            formatted_effects <- paste0(eff_fmt, " (", low_fmt, ", ", hi_fmt, ")")
+        } else {
+            formatted_effects <- paste0(eff_fmt, " (", low_fmt, ci_sep, hi_fmt, ")")
+        }
         formatted_effects[is.na(effect_vals)] <- ""
         formatted_effects[is_reference] <- reference_label
         
@@ -303,7 +346,7 @@ format_model_table <- function(data,
     
     ## Format p-values
     if ("p_value" %in% names(result)) {
-        result[, `p-value` := format_pvalues_fit(p_value, p_digits)]
+        result[, `p-value` := format_pvalues_fit(p_value, p_digits, marks)]
         
         if ("reference" %in% names(result)) {
             result[!is.na(reference) & reference == reference_label, `p-value` := "-"]
@@ -329,29 +372,37 @@ format_model_table <- function(data,
     return(formatted)
 }
 
-#' Format p-values for display
+#' Format \emph{p}-values for display
 #' 
-#' Converts numeric p-values to formatted character strings using vectorized
+#' Converts numeric \emph{p}-values to formatted character strings using vectorized
 #' operations. Values below the threshold (determined by digits parameter) 
-#' display as "< 0.001" (for digits=3), "< 0.0001" (for digits=4), etc.
+#' display as "< 0.001" (for digits=3), "< 0.0001" (for digits=4), \emph{etc.}
 #' NA values display as "-".
 #' 
-#' @param p Numeric vector of p-values.
+#' @param p Numeric vector of \emph{p}-values.
 #' @param digits Integer number of decimal places. Also determines the threshold
 #'   for "less than" display: threshold = 10^(-digits). Default is 3.
-#' @return Character vector of formatted p-values.
+#' @param marks Optional list with \code{big.mark} and \code{decimal.mark} as
+#'   returned by \code{\link{resolve_number_marks}}.
+#' @return Character vector of formatted \emph{p}-values.
 #' @keywords internal
-format_pvalues_fit <- function(p, digits = 3) {
+format_pvalues_fit <- function(p, digits = 3, marks = NULL) {
     ## Calculate threshold based on digits
     threshold <- 10^(-digits)
-    less_than_string <- paste0("< ", format(threshold, scientific = FALSE))
+    
+    if (!is.null(marks)) {
+        less_than_string <- paste0("< 0", marks$decimal.mark,
+                                   strrep("0", digits - 1), "1")
+    } else {
+        less_than_string <- paste0("< ", format(threshold, scientific = FALSE))
+    }
     
     ## Pre-compute format string
     fmt_str <- paste0("%.", digits, "f")
     
-    ## Vectorized formatting (faster than fcase for simple conditions)
+    ## Vectorized formatting
     result <- sprintf(fmt_str, p)
-    result <- fix_negative_zero(result)
+    result <- fix_negative_zero(result, marks)
     result[is.na(p)] <- "-"
     result[!is.na(p) & p < threshold] <- less_than_string
     
@@ -365,7 +416,7 @@ format_pvalues_fit <- function(p, digits = 3) {
 #' to Cox proportional hazards methods.
 #' 
 #' @param outcome Character string of the outcome specification.
-#' @return Logical TRUE if outcome starts with "Surv(", FALSE otherwise.
+#' @return Logical \code{TRUE} if outcome starts with "Surv(", \code{FALSE} otherwise.
 #' @keywords internal
 is_surv_outcome <- function(outcome) {
     grepl("^Surv\\s*\\(", outcome)
@@ -532,7 +583,7 @@ validate_model_outcome <- function(outcome, model_type, family = NULL,
 #' 
 #' @param data Data frame or data.table to check.
 #' @param outcome Character string outcome specification (may include Surv()).
-#' @return Invisible TRUE if validation passes, otherwise stops with error.
+#' @return Invisible \code{TRUE} if validation passes, otherwise stops with error.
 #' @keywords internal
 validate_outcome_exists <- function(data, outcome) {
     if (is_surv_outcome(outcome)) {
@@ -557,7 +608,7 @@ validate_outcome_exists <- function(data, outcome) {
 #' 
 #' @param data Data frame or data.table to check.
 #' @param predictors Character vector of predictor variable names.
-#' @return Invisible TRUE if validation passes, otherwise stops with error.
+#' @return Invisible \code{TRUE} if validation passes, otherwise stops with error.
 #' @keywords internal
 validate_predictors_exist <- function(data, predictors) {
     ## Remove random effects and extract interaction components
@@ -589,8 +640,8 @@ validate_predictors_exist <- function(data, predictors) {
 #' @param family GLM family object, function, or string if applicable.
 #' @param conf_level Numeric confidence level (must be between 0 and 1).
 #' @param digits Integer number of decimal places for effect estimates.
-#' @param p_digits Integer number of decimal places for p-values.
-#' @param p_threshold Numeric p-value threshold for significance highlighting.
+#' @param p_digits Integer number of decimal places for \emph{p}-values.
+#' @param p_threshold Numeric \emph{p}-value threshold for significance highlighting.
 #' @param auto_correct_model Logical whether to auto-correct model type mismatches.
 #' @return List with validated model_type, family, auto_corrected flag.
 #' @keywords internal
@@ -633,4 +684,39 @@ validate_fit_inputs <- function(data, outcome, predictors, model_type,
     )
     
     validation
+}
+
+#' Fit a model with selective warning suppression
+#'
+#' Wraps model fitting expressions to suppress routine warnings from mixed-effects
+#' and GLM fitting (\emph{e.g.,} singular fits, convergence messages, separation
+#' warnings) while allowing unexpected warnings through. When \code{verbose = TRUE},
+#' all warnings are displayed.
+#'
+#' @param expr An unevaluated expression (model fitting call) to execute.
+#' @param verbose Logical. If \code{TRUE}, all warnings are shown. If \code{FALSE},
+#'   routine fitting warnings are suppressed. Default is \code{FALSE}.
+#' @return The result of evaluating \code{expr}.
+#' @keywords internal
+quiet_fit <- function(expr, verbose = FALSE) {
+    if (verbose) {
+        eval.parent(expr)
+    } else {
+        withCallingHandlers(
+            eval.parent(expr),
+            warning = function(w) {
+                msg <- conditionMessage(w)
+                if (grepl(
+                    paste0("singular|convergence|step size|maxfun|",
+                           "fitted probabilities numerically 0 or 1|",
+                           "fitted rates numerically 0|",
+                           "algorithm did not converge|",
+                           "number of observations.*less than"),
+                    msg, ignore.case = TRUE
+                )) {
+                    invokeRestart("muffleWarning")
+                }
+            }
+        )
+    }
 }

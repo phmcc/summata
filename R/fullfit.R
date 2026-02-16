@@ -1,18 +1,19 @@
 #' Complete Regression Analysis Workflow
 #'
 #' Executes a comprehensive regression analysis pipeline that combines univariable 
-#' screening, automatic or manual variable selection, and multivariable modeling 
+#' screening, automatic/manual variable selection, and multivariable modeling 
 #' in a single function call. This function is designed to streamline the complete 
 #' analytical workflow from initial exploration to final adjusted models, with 
 #' publication-ready formatted output showing both univariable and multivariable 
-#' results side-by-side.
+#' results side-by-side if desired.
 #'
-#' @param data Data.frame or data.table containing the analysis dataset. The 
-#'   function automatically converts data frames to data.tables for processing.
+#' @param data Data frame or data.table containing the analysis dataset. The 
+#'   function automatically converts data frames to data.tables for efficient
+#'   processing.
 #'   
 #' @param outcome Character string specifying the outcome variable name. For 
 #'   time-to-event analysis, use \code{Surv()} syntax for the outcome variable
-#'   (e.g., \code{"Surv(os_months, os_status)"}).
+#'   (\emph{e.g.,} \code{"Surv(os_months, os_status)"}).
 #'   
 #' @param predictors Character vector of predictor variable names to analyze. 
 #'   All predictors are tested in univariable models. The subset included in 
@@ -20,7 +21,7 @@
 #'   
 #' @param method Character string specifying the variable selection strategy:
 #'   \itemize{
-#'     \item \code{"screen"} - Automatic selection based on univariable p-value 
+#'     \item \code{"screen"} - Automatic selection based on univariable \emph{p}-value 
 #'       threshold. Only predictors with p ≤ \code{p_threshold} in univariable 
 #'       analysis are included in the multivariable model [default]
 #'     \item \code{"all"} - Include all predictors in both univariable and 
@@ -34,11 +35,11 @@
 #'   multivariable model when \code{method = "custom"}. Required when using 
 #'   custom selection. Ignored for other methods. Default is \code{NULL}.
 #'   
-#' @param p_threshold Numeric p-value threshold for automatic variable selection 
-#'   when \code{method = "screen"}. Predictors with univariable p-value ≤ 
-#'   threshold are included in multivariable model. Common values: 0.05 (strict), 
-#'   0.10 (moderate), 0.20 (liberal screening). Default is 0.05. Ignored for 
-#'   other methods.
+#' @param p_threshold Numeric \emph{p}-value threshold for automatic variable
+#'   selection when \code{method = "screen"}. Predictors with univariable
+#'   \emph{p}-value less than the threshold are included in multivariable
+#'   model. Common values: 0.05 (strict), 0.10 (moderate), 0.20 (liberal
+#'   screening). Default is 0.05. Ignored for other methods.
 #'   
 #' @param columns Character string specifying which result columns to display:
 #'   \itemize{
@@ -53,15 +54,15 @@
 #'     \item \code{"glm"} - Generalized linear model (default). Supports multiple 
 #'       distributions via the \code{family} parameter including logistic, Poisson, 
 #'       Gamma, Gaussian, and quasi-likelihood models.
-#'     \item \code{"negbin"} - Negative binomial regression for overdispersed count 
-#'       data (requires MASS package). Estimates an additional dispersion parameter 
-#'       compared to Poisson regression.
 #'     \item \code{"lm"} - Linear regression for continuous outcomes with normally 
 #'       distributed errors.
 #'     \item \code{"coxph"} - Cox proportional hazards model for time-to-event 
 #'       survival analysis. Requires \code{Surv()} outcome syntax.
 #'     \item \code{"clogit"} - Conditional logistic regression for matched 
 #'       case-control studies.
+#'     \item \code{"negbin"} - Negative binomial regression for overdispersed count 
+#'       data (requires MASS package). Estimates an additional dispersion parameter 
+#'       compared to Poisson regression.
 #'     \item \code{"glmer"} - Generalized linear mixed-effects model for hierarchical 
 #'       or clustered data with non-normal outcomes (requires \pkg{lme4} package and 
 #'       \code{random} parameter).
@@ -106,7 +107,7 @@
 #'   \strong{Positive continuous outcomes:}
 #'   \itemize{
 #'     \item \code{"Gamma"} or \code{Gamma()} - Gamma distribution for positive, 
-#'       right-skewed continuous data (e.g., costs, lengths of stay). Default log link.
+#'       right-skewed continuous data (\emph{e.g.,} costs, lengths of stay). Default log link.
 #'     \item \code{Gamma(link = "inverse")} - Gamma with inverse (canonical) link.
 #'     \item \code{Gamma(link = "identity")} - Gamma with identity link for additive 
 #'       effects on positive outcomes.
@@ -119,14 +120,14 @@
 #'   
 #'   See \code{\link[stats]{family}} for additional details and options.
 #'
-#' @param random Character string specifying the random effects formula for 
+#' @param random Character string specifying the random-effects formula for 
 #'   mixed-effects models (\code{glmer}, \code{lmer}, \code{coxme}). Use standard
-#'   lme4/coxme syntax, e.g., \code{"(1|site)"} for random intercepts by site,
-#'   \code{"(1|site/patient)"} for nested random effects. Required when 
-#'   \code{model_type} is a mixed-effects model type unless random effects are
-#'   included in the \code{predictors} vector. Alternatively, random effects 
-#'   can be included directly in the \code{predictors} vector using the same 
-#'   syntax (e.g., \code{predictors = c("age", "sex", "(1|site)")}), though 
+#'   \pkg{lme4}/\pkg{coxme} syntax, \emph{e.g.,} \code{"(1|site)"} for random
+#'   intercepts by site, \code{"(1|site/patient)"} for nested random effects.
+#'   Required when \code{model_type} is a mixed-effects model type unless random
+#'   effects are included in the \code{predictors} vector. Alternatively, random
+#'   effects can be included directly in the \code{predictors} vector using the same 
+#'   syntax (\emph{e.g.,} \code{predictors = c("age", "sex", "(1|site)")}), though 
 #'   they will not be screened as predictors. Default is \code{NULL}.
 #'   
 #' @param conf_level Numeric confidence level for confidence intervals. Must be 
@@ -144,16 +145,21 @@
 #' @param digits Integer specifying decimal places for effect estimates. 
 #'   Default is 2.
 #'   
-#' @param p_digits Integer specifying decimal places for p-values. Default is 3.
-#'   
-#' @param labels Named character vector or list for custom variable display 
-#'   labels. Default is \code{NULL}.
+#' @param p_digits Integer specifying the number of decimal places for \emph{p}-values.
+#'   Values smaller than \code{10^(-p_digits)} are displayed as \code{"< 0.001"}
+#'   (for \code{p_digits = 3}), \code{"< 0.0001"} (for \code{p_digits = 4}),
+#'   \emph{etc.} The threshold string respects \code{number_format} (\emph{e.g.,}
+#'   \code{"< 0,001"} for EU formatting). Default is 3.
+#'
+#' @param labels Named character vector or list providing custom display
+#'   labels for variables. Names should match variable names, values are
+#'   display labels. Default is \code{NULL}.
 #'   
 #' @param metrics Character specification for which statistics to display:
 #'   \itemize{
-#'     \item \code{"both"} - Show effect estimates with CI and p-values [default]
+#'     \item \code{"both"} - Show effect estimates with CI and \emph{p}-values [default]
 #'     \item \code{"effect"} - Show only effect estimates with CI
-#'     \item \code{"p"} - Show only p-values
+#'     \item \code{"p"} - Show only \emph{p}-values
 #'   }
 #'   Can also be a character vector: \code{c("effect", "p")} is equivalent to 
 #'   \code{"both"}.
@@ -170,15 +176,43 @@
 #'   Default is \code{FALSE}.
 #'   
 #' @param exponentiate Logical. Whether to exponentiate coefficients. Default 
-#'   is \code{NULL} for automatic selection based on model type.
+#'   is \code{NULL}, which automatically exponentiates for logistic, Poisson,
+#'   and Cox models, and displays raw coefficients for linear models.
 #'
-#' @param parallel Logical. If TRUE, fit univariable models in parallel.
-#'   Default is TRUE for improved performance on multi-core systems.
+#' @param parallel Logical. If \code{TRUE} (default), fits univariable models
+#'   in parallel using multiple CPU cores for improved performance.
 #' 
-#' @param n_cores Integer. Number of cores for parallel processing.
-#'   Default is NULL (auto-detect: uses number of available cores - 1).
-#'   
-#' @param ... Additional arguments passed to model fitting functions (e.g., 
+#' @param n_cores Integer specifying the number of CPU cores to use for
+#'   parallel processing. Default is \code{NULL} (auto-detect: uses
+#'   \code{detectCores() - 1}). Ignored when \code{parallel = FALSE}.
+#'
+#' @param number_format Character string or two-element character vector
+#'   controlling thousand and decimal separators in formatted output. Named
+#'   presets:
+#'   \itemize{
+#'     \item \code{"us"} - Comma thousands, period decimal: \code{1,234.56} [default]
+#'     \item \code{"eu"} - Period thousands, comma decimal: \code{1.234,56}
+#'     \item \code{"space"} - Thin-space thousands, period decimal: \code{1 234.56}
+#'       (SI/ISO 31-0)
+#'     \item \code{"none"} - No thousands separator: \code{1234.56}
+#'   }
+#'   Or provide a custom two-element vector \code{c(big.mark, decimal.mark)},
+#'   \emph{e.g.}, \code{c("'", ".")} for Swiss-style: \verb{1'234.56}.
+#'
+#'   When \code{NULL} (default), uses
+#'   \code{getOption("summata.number_format", "us")}. Set the global option
+#'   once per session to avoid passing this argument repeatedly:
+#'   \preformatted{
+#'     options(summata.number_format = "eu")
+#'   }
+#'
+#' @param verbose Logical. If \code{TRUE}, displays model fitting warnings
+#'   (\emph{e.g.,} singular fit, convergence issues). If \code{FALSE} (default),
+#'   routine fitting messages are suppressed while unexpected warnings are
+#'   preserved. When \code{NULL}, uses
+#'   \code{getOption("summata.verbose", FALSE)}.
+#'
+#' @param ... Additional arguments passed to model fitting functions (\emph{e.g.,} 
 #'   \code{weights}, \code{subset}, \code{na.action}).
 #'
 #' @return Depends on \code{return_type} parameter:
@@ -192,16 +226,16 @@
 #'     \item{events/events_group}{Integer. Event counts (if \code{show_events = TRUE})}
 #'     \item{OR/HR/RR/Coefficient (95\% CI)}{Character. Unadjusted effect 
 #'       (if \code{columns} includes "uni" and \code{metrics} includes "effect")}
-#'     \item{Uni p}{Character. Univariable p-value (if \code{columns} includes 
+#'     \item{Uni p}{Character. Univariable \emph{p}-value (if \code{columns} includes 
 #'       "uni" and \code{metrics} includes "p")}
 #'     \item{aOR/aHR/aRR/Adj. Coefficient (95\% CI)}{Character. Adjusted effect 
 #'       (if \code{columns} includes "multi" and \code{metrics} includes "effect")}
-#'     \item{Multi p}{Character. Multivariable p-value (if \code{columns} 
+#'     \item{Multi p}{Character. Multivariable \emph{p}-value (if \code{columns} 
 #'       includes "multi" and \code{metrics} includes "p")}
 #'   }
 #'   
 #'   When \code{return_type = "model"}: The fitted multivariable model object 
-#'   (glm, lm, coxph, etc.).
+#'   (glm, lm, coxph, \emph{etc.}).
 #'   
 #'   When \code{return_type = "both"}: A list with two elements:
 #'   \describe{
@@ -218,6 +252,11 @@
 #'     \item{model}{The multivariable model object (if fitted)}
 #'     \item{uni_results}{The complete univariable screening results}
 #'     \item{n_multi}{Integer. Number of predictors in multivariable model}
+#'     \item{screened}{Character vector. Names of predictors that passed 
+#'       univariable screening at the specified \emph{p}-value threshold}
+#'     \item{significant}{Character vector. Names of variables with p < 0.05
+#'       in the multivariable model (or univariable if multivariable was not
+#'       fitted)}
 #'   }
 #'
 #' @details
@@ -244,17 +283,17 @@
 #' 
 #' \strong{Variable Selection Strategies:}
 #' 
-#' \emph{Screening Method} (\code{method = "screen"}):
+#' \emph{"Screen" Method} (\code{method = "screen"}):
 #' \itemize{
-#'   \item Uses p-value threshold for automatic selection
-#'   \item Liberal thresholds (e.g., 0.20) cast a wide net to avoid missing 
+#'   \item Uses \emph{p}-value threshold for automatic selection
+#'   \item Liberal thresholds (\emph{e.g.,} 0.20) cast a wide net to avoid missing 
 #'     important predictors
-#'   \item Stricter thresholds (e.g., 0.05) focus on strongly associated predictors
+#'   \item Stricter thresholds (\emph{e.g.,} 0.05) focus on strongly associated predictors
 #'   \item Helps reduce overfitting and multicollinearity
 #'   \item Common in exploratory analyses and when sample size is limited
 #' }
 #' 
-#' \emph{All Method} (\code{method = "all"}):
+#' \emph{"All" Method} (\code{method = "all"}):
 #' \itemize{
 #'   \item No variable selection - includes all predictors
 #'   \item Appropriate when all variables are theoretically important
@@ -262,7 +301,7 @@
 #'   \item Useful for confirmatory analyses with pre-specified models
 #' }
 #' 
-#' \emph{Custom Method} (\code{method = "custom"}):
+#' \emph{"Custom" Method} (\code{method = "custom"}):
 #' \itemize{
 #'   \item Manual selection based on subject matter knowledge
 #'   \item Runs univariable analysis for all predictors (for comparison)
@@ -276,10 +315,10 @@
 #' When \code{columns = "both"} (default), tables show:
 #' \itemize{
 #'   \item \strong{Univariable columns}: Crude associations, unadjusted for 
-#'     other variables. Labeled as "OR/HR/RR/Coefficient (95\% CI)" and "Uni p"
+#'     other variables. Labeled as "OR/HR/RR/Coefficient (95\% CI)" and "Uni \emph{p}"
 #'   \item \strong{Multivariable columns}: Adjusted associations, accounting 
 #'     for all other predictors in the model. Labeled as "aOR/aHR/aRR/Adj. Coefficient 
-#'     (95\% CI)" and "Multi p" ("a" = adjusted)
+#'     (95\% CI)" and "Multi \emph{p}" ("a" = adjusted)
 #'   \item Variables not meeting selection criteria show "-" in multivariable columns
 #' }
 #' 
@@ -296,9 +335,9 @@
 #' 
 #' Rule of thumb for multivariable models:
 #' \itemize{
-#'   \item \strong{Logistic regression}: ≥10 events per predictor variable
-#'   \item \strong{Cox regression}: ≥10 events per predictor variable  
-#'   \item \strong{Linear regression}: ≥10-20 observations per predictor
+#'   \item \strong{Logistic regression}: ≥ 10 events per predictor variable
+#'   \item \strong{Cox regression}: ≥ 10 events per predictor variable  
+#'   \item \strong{Linear regression}: ≥ 10-20 observations per predictor
 #' }
 #' 
 #' Use screening methods to reduce predictor count when these ratios are not met.
@@ -605,6 +644,8 @@ fullfit <- function(data,
                     exponentiate = NULL,
                     parallel = TRUE,
                     n_cores = NULL,
+                    number_format = NULL,
+                    verbose = NULL,
                     ...) {
     
     ## Input validation
@@ -624,6 +665,9 @@ fullfit <- function(data,
     if (!data.table::is.data.table(data)) {
         data <- data.table::as.data.table(data)
     }
+    
+    ## Resolve verbose setting
+    verbose <- if (is.null(verbose)) getOption("summata.verbose", FALSE) else verbose
     
     ## Validate inputs and auto-correct model type if needed
     validation <- validate_fit_inputs(
@@ -703,6 +747,8 @@ fullfit <- function(data,
             exponentiate = exponentiate,
             parallel = parallel,
             n_cores = n_cores,
+            number_format = number_format,
+            verbose = verbose,
             ...
         )
         ## Extract raw data for variable selection
@@ -728,6 +774,8 @@ fullfit <- function(data,
                                       show_n = FALSE,
                                       show_events = FALSE,
                                       parallel = parallel, n_cores = n_cores,
+                                      number_format = number_format,
+                                      verbose = verbose,
                                       ...)
                 uni_raw <- attr(uni_temp, "raw_data")
             }
@@ -770,6 +818,8 @@ fullfit <- function(data,
                 keep_qc_stats = FALSE,  # QC stats not needed for display
                 reference_rows = reference_rows,
                 exponentiate = exponentiate,
+                number_format = number_format,
+                verbose = verbose,
                 ...
             )
             
@@ -818,8 +868,29 @@ fullfit <- function(data,
         data.table::setattr(result, "model", multi_model)
     }
 
+    if (keep_models && !is.null(uni_results)) {
+        data.table::setattr(result, "uni_results", uni_results)
+    }
+
     if (columns != "uni" && length(multi_vars) > 0) {
         data.table::setattr(result, "n_multi", length(multi_vars))
+        data.table::setattr(result, "screened", multi_vars)
+    }
+
+    ## Extract significant variable names from multivariable model
+    if (!is.null(multi_raw) && nrow(multi_raw) > 0 &&
+        "p_value" %in% names(multi_raw) && "variable" %in% names(multi_raw)) {
+        sig_vars <- unique(
+            multi_raw[!is.na(p_value) & p_value < 0.05]$variable
+        )
+        data.table::setattr(result, "significant", sig_vars)
+    } else if (!is.null(uni_raw) && nrow(uni_raw) > 0 &&
+               "p_value" %in% names(uni_raw) && "predictor" %in% names(uni_raw)) {
+        ## Fall back to univariable if no multivariable results
+        sig_vars <- unique(
+            uni_raw[!is.na(p_value) & p_value < p_threshold]$predictor
+        )
+        data.table::setattr(result, "significant", sig_vars)
     }
 
     class(result) <- c("fullfit_result", class(result))
@@ -979,7 +1050,7 @@ format_fullfit_combined <- function(uni_formatted, multi_formatted,
 #' 
 #' Renames internal column names (uni_effect, uni_p, multi_effect, multi_p) to
 #' publication-ready display names with appropriate effect measure labels
-#' (OR, HR, RR, aOR, aHR, aRR, Coefficient, etc.).
+#' (OR, HR, RR, aOR, aHR, aRR, Coefficient, \emph{etc.}).
 #' 
 #' @param result Data.table with columns to rename. Expected to contain some
 #'   combination of: uni_effect, uni_p, multi_effect, multi_p.

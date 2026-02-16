@@ -4,7 +4,14 @@
 \alias{build_model_row}
 \title{Build comparison row for successfully fitted model}
 \usage{
-build_model_row(model_name, n_predictors, converged, metrics, model_type)
+build_model_row(
+  model_name,
+  n_predictors,
+  converged,
+  metrics,
+  model_type,
+  marks = NULL
+)
 }
 \arguments{
 \item{model_name}{Character string name of the model.}

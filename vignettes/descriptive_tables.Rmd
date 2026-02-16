@@ -26,7 +26,13 @@ options(width = 180)
 
 Descriptive statistics provide the foundation for any quantitative analysis. Before estimating relationships between variables, it is essential to first characterize the distribution of each variable and assess balance across comparison groups. A well-constructed descriptive table—often designated "Table 1" in published research—accomplishes three objectives: it summarizes the central tendency and dispersion of continuous variables, tabulates the frequency distribution of categorical variables, and tests for systematic differences between groups.
 
-The `desctable()` function generates publication-ready descriptive tables with automatic detection of variable types, appropriate summary statistics, and optional hypothesis testing. This vignette demonstrates the function's capabilities using the included sample dataset.
+The `desctable()` function generates publication-ready descriptive tables with automatic detection of variable types, appropriate summary statistics, and optional hypothesis testing.  It adheres to the to the standard `summata` calling convention:
+
+```{r, eval = FALSE}
+desctable(data, by, variables, ...)
+```
+
+where `data` is the dataset, `by` specifies the grouping variable (optional), and `variables` lists the variables to summarize. This vignette demonstrates the function’s capabilities using the included sample dataset.
 
 ---
 
@@ -56,25 +62,15 @@ The `desctable()` function automatically selects appropriate summary statistics 
 | Categorical | *n* (%) | χ² or Fisher | χ² or Fisher |
 | Time-to-event | Median (95% CI) | Log-rank | Log-rank |
 
-For categorical variables, Fisher's exact test is used when any expected cell count falls below 5. For continuous variables, the test selection follows the displayed statistic: parametric tests are used with mean-based statistics, nonparametric tests with median-based statistics.
+For categorical variables, Fisher exact test is used when any expected cell count falls below 5. For continuous variables, the test selection follows the displayed statistic: parametric tests are used with mean-based statistics, nonparametric tests with median-based statistics.
 
 ---
 
 # Basic Usage
 
-## Function Signature
-
-The `desctable()` function follows the standard `summata` calling convention with data as the first argument:
-
-```{r, eval = FALSE}
-desctable(data, by, variables, ...)
-```
-
-where `data` is the dataset, `by` specifies the grouping variable (optional), and `variables` lists the variables to summarize.
-
 ## **Example 1:** Grouped Descriptive Table
 
-The most common use case is comparing characteristics across groups:
+The most common use-case for descriptive tables is comparing characteristics across groups:
 
 ```{r}
 desc_vars <- c("age", "sex", "race", "bmi", "stage", "ecog", 
@@ -203,7 +199,7 @@ Override automatic selection with `test_continuous` and `test_categorical`. Avai
 **Continuous** (`test_continuous`):
 
 - `"auto"`: Automatic selection (default)
-- `"t"`: Student's *t*-test
+- `"t"`: Student *t*-test
 - `"wrs"`: Wilcoxon rank-sum test
 - `"aov"`: One-way ANOVA
 - `"kwt"`: Kruskal–Wallis test
@@ -211,8 +207,8 @@ Override automatic selection with `test_continuous` and `test_categorical`. Avai
 **Categorical** (`test_categorical`):
 
 - `"auto"`: Automatic selection (default)
-- `"chisq"`: Pearson's χ² test
-- `"fisher"`: Fisher's exact test
+- `"chisq"`: Pearson χ² test
+- `"fisher"`: Fisher exact test
 
 The following example forces parametric tests for continuous variables:
 
@@ -229,7 +225,7 @@ example7a <- desctable(
 example7a
 ```
 
-This example forces Fisher's exact test for categorical variables:
+This example forces the Fisher exact test for categorical variables:
 
 ```{r}
 example7b <- desctable(
@@ -432,16 +428,15 @@ table2html(
 ## Variable Selection
 
 1. Include all relevant baseline characteristics
-2. Order variables logically (demographics, then domain-specific variables)
+2. Order variables logically (typically chronologically and by domain)
 3. Exclude the grouping variable from the variables list
-4. Consider the audience when selecting variables
 
 ## Statistical Considerations
 
 1. Use automatic test selection unless there is specific justification otherwise
-2. Report exact *p*-values; very small values display as "< 0.001"
+2. Report exact *p*-values when possible; very small values display as "< 0.001" (or to preferred degree of precision)
 3. Consider multiple comparison adjustments when testing many variables
-4. For skewed continuous variables, prefer median and IQR over mean and SD
+4. For skewed or non-normally distributed continuous variables, report using nonparametric statistical procedures (e.g., median with IQR) rather than parametric ones (e.g., mean with SD)
 
 ## Formatting Recommendations
 

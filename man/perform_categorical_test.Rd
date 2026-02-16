@@ -13,7 +13,7 @@ perform_categorical_test(tab, test_type)
 Fisher's exact, or "auto" for automatic selection.}
 }
 \value{
-Numeric p-value from the hypothesis test.
+Numeric \emph{p}-value from the hypothesis test.
 }
 \description{
 Conducts chi-square or Fisher's exact tests for categorical variables

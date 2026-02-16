@@ -10,11 +10,11 @@ find_non_reference_row(var_rows, estimate_col = "estimate")
 \item{var_rows}{Data.table containing rows for a single variable.}
 
 \item{estimate_col}{Character string naming the estimate column 
-(e.g., "estimate", "coef"). Default is "estimate".}
+(\emph{e.g.,} "estimate", "coef"). Default is "estimate".}
 }
 \value{
-Integer index of the non-reference row within var_rows, or NULL if
-  cannot be determined (e.g., no NA estimates found, or multiple non-NA rows).
+Integer index of the non-reference row within var_rows, or \code{NULL} if
+  cannot be determined (\emph{e.g.,} no NA estimates found, or multiple non-NA rows).
 }
 \description{
 Identifies the non-reference row in a binary categorical variable by checking

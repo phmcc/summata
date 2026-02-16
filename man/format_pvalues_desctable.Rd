@@ -2,20 +2,23 @@
 % Please edit documentation in R/desc_utils.R
 \name{format_pvalues_desctable}
 \alias{format_pvalues_desctable}
-\title{Format p-values for descriptive tables}
+\title{Format \emph{p}-values for descriptive tables}
 \usage{
-format_pvalues_desctable(result, p_digits)
+format_pvalues_desctable(result, p_digits, marks)
 }
 \arguments{
 \item{result}{Data.table with 'p_value' column to format.}
 
 \item{p_digits}{Integer number of decimal places for p-values.}
+
+\item{marks}{List with \code{big.mark} and \code{decimal.mark} as returned
+by \code{\link{resolve_number_marks}}.}
 }
 \value{
-Modified data.table with 'p-value' column (formatted strings).
+Modified data.table with 'p_value' column (formatted strings).
 }
 \description{
 Converts numeric p-values to formatted strings with appropriate precision.
-Handles very small p-values with threshold notation (e.g., "< 0.001").
+Handles very small p-values with threshold notation (\emph{e.g.,} "< 0.001").
 }
 \keyword{internal}

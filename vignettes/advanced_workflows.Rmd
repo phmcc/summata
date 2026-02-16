@@ -53,8 +53,8 @@ if (save_figures && !dir.exists(fig_dir)) {
 save_example_plot <- function(plot, filename, width = 8, height = 5) {
   if (save_figures) {
     filepath <- file.path(fig_dir, filename)
-    final_width <- attr(plot, "recommended_dims")$width %||% width
-    final_height <- attr(plot, "recommended_dims")$height %||% height
+    final_width <- attr(plot, "rec_dims")$width %||% width
+    final_height <- attr(plot, "rec_dims")$height %||% height
     
     if (requireNamespace("ragg", quietly = TRUE)) {
       ## Use ragg directly - it uses 'res' not 'dpi', and defaults to 72
@@ -190,7 +190,7 @@ example4
 
 ## **Example 5:** Testing Interaction Significance
 
-Use `compfit()` to formally evaluate whether interactions improve model fit:
+Use `compfit()` to formally evaluate whether interactions improve model fit (*see* [Model Comparison](model_comparison.html)):
 
 ```{r}
 example5 <- compfit(
@@ -248,7 +248,7 @@ show_plot(example6, "adv_ex6.png")
 
 Mixed-effects models (multilevel or hierarchical models) account for correlation within clusters by incorporating random effects. The `summata` package supports linear mixed models (`lmer`), generalized linear mixed models (`glmer`), and Cox mixed models (`coxme`).
 
-Random effects are specified using lme4 syntax within the `predictors` parameter:
+Random effects are specified using pipe notation within either the `predictors` parameter or in a separate `random` parameter:
 
 | Syntax | Meaning |
 |:-------|:--------|
@@ -274,15 +274,16 @@ example7
 
 ## **Example 8:** Random Intercepts (Logistic Mixed)
 
-For binary outcomes with clustering:
+For binary outcomes with clustering (note the use of an independent `random` parameter):
 
 ```{r}
 example8 <- fit(
-  data = clintrial,
-  outcome = "surgery",
-  predictors = c("age", "sex", "treatment", "stage", "(1|site)"),
-  model_type = "glmer",
-  labels = clintrial_labels
+    data = clintrial,
+    outcome = "surgery",
+    predictors = c("age", "sex", "treatment", "stage"),
+    random = "(1|site)",
+    model_type = "glmer",
+    labels = clintrial_labels
 )
 
 example8
@@ -340,7 +341,7 @@ show_plot(example11, "adv_ex11.png")
 
 ## **Example 12:** Comparing Random-Effects Specifications
 
-Use `compfit()` to compare different random-effects structures:
+Use `compfit()` to compare different random-effects structures (*see* [Model Comparison](model_comparison.html)):
 
 ```{r}
 example12 <- compfit(
@@ -361,7 +362,13 @@ example12
 
 # Stratification and Clustering
 
-Cox models support stratification (separate baseline hazards) and clustered standard errors (robust variance estimation).
+In addition to mixed-effects models, Cox models support stratification (separate baseline hazards) and clustered standard errors (robust variance estimation).
+
+| Approach | When to Use |
+|:---------|:------------|
+| Mixed-effects | Model cluster-specific effects; prediction at cluster level |
+| Stratification | Proportional hazards assumption violated for a variable |
+| Clustered SE | Correlation within clusters; robust inference |
 
 ## **Example 13:** Stratified Cox Model
 
@@ -396,14 +403,6 @@ example14 <- fit(
 
 example14
 ```
-
-The following table summarizes when to use each approach:
-
-| Approach | When to Use |
-|:---------|:------------|
-| Stratification | Proportional hazards assumption violated for a variable |
-| Clustered SE | Correlation within clusters; robust inference |
-| Mixed models | Model cluster-specific effects; prediction at cluster level |
 
 ---
 
@@ -634,7 +633,7 @@ show_plot(forest_plot, "adv_workflow_forest.png")
 ## Sample Size Considerations
 
 - **Interactions**: Require larger samples than main effects models
-- **Mixed models**: Need sufficient clusters (≥20–30 recommended)
+- **Mixed models**: Need sufficient clusters (≥ 20-30 recommended)
 - **Stratification**: Each stratum needs adequate events
 
 ---
@@ -648,12 +647,9 @@ Simplify the random effects structure if convergence fails:
 ```{r, eval = FALSE}
 # Start with random intercepts only
 fit(data, outcome, c(predictors, "(1|site)"), model_type = "lmer")
-
-# Check for:
-# - Few observations per cluster
-# - Near-zero variance in random effects
-# - Highly correlated predictors
 ```
+
+Check for common problems such as few observations per cluster, near-zero variance in random effects, or highly correlated predictors.
 
 ## Interpreting Interactions
 

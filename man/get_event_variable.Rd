@@ -12,7 +12,7 @@ get_event_variable(model, model_class)
 \item{model_class}{Character string of the model class.}
 }
 \value{
-Character string naming the event variable, or NULL if not found.
+Character string naming the event variable, or \code{NULL} if not found.
 }
 \description{
 Parses the Surv() expression in survival model formulas to extract

@@ -35,9 +35,9 @@ process_table_for_flextable(
 
 \item{format_headers}{Logical whether to format headers.}
 
-\item{bold_significant}{Logical whether to bold significant p-values.}
+\item{bold_significant}{Logical whether to bold significant \emph{p}-values.}
 
-\item{p_threshold}{Numeric p-value threshold for significance.}
+\item{p_threshold}{Numeric \emph{p}-value threshold for significance.}
 
 \item{indent_groups}{Logical whether to indent group levels.}
 

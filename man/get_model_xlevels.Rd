@@ -10,7 +10,7 @@ get_model_xlevels(model)
 \item{model}{Fitted model object (S3 or S4).}
 }
 \value{
-Named list of factor levels, or NULL if no factors present.
+Named list of factor levels, or \code{NULL} if no factors present.
 }
 \description{
 Extracts factor level information from fitted model objects. Handles both

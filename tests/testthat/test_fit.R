@@ -1349,7 +1349,7 @@ test_that("print.fit_result produces output", {
     ## Should contain model information
     expect_true(any(grepl("Multivariable|Univariable", output)))
     expect_true(any(grepl("Formula", output)))
-    expect_true(any(grepl("N =", output)))
+    expect_true(any(grepl("n =", output)))
 })
 
 

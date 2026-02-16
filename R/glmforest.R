@@ -33,9 +33,10 @@
 #'   estimates and confidence intervals in the data table. Default is 2.
 #'
 #' @param p_digits Integer specifying the number of decimal places for \emph{p}-values.
-#'   \emph{p}-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001" 
-#'   (for \code{p_digits = 3}), "< 0.0001" (for \code{p_digits = 4}), \emph{etc.} 
-#'   Default is 3.
+#'   Values smaller than \code{10^(-p_digits)} are displayed as \code{"< 0.001"}
+#'   (for \code{p_digits = 3}), \code{"< 0.0001"} (for \code{p_digits = 4}),
+#'   \emph{etc.} The threshold string respects \code{number_format} (\emph{e.g.,}
+#'   \code{"< 0,001"} for EU formatting). Default is 3.
 #'
 #' @param conf_level Numeric confidence level for confidence intervals. Must be
 #'   between 0 and 1. Default is 0.95 (95\% confidence intervals). The CI
@@ -130,12 +131,19 @@
 #'
 #' @param qc_footer Logical. If \code{TRUE}, displays model quality control
 #'   statistics in the footer (observations analyzed, model family, deviance,
-#'   pseudo-R², AIC). Default is \code{TRUE}.
+#'   pseudo-\emph{R}², AIC). Default is \code{TRUE}.
 #'   
 #' @param units Character string specifying the units for plot dimensions. 
 #'   Options: \code{"in"} (inches), \code{"cm"} (centimeters), \code{"mm"} 
 #'   (millimeters). Default is \code{"in"}. Affects interpretation of 
 #'   \code{plot_width} and \code{plot_height}.
+#'
+#' @param number_format Character string or two-element character vector
+#'   controlling thousand and decimal separators in formatted output. Named
+#'   presets: \code{"us"} (default), \code{"eu"}, \code{"space"},
+#'   \code{"none"}. Or a custom vector \code{c(big.mark, decimal.mark)}.
+#'   When \code{NULL} (default), uses
+#'   \code{getOption("summata.number_format", "us")}.
 #'
 #' @return A \code{ggplot} object containing the complete forest plot. The plot 
 #'   can be:
@@ -145,8 +153,8 @@
 #'     \item Further customized with ggplot2 functions
 #'   }
 #'   
-#'   The returned object includes an attribute \code{"recommended_dims"} 
-#'   accessible via \code{attr(plot, "recommended_dims")}, which is a list 
+#'   The returned object includes an attribute \code{"rec_dims"} 
+#'   accessible via \code{attr(plot, "rec_dims")}, which is a list 
 #'   containing:
 #'   \describe{
 #'     \item{width}{Numeric. Recommended plot width in specified units}
@@ -184,7 +192,7 @@
 #'       \item Observations analyzed (with percentage of total data)
 #'       \item Model family (Binomial, Poisson, \emph{etc.})
 #'       \item Deviance statistics
-#'       \item Pseudo-R² (McFadden)
+#'       \item Pseudo-\emph{R}² (McFadden)
 #'       \item AIC
 #'     }
 #' }
@@ -253,7 +261,7 @@
 #'   \item \strong{Observations analyzed}: Total N and percentage of original 
 #'     data (accounting for missing values)
 #'   \item \strong{Null/Residual Deviance}: Model fit improvement
-#'   \item \strong{Pseudo-R²}: McFadden R² = 1 - (log L_1 / log L_2)
+#'   \item \strong{Pseudo-\emph{R}²}: McFadden \emph{R}² = 1 - (log L_1 / log L_2)
 #'   \item \strong{AIC}: For model comparison (lower is better)
 #' }
 #' 
@@ -265,7 +273,7 @@
 #' Use \code{ggplot2::ggsave()} with recommended dimensions:
 #' ```r
 #' p <- glmforest(model, data)
-#' dims <- attr(p, "recommended_dims")
+#' dims <- attr(p, "rec_dims")
 #' ggsave("forest.pdf", p, width = dims$width, height = dims$height)
 #' ```
 #' 
@@ -275,13 +283,15 @@
 #' ```
 #'
 #' @seealso 
+#' \code{\link{autoforest}} for automatic model detection,
 #' \code{\link{coxforest}} for Cox proportional hazards forest plots,
 #' \code{\link{lmforest}} for linear model forest plots,
+#' \code{\link{uniforest}} for univariable screening forest plots,
+#' \code{\link{multiforest}} for multi-outcome forest plots,
 #' \code{\link[stats]{glm}} for fitting GLMs,
-#' \code{\link{fit}} for fullfit regression modeling,
-#' \code{\link[ggplot2]{ggsave}} for saving plots
+#' \code{\link{fit}} for regression modeling
 #'
-#' @examples
+#' @examplesIf FALSE
 #' # Load example data
 #' data(clintrial)
 #' data(clintrial_labels)
@@ -294,7 +304,6 @@
 #' plot1 <- glmforest(model1, data = clintrial)
 #' print(plot1)
 #' 
-#' \donttest{
 #'   options(width = 180)
 #' # Example 2: With custom variable labels
 #' plot2 <- glmforest(
@@ -364,7 +373,7 @@
 #' # Example 8: Get and use recommended dimensions
 #' plot8 <- glmforest(model1, data = clintrial)
 #' 
-#' dims <- attr(plot8, "recommended_dims")
+#' dims <- attr(plot8, "rec_dims")
 #' cat("Recommended: ", dims$width, "x", dims$height, "inches\n")
 #' 
 #' # Save with recommended dimensions
@@ -469,12 +478,11 @@
 #' )
 #' 
 #' # Save for publication
-#' dims <- attr(final_plot, "recommended_dims")
+#' dims <- attr(final_plot, "rec_dims")
 #' # ggsave("figure1.pdf", final_plot, 
 #' #        width = dims$width, height = dims$height)
 #' # ggsave("figure1.png", final_plot,
 #' #        width = dims$width, height = dims$height, dpi = 300)
-#' }
 #'
 #' @family visualization functions
 #' @export
@@ -503,7 +511,8 @@ glmforest <- function(x, data = NULL,
                       color = NULL,
                       exponentiate = NULL,
                       qc_footer = TRUE,
-                      units = "in") {
+                      units = "in",
+                      number_format = NULL) {
     
     ## Check for required packages
     if (!requireNamespace("data.table", quietly = TRUE)) {
@@ -515,6 +524,10 @@ glmforest <- function(x, data = NULL,
     if (!requireNamespace("grid", quietly = TRUE)) {
         stop("Package 'grid' is required but not installed.")
     }
+    
+    ## Resolve number formatting marks
+    validate_number_format(number_format)
+    marks <- resolve_number_marks(number_format)
     
     ## Handle input: accept either a model object or a fit_result/fullfit_result from fit()/fullfit()
     if (inherits(x, "fit_result") || inherits(x, "fullfit_result")) {
@@ -806,11 +819,13 @@ Received class: ", paste(class(x), collapse = ", "))
     total_obs <- nrow(data)
     gmodel$pct_analyzed <- (gmodel$nobs / total_obs) * 100
     
-    ## Format observations and AIC with commas
-    gmodel$nobs_formatted <- format(gmodel$nobs, big.mark = ",", scientific = FALSE)
-    gmodel$nobs_with_pct <- paste0(gmodel$nobs_formatted, " (", 
-                                   sprintf("%.1f%%", gmodel$pct_analyzed), ")")
-    gmodel$AIC_formatted <- format(round(gmodel$AIC, 2), big.mark = ",", scientific = FALSE, nsmall = 2)
+    ## Format observations and AIC with locale-aware separators
+    gmodel$nobs_formatted <- format_count_forest(gmodel$nobs, marks)
+    pct_str <- sprintf("%.1f%%", gmodel$pct_analyzed)
+    if (marks$decimal.mark != ".") pct_str <- sub(".", marks$decimal.mark, pct_str, fixed = TRUE)
+    gmodel$nobs_with_pct <- paste0(gmodel$nobs_formatted, " (", pct_str, ")")
+    aic_val <- format(round(gmodel$AIC, 2), big.mark = marks$big.mark, decimal.mark = marks$decimal.mark, scientific = FALSE, nsmall = 2)
+    gmodel$AIC_formatted <- trimws(aic_val)
     
     ## Calculate pseudo R-squared (McFadden)
     if (!is.na(gmodel$null_deviance) && !is.na(gmodel$residual_deviance)) {
@@ -1294,26 +1309,26 @@ Received class: ", paste(class(x), collapse = ", "))
                                                                     "",
                                                                     data.table::fifelse(is.na(estimate), 
                                                                                         ref_label,
-                                                                                        format_number(exp(estimate), digits)))]
+                                                                                        format_number(exp(estimate), digits, marks)))]
         to_show_exp_clean[, conf_low_formatted := data.table::fifelse(is.na(conf_low), 
                                                                       NA_character_,
-                                                                      format_number(exp(conf_low), digits))]
+                                                                      format_number(exp(conf_low), digits, marks))]
         to_show_exp_clean[, conf_high_formatted := data.table::fifelse(is.na(conf_high), 
                                                                        NA_character_,
-                                                                       format_number(exp(conf_high), digits))]
+                                                                       format_number(exp(conf_high), digits, marks))]
     } else {
         to_show_exp_clean[, effect := estimate]
         to_show_exp_clean[, effect_formatted := data.table::fifelse(is.na(N) & is.na(estimate),
                                                                     "",
                                                                     data.table::fifelse(is.na(estimate), 
                                                                                         ref_label,
-                                                                                        format_number(estimate, digits)))]
+                                                                                        format_number(estimate, digits, marks)))]
         to_show_exp_clean[, conf_low_formatted := data.table::fifelse(is.na(conf_low), 
                                                                       NA_character_,
-                                                                      format_number(conf_low, digits))]
+                                                                      format_number(conf_low, digits, marks))]
         to_show_exp_clean[, conf_high_formatted := data.table::fifelse(is.na(conf_high), 
                                                                        NA_character_,
-                                                                       format_number(conf_high, digits))]
+                                                                       format_number(conf_high, digits, marks))]
     }
 
     ## Format CI percentage for display in headers
@@ -1321,18 +1336,22 @@ Received class: ", paste(class(x), collapse = ", "))
 
     ## Format \emph{p}-values using p_digits parameter
     p_threshold <- 10^(-p_digits)
-    p_threshold_str <- paste0("< ", format(p_threshold, scientific = FALSE))
+    p_threshold_str <- if (!is.null(marks)) {
+                           paste0("< 0", marks$decimal.mark, strrep("0", p_digits - 1), "1")
+                       } else {
+                           paste0("< ", format(p_threshold, scientific = FALSE))
+                       }
     
     to_show_exp_clean[, p_formatted := data.table::fifelse(is.na(p_value), 
                                                            NA_character_,
                                                            data.table::fifelse(p_value < p_threshold, 
                                                                                p_threshold_str,
-                                                                               format_number(p_value, p_digits)))]
+                                                                               format_number(p_value, p_digits, marks)))]
 
     ## Determine if ANY coefficient or CI bound is negative (only relevant when not exponentiating)
     ## If so, use comma notation throughout for consistency
     use_comma_notation <- !exponentiate && any(to_show_exp_clean$conf_low < 0 | to_show_exp_clean$conf_high < 0, na.rm = TRUE)
-    ci_separator <- if (use_comma_notation) ", " else "-"
+    ci_separator <- forest_ci_separator(use_comma_notation, marks)
 
     ## Create the combined effect string with expression for italic p
     ## n.b.: effect_abbrev will be recalculated by calculate_forest_layout for header
@@ -1353,8 +1372,10 @@ Received class: ", paste(class(x), collapse = ", "))
                                                           )]
 
     ## Format N and events with thousands separator
-    to_show_exp_clean[, n_formatted := data.table::fifelse(is.na(N), "", format(N, big.mark = ",", scientific = FALSE))]
-    to_show_exp_clean[, events_formatted := data.table::fifelse(is.na(Events), "", format(Events, big.mark = ",", scientific = FALSE))]
+    to_show_exp_clean[, n_formatted := data.table::fifelse(is.na(N), "",
+        vapply(N, format_count_forest, character(1), marks = marks))]
+    to_show_exp_clean[, events_formatted := data.table::fifelse(is.na(Events), "",
+        vapply(Events, format_count_forest, character(1), marks = marks))]
 
     ## Clean up variable names for display
     to_show_exp_clean[, var_display := as.character(var)]
@@ -1867,7 +1888,7 @@ Received class: ", paste(class(x), collapse = ", "))
     }
 
     ## Add recommended dimensions as an attribute
-    attr(p, "recommended_dims") <- list(width = rec_width, height = rec_height)
+    attr(p, "rec_dims") <- list(width = rec_width, height = rec_height)
 
     ## Return the plot
     return(p)

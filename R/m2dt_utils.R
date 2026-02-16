@@ -5,7 +5,7 @@
 #' the model frame.
 #' 
 #' @param model Fitted model object (S3 or S4).
-#' @return Named list of factor levels, or NULL if no factors present.
+#' @return Named list of factor levels, or \code{NULL} if no factors present.
 #' @keywords internal
 get_model_xlevels <- function(model) {
     
@@ -43,7 +43,7 @@ get_model_xlevels <- function(model) {
 #' including model attributes, $data slot, $model slot, and @frame for S4.
 #' 
 #' @param model Fitted model object (S3 or S4).
-#' @return Data frame or data.table used to fit the model, or NULL if unavailable.
+#' @return Data frame or data.table used to fit the model, or \code{NULL} if unavailable.
 #' @keywords internal
 get_model_data <- function(model) {
     
@@ -196,7 +196,7 @@ detect_model_type <- function(model) {
 #' Get readable model type name
 #' 
 #' Converts model class names to human-readable descriptions. For GLMs,
-#' uses the family to provide specific names (e.g., "Logistic", "Poisson").
+#' uses the family to provide specific names (\emph{e.g.,} "Logistic", "Poisson").
 #' 
 #' @param model Fitted model object.
 #' @return Character string with readable model type name.
@@ -330,7 +330,7 @@ parse_term <- function(terms, xlevels = NULL, model = NULL) {
 #' 
 #' @param model Fitted survival model object.
 #' @param model_class Character string of the model class.
-#' @return Character string naming the event variable, or NULL if not found.
+#' @return Character string naming the event variable, or \code{NULL} if not found.
 #' @keywords internal
 get_event_variable <- function(model, model_class) {
     event_var <- NULL

@@ -18,17 +18,26 @@ knitr::opts_chunk$set(
 options(width = 180)
 ```
 
-Publication requires tables in specific formats: Word documents for collaborative drafting, PDF for final submission, LaTeX for manuscript preparation, HTML for web supplements, PowerPoint for presentations, and RTF for regulatory submissions. The `summata` package provides export functions for each format, with consistent parameters across formats and format-specific options where needed.
+Publication requires tables in specific formats: PDF for static outputs, Word documents for collaborative drafting, LaTeX for manuscript preparation, HTML for web supplements, PowerPoint for presentations, and RTF for broad compatability. The `summata` package provides export functions for each format, with consistent parameters across formats and format-specific options where needed.
 
 | Function | Format | Dependencies |
 |:---------|:-------|:-------------|
-| `table2docx()` | Microsoft Word (.docx) | `flextable`, `officer` |
+| `data.table::fwrite()` | CSV / TSV | `data.table` |
 | `table2pdf()` | PDF | `xtable`, LaTeX distribution |
+| `table2docx()` | Microsoft Word (.docx) | `flextable`, `officer` |
 | `table2html()` | HTML | `xtable` |
 | `table2pptx()` | PowerPoint (.pptx) | `flextable`, `officer` |
 | `table2tex()` | LaTeX source (.tex) | `xtable` |
 | `table2rtf()` | Rich Text Format (.rtf) | `flextable` |
 | `autotable()` | Auto-detect from extension | Varies |
+
+For delimited text formats (CSV, TSV), tables can be written directly with `data.table::fwrite()` since all `summata` output tables are `data.table` objects. For formatted document output, these functions follow a standard syntax when called:
+
+``` r
+result <- autotable(data, "output.pdf", ...)
+```
+
+where `data` is the dataset, and `"output.pdf"` is the name of the destination file. This vignette demonstrates the various capabilities of these functions using the included sample dataset.
 
 ---
 
@@ -80,116 +89,41 @@ table4 <- compfit(
 
 ---
 
-# Automatic Format Detection
+# CSV / TSV Export
 
-The `autotable()` function detects the output format from the file extension, simplifying the export workflow:
+All `summata` output tables are `data.table` objects, so they can be written to delimited text files directly with `data.table::fwrite()`. This is the simplest export path and requires no additional dependencies beyond `data.table`, which `summata` already imports.
 
-```{r}
-autotable(table1, "Table1.pdf")
-autotable(table1, "Table1.docx")
-autotable(table1, "Table1.pptx")
-autotable(table1, "Table1.html")
-autotable(table1, "Table1.rtf")
-autotable(table1, "Table1.tex")
-```
-
-Format-specific parameters pass through to the underlying function:
+## **Example 1:** CSV Export
 
 ```{r}
-autotable(
-  table = table2,
-  file = "Table2.pdf",
-  caption = "Table 2. Regression Analysis",
-  orientation = "landscape",
-  font_size = 8,
-  bold_significant = TRUE,
-  indent_groups = TRUE,
-  zebra_stripes = TRUE
-)
+data.table::fwrite(table1, "Table1.csv")
 ```
 
----
+## **Example 2:** TSV Export
 
-# Microsoft Word Export
-
-The `table2docx()` function creates editable Word documents using the `flextable` package.
-
-## **Example 1:** Basic Export
-
-The simplest usage requires only a table and filename:
+Specify a tab delimiter for TSV output:
 
 ```{r}
-table2docx(
-  table = table1,
-  file = "Table1.docx"
-)
+data.table::fwrite(table1, "Table1.tsv", sep = "\t")
 ```
 
-## **Example 2:** With Caption
+## **Example 3:** Semicolon-Delimited (European Locale)
 
-Add a caption using the `caption` parameter:
+Use a semicolon delimiter for compatibility with locales where the comma is the decimal separator:
 
 ```{r}
-table2docx(
-  table = table1,
-  file = "Table1.docx",
-  caption = "Table 1. Baseline Characteristics by Group"
-)
+data.table::fwrite(table1, "Table1.csv", sep = ";")
 ```
 
-## **Example 3:** With Formatting Options
-
-Multiple formatting options can be combined:
-
-```{r}
-table2docx(
-  table = table2,
-  file = "Table2.docx",
-  caption = "Table 2. Regression Analysis",
-  font_size = 9,
-  font_family = "Times New Roman",
-  bold_significant = TRUE,
-  p_threshold = 0.05,
-  indent_groups = TRUE,
-  zebra_stripes = TRUE
-)
-```
-
-## **Example 4:** Page Layout
-
-Control page size and orientation for wide tables:
-
-```{r}
-table2docx(
-  table = table2,
-  file = "Table2_Landscape.docx",
-  caption = "Table 2. Regression Results",
-  paper = "letter",
-  orientation = "landscape"
-)
-```
-
-## **Example 5:** Dark Header Style
-
-Use a dark header background for visual emphasis:
-
-```{r}
-table2docx(
-  table = table1,
-  file = "Table1_DarkHeader.docx",
-  caption = "Table 1. Baseline Characteristics",
-  dark_header = TRUE,
-  zebra_stripes = TRUE
-)
-```
+CSV and TSV files are useful for archiving raw table output, importing into spreadsheet software, or downstream processing in other statistical environments. For formatted, publication-ready output, use the export functions described in the sections that follow.
 
 ---
 
 # PDF Export
 
-The `table2pdf()` function creates PDF documents using LaTeX typesetting. A LaTeX distribution (TinyTeX, TeX Live, MiKTeX, or MacTeX) is required.
+The `table2pdf()` function creates PDF documents using LaTeX typesetting via the `xtable` package. A LaTeX distribution (TinyTeX, TeX Live, MiKTeX, or MacTeX) is required.
 
-## **Example 6:** Basic Export
+## **Example 4:** Basic Export
 
 The simplest usage requires only a table and filename:
 
@@ -200,7 +134,7 @@ table2pdf(
 )
 ```
 
-## **Example 7:** With Caption
+## **Example 5:** With Caption
 
 Add a caption using the `caption` parameter:
 
@@ -212,7 +146,7 @@ table2pdf(
 )
 ```
 
-## **Example 8:** With Formatting Options
+## **Example 6:** With Formatting Options
 
 Multiple formatting options can be combined:
 
@@ -230,7 +164,7 @@ table2pdf(
 )
 ```
 
-## **Example 9:** Page Layout
+## **Example 7:** Page Layout
 
 Control page size and orientation:
 
@@ -244,7 +178,7 @@ table2pdf(
 )
 ```
 
-## **Example 10:** Custom Margins
+## **Example 8:** Custom Margins
 
 Adjust page margins (in inches):
 
@@ -256,7 +190,7 @@ table2pdf(
 )
 ```
 
-## **Example 11:** Fit to Page Width
+## **Example 9:** Fit to Page Width
 
 Scale tables to fit the page width:
 
@@ -268,7 +202,7 @@ table2pdf(
 )
 ```
 
-## **Example 12:** Standalone Table
+## **Example 10:** Standalone Table
 
 Standalone settings are useful for embedding tables in larger documents:
 
@@ -282,11 +216,86 @@ table2pdf(
 
 ---
 
+# Microsoft Word Export
+
+The `table2docx()` function creates editable Word documents using the `flextable` and `officer` packages.
+
+## **Example 11:** Basic Export
+
+The simplest usage requires only a table and filename:
+
+```{r}
+table2docx(
+  table = table1,
+  file = "Table1.docx"
+)
+```
+
+## **Example 12:** With Caption
+
+Add a caption using the `caption` parameter:
+
+```{r}
+table2docx(
+  table = table1,
+  file = "Table1.docx",
+  caption = "Table 1. Baseline Characteristics by Group"
+)
+```
+
+## **Example 13:** With Formatting Options
+
+Multiple formatting options can be combined:
+
+```{r}
+table2docx(
+  table = table2,
+  file = "Table2.docx",
+  caption = "Table 2. Regression Analysis",
+  font_size = 9,
+  font_family = "Times New Roman",
+  bold_significant = TRUE,
+  p_threshold = 0.05,
+  indent_groups = TRUE,
+  zebra_stripes = TRUE
+)
+```
+
+## **Example 14:** Page Layout
+
+Control page size and orientation for wide tables:
+
+```{r}
+table2docx(
+  table = table2,
+  file = "Table2_Landscape.docx",
+  caption = "Table 2. Regression Results",
+  paper = "letter",
+  orientation = "landscape"
+)
+```
+
+## **Example 15:** Dark Header Style
+
+Use a dark header background for visual emphasis:
+
+```{r}
+table2docx(
+  table = table1,
+  file = "Table1_DarkHeader.docx",
+  caption = "Table 1. Baseline Characteristics",
+  dark_header = TRUE,
+  zebra_stripes = TRUE
+)
+```
+
+---
+
 # HTML Export
 
-The `table2html()` function exports tables to HTML file output for web use.
+The `table2html()` function exports tables to HTML file output for web use via the `xtable` package.
 
-## **Example 13:** Basic Export
+## **Example 16:** Basic Export
 
 The simplest usage requires only a table and filename:
 
@@ -297,7 +306,7 @@ table2html(
 )
 ```
 
-## **Example 14:** With Caption
+## **Example 17:** With Caption
 
 Add a caption using the `caption` parameter:
 
@@ -309,7 +318,7 @@ table2html(
 )
 ```
 
-## **Example 15:** With Formatting Options
+## **Example 18:** With Formatting Options
 
 Multiple formatting options can be combined:
 
@@ -329,9 +338,9 @@ table2html(
 
 # PowerPoint Export
 
-The `table2pptx()` function creates PowerPoint presentations with tables.
+The `table2pptx()` function creates PowerPoint presentations with tables using the `flextable` and `officer` packages.
 
-## **Example 16:** Basic Export
+## **Example 19:** Basic Export
 
 The simplest usage creates a single-slide presentation:
 
@@ -342,7 +351,7 @@ table2pptx(
 )
 ```
 
-## **Example 17:** With Slide Title
+## **Example 20:** With Slide Title
 
 Add a slide title using the `slide_title` parameter:
 
@@ -354,7 +363,7 @@ table2pptx(
 )
 ```
 
-## **Example 18:** With Formatting Options
+## **Example 21:** With Formatting Options
 
 Multiple formatting options can be combined:
 
@@ -371,7 +380,7 @@ table2pptx(
 )
 ```
 
-## **Example 19:** Custom Template
+## **Example 22:** Custom Template
 
 Use an existing PowerPoint template:
 
@@ -389,9 +398,9 @@ table2pptx(
 
 # LaTeX Export
 
-The `table2tex()` function creates LaTeX source files for inclusion in manuscripts.
+The `table2tex()` function creates LaTeX source files for inclusion in manuscripts via the `xtable` package.
 
-## **Example 20:** Basic Export
+## **Example 23:** Basic Export
 
 The simplest usage requires only a table and filename:
 
@@ -402,7 +411,7 @@ table2tex(
 )
 ```
 
-## **Example 21:** With Caption and Label
+## **Example 24:** With Caption and Label
 
 Add caption and cross-reference label:
 
@@ -415,7 +424,7 @@ table2tex(
 )
 ```
 
-## **Example 22:** With Booktabs Styling
+## **Example 25:** With Booktabs Styling
 
 Use the booktabs package for professional formatting:
 
@@ -435,9 +444,9 @@ table2tex(
 
 # RTF Export
 
-The `table2rtf()` function creates Rich Text Format files, commonly used for regulatory submissions.
+The `table2rtf()` function creates Rich Text Format files using the `flextable` and `officer` packages.
 
-## **Example 23:** Basic Export
+## **Example 26:** Basic Export
 
 The simplest usage requires only a table and filename:
 
@@ -448,7 +457,7 @@ table2rtf(
 )
 ```
 
-## **Example 24:** With Formatting Options
+## **Example 27:** With Formatting Options
 
 Multiple formatting options can be combined:
 
@@ -465,7 +474,7 @@ table2rtf(
 )
 ```
 
-## **Example 25:** Page Layout
+## **Example 28:** Page Layout
 
 Control page size and orientation:
 
@@ -475,6 +484,38 @@ table2rtf(
   file = "Table2_Landscape.rtf",
   paper = "letter",
   orientation = "landscape"
+)
+```
+
+---
+
+# Automatic Format Detection
+
+The `autotable()` function detects the output format from the file extension, simplifying the export workflow:
+
+```{r}
+autotable(table1, "Table1.csv")   # CSV output
+autotable(table1, "Table1.tsv")   # TSV output
+autotable(table1, "Table1.pdf")   # PDF output
+autotable(table1, "Table1.docx")  # DOCX output
+autotable(table1, "Table1.html")  # HTML output
+autotable(table1, "Table1.pptx")  # PPTX output
+autotable(table1, "Table1.tex")   # TeX output
+autotable(table1, "Table1.rtf")   # RTF output
+```
+
+Format-specific parameters pass through to the underlying function:
+
+```{r}
+autotable(
+  table = table2,
+  file = "Table2.pdf",
+  caption = "Table 2. Regression Analysis",
+  orientation = "landscape",
+  font_size = 8,
+  bold_significant = TRUE,
+  indent_groups = TRUE,
+  zebra_stripes = TRUE
 )
 ```
 
@@ -501,8 +542,8 @@ All export functions share common parameters for consistent results:
 
 The `condense_table` and `condense_quantitative` parameters reduce table height:
 
-- **`condense_table = TRUE`**: Condenses continuous, survival, and binary categorical variables
-- **`condense_quantitative = TRUE`**: Condenses only continuous and survival variables (`desctable()` outputs only)
+- `condense_table = TRUE`: Condenses continuous, survival, and binary categorical variables
+- `condense_quantitative = TRUE`: Condenses only continuous and survival variables (`desctable()` outputs only)
 
 ```{r}
 # Full display
@@ -529,48 +570,48 @@ table2docx(
 
 # Format-Specific Parameters
 
-## Word/RTF/PowerPoint (flextable-based)
+## PDF
 
-| Parameter | Description |
-|:----------|:------------|
-| `font_family` | Font name (e.g., "Arial") |
-| `width` | Table width (inches) |
-| `align` | Column alignment vector |
-| `return_ft` | Return flextable object |
+| Parameter | Description | Default |
+|:----------|:------------|:--------|
+| `margins` | Page margins `c(top, right, bottom, left)` | `c(1, 1, 1, 1)` |
+| `fit_to_page` | Scale table to fit page width | `TRUE` |
+| `cell_padding` | Vertical padding ("none", "normal", "relaxed", "loose") | `"normal"` |
+| `variable_padding` | Add spacing between variables | `FALSE` |
+| `show_logs` | Keep LaTeX log files | `FALSE` |
 
-## PDF (LaTeX-based)
+## Word/RTF/PowerPoint
 
-| Parameter | Description |
-|:----------|:------------|
-| `margins` | Page margins `c(top, right, bottom, left)` |
-| `fit_to_page` | Scale table to fit page width |
-| `cell_padding` | Vertical padding ("none", "normal", "relaxed", "loose") |
-| `variable_padding` | Add spacing between variables |
-| `show_logs` | Keep LaTeX log files |
+| Parameter | Description | Default |
+|:----------|:------------|:--------|
+| `font_family` | Font name | `Arial` |
+| `width` | Table width (inches) | `NULL` |
+| `align` | Column alignment vector | `NULL` |
+| `return_ft` | Return flextable object | `FALSE` |
 
 ## HTML
 
-| Parameter | Description |
-|:----------|:------------|
-| `include_css` | Include embedded CSS styling |
-| `stripe_color` | Zebra stripe color (hex or name) |
+| Parameter | Description | Default |
+|:----------|:------------|:--------|
+| `include_css` | Include embedded CSS styling | `FALSE` |
+| `stripe_color` | Zebra stripe color (hex or name) | `"#EEEEEE"` |
 
 ## LaTeX
 
-| Parameter | Description |
-|:----------|:------------|
-| `booktabs` | Use booktabs package styling |
-| `label` | LaTeX cross-reference label |
-| `cell_padding` | Arraystretch value |
+| Parameter | Description | Default |
+|:----------|:------------|:--------|
+| `booktabs` | Use booktabs package styling | `FALSE` |
+| `label` | LaTeX cross-reference label | `NULL` |
+| `cell_padding` | Arraystretch value | `"normal"` |
 
-## PowerPoint
+## PowerPoint (additional)
 
-| Parameter | Description |
-|:----------|:------------|
-| `template` | Custom PPTX template file |
-| `layout` | Slide layout name |
-| `master` | Slide master name |
-| `left`, `top` | Table position (inches) |
+| Parameter | Description | Default |
+|:----------|:------------|:--------|
+| `template` | Custom PPTX template file | `NULL` |
+| `layout` | Slide layout name | `"Title and Content"` |
+| `master` | Slide master name | `"Office Theme"` |
+| `left`, `top` | Table position (inches) | `0.5`, `1.5` |
 
 ---
 
@@ -580,11 +621,11 @@ table2docx(
 
 | Use-Case | Recommended Format |
 |:---------|:-------------------|
-| Manuscript drafts, collaboration | Word (.docx) |
+| Data archival, further processing | CSV (.csv) or TSV (.tsv) |
 | Journal submission | PDF (.pdf) or LaTeX (.tex) |
+| Manuscript drafts, collaboration | Word (.docx) |
 | Web/R Markdown | HTML (.html) |
 | Presentations | PowerPoint (.pptx) |
-| Regulatory submissions | RTF (.rtf) |
 | Maximum compatibility | RTF (.rtf) |
 
 ## Page Layout Guidelines
@@ -605,7 +646,7 @@ common_opts <- list(
   zebra_stripes = TRUE
 )
 
-formats <- c("pdf", "docx", "html", "pptx", "rtf", "tex")
+formats <- c("csv", "pdf", "docx", "html", "pptx", "rtf", "tex")
 
 for (fmt in formats) {
   autotable(

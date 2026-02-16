@@ -31,7 +31,8 @@ multiforest(
   null_line = NULL,
   log_scale = NULL,
   labels = NULL,
-  units = "in"
+  units = "in",
+  number_format = NULL
 )
 }
 \arguments{
@@ -54,8 +55,10 @@ When \code{"both"}, shows side-by-side forest plots.}
 estimates and confidence intervals. Default is 2.}
 
 \item{p_digits}{Integer specifying the number of decimal places for \emph{p}-values.
-\emph{p}-values smaller than \code{10^(-p_digits)} are displayed as "< 0.001" 
-(for \code{p_digits = 3}). Default is 3.}
+Values smaller than \code{10^(-p_digits)} are displayed as \code{"< 0.001"}
+(for \code{p_digits = 3}), \code{"< 0.0001"} (for \code{p_digits = 4}),
+\emph{etc.} The threshold string respects \code{number_format} (\emph{e.g.,}
+\code{"< 0,001"} for EU formatting). Default is 3.}
 
 \item{conf_level}{Numeric confidence level for confidence intervals. Must be
 between 0 and 1. Default is 0.95 (95\% confidence intervals). The CI
@@ -132,7 +135,7 @@ Use hex codes or R color names for custom colors.}
 coefficients.}
 
 \item{log_scale}{Logical. If \code{TRUE}, uses log scale for the x-axis.
-Default is \code{NULL}, which auto-detects (TRUE for OR/HR/RR, FALSE for
+Default is \code{NULL}, which auto-detects (\code{TRUE} for OR/HR/RR, \code{FALSE} for
 coefficients).}
 
 \item{labels}{Named character vector providing custom display labels for 
@@ -142,12 +145,19 @@ original names).}
 
 \item{units}{Character string specifying units for plot dimensions: 
 \code{"in"} (inches), \code{"cm"}, or \code{"mm"}. Default is \code{"in"}.}
+
+\item{number_format}{Character string or two-element character vector
+controlling thousand and decimal separators in formatted output. Named
+presets: \code{"us"} (default), \code{"eu"}, \code{"space"},
+\code{"none"}. Or a custom vector \code{c(big.mark, decimal.mark)}.
+When \code{NULL} (default), uses
+\code{getOption("summata.number_format", "us")}.}
 }
 \value{
 A \code{ggplot} object containing the complete forest plot.
   
-  The returned object includes an attribute \code{"recommended_dims"} 
-  accessible via \code{attr(plot, "recommended_dims")}, containing:
+  The returned object includes an attribute \code{"rec_dims"} 
+  accessible via \code{attr(plot, "rec_dims")}, containing:
   \describe{
     \item{width}{Numeric. Recommended plot width in specified units}
     \item{height}{Numeric. Recommended plot height in specified units}
@@ -193,6 +203,7 @@ needed for plotting. This approach is efficient and ensures consistency
 with the formatted table output.
 }
 \examples{
+\dontshow{if (FALSE) withAutoprint(\{ # examplesIf}
 # Load example data
 data(clintrial)
 data(clintrial_labels)
@@ -210,7 +221,6 @@ result <- multifit(
 plot1 <- multiforest(result)
 print(plot1)
 
-\donttest{
   options(width = 180)
 # Example 2: With custom title and labels
 plot2 <- multiforest(
@@ -248,17 +258,18 @@ print(plot4)
 
 # Example 5: Save with recommended dimensions
 plot5 <- multiforest(result)
-dims <- attr(plot5, "recommended_dims")
+dims <- attr(plot5, "rec_dims")
 # ggsave("multioutcome_forest.pdf", plot5,
 #        width = dims$width, height = dims$height)
-}
-
+\dontshow{\}) # examplesIf}
 }
 \seealso{
-\code{\link{multifit}} for multivariate regression analysis,
+\code{\link{autoforest}} for automatic model detection,
+\code{\link{multifit}} for multi-outcome regression analysis,
 \code{\link{glmforest}} for single GLM forest plots,
 \code{\link{coxforest}} for single Cox model forest plots,
-\code{\link{autoforest}} for automatic model detection
+\code{\link{lmforest}} for single linear model forest plots,
+\code{\link{uniforest}} for univariable screening forest plots
 
 Other visualization functions: 
 \code{\link{autoforest}()},

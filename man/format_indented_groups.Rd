@@ -17,6 +17,6 @@ Data.table with Group column removed and levels indented under Variables.
 \description{
 Transforms tables with Variable/Group columns into indented format where
 group levels appear as indented rows under variable names. Handles both
-regression and descriptive tables with appropriate p-value placement.
+regression and descriptive tables with appropriate \emph{p}-value placement.
 }
 \keyword{internal}

@@ -46,7 +46,7 @@ utils::globalVariables(c(
            "R2",
            "RR",
            "N",
-           "Summata Score",
+           "Composite Model Score (CMS)",
            "Uni p",
            "Variable",
            "p-value",

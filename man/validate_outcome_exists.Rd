@@ -12,7 +12,7 @@ validate_outcome_exists(data, outcome)
 \item{outcome}{Character string outcome specification (may include Surv()).}
 }
 \value{
-Invisible TRUE if validation passes, otherwise stops with error.
+Invisible \code{TRUE} if validation passes, otherwise stops with error.
 }
 \description{
 Checks that the specified outcome variable (or survival variables within

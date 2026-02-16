@@ -16,12 +16,12 @@ validate_outcome_homogeneity(data, outcomes, model_type, family = "binomial")
 \item{family}{Character string specifying the GLM family (for glm/glmer).}
 }
 \value{
-Invisible NULL. Issues warnings if problems are detected.
+Invisible \code{NULL}. Issues warnings if problems are detected.
 }
 \description{
 Checks whether all outcomes in a multifit analysis are compatible with the
 specified model type. Issues a warning when outcomes appear to be of mixed
-types (e.g., binary and continuous outcomes in the same analysis), which
+types (\emph{e.g.,} binary and continuous outcomes in the same analysis), which
 would produce tables with incompatible effect measures.
 }
 \keyword{internal}

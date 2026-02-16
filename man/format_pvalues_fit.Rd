@@ -2,23 +2,26 @@
 % Please edit documentation in R/fit_utils.R
 \name{format_pvalues_fit}
 \alias{format_pvalues_fit}
-\title{Format p-values for display}
+\title{Format \emph{p}-values for display}
 \usage{
-format_pvalues_fit(p, digits = 3)
+format_pvalues_fit(p, digits = 3, marks = NULL)
 }
 \arguments{
-\item{p}{Numeric vector of p-values.}
+\item{p}{Numeric vector of \emph{p}-values.}
 
 \item{digits}{Integer number of decimal places. Also determines the threshold
 for "less than" display: threshold = 10^(-digits). Default is 3.}
+
+\item{marks}{Optional list with \code{big.mark} and \code{decimal.mark} as
+returned by \code{\link{resolve_number_marks}}.}
 }
 \value{
-Character vector of formatted p-values.
+Character vector of formatted \emph{p}-values.
 }
 \description{
-Converts numeric p-values to formatted character strings using vectorized
+Converts numeric \emph{p}-values to formatted character strings using vectorized
 operations. Values below the threshold (determined by digits parameter) 
-display as "< 0.001" (for digits=3), "< 0.0001" (for digits=4), etc.
+display as "< 0.001" (for digits=3), "< 0.0001" (for digits=4), \emph{etc.}
 NA values display as "-".
 }
 \keyword{internal}

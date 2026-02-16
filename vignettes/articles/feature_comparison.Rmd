@@ -14,15 +14,13 @@ This article compares `summata` with other R packages for regression table gener
 
 ---
 
-# Package Comparison
+# Similar Packages
 
 The R ecosystem includes several well-established packages for creating publication-ready regression tables. The following comparison identifies areas of overlap and distinction between `summata` and its alternatives.
 
-## Compared Packages
-
 | Package | Primary Focus |
 |:--------|:--------------|
-| **summata** | Fast regression workflows, forest plots, multivariate analysis |
+| **summata** | Fast regression workflows, forest plots, multivariate regression |
 | **gtsummary** | Comprehensive table generation, gt ecosystem, maximum flexibility |
 | **finalfit** | Clinical research, missing data handling, bootstrap simulations |
 | **arsenal** | Large-scale summaries, SAS-like output |
@@ -41,8 +39,8 @@ features <- data.frame(
     "Descriptive Tables",
     "Stratified Summaries", 
     "Univariable Screening",
-    "Multivariable Regression",
-    "Multivariate Analysis",
+    "Multivariable Workflow",
+    "Multivariate Regression",
     "Model Comparison",
     "Mixed-Effects Models",
     "Cox/Survival Models",
@@ -106,13 +104,13 @@ cat('<p style="font-size: 0.85em; color: #666;"><strong>Legend:</strong> ✓ Ful
 
 | Feature | Description |
 |:--------|:------------|
-| **Descriptive Tables** | Summary statistics tables (mean, SD, median, IQR, n, %) |
-| **Stratified Summaries** | Table 1-style summaries stratified by group with p-values |
+| **Descriptive Tables** | Summary statistics tables (mean, SD, median, IQR, *n*, %) |
+| **Stratified Summaries** | Table 1-style summaries stratified by group with *p*-values |
 | **Univariable Screening** | Test multiple predictors against one outcome (crude associations) |
-| **Multivariable Regression** | Combined univariable + multivariable analysis in one table |
-| **Multivariate Analysis** | Test one predictor across multiple outcomes |
+| **Multivariable Workflow** | Combined univariable + multivariable analysis in one table |
+| **Multivariate Regression** | Test one predictor across multiple outcomes |
 | **Model Comparison** | Compare multiple models side-by-side with fit statistics |
-| **Mixed-Effects Models** | Support for lmer/glmer/coxme random effects models |
+| **Mixed-Effects Models** | Support for `lmer`/`glmer`/`coxme` random effects models |
 | **Cox/Survival Models** | Cox proportional hazards and survival analysis |
 | **Interaction Formatting** | Native support for interaction terms with formatted output |
 | **Forest Plots** | Integrated forest plot visualization from regression results |
@@ -126,7 +124,7 @@ cat('<p style="font-size: 0.85em; color: #666;"><strong>Legend:</strong> ✓ Ful
 
 The following features distinguish `summata` from comparable packages:
 
-## Multivariate Analysis
+## Multivariate Regression
 
 The `multifit()` and `multiforest()` functions implement an inverted screening paradigm: testing a single predictor across multiple outcomes simultaneously. This workflow is common in epidemiological and clinical research but not directly supported by other packages.
  
@@ -149,7 +147,7 @@ Forest plots are generated directly from analysis results without intermediate s
 screen_result <- uniscreen(data, outcome, predictors)
 uniforest(screen_result)
 
-# From multivariate analysis
+# From multivariate regression
 multi_result <- multifit(data, outcomes, predictor)
 multiforest(multi_result)
 ```
