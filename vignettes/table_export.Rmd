@@ -719,5 +719,5 @@ save_as_docx(ft, path = "Table1_Custom.docx")
 - [Regression Modeling](regression_modeling.html): `fit()`, `uniscreen()`, and `fullfit()`
 - [Model Comparison](model_comparison.html): `compfit()` for comparing models
 - [Forest Plots](forest_plots.html): Visualization of regression results
-- [Multivariate Analysis](multivariate_analysis.html): `multifit()` for multi-outcome analysis
+- [Multivariate Regression](multivariate_regression.html): `multifit()` for multi-outcome analysis
 - [Advanced Workflows](advanced_workflows.html): Interactions and mixed-effects models

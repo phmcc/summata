@@ -761,5 +761,5 @@ p <- glmforest(model, labels = labels)
 - [Regression Modeling](regression_modeling.html): `fit()`, `uniscreen()`, and `fullfit()`
 - [Model Comparison](model_comparison.html): `compfit()` for comparing models
 - [Table Export](table_export.html): Export to PDF, Word, and other formats
-- [Multivariate Analysis](multivariate_analysis.html): `multifit()` for multi-outcome analysis
+- [Multivariate Regression](multivariate_regression.html): `multifit()` for multi-outcome analysis
 - [Advanced Workflows](advanced_workflows.html): Interactions and mixed-effects models

@@ -675,4 +675,4 @@ Forest plots display all terms including interactions. For complex interaction p
 - [Model Comparison](model_comparison.html): `compfit()` for comparing models
 - [Table Export](table_export.html): Export to PDF, Word, and other formats
 - [Forest Plots](forest_plots.html): Visualization of regression results
-- [Multivariate Analysis](multivariate_analysis.html): `multifit()` for multi-outcome analysis
+- [Multivariate Regression](multivariate_regression.html): `multifit()` for multi-outcome analysis

@@ -9,7 +9,7 @@ multiple predictors against one outcome (as in
 [`fullfit()`](https://phmcc.github.io/summata/reference/fullfit.md)),
 multivariate regression tests the predictive value of a individual
 factor against multiple outcomes, with or without multivariable
-adjustment with other independent factors. This design is particularly
+adjustment for other independent factors. This design is particularly
 useful when a key exposure or intervention must be evaluated against
 several endpoints simultaneously.
 

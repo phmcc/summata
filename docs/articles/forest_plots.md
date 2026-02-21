@@ -690,7 +690,7 @@ p <- glmforest(model, labels = labels)
   Export](https://phmcc.github.io/summata/articles/table_export.md):
   Export to PDF, Word, and other formats
 - [Multivariate
-  Analysis](https://phmcc.github.io/summata/articles/multivariate_analysis.md):
+  Regression](https://phmcc.github.io/summata/articles/multivariate_regression.md):
   [`multifit()`](https://phmcc.github.io/summata/reference/multifit.md)
   for multi-outcome analysis
 - [Advanced

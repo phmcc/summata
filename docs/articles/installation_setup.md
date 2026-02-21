@@ -263,9 +263,4 @@ file.access(getwd(), mode = 2)  # Returns 0 if writable
 
 ## System Requirements
 
-| Component | Requirement |
-|:---|:---|
-| R | ≥ 4.2.0 |
-| Operating System | Windows, macOS, or Linux |
-| RAM | 4 GB minimum; 8 GB recommended |
-| Disk Space | Base package (\< 5 MB), TinyTeX (~150 MB), Full LaTeX distribution (2–6 GB) |
+[TABLE]

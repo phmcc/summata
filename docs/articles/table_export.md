@@ -765,7 +765,7 @@ save_as_docx(ft, path = "Table1_Custom.docx")
   Plots](https://phmcc.github.io/summata/articles/forest_plots.md):
   Visualization of regression results
 - [Multivariate
-  Analysis](https://phmcc.github.io/summata/articles/multivariate_analysis.md):
+  Regression](https://phmcc.github.io/summata/articles/multivariate_regression.md):
   [`multifit()`](https://phmcc.github.io/summata/reference/multifit.md)
   for multi-outcome analysis
 - [Advanced
