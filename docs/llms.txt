@@ -1,4 +1,4 @@
-# summata [![summata website](reference/figures/summata.svg)](https://phmcc.github.io/summata/)
+# summata [![summata website](reference/figures/summata.png)](https://phmcc.github.io/summata/)
 
 > ***summata*** \| /suːˈmɑːtə/ \| *Latin, n. pl. of* summātum*,
 > gerundive of* summāre*: those that have been summarized*
@@ -14,11 +14,11 @@ from descriptive statistics, through regression modeling, to final
 output—all using a unified interface with standardized,
 presentation-ready results.
 
-![Cox regression forest plot](reference/figures/README_coxforest.png)
-
 For a more comprehensive description of this package and its features,
 see the [full documentation and
 vignettes](https://phmcc.github.io/summata/).
+
+![Cox regression forest plot](reference/figures/README_coxforest.png)
 
 ## Installation
 
@@ -185,7 +185,7 @@ and distinction:
 _(✓ Full support \| ◐ Partial support \| — Not available)
 
 A detailed feature comparison is available in the [package
-documentation](https://phmcc.github.io/summata/articles/feature_comparison.md).
+documentation](https://phmcc.github.io/summata/articles/feature_comparison.html).
 
 ## Illustrative Example
 
@@ -320,7 +320,7 @@ packages:
 
 ## License
 
-GPL ≥ 3.0
+GPL (\>= 3.0)
 
 ## Citation
 
@@ -345,9 +345,9 @@ A BibTeX entry for LaTeX users is
 ## Further Resources
 
 - **Function documentation**: `?function_name` or the [reference
-  index](https://phmcc.github.io/summata/reference/index.md)
+  index](https://phmcc.github.io/summata/reference/index.html)
 - **Vignettes**: `vignette("summata")` or [online
-  articles](https://phmcc.github.io/summata/articles/index.md)
+  articles](https://phmcc.github.io/summata/articles/index.html)
 - **Issue tracker**: [Codeberg
   Issues](https://codeberg.org/phmcc/summata/issues), [GitHub
   Issues](https://github.com/phmcc/summata/issues)

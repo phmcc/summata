@@ -156,7 +156,7 @@ The R ecosystem includes several established packages for regression table gener
 
 <sub>✓ Full support | ◐ Partial support | — Not available</sub>
 
-A detailed feature comparison is available in the [package documentation](articles/feature_comparison.html).
+A detailed feature comparison is available in the [package documentation](https://phmcc.github.io/summata/articles/feature_comparison.html).
 
 ## Illustrative Example
 
@@ -294,8 +294,8 @@ A BibTeX entry for LaTeX users is
 
 ## Further Resources
 
-- **Function documentation**: `?function_name` or the [reference index](reference/index.html)
-- **Vignettes**: `vignette("summata")` or [online articles](articles/index.html)
+- **Function documentation**: `?function_name` or the [reference index](https://phmcc.github.io/summata/reference/index.html)
+- **Vignettes**: `vignette("summata")` or [online articles](https://phmcc.github.io/summata/articles/index.html)
 - **Issue tracker**: [Codeberg Issues](https://codeberg.org/phmcc/summata/issues), [GitHub Issues](https://github.com/phmcc/summata/issues)
 
 ---
