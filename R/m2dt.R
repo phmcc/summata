@@ -3,7 +3,8 @@
 #' Extracts coefficients, confidence intervals, and comprehensive model statistics 
 #' from fitted regression models and converts them to a standardized data.table 
 #' format suitable for further analysis or publication. This is a core utility 
-#' function used internally by other \pkg{summata} regression functions.
+#' function frequently used internally by other \pkg{summata} regression functions,
+#' although it can be used as a standalone function as well.
 #'
 #' @param data Data frame or data.table containing the dataset used to fit the
 #'   model. Required for computing group-level sample sizes and event counts.
@@ -80,8 +81,8 @@
 #'     \item{ci_upper}{Numeric. Upper bound of confidence interval for effect estimate}
 #'     \item{statistic}{Numeric. Test statistic (z-value for GLM/Cox, t-value for LM)}
 #'     \item{p_value}{Numeric. \emph{p}-value for coefficient test}
-#'     \item{sig}{Character. Significance markers: "***" (p<0.001), "**" (\emph{p} < 0.01), 
-#'       "*" (\emph{p} < 0.05), "." (\emph{p} < 0.10), "" (p ≥ 0.10)}
+#'     \item{sig}{Character. Significance markers: \code{***} (p < 0.001), \code{**}
+#'       (\emph{p} < 0.01), \code{*} (\emph{p} < 0.05), \code{.} (\emph{p} < 0.10).}
 #'     \item{sig_binary}{Logical. Binary indicator: \code{TRUE} if \emph{p} < 0.05, 
 #'       \code{FALSE} otherwise}
 #'     \item{reference}{Character. Contains \code{reference_label} for reference 
@@ -102,8 +103,9 @@
 #' }
 #'
 #' \strong{Mixed Effects Models:}
-#' For lme4 models (glmer, lmer), the function extracts fixed effects only.
-#' Random effects structure is not included in the output table.
+#' For \pkg{lme4} models (glmer, lmer), the function extracts fixed effects
+#' only. Random effects variance components are not included in the output
+#' table, as they represent clustering structure rather than predictor effects.
 #'
 #' @seealso
 #' \code{\link{fit}} for the main regression interface,

@@ -32,11 +32,10 @@
 #' @param digits Integer specifying the number of decimal places for effect 
 #'   estimates and confidence intervals in the data table. Default is 2.
 #'
-#' @param p_digits Integer specifying the number of decimal places for \emph{p}-values.
-#'   Values smaller than \code{10^(-p_digits)} are displayed as \code{"< 0.001"}
-#'   (for \code{p_digits = 3}), \code{"< 0.0001"} (for \code{p_digits = 4}),
-#'   \emph{etc.} The threshold string respects \code{number_format} (\emph{e.g.,}
-#'   \code{"< 0,001"} for EU formatting). Default is 3.
+#' @param p_digits Integer specifying the number of decimal places for
+#'   \emph{p}-values. Values smaller than \code{10^(-p_digits)} are displayed
+#'   as \code{"< 0.001"} (for \code{p_digits = 3}), \code{"< 0.0001"} (for
+#'   \code{p_digits = 4}), etc. Default is 3.
 #'
 #' @param conf_level Numeric confidence level for confidence intervals. Must be
 #'   between 0 and 1. Default is 0.95 (95\% confidence intervals). The CI
@@ -140,17 +139,30 @@
 #'
 #' @param number_format Character string or two-element character vector
 #'   controlling thousand and decimal separators in formatted output. Named
-#'   presets: \code{"us"} (default), \code{"eu"}, \code{"space"},
-#'   \code{"none"}. Or a custom vector \code{c(big.mark, decimal.mark)}.
+#'   presets:
+#'   \itemize{
+#'     \item \code{"us"} - Comma thousands, period decimal: \code{1,234.56} [default]
+#'     \item \code{"eu"} - Period thousands, comma decimal: \code{1.234,56}
+#'     \item \code{"space"} - Thin-space thousands, period decimal: \code{1 234.56}
+#'       (SI/ISO 31-0)
+#'     \item \code{"none"} - No thousands separator: \code{1234.56}
+#'   }
+#'   Or provide a custom two-element vector \code{c(big.mark, decimal.mark)},
+#'   \emph{e.g.}, \code{c("'", ".")} for Swiss-style: \verb{1'234.56}.
+#'
 #'   When \code{NULL} (default), uses
-#'   \code{getOption("summata.number_format", "us")}.
+#'   \code{getOption("summata.number_format", "us")}. Set the global option
+#'   once per session to avoid passing this argument repeatedly:
+#'   \preformatted{
+#'     options(summata.number_format = "eu")
+#'   }
 #'
 #' @return A \code{ggplot} object containing the complete forest plot. The plot 
 #'   can be:
 #'   \itemize{
 #'     \item Displayed directly: \code{print(plot)}
 #'     \item Saved to file: \code{ggsave("forest.pdf", plot, width = 12, height = 8)}
-#'     \item Further customized with ggplot2 functions
+#'     \item Further customized with \pkg{ggplot2} functions
 #'   }
 #'   
 #'   The returned object includes an attribute \code{"rec_dims"} 
@@ -206,7 +218,7 @@
 #'     Odds Ratios (OR)
 #'   \item \strong{Log-link models} (\code{link = "log"}): Risk Ratios (RR) 
 #'     or Rate Ratios
-#'   \item \strong{Other exponential families}: Exp(Coefficient)
+#'   \item \strong{Other exponential families}: exp(coefficient)
 #'   \item \strong{Identity link}: Raw coefficients
 #' }
 #' 
@@ -271,16 +283,16 @@
 #' \strong{Saving Plots:}
 #' 
 #' Use \code{ggplot2::ggsave()} with recommended dimensions:
-#' ```r
-#' p <- glmforest(model, data)
-#' dims <- attr(p, "rec_dims")
-#' ggsave("forest.pdf", p, width = dims$width, height = dims$height)
-#' ```
+#' \preformatted{
+#'   p <- glmforest(model, data)
+#'   dims <- attr(p, "rec_dims")
+#'   ggsave("forest.pdf", p, width = dims$width, height = dims$height)
+#' }
 #' 
 #' Or specify custom dimensions:
-#' ```r
+#' \preformatted{
 #' ggsave("forest.png", p, width = 12, height = 8, dpi = 300)
-#' ```
+#' }
 #'
 #' @seealso 
 #' \code{\link{autoforest}} for automatic model detection,

@@ -44,19 +44,7 @@ NULL
 #'     \item{\code{big.mark}}{Character string for thousands separator.}
 #'     \item{\code{decimal.mark}}{Character string for decimal separator.}
 #'   }
-#'
-#' @examples
-#' # Named presets
-#' resolve_number_marks("us")     # list(big.mark = ",",  decimal.mark = ".")
-#' resolve_number_marks("eu")   # list(big.mark = ".",  decimal.mark = ",")
-#' resolve_number_marks("space")  # list(big.mark = " ", decimal.mark = ".")
-#'
-#' # Custom separators
-#' resolve_number_marks(c("'", "."))  # Swiss style: 1'234.56
-#'
-#' # \code{NULL} falls back to getOption("summata.number_format", "us")
-#' resolve_number_marks(NULL)
-#'
+#' 
 #' @keywords internal
 resolve_number_marks <- function(number_format = NULL) {
 

@@ -172,11 +172,10 @@ and logistic models). Default is \code{TRUE}.}
 \item{digits}{Integer specifying decimal places for effect estimates. 
 Default is 2.}
 
-\item{p_digits}{Integer specifying the number of decimal places for \emph{p}-values.
-Values smaller than \code{10^(-p_digits)} are displayed as \code{"< 0.001"}
-(for \code{p_digits = 3}), \code{"< 0.0001"} (for \code{p_digits = 4}),
-\emph{etc.} The threshold string respects \code{number_format} (\emph{e.g.,}
-\code{"< 0,001"} for EU formatting). Default is 3.}
+\item{p_digits}{Integer specifying the number of decimal places for
+\emph{p}-values. Values smaller than \code{10^(-p_digits)} are displayed
+as \code{"< 0.001"} (for \code{p_digits = 3}), \code{"< 0.0001"} (for
+\code{p_digits = 4}), etc. Default is 3.}
 
 \item{labels}{Named character vector or list providing custom display
 labels for variables. Names should match variable names, values are

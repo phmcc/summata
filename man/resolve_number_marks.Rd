@@ -36,17 +36,4 @@ and \code{decimal.mark} values used by all downstream formatting functions.
 Supports named presets, custom two-element vectors, and the global
 \code{summata.number_format} option.
 }
-\examples{
-# Named presets
-resolve_number_marks("us")     # list(big.mark = ",",  decimal.mark = ".")
-resolve_number_marks("eu")   # list(big.mark = ".",  decimal.mark = ",")
-resolve_number_marks("space")  # list(big.mark = " ", decimal.mark = ".")
-
-# Custom separators
-resolve_number_marks(c("'", "."))  # Swiss style: 1'234.56
-
-# \code{NULL} falls back to getOption("summata.number_format", "us")
-resolve_number_marks(NULL)
-
-}
 \keyword{internal}

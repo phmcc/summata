@@ -49,9 +49,25 @@
 #'   }
 #'   See the documentation for the specific forest function for all available options.
 #'
-#' @return A \code{ggplot} object containing the forest plot. The returned object
-#'   includes an attribute \code{"rec_dims"} accessible via 
-#'   \code{attr(plot, "rec_dims")} containing recommended width and height.
+#' @return A \code{ggplot} object containing the complete forest plot. The plot 
+#'   can be:
+#'   \itemize{
+#'     \item Displayed directly: \code{print(plot)}
+#'     \item Saved to file: \code{ggsave("forest.pdf", plot, width = 12, height = 8)}
+#'     \item Further customized with \pkg{ggplot2} functions
+#'   }
+#'   
+#'   The returned object includes an attribute \code{"rec_dims"} 
+#'   accessible via \code{attr(plot, "rec_dims")}, which is a list 
+#'   containing:
+#'   \describe{
+#'     \item{width}{Numeric. Recommended plot width in specified units}
+#'     \item{height}{Numeric. Recommended plot height in specified units}
+#'   }
+#'   
+#'   These recommendations are automatically calculated based on the number of 
+#'   variables, text sizes, and layout parameters, and are printed to console 
+#'   if \code{plot_width} or \code{plot_height} are not specified.
 #'
 #' @details
 #'
@@ -60,8 +76,8 @@
 #' the model class or result type. All parameters are passed through to the
 #' underlying function, so the full range of options remains available.
 #' 
-#' For model-specific advanced features, you may prefer to call the individual
-#' forest functions directly.
+#' For model-specific advanced features, individual forest functions may be
+#' called directly.
 #'
 #' \strong{Automatic Detection Logic:}
 #' 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/multiforest.R
 \name{multiforest}
 \alias{multiforest}
-\title{Create Forest Plot for Multivariate Analysis}
+\title{Create Forest Plot for Multivariate Regression}
 \usage{
 multiforest(
   x,
@@ -46,19 +46,18 @@ multiforest(
 forest plot axis. Default is \code{NULL}, which auto-detects based on 
 model type (\emph{e.g.,} "Odds Ratio", "Hazard Ratio", "Rate Ratio", "Estimate").}
 
-\item{column}{Character string specifying which column to plot when both 
-univariable and multivariable results are present. Options are 
-\code{"adjusted"} (default), \code{"unadjusted"}, or \code{"both"}.
-When \code{"both"}, shows side-by-side forest plots.}
+\item{column}{Character string specifying which results to plot when
+\code{multifit()} was called with \code{columns = "both"}. Options are
+\code{"adjusted"} (default) or \code{"unadjusted"}. Ignored when the
+\code{multifit} result contains only one column type.}
 
 \item{digits}{Integer specifying the number of decimal places for effect 
 estimates and confidence intervals. Default is 2.}
 
-\item{p_digits}{Integer specifying the number of decimal places for \emph{p}-values.
-Values smaller than \code{10^(-p_digits)} are displayed as \code{"< 0.001"}
-(for \code{p_digits = 3}), \code{"< 0.0001"} (for \code{p_digits = 4}),
-\emph{etc.} The threshold string respects \code{number_format} (\emph{e.g.,}
-\code{"< 0,001"} for EU formatting). Default is 3.}
+\item{p_digits}{Integer specifying the number of decimal places for
+\emph{p}-values. Values smaller than \code{10^(-p_digits)} are displayed
+as \code{"< 0.001"} (for \code{p_digits = 3}), \code{"< 0.0001"} (for
+\code{p_digits = 4}), etc. Default is 3.}
 
 \item{conf_level}{Numeric confidence level for confidence intervals. Must be
 between 0 and 1. Default is 0.95 (95\% confidence intervals). The CI
@@ -96,11 +95,11 @@ Default is \code{TRUE}.}
 number of events for each row. Default is \code{TRUE} for binomial and 
 survival models, \code{FALSE} for linear models.}
 
-\item{show_predictor}{Logical. If \code{TRUE}, includes the Predictor column 
+\item{show_predictor}{Logical. If \code{TRUE}, includes the "Predictor" column 
 showing which level of a factor predictor is being compared. If \code{FALSE},
 omits the column (useful when predictor info is in the caption). Default is 
-\code{NULL}, which uses the \code{include_predictor} setting from multifit() 
-if available, otherwise \code{TRUE}.}
+\code{NULL}, which uses the \code{include_predictor} setting from
+\code{multifit()} if available, otherwise \code{TRUE}.}
 
 \item{covariates_footer}{Logical. If \code{TRUE} (default), displays a footer
 listing the covariates used in adjusted models. Covariate names are formatted
@@ -147,21 +146,45 @@ original names).}
 \code{"in"} (inches), \code{"cm"}, or \code{"mm"}. Default is \code{"in"}.}
 
 \item{number_format}{Character string or two-element character vector
-controlling thousand and decimal separators in formatted output. Named
-presets: \code{"us"} (default), \code{"eu"}, \code{"space"},
-\code{"none"}. Or a custom vector \code{c(big.mark, decimal.mark)}.
-When \code{NULL} (default), uses
-\code{getOption("summata.number_format", "us")}.}
+  controlling thousand and decimal separators in formatted output. Named
+  presets:
+  \itemize{
+    \item \code{"us"} - Comma thousands, period decimal: \code{1,234.56} [default]
+    \item \code{"eu"} - Period thousands, comma decimal: \code{1.234,56}
+    \item \code{"space"} - Thin-space thousands, period decimal: \code{1 234.56}
+      (SI/ISO 31-0)
+    \item \code{"none"} - No thousands separator: \code{1234.56}
+  }
+  Or provide a custom two-element vector \code{c(big.mark, decimal.mark)},
+  \emph{e.g.}, \code{c("'", ".")} for Swiss-style: \verb{1'234.56}.
+
+  When \code{NULL} (default), uses
+  \code{getOption("summata.number_format", "us")}. Set the global option
+  once per session to avoid passing this argument repeatedly:
+  \preformatted{
+    options(summata.number_format = "eu")
+  }}
 }
 \value{
-A \code{ggplot} object containing the complete forest plot.
+A \code{ggplot} object containing the complete forest plot. The plot 
+  can be:
+  \itemize{
+    \item Displayed directly: \code{print(plot)}
+    \item Saved to file: \code{ggsave("forest.pdf", plot, width = 12, height = 8)}
+    \item Further customized with \pkg{ggplot2} functions
+  }
   
   The returned object includes an attribute \code{"rec_dims"} 
-  accessible via \code{attr(plot, "rec_dims")}, containing:
+  accessible via \code{attr(plot, "rec_dims")}, which is a list 
+  containing:
   \describe{
     \item{width}{Numeric. Recommended plot width in specified units}
     \item{height}{Numeric. Recommended plot height in specified units}
   }
+  
+  These recommendations are automatically calculated based on the number of 
+  variables, text sizes, and layout parameters, and are printed to console 
+  if \code{plot_width} or \code{plot_height} are not specified.
 }
 \description{
 Generates a publication-ready forest plot from a \code{multifit()} output

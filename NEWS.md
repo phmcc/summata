@@ -1,3 +1,8 @@
+# *summata* 0.10.9 (2026-02-20)
+
+* Documentation headers fine editing and revisions
+* Minor bugfixes
+
 # *summata* 0.10.8 (2026-02-09)
 
 * Add compatibility with US/EU locales and different big/small number marks
