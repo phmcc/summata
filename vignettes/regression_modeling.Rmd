@@ -38,7 +38,7 @@ The `summata` package provides three principal functions for regression analysis
 
 All functions support a wide range of model types including linear models, generalized linear models (logistic, Poisson, Gaussian, Gamma, negative binomial), Cox proportional hazards models, and mixed-effects models, with consistent syntax and formatted output. For a more thorough treatment of the statistical methods underlying these models, see the [Statistical Foundations](statistical_foundations.html) article.
 
-As with other `summata` functions, these functions adhere to the standard `summata` calling convention:
+As with other `summata` functions, these functions adhere to the standard calling convention:
 
 ```{r, eval = FALSE}
 fullfit(data, outcome, predictors, model_type, ...)

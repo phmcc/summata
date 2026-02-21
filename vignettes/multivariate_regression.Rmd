@@ -90,11 +90,11 @@ show_plot <- function(plot, filename, width = 8, height = 5) {
 }
 ```
 
-Multivariate regression refers to the simultaneous examination of a single independent variable across multiple dependent variables. This approach inverts the typical regression paradigm: rather than testing multiple predictors against one outcome (as in `uniscreen()`), multivariate analysis tests one predictor against multiple outcomes. This design is particularly useful when a key exposure or intervention must be evaluated against several endpoints simultaneously.
+Multivariate regression refers to the simultaneous examination of a single independent predictor across multiple dependent variables. This approach inverts the typical regression paradigm: rather than testing multiple predictors against one outcome (as in `uniscreen()`, `fit()`, and `fullfit()`), multivariate regression tests the predictive value of a individual factor against multiple outcomes, with or without multivariable adjustment with other independent factors. This design is particularly useful when a key exposure or intervention must be evaluated against several endpoints simultaneously.
 
 The `multifit()` function implements this workflow, supporting all model types available in `summata` with optional covariate adjustment, interaction terms, and mixed-effects specifications. Results can be visualized using `multiforest()` and exported using standard table export functions.
 
-As with other `summata` functions, this function adheres to the standard `summata` calling convention:
+As with other `summata` functions, this function adheres to the standard calling convention:
 
 ```{r, eval = FALSE}
 multifit(data, outcomes, predictor, covariates, model_type, ...)
@@ -642,9 +642,9 @@ All outcomes in a single `multifit()` call should be of the same type (all binar
 
 ## Categorical Outcomes with More Than Two Levels
 
-`multifit()` supports binary outcomes (via logistic regression) but not multinomial or ordinal outcomes. If you include a categorical outcome with three or more levels (e.g., treatment group with "Control", "Drug A", "Drug B"), the function will issue a warning because binomial GLM coerces such variables to binary (first level *vs.* all others).
+`multifit()` supports binary outcomes (via logistic regression) but not multinomial or ordinal outcomes. If a categorical outcome with three or more levels is included (e.g., treatment group with "Control", "Drug A", "Drug B"), the function will issue a warning because binomial GLM coerces such variables to binary (first level *vs.* all others).
 
-For multi-level categorical outcomes, use dedicated packages outside of `summata`:
+For multilevel categorical outcomes, use dedicated packages outside of `summata`:
 
 ```{r, eval = FALSE}
 ## Multinomial regression (unordered categories)

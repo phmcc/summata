@@ -18,6 +18,8 @@ The `summata` package provides a comprehensive framework for generating summary 
 
 <img src="man/figures/README_coxforest.png" alt="Cox regression forest plot" width="100%">
 
+For a more comprehensive description of this package and its features, see the [full documentation and vignettes](https://phmcc.github.io/summata/).
+
 ## Installation
 
 This package is not yet on CRAN.  Install it from GitHub (stable) or Codeberg (development):
@@ -294,7 +296,7 @@ A BibTeX entry for LaTeX users is
 
 - **Function documentation**: `?function_name` or the [reference index](reference/index.html)
 - **Vignettes**: `vignette("summata")` or [online articles](articles/index.html)
-- **Issue tracker**: [GitHub Issues](https://github.com/phmcc/summata/issues)
+- **Issue tracker**: [Codeberg Issues](https://codeberg.org/phmcc/summata/issues), [GitHub Issues](https://github.com/phmcc/summata/issues)
 
 ---
 

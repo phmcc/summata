@@ -21,7 +21,7 @@ The R ecosystem includes several well-established packages for creating publicat
 | Package | Primary Focus |
 |:--------|:--------------|
 | **summata** | Fast regression workflows, forest plots, multivariate regression |
-| **gtsummary** | Comprehensive table generation, gt ecosystem, maximum flexibility |
+| **gtsummary** | Comprehensive table generation, `gt` ecosystem, maximum flexibility |
 | **finalfit** | Clinical research, missing data handling, bootstrap simulations |
 | **arsenal** | Large-scale summaries, SAS-like output |
 | **stargazer** | Econometrics, LaTeX output, academic journal formatting |
@@ -140,7 +140,7 @@ result <- multifit(
 
 ## Integrated Forest Plots
 
-Forest plots are generated directly from analysis results without intermediate steps:
+Customizable forest plots are generated directly from analysis results without intermediate steps:
 
 ```{r forest-example, eval=FALSE}
 # From univariable screening
@@ -154,7 +154,7 @@ multiforest(multi_result)
 
 ## Performance Optimization
 
-Built on `data.table` for computational efficiency, `summata` demonstrates 35–54% faster execution than comparable workflows in other packages. See the [Benchmarks](benchmarks.html) article for detailed comparisons.
+Built on `data.table` for computational efficiency, `summata` demonstrates 35–54% faster execution than comparable workflows in other packages with a smaller dependency footprint. See the [Benchmarks](benchmarks.html) article for detailed comparisons.
 
 ## Unified API
 

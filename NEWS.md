@@ -1,3 +1,8 @@
+# *summata* 1.0.0 (2026-02-21)
+
+* CRAN release push
+* Upload documentation
+
 # *summata* 0.10.9 (2026-02-20)
 
 * Documentation headers fine editing and revisions
@@ -257,24 +262,24 @@
 
 # *summata* 0.5.2 (2025-10-09)
 
-* Fixed "n" and "events" columns in `uscreen()`, `fit()`, and `*summata*()`
-* Added hyphen space fillers for "p-value", "Uni p", and "Multi p" columns
+* Fix "n" and "events" columns in `uscreen()`, `fit()`, and `*summata*()`
+* Add hyphen space fillers for "p-value", "Uni p", and "Multi p" columns
 
 # *summata* 0.5.1 (2025-10-08)
 
-* Added N rows to `desctable()`
-* Fixed errors with "rolling" p-values in `desctable()`
-* Fixed `m2dt()` edge cases
+* Add N rows to `desctable()`
+* Fix errors with "rolling" p-values in `desctable()`
+* Fix `m2dt()` edge cases
 
 # *summata* 0.5.0 (2025-10-06)
 
-* Added export functions `table2pdf()`, `table2tex()`, and `table2html()`
+* Add export functions `table2pdf()`, `table2tex()`, and `table2html()`
 
 # *summata* 0.4.1 (2025-10-06)
 
 * Added `compfit()` function
 * Reorganized helper functions
-* Cleaned up function names
+* Function name cleanup
 
 # *summata* 0.4.0 (2025-10-05)
 
@@ -287,9 +292,9 @@
 
 # *summata* 0.3.0 (2025-09-30)
 
-* Edits to `desctable()` and `*summata*()`
+* Edits to `desctable()` and `fit()`
 * Addition of "raw data" outputs
-* Expanded internal documentation
+* Expand internal documentation
 
 # *summata* 0.2.1 (2025-09-26)
 
@@ -297,8 +302,8 @@
 
 # *summata* 0.2.0 (2025-09-26)
 
-* Added `desctable()` function
-* Added `*summata*()` function
+* Add `desctable()` function
+* Add `fit()` function
 
 # *summata* 0.1.0 (2025-09-23)
 

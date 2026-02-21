@@ -430,7 +430,7 @@ example15
 
 ---
 
-# Advanced uniscreen() Features
+# Advanced Univariable Screening Features
 
 The `uniscreen()` function supports advanced model specifications including random effects and stratification.
 
@@ -495,7 +495,7 @@ show_plot(example18, "adv_ex18.png")
 
 ---
 
-# Advanced multifit() Features
+# Advanced Multivariate Regression Features
 
 The `multifit()` function supports interactions and mixed-effects models when testing a predictor across multiple outcomes.
 
