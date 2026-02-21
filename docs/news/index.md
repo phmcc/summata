@@ -1,8 +1,8 @@
 # Changelog
 
-## *summata* 1.0.0 (2026-02-21)
+## *summata* 0.11.0 (2026-02-21)
 
-- CRAN release push
+- CRAN submission
 - Upload documentation
 
 ## *summata* 0.10.9 (2026-02-20)

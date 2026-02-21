@@ -1,7 +1,7 @@
 Package: summata
 Type: Package
 Title: Publication-Ready Summary Tables and Forest Plots
-Version: 1.0.0
+Version: 0.11.0
 Authors@R: c(
     person(
         given = c("Paul", "Hsin-ti"), 
@@ -10,7 +10,6 @@ Authors@R: c(
         email = "PaulHMcClelland@protonmail.com",
         comment = c(ORCID = "0000-0002-3119-6531")
     ))
-Maintainer: Paul H. McClelland <PaulHMcClelland@protonmail.com>
 Description: A comprehensive framework for descriptive statistics and regression
     analysis that produces publication-ready tables and forest plots. Provides a
     unified interface from descriptive statistics through multivariable modeling,
@@ -22,7 +21,7 @@ Description: A comprehensive framework for descriptive statistics and regression
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
-URL: https://phmcc.github.io/summata/
+URL: https://phmcc.github.io/summata/, https://github.com/phmcc/summata
 BugReports: https://github.com/phmcc/summata/issues
 Imports:
     data.table,
@@ -42,13 +41,13 @@ Suggests:
     MuMIn,
     officer,
     pROC,
+    ragg,
     ResourceSelection,
     rmarkdown,
     stringr,
+    systemfonts,
     tinytex,
     utils,
     withr,
-    xtable,
-    ragg,
-    systemfonts
+    xtable
 VignetteBuilder: knitr
