@@ -16,9 +16,9 @@
 
 The `summata` package provides a comprehensive framework for generating summary tables and visualizations from statistical analyses. Built on `data.table` for computational efficiency, it streamlines the workflow from descriptive statistics, through regression modeling, to final output—all using a unified interface with standardized, presentation-ready results.
 
-<img src="man/figures/README_coxforest.png" alt="Cox regression forest plot" width="100%">
-
 For a more comprehensive description of this package and its features, see the [full documentation and vignettes](https://phmcc.github.io/summata/).
+
+<img src="man/figures/README_coxforest.png" alt="Cox regression forest plot" width="100%">
 
 ## Installation
 
@@ -270,7 +270,7 @@ The design of `summata` draws inspiration from several existing packages:
 
 ## License
 
-GPL ≥ 3.0
+GPL (>= 3.0)
 
 ## Citation
 
