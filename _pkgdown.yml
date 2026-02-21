@@ -7,10 +7,10 @@ destination: docs
 
 repo:
   url:
-    home: https://codeberg.org/phmcc/summata/
-    source: https://codeberg.org/phmcc/summata/tree/main/
-    issue: https://codeberg.org/phmcc/summata/issues/
-    user: https://codeberg.org/phmcc/
+    home: https://github.com/phmcc/summata/
+    source: https://github.com/phmcc/summata/tree/main/
+    issue: https://github.com/phmcc/summata/issues/
+    user: https://github.com/phmcc/
 
 template:
   assets: pkgdown

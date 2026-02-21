@@ -8,7 +8,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://codeberg.org/phmcc/summata/tree/main/inst/CITATION)
+[`inst/CITATION`](https://github.com/phmcc/summata/tree/main/inst/CITATION)
 
 McClelland PH (2026). *summata: Publication-Ready Summary Tables and
 Forest Plots*. R package version 0.11.0,
