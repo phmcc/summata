@@ -1,4 +1,4 @@
-# <span class="pkg-name">summata</span> <a href="https://phmcc.github.io/summata/"><img src="man/figures/summata.svg" align="right" height="139" alt="summata website" /></a>
+# <span class="pkg-name">summata</span> <a href="https://phmcc.github.io/summata/"><img src="man/figures/summata.png" align="right" height="139" alt="summata website" /></a>
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/phmcc/summata/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/phmcc/summata/actions/workflows/R-CMD-check.yaml)
