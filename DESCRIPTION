@@ -23,15 +23,15 @@ Encoding: UTF-8
 LazyData: true
 URL: https://phmcc.github.io/summata/, https://github.com/phmcc/summata
 BugReports: https://github.com/phmcc/summata/issues
+RoxygenNote: 7.3.3
+Depends: 
+    R (>= 4.2.0)
 Imports:
     data.table,
     survival,
     ggplot2,
     stats,
     grDevices
-RoxygenNote: 7.3.3
-Depends: 
-    R (>= 4.2.0)
 Suggests: 
     MASS,
     coxme,
@@ -47,7 +47,6 @@ Suggests:
     stringr,
     systemfonts,
     tinytex,
-    utils,
     withr,
     xtable
 VignetteBuilder: knitr

@@ -19,3 +19,4 @@
 ^vignettes/articles/figures$
 ^tests/benchmarks/^
 ^\.lintr$
+^CRAN-SUBMISSION$
