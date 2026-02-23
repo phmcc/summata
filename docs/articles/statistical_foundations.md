@@ -505,11 +505,11 @@ Requires the **coxme** package.
 
 Mixed-effects models require adequate sample sizes at both levels:
 
-| Level                    | Recommendation                       |
-|:-------------------------|:-------------------------------------|
-| Clusters                 | ≥20–30 for stable variance estimates |
-| Observations per cluster | ≥5 for random intercepts             |
-| Total observations       | Standard regression guidelines apply |
+| Level                    | Recommendation                        |
+|:-------------------------|:--------------------------------------|
+| Clusters                 | ≥ 20–30 for stable variance estimates |
+| Observations per cluster | ≥ 5 for random intercepts             |
+| Total observations       | Standard regression guidelines apply  |
 
 ------------------------------------------------------------------------
 
