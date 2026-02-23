@@ -11,7 +11,13 @@
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -26,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -167,11 +173,13 @@ class.</p>
 </h3>
 <p>Linear regression models the expected value of a continuous response
 as a linear combination of predictors:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mo stretchy="false" form="prefix">[</mo><msub><mi>Y</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">|</mo><msub><mi>X</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">]</mo><mo>=</mo><msub><mi>β</mi><mn>0</mn></msub><mo>+</mo><msub><mi>β</mi><mn>1</mn></msub><msub><mi>X</mi><mrow><mi>i</mi><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>β</mi><mn>2</mn></msub><msub><mi>X</mi><mrow><mi>i</mi><mn>2</mn></mrow></msub><mo>+</mo><mi>⋯</mi><mo>+</mo><msub><mi>β</mi><mi>p</mi></msub><msub><mi>X</mi><mrow><mi>i</mi><mi>p</mi></mrow></msub></mrow><annotation encoding="application/x-tex">E[Y_i | X_i] = \beta_0 + \beta_1 X_{i1} + \beta_2 X_{i2} + \cdots + \beta_p X_{ip}</annotation></semantics></math></p>
+<p><span class="math display">\[E[Y_i | X_i] = \beta_0 + \beta_1 X_{i1}
++ \beta_2 X_{i2} + \cdots + \beta_p X_{ip}\]</span></p>
 <p>Equivalently, in matrix notation:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐘</mi><mo>=</mo><mi>𝐗</mi><mi>𝛃</mi><mo>+</mo><mi>𝛆</mi></mrow><annotation encoding="application/x-tex">\mathbf{Y} = \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\varepsilon}</annotation></semantics></math></p>
-<p>where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝛆</mi><mo>∼</mo><mi>N</mi><mo stretchy="false" form="prefix">(</mo><mn>𝟎</mn><mo>,</mo><msup><mi>σ</mi><mn>2</mn></msup><mi>𝐈</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\boldsymbol{\varepsilon} \sim N(\mathbf{0}, \sigma^2\mathbf{I})</annotation></semantics></math>.</p>
+<p><span class="math display">\[\mathbf{Y} = \mathbf{X}\mathbf{\beta} +
+\mathbf{\varepsilon}\]</span></p>
+<p>where <span class="math inline">\(\mathbf{\varepsilon} \sim
+N(\mathbf{0}, \sigma^2\mathbf{I})\)</span>.</p>
 </div>
 <div class="section level3">
 <h3 id="assumptions">Assumptions<a class="anchor" aria-label="anchor" href="#assumptions"></a>
@@ -197,7 +205,8 @@ correlated</li>
 <h3 id="parameter-estimation">Parameter Estimation<a class="anchor" aria-label="anchor" href="#parameter-estimation"></a>
 </h3>
 <p>Coefficients are estimated by ordinary least squares (OLS):</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>𝛃</mi><mo accent="true">̂</mo></mover><mo>=</mo><mo stretchy="false" form="prefix">(</mo><msup><mi>𝐗</mi><mo>′</mo></msup><mi>𝐗</mi><msup><mo stretchy="false" form="postfix">)</mo><mrow><mi>−</mi><mn>1</mn></mrow></msup><msup><mi>𝐗</mi><mo>′</mo></msup><mi>𝐘</mi></mrow><annotation encoding="application/x-tex">\hat{\boldsymbol{\beta}} = (\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'\mathbf{Y}</annotation></semantics></math></p>
+<p><span class="math display">\[\hat{\mathbf{\beta}} =
+(\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'\mathbf{Y}\]</span></p>
 </div>
 <div class="section level3">
 <h3 id="interpretation">Interpretation<a class="anchor" aria-label="anchor" href="#interpretation"></a>
@@ -232,12 +241,12 @@ predictors constant.</p>
 <div class="section level3">
 <h3 id="goodness-of-fit">Goodness of Fit<a class="anchor" aria-label="anchor" href="#goodness-of-fit"></a>
 </h3>
-<p><strong>Coefficient of determination (<em>R</em>²):</strong>
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>R</mi><mn>2</mn></msup><mo>=</mo><mn>1</mn><mo>−</mo><mfrac><mrow><munder><mo>∑</mo><mi>i</mi></munder><mo stretchy="false" form="prefix">(</mo><msub><mi>Y</mi><mi>i</mi></msub><mo>−</mo><msub><mover><mi>Y</mi><mo accent="true">̂</mo></mover><mi>i</mi></msub><msup><mo stretchy="false" form="postfix">)</mo><mn>2</mn></msup></mrow><mrow><munder><mo>∑</mo><mi>i</mi></munder><mo stretchy="false" form="prefix">(</mo><msub><mi>Y</mi><mi>i</mi></msub><mo>−</mo><mover><mi>Y</mi><mo accent="true">‾</mo></mover><msup><mo stretchy="false" form="postfix">)</mo><mn>2</mn></msup></mrow></mfrac></mrow><annotation encoding="application/x-tex">R^2 = 1 - \frac{\sum_i (Y_i - \hat{Y}_i)^2}{\sum_i (Y_i - \bar{Y})^2}</annotation></semantics></math></p>
-<p><strong>Adjusted <em>R</em>²:</strong>
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>R</mi><mtext mathvariant="normal">adj</mtext><mn>2</mn></msubsup><mo>=</mo><mn>1</mn><mo>−</mo><mfrac><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><msup><mi>R</mi><mn>2</mn></msup><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="prefix">(</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow><mrow><mi>n</mi><mo>−</mo><mi>p</mi><mo>−</mo><mn>1</mn></mrow></mfrac></mrow><annotation encoding="application/x-tex">R^2_{\text{adj}} = 1 - \frac{(1 - R^2)(n - 1)}{n - p - 1}</annotation></semantics></math></p>
-<p><strong>Root mean squared error (RMSE):</strong>
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">RMSE</mtext><mo>=</mo><msqrt><mrow><mfrac><mn>1</mn><mi>n</mi></mfrac><munder><mo>∑</mo><mi>i</mi></munder><mo stretchy="false" form="prefix">(</mo><msub><mi>Y</mi><mi>i</mi></msub><mo>−</mo><msub><mover><mi>Y</mi><mo accent="true">̂</mo></mover><mi>i</mi></msub><msup><mo stretchy="false" form="postfix">)</mo><mn>2</mn></msup></mrow></msqrt></mrow><annotation encoding="application/x-tex">\text{RMSE} = \sqrt{\frac{1}{n}\sum_i (Y_i - \hat{Y}_i)^2}</annotation></semantics></math></p>
+<p><strong>Coefficient of determination (<em>R</em>²):</strong> <span class="math display">\[R^2 = 1 - \frac{\sum_i (Y_i -
+\hat{Y}_i)^2}{\sum_i (Y_i - \bar{Y})^2}\]</span></p>
+<p><strong>Adjusted <em>R</em>²:</strong> <span class="math display">\[R^2_{\text{adj}} = 1 - \frac{(1 - R^2)(n - 1)}{n
+- p - 1}\]</span></p>
+<p><strong>Root mean squared error (RMSE):</strong> <span class="math display">\[\text{RMSE} = \sqrt{\frac{1}{n}\sum_i (Y_i -
+\hat{Y}_i)^2}\]</span></p>
 </div>
 <div class="section level3">
 <h3 id="implementation">Implementation<a class="anchor" aria-label="anchor" href="#implementation"></a>
@@ -260,14 +269,12 @@ components:</p>
 <strong>Random component</strong>: Distribution of <em>Y</em> from
 the exponential family</li>
 <li>
-<strong>Systematic component</strong>: Linear predictor
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>η</mi><mo>=</mo><mi>𝐗</mi><mi>𝛃</mi></mrow><annotation encoding="application/x-tex">\eta = \mathbf{X}\boldsymbol{\beta}</annotation></semantics></math>
+<strong>Systematic component</strong>: Linear predictor <span class="math inline">\(\eta = \mathbf{X}\mathbf{\beta}\)</span>
 </li>
 <li>
-<strong>Link function</strong>:
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mo stretchy="false" form="prefix">(</mo><mi>μ</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>η</mi></mrow><annotation encoding="application/x-tex">g(\mu) = \eta</annotation></semantics></math>,
-where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>μ</mi><mo>=</mo><mi>E</mi><mo stretchy="false" form="prefix">[</mo><mi>Y</mi><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">\mu = E[Y]</annotation></semantics></math>
+<strong>Link function</strong>: <span class="math inline">\(g(\mu) =
+\eta\)</span>, where <span class="math inline">\(\mu =
+E[Y]\)</span>
 </li>
 </ol>
 <div class="section level3">
@@ -278,9 +285,12 @@ where
 </h4>
 <p>For binary outcomes <em>Y</em> ∈ {0, 1}, logistic regression models
 the log-odds of the event:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi>log</mi><mo>⁡</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>P</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>Y</mi><mi>i</mi></msub><mo>=</mo><mn>1</mn><mo stretchy="false" form="prefix">|</mo><msub><mi>X</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><mrow><mn>1</mn><mo>−</mo><mi>P</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>Y</mi><mi>i</mi></msub><mo>=</mo><mn>1</mn><mo stretchy="false" form="prefix">|</mo><msub><mi>X</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>β</mi><mn>0</mn></msub><mo>+</mo><msub><mi>β</mi><mn>1</mn></msub><msub><mi>X</mi><mrow><mi>i</mi><mn>1</mn></mrow></msub><mo>+</mo><mi>⋯</mi><mo>+</mo><msub><mi>β</mi><mi>p</mi></msub><msub><mi>X</mi><mrow><mi>i</mi><mi>p</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\log\left(\frac{P(Y_i = 1 | X_i)}{1 - P(Y_i = 1 | X_i)}\right) = \beta_0 + \beta_1 X_{i1} + \cdots + \beta_p X_{ip}</annotation></semantics></math></p>
-<p>Equivalently:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>Y</mi><mi>i</mi></msub><mo>=</mo><mn>1</mn><mo stretchy="false" form="prefix">|</mo><msub><mi>X</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mfrac><mrow><mrow><mi>exp</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>β</mi><mn>0</mn></msub><mo>+</mo><msub><mi>β</mi><mn>1</mn></msub><msub><mi>X</mi><mrow><mi>i</mi><mn>1</mn></mrow></msub><mo>+</mo><mi>⋯</mi><mo>+</mo><msub><mi>β</mi><mi>p</mi></msub><msub><mi>X</mi><mrow><mi>i</mi><mi>p</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo></mrow><mrow><mn>1</mn><mo>+</mo><mrow><mi>exp</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>β</mi><mn>0</mn></msub><mo>+</mo><msub><mi>β</mi><mn>1</mn></msub><msub><mi>X</mi><mrow><mi>i</mi><mn>1</mn></mrow></msub><mo>+</mo><mi>⋯</mi><mo>+</mo><msub><mi>β</mi><mi>p</mi></msub><msub><mi>X</mi><mrow><mi>i</mi><mi>p</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo></mrow></mfrac></mrow><annotation encoding="application/x-tex">P(Y_i = 1 | X_i) = \frac{\exp(\beta_0 + \beta_1 X_{i1} + \cdots + \beta_p X_{ip})}{1 + \exp(\beta_0 + \beta_1 X_{i1} + \cdots + \beta_p X_{ip})}</annotation></semantics></math></p>
+<p><span class="math display">\[\log\left(\frac{P(Y_i = 1 | X_i)}{1 -
+P(Y_i = 1 | X_i)}\right) = \beta_0 + \beta_1 X_{i1} + \cdots + \beta_p
+X_{ip}\]</span></p>
+<p>Equivalently: <span class="math display">\[P(Y_i = 1 | X_i) =
+\frac{\exp(\beta_0 + \beta_1 X_{i1} + \cdots + \beta_p X_{ip})}{1 +
+\exp(\beta_0 + \beta_1 X_{i1} + \cdots + \beta_p X_{ip})}\]</span></p>
 </div>
 <div class="section level4">
 <h4 id="assumptions-1">Assumptions<a class="anchor" aria-label="anchor" href="#assumptions-1"></a>
@@ -306,7 +316,9 @@ rule of thumb)</li>
 </h4>
 <p>The exponentiated coefficient exp(<em>β</em>ⱼ) yields the
 <strong>odds ratio (OR)</strong>:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">OR</mtext><mo>=</mo><mrow><mi>exp</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>β</mi><mi>j</mi></msub><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mfrac><mrow><mtext mathvariant="normal">Odds</mtext><mo stretchy="false" form="prefix">(</mo><mi>Y</mi><mo>=</mo><mn>1</mn><mo stretchy="false" form="prefix">|</mo><msub><mi>X</mi><mi>j</mi></msub><mo>+</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow><mrow><mtext mathvariant="normal">Odds</mtext><mo stretchy="false" form="prefix">(</mo><mi>Y</mi><mo>=</mo><mn>1</mn><mo stretchy="false" form="prefix">|</mo><msub><mi>X</mi><mi>j</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow></mfrac></mrow><annotation encoding="application/x-tex">\text{OR} = \exp(\beta_j) = \frac{\text{Odds}(Y = 1 | X_j + 1)}{\text{Odds}(Y = 1 | X_j)}</annotation></semantics></math></p>
+<p><span class="math display">\[\text{OR} = \exp(\beta_j) =
+\frac{\text{Odds}(Y = 1 | X_j + 1)}{\text{Odds}(Y = 1 |
+X_j)}\]</span></p>
 <table class="table">
 <thead><tr class="header">
 <th align="left">OR Value</th>
@@ -346,7 +358,8 @@ OR compares each level to the reference category.</p>
 </h4>
 <p>For count outcomes <em>Y</em> ∈ {0, 1, 2, …}, Poisson regression
 models the log of the expected count:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi>log</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>E</mi><mo stretchy="false" form="prefix">[</mo><msub><mi>Y</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">|</mo><msub><mi>X</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">]</mo><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>β</mi><mn>0</mn></msub><mo>+</mo><msub><mi>β</mi><mn>1</mn></msub><msub><mi>X</mi><mrow><mi>i</mi><mn>1</mn></mrow></msub><mo>+</mo><mi>⋯</mi><mo>+</mo><msub><mi>β</mi><mi>p</mi></msub><msub><mi>X</mi><mrow><mi>i</mi><mi>p</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\log(E[Y_i | X_i]) = \beta_0 + \beta_1 X_{i1} + \cdots + \beta_p X_{ip}</annotation></semantics></math></p>
+<p><span class="math display">\[\log(E[Y_i | X_i]) = \beta_0 + \beta_1
+X_{i1} + \cdots + \beta_p X_{ip}\]</span></p>
 </div>
 <div class="section level4">
 <h4 id="assumptions-2">Assumptions<a class="anchor" aria-label="anchor" href="#assumptions-2"></a>
@@ -370,7 +383,8 @@ linear in predictors</li>
 </h4>
 <p>The exponentiated coefficient exp(<em>β</em>ⱼ) yields the
 <strong>rate ratio (RR)</strong>:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">RR</mtext><mo>=</mo><mrow><mi>exp</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>β</mi><mi>j</mi></msub><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mfrac><mrow><mi>E</mi><mo stretchy="false" form="prefix">[</mo><mi>Y</mi><mo stretchy="false" form="prefix">|</mo><msub><mi>X</mi><mi>j</mi></msub><mo>+</mo><mn>1</mn><mo stretchy="false" form="postfix">]</mo></mrow><mrow><mi>E</mi><mo stretchy="false" form="prefix">[</mo><mi>Y</mi><mo stretchy="false" form="prefix">|</mo><msub><mi>X</mi><mi>j</mi></msub><mo stretchy="false" form="postfix">]</mo></mrow></mfrac></mrow><annotation encoding="application/x-tex">\text{RR} = \exp(\beta_j) = \frac{E[Y | X_j + 1]}{E[Y | X_j]}</annotation></semantics></math></p>
+<p><span class="math display">\[\text{RR} = \exp(\beta_j) = \frac{E[Y |
+X_j + 1]}{E[Y | X_j]}\]</span></p>
 </div>
 <div class="section level4">
 <h4 id="overdispersion">Overdispersion<a class="anchor" aria-label="anchor" href="#overdispersion"></a>
@@ -406,9 +420,11 @@ component</li>
 </h4>
 <p>Negative binomial regression extends Poisson regression with an
 additional dispersion parameter <em>θ</em>:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Y</mi><mi>i</mi></msub><mo>∼</mo><mtext mathvariant="normal">NegBin</mtext><mo stretchy="false" form="prefix">(</mo><msub><mi>μ</mi><mi>i</mi></msub><mo>,</mo><mi>θ</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">Y_i \sim \text{NegBin}(\mu_i, \theta)</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi>log</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>μ</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>β</mi><mn>0</mn></msub><mo>+</mo><msub><mi>β</mi><mn>1</mn></msub><msub><mi>X</mi><mrow><mi>i</mi><mn>1</mn></mrow></msub><mo>+</mo><mi>⋯</mi><mo>+</mo><msub><mi>β</mi><mi>p</mi></msub><msub><mi>X</mi><mrow><mi>i</mi><mi>p</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\log(\mu_i) = \beta_0 + \beta_1 X_{i1} + \cdots + \beta_p X_{ip}</annotation></semantics></math></p>
-<p>The variance is:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Var</mtext><mo stretchy="false" form="prefix">(</mo><msub><mi>Y</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>μ</mi><mi>i</mi></msub><mo>+</mo><mfrac><msubsup><mi>μ</mi><mi>i</mi><mn>2</mn></msubsup><mi>θ</mi></mfrac></mrow><annotation encoding="application/x-tex">\text{Var}(Y_i) = \mu_i + \frac{\mu_i^2}{\theta}</annotation></semantics></math></p>
+<p><span class="math display">\[Y_i \sim \text{NegBin}(\mu_i,
+\theta)\]</span> <span class="math display">\[\log(\mu_i) = \beta_0 +
+\beta_1 X_{i1} + \cdots + \beta_p X_{ip}\]</span></p>
+<p>The variance is: <span class="math display">\[\text{Var}(Y_i) = \mu_i
++ \frac{\mu_i^2}{\theta}\]</span></p>
 <p>As <em>θ</em> → ∞, the negative binomial converges to Poisson.</p>
 </div>
 <div class="section level4">
@@ -437,9 +453,10 @@ model</li>
 </h4>
 <p>For positive, continuous, right-skewed outcomes, Gamma regression
 models:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Y</mi><mi>i</mi></msub><mo>∼</mo><mtext mathvariant="normal">Gamma</mtext><mo stretchy="false" form="prefix">(</mo><msub><mi>μ</mi><mi>i</mi></msub><mo>,</mo><mi>ϕ</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">Y_i \sim \text{Gamma}(\mu_i, \phi)</annotation></semantics></math></p>
-<p>With log link (default):
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi>log</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>E</mi><mo stretchy="false" form="prefix">[</mo><msub><mi>Y</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">|</mo><msub><mi>X</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">]</mo><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>β</mi><mn>0</mn></msub><mo>+</mo><msub><mi>β</mi><mn>1</mn></msub><msub><mi>X</mi><mrow><mi>i</mi><mn>1</mn></mrow></msub><mo>+</mo><mi>⋯</mi><mo>+</mo><msub><mi>β</mi><mi>p</mi></msub><msub><mi>X</mi><mrow><mi>i</mi><mi>p</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\log(E[Y_i | X_i]) = \beta_0 + \beta_1 X_{i1} + \cdots + \beta_p X_{ip}</annotation></semantics></math></p>
+<p><span class="math display">\[Y_i \sim \text{Gamma}(\mu_i,
+\phi)\]</span></p>
+<p>With log link (default): <span class="math display">\[\log(E[Y_i |
+X_i]) = \beta_0 + \beta_1 X_{i1} + \cdots + \beta_p X_{ip}\]</span></p>
 </div>
 <div class="section level4">
 <h4 id="assumptions-3">Assumptions<a class="anchor" aria-label="anchor" href="#assumptions-3"></a>
@@ -459,7 +476,8 @@ proportional to mean squared</li>
 </h4>
 <p>With log link, exp(<em>β</em>ⱼ) represents the <strong>multiplicative
 effect</strong> (ratio):</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mi>E</mi><mo stretchy="false" form="prefix">[</mo><mi>Y</mi><mo stretchy="false" form="prefix">|</mo><msub><mi>X</mi><mi>j</mi></msub><mo>+</mo><mn>1</mn><mo stretchy="false" form="postfix">]</mo></mrow><mrow><mi>E</mi><mo stretchy="false" form="prefix">[</mo><mi>Y</mi><mo stretchy="false" form="prefix">|</mo><msub><mi>X</mi><mi>j</mi></msub><mo stretchy="false" form="postfix">]</mo></mrow></mfrac><mo>=</mo><mrow><mi>exp</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>β</mi><mi>j</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\frac{E[Y | X_j + 1]}{E[Y | X_j]} = \exp(\beta_j)</annotation></semantics></math></p>
+<p><span class="math display">\[\frac{E[Y | X_j + 1]}{E[Y | X_j]} =
+\exp(\beta_j)\]</span></p>
 </div>
 <div class="section level4">
 <h4 id="common-applications">Common Applications<a class="anchor" aria-label="anchor" href="#common-applications"></a>
@@ -486,7 +504,8 @@ effect</strong> (ratio):</p>
 </h4>
 <p>For overdispersed binary data, quasibinomial regression estimates a
 dispersion parameter:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Var</mtext><mo stretchy="false" form="prefix">(</mo><msub><mi>Y</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>ϕ</mi><mo>⋅</mo><msub><mi>μ</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><msub><mi>μ</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{Var}(Y_i) = \phi \cdot \mu_i(1 - \mu_i)</annotation></semantics></math></p>
+<p><span class="math display">\[\text{Var}(Y_i) = \phi \cdot \mu_i(1 -
+\mu_i)\]</span></p>
 <p>where <em>φ</em> &gt; 1 indicates overdispersion. Coefficients are
 identical to binomial GLM, but standard errors are adjusted.</p>
 </div>
@@ -494,7 +513,8 @@ identical to binomial GLM, but standard errors are adjusted.</p>
 <h4 id="quasipoisson">Quasipoisson<a class="anchor" aria-label="anchor" href="#quasipoisson"></a>
 </h4>
 <p>For overdispersed count data:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Var</mtext><mo stretchy="false" form="prefix">(</mo><msub><mi>Y</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>ϕ</mi><mo>⋅</mo><msub><mi>μ</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\text{Var}(Y_i) = \phi \cdot \mu_i</annotation></semantics></math></p>
+<p><span class="math display">\[\text{Var}(Y_i) = \phi \cdot
+\mu_i\]</span></p>
 </div>
 <div class="section level4">
 <h4 id="implementation-5">Implementation<a class="anchor" aria-label="anchor" href="#implementation-5"></a>
@@ -575,7 +595,8 @@ identical to binomial GLM, but standard errors are adjusted.</p>
 <h4 id="model-specification-5">Model Specification<a class="anchor" aria-label="anchor" href="#model-specification-5"></a>
 </h4>
 <p>The Cox model relates the hazard function to predictors:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="prefix">|</mo><msub><mi>X</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>h</mi><mn>0</mn></msub><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mrow><mi>exp</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>β</mi><mn>1</mn></msub><msub><mi>X</mi><mrow><mi>i</mi><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>β</mi><mn>2</mn></msub><msub><mi>X</mi><mrow><mi>i</mi><mn>2</mn></mrow></msub><mo>+</mo><mi>⋯</mi><mo>+</mo><msub><mi>β</mi><mi>p</mi></msub><msub><mi>X</mi><mrow><mi>i</mi><mi>p</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">h(t | X_i) = h_0(t) \exp(\beta_1 X_{i1} + \beta_2 X_{i2} + \cdots + \beta_p X_{ip})</annotation></semantics></math></p>
+<p><span class="math display">\[h(t | X_i) = h_0(t) \exp(\beta_1 X_{i1}
++ \beta_2 X_{i2} + \cdots + \beta_p X_{ip})\]</span></p>
 <p>where:</p>
 <ul>
 <li>
@@ -610,7 +631,8 @@ correlated</li>
 </h4>
 <p>The <strong>hazard ratio (HR)</strong> = exp(<em>β</em>ⱼ) represents
 the relative hazard:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">HR</mtext><mo>=</mo><mfrac><mrow><mi>h</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="prefix">|</mo><msub><mi>X</mi><mi>j</mi></msub><mo>+</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow><mrow><mi>h</mi><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="prefix">|</mo><msub><mi>X</mi><mi>j</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow></mfrac><mo>=</mo><mrow><mi>exp</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>β</mi><mi>j</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{HR} = \frac{h(t | X_j + 1)}{h(t | X_j)} = \exp(\beta_j)</annotation></semantics></math></p>
+<p><span class="math display">\[\text{HR} = \frac{h(t | X_j + 1)}{h(t |
+X_j)} = \exp(\beta_j)\]</span></p>
 <table class="table">
 <thead><tr class="header">
 <th align="left">HR Value</th>
@@ -635,8 +657,8 @@ the relative hazard:</p>
 <div class="section level4">
 <h4 id="goodness-of-fit-1">Goodness of Fit<a class="anchor" aria-label="anchor" href="#goodness-of-fit-1"></a>
 </h4>
-<p><strong>Concordance (Harrell’s C-index):</strong>
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><mo>=</mo><mi>P</mi><mo stretchy="false" form="prefix">(</mo><msub><mover><mi>h</mi><mo accent="true">̂</mo></mover><mi>i</mi></msub><mo>&gt;</mo><msub><mover><mi>h</mi><mo accent="true">̂</mo></mover><mi>j</mi></msub><mo stretchy="false" form="prefix">|</mo><msub><mi>T</mi><mi>i</mi></msub><mo>&lt;</mo><msub><mi>T</mi><mi>j</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">C = P(\hat{h}_i &gt; \hat{h}_j | T_i &lt; T_j)</annotation></semantics></math></p>
+<p><strong>Concordance (Harrell’s C-index):</strong> <span class="math display">\[C = P(\hat{h}_i &gt; \hat{h}_j | T_i &lt;
+T_j)\]</span></p>
 <p>Proportion of concordant pairs; C = 0.5 indicates no discrimination,
 C = 1 indicates perfect discrimination.</p>
 </div>
@@ -666,7 +688,9 @@ C = 1 indicates perfect discrimination.</p>
 </h4>
 <p>For matched case-control studies, conditional logistic regression
 conditions on the stratum:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi>log</mi><mo>⁡</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>P</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>Y</mi><mi>i</mi></msub><mo>=</mo><mn>1</mn><mo stretchy="false" form="prefix">|</mo><msub><mi>X</mi><mi>i</mi></msub><mo>,</mo><mtext mathvariant="normal">stratum</mtext><mo stretchy="false" form="postfix">)</mo></mrow><mrow><mi>P</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>Y</mi><mi>i</mi></msub><mo>=</mo><mn>0</mn><mo stretchy="false" form="prefix">|</mo><msub><mi>X</mi><mi>i</mi></msub><mo>,</mo><mtext mathvariant="normal">stratum</mtext><mo stretchy="false" form="postfix">)</mo></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msub><mi>β</mi><mn>1</mn></msub><msub><mi>X</mi><mrow><mi>i</mi><mn>1</mn></mrow></msub><mo>+</mo><mi>⋯</mi><mo>+</mo><msub><mi>β</mi><mi>p</mi></msub><msub><mi>X</mi><mrow><mi>i</mi><mi>p</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\log\left(\frac{P(Y_i = 1 | X_i, \text{stratum})}{P(Y_i = 0 | X_i, \text{stratum})}\right) = \beta_1 X_{i1} + \cdots + \beta_p X_{ip}</annotation></semantics></math></p>
+<p><span class="math display">\[\log\left(\frac{P(Y_i = 1 | X_i,
+\text{stratum})}{P(Y_i = 0 | X_i, \text{stratum})}\right) = \beta_1
+X_{i1} + \cdots + \beta_p X_{ip}\]</span></p>
 <p>Note: No intercept is estimated; it is absorbed by the stratum.</p>
 </div>
 <div class="section level4">
@@ -697,7 +721,8 @@ correlation within clusters by incorporating random effects.</p>
 <h3 id="general-framework">General Framework<a class="anchor" aria-label="anchor" href="#general-framework"></a>
 </h3>
 <p>For observation <em>i</em> within cluster <em>j</em>:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mo stretchy="false" form="prefix">(</mo><mi>E</mi><mo stretchy="false" form="prefix">[</mo><msub><mi>Y</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo stretchy="false" form="prefix">|</mo><msub><mi>X</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>,</mo><msub><mi>u</mi><mi>j</mi></msub><mo stretchy="false" form="postfix">]</mo><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>𝐗</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mi>𝛃</mi><mo>+</mo><msub><mi>𝐙</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><msub><mi>𝐮</mi><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">g(E[Y_{ij} | X_{ij}, u_j]) = \mathbf{X}_{ij}\boldsymbol{\beta} + \mathbf{Z}_{ij}\mathbf{u}_j</annotation></semantics></math></p>
+<p><span class="math display">\[g(E[Y_{ij} | X_{ij}, u_j]) =
+\mathbf{X}_{ij}\mathbf{\beta} + \mathbf{Z}_{ij}\mathbf{u}_j\]</span></p>
 <p>where:</p>
 <ul>
 <li>
@@ -716,7 +741,9 @@ random effects (cluster-specific deviations)</li>
 <h4 id="model-specification-7">Model Specification<a class="anchor" aria-label="anchor" href="#model-specification-7"></a>
 </h4>
 <p>For continuous outcomes:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>Y</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><msub><mi>β</mi><mn>0</mn></msub><mo>+</mo><msub><mi>β</mi><mn>1</mn></msub><msub><mi>X</mi><mrow><mn>1</mn><mi>i</mi><mi>j</mi></mrow></msub><mo>+</mo><mi>⋯</mi><mo>+</mo><msub><mi>β</mi><mi>p</mi></msub><msub><mi>X</mi><mrow><mi>p</mi><mi>i</mi><mi>j</mi></mrow></msub><mo>+</mo><msub><mi>u</mi><mrow><mn>0</mn><mi>j</mi></mrow></msub><mo>+</mo><msub><mi>u</mi><mrow><mn>1</mn><mi>j</mi></mrow></msub><msub><mi>X</mi><mrow><mn>1</mn><mi>i</mi><mi>j</mi></mrow></msub><mo>+</mo><msub><mi>ε</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mrow><annotation encoding="application/x-tex">Y_{ij} = \beta_0 + \beta_1 X_{1ij} + \cdots + \beta_p X_{pij} + u_{0j} + u_{1j}X_{1ij} + \varepsilon_{ij}</annotation></semantics></math></p>
+<p><span class="math display">\[Y_{ij} = \beta_0 + \beta_1 X_{1ij} +
+\cdots + \beta_p X_{pij} + u_{0j} + u_{1j}X_{1ij} +
+\varepsilon_{ij}\]</span></p>
 <p>where:</p>
 <ul>
 <li>
@@ -772,7 +799,8 @@ random effects (cluster-specific deviations)</li>
 <h4 id="model-specification-8">Model Specification<a class="anchor" aria-label="anchor" href="#model-specification-8"></a>
 </h4>
 <p>GLMMs extend mixed-effects models to non-normal outcomes:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mo stretchy="false" form="prefix">(</mo><mi>E</mi><mo stretchy="false" form="prefix">[</mo><msub><mi>Y</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo stretchy="false" form="prefix">|</mo><msub><mi>X</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>,</mo><msub><mi>u</mi><mi>j</mi></msub><mo stretchy="false" form="postfix">]</mo><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>β</mi><mn>0</mn></msub><mo>+</mo><msub><mi>β</mi><mn>1</mn></msub><msub><mi>X</mi><mrow><mn>1</mn><mi>i</mi><mi>j</mi></mrow></msub><mo>+</mo><mi>⋯</mi><mo>+</mo><msub><mi>β</mi><mi>p</mi></msub><msub><mi>X</mi><mrow><mi>p</mi><mi>i</mi><mi>j</mi></mrow></msub><mo>+</mo><msub><mi>u</mi><mrow><mn>0</mn><mi>j</mi></mrow></msub></mrow><annotation encoding="application/x-tex">g(E[Y_{ij} | X_{ij}, u_j]) = \beta_0 + \beta_1 X_{1ij} + \cdots + \beta_p X_{pij} + u_{0j}</annotation></semantics></math></p>
+<p><span class="math display">\[g(E[Y_{ij} | X_{ij}, u_j]) = \beta_0 +
+\beta_1 X_{1ij} + \cdots + \beta_p X_{pij} + u_{0j}\]</span></p>
 <p>Common families:</p>
 <ul>
 <li>
@@ -807,7 +835,8 @@ due to the non-linear link function.</p>
 <h4 id="model-specification-9">Model Specification<a class="anchor" aria-label="anchor" href="#model-specification-9"></a>
 </h4>
 <p>For clustered survival data:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>h</mi><mn>0</mn></msub><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mrow><mi>exp</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>β</mi><mn>1</mn></msub><msub><mi>X</mi><mrow><mn>1</mn><mi>i</mi><mi>j</mi></mrow></msub><mo>+</mo><mi>⋯</mi><mo>+</mo><msub><mi>β</mi><mi>p</mi></msub><msub><mi>X</mi><mrow><mi>p</mi><mi>i</mi><mi>j</mi></mrow></msub><mo>+</mo><msub><mi>u</mi><mi>j</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">h_{ij}(t) = h_0(t) \exp(\beta_1 X_{1ij} + \cdots + \beta_p X_{pij} + u_j)</annotation></semantics></math></p>
+<p><span class="math display">\[h_{ij}(t) = h_0(t) \exp(\beta_1 X_{1ij}
++ \cdots + \beta_p X_{pij} + u_j)\]</span></p>
 <p>where <em>u</em>ⱼ ~ N(0, σ²ᵤ) is the cluster-specific frailty
 term.</p>
 </div>
@@ -864,7 +893,8 @@ levels:</p>
 </h3>
 <p>An interaction occurs when the effect of one predictor depends on the
 level of another. For predictors <em>X</em> and <em>Z</em>:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mo stretchy="false" form="prefix">(</mo><mi>E</mi><mo stretchy="false" form="prefix">[</mo><mi>Y</mi><mo stretchy="false" form="postfix">]</mo><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>β</mi><mn>0</mn></msub><mo>+</mo><msub><mi>β</mi><mn>1</mn></msub><mi>X</mi><mo>+</mo><msub><mi>β</mi><mn>2</mn></msub><mi>Z</mi><mo>+</mo><msub><mi>β</mi><mn>3</mn></msub><mo stretchy="false" form="prefix">(</mo><mi>X</mi><mo>×</mo><mi>Z</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">g(E[Y]) = \beta_0 + \beta_1 X + \beta_2 Z + \beta_3 (X \times Z)</annotation></semantics></math></p>
+<p><span class="math display">\[g(E[Y]) = \beta_0 + \beta_1 X + \beta_2
+Z + \beta_3 (X \times Z)\]</span></p>
 <p>where:</p>
 <ul>
 <li>
@@ -884,7 +914,8 @@ effect by <em>Z</em>)</li>
 </h4>
 <p>For continuous <em>X</em> and <em>Z</em>, the effect of <em>X</em> on
 <em>Y</em> is:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mi>∂</mi><mi>E</mi><mo stretchy="false" form="prefix">[</mo><mi>Y</mi><mo stretchy="false" form="postfix">]</mo></mrow><mrow><mi>∂</mi><mi>X</mi></mrow></mfrac><mo>=</mo><msub><mi>β</mi><mn>1</mn></msub><mo>+</mo><msub><mi>β</mi><mn>3</mn></msub><mi>Z</mi></mrow><annotation encoding="application/x-tex">\frac{\partial E[Y]}{\partial X} = \beta_1 + \beta_3 Z</annotation></semantics></math></p>
+<p><span class="math display">\[\frac{\partial E[Y]}{\partial X} =
+\beta_1 + \beta_3 Z\]</span></p>
 <p>The effect of <em>X</em> varies linearly with <em>Z</em>.</p>
 </div>
 <div class="section level4">
@@ -936,7 +967,7 @@ compare AIC/BIC</li>
 <div class="section level4">
 <h4 id="akaike-information-criterion-aic">Akaike Information Criterion (AIC)<a class="anchor" aria-label="anchor" href="#akaike-information-criterion-aic"></a>
 </h4>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">AIC</mtext><mo>=</mo><mi>−</mi><mn>2</mn><mrow><mi>log</mi><mo>⁡</mo></mrow><mi>L</mi><mo>+</mo><mn>2</mn><mi>k</mi></mrow><annotation encoding="application/x-tex">\text{AIC} = -2\log L + 2k</annotation></semantics></math></p>
+<p><span class="math display">\[\text{AIC} = -2\log L + 2k\]</span></p>
 <p>where <em>L</em> is the maximized likelihood and <em>k</em> is the
 number of parameters. AIC balances fit and complexity; lower values
 indicate better models.</p>
@@ -944,7 +975,8 @@ indicate better models.</p>
 <div class="section level4">
 <h4 id="bayesian-information-criterion-bic">Bayesian Information Criterion (BIC)<a class="anchor" aria-label="anchor" href="#bayesian-information-criterion-bic"></a>
 </h4>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">BIC</mtext><mo>=</mo><mi>−</mi><mn>2</mn><mrow><mi>log</mi><mo>⁡</mo></mrow><mi>L</mi><mo>+</mo><mi>k</mi><mrow><mi>log</mi><mo>⁡</mo></mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">\text{BIC} = -2\log L + k\log n</annotation></semantics></math></p>
+<p><span class="math display">\[\text{BIC} = -2\log L + k\log
+n\]</span></p>
 <p>BIC penalizes complexity more heavily than AIC, especially for large
 samples.</p>
 </div>
@@ -980,7 +1012,8 @@ samples.</p>
 <h4 id="concordance-c-statistic">Concordance (C-statistic)<a class="anchor" aria-label="anchor" href="#concordance-c-statistic"></a>
 </h4>
 <p>For binary outcomes or survival models:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><mo>=</mo><mi>P</mi><mo stretchy="false" form="prefix">(</mo><msub><mover><mi>p</mi><mo accent="true">̂</mo></mover><mi>i</mi></msub><mo>&gt;</mo><msub><mover><mi>p</mi><mo accent="true">̂</mo></mover><mi>j</mi></msub><mo stretchy="false" form="prefix">|</mo><msub><mi>Y</mi><mi>i</mi></msub><mo>=</mo><mn>1</mn><mo>,</mo><msub><mi>Y</mi><mi>j</mi></msub><mo>=</mo><mn>0</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">C = P(\hat{p}_i &gt; \hat{p}_j | Y_i = 1, Y_j = 0)</annotation></semantics></math></p>
+<p><span class="math display">\[C = P(\hat{p}_i &gt; \hat{p}_j | Y_i =
+1, Y_j = 0)\]</span></p>
 <table class="table">
 <thead><tr class="header">
 <th align="left">C Value</th>
@@ -1014,7 +1047,8 @@ samples.</p>
 <h4 id="brier-score">Brier Score<a class="anchor" aria-label="anchor" href="#brier-score"></a>
 </h4>
 <p>For binary outcomes:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Brier</mtext><mo>=</mo><mfrac><mn>1</mn><mi>n</mi></mfrac><munder><mo>∑</mo><mi>i</mi></munder><mo stretchy="false" form="prefix">(</mo><msub><mi>Y</mi><mi>i</mi></msub><mo>−</mo><msub><mover><mi>p</mi><mo accent="true">̂</mo></mover><mi>i</mi></msub><msup><mo stretchy="false" form="postfix">)</mo><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">\text{Brier} = \frac{1}{n}\sum_i (Y_i - \hat{p}_i)^2</annotation></semantics></math></p>
+<p><span class="math display">\[\text{Brier} = \frac{1}{n}\sum_i (Y_i -
+\hat{p}_i)^2\]</span></p>
 <p>Lower values indicate better calibration; Brier = 0 is perfect.</p>
 </div>
 </div>
@@ -1024,16 +1058,18 @@ samples.</p>
 <div class="section level4">
 <h4 id="r²-linear-models">R² (Linear Models)<a class="anchor" aria-label="anchor" href="#r%C2%B2-linear-models"></a>
 </h4>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>R</mi><mn>2</mn></msup><mo>=</mo><mn>1</mn><mo>−</mo><mfrac><mrow><mi>S</mi><msub><mi>S</mi><mtext mathvariant="normal">res</mtext></msub></mrow><mrow><mi>S</mi><msub><mi>S</mi><mtext mathvariant="normal">tot</mtext></msub></mrow></mfrac></mrow><annotation encoding="application/x-tex">R^2 = 1 - \frac{SS_{\text{res}}}{SS_{\text{tot}}}</annotation></semantics></math></p>
+<p><span class="math display">\[R^2 = 1 -
+\frac{SS_{\text{res}}}{SS_{\text{tot}}}\]</span></p>
 <p>Proportion of variance explained.</p>
 </div>
 <div class="section level4">
 <h4 id="pseudo-r²-glms">Pseudo-R² (GLMs)<a class="anchor" aria-label="anchor" href="#pseudo-r%C2%B2-glms"></a>
 </h4>
-<p><strong>McFadden’s pseudo-R²:</strong>
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>R</mi><mtext mathvariant="normal">McF</mtext><mn>2</mn></msubsup><mo>=</mo><mn>1</mn><mo>−</mo><mfrac><mrow><mrow><mi>log</mi><mo>⁡</mo></mrow><msub><mi>L</mi><mtext mathvariant="normal">full</mtext></msub></mrow><mrow><mrow><mi>log</mi><mo>⁡</mo></mrow><msub><mi>L</mi><mtext mathvariant="normal">null</mtext></msub></mrow></mfrac></mrow><annotation encoding="application/x-tex">R^2_{\text{McF}} = 1 - \frac{\log L_{\text{full}}}{\log L_{\text{null}}}</annotation></semantics></math></p>
-<p><strong>Nagelkerke’s pseudo-R²:</strong>
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>R</mi><mi>N</mi><mn>2</mn></msubsup><mo>=</mo><mfrac><mrow><mn>1</mn><mo>−</mo><mo stretchy="false" form="prefix">(</mo><msub><mi>L</mi><mtext mathvariant="normal">null</mtext></msub><mi>/</mi><msub><mi>L</mi><mtext mathvariant="normal">full</mtext></msub><msup><mo stretchy="false" form="postfix">)</mo><mrow><mn>2</mn><mi>/</mi><mi>n</mi></mrow></msup></mrow><mrow><mn>1</mn><mo>−</mo><msubsup><mi>L</mi><mtext mathvariant="normal">null</mtext><mrow><mn>2</mn><mi>/</mi><mi>n</mi></mrow></msubsup></mrow></mfrac></mrow><annotation encoding="application/x-tex">R^2_N = \frac{1 - (L_{\text{null}}/L_{\text{full}})^{2/n}}{1 - L_{\text{null}}^{2/n}}</annotation></semantics></math></p>
+<p><strong>McFadden’s pseudo-R²:</strong> <span class="math display">\[R^2_{\text{McF}} = 1 - \frac{\log
+L_{\text{full}}}{\log L_{\text{null}}}\]</span></p>
+<p><strong>Nagelkerke’s pseudo-R²:</strong> <span class="math display">\[R^2_N = \frac{1 -
+(L_{\text{null}}/L_{\text{full}})^{2/n}}{1 -
+L_{\text{null}}^{2/n}}\]</span></p>
 <p>Values are not directly comparable to linear <em>R</em>²; 0.2–0.4
 typically indicates good fit for logistic models.</p>
 <hr>
@@ -1078,27 +1114,28 @@ research objectives.</p>
 <p>Each component metric is transformed to a 0–100 scale where higher
 values indicate better performance:</p>
 <p><strong>Information criteria</strong> (AIC, BIC) — Lower is better:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mtext mathvariant="normal">AIC</mtext></msub><mo>=</mo><mn>100</mn><mo>×</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>−</mo><mfrac><mrow><msub><mtext mathvariant="normal">AIC</mtext><mi>i</mi></msub><mo>−</mo><msub><mtext mathvariant="normal">AIC</mtext><mi>min</mi></msub></mrow><mrow><msub><mtext mathvariant="normal">AIC</mtext><mi>max</mi></msub><mo>−</mo><msub><mtext mathvariant="normal">AIC</mtext><mi>min</mi></msub></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">S_{\text{AIC}} = 100 \times \left(1 - \frac{\text{AIC}_i - \text{AIC}_{\min}}{\text{AIC}_{\max} - \text{AIC}_{\min}}\right)</annotation></semantics></math></p>
+<span class="math display">\[S_{\text{AIC}} = 100 \times \left(1 -
+\frac{\text{AIC}_i - \text{AIC}_{\min}}{\text{AIC}_{\max} -
+\text{AIC}_{\min}}\right)\]</span></p>
 <p><strong>Concordance</strong> (<em>C</em>-statistic) — Higher is
-better, with 0.5 as floor:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mi>C</mi></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mn>0</mn></mtd><mtd columnalign="left" style="text-align: left"><mi>C</mi><mo>≤</mo><mn>0.5</mn></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mn>200</mn><mo>×</mo><mo stretchy="false" form="prefix">(</mo><mi>C</mi><mo>−</mo><mn>0.5</mn><mo stretchy="false" form="postfix">)</mo></mtd><mtd columnalign="left" style="text-align: left"><mi>C</mi><mo>&gt;</mo><mn>0.5</mn></mtd></mtr></mtable></mrow></mrow><annotation encoding="application/x-tex">S_C = \begin{cases} 
+better, with 0.5 as floor: <span class="math display">\[S_C =
+\begin{cases}
 0 &amp; C \leq 0.5 \\
 200 \times (C - 0.5) &amp; C &gt; 0.5
-\end{cases}</annotation></semantics></math></p>
+\end{cases}\]</span></p>
 <p><strong>Pseudo-<em>R</em>²</strong> (McFadden) — Scaled recognizing
-typical range:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><msup><mi>R</mi><mn>2</mn></msup></msub><mo>=</mo><mrow><mi>min</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><mn>100</mn><mo>,</mo><mspace width="0.278em"></mspace><mn>250</mn><mo>×</mo><msubsup><mi>R</mi><mtext mathvariant="normal">McF</mtext><mn>2</mn></msubsup><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">S_{R^2} = \min(100, \; 250 \times R^2_{\text{McF}})</annotation></semantics></math></p>
+typical range: <span class="math display">\[S_{R^2} = \min(100, \; 250
+\times R^2_{\text{McF}})\]</span></p>
 <p>This scaling reflects that McFadden’s <em>R</em>² rarely exceeds 0.4
 even for well-fitting models.</p>
 <p><strong>Brier score</strong> — Lower is better, with 0.25 as no-skill
-baseline:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mtext mathvariant="normal">Brier</mtext></msub><mo>=</mo><mn>100</mn><mo>×</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>−</mo><mfrac><mtext mathvariant="normal">Brier</mtext><mn>0.25</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">S_{\text{Brier}} = 100 \times \left(1 - \frac{\text{Brier}}{0.25}\right)</annotation></semantics></math></p>
-<p><strong>Convergence</strong> — Categorical assessment:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mtext mathvariant="normal">conv</mtext></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mn>100</mn></mtd><mtd columnalign="left" style="text-align: left"><mtext mathvariant="normal">converged normally</mtext></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mn>70</mn></mtd><mtd columnalign="left" style="text-align: left"><mtext mathvariant="normal">suspect (warnings)</mtext></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mn>30</mn></mtd><mtd columnalign="left" style="text-align: left"><mtext mathvariant="normal">failed to converge</mtext></mtd></mtr></mtable></mrow></mrow><annotation encoding="application/x-tex">S_{\text{conv}} = \begin{cases}
+baseline: <span class="math display">\[S_{\text{Brier}} = 100 \times
+\left(1 - \frac{\text{Brier}}{0.25}\right)\]</span></p>
+<p><strong>Convergence</strong> — Categorical assessment: <span class="math display">\[S_{\text{conv}} = \begin{cases}
 100 &amp; \text{converged normally} \\
 70 &amp; \text{suspect (warnings)} \\
 30 &amp; \text{failed to converge}
-\end{cases}</annotation></semantics></math></p>
+\end{cases}\]</span></p>
 </div>
 <div class="section level4">
 <h4 id="weighting">Weighting<a class="anchor" aria-label="anchor" href="#weighting"></a>
@@ -1162,7 +1199,8 @@ reflect the relative importance of each metric for that model class:</p>
 <h4 id="final-score">Final Score<a class="anchor" aria-label="anchor" href="#final-score"></a>
 </h4>
 <p>The CMS is computed as a weighted sum:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">CMS</mtext><mo>=</mo><munder><mo>∑</mo><mi>j</mi></munder><msub><mi>w</mi><mi>j</mi></msub><mo>×</mo><msub><mi>S</mi><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">\text{CMS} = \sum_j w_j \times S_j</annotation></semantics></math></p>
+<p><span class="math display">\[\text{CMS} = \sum_j w_j \times
+S_j\]</span></p>
 <p>where <em>w</em>ⱼ are the weights and <em>S</em>ⱼ are the normalized
 component scores.</p>
 </div>
@@ -1265,7 +1303,8 @@ expertise</li>
 <h3 id="wald-confidence-intervals">Wald Confidence Intervals<a class="anchor" aria-label="anchor" href="#wald-confidence-intervals"></a>
 </h3>
 <p>For coefficient <em>β</em> with standard error SE(<em>β</em>):</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>β</mi><mo>±</mo><msub><mi>z</mi><mrow><mn>1</mn><mo>−</mo><mi>α</mi><mi>/</mi><mn>2</mn></mrow></msub><mo>⋅</mo><mtext mathvariant="normal">SE</mtext><mo stretchy="false" form="prefix">(</mo><mi>β</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\beta \pm z_{1-\alpha/2} \cdot \text{SE}(\beta)</annotation></semantics></math></p>
+<p><span class="math display">\[\beta \pm z_{1-\alpha/2} \cdot
+\text{SE}(\beta)\]</span></p>
 <p>where <em>z</em>₁₋α/₂ is the standard normal quantile (1.96 for 95%
 CI).</p>
 </div>
@@ -1274,13 +1313,15 @@ CI).</p>
 </h3>
 <p>More accurate for small samples or boundary estimates; based on the
 likelihood ratio:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><mi>β</mi><mo>:</mo><mn>2</mn><mo stretchy="false" form="prefix">[</mo><mrow><mi>log</mi><mo>⁡</mo></mrow><mi>L</mi><mo stretchy="false" form="prefix">(</mo><mover><mi>β</mi><mo accent="true">̂</mo></mover><mo stretchy="false" form="postfix">)</mo><mo>−</mo><mrow><mi>log</mi><mo>⁡</mo></mrow><mi>L</mi><mo stretchy="false" form="prefix">(</mo><mi>β</mi><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">]</mo><mo>≤</mo><msubsup><mi>χ</mi><mrow><mn>1</mn><mo>,</mo><mn>1</mn><mo>−</mo><mi>α</mi></mrow><mn>2</mn></msubsup><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\{\beta : 2[\log L(\hat{\beta}) - \log L(\beta)] \leq \chi^2_{1,1-\alpha}\}</annotation></semantics></math></p>
+<p><span class="math display">\[\{\beta : 2[\log L(\hat{\beta}) - \log
+L(\beta)] \leq \chi^2_{1,1-\alpha}\}\]</span></p>
 </div>
 <div class="section level3">
 <h3 id="confidence-intervals-for-effect-measures">Confidence Intervals for Effect Measures<a class="anchor" aria-label="anchor" href="#confidence-intervals-for-effect-measures"></a>
 </h3>
 <p>For exponentiated coefficients (OR, HR, RR):</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi>exp</mi><mo>⁡</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>β</mi><mo>±</mo><msub><mi>z</mi><mrow><mn>1</mn><mo>−</mo><mi>α</mi><mi>/</mi><mn>2</mn></mrow></msub><mo>⋅</mo><mtext mathvariant="normal">SE</mtext><mo stretchy="false" form="prefix">(</mo><mi>β</mi><mo stretchy="false" form="postfix">)</mo><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\exp\left(\beta \pm z_{1-\alpha/2} \cdot \text{SE}(\beta)\right)</annotation></semantics></math></p>
+<p><span class="math display">\[\exp\left(\beta \pm z_{1-\alpha/2} \cdot
+\text{SE}(\beta)\right)\]</span></p>
 <hr>
 </div>
 </div>
@@ -1291,14 +1332,16 @@ likelihood ratio:</p>
 <h3 id="wald-test">Wald Test<a class="anchor" aria-label="anchor" href="#wald-test"></a>
 </h3>
 <p>Tests H₀: <em>β</em> = 0 using:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>z</mi><mo>=</mo><mfrac><mover><mi>β</mi><mo accent="true">̂</mo></mover><mrow><mtext mathvariant="normal">SE</mtext><mo stretchy="false" form="prefix">(</mo><mover><mi>β</mi><mo accent="true">̂</mo></mover><mo stretchy="false" form="postfix">)</mo></mrow></mfrac></mrow><annotation encoding="application/x-tex">z = \frac{\hat{\beta}}{\text{SE}(\hat{\beta})}</annotation></semantics></math></p>
+<p><span class="math display">\[z =
+\frac{\hat{\beta}}{\text{SE}(\hat{\beta})}\]</span></p>
 <p>Under H₀, <em>z</em> ~ N(0, 1).</p>
 </div>
 <div class="section level3">
 <h3 id="likelihood-ratio-test">Likelihood Ratio Test<a class="anchor" aria-label="anchor" href="#likelihood-ratio-test"></a>
 </h3>
 <p>Compares nested models:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Λ</mi><mo>=</mo><mi>−</mi><mn>2</mn><mo stretchy="false" form="prefix">[</mo><mrow><mi>log</mi><mo>⁡</mo></mrow><msub><mi>L</mi><mtext mathvariant="normal">reduced</mtext></msub><mo>−</mo><mrow><mi>log</mi><mo>⁡</mo></mrow><msub><mi>L</mi><mtext mathvariant="normal">full</mtext></msub><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">\Lambda = -2[\log L_{\text{reduced}} - \log L_{\text{full}}]</annotation></semantics></math></p>
+<p><span class="math display">\[\Lambda = -2[\log L_{\text{reduced}} -
+\log L_{\text{full}}]\]</span></p>
 <p>Under H₀, Λ ~ χ²ₖ, where <em>k</em> is the difference in
 parameters.</p>
 </div>

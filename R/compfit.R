@@ -117,7 +117,7 @@
 #'     \item{Converged}{Whether model converged properly}
 #'     \item{AIC}{Akaike Information Criterion}
 #'     \item{BIC}{Bayesian Information Criterion}
-#'     \item{Pseudo-\emph{R}²}{McFadden's pseudo-R-squared (GLM)}
+#'     \item{Pseudo-\emph{R}\eqn{^2}}{McFadden's pseudo-R-squared (GLM)}
 #'     \item{Concordance}{C-statistic (logistic/survival)}
 #'     \item{Brier Score}{Brier accuracy score (logistic)}
 #'     \item{Global \emph{p}}{Overall model \emph{p}-value}

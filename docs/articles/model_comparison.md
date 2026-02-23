@@ -42,10 +42,7 @@ data(clintrial_labels)
 ## Model Quality Metrics
 
 The [`compfit()`](https://phmcc.github.io/summata/reference/compfit.md)
-function uses several metrics for comparing models. For mathematical
-details, see the [Statistical
-Foundations](https://phmcc.github.io/summata/articles/statistical_foundations.md)
-article.
+function uses several metrics for comparing models.
 
 | Metric      | Interpretation                                         | Better |
 |:------------|:-------------------------------------------------------|:-------|
@@ -845,9 +842,6 @@ comparison[, .(Model, `Composite Model Score (CMS)`, AIC, Concordance)]
 
 ## Further Reading
 
-- [Statistical
-  Foundations](https://phmcc.github.io/summata/articles/statistical_foundations.md):
-  Mathematical details for model quality metrics
 - [Descriptive
   Tables](https://phmcc.github.io/summata/articles/descriptive_tables.md):
   [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md)

@@ -56,8 +56,8 @@ m2dt(
 - keep_qc_stats:
 
   Logical. If `TRUE`, includes model quality statistics such as AIC,
-  BIC, R², concordance, and model fit tests. These appear as additional
-  columns in the output. Default is `TRUE`.
+  BIC, *R*\\^2\\, concordance, and model fit tests. These appear as
+  additional columns in the output. Default is `TRUE`.
 
 - include_intercept:
 
@@ -257,7 +257,6 @@ glm_result
 #> 7:      FALSE
 
 # \donttest{
-  options(width = 180)
 # Example 2: Extract from linear model
 lm_model <- lm(los_days ~ age + sex + surgery, data = clintrial)
 

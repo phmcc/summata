@@ -673,7 +673,7 @@ print(linear_screen)
 #> 8:  Baseline Hemoglobin (g/dL)       -    834  0.10 (-0.08 to 0.27)   0.273
 
 # Example 7: Poisson regression for equidispersed count outcomes
-# fu_count has variance ≈ mean, appropriate for standard Poisson
+# fu_count has variance ~= mean, appropriate for standard Poisson
 poisson_screen <- uniscreen(
     data = clintrial,
     outcome = "fu_count",

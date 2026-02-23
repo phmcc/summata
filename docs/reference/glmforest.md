@@ -221,8 +221,8 @@ glmforest(
 - qc_footer:
 
   Logical. If `TRUE`, displays model quality control statistics in the
-  footer (observations analyzed, model family, deviance, pseudo-*R*²,
-  AIC). Default is `TRUE`.
+  footer (observations analyzed, model family, deviance,
+  pseudo-*R*\\^2\\, AIC). Default is `TRUE`.
 
 - units:
 
@@ -319,7 +319,7 @@ The forest plot consists of several integrated components:
 
     - Deviance statistics
 
-    - Pseudo-*R*² (McFadden)
+    - Pseudo-*R*\\^2\\ (McFadden)
 
     - AIC
 
@@ -397,7 +397,7 @@ The footer shows key diagnostic information:
 
 - **Null/Residual Deviance**: Model fit improvement
 
-- **Pseudo-*R*²**: McFadden *R*² = 1 - (log L_1 / log L_2)
+- **Pseudo-*R*\\^2\\**: McFadden *R*\\^2\\ = 1 - (log L_1 / log L_2)
 
 - **AIC**: For model comparison (lower is better)
 

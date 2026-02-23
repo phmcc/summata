@@ -62,13 +62,13 @@ desctable(
   variables. Multiple values create separate rows for each variable.
   Options:
 
-  - `"mean_sd"` - Mean ± standard deviation
+  - `"mean_sd"` - Mean \\\pm\\ standard deviation
 
   - `"median_iqr"` - Median \[interquartile range\]
 
-  - `"median_range"` - Median (minimum–maximum)
+  - `"median_range"` - Median (minimum-maximum)
 
-  - `"range"` - Minimum–maximum only
+  - `"range"` - Minimum-maximum only
 
   Default is `"median_iqr"`.
 
@@ -160,11 +160,11 @@ desctable(
   variables:
 
   - `"auto"` - Automatic selection: Fisher exact test if any expected
-    cell frequency \< 5, otherwise χ² test \[default\]
+    cell frequency \< 5, otherwise \\\chi^2\\ test \[default\]
 
   - `"fisher"` - Fisher exact test
 
-  - `"chisq"` - χ² test
+  - `"chisq"` - \\\chi^2\\ test
 
 - total:
 
@@ -231,9 +231,9 @@ descriptive statistics. The table structure includes:
 
 - Group:
 
-  For continuous variables: statistic type (*e.g.*, "Mean ± SD", "Median
-  \[IQR\]"). For categorical variables: category level. Empty for
-  variable name rows.
+  For continuous variables: statistic type (*e.g.*, "Mean \\\pm\\ SD",
+  "Median \[IQR\]"). For categorical variables: category level. Empty
+  for variable name rows.
 
 - Total:
 
@@ -296,7 +296,7 @@ When `test = TRUE` and `by` is specified:
   for median-based statistics
 
 - **Categorical with "auto"**: Fisher exact test when any expected cell
-  frequency \< 5; χ² test otherwise
+  frequency \< 5; \\\chi^2\\ test otherwise
 
 - **Survival**: Log-rank test for comparing survival curves
 
@@ -321,17 +321,18 @@ All numeric output respects the `number_format` parameter. Separators
 within ranges and confidence intervals adapt automatically to avoid
 ambiguity:
 
-- Mean ± SD: `"45.2 ± 12.3"` (US) or `"45,2 ± 12,3"` (EU)
+- Mean \\\pm\\ SD: `"45.2 \eqn{\pm} 12.3"` (US) or
+  `"45,2 \eqn{\pm} 12,3"` (EU)
 
-- Median \[IQR\]: `"38.0 [28.0-52.0]"` (US) or `"38,0 [28,0–52,0]"` (EU,
+- Median \[IQR\]: `"38.0 [28.0-52.0]"` (US) or `"38,0 [28,0-52,0]"` (EU,
   en-dash separator)
 
 - Range: `"18.0-75.0"` (positive, US), `"-5.0 to 10.0"` (when bounds are
   negative)
 
-- Survival: `"24.5 (21.2-28.9)"` (US) or `"24,5 (21,2–28,9)"` (EU)
+- Survival: `"24.5 (21.2-28.9)"` (US) or `"24,5 (21,2-28,9)"` (EU)
 
-- Counts ≥ 1000: `"1,234"` (US) or `"1.234"` (EU)
+- Counts \\\ge\\ 1000: `"1,234"` (US) or `"1.234"` (EU)
 
 - *p*-values: `"< 0.001"` (US) or `"< 0,001"` (EU)
 
@@ -602,14 +603,10 @@ result <- desctable(clintrial,
                   variables = c("age", "bmi"))
 raw_data <- attr(result, "raw_data")
 print(raw_data)
-#>    Variable      Group  stat_type Total Total_q1 Total_q3 Total_n Control Control_q1 Control_q3 Control_n Drug A Drug A_q1 Drug A_q3 Drug A_n Drug B Drug B_q1 Drug B_q3 Drug B_n
-#>      <char>     <char>     <char> <num>    <num>    <num>   <int>   <num>      <num>      <num>     <int>  <num>     <num>     <num>    <int>  <num>     <num>     <num>    <int>
-#> 1:      age median_iqr median_iqr    60     52.0     67.0     850      59       52.0       66.5       196  60.00      51.0      68.0      292   61.0      53.0      68.0      362
-#> 2:      bmi median_iqr median_iqr    28     24.7     31.5     838      28       24.4       31.9       194  28.25      24.9      31.3      288   27.8      24.7      31.5      356
-#>      p_value
-#>        <num>
-#> 1: 0.4653885
-#> 2: 0.8314435
+#>    Variable      Group  stat_type Total Total_q1 Total_q3 Total_n Control Control_q1 Control_q3 Control_n Drug A Drug A_q1 Drug A_q3 Drug A_n Drug B Drug B_q1 Drug B_q3 Drug B_n   p_value
+#>      <char>     <char>     <char> <num>    <num>    <num>   <int>   <num>      <num>      <num>     <int>  <num>     <num>     <num>    <int>  <num>     <num>     <num>    <int>     <num>
+#> 1:      age median_iqr median_iqr    60     52.0     67.0     850      59       52.0       66.5       196  60.00      51.0      68.0      292   61.0      53.0      68.0      362 0.4653885
+#> 2:      bmi median_iqr median_iqr    28     24.7     31.5     838      28       24.4       31.9       194  28.25      24.9      31.3      288   27.8      24.7      31.5      356 0.8314435
 # Raw data includes unformatted numbers, SDs, quartiles, etc.
 
 # Example 18: Check which grouping variable was used

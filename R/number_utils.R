@@ -80,7 +80,7 @@ resolve_number_marks <- function(number_format = NULL) {
 #' Format a numeric value with locale-aware separators
 #'
 #' General-purpose number formatter used by all display functions. For values
-#' ≥ 1000 (in absolute value), inserts the appropriate
+#' \eqn{\ge} 1000 (in absolute value), inserts the appropriate
 #' thousands separator. Fixes negative-zero display artefacts.
 #'
 #' @param x Numeric value to format.

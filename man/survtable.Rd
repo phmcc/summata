@@ -254,10 +254,10 @@ Separators within confidence intervals adapt automatically to avoid
 ambiguity:
 \itemize{
   \item Survival probabilities: \code{"85\% (80\%-89\%)"} (US) or
-    \code{"85\% (80\%–89\%)"} (EU, en-dash separator)
+    \code{"85\% (80\%-89\%)"} (EU, en-dash separator)
   \item Median survival: \code{"24.5 (21.2-28.9)"} (US) or
-    \code{"24,5 (21,2–28,9)"} (EU)
-  \item Counts ≥ 1000: \code{"1,234"} (US) or
+    \code{"24,5 (21,2-28,9)"} (EU)
+  \item Counts \eqn{\ge} 1000: \code{"1,234"} (US) or
     \code{"1.234"} (EU)
   \item \emph{p}-values: \code{"< 0.001"} (US) or
     \code{"< 0,001"} (EU)

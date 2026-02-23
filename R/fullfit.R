@@ -22,7 +22,7 @@
 #' @param method Character string specifying the variable selection strategy:
 #'   \itemize{
 #'     \item \code{"screen"} - Automatic selection based on univariable \emph{p}-value 
-#'       threshold. Only predictors with p ≤ \code{p_threshold} in univariable 
+#'       threshold. Only predictors with p \eqn{\le} \code{p_threshold} in univariable 
 #'       analysis are included in the multivariable model [default]
 #'     \item \code{"all"} - Include all predictors in both univariable and 
 #'       multivariable analyses (no selection)
@@ -37,9 +37,9 @@
 #'   
 #' @param p_threshold Numeric \emph{p}-value threshold for automatic variable
 #'   selection when \code{method = "screen"}. Predictors with univariable
-#'   \emph{p}-value less than the threshold are included in multivariable
-#'   model. Common values: 0.05 (strict), 0.10 (moderate), 0.20 (liberal
-#'   screening). Default is 0.05. Ignored for other methods.
+#'   \emph{p}-value less than or equal to the threshold are included in
+#'   multivariable model. Common values: 0.05 (strict), 0.10 (moderate),
+#'   0.20 (liberal screening). Default is 0.05. Ignored for other methods.
 #'   
 #' @param columns Character string specifying which result columns to display:
 #'   \itemize{
@@ -269,7 +269,7 @@
 #'   \item \strong{Variable selection}: Based on the \code{method} parameter:
 #'     \itemize{
 #'       \item \code{"screen"}: Automatically selects predictors with univariable 
-#'         p ≤ \code{p_threshold}
+#'         p \eqn{\le} \code{p_threshold}
 #'       \item \code{"all"}: Includes all predictors (no selection)
 #'       \item \code{"custom"}: Uses predictors specified in \code{multi_predictors}
 #'     }
@@ -334,9 +334,9 @@
 #' 
 #' Rule of thumb for multivariable models:
 #' \itemize{
-#'   \item \strong{Logistic regression}: ≥ 10 events per predictor variable
-#'   \item \strong{Cox regression}: ≥ 10 events per predictor variable  
-#'   \item \strong{Linear regression}: ≥ 10-20 observations per predictor
+#'   \item \strong{Logistic regression}: \eqn{\ge} 10 events per predictor variable
+#'   \item \strong{Cox regression}:  \eqn{\ge} 10 events per predictor variable
+#'   \item \strong{Linear regression}: \eqn{\ge} 10-20 observations per predictor
 #' }
 #' 
 #' Use screening methods to reduce predictor count when these ratios are not met.
@@ -498,7 +498,7 @@
 #' print(linear_result)
 #' 
 #' # Example 13: Poisson regression for equidispersed count outcomes
-#' # fu_count has variance ≈ mean, appropriate for standard Poisson
+#' # fu_count has variance ~= mean, appropriate for standard Poisson
 #' poisson_result <- fullfit(
 #'     data = clintrial,
 #'     outcome = "fu_count",

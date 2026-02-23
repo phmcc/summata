@@ -373,7 +373,7 @@ Results will vary across systems due to differences in hardware, R version, and 
 
 This benchmark was run under the following conditions:
 
-```{r, eval = FALSE}
+```
 R version 4.5.2 (2025-10-31)
 Platform: x86_64-unknown-linux-gnu
 

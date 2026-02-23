@@ -442,15 +442,13 @@ version, and package versions.
 
 This benchmark was run under the following conditions:
 
-``` r
-R version 4.5.2 (2025-10-31)
-Platform: x86_64-unknown-linux-gnu
+    R version 4.5.2 (2025-10-31)
+    Platform: x86_64-unknown-linux-gnu
 
-Matrix products: default
-BLAS/LAPACK: /usr/lib/libopenblasp-r0.3.30.so;  LAPACK version 3.12.0
+    Matrix products: default
+    BLAS/LAPACK: /usr/lib/libopenblasp-r0.3.30.so;  LAPACK version 3.12.0
 
-Void Linux x86_64
-Linux 6.12.63_1
-Intel(R) Core(TM) i5-4670K (4) @ 3.80 GHz
-NVIDIA GeForce GTX 970 [Discrete]
-```
+    Void Linux x86_64
+    Linux 6.12.63_1
+    Intel(R) Core(TM) i5-4670K (4) @ 3.80 GHz
+    NVIDIA GeForce GTX 970 [Discrete]

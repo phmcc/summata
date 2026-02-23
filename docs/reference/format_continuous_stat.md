@@ -1,7 +1,7 @@
 # Format continuous statistic for display
 
 Converts numeric summary statistics into formatted display strings
-following standard conventions (mean ± SD, median \[IQR\], range,
+following standard conventions (mean \\\pm\\ SD, median \[IQR\], range,
 *etc.*).
 
 ## Usage

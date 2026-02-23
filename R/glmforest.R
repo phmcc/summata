@@ -130,7 +130,7 @@
 #'
 #' @param qc_footer Logical. If \code{TRUE}, displays model quality control
 #'   statistics in the footer (observations analyzed, model family, deviance,
-#'   pseudo-\emph{R}², AIC). Default is \code{TRUE}.
+#'   pseudo-\emph{R}\eqn{^2}, AIC). Default is \code{TRUE}.
 #'   
 #' @param units Character string specifying the units for plot dimensions. 
 #'   Options: \code{"in"} (inches), \code{"cm"} (centimeters), \code{"mm"} 
@@ -204,7 +204,7 @@
 #'       \item Observations analyzed (with percentage of total data)
 #'       \item Model family (Binomial, Poisson, \emph{etc.})
 #'       \item Deviance statistics
-#'       \item Pseudo-\emph{R}² (McFadden)
+#'       \item Pseudo-\emph{R}\eqn{^2} (McFadden)
 #'       \item AIC
 #'     }
 #' }
@@ -273,7 +273,7 @@
 #'   \item \strong{Observations analyzed}: Total N and percentage of original 
 #'     data (accounting for missing values)
 #'   \item \strong{Null/Residual Deviance}: Model fit improvement
-#'   \item \strong{Pseudo-\emph{R}²}: McFadden \emph{R}² = 1 - (log L_1 / log L_2)
+#'   \item \strong{Pseudo-\emph{R}\eqn{^2}}: McFadden \emph{R}\eqn{^2} = 1 - (log L_1 / log L_2)
 #'   \item \strong{AIC}: For model comparison (lower is better)
 #' }
 #' 

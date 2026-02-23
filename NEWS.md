@@ -1,3 +1,9 @@
+# *summata* 0.11.0 (2026-02-22)
+
+* CRAN re-submission
+* Documentation LaTeX fixes
+* Broken link fixes
+
 # *summata* 0.11.0 (2026-02-21)
 
 * CRAN submission

@@ -11,7 +11,7 @@ get_stat_label(stat_type)
 "range", "n_miss", or custom type.}
 }
 \value{
-Character string with formatted label (\emph{e.g.,} "Mean ± SD").
+Character string with formatted label (\emph{e.g.,} "Mean \eqn{\pm} SD").
 }
 \description{
 Converts internal statistic type codes to formatted display labels for

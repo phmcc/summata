@@ -215,7 +215,7 @@ A data.table with class "compfit_result" containing:
 
   Bayesian Information Criterion
 
-- Pseudo-*R*²:
+- Pseudo-*R*\\^2\\:
 
   McFadden's pseudo-R-squared (GLM)
 

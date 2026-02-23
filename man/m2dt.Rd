@@ -35,7 +35,7 @@ model. Required for computing group-level sample sizes and event counts.}
 between 0 and 1. Default is 0.95 (95\% CI).}
 
 \item{keep_qc_stats}{Logical. If \code{TRUE}, includes model quality statistics 
-such as AIC, BIC, R², concordance, and model fit tests. These appear 
+such as AIC, BIC, \emph{R}\eqn{^2}, concordance, and model fit tests. These appear 
 as additional columns in the output. Default is \code{TRUE}.}
 
 \item{include_intercept}{Logical. If \code{TRUE}, includes the model intercept 
@@ -138,7 +138,6 @@ glm_result <- m2dt(clintrial, glm_model)
 glm_result
 
 \donttest{
-  options(width = 180)
 # Example 2: Extract from linear model
 lm_model <- lm(los_days ~ age + sex + surgery, data = clintrial)
 

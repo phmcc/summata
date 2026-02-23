@@ -21,6 +21,6 @@ Character string with formatted statistic.
 }
 \description{
 Converts numeric summary statistics into formatted display strings following
-standard conventions (mean ± SD, median [IQR], range, \emph{etc.}).
+standard conventions (mean \eqn{\pm} SD, median [IQR], range, \emph{etc.}).
 }
 \keyword{internal}

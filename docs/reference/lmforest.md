@@ -4,7 +4,7 @@ Generates a publication-ready forest plot that combines a formatted data
 table with a graphical representation of regression coefficients from a
 linear model. The plot integrates variable names, group levels, sample
 sizes, coefficients with confidence intervals, *p*-values, and model
-diagnostics (*R*², *F*-statistic, AIC) in a single comprehensive
+diagnostics (*R*\\^2\\, *F*-statistic, AIC) in a single comprehensive
 visualization designed for manuscripts and presentations.
 
 ## Usage
@@ -179,8 +179,8 @@ lmforest(
 - qc_footer:
 
   Logical. If `TRUE`, displays model quality control statistics in the
-  footer (observations analyzed, *R*², adjusted *R*², *F*-statistic,
-  AIC). Default is `TRUE`.
+  footer (observations analyzed, *R*\\^2\\, adjusted *R*\\^2\\,
+  *F*-statistic, AIC). Default is `TRUE`.
 
 - number_format:
 
@@ -247,7 +247,8 @@ several ways:
 
 - **No events column**: Only sample sizes shown (no event counts)
 
-- ***R*² statistics**: Model fit assessed by *R*² and adjusted *R*²
+- ***R*\\^2\\ statistics**: Model fit assessed by *R*\\^2\\ and adjusted
+  *R*\\^2\\
 
 - ***F*-test**: Overall model significance from *F*-statistic
 
@@ -280,7 +281,7 @@ several ways:
 
     - Observations analyzed (with percentage of total data)
 
-    - *R*² and adjusted *R*²
+    - *R*\\^2\\ and adjusted *R*\\^2\\
 
     - *F*-statistic with degrees of freedom and *p*-value
 
@@ -303,13 +304,13 @@ variable for a one-unit change in the predictor:
 - **Zero crossing**: CI crossing zero suggests no significant effect
 
 Example: If the coefficient for "age" is 0.50 when predicting BMI, BMI
-increases by 0.50 kg/m² for each additional year of age.
+increases by 0.50 kg/m\\^2\\ for each additional year of age.
 
 **Model Fit Statistics:**
 
 The footer displays key diagnostics:
 
-- ***R*²**: Proportion of variance explained (0 to 1)
+- ***R*\\^2\\**: Proportion of variance explained (0 to 1)
 
   - 0.0-0.3: Weak explanatory power
 
@@ -319,9 +320,9 @@ The footer displays key diagnostics:
 
   - \> 0.7: Strong (rare in social/biological sciences)
 
-- **Adjusted *R*²**: *R*² penalized for number of predictors
+- **Adjusted *R*\\^2\\**: *R*\\^2\\ penalized for number of predictors
 
-  - Always ≤ *R*²
+  - Always \\\le\\ *R*\\^2\\
 
   - Preferred for model comparison
 
@@ -429,7 +430,7 @@ plot2 <- lmforest(
     x = model1,
     data = clintrial,
     title = "Predictors of Body Mass Index",
-    effect_label = "Change in BMI (kg/m²)",
+    effect_label = "Change in BMI (kg/m^2)",
     labels = clintrial_labels
 )
 print(plot2)
@@ -588,7 +589,7 @@ final_plot <- lmforest(
     x = final_model,
     data = clintrial,
     title = "Multivariable Linear Regression: Predictors of Body Mass Index",
-    effect_label = "Change in BMI (kg/m²)",
+    effect_label = "Change in BMI (kg/m^2)",
     labels = clintrial_labels,
     indent_groups = TRUE,
     zebra_stripes = TRUE,

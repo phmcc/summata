@@ -375,7 +375,7 @@
 #' print(linear_screen)
 #' 
 #' # Example 7: Poisson regression for equidispersed count outcomes
-#' # fu_count has variance ≈ mean, appropriate for standard Poisson
+#' # fu_count has variance ~= mean, appropriate for standard Poisson
 #' poisson_screen <- uniscreen(
 #'     data = clintrial,
 #'     outcome = "fu_count",

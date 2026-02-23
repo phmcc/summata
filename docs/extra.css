@@ -56,3 +56,11 @@ h6 { font-size: 1rem; font-style: italic}
 code, pre, .sourceCode {
     font-family: 'Inconsolata', monospace;
 }
+
+mjx-container[display="true"] {
+    font-size: 0.95em !important;
+}
+
+mjx-container:not([display="true"]) {
+    font-size: 0.75em !important;
+}

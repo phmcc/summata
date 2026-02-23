@@ -811,9 +811,6 @@ model <- polr(grade ~ age + sex + stage, data = clintrial, Hess = TRUE)
 
 ### Further Reading
 
-- [Statistical
-  Foundations](https://phmcc.github.io/summata/articles/statistical_foundations.md):
-  Mathematical details for all model types
 - [Descriptive
   Tables](https://phmcc.github.io/summata/articles/descriptive_tables.md):
   [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md)

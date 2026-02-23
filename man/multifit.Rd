@@ -564,7 +564,7 @@ print(linear_result)
 # Returns coefficient estimates, not ratios
 
 # Example 10: Poisson regression for equidispersed count outcomes
-# fu_count has variance ≈ mean, appropriate for standard Poisson
+# fu_count has variance ~= mean, appropriate for standard Poisson
 poisson_result <- multifit(
     data = clintrial,
     outcomes = c("fu_count"),

@@ -36,7 +36,7 @@ The `summata` package provides three principal functions for regression analysis
 | `fit()` | Single univariable/multivariable model |
 | `fullfit()` | Combined univariable and multivariable analysis |
 
-All functions support a wide range of model types including linear models, generalized linear models (logistic, Poisson, Gaussian, Gamma, negative binomial), Cox proportional hazards models, and mixed-effects models, with consistent syntax and formatted output. For a more thorough treatment of the statistical methods underlying these models, see the [Statistical Foundations](statistical_foundations.html) article.
+All functions support a wide range of model types including linear models, generalized linear models (logistic, Poisson, Gaussian, Gamma, negative binomial), Cox proportional hazards models, and mixed-effects models, with consistent syntax and formatted output.
 
 As with other `summata` functions, these functions adhere to the standard calling convention:
 
@@ -747,7 +747,6 @@ The `summata` package currently supports binary outcomes (via logistic regressio
 
 # Further Reading
 
-- [Statistical Foundations](statistical_foundations.html): Mathematical details for all supported models
 - [Descriptive Tables](descriptive_tables.html): `desctable()` for baseline characteristics
 - [Model Comparison](model_comparison.html): `compfit()` for comparing models
 - [Table Export](table_export.html): Export to PDF, Word, and other formats

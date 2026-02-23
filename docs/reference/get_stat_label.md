@@ -18,4 +18,4 @@ get_stat_label(stat_type)
 
 ## Value
 
-Character string with formatted label (*e.g.,* "Mean ± SD").
+Character string with formatted label (*e.g.,* "Mean \\\pm\\ SD").

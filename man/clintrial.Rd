@@ -12,7 +12,7 @@ A data frame with 850 observations and 32 variables:
   \item{sex}{Biological sex (factor: Female, Male)}
   \item{race}{Self-reported race (factor: White, Black, Asian, Other)}
   \item{ethnicity}{Hispanic ethnicity (factor: Non-Hispanic, Hispanic)}
-  \item{bmi}{Body mass index in kg/m² (numeric)}
+  \item{bmi}{Body mass index in kg/m\eqn{^2} (numeric)}
   \item{smoking}{Smoking history (factor: Never, Former, Current)}
   \item{hypertension}{Hypertension diagnosis (factor: No, Yes)}
   \item{diabetes}{Diabetes diagnosis (factor: No, Yes)}
@@ -59,7 +59,7 @@ This dataset includes realistic correlations between variables:
 - Survival is worse with higher stage, ECOG, age, and biomarker_x
 - Treatment effects show Drug B > Drug A > Control
 - \code{ae_count} is overdispersed (variance > mean) for negative binomial demos
-- \code{fu_count} is equidispersed (variance ≈ mean) for Poisson demos
+- \code{fu_count} is equidispersed (variance \eqn{\approx} mean) for Poisson demos
 - Approximately 2\% of values are missing at random
 - Median follow-up is approximately 30 months
 }

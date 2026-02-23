@@ -23,9 +23,10 @@ template:
     body-color: "#2F2F2F"
     headings-color: "#1D1D1D"
     link-color: "#5A5A5A"
+  math-rendering: mathjax
 
 code:
-  width: 180
+  width: 240
   knitr:
     opts_chunk:
       dev: "ragg_png"

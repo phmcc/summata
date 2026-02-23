@@ -92,8 +92,6 @@ show_plot <- function(plot, filename, width = 8, height = 5) {
 
 Standard regression analysis assumes independent observations and constant effects across subgroups. In practice, these assumptions often fail: observations may be clustered (e.g., subjects within study sites), effects may vary by subgroup (interaction), or the baseline hazard may differ across strata. This vignette demonstrates advanced analytical techniques to address these complexities.
 
-For mathematical details on the methods covered here, see the [Statistical Foundations](statistical_foundations.html) article.
-
 ---
 
 # Preliminaries
@@ -669,7 +667,6 @@ Forest plots display all terms including interactions. For complex interaction p
 
 # Further Reading
 
-- [Statistical Foundations](statistical_foundations.html): Mathematical details for all model types
 - [Descriptive Tables](descriptive_tables.html): `desctable()` for baseline characteristics
 - [Regression Modeling](regression_modeling.html): `fit()`, `uniscreen()`, and `fullfit()`
 - [Model Comparison](model_comparison.html): `compfit()` for comparing models

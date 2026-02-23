@@ -511,13 +511,11 @@ Mixed effects models handle hierarchical or clustered data:
 
 **Confidence Intervals:**
 
-Confidence intervals are computed using the Wald method: β̂ ± z(1−α/2) ×
-SE(β̂)
-
-This is the standard approach for GLM, Cox, and mixed-effects
-regression, and is appropriate for standard sample sizes. The Wald
-interval is computed directly from the coefficient and standard error,
-avoiding redundant matrix operations.
+Confidence intervals are computed using the Wald method. This is the
+standard approach for GLM, Cox, and mixed-effects regression and is
+appropriate for standard sample sizes. The Wald interval is computed
+directly from the coefficient and standard error, avoiding redundant
+matrix operations.
 
 For small samples, sparse data, or parameters near boundary values,
 profile likelihood confidence intervals may be preferred. These can be
@@ -719,7 +717,7 @@ print(linear_model)
 #> 6:                Current    185      0.25 (-0.63 to 1.14)   0.577
 
 # Example 8: Poisson regression for equidispersed count data
-# fu_count has variance ≈ mean, appropriate for standard Poisson
+# fu_count has variance ~= mean, appropriate for standard Poisson
 poisson_model <- fit(
     data = clintrial,
     outcome = "fu_count",
@@ -846,18 +844,18 @@ preds <- predict(model_obj, type = "response")
 # Example 12: Access raw numeric data
 raw_data <- attr(result, "raw_data")
 print(raw_data)
-#>      model_scope model_type      term     n events coefficient          se       coef   coef_lower coef_upper exp_coef exp_lower exp_upper       OR  ci_lower ci_upper statistic
-#>           <char>     <char>    <char> <int>  <num>       <num>       <num>      <num>        <num>      <num>    <num>     <num>     <num>    <num>     <num>    <num>     <num>
-#> 1: Multivariable   Logistic       age   838    599  0.04801974 0.007174285 0.04801974  0.033958405 0.06208108 1.049191 1.0345416  1.064049 1.049191 1.0345416 1.064049  6.693315
-#> 2: Multivariable   Logistic sexFemale   445    294  0.00000000          NA 0.00000000           NA         NA 1.000000        NA        NA 1.000000        NA       NA        NA
-#> 3: Multivariable   Logistic   sexMale   393    305  0.63042825 0.162565588 0.63042825  0.311805551 0.94905095 1.878415 1.3658891  2.583257 1.878415 1.3658891 2.583257  3.877993
-#> 4: Multivariable   Logistic       bmi   838    599  0.02423580 0.016289550 0.02423580 -0.007691127 0.05616274 1.024532 0.9923384  1.057770 1.024532 0.9923384 1.057770  1.487813
-#>         p_value      AIC      BIC deviance null_deviance df_residual c_statistic hoslem_chi2  hoslem_p variable  group n_group events_group reference    sig sig_binary
-#>           <num>    <num>    <num>    <num>         <num>       <int>       <num>       <num>     <num>   <char> <char>   <num>        <num>    <char> <char>     <lgcl>
-#> 1: 2.181713e-11 945.9441 964.8681 937.9441      1001.913         834   0.6745587    3.109658 0.9272885      age             NA           NA              ***       TRUE
-#> 2:           NA 945.9441 964.8681 937.9441      1001.913          NA   0.6745587          NA        NA      sex Female     445          294 reference             FALSE
-#> 3: 1.053217e-04 945.9441 964.8681 937.9441      1001.913         834   0.6745587    3.109658 0.9272885      sex   Male     393          305              ***       TRUE
-#> 4: 1.368002e-01 945.9441 964.8681 937.9441      1001.913         834   0.6745587    3.109658 0.9272885      bmi             NA           NA                       FALSE
+#>      model_scope model_type      term     n events coefficient          se       coef   coef_lower coef_upper exp_coef exp_lower exp_upper       OR  ci_lower ci_upper statistic      p_value      AIC      BIC deviance null_deviance
+#>           <char>     <char>    <char> <int>  <num>       <num>       <num>      <num>        <num>      <num>    <num>     <num>     <num>    <num>     <num>    <num>     <num>        <num>    <num>    <num>    <num>         <num>
+#> 1: Multivariable   Logistic       age   838    599  0.04801974 0.007174285 0.04801974  0.033958405 0.06208108 1.049191 1.0345416  1.064049 1.049191 1.0345416 1.064049  6.693315 2.181713e-11 945.9441 964.8681 937.9441      1001.913
+#> 2: Multivariable   Logistic sexFemale   445    294  0.00000000          NA 0.00000000           NA         NA 1.000000        NA        NA 1.000000        NA       NA        NA           NA 945.9441 964.8681 937.9441      1001.913
+#> 3: Multivariable   Logistic   sexMale   393    305  0.63042825 0.162565588 0.63042825  0.311805551 0.94905095 1.878415 1.3658891  2.583257 1.878415 1.3658891 2.583257  3.877993 1.053217e-04 945.9441 964.8681 937.9441      1001.913
+#> 4: Multivariable   Logistic       bmi   838    599  0.02423580 0.016289550 0.02423580 -0.007691127 0.05616274 1.024532 0.9923384  1.057770 1.024532 0.9923384 1.057770  1.487813 1.368002e-01 945.9441 964.8681 937.9441      1001.913
+#>    df_residual c_statistic hoslem_chi2  hoslem_p variable  group n_group events_group reference    sig sig_binary
+#>          <int>       <num>       <num>     <num>   <char> <char>   <num>        <num>    <char> <char>     <lgcl>
+#> 1:         834   0.6745587    3.109658 0.9272885      age             NA           NA              ***       TRUE
+#> 2:          NA   0.6745587          NA        NA      sex Female     445          294 reference             FALSE
+#> 3:         834   0.6745587    3.109658 0.9272885      sex   Male     393          305              ***       TRUE
+#> 4:         834   0.6745587    3.109658 0.9272885      bmi             NA           NA                       FALSE
 # Contains unformatted coefficients, SEs, CIs, AIC, BIC, \emph{etc.}
 
 # Example 13: Multiple interactions

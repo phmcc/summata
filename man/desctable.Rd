@@ -46,10 +46,10 @@ order provided.}
 compute for continuous variables. Multiple values create separate rows
 for each variable. Options:
 \itemize{
-  \item \code{"mean_sd"} - Mean ± standard deviation
+  \item \code{"mean_sd"} - Mean \eqn{\pm} standard deviation
   \item \code{"median_iqr"} - Median [interquartile range]
-  \item \code{"median_range"} - Median (minimum–maximum)
-  \item \code{"range"} - Minimum–maximum only
+  \item \code{"median_range"} - Median (minimum-maximum)
+  \item \code{"range"} - Minimum-maximum only
 }
 Default is \code{"median_iqr"}.}
 
@@ -116,9 +116,9 @@ continuous variables:
 for categorical variables:
 \itemize{
   \item \code{"auto"} - Automatic selection: Fisher exact test if any
-    expected cell frequency < 5, otherwise χ² test [default]
+    expected cell frequency < 5, otherwise \eqn{\chi^2} test [default]
   \item \code{"fisher"} - Fisher exact test
-  \item \code{"chisq"} - χ² test
+  \item \code{"chisq"} - \eqn{\chi^2} test
 }}
 
 \item{total}{Logical or character string controlling the total column:
@@ -169,7 +169,7 @@ A data.table with S3 class \code{"desctable"} containing formatted
   \describe{
     \item{Variable}{Variable name or label (from \code{labels})}
     \item{Group}{For continuous variables: statistic type (\emph{e.g.},
-      "Mean ± SD", "Median [IQR]"). For categorical variables:
+      "Mean \eqn{\pm} SD", "Median [IQR]"). For categorical variables:
       category level. Empty for variable name rows.}
     \item{Total}{Statistics for the total sample (if
       \code{total = TRUE})}
@@ -226,7 +226,7 @@ When \code{test = TRUE} and \code{by} is specified:
     for mean-based statistics; non-parametric tests (Wilcoxon,
     Kruskal-Wallis) for median-based statistics
   \item \strong{Categorical with "auto"}: Fisher exact test when any
-    expected cell frequency < 5; χ² test otherwise
+    expected cell frequency < 5; \eqn{\chi^2} test otherwise
   \item \strong{Survival}: Log-rank test for comparing survival curves
   \item \strong{Range statistics}: No \emph{p}-value computed (ranges
     are descriptive)
@@ -251,15 +251,15 @@ All numeric output respects the \code{number_format} parameter. Separators
 within ranges and confidence intervals adapt automatically to avoid
 ambiguity:
 \itemize{
-  \item Mean ± SD: \code{"45.2 ± 12.3"} (US) or
-    \code{"45,2 ± 12,3"} (EU)
+  \item Mean \eqn{\pm} SD: \code{"45.2 \eqn{\pm} 12.3"} (US) or
+    \code{"45,2 \eqn{\pm} 12,3"} (EU)
   \item Median [IQR]: \code{"38.0 [28.0-52.0]"} (US) or
-    \code{"38,0 [28,0–52,0]"} (EU, en-dash separator)
+    \code{"38,0 [28,0-52,0]"} (EU, en-dash separator)
   \item Range: \code{"18.0-75.0"} (positive, US),
     \code{"-5.0 to 10.0"} (when bounds are negative)
   \item Survival: \code{"24.5 (21.2-28.9)"} (US) or
-    \code{"24,5 (21,2–28,9)"} (EU)
-  \item Counts ≥ 1000: \code{"1,234"} (US) or \code{"1.234"} (EU)
+    \code{"24,5 (21,2-28,9)"} (EU)
+  \item Counts \eqn{\ge} 1000: \code{"1,234"} (US) or \code{"1.234"} (EU)
   \item \emph{p}-values: \code{"< 0.001"} (US) or \code{"< 0,001"} (EU)
 }
 }

@@ -51,7 +51,7 @@ data(clintrial_labels)
 
 # Model Quality Metrics
 
-The `compfit()` function uses several metrics for comparing models. For mathematical details, see the [Statistical Foundations](statistical_foundations.html) article.
+The `compfit()` function uses several metrics for comparing models.
 
 | Metric | Interpretation | Better |
 |:-------|:---------------|:-------|
@@ -517,7 +517,6 @@ comparison[, .(Model, `Composite Model Score (CMS)`, AIC, Concordance)]
 
 # Further Reading
 
-- [Statistical Foundations](statistical_foundations.html): Mathematical details for model quality metrics
 - [Descriptive Tables](descriptive_tables.html): `desctable()` for baseline characteristics
 - [Regression Modeling](regression_modeling.html): `fit()`, `uniscreen()`, and `fullfit()`
 - [Table Export](table_export.html): Export to PDF, Word, and other formats

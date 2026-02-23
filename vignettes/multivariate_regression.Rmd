@@ -660,7 +660,6 @@ model <- polr(grade ~ age + sex + stage, data = clintrial, Hess = TRUE)
 
 ## Further Reading
 
-- [Statistical Foundations](statistical_foundations.html): Mathematical details for all model types
 - [Descriptive Tables](descriptive_tables.html): `desctable()` for baseline characteristics
 - [Regression Modeling](regression_modeling.html): `fit()`, `uniscreen()`, and `fullfit()`
 - [Model Comparison](model_comparison.html): `compfit()` for comparing models

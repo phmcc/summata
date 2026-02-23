@@ -59,6 +59,6 @@ List with 'formatted' and 'raw' data.table components.
 \description{
 Calculates descriptive statistics for continuous numeric variables, with
 optional grouping and statistical testing. Supports multiple summary
-statistics (mean ± SD, median [IQR], range) and various hypothesis tests.
+statistics (mean \eqn{\pm} SD, median [IQR], range) and various hypothesis tests.
 }
 \keyword{internal}

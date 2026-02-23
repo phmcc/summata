@@ -322,13 +322,10 @@
 #' 
 #' \strong{Confidence Intervals:}
 #' 
-#' Confidence intervals are computed using the Wald method:
-#' β̂ ± z(1−α/2) × SE(β̂)
-#' 
-#' This is the standard approach for GLM, Cox, and mixed-effects regression, 
-#' and is appropriate for standard sample sizes. The Wald interval is computed
-#' directly from the coefficient and standard error, avoiding redundant matrix
-#' operations.
+#' Confidence intervals are computed using the Wald method. This is the standard
+#' approach for GLM, Cox, and mixed-effects regression and is appropriate for
+#' standard sample sizes. The Wald interval is computed directly from the
+#' coefficient and standard error, avoiding redundant matrix operations.
 #' 
 #' For small samples, sparse data, or parameters near boundary values, profile 
 #' likelihood confidence intervals may be preferred. These can be obtained from 
@@ -423,7 +420,7 @@
 #' print(linear_model)
 #' 
 #' # Example 8: Poisson regression for equidispersed count data
-#' # fu_count has variance ≈ mean, appropriate for standard Poisson
+#' # fu_count has variance ~= mean, appropriate for standard Poisson
 #' poisson_model <- fit(
 #'     data = clintrial,
 #'     outcome = "fu_count",

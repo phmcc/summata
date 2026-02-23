@@ -337,13 +337,13 @@ parts of the survival curve:
 All numeric output respects the `number_format` parameter. Separators
 within confidence intervals adapt automatically to avoid ambiguity:
 
-- Survival probabilities: `"85% (80%-89%)"` (US) or `"85% (80%–89%)"`
+- Survival probabilities: `"85% (80%-89%)"` (US) or `"85% (80%-89%)"`
   (EU, en-dash separator)
 
-- Median survival: `"24.5 (21.2-28.9)"` (US) or `"24,5 (21,2–28,9)"`
+- Median survival: `"24.5 (21.2-28.9)"` (US) or `"24,5 (21,2-28,9)"`
   (EU)
 
-- Counts ≥ 1000: `"1,234"` (US) or `"1.234"` (EU)
+- Counts \\\ge\\ 1000: `"1,234"` (US) or `"1.234"` (EU)
 
 - *p*-values: `"< 0.001"` (US) or `"< 0,001"` (EU)
 

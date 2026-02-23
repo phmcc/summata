@@ -11,7 +11,13 @@
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -26,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -1212,16 +1218,16 @@ version, and package versions.</p>
 <h2 id="session-information">Session Information<a class="anchor" aria-label="anchor" href="#session-information"></a>
 </h2>
 <p>This benchmark was run under the following conditions:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>R version <span class="dv">4</span>.<span class="fl">5.2</span> (<span class="dv">2025-10-31</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>Platform<span class="sc">:</span> x86_64<span class="sc">-</span>unknown<span class="sc">-</span>linux<span class="sc">-</span>gnu</span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>Matrix products<span class="sc">:</span> default</span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>BLAS<span class="sc">/</span>LAPACK<span class="sc">:</span> <span class="er">/</span>usr<span class="sc">/</span>lib<span class="sc">/</span>libopenblasp<span class="sc">-</span>r0.<span class="dv">3</span>.<span class="fl">30.</span>so;  LAPACK version <span class="dv">3</span>.<span class="fl">12.0</span></span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>Void Linux x86_64</span>
-<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>Linux <span class="dv">6</span>.<span class="fl">12.63</span>_1</span>
-<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="fu">Intel</span>(R) <span class="fu">Core</span>(TM) i5<span class="dv">-4670</span><span class="fu">K</span> (<span class="dv">4</span>) <span class="sc">@</span> <span class="fl">3.80</span> GHz</span>
-<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>NVIDIA GeForce GTX <span class="dv">970</span> [Discrete]</span></code></pre></div>
+<pre><code>R version 4.5.2 (2025-10-31)
+Platform: x86_64-unknown-linux-gnu
+
+Matrix products: default
+BLAS/LAPACK: /usr/lib/libopenblasp-r0.3.30.so;  LAPACK version 3.12.0
+
+Void Linux x86_64
+Linux 6.12.63_1
+Intel(R) Core(TM) i5-4670K (4) @ 3.80 GHz
+NVIDIA GeForce GTX 970 [Discrete]</code></pre>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

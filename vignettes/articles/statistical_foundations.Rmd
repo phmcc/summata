@@ -48,9 +48,9 @@ $$E[Y_i | X_i] = \beta_0 + \beta_1 X_{i1} + \beta_2 X_{i2} + \cdots + \beta_p X_
 
 Equivalently, in matrix notation:
 
-$$\mathbf{Y} = \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\varepsilon}$$
+$$\mathbf{Y} = \mathbf{X}\mathbf{\beta} + \mathbf{\varepsilon}$$
 
-where $\boldsymbol{\varepsilon} \sim N(\mathbf{0}, \sigma^2\mathbf{I})$.
+where $\mathbf{\varepsilon} \sim N(\mathbf{0}, \sigma^2\mathbf{I})$.
 
 ## Assumptions
 
@@ -64,7 +64,7 @@ where $\boldsymbol{\varepsilon} \sim N(\mathbf{0}, \sigma^2\mathbf{I})$.
 
 Coefficients are estimated by ordinary least squares (OLS):
 
-$$\hat{\boldsymbol{\beta}} = (\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'\mathbf{Y}$$
+$$\hat{\mathbf{\beta}} = (\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'\mathbf{Y}$$
 
 ## Interpretation
 
@@ -102,7 +102,7 @@ fit(data, outcome = "continuous_var", predictors, model_type = "lm")
 Generalized linear models (GLMs) extend linear regression to accommodate non-normal response distributions through three components:
 
 1. **Random component**: Distribution of *Y* from the exponential family
-2. **Systematic component**: Linear predictor $\eta = \mathbf{X}\boldsymbol{\beta}$
+2. **Systematic component**: Linear predictor $\eta = \mathbf{X}\mathbf{\beta}$
 3. **Link function**: $g(\mu) = \eta$, where $\mu = E[Y]$
 
 ## Logistic Regression
@@ -377,7 +377,7 @@ Mixed-effects models (hierarchical or multilevel models) account for correlation
 
 For observation *i* within cluster *j*:
 
-$$g(E[Y_{ij} | X_{ij}, u_j]) = \mathbf{X}_{ij}\boldsymbol{\beta} + \mathbf{Z}_{ij}\mathbf{u}_j$$
+$$g(E[Y_{ij} | X_{ij}, u_j]) = \mathbf{X}_{ij}\mathbf{\beta} + \mathbf{Z}_{ij}\mathbf{u}_j$$
 
 where:
 

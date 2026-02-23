@@ -37,7 +37,7 @@ A data frame with 850 observations and 32 variables:
 
 - bmi:
 
-  Body mass index in kg/m² (numeric)
+  Body mass index in kg/m\\^2\\ (numeric)
 
 - smoking:
 
@@ -155,9 +155,9 @@ This dataset includes realistic correlations between variables: -
 Survival is worse with higher stage, ECOG, age, and biomarker_x -
 Treatment effects show Drug B \> Drug A \> Control - `ae_count` is
 overdispersed (variance \> mean) for negative binomial demos -
-`fu_count` is equidispersed (variance ≈ mean) for Poisson demos -
-Approximately 2% of values are missing at random - Median follow-up is
-approximately 30 months
+`fu_count` is equidispersed (variance \\\approx\\ mean) for Poisson
+demos - Approximately 2% of values are missing at random - Median
+follow-up is approximately 30 months
 
 ## See also
 

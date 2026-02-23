@@ -3,7 +3,7 @@
 #' Generates a publication-ready forest plot that combines a formatted data table 
 #' with a graphical representation of regression coefficients from a linear model. 
 #' The plot integrates variable names, group levels, sample sizes, coefficients 
-#' with confidence intervals, \emph{p}-values, and model diagnostics (\emph{R}²,
+#' with confidence intervals, \emph{p}-values, and model diagnostics (\emph{R}\eqn{^2},
 #' \emph{F}-statistic, AIC) in a single comprehensive visualization designed for
 #' manuscripts and presentations.
 #'
@@ -94,8 +94,8 @@
 #'   hex codes or R color names.
 #'
 #' @param qc_footer Logical. If \code{TRUE}, displays model quality control
-#'   statistics in the footer (observations analyzed, \emph{R}², adjusted
-#'   \emph{R}², \emph{F}-statistic, AIC). Default is \code{TRUE}.
+#'   statistics in the footer (observations analyzed, \emph{R}\eqn{^2}, adjusted
+#'   \emph{R}\eqn{^2}, \emph{F}-statistic, AIC). Default is \code{TRUE}.
 #'
 #' @param number_format Character string or two-element character vector
 #'   controlling thousand and decimal separators in formatted output. Named
@@ -146,7 +146,7 @@
 #'   \item \strong{Reference line}: At coefficient = 0 (not at 1)
 #'   \item \strong{Linear scale}: Forest plot uses linear scale (not log scale)
 #'   \item \strong{No events column}: Only sample sizes shown (no event counts)
-#'   \item \strong{\emph{R}² statistics}: Model fit assessed by \emph{R}² and adjusted \emph{R}²
+#'   \item \strong{\emph{R}\eqn{^2} statistics}: Model fit assessed by \emph{R}\eqn{^2} and adjusted \emph{R}\eqn{^2}
 #'   \item \strong{\emph{F}-test}: Overall model significance from \emph{F}-statistic
 #' }
 #' 
@@ -171,7 +171,7 @@
 #'   \item \strong{Model Statistics} (footer):
 #'     \itemize{
 #'       \item Observations analyzed (with percentage of total data)
-#'       \item \emph{R}² and adjusted \emph{R}²
+#'       \item \emph{R}\eqn{^2} and adjusted \emph{R}\eqn{^2}
 #'       \item \emph{F}-statistic with degrees of freedom and \emph{p}-value
 #'       \item AIC
 #'     }
@@ -191,22 +191,22 @@
 #' }
 #' 
 #' Example: If the coefficient for "age" is 0.50 when predicting BMI, 
-#' BMI increases by 0.50 kg/m² for each additional year of age.
+#' BMI increases by 0.50 kg/m\eqn{^2} for each additional year of age.
 #' 
 #' \strong{Model Fit Statistics:}
 #' 
 #' The footer displays key diagnostics:
 #' \itemize{
-#'   \item \strong{\emph{R}²}: Proportion of variance explained (0 to 1)
+#'   \item \strong{\emph{R}\eqn{^2}}: Proportion of variance explained (0 to 1)
 #'     \itemize{
 #'       \item 0.0-0.3: Weak explanatory power
 #'       \item 0.3-0.5: Moderate
 #'       \item 0.5-0.7: Good
 #'       \item > 0.7: Strong (rare in social/biological sciences)
 #'     }
-#'   \item \strong{Adjusted \emph{R}²}: \emph{R}² penalized for number of predictors
+#'   \item \strong{Adjusted \emph{R}\eqn{^2}}: \emph{R}\eqn{^2} penalized for number of predictors
 #'     \itemize{
-#'       \item Always ≤ \emph{R}²
+#'       \item Always \eqn{\le} \emph{R}\eqn{^2}
 #'       \item Preferred for model comparison
 #'       \item Accounts for model complexity
 #'     }
@@ -285,7 +285,7 @@
 #'     x = model1,
 #'     data = clintrial,
 #'     title = "Predictors of Body Mass Index",
-#'     effect_label = "Change in BMI (kg/m²)",
+#'     effect_label = "Change in BMI (kg/m^2)",
 #'     labels = clintrial_labels
 #' )
 #' print(plot2)
@@ -444,7 +444,7 @@
 #'     x = final_model,
 #'     data = clintrial,
 #'     title = "Multivariable Linear Regression: Predictors of Body Mass Index",
-#'     effect_label = "Change in BMI (kg/m²)",
+#'     effect_label = "Change in BMI (kg/m^2)",
 #'     labels = clintrial_labels,
 #'     indent_groups = TRUE,
 #'     zebra_stripes = TRUE,

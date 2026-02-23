@@ -100,7 +100,7 @@ process_variable <- function(data, var, group_var = NULL,
 #' 
 #' Calculates descriptive statistics for continuous numeric variables, with
 #' optional grouping and statistical testing. Supports multiple summary
-#' statistics (mean ± SD, median [IQR], range) and various hypothesis tests.
+#' statistics (mean \eqn{\pm} SD, median [IQR], range) and various hypothesis tests.
 #' 
 #' @param data Data.table containing the variable.
 #' @param var Character string naming the variable to process.
@@ -389,7 +389,7 @@ perform_continuous_test <- function(var_vec, grp_vec, test_type, stat_type) {
 #' Format continuous statistic for display
 #' 
 #' Converts numeric summary statistics into formatted display strings following
-#' standard conventions (mean ± SD, median [IQR], range, \emph{etc.}).
+#' standard conventions (mean \eqn{\pm} SD, median [IQR], range, \emph{etc.}).
 #' 
 #' @param stats Named list of numeric statistics (mean, sd, median, q1, q3, min, max).
 #' @param stat_type Character string: "mean_sd", "median_iqr", "median_range", or "range".
@@ -444,7 +444,7 @@ format_continuous_stat <- function(stats, stat_type, fmt_str, marks) {
 #' 
 #' @param stat_type Character string: "mean_sd", "median_iqr", "median_range",
 #'   "range", "n_miss", or custom type.
-#' @return Character string with formatted label (\emph{e.g.,} "Mean ± SD").
+#' @return Character string with formatted label (\emph{e.g.,} "Mean \eqn{\pm} SD").
 #' @keywords internal
 get_stat_label <- function(stat_type) {
     switch(stat_type,

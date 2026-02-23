@@ -67,8 +67,9 @@ fullfit(
   Character string specifying the variable selection strategy:
 
   - `"screen"` - Automatic selection based on univariable *p*-value
-    threshold. Only predictors with p ≤ `p_threshold` in univariable
-    analysis are included in the multivariable model \[default\]
+    threshold. Only predictors with p \\\le\\ `p_threshold` in
+    univariable analysis are included in the multivariable model
+    \[default\]
 
   - `"all"` - Include all predictors in both univariable and
     multivariable analyses (no selection)
@@ -87,9 +88,9 @@ fullfit(
 
   Numeric *p*-value threshold for automatic variable selection when
   `method = "screen"`. Predictors with univariable *p*-value less than
-  the threshold are included in multivariable model. Common values: 0.05
-  (strict), 0.10 (moderate), 0.20 (liberal screening). Default is 0.05.
-  Ignored for other methods.
+  or equal to the threshold are included in multivariable model. Common
+  values: 0.05 (strict), 0.10 (moderate), 0.20 (liberal screening).
+  Default is 0.05. Ignored for other methods.
 
 - columns:
 
@@ -437,8 +438,8 @@ The function implements a complete regression analysis pipeline:
 
 2.  **Variable selection**: Based on the `method` parameter:
 
-    - `"screen"`: Automatically selects predictors with univariable p ≤
-      `p_threshold`
+    - `"screen"`: Automatically selects predictors with univariable p
+      \\\le\\ `p_threshold`
 
     - `"all"`: Includes all predictors (no selection)
 
@@ -518,11 +519,11 @@ Comparing univariable and multivariable results helps identify:
 
 Rule of thumb for multivariable models:
 
-- **Logistic regression**: ≥ 10 events per predictor variable
+- **Logistic regression**: \\\ge\\ 10 events per predictor variable
 
-- **Cox regression**: ≥ 10 events per predictor variable
+- **Cox regression**: \\\ge\\ 10 events per predictor variable
 
-- **Linear regression**: ≥ 10-20 observations per predictor
+- **Linear regression**: \\\ge\\ 10-20 observations per predictor
 
 Use screening methods to reduce predictor count when these ratios are
 not met.
@@ -1017,7 +1018,7 @@ print(linear_result)
 #> 7: Baseline Creatinine (mg/dL)       -    833  0.52 (-0.61 to 1.65)  0.367      0.55 (-0.58 to 1.68)   0.340
 
 # Example 13: Poisson regression for equidispersed count outcomes
-# fu_count has variance ≈ mean, appropriate for standard Poisson
+# fu_count has variance ~= mean, appropriate for standard Poisson
 poisson_result <- fullfit(
     data = clintrial,
     outcome = "fu_count",

@@ -21,11 +21,7 @@ analysis:
 All functions support a wide range of model types including linear
 models, generalized linear models (logistic, Poisson, Gaussian, Gamma,
 negative binomial), Cox proportional hazards models, and mixed-effects
-models, with consistent syntax and formatted output. For a more thorough
-treatment of the statistical methods underlying these models, see the
-[Statistical
-Foundations](https://phmcc.github.io/summata/articles/statistical_foundations.md)
-article.
+models, with consistent syntax and formatted output.
 
 As with other `summata` functions, these functions adhere to the
 standard calling convention:
@@ -1331,9 +1327,6 @@ regression.
 
 ## Further Reading
 
-- [Statistical
-  Foundations](https://phmcc.github.io/summata/articles/statistical_foundations.md):
-  Mathematical details for all supported models
 - [Descriptive
   Tables](https://phmcc.github.io/summata/articles/descriptive_tables.md):
   [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md)

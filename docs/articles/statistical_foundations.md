@@ -38,18 +38,14 @@ Throughout this article, we adopt the following notation:
 Linear regression models the expected value of a continuous response as
 a linear combination of predictors:
 
-``` math
-E[Y_i | X_i] = \beta_0 + \beta_1 X_{i1} + \beta_2 X_{i2} + \cdots + \beta_p X_{ip}
-```
+\\E\[Y_i \| X_i\] = \beta_0 + \beta_1 X\_{i1} + \beta_2 X\_{i2} +
+\cdots + \beta_p X\_{ip}\\
 
 Equivalently, in matrix notation:
 
-``` math
-\mathbf{Y} = \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\varepsilon}
-```
+\\\mathbf{Y} = \mathbf{X}\mathbf{\beta} + \mathbf{\varepsilon}\\
 
-where
-$`\boldsymbol{\varepsilon} \sim N(\mathbf{0}, \sigma^2\mathbf{I})`$.
+where \\\mathbf{\varepsilon} \sim N(\mathbf{0}, \sigma^2\mathbf{I})\\.
 
 ### Assumptions
 
@@ -65,9 +61,8 @@ $`\boldsymbol{\varepsilon} \sim N(\mathbf{0}, \sigma^2\mathbf{I})`$.
 
 Coefficients are estimated by ordinary least squares (OLS):
 
-``` math
-\hat{\boldsymbol{\beta}} = (\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'\mathbf{Y}
-```
+\\\hat{\mathbf{\beta}} =
+(\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'\mathbf{Y}\\
 
 ### Interpretation
 
@@ -82,20 +77,14 @@ one-unit increase in *X*ⱼ, holding all other predictors constant.
 
 ### Goodness of Fit
 
-**Coefficient of determination (*R*²):**
-``` math
-R^2 = 1 - \frac{\sum_i (Y_i - \hat{Y}_i)^2}{\sum_i (Y_i - \bar{Y})^2}
-```
+**Coefficient of determination (*R*²):** \\R^2 = 1 - \frac{\sum_i (Y_i -
+\hat{Y}\_i)^2}{\sum_i (Y_i - \bar{Y})^2}\\
 
-**Adjusted *R*²:**
-``` math
-R^2_{\text{adj}} = 1 - \frac{(1 - R^2)(n - 1)}{n - p - 1}
-```
+**Adjusted *R*²:** \\R^2\_{\text{adj}} = 1 - \frac{(1 - R^2)(n - 1)}{n -
+p - 1}\\
 
-**Root mean squared error (RMSE):**
-``` math
-\text{RMSE} = \sqrt{\frac{1}{n}\sum_i (Y_i - \hat{Y}_i)^2}
-```
+**Root mean squared error (RMSE):** \\\text{RMSE} =
+\sqrt{\frac{1}{n}\sum_i (Y_i - \hat{Y}\_i)^2}\\
 
 ### Implementation
 
@@ -114,9 +103,9 @@ non-normal response distributions through three components:
 
 1.  **Random component**: Distribution of *Y* from the exponential
     family
-2.  **Systematic component**: Linear predictor
-    $`\eta = \mathbf{X}\boldsymbol{\beta}`$
-3.  **Link function**: $`g(\mu) = \eta`$, where $`\mu = E[Y]`$
+2.  **Systematic component**: Linear predictor \\\eta =
+    \mathbf{X}\mathbf{\beta}\\
+3.  **Link function**: \\g(\mu) = \eta\\, where \\\mu = E\[Y\]\\
 
 ### Logistic Regression
 
@@ -125,14 +114,12 @@ non-normal response distributions through three components:
 For binary outcomes *Y* ∈ {0, 1}, logistic regression models the
 log-odds of the event:
 
-``` math
-\log\left(\frac{P(Y_i = 1 | X_i)}{1 - P(Y_i = 1 | X_i)}\right) = \beta_0 + \beta_1 X_{i1} + \cdots + \beta_p X_{ip}
-```
+\\\log\left(\frac{P(Y_i = 1 \| X_i)}{1 - P(Y_i = 1 \| X_i)}\right) =
+\beta_0 + \beta_1 X\_{i1} + \cdots + \beta_p X\_{ip}\\
 
-Equivalently:
-``` math
-P(Y_i = 1 | X_i) = \frac{\exp(\beta_0 + \beta_1 X_{i1} + \cdots + \beta_p X_{ip})}{1 + \exp(\beta_0 + \beta_1 X_{i1} + \cdots + \beta_p X_{ip})}
-```
+Equivalently: \\P(Y_i = 1 \| X_i) = \frac{\exp(\beta_0 + \beta_1
+X\_{i1} + \cdots + \beta_p X\_{ip})}{1 + \exp(\beta_0 + \beta_1
+X\_{i1} + \cdots + \beta_p X\_{ip})}\\
 
 #### Assumptions
 
@@ -147,9 +134,8 @@ P(Y_i = 1 | X_i) = \frac{\exp(\beta_0 + \beta_1 X_{i1} + \cdots + \beta_p X_{ip}
 
 The exponentiated coefficient exp(*β*ⱼ) yields the **odds ratio (OR)**:
 
-``` math
-\text{OR} = \exp(\beta_j) = \frac{\text{Odds}(Y = 1 | X_j + 1)}{\text{Odds}(Y = 1 | X_j)}
-```
+\\\text{OR} = \exp(\beta_j) = \frac{\text{Odds}(Y = 1 \| X_j +
+1)}{\text{Odds}(Y = 1 \| X_j)}\\
 
 | OR Value | Interpretation            |
 |:---------|:--------------------------|
@@ -174,9 +160,8 @@ fit(data, outcome = "binary_var", predictors, model_type = "glm", family = "bino
 For count outcomes *Y* ∈ {0, 1, 2, …}, Poisson regression models the log
 of the expected count:
 
-``` math
-\log(E[Y_i | X_i]) = \beta_0 + \beta_1 X_{i1} + \cdots + \beta_p X_{ip}
-```
+\\\log(E\[Y_i \| X_i\]) = \beta_0 + \beta_1 X\_{i1} + \cdots + \beta_p
+X\_{ip}\\
 
 #### Assumptions
 
@@ -190,9 +175,7 @@ of the expected count:
 
 The exponentiated coefficient exp(*β*ⱼ) yields the **rate ratio (RR)**:
 
-``` math
-\text{RR} = \exp(\beta_j) = \frac{E[Y | X_j + 1]}{E[Y | X_j]}
-```
+\\\text{RR} = \exp(\beta_j) = \frac{E\[Y \| X_j + 1\]}{E\[Y \| X_j\]}\\
 
 #### Overdispersion
 
@@ -219,17 +202,10 @@ fit(data, outcome = "count_var", predictors, model_type = "glm", family = "quasi
 Negative binomial regression extends Poisson regression with an
 additional dispersion parameter *θ*:
 
-``` math
-Y_i \sim \text{NegBin}(\mu_i, \theta)
-```
-``` math
-\log(\mu_i) = \beta_0 + \beta_1 X_{i1} + \cdots + \beta_p X_{ip}
-```
+\\Y_i \sim \text{NegBin}(\mu_i, \theta)\\ \\\log(\mu_i) = \beta_0 +
+\beta_1 X\_{i1} + \cdots + \beta_p X\_{ip}\\
 
-The variance is:
-``` math
-\text{Var}(Y_i) = \mu_i + \frac{\mu_i^2}{\theta}
-```
+The variance is: \\\text{Var}(Y_i) = \mu_i + \frac{\mu_i^2}{\theta}\\
 
 As *θ* → ∞, the negative binomial converges to Poisson.
 
@@ -254,14 +230,10 @@ Requires the **MASS** package.
 For positive, continuous, right-skewed outcomes, Gamma regression
 models:
 
-``` math
-Y_i \sim \text{Gamma}(\mu_i, \phi)
-```
+\\Y_i \sim \text{Gamma}(\mu_i, \phi)\\
 
-With log link (default):
-``` math
-\log(E[Y_i | X_i]) = \beta_0 + \beta_1 X_{i1} + \cdots + \beta_p X_{ip}
-```
+With log link (default): \\\log(E\[Y_i \| X_i\]) = \beta_0 + \beta_1
+X\_{i1} + \cdots + \beta_p X\_{ip}\\
 
 #### Assumptions
 
@@ -275,9 +247,7 @@ With log link (default):
 With log link, exp(*β*ⱼ) represents the **multiplicative effect**
 (ratio):
 
-``` math
-\frac{E[Y | X_j + 1]}{E[Y | X_j]} = \exp(\beta_j)
-```
+\\\frac{E\[Y \| X_j + 1\]}{E\[Y \| X_j\]} = \exp(\beta_j)\\
 
 #### Common Applications
 
@@ -299,9 +269,7 @@ fit(data, outcome = "positive_continuous", predictors, model_type = "glm", famil
 For overdispersed binary data, quasibinomial regression estimates a
 dispersion parameter:
 
-``` math
-\text{Var}(Y_i) = \phi \cdot \mu_i(1 - \mu_i)
-```
+\\\text{Var}(Y_i) = \phi \cdot \mu_i(1 - \mu_i)\\
 
 where *φ* \> 1 indicates overdispersion. Coefficients are identical to
 binomial GLM, but standard errors are adjusted.
@@ -310,9 +278,7 @@ binomial GLM, but standard errors are adjusted.
 
 For overdispersed count data:
 
-``` math
-\text{Var}(Y_i) = \phi \cdot \mu_i
-```
+\\\text{Var}(Y_i) = \phi \cdot \mu_i\\
 
 #### Implementation
 
@@ -346,9 +312,8 @@ fit(data, outcome, predictors, model_type = "glm", family = "quasipoisson")
 
 The Cox model relates the hazard function to predictors:
 
-``` math
-h(t | X_i) = h_0(t) \exp(\beta_1 X_{i1} + \beta_2 X_{i2} + \cdots + \beta_p X_{ip})
-```
+\\h(t \| X_i) = h_0(t) \exp(\beta_1 X\_{i1} + \beta_2 X\_{i2} + \cdots +
+\beta_p X\_{ip})\\
 
 where:
 
@@ -368,9 +333,7 @@ where:
 
 The **hazard ratio (HR)** = exp(*β*ⱼ) represents the relative hazard:
 
-``` math
-\text{HR} = \frac{h(t | X_j + 1)}{h(t | X_j)} = \exp(\beta_j)
-```
+\\\text{HR} = \frac{h(t \| X_j + 1)}{h(t \| X_j)} = \exp(\beta_j)\\
 
 | HR Value | Interpretation                      |
 |:---------|:------------------------------------|
@@ -380,10 +343,8 @@ The **hazard ratio (HR)** = exp(*β*ⱼ) represents the relative hazard:
 
 #### Goodness of Fit
 
-**Concordance (Harrell’s C-index):**
-``` math
-C = P(\hat{h}_i > \hat{h}_j | T_i < T_j)
-```
+**Concordance (Harrell’s C-index):** \\C = P(\hat{h}\_i \> \hat{h}\_j \|
+T_i \< T_j)\\
 
 Proportion of concordant pairs; C = 0.5 indicates no discrimination, C =
 1 indicates perfect discrimination.
@@ -411,9 +372,8 @@ Requires the **survival** package.
 For matched case-control studies, conditional logistic regression
 conditions on the stratum:
 
-``` math
-\log\left(\frac{P(Y_i = 1 | X_i, \text{stratum})}{P(Y_i = 0 | X_i, \text{stratum})}\right) = \beta_1 X_{i1} + \cdots + \beta_p X_{ip}
-```
+\\\log\left(\frac{P(Y_i = 1 \| X_i, \text{stratum})}{P(Y_i = 0 \| X_i,
+\text{stratum})}\right) = \beta_1 X\_{i1} + \cdots + \beta_p X\_{ip}\\
 
 Note: No intercept is estimated; it is absorbed by the stratum.
 
@@ -442,9 +402,8 @@ correlation within clusters by incorporating random effects.
 
 For observation *i* within cluster *j*:
 
-``` math
-g(E[Y_{ij} | X_{ij}, u_j]) = \mathbf{X}_{ij}\boldsymbol{\beta} + \mathbf{Z}_{ij}\mathbf{u}_j
-```
+\\g(E\[Y\_{ij} \| X\_{ij}, u_j\]) = \mathbf{X}\_{ij}\mathbf{\beta} +
+\mathbf{Z}\_{ij}\mathbf{u}\_j\\
 
 where:
 
@@ -459,9 +418,8 @@ where:
 
 For continuous outcomes:
 
-``` math
-Y_{ij} = \beta_0 + \beta_1 X_{1ij} + \cdots + \beta_p X_{pij} + u_{0j} + u_{1j}X_{1ij} + \varepsilon_{ij}
-```
+\\Y\_{ij} = \beta_0 + \beta_1 X\_{1ij} + \cdots + \beta_p X\_{pij} +
+u\_{0j} + u\_{1j}X\_{1ij} + \varepsilon\_{ij}\\
 
 where:
 
@@ -492,9 +450,8 @@ Requires the **lme4** package.
 
 GLMMs extend mixed-effects models to non-normal outcomes:
 
-``` math
-g(E[Y_{ij} | X_{ij}, u_j]) = \beta_0 + \beta_1 X_{1ij} + \cdots + \beta_p X_{pij} + u_{0j}
-```
+\\g(E\[Y\_{ij} \| X\_{ij}, u_j\]) = \beta_0 + \beta_1 X\_{1ij} +
+\cdots + \beta_p X\_{pij} + u\_{0j}\\
 
 Common families:
 
@@ -525,9 +482,8 @@ Requires the **lme4** package.
 
 For clustered survival data:
 
-``` math
-h_{ij}(t) = h_0(t) \exp(\beta_1 X_{1ij} + \cdots + \beta_p X_{pij} + u_j)
-```
+\\h\_{ij}(t) = h_0(t) \exp(\beta_1 X\_{1ij} + \cdots + \beta_p
+X\_{pij} + u_j)\\
 
 where *u*ⱼ ~ N(0, σ²ᵤ) is the cluster-specific frailty term.
 
@@ -564,9 +520,7 @@ Mixed-effects models require adequate sample sizes at both levels:
 An interaction occurs when the effect of one predictor depends on the
 level of another. For predictors *X* and *Z*:
 
-``` math
-g(E[Y]) = \beta_0 + \beta_1 X + \beta_2 Z + \beta_3 (X \times Z)
-```
+\\g(E\[Y\]) = \beta_0 + \beta_1 X + \beta_2 Z + \beta_3 (X \times Z)\\
 
 where:
 
@@ -580,9 +534,7 @@ where:
 
 For continuous *X* and *Z*, the effect of *X* on *Y* is:
 
-``` math
-\frac{\partial E[Y]}{\partial X} = \beta_1 + \beta_3 Z
-```
+\\\frac{\partial E\[Y\]}{\partial X} = \beta_1 + \beta_3 Z\\
 
 The effect of *X* varies linearly with *Z*.
 
@@ -622,9 +574,7 @@ fit(data, outcome, predictors, interactions = c("X:Z"), model_type = "glm")
 
 #### Akaike Information Criterion (AIC)
 
-``` math
-\text{AIC} = -2\log L + 2k
-```
+\\\text{AIC} = -2\log L + 2k\\
 
 where *L* is the maximized likelihood and *k* is the number of
 parameters. AIC balances fit and complexity; lower values indicate
@@ -632,9 +582,7 @@ better models.
 
 #### Bayesian Information Criterion (BIC)
 
-``` math
-\text{BIC} = -2\log L + k\log n
-```
+\\\text{BIC} = -2\log L + k\log n\\
 
 BIC penalizes complexity more heavily than AIC, especially for large
 samples.
@@ -653,9 +601,7 @@ samples.
 
 For binary outcomes or survival models:
 
-``` math
-C = P(\hat{p}_i > \hat{p}_j | Y_i = 1, Y_j = 0)
-```
+\\C = P(\hat{p}\_i \> \hat{p}\_j \| Y_i = 1, Y_j = 0)\\
 
 | C Value | Discrimination             |
 |:--------|:---------------------------|
@@ -669,9 +615,7 @@ C = P(\hat{p}_i > \hat{p}_j | Y_i = 1, Y_j = 0)
 
 For binary outcomes:
 
-``` math
-\text{Brier} = \frac{1}{n}\sum_i (Y_i - \hat{p}_i)^2
-```
+\\\text{Brier} = \frac{1}{n}\sum_i (Y_i - \hat{p}\_i)^2\\
 
 Lower values indicate better calibration; Brier = 0 is perfect.
 
@@ -679,23 +623,17 @@ Lower values indicate better calibration; Brier = 0 is perfect.
 
 #### R² (Linear Models)
 
-``` math
-R^2 = 1 - \frac{SS_{\text{res}}}{SS_{\text{tot}}}
-```
+\\R^2 = 1 - \frac{SS\_{\text{res}}}{SS\_{\text{tot}}}\\
 
 Proportion of variance explained.
 
 #### Pseudo-R² (GLMs)
 
-**McFadden’s pseudo-R²:**
-``` math
-R^2_{\text{McF}} = 1 - \frac{\log L_{\text{full}}}{\log L_{\text{null}}}
-```
+**McFadden’s pseudo-R²:** \\R^2\_{\text{McF}} = 1 - \frac{\log
+L\_{\text{full}}}{\log L\_{\text{null}}}\\
 
-**Nagelkerke’s pseudo-R²:**
-``` math
-R^2_N = \frac{1 - (L_{\text{null}}/L_{\text{full}})^{2/n}}{1 - L_{\text{null}}^{2/n}}
-```
+**Nagelkerke’s pseudo-R²:** \\R^2_N = \frac{1 -
+(L\_{\text{null}}/L\_{\text{full}})^{2/n}}{1 - L\_{\text{null}}^{2/n}}\\
 
 Values are not directly comparable to linear *R*²; 0.2–0.4 typically
 indicates good fit for logistic models.
@@ -735,40 +673,27 @@ research objectives.
 Each component metric is transformed to a 0–100 scale where higher
 values indicate better performance:
 
-**Information criteria** (AIC, BIC) — Lower is better:
-``` math
-S_{\text{AIC}} = 100 \times \left(1 - \frac{\text{AIC}_i - \text{AIC}_{\min}}{\text{AIC}_{\max} - \text{AIC}_{\min}}\right)
-```
+**Information criteria** (AIC, BIC) — Lower is better: \\S\_{\text{AIC}}
+= 100 \times \left(1 - \frac{\text{AIC}\_i -
+\text{AIC}\_{\min}}{\text{AIC}\_{\max} - \text{AIC}\_{\min}}\right)\\
 
 **Concordance** (*C*-statistic) — Higher is better, with 0.5 as floor:
-``` math
-S_C = \begin{cases} 
-0 & C \leq 0.5 \\
-200 \times (C - 0.5) & C > 0.5
-\end{cases}
-```
+\\S_C = \begin{cases} 0 & C \leq 0.5 \\ 200 \times (C - 0.5) & C \> 0.5
+\end{cases}\\
 
 **Pseudo-*R*²** (McFadden) — Scaled recognizing typical range:
-``` math
-S_{R^2} = \min(100, \; 250 \times R^2_{\text{McF}})
-```
+\\S\_{R^2} = \min(100, \\ 250 \times R^2\_{\text{McF}})\\
 
 This scaling reflects that McFadden’s *R*² rarely exceeds 0.4 even for
 well-fitting models.
 
 **Brier score** — Lower is better, with 0.25 as no-skill baseline:
-``` math
-S_{\text{Brier}} = 100 \times \left(1 - \frac{\text{Brier}}{0.25}\right)
-```
+\\S\_{\text{Brier}} = 100 \times \left(1 -
+\frac{\text{Brier}}{0.25}\right)\\
 
-**Convergence** — Categorical assessment:
-``` math
-S_{\text{conv}} = \begin{cases}
-100 & \text{converged normally} \\
-70 & \text{suspect (warnings)} \\
-30 & \text{failed to converge}
-\end{cases}
-```
+**Convergence** — Categorical assessment: \\S\_{\text{conv}} =
+\begin{cases} 100 & \text{converged normally} \\ 70 & \text{suspect
+(warnings)} \\ 30 & \text{failed to converge} \end{cases}\\
 
 #### Weighting
 
@@ -788,9 +713,7 @@ conditional *R*², and ICC.
 
 The CMS is computed as a weighted sum:
 
-``` math
-\text{CMS} = \sum_j w_j \times S_j
-```
+\\\text{CMS} = \sum_j w_j \times S_j\\
 
 where *w*ⱼ are the weights and *S*ⱼ are the normalized component scores.
 
@@ -858,9 +781,7 @@ comparison_custom <- compfit(
 
 For coefficient *β* with standard error SE(*β*):
 
-``` math
-\beta \pm z_{1-\alpha/2} \cdot \text{SE}(\beta)
-```
+\\\beta \pm z\_{1-\alpha/2} \cdot \text{SE}(\beta)\\
 
 where *z*₁₋α/₂ is the standard normal quantile (1.96 for 95% CI).
 
@@ -869,17 +790,14 @@ where *z*₁₋α/₂ is the standard normal quantile (1.96 for 95% CI).
 More accurate for small samples or boundary estimates; based on the
 likelihood ratio:
 
-``` math
-\{\beta : 2[\log L(\hat{\beta}) - \log L(\beta)] \leq \chi^2_{1,1-\alpha}\}
-```
+\\\\\beta : 2\[\log L(\hat{\beta}) - \log L(\beta)\] \leq
+\chi^2\_{1,1-\alpha}\\\\
 
 ### Confidence Intervals for Effect Measures
 
 For exponentiated coefficients (OR, HR, RR):
 
-``` math
-\exp\left(\beta \pm z_{1-\alpha/2} \cdot \text{SE}(\beta)\right)
-```
+\\\exp\left(\beta \pm z\_{1-\alpha/2} \cdot \text{SE}(\beta)\right)\\
 
 ------------------------------------------------------------------------
 
@@ -889,9 +807,7 @@ For exponentiated coefficients (OR, HR, RR):
 
 Tests H₀: *β* = 0 using:
 
-``` math
-z = \frac{\hat{\beta}}{\text{SE}(\hat{\beta})}
-```
+\\z = \frac{\hat{\beta}}{\text{SE}(\hat{\beta})}\\
 
 Under H₀, *z* ~ N(0, 1).
 
@@ -899,9 +815,7 @@ Under H₀, *z* ~ N(0, 1).
 
 Compares nested models:
 
-``` math
-\Lambda = -2[\log L_{\text{reduced}} - \log L_{\text{full}}]
-```
+\\\Lambda = -2\[\log L\_{\text{reduced}} - \log L\_{\text{full}}\]\\
 
 Under H₀, Λ ~ χ²ₖ, where *k* is the difference in parameters.
 

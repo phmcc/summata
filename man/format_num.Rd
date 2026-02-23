@@ -20,7 +20,7 @@ Character string with the formatted number.
 }
 \description{
 General-purpose number formatter used by all display functions. For values
-≥ 1000 (in absolute value), inserts the appropriate
+\eqn{\ge} 1000 (in absolute value), inserts the appropriate
 thousands separator. Fixes negative-zero display artefacts.
 }
 \keyword{internal}

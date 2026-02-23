@@ -7,11 +7,6 @@ effects may vary by subgroup (interaction), or the baseline hazard may
 differ across strata. This vignette demonstrates advanced analytical
 techniques to address these complexities.
 
-For mathematical details on the methods covered here, see the
-[Statistical
-Foundations](https://phmcc.github.io/summata/articles/statistical_foundations.md)
-article.
-
 ------------------------------------------------------------------------
 
 ## Preliminaries
@@ -1011,9 +1006,6 @@ interaction patterns, consider stratified analyses or effect plots.
 
 ## Further Reading
 
-- [Statistical
-  Foundations](https://phmcc.github.io/summata/articles/statistical_foundations.md):
-  Mathematical details for all model types
 - [Descriptive
   Tables](https://phmcc.github.io/summata/articles/descriptive_tables.md):
   [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md)
