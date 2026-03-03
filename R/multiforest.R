@@ -195,65 +195,50 @@
 #' \code{\link{lmforest}} for single linear model forest plots,
 #' \code{\link{uniforest}} for univariable screening forest plots
 #'
-#' @examplesIf FALSE
-#' # Load example data
+#' @examples
 #' data(clintrial)
 #' data(clintrial_labels)
-#' 
-#' # Example 1: Basic multivariate forest plot
-#' outcomes <- c("surgery", "pfs_status", "os_status")
+#' library(survival)
+#'
+#' # Create example multifit result
 #' result <- multifit(
 #'     data = clintrial,
-#'     outcomes = outcomes,
+#'     outcomes = c("surgery", "pfs_status", "os_status"),
 #'     predictor = "treatment",
 #'     covariates = c("age", "sex", "stage"),
 #'     parallel = FALSE
 #' )
+#'
+#' # Example 1: Basic multivariate forest plot
+#' p <- multiforest(result)
+#'
+#' \donttest{
 #' 
-#' plot1 <- multiforest(result)
-#' print(plot1)
+#' old_width <- options(width = 180)
 #' 
-#'   options(width = 180)
 #' # Example 2: With custom title and labels
 #' plot2 <- multiforest(
 #'     result,
 #'     title = "Treatment Effects Across Clinical Outcomes",
 #'     labels = clintrial_labels
 #' )
-#' print(plot2)
 #' 
-#' # Example 3: Cox survival outcomes
-#' surv_result <- multifit(
-#'     data = clintrial,
-#'     outcomes = c("Surv(pfs_months, pfs_status)", "Surv(os_months, os_status)"),
-#'     predictor = "treatment",
-#'     covariates = c("age", "sex", "stage"),
-#'     model_type = "coxph",
-#'     parallel = FALSE
-#' )
-#' 
+#' # Example 3: Customize appearance
 #' plot3 <- multiforest(
-#'     surv_result,
-#'     title = "Treatment Effects on Survival Outcomes"
-#' )
-#' print(plot3)
-#' 
-#' # Example 4: Customize appearance
-#' plot4 <- multiforest(
 #'     result,
 #'     color = "#E74C3C",
 #'     zebra_stripes = TRUE,
-#'     show_n = FALSE,
-#'     font_size = 1.2
+#'     labels = clintrial_labels
 #' )
-#' print(plot4)
 #' 
-#' # Example 5: Save with recommended dimensions
-#' plot5 <- multiforest(result)
-#' dims <- attr(plot5, "rec_dims")
-#' # ggsave("multioutcome_forest.pdf", plot5,
-#' #        width = dims$width, height = dims$height)
+#' # Example 4: Save with recommended dimensions
+#' dims <- attr(plot3, "rec_dims")
+#' ggplot2::ggsave(file.path(tempdir(), "multioutcome_forest.pdf"),
+#'                 plot3, width = dims$width, height = dims$height)
 #'
+#' options(old_width)
+#' 
+#' }
 #' @family visualization functions
 #' @export
 multiforest <- function(x,

@@ -272,58 +272,61 @@
 #' \code{\link[flextable]{flextable}} for the underlying table object,
 #' \code{\link[officer]{read_docx}} for Word document manipulation
 #'
-#' @examplesIf FALSE
-#' options(width = 180)
-#' # Load data
+#' @examples
 #' data(clintrial)
 #' data(clintrial_labels)
-#' 
-#' # Create regression table
+#'
+#' # Create example table
 #' results <- fit(
 #'    data = clintrial,
 #'    outcome = "os_status",
 #'    predictors = c("age", "sex", "treatment", "stage"),
 #'    labels = clintrial_labels
 #' )
-#' 
+#'
 #' # Example 1: Basic Word export
-#' table2docx(results, "results.docx")
-#' 
+#' if (requireNamespace("flextable", quietly = TRUE) &&
+#'     requireNamespace("officer", quietly = TRUE)) {
+#'   table2docx(results, file.path(tempdir(), "results.docx"))
+#' }
+#'
+#' \donttest{
+#' old_width <- options(width = 180)
 #' # Example 2: With caption
-#' table2docx(results, "captioned.docx",
+#' table2docx(results, file.path(tempdir(), "captioned.docx"),
 #'         caption = "Table 1: Multivariable Logistic Regression Results")
 #' 
 #' # Example 3: Landscape orientation for wide tables
-#' table2docx(results, "wide.docx",
+#' table2docx(results, file.path(tempdir(), "wide.docx"),
 #'         orientation = "landscape")
 #' 
 #' # Example 4: Custom font and size
-#' table2docx(results, "custom_font.docx",
+#' table2docx(results, file.path(tempdir(), "custom_font.docx"),
 #'         font_family = "Times New Roman",
 #'         font_size = 11)
 #' 
 #' # Example 5: Hierarchical display
-#' table2docx(results, "indented.docx",
+#' table2docx(results, file.path(tempdir(), "indented.docx"),
 #'         indent_groups = TRUE)
 #' 
 #' # Example 6: Condensed table
-#' table2docx(results, "condensed.docx",
+#' table2docx(results, file.path(tempdir(), "condensed.docx"),
 #'         condense_table = TRUE)
 #' 
 #' # Example 7: With zebra stripes
-#' table2docx(results, "striped.docx",
+#' table2docx(results, file.path(tempdir(), "striped.docx"),
 #'         zebra_stripes = TRUE)
 #' 
 #' # Example 8: Dark header style
-#' table2docx(results, "dark.docx",
+#' table2docx(results, file.path(tempdir(), "dark.docx"),
 #'         dark_header = TRUE)
 #' 
 #' # Example 9: A4 paper for international journals
-#' table2docx(results, "a4.docx",
+#' table2docx(results, file.path(tempdir(), "a4.docx"),
 #'         paper = "a4")
 #' 
 #' # Example 10: Get flextable for customization
-#' result <- table2docx(results, "base.docx")
+#' result <- table2docx(results, file.path(tempdir(), "base.docx"))
 #' ft <- attr(result, "flextable")
 #' 
 #' # Customize the flextable
@@ -331,11 +334,11 @@
 #' ft <- flextable::color(ft, j = "p-value", color = "blue")
 #' 
 #' # Example 11: Direct flextable return
-#' ft <- table2docx(results, "direct.docx", return_ft = TRUE)
+#' ft <- table2docx(results, file.path(tempdir(), "direct.docx"), return_ft = TRUE)
 #' ft <- flextable::bg(ft, bg = "yellow", part = "header")
 #' 
 #' # Example 12: Publication-ready table
-#' table2docx(results, "publication.docx",
+#' table2docx(results, file.path(tempdir(), "publication.docx"),
 #'         caption = "Table 2: Adjusted Odds Ratios for Mortality",
 #'         font_family = "Times New Roman",
 #'         font_size = 10,
@@ -344,18 +347,20 @@
 #'         bold_significant = TRUE)
 #' 
 #' # Example 13: Custom column alignment
-#' table2docx(results, "aligned.docx",
+#' table2docx(results, file.path(tempdir(), "aligned.docx"),
 #'         align = c("left", "left", "center", "right", "right"))
 #' 
 #' # Example 14: Disable significance bolding
-#' table2docx(results, "no_bold.docx",
+#' table2docx(results, file.path(tempdir(), "no_bold.docx"),
 #'         bold_significant = FALSE)
 #' 
 #' # Example 15: Stricter significance threshold
-#' table2docx(results, "strict.docx",
+#' table2docx(results, file.path(tempdir(), "strict.docx"),
 #'         bold_significant = TRUE,
 #'         p_threshold = 0.01)
 #'
+#' options(old_width)
+#' }
 #' @family export functions
 #' @export
 table2docx <- function(table,
@@ -473,6 +478,11 @@ table2docx <- function(table,
 }
 
 #' Print method for table2docx results
+#'
+#' @param x Object of class \code{table2docx_result}.
+#' @param ... Additional arguments passed to print methods.
+#' @return Invisibly returns the input object \code{x}. Called for its
+#'   side effect of printing a formatted summary to the console.
 #' @keywords internal
 #' @export
 print.table2docx_result <- function(x, ...) {

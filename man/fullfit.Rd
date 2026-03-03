@@ -381,14 +381,14 @@ Use screening methods to reduce predictor count when these ratios are not met.
 # Load example data
 data(clintrial)
 data(clintrial_labels)
-library(survival)
 
 # Example 1: Basic screening with p < 0.05 threshold
 result1 <- fullfit(
     data = clintrial,
     outcome = "os_status",
-    predictors = c("age", "sex", "bmi", "smoking", "hypertension", 
-                  "diabetes", "treatment", "stage"),
+    predictors = c("age", "sex", "bmi", "smoking",
+                   "hypertension", "diabetes",
+                   "treatment", "stage"),
     method = "screen",
     p_threshold = 0.05,
     labels = clintrial_labels
@@ -398,125 +398,43 @@ print(result1)
 # Only significant univariable predictors in multivariable model
 
 \donttest{
-# Example 2: Liberal screening threshold (p < 0.20)
-result2 <- fullfit(
-    data = clintrial,
-    outcome = "os_status",
-    predictors = c("age", "sex", "bmi", "smoking", "hypertension",
-                  "diabetes", "ecog", "treatment", "stage", "grade"),
-    method = "screen",
-    p_threshold = 0.20,  # More liberal for screening
-    labels = clintrial_labels
-)
-print(result2)
 
-# Example 3: Include all predictors (no selection)
-result3 <- fullfit(
+# Example 2: Include all predictors (no selection)
+result2 <- fullfit(
     data = clintrial,
     outcome = "os_status",
     predictors = c("age", "sex", "treatment", "stage"),
     method = "all",
     labels = clintrial_labels
 )
-print(result3)
-# All predictors in both analyses
+print(result2)
 
-# Example 4: Custom variable selection
-result4 <- fullfit(
+# Example 3: Custom variable selection
+result3 <- fullfit(
     data = clintrial,
     outcome = "os_status",
     predictors = c("age", "sex", "bmi", "smoking", "treatment", "stage"),
     method = "custom",
-    multi_predictors = c("age", "treatment", "stage"),  # Manual selection
+    multi_predictors = c("age", "treatment", "stage"),
     labels = clintrial_labels
 )
-print(result4)
+print(result3)
 # Univariable for all, multivariable for selected only
 
-# Example 5: Cox regression with screening
+# Example 4: Cox regression with screening
+library(survival)
 cox_result <- fullfit(
     data = clintrial,
     outcome = "Surv(os_months, os_status)",
-    predictors = c("age", "sex", "bmi", "treatment", "stage", "grade"),
+    predictors = c("age", "sex", "treatment", "stage"),
     model_type = "coxph",
     method = "screen",
     p_threshold = 0.10,
     labels = clintrial_labels
 )
 print(cox_result)
-# Returns hazard ratios (HR/aHR)
 
-# Example 6: Show only multivariable results
-multi_only <- fullfit(
-    data = clintrial,
-    outcome = "os_status",
-    predictors = c("age", "sex", "treatment", "stage"),
-    method = "all",
-    columns = "multi",  # Multivariable results only
-    labels = clintrial_labels
-)
-print(multi_only)
-
-# Example 7: Show only univariable results
-uni_only <- fullfit(
-    data = clintrial,
-    outcome = "os_status",
-    predictors = c("age", "sex", "treatment", "stage"),
-    columns = "uni",  # Univariable results only
-    labels = clintrial_labels
-)
-print(uni_only)
-
-# Example 8: Show only effect estimates (no p-values)
-effects_only <- fullfit(
-    data = clintrial,
-    outcome = "os_status",
-    predictors = c("age", "sex", "treatment"),
-    metrics = "effect",  # Effect estimates only
-    labels = clintrial_labels
-)
-print(effects_only)
-
-# Example 9: Show only p-values (no effect estimates)
-pvals_only <- fullfit(
-    data = clintrial,
-    outcome = "os_status",
-    predictors = c("age", "sex", "treatment"),
-    metrics = "p",  # P-values only
-    labels = clintrial_labels
-)
-print(pvals_only)
-
-# Example 10: Return both table and model object
-both <- fullfit(
-    data = clintrial,
-    outcome = "os_status",
-    predictors = c("age", "sex", "treatment", "stage"),
-    method = "all",
-    return_type = "both"
-)
-
-# Access the table
-print(both$table)
-
-# Access the model
-summary(both$model)
-
-# Model diagnostics
-plot(both$model)
-
-# Example 11: Return only the model object
-model_only <- fullfit(
-    data = clintrial,
-    outcome = "os_status",
-    predictors = c("age", "sex", "treatment"),
-    return_type = "model"
-)
-
-# This returns a glm object directly
-summary(model_only)
-
-# Example 12: Linear regression
+# Example 5: Linear regression without screening
 linear_result <- fullfit(
     data = clintrial,
     outcome = "bmi",
@@ -527,8 +445,7 @@ linear_result <- fullfit(
 )
 print(linear_result)
 
-# Example 13: Poisson regression for equidispersed count outcomes
-# fu_count has variance ~= mean, appropriate for standard Poisson
+# Example 6: Poisson regression for count outcomes
 poisson_result <- fullfit(
     data = clintrial,
     outcome = "fu_count",
@@ -539,86 +456,41 @@ poisson_result <- fullfit(
     labels = clintrial_labels
 )
 print(poisson_result)
-# Returns rate ratios (RR/aRR)
-# For overdispersed counts (ae_count), use model_type = "negbin" instead
 
-# Example 14: Keep univariable models for diagnostics
+# Example 7: Show only multivariable results
+multi_only <- fullfit(
+    data = clintrial,
+    outcome = "os_status",
+    predictors = c("age", "sex", "treatment", "stage"),
+    method = "all",
+    columns = "multi",
+    labels = clintrial_labels
+)
+print(multi_only)
+
+# Example 8: Return both table and model object
+both <- fullfit(
+    data = clintrial,
+    outcome = "os_status",
+    predictors = c("age", "sex", "treatment", "stage"),
+    method = "all",
+    return_type = "both"
+)
+print(both$table)
+summary(both$model)
+
+# Example 9: Keep univariable models for diagnostics
 with_models <- fullfit(
     data = clintrial,
     outcome = "os_status",
     predictors = c("age", "bmi", "creatinine"),
     keep_models = TRUE
 )
-
-# Access univariable models
 uni_results <- attr(with_models, "uni_results")
 uni_models <- attr(uni_results, "models")
 summary(uni_models[["age"]])
 
-# Example 15: Check how many predictors made it to multivariable
-result <- fullfit(
-    data = clintrial,
-    outcome = "os_status",
-    predictors = c("age", "sex", "bmi", "smoking", "hypertension",
-                  "diabetes", "ecog", "treatment", "stage", "grade"),
-    method = "screen",
-    p_threshold = 0.10
-)
-
-n_multi <- attr(result, "n_multi")
-cat("Predictors in multivariable model:", n_multi, "\n")
-
-# Example 16: Complete publication workflow
-final_table <- fullfit(
-    data = clintrial,
-    outcome = "Surv(os_months, os_status)",
-    predictors = c("age", "sex", "race", "bmi", "smoking", 
-                  "hypertension", "diabetes", "ecog",
-                  "treatment", "stage", "grade"),
-    model_type = "coxph",
-    method = "screen",
-    p_threshold = 0.10,
-    columns = "both",
-    metrics = "both",
-    labels = clintrial_labels,
-    digits = 2,
-    p_digits = 3
-)
-print(final_table)
-
-# Can export directly to PDF/LaTeX/HTML for publication
-# table2pdf(final_table, "regression_results.pdf")
-# table2docx(final_table, "regression_results.docx")
-
-# Example 17: Gamma regression with screening
-gamma_result <- fullfit(
-    data = clintrial,
-    outcome = "los_days",
-    predictors = c("age", "treatment", "surgery", "any_complication", 
-                  "stage", "ecog"),
-    model_type = "glm",
-    family = Gamma(link = "log"),
-    method = "screen",
-    p_threshold = 0.10,
-    labels = clintrial_labels
-)
-print(gamma_result)
-
-# Example 18: Quasipoisson for overdispersed counts
-quasi_result <- fullfit(
-    data = clintrial,
-    outcome = "ae_count",
-    predictors = c("age", "treatment", "diabetes", "surgery", 
-                  "stage", "ecog"),
-    model_type = "glm",
-    family = "quasipoisson",
-    method = "screen",
-    p_threshold = 0.20,
-    labels = clintrial_labels
-)
-print(quasi_result)
-
-# Example 19: Linear mixed effects with site clustering
+# Example 10: Linear mixed effects with site clustering
 if (requireNamespace("lme4", quietly = TRUE)) {
     lmer_result <- fullfit(
         data = clintrial,
@@ -632,20 +504,6 @@ if (requireNamespace("lme4", quietly = TRUE)) {
     print(lmer_result)
 }
 
-# Example 20: Cox mixed effects with site clustering
-if (requireNamespace("coxme", quietly = TRUE)) {
-    coxme_result <- fullfit(
-        data = clintrial,
-        outcome = "Surv(os_months, os_status)",
-        predictors = c("age", "treatment", "stage", "grade"),
-        random = "(1|site)",
-        model_type = "coxme",
-        method = "screen",
-        p_threshold = 0.10,
-        labels = clintrial_labels
-    )
-    print(coxme_result)
-}
 }
 
 }

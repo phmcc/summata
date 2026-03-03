@@ -1166,14 +1166,14 @@ Regression tables can be exported to various formats:
 # Microsoft Word
 table2docx(
   table = example13,
-  file = "Table2_Regression.docx",
+  file = file.path(tempdir(), "Table2_Regression.docx"),
   caption = "Table 2. Univariable and Multivariable Analysis"
 )
 
 # PDF
 table2pdf(
   table = example13,
-  file = "Table2_Regression.pdf",
+  file = file.path(tempdir(), "Table2_Regression.pdf"),
   caption = "Table 2. Regression Results"
 )
 ```

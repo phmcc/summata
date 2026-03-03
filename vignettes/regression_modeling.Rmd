@@ -23,7 +23,7 @@ if (requireNamespace("ragg", quietly = TRUE)) {
   knitr::opts_chunk$set(dev = "ragg_png")
 }
 
-options(width = 180)
+old_opts <- options(width = 180)
 ```
 
 Regression analysis quantifies the relationship between a response variable and one or more predictors while accounting for potential confounding. The standard analytical workflow proceeds in two phases: *univariable* (unadjusted) analysis, in which each predictor is examined independently; and *multivariable* (adjusted) analysis, in which effects conditional on other predictors are examined collectively. Comparing these estimates found in these analyses reveals the extent of confounding and identifies independent predictors of a given outcome.
@@ -608,14 +608,14 @@ Regression tables can be exported to various formats:
 # Microsoft Word
 table2docx(
   table = example13,
-  file = "Table2_Regression.docx",
+  file = file.path(tempdir(), "Table2_Regression.docx"),
   caption = "Table 2. Univariable and Multivariable Analysis"
 )
 
 # PDF
 table2pdf(
   table = example13,
-  file = "Table2_Regression.pdf",
+  file = file.path(tempdir(), "Table2_Regression.pdf"),
   caption = "Table 2. Regression Results"
 )
 ```
@@ -742,6 +742,10 @@ result <- fit(
 ## Multinomial and Ordinal Outcomes
 
 The `summata` package currently supports binary outcomes (via logistic regression) but not multinomial or ordinal outcomes with more than two categories. For categorical outcomes with more than two levels, use dedicated packages such as `nnet::multinom()` for multinomial regression or `MASS::polr()` for ordinal regression.
+
+```{r, include = FALSE}
+options(old_opts)
+```
 
 ---
 

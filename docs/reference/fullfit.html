@@ -23,7 +23,7 @@ results side-by-side if desired."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -487,14 +487,14 @@ preserved. When <code>NULL</code>, uses
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Load example data</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">clintrial</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">clintrial_labels</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/therneau/survival" class="external-link">survival</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 1: Basic screening with p &lt; 0.05 threshold</span></span></span>
 <span class="r-in"><span><span class="va">result1</span> <span class="op">&lt;-</span> <span class="fu">fullfit</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>    outcome <span class="op">=</span> <span class="st">"os_status"</span>,</span></span>
-<span class="r-in"><span>    predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"bmi"</span>, <span class="st">"smoking"</span>, <span class="st">"hypertension"</span>, </span></span>
-<span class="r-in"><span>                  <span class="st">"diabetes"</span>, <span class="st">"treatment"</span>, <span class="st">"stage"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"bmi"</span>, <span class="st">"smoking"</span>,</span></span>
+<span class="r-in"><span>                   <span class="st">"hypertension"</span>, <span class="st">"diabetes"</span>,</span></span>
+<span class="r-in"><span>                   <span class="st">"treatment"</span>, <span class="st">"stage"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    method <span class="op">=</span> <span class="st">"screen"</span>,</span></span>
 <span class="r-in"><span>    p_threshold <span class="op">=</span> <span class="fl">0.05</span>,</span></span>
 <span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
@@ -534,59 +534,9 @@ preserved. When <code>NULL</code>, uses
 <span class="r-in"><span><span class="co"># Only significant univariable predictors in multivariable model</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
-<span class="r-in"><span><span class="co"># Example 2: Liberal screening threshold (p &lt; 0.20)</span></span></span>
-<span class="r-in"><span><span class="va">result2</span> <span class="op">&lt;-</span> <span class="fu">fullfit</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    outcome <span class="op">=</span> <span class="st">"os_status"</span>,</span></span>
-<span class="r-in"><span>    predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"bmi"</span>, <span class="st">"smoking"</span>, <span class="st">"hypertension"</span>,</span></span>
-<span class="r-in"><span>                  <span class="st">"diabetes"</span>, <span class="st">"ecog"</span>, <span class="st">"treatment"</span>, <span class="st">"stage"</span>, <span class="st">"grade"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    method <span class="op">=</span> <span class="st">"screen"</span>,</span></span>
-<span class="r-in"><span>    p_threshold <span class="op">=</span> <span class="fl">0.20</span>,  <span class="co"># More liberal for screening</span></span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running univariable analysis...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting multivariable model with 7 predictors...</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result2</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Fullfit Analysis Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Outcome: os_status</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Model Type: glm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Method: screen (p &lt; 0.2)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Predictors Screened: 10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Predictors: 7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                    Variable                     Group      n Events            OR (95% CI)   Uni p           aOR (95% CI) Multi p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                      &lt;char&gt;                    &lt;char&gt; &lt;char&gt; &lt;char&gt;                 &lt;char&gt;  &lt;char&gt;                 &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1:             Age (years)                         -    850    609       1.05 (1.03-1.06) &lt; 0.001       1.06 (1.04-1.08) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2:                     Sex                    Female    450    298              reference       -              reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3:                                              Male    400    311       1.78 (1.31-2.42) &lt; 0.001       2.09 (1.46-2.98) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  4: Body Mass Index (kg/m²)                         -    838    599       1.01 (0.98-1.05)   0.347                      -       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  5:          Smoking Status                     Never    337    248              reference       -              reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6:                                            Former    311    203       0.67 (0.48-0.94)   0.022       0.72 (0.49-1.06)   0.097</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  7:                                           Current    185    143       1.22 (0.80-1.86)   0.351       1.37 (0.85-2.20)   0.197</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  8:            Hypertension                        No    504    354              reference       -                      -       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  9:                                               Yes    331    242       1.15 (0.85-1.57)   0.369                      -       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10:                Diabetes                        No    637    457              reference       -                      -       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11:                                               Yes    197    138       0.92 (0.65-1.31)   0.646                      -       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12: ECOG Performance Status                         0    265    159              reference       -              reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13:                                                 1    302    212       1.57 (1.11-2.22)   0.011       1.88 (1.26-2.81)   0.002</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14:                                                 2    238    194       2.94 (1.95-4.43) &lt; 0.001       3.78 (2.37-6.02) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15:                                                 3     37     37 10434240.53 (0.00-Inf)   0.967 40085625.57 (0.00-Inf)   0.976</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16:         Treatment Group                   Control    196    151              reference       -              reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17:                                            Drug A    292    184       0.51 (0.34-0.76)   0.001       0.38 (0.23-0.61) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18:                                            Drug B    362    274       0.93 (0.62-1.40)   0.721       0.72 (0.45-1.15)   0.168</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 19:           Disease Stage                         I    211    127              reference       -              reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20:                                                II    263    172       1.25 (0.86-1.82)   0.243       1.33 (0.86-2.04)   0.201</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21:                                               III    241    186       2.24 (1.49-3.36) &lt; 0.001       2.72 (1.70-4.36) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 22:                                                IV    132    121      7.28 (3.70-14.30) &lt; 0.001     10.52 (5.06-21.90) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 23:             Tumor Grade       Well-differentiated    153     95              reference       -              reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 24:                         Moderately differentiated    412    297       1.58 (1.07-2.33)   0.023       1.93 (1.22-3.06)   0.005</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 25:                             Poorly differentiated    275    208       1.90 (1.24-2.91)   0.003       2.53 (1.53-4.20) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                    Variable                     Group      n Events            OR (95% CI)   Uni p           aOR (95% CI) Multi p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                      &lt;char&gt;                    &lt;char&gt; &lt;char&gt; &lt;char&gt;                 &lt;char&gt;  &lt;char&gt;                 &lt;char&gt;  &lt;char&gt;</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 3: Include all predictors (no selection)</span></span></span>
-<span class="r-in"><span><span class="va">result3</span> <span class="op">&lt;-</span> <span class="fu">fullfit</span><span class="op">(</span></span></span>
+<span class="r-in"><span><span class="co"># Example 2: Include all predictors (no selection)</span></span></span>
+<span class="r-in"><span><span class="va">result2</span> <span class="op">&lt;-</span> <span class="fu">fullfit</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>    outcome <span class="op">=</span> <span class="st">"os_status"</span>,</span></span>
 <span class="r-in"><span>    predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"treatment"</span>, <span class="st">"stage"</span><span class="op">)</span>,</span></span>
@@ -595,7 +545,7 @@ preserved. When <code>NULL</code>, uses
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Running univariable analysis...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting multivariable model with 4 predictors...</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result2</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Fullfit Analysis Results</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Outcome: os_status</span>
@@ -616,20 +566,19 @@ preserved. When <code>NULL</code>, uses
 <span class="r-out co"><span class="r-pr">#&gt;</span>  8:                      II    263    172  1.25 (0.86-1.82)   0.243  1.32 (0.88-1.97)   0.181</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  9:                     III    241    186  2.24 (1.49-3.36) &lt; 0.001  2.70 (1.74-4.19) &lt; 0.001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10:                      IV    132    121 7.28 (3.70-14.30) &lt; 0.001 9.08 (4.49-18.37) &lt; 0.001</span>
-<span class="r-in"><span><span class="co"># All predictors in both analyses</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 4: Custom variable selection</span></span></span>
-<span class="r-in"><span><span class="va">result4</span> <span class="op">&lt;-</span> <span class="fu">fullfit</span><span class="op">(</span></span></span>
+<span class="r-in"><span><span class="co"># Example 3: Custom variable selection</span></span></span>
+<span class="r-in"><span><span class="va">result3</span> <span class="op">&lt;-</span> <span class="fu">fullfit</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>    outcome <span class="op">=</span> <span class="st">"os_status"</span>,</span></span>
 <span class="r-in"><span>    predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"bmi"</span>, <span class="st">"smoking"</span>, <span class="st">"treatment"</span>, <span class="st">"stage"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    method <span class="op">=</span> <span class="st">"custom"</span>,</span></span>
-<span class="r-in"><span>    multi_predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"treatment"</span>, <span class="st">"stage"</span><span class="op">)</span>,  <span class="co"># Manual selection</span></span></span>
+<span class="r-in"><span>    multi_predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"treatment"</span>, <span class="st">"stage"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Running univariable analysis...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting multivariable model with 3 predictors...</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result4</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result3</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Fullfit Analysis Results</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Outcome: os_status</span>
@@ -656,269 +605,42 @@ preserved. When <code>NULL</code>, uses
 <span class="r-out co"><span class="r-pr">#&gt;</span> 14:                              IV    132    121 7.28 (3.70-14.30) &lt; 0.001 8.43 (4.20-16.92) &lt; 0.001</span>
 <span class="r-in"><span><span class="co"># Univariable for all, multivariable for selected only</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 5: Cox regression with screening</span></span></span>
+<span class="r-in"><span><span class="co"># Example 4: Cox regression with screening</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/therneau/survival" class="external-link">survival</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">cox_result</span> <span class="op">&lt;-</span> <span class="fu">fullfit</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>    outcome <span class="op">=</span> <span class="st">"Surv(os_months, os_status)"</span>,</span></span>
-<span class="r-in"><span>    predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"bmi"</span>, <span class="st">"treatment"</span>, <span class="st">"stage"</span>, <span class="st">"grade"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"treatment"</span>, <span class="st">"stage"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    model_type <span class="op">=</span> <span class="st">"coxph"</span>,</span></span>
 <span class="r-in"><span>    method <span class="op">=</span> <span class="st">"screen"</span>,</span></span>
 <span class="r-in"><span>    p_threshold <span class="op">=</span> <span class="fl">0.10</span>,</span></span>
 <span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Running univariable analysis...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting multivariable model with 5 predictors...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting multivariable model with 4 predictors...</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cox_result</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Fullfit Analysis Results</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Outcome: Surv(os_months, os_status)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model Type: coxph</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Method: screen (p &lt; 0.1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Predictors Screened: 6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Predictors: 5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                    Variable                     Group      n Events      HR (95% CI)   Uni p     aHR (95% CI) Multi p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                      &lt;char&gt;                    &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1:             Age (years)                         -    850    609 1.03 (1.03-1.04) &lt; 0.001 1.04 (1.03-1.04) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2:                     Sex                    Female    450    298        reference       -        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3:                                              Male    400    311 1.30 (1.11-1.53)   0.001 1.36 (1.15-1.59) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  4: Body Mass Index (kg/m²)                         -    838    599 1.01 (0.99-1.03)   0.312                -       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  5:         Treatment Group                   Control    196    151        reference       -        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6:                                            Drug A    292    184 0.64 (0.52-0.80) &lt; 0.001 0.54 (0.44-0.68) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  7:                                            Drug B    362    274 0.94 (0.77-1.15)   0.567 0.79 (0.64-0.97)   0.023</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  8:           Disease Stage                         I    211    127        reference       -        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  9:                                                II    263    172 1.12 (0.89-1.41)   0.337 1.16 (0.92-1.47)   0.198</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10:                                               III    241    186 1.69 (1.35-2.11) &lt; 0.001 1.87 (1.48-2.35) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11:                                                IV    132    121 3.18 (2.47-4.09) &lt; 0.001 3.60 (2.78-4.65) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12:             Tumor Grade       Well-differentiated    153     95        reference       -        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13:                         Moderately differentiated    412    297 1.36 (1.08-1.71)   0.010 1.40 (1.11-1.77)   0.005</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14:                             Poorly differentiated    275    208 1.62 (1.27-2.06) &lt; 0.001 1.71 (1.34-2.19) &lt; 0.001</span>
-<span class="r-in"><span><span class="co"># Returns hazard ratios (HR/aHR)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 6: Show only multivariable results</span></span></span>
-<span class="r-in"><span><span class="va">multi_only</span> <span class="op">&lt;-</span> <span class="fu">fullfit</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    outcome <span class="op">=</span> <span class="st">"os_status"</span>,</span></span>
-<span class="r-in"><span>    predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"treatment"</span>, <span class="st">"stage"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    method <span class="op">=</span> <span class="st">"all"</span>,</span></span>
-<span class="r-in"><span>    columns <span class="op">=</span> <span class="st">"multi"</span>,  <span class="co"># Multivariable results only</span></span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting multivariable model with 4 predictors...</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">multi_only</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Fullfit Analysis Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Outcome: os_status</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Model Type: glm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Method: all</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Predictors Screened: 4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Predictors: 4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            Variable   Group      n Events      aOR (95% CI) p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;            &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1:     Age (years)       -    847    606  1.05 (1.04-1.07) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2:             Sex  Female    449    297         reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3:                    Male    398    309  2.02 (1.45-2.82) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  4: Treatment Group Control    194    149         reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  5:                  Drug A    292    184  0.44 (0.28-0.68) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6:                  Drug B    361    273  0.74 (0.48-1.16)   0.192</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  7:   Disease Stage       I    211    127         reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  8:                      II    263    172  1.32 (0.88-1.97)   0.181</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  9:                     III    241    186  2.70 (1.74-4.19) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10:                      IV    132    121 9.08 (4.49-18.37) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            Variable   Group      n Events      HR (95% CI)   Uni p     aHR (95% CI) Multi p</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1:     Age (years)       -    850    609 1.03 (1.03-1.04) &lt; 0.001 1.04 (1.03-1.04) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:             Sex  Female    450    298        reference       -        reference       -</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:                    Male    400    311 1.30 (1.11-1.53)   0.001 1.33 (1.13-1.56) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4: Treatment Group Control    196    151        reference       -        reference       -</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:                  Drug A    292    184 0.64 (0.52-0.80) &lt; 0.001 0.56 (0.45-0.70) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:                  Drug B    362    274 0.94 (0.77-1.15)   0.567 0.83 (0.67-1.01)   0.062</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:   Disease Stage       I    211    127        reference       -        reference       -</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:                      II    263    172 1.12 (0.89-1.41)   0.337 1.16 (0.92-1.46)   0.214</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:                     III    241    186 1.69 (1.35-2.11) &lt; 0.001 1.90 (1.51-2.38) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:                      IV    132    121 3.18 (2.47-4.09) &lt; 0.001 3.57 (2.77-4.60) &lt; 0.001</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 7: Show only univariable results</span></span></span>
-<span class="r-in"><span><span class="va">uni_only</span> <span class="op">&lt;-</span> <span class="fu">fullfit</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    outcome <span class="op">=</span> <span class="st">"os_status"</span>,</span></span>
-<span class="r-in"><span>    predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"treatment"</span>, <span class="st">"stage"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    columns <span class="op">=</span> <span class="st">"uni"</span>,  <span class="co"># Univariable results only</span></span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running univariable analysis...</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">uni_only</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Fullfit Analysis Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Outcome: os_status</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Model Type: glm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Method: screen (p &lt; 0.05)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Predictors Screened: 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            Variable   Group      n Events       OR (95% CI) p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;            &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1:     Age (years)       -    850    609  1.05 (1.03-1.06) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2:             Sex  Female    450    298         reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3:                    Male    400    311  1.78 (1.31-2.42) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  4: Treatment Group Control    196    151         reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  5:                  Drug A    292    184  0.51 (0.34-0.76)   0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6:                  Drug B    362    274  0.93 (0.62-1.40)   0.721</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  7:   Disease Stage       I    211    127         reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  8:                      II    263    172  1.25 (0.86-1.82)   0.243</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  9:                     III    241    186  2.24 (1.49-3.36) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10:                      IV    132    121 7.28 (3.70-14.30) &lt; 0.001</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 8: Show only effect estimates (no p-values)</span></span></span>
-<span class="r-in"><span><span class="va">effects_only</span> <span class="op">&lt;-</span> <span class="fu">fullfit</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    outcome <span class="op">=</span> <span class="st">"os_status"</span>,</span></span>
-<span class="r-in"><span>    predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"treatment"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    metrics <span class="op">=</span> <span class="st">"effect"</span>,  <span class="co"># Effect estimates only</span></span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running univariable analysis...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting multivariable model with 3 predictors...</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">effects_only</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Fullfit Analysis Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Outcome: os_status</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Model Type: glm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Method: screen (p &lt; 0.05)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Predictors Screened: 3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Predictors: 3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           Variable   Group      n Events      OR (95% CI)     aOR (95% CI)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;           &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:     Age (years)       -    850    609 1.05 (1.03-1.06) 1.05 (1.04-1.07)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:             Sex  Female    450    298        reference        reference</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:                    Male    400    311 1.78 (1.31-2.42) 1.83 (1.33-2.52)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4: Treatment Group Control    196    151        reference        reference</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5:                  Drug A    292    184 0.51 (0.34-0.76) 0.48 (0.31-0.73)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6:                  Drug B    362    274 0.93 (0.62-1.40) 0.86 (0.56-1.32)</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 9: Show only p-values (no effect estimates)</span></span></span>
-<span class="r-in"><span><span class="va">pvals_only</span> <span class="op">&lt;-</span> <span class="fu">fullfit</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    outcome <span class="op">=</span> <span class="st">"os_status"</span>,</span></span>
-<span class="r-in"><span>    predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"treatment"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    metrics <span class="op">=</span> <span class="st">"p"</span>,  <span class="co"># P-values only</span></span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running univariable analysis...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting multivariable model with 3 predictors...</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">pvals_only</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Fullfit Analysis Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Outcome: os_status</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Model Type: glm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Method: screen (p &lt; 0.05)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Predictors Screened: 3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Predictors: 3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           Variable   Group      n Events   Uni p Multi p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;  &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:     Age (years)       -    850    609 &lt; 0.001 &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:             Sex  Female    450    298       -       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:                    Male    400    311 &lt; 0.001 &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4: Treatment Group Control    196    151       -       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5:                  Drug A    292    184   0.001 &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6:                  Drug B    362    274   0.721   0.492</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 10: Return both table and model object</span></span></span>
-<span class="r-in"><span><span class="va">both</span> <span class="op">&lt;-</span> <span class="fu">fullfit</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    outcome <span class="op">=</span> <span class="st">"os_status"</span>,</span></span>
-<span class="r-in"><span>    predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"treatment"</span>, <span class="st">"stage"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    method <span class="op">=</span> <span class="st">"all"</span>,</span></span>
-<span class="r-in"><span>    return_type <span class="op">=</span> <span class="st">"both"</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running univariable analysis...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting multivariable model with 4 predictors...</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Access the table</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">both</span><span class="op">$</span><span class="va">table</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Fullfit Analysis Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Outcome: os_status</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Model Type: glm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Method: all</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Predictors Screened: 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Predictors: 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Variable   Group      n Events       OR (95% CI)   Uni p      aOR (95% CI) Multi p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;            &lt;char&gt;  &lt;char&gt;            &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1:       age       -    850    609  1.05 (1.03-1.06) &lt; 0.001  1.05 (1.04-1.07) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2:       sex  Female    450    298         reference       -         reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3:              Male    400    311  1.78 (1.31-2.42) &lt; 0.001  2.02 (1.45-2.82) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  4: treatment Control    196    151         reference       -         reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  5:            Drug A    292    184  0.51 (0.34-0.76)   0.001  0.44 (0.28-0.68) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6:            Drug B    362    274  0.93 (0.62-1.40)   0.721  0.74 (0.48-1.16)   0.192</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  7:     stage       I    211    127         reference       -         reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  8:                II    263    172  1.25 (0.86-1.82)   0.243  1.32 (0.88-1.97)   0.181</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  9:               III    241    186  2.24 (1.49-3.36) &lt; 0.001  2.70 (1.74-4.19) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10:                IV    132    121 7.28 (3.70-14.30) &lt; 0.001 9.08 (4.49-18.37) &lt; 0.001</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Access the model</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">both</span><span class="op">$</span><span class="va">model</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> stats::glm(formula = formula, family = family, data = data)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                  Estimate Std. Error z value Pr(&gt;|z|)    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)     -2.646316   0.491675  -5.382 7.36e-08 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> age              0.052666   0.007447   7.072 1.53e-12 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> sexMale          0.702430   0.170410   4.122 3.76e-05 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> treatmentDrug A -0.829478   0.227358  -3.648 0.000264 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> treatmentDrug B -0.297335   0.227823  -1.305 0.191854    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> stageII          0.274497   0.205201   1.338 0.180994    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> stageIII         0.992064   0.224514   4.419 9.93e-06 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> stageIV          2.205770   0.359692   6.132 8.66e-10 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Dispersion parameter for binomial family taken to be 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Null deviance: 1011.63  on 846  degrees of freedom</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance:  869.99  on 839  degrees of freedom</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   (3 observations deleted due to missingness)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> AIC: 885.99</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Number of Fisher Scoring iterations: 5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Model diagnostics</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">both</span><span class="op">$</span><span class="va">model</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="fullfit-1.png" alt="" width="700" height="433"></span>
-<span class="r-plt img"><img src="fullfit-2.png" alt="" width="700" height="433"></span>
-<span class="r-plt img"><img src="fullfit-3.png" alt="" width="700" height="433"></span>
-<span class="r-plt img"><img src="fullfit-4.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 11: Return only the model object</span></span></span>
-<span class="r-in"><span><span class="va">model_only</span> <span class="op">&lt;-</span> <span class="fu">fullfit</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    outcome <span class="op">=</span> <span class="st">"os_status"</span>,</span></span>
-<span class="r-in"><span>    predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"treatment"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    return_type <span class="op">=</span> <span class="st">"model"</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running univariable analysis...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting multivariable model with 3 predictors...</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># This returns a glm object directly</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">model_only</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> stats::glm(formula = formula, family = family, data = data)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                  Estimate Std. Error z value Pr(&gt;|z|)    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)     -1.875423   0.447739  -4.189 2.81e-05 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> age              0.049051   0.007173   6.838 8.01e-12 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> sexMale          0.604650   0.163104   3.707 0.000210 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> treatmentDrug A -0.740041   0.217839  -3.397 0.000681 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> treatmentDrug B -0.149591   0.217516  -0.688 0.491627    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Dispersion parameter for binomial family taken to be 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Null deviance: 1013.64  on 849  degrees of freedom</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance:  933.43  on 845  degrees of freedom</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> AIC: 943.43</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Number of Fisher Scoring iterations: 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 12: Linear regression</span></span></span>
+<span class="r-in"><span><span class="co"># Example 5: Linear regression without screening</span></span></span>
 <span class="r-in"><span><span class="va">linear_result</span> <span class="op">&lt;-</span> <span class="fu">fullfit</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>    outcome <span class="op">=</span> <span class="st">"bmi"</span>,</span></span>
@@ -948,8 +670,7 @@ preserved. When <code>NULL</code>, uses
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6:                             Current    185  0.31 (-0.57 to 1.20)  0.490      0.26 (-0.62 to 1.15)   0.558</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 7: Baseline Creatinine (mg/dL)       -    833  0.52 (-0.61 to 1.65)  0.367      0.55 (-0.58 to 1.68)   0.340</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 13: Poisson regression for equidispersed count outcomes</span></span></span>
-<span class="r-in"><span><span class="co"># fu_count has variance ~= mean, appropriate for standard Poisson</span></span></span>
+<span class="r-in"><span><span class="co"># Example 6: Poisson regression for count outcomes</span></span></span>
 <span class="r-in"><span><span class="va">poisson_result</span> <span class="op">&lt;-</span> <span class="fu">fullfit</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>    outcome <span class="op">=</span> <span class="st">"fu_count"</span>,</span></span>
@@ -982,10 +703,99 @@ preserved. When <code>NULL</code>, uses
 <span class="r-out co"><span class="r-pr">#&gt;</span>  8:                     Drug B    362  2,443 1.11 (1.04-1.19)   0.003 1.12 (1.04-1.20)   0.002</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  9: Surgical Resection      No    480  3,098        reference       -        reference       -</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10:                        Yes    370  2,435 1.03 (0.97-1.08)   0.322 1.09 (1.03-1.16)   0.003</span>
-<span class="r-in"><span><span class="co"># Returns rate ratios (RR/aRR)</span></span></span>
-<span class="r-in"><span><span class="co"># For overdispersed counts (ae_count), use model_type = "negbin" instead</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 14: Keep univariable models for diagnostics</span></span></span>
+<span class="r-in"><span><span class="co"># Example 7: Show only multivariable results</span></span></span>
+<span class="r-in"><span><span class="va">multi_only</span> <span class="op">&lt;-</span> <span class="fu">fullfit</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
+<span class="r-in"><span>    outcome <span class="op">=</span> <span class="st">"os_status"</span>,</span></span>
+<span class="r-in"><span>    predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"treatment"</span>, <span class="st">"stage"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    method <span class="op">=</span> <span class="st">"all"</span>,</span></span>
+<span class="r-in"><span>    columns <span class="op">=</span> <span class="st">"multi"</span>,</span></span>
+<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting multivariable model with 4 predictors...</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">multi_only</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fullfit Analysis Results</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Outcome: os_status</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Model Type: glm</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Method: all</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Predictors Screened: 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Predictors: 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            Variable   Group      n Events      aOR (95% CI) p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;            &lt;char&gt;  &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1:     Age (years)       -    847    606  1.05 (1.04-1.07) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:             Sex  Female    449    297         reference       -</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:                    Male    398    309  2.02 (1.45-2.82) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4: Treatment Group Control    194    149         reference       -</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:                  Drug A    292    184  0.44 (0.28-0.68) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:                  Drug B    361    273  0.74 (0.48-1.16)   0.192</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:   Disease Stage       I    211    127         reference       -</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:                      II    263    172  1.32 (0.88-1.97)   0.181</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:                     III    241    186  2.70 (1.74-4.19) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:                      IV    132    121 9.08 (4.49-18.37) &lt; 0.001</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Example 8: Return both table and model object</span></span></span>
+<span class="r-in"><span><span class="va">both</span> <span class="op">&lt;-</span> <span class="fu">fullfit</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
+<span class="r-in"><span>    outcome <span class="op">=</span> <span class="st">"os_status"</span>,</span></span>
+<span class="r-in"><span>    predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"treatment"</span>, <span class="st">"stage"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    method <span class="op">=</span> <span class="st">"all"</span>,</span></span>
+<span class="r-in"><span>    return_type <span class="op">=</span> <span class="st">"both"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Running univariable analysis...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting multivariable model with 4 predictors...</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">both</span><span class="op">$</span><span class="va">table</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fullfit Analysis Results</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Outcome: os_status</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Model Type: glm</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Method: all</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Predictors Screened: 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Predictors: 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      Variable   Group      n Events       OR (95% CI)   Uni p      aOR (95% CI) Multi p</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;            &lt;char&gt;  &lt;char&gt;            &lt;char&gt;  &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1:       age       -    850    609  1.05 (1.03-1.06) &lt; 0.001  1.05 (1.04-1.07) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:       sex  Female    450    298         reference       -         reference       -</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:              Male    400    311  1.78 (1.31-2.42) &lt; 0.001  2.02 (1.45-2.82) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4: treatment Control    196    151         reference       -         reference       -</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:            Drug A    292    184  0.51 (0.34-0.76)   0.001  0.44 (0.28-0.68) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:            Drug B    362    274  0.93 (0.62-1.40)   0.721  0.74 (0.48-1.16)   0.192</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:     stage       I    211    127         reference       -         reference       -</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:                II    263    172  1.25 (0.86-1.82)   0.243  1.32 (0.88-1.97)   0.181</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:               III    241    186  2.24 (1.49-3.36) &lt; 0.001  2.70 (1.74-4.19) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:                IV    132    121 7.28 (3.70-14.30) &lt; 0.001 9.08 (4.49-18.37) &lt; 0.001</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">both</span><span class="op">$</span><span class="va">model</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> stats::glm(formula = formula, family = family, data = data)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                  Estimate Std. Error z value Pr(&gt;|z|)    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)     -2.646316   0.491675  -5.382 7.36e-08 ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> age              0.052666   0.007447   7.072 1.53e-12 ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> sexMale          0.702430   0.170410   4.122 3.76e-05 ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> treatmentDrug A -0.829478   0.227358  -3.648 0.000264 ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> treatmentDrug B -0.297335   0.227823  -1.305 0.191854    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> stageII          0.274497   0.205201   1.338 0.180994    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> stageIII         0.992064   0.224514   4.419 9.93e-06 ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> stageIV          2.205770   0.359692   6.132 8.66e-10 ***</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Dispersion parameter for binomial family taken to be 1)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     Null deviance: 1011.63  on 846  degrees of freedom</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance:  869.99  on 839  degrees of freedom</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   (3 observations deleted due to missingness)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> AIC: 885.99</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Number of Fisher Scoring iterations: 5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Example 9: Keep univariable models for diagnostics</span></span></span>
 <span class="r-in"><span><span class="va">with_models</span> <span class="op">&lt;-</span> <span class="fu">fullfit</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>    outcome <span class="op">=</span> <span class="st">"os_status"</span>,</span></span>
@@ -994,8 +804,6 @@ preserved. When <code>NULL</code>, uses
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Running univariable analysis...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting multivariable model with 1 predictors...</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Access univariable models</span></span></span>
 <span class="r-in"><span><span class="va">uni_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">with_models</span>, <span class="st">"uni_results"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">uni_models</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">uni_results</span>, <span class="st">"models"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">uni_models</span><span class="op">[[</span><span class="st">"age"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></span>
@@ -1020,172 +828,7 @@ preserved. When <code>NULL</code>, uses
 <span class="r-out co"><span class="r-pr">#&gt;</span> Number of Fisher Scoring iterations: 4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 15: Check how many predictors made it to multivariable</span></span></span>
-<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">fullfit</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    outcome <span class="op">=</span> <span class="st">"os_status"</span>,</span></span>
-<span class="r-in"><span>    predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"bmi"</span>, <span class="st">"smoking"</span>, <span class="st">"hypertension"</span>,</span></span>
-<span class="r-in"><span>                  <span class="st">"diabetes"</span>, <span class="st">"ecog"</span>, <span class="st">"treatment"</span>, <span class="st">"stage"</span>, <span class="st">"grade"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    method <span class="op">=</span> <span class="st">"screen"</span>,</span></span>
-<span class="r-in"><span>    p_threshold <span class="op">=</span> <span class="fl">0.10</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running univariable analysis...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting multivariable model with 7 predictors...</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">n_multi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">result</span>, <span class="st">"n_multi"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Predictors in multivariable model:"</span>, <span class="va">n_multi</span>, <span class="st">"\n"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Predictors in multivariable model: 7 </span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 16: Complete publication workflow</span></span></span>
-<span class="r-in"><span><span class="va">final_table</span> <span class="op">&lt;-</span> <span class="fu">fullfit</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    outcome <span class="op">=</span> <span class="st">"Surv(os_months, os_status)"</span>,</span></span>
-<span class="r-in"><span>    predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"race"</span>, <span class="st">"bmi"</span>, <span class="st">"smoking"</span>, </span></span>
-<span class="r-in"><span>                  <span class="st">"hypertension"</span>, <span class="st">"diabetes"</span>, <span class="st">"ecog"</span>,</span></span>
-<span class="r-in"><span>                  <span class="st">"treatment"</span>, <span class="st">"stage"</span>, <span class="st">"grade"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    model_type <span class="op">=</span> <span class="st">"coxph"</span>,</span></span>
-<span class="r-in"><span>    method <span class="op">=</span> <span class="st">"screen"</span>,</span></span>
-<span class="r-in"><span>    p_threshold <span class="op">=</span> <span class="fl">0.10</span>,</span></span>
-<span class="r-in"><span>    columns <span class="op">=</span> <span class="st">"both"</span>,</span></span>
-<span class="r-in"><span>    metrics <span class="op">=</span> <span class="st">"both"</span>,</span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span></span>
-<span class="r-in"><span>    digits <span class="op">=</span> <span class="fl">2</span>,</span></span>
-<span class="r-in"><span>    p_digits <span class="op">=</span> <span class="fl">3</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running univariable analysis...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting multivariable model with 7 predictors...</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">final_table</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Fullfit Analysis Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Outcome: Surv(os_months, os_status)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Model Type: coxph</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Method: screen (p &lt; 0.1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Predictors Screened: 11</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Predictors: 7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                    Variable                     Group      n Events      HR (95% CI)   Uni p     aHR (95% CI) Multi p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                      &lt;char&gt;                    &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1:             Age (years)                         -    850    609 1.03 (1.03-1.04) &lt; 0.001 1.04 (1.03-1.04) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2:                     Sex                    Female    450    298        reference       -        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3:                                              Male    400    311 1.30 (1.11-1.53)   0.001 1.31 (1.11-1.54)   0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  4:                    Race                     White    598    433        reference       -                -       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  5:                                             Black    126     84 0.87 (0.69-1.10)   0.249                -       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6:                                             Asian     93     71 1.05 (0.82-1.35)   0.683                -       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  7:                                             Other     33     21 0.79 (0.51-1.22)   0.287                -       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  8: Body Mass Index (kg/m²)                         -    838    599 1.01 (0.99-1.03)   0.312                -       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  9:          Smoking Status                     Never    337    248        reference       -        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10:                                            Former    311    203 0.84 (0.70-1.02)   0.074 0.91 (0.75-1.10)   0.325</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11:                                           Current    185    143 1.19 (0.97-1.46)   0.103 1.30 (1.05-1.61)   0.015</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12:            Hypertension                        No    504    354        reference       -                -       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13:                                               Yes    331    242 1.06 (0.90-1.25)   0.482                -       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14:                Diabetes                        No    637    457        reference       -                -       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15:                                               Yes    197    138 0.93 (0.77-1.12)   0.432                -       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16: ECOG Performance Status                         0    265    159        reference       -        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17:                                                 1    302    212 1.36 (1.11-1.67)   0.003 1.50 (1.22-1.85) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18:                                                 2    238    194 1.86 (1.51-2.29) &lt; 0.001 2.00 (1.62-2.48) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 19:                                                 3     37     37 3.06 (2.13-4.38) &lt; 0.001 3.35 (2.31-4.85) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20:         Treatment Group                   Control    196    151        reference       -        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21:                                            Drug A    292    184 0.64 (0.52-0.80) &lt; 0.001 0.52 (0.41-0.65) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 22:                                            Drug B    362    274 0.94 (0.77-1.15)   0.567 0.79 (0.65-0.98)   0.029</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 23:           Disease Stage                         I    211    127        reference       -        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 24:                                                II    263    172 1.12 (0.89-1.41)   0.337 1.14 (0.90-1.43)   0.280</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 25:                                               III    241    186 1.69 (1.35-2.11) &lt; 0.001 1.87 (1.48-2.36) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 26:                                                IV    132    121 3.18 (2.47-4.09) &lt; 0.001 4.07 (3.13-5.29) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 27:             Tumor Grade       Well-differentiated    153     95        reference       -        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 28:                         Moderately differentiated    412    297 1.36 (1.08-1.71)   0.010 1.48 (1.17-1.87)   0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 29:                             Poorly differentiated    275    208 1.62 (1.27-2.06) &lt; 0.001 1.87 (1.46-2.40) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                    Variable                     Group      n Events      HR (95% CI)   Uni p     aHR (95% CI) Multi p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                      &lt;char&gt;                    &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Can export directly to PDF/LaTeX/HTML for publication</span></span></span>
-<span class="r-in"><span><span class="co"># table2pdf(final_table, "regression_results.pdf")</span></span></span>
-<span class="r-in"><span><span class="co"># table2docx(final_table, "regression_results.docx")</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 17: Gamma regression with screening</span></span></span>
-<span class="r-in"><span><span class="va">gamma_result</span> <span class="op">&lt;-</span> <span class="fu">fullfit</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    outcome <span class="op">=</span> <span class="st">"los_days"</span>,</span></span>
-<span class="r-in"><span>    predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"treatment"</span>, <span class="st">"surgery"</span>, <span class="st">"any_complication"</span>, </span></span>
-<span class="r-in"><span>                  <span class="st">"stage"</span>, <span class="st">"ecog"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    model_type <span class="op">=</span> <span class="st">"glm"</span>,</span></span>
-<span class="r-in"><span>    family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">Gamma</a></span><span class="op">(</span>link <span class="op">=</span> <span class="st">"log"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    method <span class="op">=</span> <span class="st">"screen"</span>,</span></span>
-<span class="r-in"><span>    p_threshold <span class="op">=</span> <span class="fl">0.10</span>,</span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running univariable analysis...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting multivariable model with 6 predictors...</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">gamma_result</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Fullfit Analysis Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Outcome: los_days</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Model Type: glm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Method: screen (p &lt; 0.1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Predictors Screened: 6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Predictors: 6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                    Variable            Group      n Coefficient (95% CI)   Uni p Adj. Coefficient (95% CI) Multi p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                      &lt;char&gt;           &lt;char&gt; &lt;char&gt;               &lt;char&gt;  &lt;char&gt;                    &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1:             Age (years)                -    830     1.01 (1.01-1.01) &lt; 0.001          1.01 (1.01-1.01) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2:         Treatment Group          Control    196            reference       -                 reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3:                                   Drug A    292     0.96 (0.92-1.00)   0.067          0.93 (0.90-0.96) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  4:                                   Drug B    362     1.15 (1.10-1.19) &lt; 0.001          1.16 (1.13-1.20) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  5:      Surgical Resection               No    480            reference       -                 reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6:                                      Yes    370     1.03 (1.00-1.06)   0.091          1.25 (1.21-1.28) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  7:        Any Complication  No complication    370            reference       -                 reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  8:                         Any complication    480     1.17 (1.13-1.20) &lt; 0.001          1.06 (1.03-1.09) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  9:           Disease Stage                I    211            reference       -                 reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10:                                       II    263     1.06 (1.02-1.11)   0.006          1.08 (1.05-1.12) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11:                                      III    241     1.15 (1.10-1.20) &lt; 0.001          1.17 (1.14-1.21) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12:                                       IV    132     1.16 (1.10-1.22) &lt; 0.001          1.27 (1.22-1.32) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13: ECOG Performance Status                0    265            reference       -                 reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14:                                        1    302     1.12 (1.08-1.16) &lt; 0.001          1.14 (1.11-1.18) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15:                                        2    238     1.21 (1.16-1.26) &lt; 0.001          1.28 (1.24-1.32) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16:                                        3     37     1.27 (1.17-1.38) &lt; 0.001          1.41 (1.33-1.50) &lt; 0.001</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 18: Quasipoisson for overdispersed counts</span></span></span>
-<span class="r-in"><span><span class="va">quasi_result</span> <span class="op">&lt;-</span> <span class="fu">fullfit</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    outcome <span class="op">=</span> <span class="st">"ae_count"</span>,</span></span>
-<span class="r-in"><span>    predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"treatment"</span>, <span class="st">"diabetes"</span>, <span class="st">"surgery"</span>, </span></span>
-<span class="r-in"><span>                  <span class="st">"stage"</span>, <span class="st">"ecog"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    model_type <span class="op">=</span> <span class="st">"glm"</span>,</span></span>
-<span class="r-in"><span>    family <span class="op">=</span> <span class="st">"quasipoisson"</span>,</span></span>
-<span class="r-in"><span>    method <span class="op">=</span> <span class="st">"screen"</span>,</span></span>
-<span class="r-in"><span>    p_threshold <span class="op">=</span> <span class="fl">0.20</span>,</span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running univariable analysis...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting multivariable model with 5 predictors...</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">quasi_result</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Fullfit Analysis Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Outcome: ae_count</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Model Type: glm</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Method: screen (p &lt; 0.2)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Predictors Screened: 6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Predictors: 5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                    Variable   Group      n Events      RR (95% CI)   Uni p     aRR (95% CI) Multi p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                      &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1:             Age (years)       -    840  4,599 1.01 (1.01-1.02) &lt; 0.001 1.01 (1.01-1.02) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2:         Treatment Group Control    196    851        reference       -        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3:                          Drug A    292  1,240 0.97 (0.82-1.15)   0.741 0.94 (0.80-1.10)   0.444</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  4:                          Drug B    362  2,508 1.61 (1.38-1.88) &lt; 0.001 1.54 (1.33-1.78) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  5:                Diabetes      No    637  2,998        reference       -        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6:                             Yes    197  1,508 1.63 (1.44-1.85) &lt; 0.001 1.65 (1.47-1.85) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  7:      Surgical Resection      No    480  2,627        reference       -                -       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  8:                             Yes    370  1,972 0.97 (0.85-1.10)   0.602                -       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  9:           Disease Stage       I    211  1,103        reference       -        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10:                              II    263  1,291 0.94 (0.80-1.12)   0.508 0.90 (0.78-1.05)   0.180</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11:                             III    241  1,494 1.18 (1.01-1.40)   0.043 1.11 (0.96-1.29)   0.145</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12:                              IV    132    689 1.00 (0.82-1.23)   0.967 0.94 (0.79-1.12)   0.488</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13: ECOG Performance Status       0    265  1,224        reference       -        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14:                               1    302  1,641 1.16 (0.99-1.35)   0.068 1.26 (1.10-1.44) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15:                               2    238  1,424 1.28 (1.09-1.50)   0.003 1.28 (1.12-1.48) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16:                               3     37    254 1.45 (1.09-1.93)   0.011 1.43 (1.12-1.83)   0.004</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 19: Linear mixed effects with site clustering</span></span></span>
+<span class="r-in"><span><span class="co"># Example 10: Linear mixed effects with site clustering</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"lme4"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>    <span class="va">lmer_result</span> <span class="op">&lt;-</span> <span class="fu">fullfit</span><span class="op">(</span></span></span>
 <span class="r-in"><span>        data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
@@ -1221,43 +864,6 @@ preserved. When <code>NULL</code>, uses
 <span class="r-out co"><span class="r-pr">#&gt;</span>  9:                        III    235   2.68 (1.82 to 3.54) &lt; 0.001       3.00 (2.28 to 3.72) &lt; 0.001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10:                         IV    126   3.04 (2.02 to 4.06) &lt; 0.001       4.35 (3.48 to 5.22) &lt; 0.001</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 20: Cox mixed effects with site clustering</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"coxme"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>    <span class="va">coxme_result</span> <span class="op">&lt;-</span> <span class="fu">fullfit</span><span class="op">(</span></span></span>
-<span class="r-in"><span>        data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>        outcome <span class="op">=</span> <span class="st">"Surv(os_months, os_status)"</span>,</span></span>
-<span class="r-in"><span>        predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"treatment"</span>, <span class="st">"stage"</span>, <span class="st">"grade"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>        random <span class="op">=</span> <span class="st">"(1|site)"</span>,</span></span>
-<span class="r-in"><span>        model_type <span class="op">=</span> <span class="st">"coxme"</span>,</span></span>
-<span class="r-in"><span>        method <span class="op">=</span> <span class="st">"screen"</span>,</span></span>
-<span class="r-in"><span>        p_threshold <span class="op">=</span> <span class="fl">0.10</span>,</span></span>
-<span class="r-in"><span>        labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span>    <span class="op">)</span></span></span>
-<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">coxme_result</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running univariable analysis...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting multivariable model with 4 predictors...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Fullfit Analysis Results</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Outcome: Surv(os_months, os_status)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Model Type: coxme</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Method: screen (p &lt; 0.1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Predictors Screened: 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Predictors: 4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            Variable                     Group      n Events      HR (95% CI)   Uni p     aHR (95% CI) Multi p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              &lt;char&gt;                    &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1:     Age (years)                         -    850    609 1.04 (1.03-1.04) &lt; 0.001 1.04 (1.03-1.05) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2: Treatment Group                   Control    196    151        reference       -        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3:                                    Drug A    292    184 0.65 (0.53-0.81) &lt; 0.001 0.53 (0.42-0.66) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  4:                                    Drug B    362    274 1.04 (0.85-1.27)   0.735 0.86 (0.70-1.05)   0.138</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  5:   Disease Stage                         I    211    127        reference       -        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6:                                        II    263    172 1.13 (0.90-1.42)   0.307 1.17 (0.93-1.48)   0.186</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  7:                                       III    241    186 1.78 (1.41-2.23) &lt; 0.001 1.93 (1.52-2.44) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  8:                                        IV    132    121 3.63 (2.81-4.69) &lt; 0.001 4.05 (3.12-5.26) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  9:     Tumor Grade       Well-differentiated    153     95        reference       -        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10:                 Moderately differentiated    412    297 1.34 (1.06-1.69)   0.013 1.42 (1.13-1.80)   0.003</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11:                     Poorly differentiated    275    208 1.69 (1.32-2.15) &lt; 0.001 1.76 (1.37-2.26) &lt; 0.001</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

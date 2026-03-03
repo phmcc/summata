@@ -385,6 +385,7 @@ print(uni_model)
 # Labeled as "Univariable OR"
 
 \donttest{
+
 # Example 2: Multivariable logistic regression
 multi_model <- fit(
     data = clintrial,
@@ -503,7 +504,7 @@ preds <- predict(model_obj, type = "response")
 # Example 12: Access raw numeric data
 raw_data <- attr(result, "raw_data")
 print(raw_data)
-# Contains unformatted coefficients, SEs, CIs, AIC, BIC, \emph{etc.}
+# Contains unformatted coefficients, SEs, CIs, AIC, BIC, etc.
 
 # Example 13: Multiple interactions
 complex_model <- fit(
@@ -556,10 +557,7 @@ raw <- attr(result, "raw_data")
 cat("AIC:", raw$AIC[1], "\n")
 cat("BIC:", raw$BIC[1], "\n")
 cat("C-statistic:", raw$c_statistic[1], "\n")
-}
 
-\donttest{
-  options(width = 180)
 # Example 18: Interaction effects - treatment effect modified by stage
 interaction_model <- fit(
     data = clintrial,
@@ -680,13 +678,14 @@ if (requireNamespace("lme4", quietly = TRUE)) {
 }
 
 # Example 28: Format a pre-fitted model (model-based workflow)
-# Useful for models fitted outside of fit(), like MASS::glm.nb()
+# Useful for models fitted outside of fit()
 pre_fitted <- glm(os_status ~ age + sex + treatment,
                   family = binomial, data = clintrial)
 result <- fit(model = pre_fitted, 
               data = clintrial,
               labels = clintrial_labels)
 print(result)
+
 }
 
 }

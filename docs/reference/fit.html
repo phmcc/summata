@@ -21,7 +21,7 @@ multivariable models automatically."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -500,6 +500,7 @@ the underlying model object:</p>
 <span class="r-in"><span><span class="co"># Labeled as "Univariable OR"</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 2: Multivariable logistic regression</span></span></span>
 <span class="r-in"><span><span class="va">multi_model</span> <span class="op">&lt;-</span> <span class="fu">fit</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
@@ -784,7 +785,7 @@ the underlying model object:</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2:          NA   0.6745587          NA        NA      sex Female     445          294 reference             FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3:         834   0.6745587    3.109658 0.9272885      sex   Male     393          305              ***       TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4:         834   0.6745587    3.109658 0.9272885      bmi             NA           NA                       FALSE</span>
-<span class="r-in"><span><span class="co"># Contains unformatted coefficients, SEs, CIs, AIC, BIC, \emph{etc.}</span></span></span>
+<span class="r-in"><span><span class="co"># Contains unformatted coefficients, SEs, CIs, AIC, BIC, etc.</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 13: Multiple interactions</span></span></span>
 <span class="r-in"><span><span class="va">complex_model</span> <span class="op">&lt;-</span> <span class="fu">fit</span><span class="op">(</span></span></span>
@@ -888,10 +889,7 @@ the underlying model object:</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> BIC: 923.9276 </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"C-statistic:"</span>, <span class="va">raw</span><span class="op">$</span><span class="va">c_statistic</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="st">"\n"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> C-statistic: 0.7554538 </span>
-<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">180</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Example 18: Interaction effects - treatment effect modified by stage</span></span></span>
 <span class="r-in"><span><span class="va">interaction_model</span> <span class="op">&lt;-</span> <span class="fu">fit</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
@@ -1164,7 +1162,7 @@ the underlying model object:</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8:                      IV    126       2.98 (2.08 to 3.87) &lt; 0.001</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 28: Format a pre-fitted model (model-based workflow)</span></span></span>
-<span class="r-in"><span><span class="co"># Useful for models fitted outside of fit(), like MASS::glm.nb()</span></span></span>
+<span class="r-in"><span><span class="co"># Useful for models fitted outside of fit()</span></span></span>
 <span class="r-in"><span><span class="va">pre_fitted</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">os_status</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">treatment</span>,</span></span>
 <span class="r-in"><span>                  family <span class="op">=</span> <span class="va">binomial</span>, data <span class="op">=</span> <span class="va">clintrial</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">fit</span><span class="op">(</span>model <span class="op">=</span> <span class="va">pre_fitted</span>, </span></span>
@@ -1184,6 +1182,7 @@ the underlying model object:</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4: Treatment Group Control    196    151        reference       -</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5:                  Drug A    292    184 0.48 (0.31-0.73) &lt; 0.001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6:                  Drug B    362    274 0.86 (0.56-1.32)   0.492</span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

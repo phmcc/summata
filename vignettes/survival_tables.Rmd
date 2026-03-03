@@ -21,7 +21,7 @@ if (requireNamespace("ragg", quietly = TRUE)) {
   knitr::opts_chunk$set(dev = "ragg_png")
 }
 
-options(width = 180)
+old_opts <- options(width = 180)
 ```
 
 Survival analysis requires specialized summary tables that report time-to-event outcomes in formats appropriate for longitudinal research. While `desctable()` includes basic survival summaries (median with 95% CI), detailed survival analysis often requires more comprehensive reporting: survival probabilities at specified time points, multiple quantiles, and group comparisons with appropriate statistical tests.
@@ -221,8 +221,8 @@ surv_table <- survtable(
 )
 
 # Export both for publication
-ggsave("km_curve.pdf", width = 8, height = 6)
-table2pdf(surv_table, "survival_table.pdf", 
+ggsave(file.path(tempdir(), "km_curve.pdf"), width = 8, height = 6)
+table2pdf(surv_table, file.path(tempdir(), "survival_table.pdf"), 
           caption = "Table 2. Survival Estimates by Treatment Group")
 ```
 
@@ -238,14 +238,14 @@ Survival tables can be exported to various formats using the standard `summata` 
 # Microsoft Word
 table2docx(
   table = example1,
-  file = "SurvivalTable.docx",
+  file = file.path(tempdir(), "SurvivalTable.docx"),
   caption = "Table 2. Survival Estimates by Treatment Group"
 )
 
 # PDF (requires LaTeX)
 table2pdf(
   table = example1,
-  file = "SurvivalTable.pdf",
+  file = file.path(tempdir(), "SurvivalTable.pdf"),
   caption = "Table 2. Survival Estimates by Treatment Group"
 )
 ```
@@ -269,6 +269,10 @@ When selecting landmark time points, consider the following:
 2. Include the number at risk when space permits
 3. Specify the time unit in table headers or footnotes
 4. Use consistent decimal precision across estimates
+
+```{r, include = FALSE}
+options(old_opts)
+```
 
 ---
 

@@ -572,6 +572,7 @@ print(uni_model)
 # Labeled as "Univariable OR"
 
 # \donttest{
+
 # Example 2: Multivariable logistic regression
 multi_model <- fit(
     data = clintrial,
@@ -856,7 +857,7 @@ print(raw_data)
 #> 2:          NA   0.6745587          NA        NA      sex Female     445          294 reference             FALSE
 #> 3:         834   0.6745587    3.109658 0.9272885      sex   Male     393          305              ***       TRUE
 #> 4:         834   0.6745587    3.109658 0.9272885      bmi             NA           NA                       FALSE
-# Contains unformatted coefficients, SEs, CIs, AIC, BIC, \emph{etc.}
+# Contains unformatted coefficients, SEs, CIs, AIC, BIC, etc.
 
 # Example 13: Multiple interactions
 complex_model <- fit(
@@ -960,10 +961,7 @@ cat("BIC:", raw$BIC[1], "\n")
 #> BIC: 923.9276 
 cat("C-statistic:", raw$c_statistic[1], "\n")
 #> C-statistic: 0.7554538 
-# }
 
-# \donttest{
-  options(width = 180)
 # Example 18: Interaction effects - treatment effect modified by stage
 interaction_model <- fit(
     data = clintrial,
@@ -1236,7 +1234,7 @@ if (requireNamespace("lme4", quietly = TRUE)) {
 #> 8:                      IV    126       2.98 (2.08 to 3.87) < 0.001
 
 # Example 28: Format a pre-fitted model (model-based workflow)
-# Useful for models fitted outside of fit(), like MASS::glm.nb()
+# Useful for models fitted outside of fit()
 pre_fitted <- glm(os_status ~ age + sex + treatment,
                   family = binomial, data = clintrial)
 result <- fit(model = pre_fitted, 
@@ -1256,5 +1254,6 @@ print(result)
 #> 4: Treatment Group Control    196    151        reference       -
 #> 5:                  Drug A    292    184 0.48 (0.31-0.73) < 0.001
 #> 6:                  Drug B    362    274 0.86 (0.56-1.32)   0.492
+
 # }
 ```

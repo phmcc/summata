@@ -659,6 +659,7 @@ print(result1)
 # Shows odds ratios comparing Drug A and Drug B to Control
 
 # \donttest{
+
 # Example 2: Adjusted analysis with covariates
 # Adjust for age, sex, and disease stage
 result2 <- multifit(
@@ -1125,27 +1126,7 @@ print(final_table)
 #> 5:         Surgical Resection Treatment Group (Drug A)    292    173 1.58 (1.10-2.27)   0.014 1.78 (1.19-2.67)   0.005
 #> 6:         Surgical Resection Treatment Group (Drug B)    362    103 0.43 (0.30-0.62) < 0.001 0.43 (0.29-0.64) < 0.001
 
-# Export to various formats for publication
-# table2pdf(final_table, "treatment_effects.pdf", 
-#         caption = "Treatment effects across outcomes")
-# table2docx(final_table, "treatment_effects.docx")
-
-# Example 19: Create forest plot from results
-result_forest <- multifit(
-    data = clintrial,
-    outcomes = c("surgery", "pfs_status", "os_status"),
-    predictor = "treatment",
-    covariates = c("age", "sex", "stage"),
-    labels = clintrial_labels,
-    parallel = FALSE
-)
-
-# Create forest plot (requires \pkg{ggplot2})
-# p <- multiforest(result_forest, 
-#                  title = "Treatment Effects Across Outcomes")
-# print(p)
-
-# Example 20: Gamma regression for positive continuous outcomes
+# Example 19: Gamma regression for positive continuous outcomes
 gamma_result <- multifit(
     data = clintrial,
     outcomes = c("los_days", "recovery_days"),
@@ -1173,7 +1154,7 @@ print(gamma_result)
 #> 4:    Days to Functional Recovery Treatment Group (Drug B)    352       0.17 (0.10 to 0.23)       -
 # Returns multiplicative effects on positive continuous data
 
-# Example 21: Quasipoisson for overdispersed counts
+# Example 20: Quasipoisson for overdispersed counts
 quasi_result <- multifit(
     data = clintrial,
     outcomes = c("ae_count"),
@@ -1199,10 +1180,10 @@ print(quasi_result)
 #> 2: Adverse Event Count Treatment Group (Drug B)    348  2,459 1.55 (1.34-1.80)       -
 # Adjusts standard errors for overdispersion
 
-# Example 22: Generalized linear mixed effects (GLMER)
+# Example 21: Generalized linear mixed effects (GLMER)
 # Test treatment across outcomes with site clustering
 if (requireNamespace("lme4", quietly = TRUE)) {
-    glmer_result <- multifit(
+    glmer_result <- suppressWarnings(multifit(
         data = clintrial,
         outcomes = c("surgery", "pfs_status", "os_status"),
         predictor = "treatment",
@@ -1212,12 +1193,9 @@ if (requireNamespace("lme4", quietly = TRUE)) {
         family = "binomial",
         labels = clintrial_labels,
         parallel = FALSE
-    )
+    ))
     print(glmer_result)
 }
-#> Warning: Model is nearly unidentifiable: very large eigenvalue
-#>  - Rescale variables?;Model is nearly unidentifiable: large eigenvalue ratio
-#>  - Rescale variables?
 #> 
 #> Multivariate Analysis Results
 #> Predictor: treatment
@@ -1236,7 +1214,7 @@ if (requireNamespace("lme4", quietly = TRUE)) {
 #> 5:                Death Event Treatment Group (Drug A)    292    184 0.44 (0.28-0.69) < 0.001
 #> 6:                Death Event Treatment Group (Drug B)    362    274 0.88 (0.56-1.38)   0.571
 
-# Example 23: Cox mixed effects with random site effects
+# Example 22: Cox mixed effects with random site effects
 if (requireNamespace("coxme", quietly = TRUE)) {
     coxme_result <- multifit(
         data = clintrial,
@@ -1267,7 +1245,7 @@ if (requireNamespace("coxme", quietly = TRUE)) {
 #> 3:          Overall Survival (months) Treatment Group (Drug A)    606    606 0.57 (0.46-0.72) < 0.001
 #> 4:          Overall Survival (months) Treatment Group (Drug B)    606    606 0.93 (0.76-1.14)   0.492
 
-# Example 24: Multiple interactions across outcomes
+# Example 23: Multiple interactions across outcomes
 multi_int <- multifit(
     data = clintrial,
     outcomes = c("surgery", "pfs_status", "os_status"),

@@ -6,6 +6,15 @@
 \usage{
 \method{print}{uniscreen_result}(x, ...)
 }
+\arguments{
+\item{x}{Object of class \code{uniscreen_result}.}
+
+\item{...}{Additional arguments passed to print methods.}
+}
+\value{
+Invisibly returns the input object \code{x}. Called for its
+  side effect of printing a formatted summary to the console.
+}
 \description{
 Print method for uniscreen results
 }

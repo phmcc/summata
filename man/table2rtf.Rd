@@ -265,13 +265,10 @@ The function applies professional typography:
 }
 }
 \examples{
-\dontshow{if (FALSE) withAutoprint(\{ # examplesIf}
-options(width = 180)
-# Load data
 data(clintrial)
 data(clintrial_labels)
 
-# Create regression table
+# Create example table
 results <- fit(
    data = clintrial,
    outcome = "os_status",
@@ -280,43 +277,47 @@ results <- fit(
 )
 
 # Example 1: Basic RTF export
-table2rtf(results, "results.rtf")
+if (requireNamespace("flextable", quietly = TRUE)) {
+  table2rtf(results, file.path(tempdir(), "results.rtf"))
+}
 
+\donttest{
+old_width <- options(width = 180)
 # Example 2: With caption
-table2rtf(results, "captioned.rtf",
+table2rtf(results, file.path(tempdir(), "captioned.rtf"),
        caption = "Table 1: Multivariable Logistic Regression Results")
 
 # Example 3: Landscape orientation for wide tables
-table2rtf(results, "wide.rtf",
+table2rtf(results, file.path(tempdir(), "wide.rtf"),
        orientation = "landscape")
 
 # Example 4: Custom font and size
-table2rtf(results, "custom_font.rtf",
+table2rtf(results, file.path(tempdir(), "custom_font.rtf"),
        font_family = "Times New Roman",
        font_size = 11)
 
 # Example 5: Hierarchical display
-table2rtf(results, "indented.rtf",
+table2rtf(results, file.path(tempdir(), "indented.rtf"),
        indent_groups = TRUE)
 
 # Example 6: Condensed table
-table2rtf(results, "condensed.rtf",
+table2rtf(results, file.path(tempdir(), "condensed.rtf"),
        condense_table = TRUE)
 
 # Example 7: With zebra stripes
-table2rtf(results, "striped.rtf",
+table2rtf(results, file.path(tempdir(), "striped.rtf"),
        zebra_stripes = TRUE)
 
 # Example 8: Dark header style
-table2rtf(results, "dark.rtf",
+table2rtf(results, file.path(tempdir(), "dark.rtf"),
        dark_header = TRUE)
 
 # Example 9: A4 paper for international submissions
-table2rtf(results, "a4.rtf",
+table2rtf(results, file.path(tempdir(), "a4.rtf"),
        paper = "a4")
 
 # Example 10: Get flextable for customization
-result <- table2rtf(results, "base.rtf")
+result <- table2rtf(results, file.path(tempdir(), "base.rtf"))
 ft <- attr(result, "flextable")
 
 # Customize the flextable
@@ -324,14 +325,14 @@ ft <- flextable::bold(ft, i = 1, part = "body")
 ft <- flextable::color(ft, j = "p-value", color = "blue")
 
 # Re-save
-flextable::save_as_rtf(ft, path = "customized.rtf")
+flextable::save_as_rtf(ft, path = file.path(tempdir(), "customized.rtf"))
 
 # Example 11: Direct flextable return
-ft <- table2rtf(results, "direct.rtf", return_ft = TRUE)
+ft <- table2rtf(results, file.path(tempdir(), "direct.rtf"), return_ft = TRUE)
 ft <- flextable::bg(ft, bg = "yellow", part = "header")
 
 # Example 12: Regulatory submission table
-table2rtf(results, "submission.rtf",
+table2rtf(results, file.path(tempdir(), "submission.rtf"),
        caption = "Table 2: Adjusted Odds Ratios for Mortality",
        font_family = "Times New Roman",
        font_size = 10,
@@ -340,38 +341,36 @@ table2rtf(results, "submission.rtf",
        bold_significant = TRUE)
 
 # Example 13: Custom column alignment
-table2rtf(results, "aligned.rtf",
+table2rtf(results, file.path(tempdir(), "aligned.rtf"),
        align = c("left", "left", "center", "right", "right"))
 
 # Example 14: Disable significance bolding
-table2rtf(results, "no_bold.rtf",
+table2rtf(results, file.path(tempdir(), "no_bold.rtf"),
        bold_significant = FALSE)
 
 # Example 15: Stricter significance threshold
-table2rtf(results, "strict.rtf",
+table2rtf(results, file.path(tempdir(), "strict.rtf"),
        bold_significant = TRUE,
        p_threshold = 0.01)
 
 # Example 16: Descriptive statistics for baseline characteristics
-desc <- desctable(
-   data = clintrial,
-   by = "treatment",
-   variables = c("age", "sex", "bmi", "stage"),
-   labels = clintrial_labels
-)
+desc <- desctable(clintrial, by = "treatment",
+   variables = c("age", "sex", "bmi", "stage"), labels = clintrial_labels)
 
-table2rtf(desc, "baseline.rtf",
+table2rtf(desc, file.path(tempdir(), "baseline.rtf"),
        caption = "Table 1: Baseline Patient Characteristics",
        zebra_stripes = TRUE)
 
 # Example 17: Clinical trial efficacy table
-table2rtf(results, "efficacy.rtf",
+table2rtf(results, file.path(tempdir(), "efficacy.rtf"),
        caption = "Table 3: Primary Efficacy Analysis - Intent to Treat Population",
        font_family = "Courier New",  # Monospace for alignment
        paper = "letter",
        orientation = "landscape",
        condense_table = TRUE)
-\dontshow{\}) # examplesIf}
+
+options(old_width)
+}
 }
 \seealso{
 \code{\link{autotable}} for automatic format detection,

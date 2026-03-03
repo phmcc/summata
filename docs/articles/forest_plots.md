@@ -54,20 +54,26 @@ data(clintrial)
 data(clintrial_labels)
 ```
 
-Moreover, note that all plots in this vignette are generated using the
-[`ggsave()`](https://ggplot2.tidyverse.org/reference/ggsave.html)
-function with recommended dimensions—*i.e.*,
-
-``` r
-ggsave("output.png", plot, 
-       width = attr(plot, "rec_dims")$width, 
-       height = attr(plot, "rec_dims")$height, 
-       units = "in")
-```
-
-This ensures that the figure size is always large enough to accommodate
-the constituent plot text and graphics, and it is generally the
-preferred method for saving forest plot outputs in `summata`.
+> *n.b.:* To ensure correct font rendering and figure sizing, the forest
+> plots below are displayed using a helper function (`queue_plot()`)
+> that applies each plot’s recommended dimensions (stored in the
+> `"rec_dims"` attribute) via the [`ragg`](https://ragg.r-lib.org/)
+> graphics device. In practice, replace `queue_plot()` with
+> [`ggplot2::ggsave()`](https://ggplot2.tidyverse.org/reference/ggsave.html)
+> using recommended plot dimensions for equivalent results:
+>
+> ``` r
+> p <- glmforest(model, data = mydata)
+> dims <- attr(p, "rec_dims")
+> ggplot2::ggsave("forest_plot.png", p,
+>                 width = dims$width, 
+>                 height = dims$height)
+> ```
+>
+> This ensures that the figure size is always large enough to
+> accommodate the constituent plot text and graphics, and it is
+> generally the preferred method for saving forest plot outputs in
+> `summata`.
 
 ------------------------------------------------------------------------
 
@@ -93,9 +99,10 @@ example1 <- glmforest(
   title = "Logistic Regression: Predictors of Outcome",
   labels = clintrial_labels
 )
+queue_plot(example1)
 ```
 
-![](figures/forest_ex1.png)
+![](forest_plots_files/figure-html/unnamed-chunk-4-1.png)
 
 ### **Example 2:** Linear Regression
 
@@ -114,9 +121,10 @@ example2 <- lmforest(
   title = "Linear Regression: Length of Stay",
   labels = clintrial_labels
 )
+queue_plot(example2)
 ```
 
-![](figures/forest_ex2.png)
+![](forest_plots_files/figure-html/unnamed-chunk-6-1.png)
 
 ### **Example 3:** Cox Regression
 
@@ -135,9 +143,10 @@ example3 <- coxforest(
   title = "Cox Regression: Survival Analysis",
   labels = clintrial_labels
 )
+queue_plot(example3)
 ```
 
-![](figures/forest_ex3.png)
+![](forest_plots_files/figure-html/unnamed-chunk-8-1.png)
 
 ### **Example 4:** Automatic Model Detection
 
@@ -151,9 +160,10 @@ example4 <- autoforest(
   data = clintrial,
   labels = clintrial_labels
 )
+queue_plot(example4)
 ```
 
-![](figures/forest_ex4.png)
+![](forest_plots_files/figure-html/unnamed-chunk-10-1.png)
 
 ------------------------------------------------------------------------
 
@@ -183,9 +193,10 @@ example5 <- glmforest(
   labels = clintrial_labels,
   zebra_stripes = TRUE
 )
+queue_plot(example5)
 ```
 
-![](figures/forest_ex5.png)
+![](forest_plots_files/figure-html/unnamed-chunk-12-1.png)
 
 ### **Example 6:** Model Attribute from Fit Output
 
@@ -206,9 +217,10 @@ example6 <- coxforest(
   labels = clintrial_labels,
   zebra_stripes = TRUE
 )
+queue_plot(example6)
 ```
 
-![](figures/forest_ex6.png)
+![](forest_plots_files/figure-html/unnamed-chunk-14-1.png)
 
 ------------------------------------------------------------------------
 
@@ -226,9 +238,10 @@ example7 <- glmforest(
   labels = clintrial_labels,
   indent_groups = TRUE
 )
+queue_plot(example7)
 ```
 
-![](figures/forest_ex7.png)
+![](forest_plots_files/figure-html/unnamed-chunk-16-1.png)
 
 ### **Example 8:** Condensing Binary Variables
 
@@ -242,9 +255,10 @@ example8 <- glmforest(
   labels = clintrial_labels,
   condense_table = TRUE
 )
+queue_plot(example8)
 ```
 
-![](figures/forest_ex8.png)
+![](forest_plots_files/figure-html/unnamed-chunk-18-1.png)
 
 ### **Example 9:** Toggle Zebra Striping
 
@@ -259,9 +273,10 @@ example9 <- glmforest(
   indent_groups = TRUE,
   zebra_stripes = FALSE
 )
+queue_plot(example9)
 ```
 
-![](figures/forest_ex9.png)
+![](forest_plots_files/figure-html/unnamed-chunk-20-1.png)
 
 ### **Example 10:** Sample Size and Event Columns
 
@@ -278,9 +293,10 @@ example10a <- coxforest(
   indent_groups = TRUE,
   zebra_stripes = TRUE
 )
+queue_plot(example10a)
 ```
 
-![](figures/forest_ex10a.png)
+![](forest_plots_files/figure-html/unnamed-chunk-22-1.png)
 
 ``` r
 # Minimal display
@@ -292,9 +308,10 @@ example10b <- coxforest(
   show_events = FALSE,
   indent_groups = TRUE
 )
+queue_plot(example10b)
 ```
 
-![](figures/forest_ex10b.png)
+![](forest_plots_files/figure-html/unnamed-chunk-24-1.png)
 
 ------------------------------------------------------------------------
 
@@ -313,9 +330,10 @@ example11 <- glmforest(
   digits = 3,
   indent_groups = TRUE
 )
+queue_plot(example11)
 ```
 
-![](figures/forest_ex11.png)
+![](forest_plots_files/figure-html/unnamed-chunk-26-1.png)
 
 ### **Example 12:** Custom Reference Label
 
@@ -329,9 +347,10 @@ example12 <- glmforest(
   ref_label = "ref",
   indent_groups = TRUE
 )
+queue_plot(example12)
 ```
 
-![](figures/forest_ex12.png)
+![](forest_plots_files/figure-html/unnamed-chunk-28-1.png)
 
 ### **Example 13:** Custom Effect Measure Label
 
@@ -345,9 +364,10 @@ example13 <- coxforest(
   effect_label = "Effect (95% CI)",
   indent_groups = TRUE
 )
+queue_plot(example13)
 ```
 
-![](figures/forest_ex13.png)
+![](forest_plots_files/figure-html/unnamed-chunk-30-1.png)
 
 ### **Example 14:** Custom Colors
 
@@ -361,9 +381,10 @@ example14 <- glmforest(
   color = "#E41A1C",
   indent_groups = TRUE
 )
+queue_plot(example14)
 ```
 
-![](figures/forest_ex14.png)
+![](forest_plots_files/figure-html/unnamed-chunk-32-1.png)
 
 ### **Example 15:** Change Font Sizes
 
@@ -377,9 +398,10 @@ example15 <- glmforest(
   font_size = 1.5,
   indent_groups = TRUE
 )
+queue_plot(example15)
 ```
 
-![](figures/forest_ex15.png)
+![](forest_plots_files/figure-html/unnamed-chunk-34-1.png)
 
 ### **Example 16:** Table Width
 
@@ -394,9 +416,10 @@ example16a <- glmforest(
   labels = clintrial_labels,
   table_width = 0.75
 )
+queue_plot(example16a)
 ```
 
-![](figures/forest_ex16a.png)
+![](forest_plots_files/figure-html/unnamed-chunk-36-1.png)
 
 ``` r
 # Narrow table (emphasizes forest plot)
@@ -406,9 +429,10 @@ example16b <- glmforest(
   labels = clintrial_labels,
   table_width = 0.50
 )
+queue_plot(example16b)
 ```
 
-![](figures/forest_ex16b.png)
+![](forest_plots_files/figure-html/unnamed-chunk-38-1.png)
 
 ------------------------------------------------------------------------
 
@@ -437,7 +461,7 @@ cat("Height:", dims$height, "inches\n")
 
 # Save with recommended dimensions
 ggsave(
-  filename = "forest_plot.pdf",
+  filename = file.path(tempdir(), "forest_plot.pdf"),
   plot = p,
   width = dims$width,
   height = dims$height,
@@ -459,16 +483,16 @@ p <- glmforest(
 dims <- attr(p, "rec_dims")
 
 # PDF (vector, best for publications)
-# ggsave("forest.pdf", p, width = dims$width, height = dims$height)
+ggsave("forest.pdf", p, width = dims$width, height = dims$height)
 
 # PNG (raster, good for presentations)
-# ggsave("forest.png", p, width = dims$width, height = dims$height, dpi = 300)
+ggsave("forest.png", p, width = dims$width, height = dims$height, dpi = 300)
 
 # TIFF (high-quality raster, often required by journals)
-# ggsave("forest.tiff", p, width = dims$width, height = dims$height, dpi = 300)
+ggsave("forest.tiff", p, width = dims$width, height = dims$height, dpi = 300)
 
 # SVG (vector, good for web)
-# ggsave("forest.svg", p, width = dims$width, height = dims$height)
+ggsave("forest.svg", p, width = dims$width, height = dims$height)
 ```
 
 ------------------------------------------------------------------------
@@ -499,9 +523,10 @@ example19 <- coxforest(
   table_width = 0.62,
   color = "#8A61D8"
 )
+queue_plot(example19)
 ```
 
-![](figures/forest_ex19.png)
+![](forest_plots_files/figure-html/unnamed-chunk-42-1.png)
 
 ### **Example 20:** Extensions with ggplot2
 
@@ -520,9 +545,10 @@ example20_modified <- example20 +
     plot.title = element_text(face = "italic", color = "#A72727"),
     plot.background = element_rect(fill = "white", color = NA)
   )
+queue_plot(example20_modified)
 ```
 
-![](figures/forest_ex20.png)
+![](forest_plots_files/figure-html/unnamed-chunk-44-1.png)
 
 ------------------------------------------------------------------------
 
@@ -553,9 +579,10 @@ example21 <- glmforest(
   title = "Poisson Regression: Follow-Up Visits",
   labels = clintrial_labels
 )
+queue_plot(example21)
 ```
 
-![](figures/forest_ex21.png)
+![](forest_plots_files/figure-html/unnamed-chunk-46-1.png)
 
 ### **Example 22:** Negative Binomial Regression
 
@@ -577,9 +604,10 @@ example22 <- glmforest(
   x = nb_result,
   title = "Negative Binomial: Adverse Events"
 )
+queue_plot(example22)
 ```
 
-![](figures/forest_ex22.png)
+![](forest_plots_files/figure-html/unnamed-chunk-48-1.png)
 
 ------------------------------------------------------------------------
 
@@ -648,7 +676,7 @@ Reduce font size or increase figure dimensions:
 
 ``` r
 p <- glmforest(model, font_size = 0.9)
-ggsave("plot.pdf", p, width = 14, height = 8)
+ggsave(file.path(tempdir(), "plot.pdf"), p, width = 14, height = 8)
 ```
 
 ### Missing Labels

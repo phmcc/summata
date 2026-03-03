@@ -62,6 +62,27 @@ multivariate analysis:
 | Count (overdispersed) | `ae_count` | `negbin` or `quasipoisson` |
 | Time-to-event | `Surv(pfs_months, pfs_status)`, `Surv(os_months, os_status)` | `coxph` |
 
+> *n.b.:* To ensure correct font rendering and figure sizing, the forest
+> plots below are displayed using a helper function (`queue_plot()`)
+> that applies each plot’s recommended dimensions (stored in the
+> `"rec_dims"` attribute) via the [`ragg`](https://ragg.r-lib.org/)
+> graphics device. In practice, replace `queue_plot()` with
+> [`ggplot2::ggsave()`](https://ggplot2.tidyverse.org/reference/ggsave.html)
+> using recommended plot dimensions for equivalent results:
+>
+> ``` r
+> p <- glmforest(model, data = mydata)
+> dims <- attr(p, "rec_dims")
+> ggplot2::ggsave("forest_plot.png", p,
+>                 width = dims$width, 
+>                 height = dims$height)
+> ```
+>
+> This ensures that the figure size is always large enough to
+> accommodate the constituent plot text and graphics, and it is
+> generally the preferred method for saving forest plot outputs in
+> `summata`.
+
 ------------------------------------------------------------------------
 
 ## Basic Usage
@@ -482,9 +503,10 @@ example12 <- multiforest(
   indent_predictor = TRUE,
   zebra_stripes = TRUE
 )
+queue_plot(example12)
 ```
 
-![](figures/multi_ex12.png)
+![](multivariate_regression_files/figure-html/unnamed-chunk-16-1.png)
 
 ### **Example 13:** Customization Options
 
@@ -501,9 +523,10 @@ example13 <- multiforest(
   table_width = 0.65,
   color = "#4BA6B6"
 )
+queue_plot(example13)
 ```
 
-![](figures/multi_ex13.png)
+![](multivariate_regression_files/figure-html/unnamed-chunk-18-1.png)
 
 ### **Example 14:** Forest Plot for Continuous Outcomes
 
@@ -526,9 +549,10 @@ example14 <- multiforest(
   covariates_footer = TRUE,
   labels = clintrial_labels
 )
+queue_plot(example14)
 ```
 
-![](figures/multi_ex14.png)
+![](multivariate_regression_files/figure-html/unnamed-chunk-20-1.png)
 
 ### **Example 15:** Forest Plot for Survival Outcomes
 
@@ -558,9 +582,10 @@ example15 <- multiforest(
   zebra_stripes = TRUE,
   labels = clintrial_labels
 )
+queue_plot(example15)
 ```
 
-![](figures/multi_ex15.png)
+![](multivariate_regression_files/figure-html/unnamed-chunk-22-1.png)
 
 ------------------------------------------------------------------------
 
@@ -573,13 +598,13 @@ Export tables using standard export functions:
 ``` r
 table2docx(
   table = result,
-  file = "multioutcome_analysis.docx",
+  file = file.path(tempdir(), "multioutcome_analysis.docx"),
   caption = "Treatment Effects Across Outcomes"
 )
 
 table2pdf(
   table = result,
-  file = "multioutcome_analysis.pdf",
+  file = file.path(tempdir(), "multioutcome_analysis.pdf"),
   caption = "Treatment Effects Across Outcomes"
 )
 ```
@@ -593,7 +618,7 @@ Save forest plots using
 p <- multiforest(result, title = "Effect Estimates")
 dims <- attr(p, "rec_dims")
 
-ggsave("multioutcome_forest.pdf", p,
+ggsave(file.path(tempdir(), "multioutcome_forest.pdf"), p,
        width = attr(result, "rec_dims")$width,
        height = attr(result, "rec_dims")$height, 
        units = "in")
@@ -681,9 +706,10 @@ forest_plot <- multiforest(
   table_width = 0.65,
   labels = clintrial_labels
 )
+queue_plot(forest_plot)
 ```
 
-![](figures/multi_workflow_forest.png)
+![](multivariate_regression_files/figure-html/unnamed-chunk-26-1.png)
 
 ------------------------------------------------------------------------
 
@@ -765,7 +791,7 @@ clintrial$treatment_binary <- ifelse(clintrial$treatment == "Control",
 
 ## Other Considerations
 
-### Multivariate vs. Univariable Screening
+### Multivariate Regression vs. Univariable Screening
 
 The distinction between
 [`multifit()`](https://phmcc.github.io/summata/reference/multifit.md)

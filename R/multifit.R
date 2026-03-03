@@ -423,8 +423,9 @@
 #' )
 #' print(result1)
 #' # Shows odds ratios comparing Drug A and Drug B to Control
-#' 
+#'
 #' \donttest{
+#' 
 #' # Example 2: Adjusted analysis with covariates
 #' # Adjust for age, sex, and disease stage
 #' result2 <- multifit(
@@ -652,27 +653,7 @@
 #' )
 #' print(final_table)
 #' 
-#' # Export to various formats for publication
-#' # table2pdf(final_table, "treatment_effects.pdf", 
-#' #         caption = "Treatment effects across outcomes")
-#' # table2docx(final_table, "treatment_effects.docx")
-#' 
-#' # Example 19: Create forest plot from results
-#' result_forest <- multifit(
-#'     data = clintrial,
-#'     outcomes = c("surgery", "pfs_status", "os_status"),
-#'     predictor = "treatment",
-#'     covariates = c("age", "sex", "stage"),
-#'     labels = clintrial_labels,
-#'     parallel = FALSE
-#' )
-#' 
-#' # Create forest plot (requires \pkg{ggplot2})
-#' # p <- multiforest(result_forest, 
-#' #                  title = "Treatment Effects Across Outcomes")
-#' # print(p)
-#' 
-#' # Example 20: Gamma regression for positive continuous outcomes
+#' # Example 19: Gamma regression for positive continuous outcomes
 #' gamma_result <- multifit(
 #'     data = clintrial,
 #'     outcomes = c("los_days", "recovery_days"),
@@ -686,7 +667,7 @@
 #' print(gamma_result)
 #' # Returns multiplicative effects on positive continuous data
 #' 
-#' # Example 21: Quasipoisson for overdispersed counts
+#' # Example 20: Quasipoisson for overdispersed counts
 #' quasi_result <- multifit(
 #'     data = clintrial,
 #'     outcomes = c("ae_count"),
@@ -700,10 +681,10 @@
 #' print(quasi_result)
 #' # Adjusts standard errors for overdispersion
 #' 
-#' # Example 22: Generalized linear mixed effects (GLMER)
+#' # Example 21: Generalized linear mixed effects (GLMER)
 #' # Test treatment across outcomes with site clustering
 #' if (requireNamespace("lme4", quietly = TRUE)) {
-#'     glmer_result <- multifit(
+#'     glmer_result <- suppressWarnings(multifit(
 #'         data = clintrial,
 #'         outcomes = c("surgery", "pfs_status", "os_status"),
 #'         predictor = "treatment",
@@ -713,11 +694,11 @@
 #'         family = "binomial",
 #'         labels = clintrial_labels,
 #'         parallel = FALSE
-#'     )
+#'     ))
 #'     print(glmer_result)
 #' }
 #' 
-#' # Example 23: Cox mixed effects with random site effects
+#' # Example 22: Cox mixed effects with random site effects
 #' if (requireNamespace("coxme", quietly = TRUE)) {
 #'     coxme_result <- multifit(
 #'         data = clintrial,
@@ -733,7 +714,7 @@
 #'     print(coxme_result)
 #' }
 #' 
-#' # Example 24: Multiple interactions across outcomes
+#' # Example 23: Multiple interactions across outcomes
 #' multi_int <- multifit(
 #'     data = clintrial,
 #'     outcomes = c("surgery", "pfs_status", "os_status"),
@@ -747,7 +728,7 @@
 #' # Shows how treatment effects vary by stage and sex across outcomes
 #'
 #' }
-#'
+#' 
 #' @family regression functions
 #' @export
 multifit <- function(data,
@@ -2004,6 +1985,11 @@ format_pvalues_multifit <- function(p, digits = 3, marks = NULL) {
 
 
 #' Print method for multifit results
+#'
+#' @param x Object of class \code{multifit_result}.
+#' @param ... Additional arguments passed to print methods.
+#' @return Invisibly returns the input object \code{x}. Called for its
+#'   side effect of printing a formatted summary to the console.
 #' @keywords internal
 #' @family regression functions
 #' @export

@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -191,6 +191,25 @@ suitable for multivariate analysis:</p>
 </tr>
 </tbody>
 </table>
+<blockquote>
+<p><em>n.b.:</em> To ensure correct font rendering and figure sizing,
+the forest plots below are displayed using a helper function
+(<code>queue_plot()</code>) that applies each plot’s recommended
+dimensions (stored in the <code>"rec_dims"</code> attribute) via the <a href="https://ragg.r-lib.org/" class="external-link"><code>ragg</code></a> graphics device. In
+practice, replace <code>queue_plot()</code> with
+<code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggplot2::ggsave()</a></code> using recommended plot dimensions for
+equivalent results:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glmforest.html">glmforest</a></span><span class="op">(</span><span class="va">model</span>, data <span class="op">=</span> <span class="va">mydata</span><span class="op">)</span></span>
+<span><span class="va">dims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">p</span>, <span class="st">"rec_dims"</span><span class="op">)</span></span>
+<span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"forest_plot.png"</span>, <span class="va">p</span>,</span>
+<span>                width <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">width</span>, </span>
+<span>                height <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">height</span><span class="op">)</span></span></code></pre></div>
+<p>This ensures that the figure size is always large enough to
+accommodate the constituent plot text and graphics, and it is generally
+the preferred method for saving forest plot outputs in
+<code>summata</code>.</p>
+</blockquote>
 <hr>
 </div>
 <div class="section level2">
@@ -201,7 +220,7 @@ suitable for multivariate analysis:</p>
 <strong>Example 1:</strong> Unadjusted Analysis<a class="anchor" aria-label="anchor" href="#example-1-unadjusted-analysis"></a>
 </h3>
 <p>Test a single predictor against multiple binary outcomes:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/multifit.html">multifit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcomes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"any_complication"</span>, <span class="st">"wound_infection"</span>,</span>
@@ -233,7 +252,7 @@ categorical predictors, each non-reference level appears separately.</p>
 <strong>Example 2:</strong> Adjusted Analysis<a class="anchor" aria-label="anchor" href="#example-2-adjusted-analysis"></a>
 </h3>
 <p>Include covariates for confounding control:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/multifit.html">multifit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcomes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"any_complication"</span>, <span class="st">"wound_infection"</span>,</span>
@@ -266,7 +285,7 @@ categorical predictors, each non-reference level appears separately.</p>
 </h3>
 <p>Use <code>columns = "both"</code> to display unadjusted and adjusted
 results side-by-side:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/multifit.html">multifit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcomes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"any_complication"</span>, <span class="st">"wound_infection"</span>,</span>
@@ -306,7 +325,7 @@ associations (similar estimates).</p>
 <strong>Example 4:</strong> Continuous Predictors<a class="anchor" aria-label="anchor" href="#example-4-continuous-predictors"></a>
 </h3>
 <p>For continuous predictors, one row appears per outcome:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/multifit.html">multifit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcomes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"any_complication"</span>, <span class="st">"wound_infection"</span>, <span class="st">"icu_admission"</span><span class="op">)</span>,</span>
@@ -339,7 +358,7 @@ increase in the predictor.</p>
 </h3>
 <p>For categorical predictors with multiple levels, the display is
 expanded:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example5</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/multifit.html">multifit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcomes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"any_complication"</span>, <span class="st">"wound_infection"</span>,</span>
@@ -381,7 +400,7 @@ expanded:</p>
 </h3>
 <p>For time-to-event outcomes, use
 <code>model_type = "coxph"</code>:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example6</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/multifit.html">multifit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcomes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Surv(pfs_months, pfs_status)"</span>,</span>
@@ -414,7 +433,7 @@ expanded:</p>
 <strong>Example 7:</strong> Linear Regression<a class="anchor" aria-label="anchor" href="#example-7-linear-regression"></a>
 </h3>
 <p>For continuous outcomes, use <code>model_type = "lm"</code>:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example7</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/multifit.html">multifit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcomes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"los_days"</span>, <span class="st">"pain_score"</span>, <span class="st">"recovery_days"</span><span class="op">)</span>,</span>
@@ -448,7 +467,7 @@ expanded:</p>
 <strong>Example 8:</strong> Mixed-Effects Models<a class="anchor" aria-label="anchor" href="#example-8-mixed-effects-models"></a>
 </h3>
 <p>Account for clustering using random effects:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example8</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/multifit.html">multifit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcomes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"any_complication"</span>, <span class="st">"wound_infection"</span><span class="op">)</span>,</span>
@@ -487,7 +506,7 @@ expanded:</p>
 <strong>Example 9:</strong> Interaction Terms<a class="anchor" aria-label="anchor" href="#example-9-interaction-terms"></a>
 </h3>
 <p>Interaction terms can be added to test effect modification:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example9</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/multifit.html">multifit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcomes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"any_complication"</span>, <span class="st">"wound_infection"</span><span class="op">)</span>,</span>
@@ -524,7 +543,7 @@ expanded:</p>
 <strong>Example 10:</strong> Filtering by p-value<a class="anchor" aria-label="anchor" href="#example-10-filtering-by-p-value"></a>
 </h3>
 <p>Outputs can be filtered to retain only significant associations:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example10</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/multifit.html">multifit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcomes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"any_complication"</span>, <span class="st">"wound_infection"</span>,</span>
@@ -557,7 +576,7 @@ expanded:</p>
 </h3>
 <p>Underlying model objects are stored as attributes for additional
 analysis:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/multifit.html">multifit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcomes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"any_complication"</span>, <span class="st">"wound_infection"</span><span class="op">)</span>,</span>
@@ -592,7 +611,7 @@ Outcomes<a class="anchor" aria-label="anchor" href="#example-12-forest-plot-for-
 </h3>
 <p>Results from <code><a href="../reference/multifit.html">multifit()</a></code> can be directly inserted into
 the <code><a href="../reference/multiforest.html">multiforest()</a></code> function to generate a forest plot:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/multifit.html">multifit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcomes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"any_complication"</span>, <span class="st">"wound_infection"</span>,</span>
@@ -608,8 +627,9 @@ the <code><a href="../reference/multiforest.html">multiforest()</a></code> funct
 <span>  title <span class="op">=</span> <span class="st">"Treatment Effects Across Outcomes"</span>,</span>
 <span>  indent_predictor <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/multi_ex12.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example12</span><span class="op">)</span></span></code></pre></div>
+<p><img src="multivariate_regression_files/figure-html/unnamed-chunk-16-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-13-customization-options">
@@ -617,7 +637,7 @@ the <code><a href="../reference/multiforest.html">multiforest()</a></code> funct
 </h3>
 <p>Customize the appearance of the forest plot by adjusting function
 parameters:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example13</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/multiforest.html">multiforest</a></span><span class="op">(</span></span>
 <span>  <span class="va">result</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"Effect Estimates"</span>,</span>
@@ -626,8 +646,9 @@ parameters:</p>
 <span>  covariates_footer <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  table_width <span class="op">=</span> <span class="fl">0.65</span>,</span>
 <span>  color <span class="op">=</span> <span class="st">"#4BA6B6"</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/multi_ex13.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example13</span><span class="op">)</span></span></code></pre></div>
+<p><img src="multivariate_regression_files/figure-html/unnamed-chunk-18-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-14-forest-plot-for-continuous-outcomes">
@@ -635,7 +656,7 @@ parameters:</p>
 Outcomes<a class="anchor" aria-label="anchor" href="#example-14-forest-plot-for-continuous-outcomes"></a>
 </h3>
 <p>Create forest plots for continuous outcomes:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lm_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/multifit.html">multifit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcomes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pain_score"</span>, <span class="st">"recovery_days"</span>, <span class="st">"los_days"</span><span class="op">)</span>,</span>
@@ -651,8 +672,9 @@ Outcomes<a class="anchor" aria-label="anchor" href="#example-14-forest-plot-for-
 <span>  show_predictor <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  covariates_footer <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/multi_ex14.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example14</span><span class="op">)</span></span></code></pre></div>
+<p><img src="multivariate_regression_files/figure-html/unnamed-chunk-20-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-15-forest-plot-for-survival-outcomes">
@@ -662,7 +684,7 @@ Outcomes<a class="anchor" aria-label="anchor" href="#example-14-forest-plot-for-
 <code>model_type</code> outputs from <code><a href="../reference/multifit.html">multifit()</a></code>. In
 addition, variable labels can be applied to <code><a href="../reference/multiforest.html">multiforest()</a></code>
 outputs similarly to other forest plot functions:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cox_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/multifit.html">multifit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcomes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Surv(pfs_months, pfs_status)"</span>,</span>
@@ -679,8 +701,9 @@ outputs similarly to other forest plot functions:</p>
 <span>  indent_predictor <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/multi_ex15.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example15</span><span class="op">)</span></span></code></pre></div>
+<p><img src="multivariate_regression_files/figure-html/unnamed-chunk-22-1.png" class="r-plt" alt="" width="100%"></p>
 <hr>
 </div>
 </div>
@@ -691,16 +714,16 @@ outputs similarly to other forest plot functions:</p>
 <h3 id="tables">Tables<a class="anchor" aria-label="anchor" href="#tables"></a>
 </h3>
 <p>Export tables using standard export functions:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/table2docx.html">table2docx</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">result</span>,</span>
-<span>  file <span class="op">=</span> <span class="st">"multioutcome_analysis.docx"</span>,</span>
+<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"multioutcome_analysis.docx"</span><span class="op">)</span>,</span>
 <span>  caption <span class="op">=</span> <span class="st">"Treatment Effects Across Outcomes"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">result</span>,</span>
-<span>  file <span class="op">=</span> <span class="st">"multioutcome_analysis.pdf"</span>,</span>
+<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"multioutcome_analysis.pdf"</span><span class="op">)</span>,</span>
 <span>  caption <span class="op">=</span> <span class="st">"Treatment Effects Across Outcomes"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -708,11 +731,11 @@ outputs similarly to other forest plot functions:</p>
 <h3 id="forest-plots">Forest Plots<a class="anchor" aria-label="anchor" href="#forest-plots"></a>
 </h3>
 <p>Save forest plots using <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave()</a></code>:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/multiforest.html">multiforest</a></span><span class="op">(</span><span class="va">result</span>, title <span class="op">=</span> <span class="st">"Effect Estimates"</span><span class="op">)</span></span>
 <span><span class="va">dims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">p</span>, <span class="st">"rec_dims"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"multioutcome_forest.pdf"</span>, <span class="va">p</span>,</span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"multioutcome_forest.pdf"</span><span class="op">)</span>, <span class="va">p</span>,</span>
 <span>       width <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">result</span>, <span class="st">"rec_dims"</span><span class="op">)</span><span class="op">$</span><span class="va">width</span>,</span>
 <span>       height <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">result</span>, <span class="st">"rec_dims"</span><span class="op">)</span><span class="op">$</span><span class="va">height</span>, </span>
 <span>       units <span class="op">=</span> <span class="st">"in"</span><span class="op">)</span></span></code></pre></div>
@@ -723,7 +746,7 @@ outputs similarly to other forest plot functions:</p>
 </h3>
 <p>The following demonstrates a complete multi-outcome analysis
 workflow:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Define outcomes by type</span></span>
 <span><span class="va">binary_outcomes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"any_complication"</span>, <span class="st">"wound_infection"</span>,</span>
 <span>                     <span class="st">"readmission_30d"</span>, <span class="st">"icu_admission"</span><span class="op">)</span></span>
@@ -798,8 +821,9 @@ workflow:</p>
 <span>  zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  table_width <span class="op">=</span> <span class="fl">0.65</span>,</span>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/multi_workflow_forest.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">forest_plot</span><span class="op">)</span></span></code></pre></div>
+<p><img src="multivariate_regression_files/figure-html/unnamed-chunk-26-1.png" class="r-plt" alt="" width="100%"></p>
 <hr>
 </div>
 <div class="section level3">
@@ -932,7 +956,7 @@ survival)</li>
 <h3 id="convergence-warnings">Convergence Warnings<a class="anchor" aria-label="anchor" href="#convergence-warnings"></a>
 </h3>
 <p>For mixed-effects models, simplify the random effects structure:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Start with random intercepts only</span></span>
 <span><span class="fu"><a href="../reference/multifit.html">multifit</a></span><span class="op">(</span><span class="va">data</span>, <span class="va">outcomes</span>, <span class="va">predictor</span>,</span>
 <span>         random <span class="op">=</span> <span class="st">"(1|site)"</span>,</span>
@@ -942,7 +966,7 @@ survival)</li>
 <h3 id="many-factor-levels">Many Factor Levels<a class="anchor" aria-label="anchor" href="#many-factor-levels"></a>
 </h3>
 <p>For predictors with many levels, consider collapsing categories:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">clintrial</span><span class="op">$</span><span class="va">treatment_binary</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">clintrial</span><span class="op">$</span><span class="va">treatment</span> <span class="op">==</span> <span class="st">"Control"</span>, </span>
 <span>                                      <span class="st">"Control"</span>, <span class="st">"Active"</span><span class="op">)</span></span></code></pre></div>
 <hr>
@@ -952,7 +976,7 @@ survival)</li>
 <h2 id="other-considerations">Other Considerations<a class="anchor" aria-label="anchor" href="#other-considerations"></a>
 </h2>
 <div class="section level3">
-<h3 id="multivariate-vs--univariable-screening">Multivariate vs. Univariable Screening<a class="anchor" aria-label="anchor" href="#multivariate-vs--univariable-screening"></a>
+<h3 id="multivariate-regression-vs--univariable-screening">Multivariate Regression vs. Univariable Screening<a class="anchor" aria-label="anchor" href="#multivariate-regression-vs--univariable-screening"></a>
 </h3>
 <p>The distinction between <code><a href="../reference/multifit.html">multifit()</a></code> and
 <code><a href="../reference/uniscreen.html">uniscreen()</a></code> is important:</p>
@@ -997,7 +1021,7 @@ because binomial GLM coerces such variables to binary (first level
 <em>vs.</em> all others).</p>
 <p>For multilevel categorical outcomes, use dedicated packages outside
 of <code>summata</code>:</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Multinomial regression (unordered categories)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.stats.ox.ac.uk/pub/MASS4/" class="external-link">nnet</a></span><span class="op">)</span></span>
 <span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nnet/man/multinom.html" class="external-link">multinom</a></span><span class="op">(</span><span class="va">treatment</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">stage</span>, data <span class="op">=</span> <span class="va">clintrial</span><span class="op">)</span></span>

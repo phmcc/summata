@@ -23,7 +23,8 @@ print(x, ...)
 
 ## Value
 
-Invisibly returns the input object.
+Invisibly returns the input object `x`. Called for its side effect of
+printing a formatted summary to the console.
 
 ## See also
 

@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -1463,14 +1463,14 @@ stratification variable should be specified using the
 <code class="sourceCode R"><span><span class="co"># Microsoft Word</span></span>
 <span><span class="fu"><a href="../reference/table2docx.html">table2docx</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">example13</span>,</span>
-<span>  file <span class="op">=</span> <span class="st">"Table2_Regression.docx"</span>,</span>
+<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table2_Regression.docx"</span><span class="op">)</span>,</span>
 <span>  caption <span class="op">=</span> <span class="st">"Table 2. Univariable and Multivariable Analysis"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># PDF</span></span>
 <span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">example13</span>,</span>
-<span>  file <span class="op">=</span> <span class="st">"Table2_Regression.pdf"</span>,</span>
+<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table2_Regression.pdf"</span><span class="op">)</span>,</span>
 <span>  caption <span class="op">=</span> <span class="st">"Table 2. Regression Results"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>See the <a href="table_export.html">Table Export</a> vignette for

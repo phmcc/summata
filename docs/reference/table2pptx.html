@@ -21,7 +21,7 @@ after creation. Ideal for creating data-driven presentations and conference talk
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -331,23 +331,21 @@ Default is <code>FALSE</code>.</p></dd>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">pres</span>, target <span class="op">=</span> <span class="st">"combined.pptx"</span><span class="op">)</span></span></code></pre></div>
 
 <p><strong>Further Customization:</strong></p>
-<p>Access the <code>flextable</code> object for advanced formatting:</p><div class="sourceCode"><pre><code>
-ft &lt;- table2pptx(table, "base.pptx", return_ft = TRUE)
+<p>Access the <code>flextable</code> object for advanced formatting:</p><div class="sourceCode"><pre><code><span></span>
+<span><span class="va">ft</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/table2pptx.html">table2pptx</a></span><span class="op">(</span><span class="va">table</span>, <span class="st">"base.pptx"</span>, return_ft <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Customize</span></span>
+<span><span class="va">ft</span> <span class="op">&lt;-</span> <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/color.html" class="external-link">color</a></span><span class="op">(</span><span class="va">ft</span>, j <span class="op">=</span> <span class="st">"p-value"</span>, color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></span>
+<span><span class="va">ft</span> <span class="op">&lt;-</span> <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/bg.html" class="external-link">bg</a></span><span class="op">(</span><span class="va">ft</span>, i <span class="op">=</span> <span class="fl">1</span>, bg <span class="op">=</span> <span class="st">"yellow"</span><span class="op">)</span></span>
+<span><span class="va">ft</span> <span class="op">&lt;-</span> <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/bold.html" class="external-link">bold</a></span><span class="op">(</span><span class="va">ft</span>, i <span class="op">=</span> <span class="op">~</span> <span class="va">estimate</span> <span class="op">&gt;</span> <span class="fl">0</span>, j <span class="op">=</span> <span class="st">"estimate"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Save to new slide</span></span>
+<span><span class="va">pres</span> <span class="op">&lt;-</span> <span class="fu">officer</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/officer/reference/read_pptx.html" class="external-link">read_pptx</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">pres</span> <span class="op">&lt;-</span> <span class="fu">officer</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/officer/reference/add_slide.html" class="external-link">add_slide</a></span><span class="op">(</span><span class="va">pres</span><span class="op">)</span></span>
+<span><span class="va">pres</span> <span class="op">&lt;-</span> <span class="fu">officer</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/officer/reference/ph_with.html" class="external-link">ph_with</a></span><span class="op">(</span><span class="va">pres</span>, <span class="va">ft</span>,</span>
+<span>                         location <span class="op">=</span> <span class="fu">officer</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/officer/reference/ph_location.html" class="external-link">ph_location</a></span><span class="op">(</span>left <span class="op">=</span> <span class="fl">0.5</span>, top <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">pres</span>, target <span class="op">=</span> <span class="st">"custom.pptx"</span><span class="op">)</span></span></code></pre></div>
 
-# Customize
-ft &lt;- flextable::color(ft, j = "\emph{p}-value", color = "red")
-ft &lt;- flextable::bg(ft, i = 1, bg = "yellow")
-ft &lt;- flextable::bold(ft, i = ~ estimate &gt; 0, j = "estimate")
-
-# Save to new slide
-pres &lt;- officer::read_pptx()
-pres &lt;- officer::add_slide(pres)
-pres &lt;- officer::ph_with(pres, ft,
-                         location = officer::ph_location(left = 0.5, top = 1.5))
-print(pres, target = "custom.pptx")
-</code></pre></div>
-
-<p><strong>Editability in PowerPoint:</strong></p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -370,8 +368,21 @@ print(pres, target = "custom.pptx")
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">180</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Create example data</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">clintrial</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">clintrial_labels</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">tbl</span> <span class="op">&lt;-</span> <span class="fu"><a href="desctable.html">desctable</a></span><span class="op">(</span><span class="va">clintrial</span>, by <span class="op">=</span> <span class="st">"treatment"</span>,</span></span>
+<span class="r-in"><span>    variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span><span class="op">)</span>, labels <span class="op">=</span> <span class="va">clintrial_labels</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Basic PowerPoint export</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"flextable"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">&amp;&amp;</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"officer"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="fu">table2pptx</span><span class="op">(</span><span class="va">tbl</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"example.pptx"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpox9B2N/example.pptx</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="va">old_width</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">180</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Load data</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">clintrial</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">clintrial_labels</span><span class="op">)</span></span></span>
@@ -385,61 +396,63 @@ print(pres, target = "custom.pptx")
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 1: Basic PowerPoint slide</span></span></span>
-<span class="r-in"><span><span class="fu">table2pptx</span><span class="op">(</span><span class="va">results</span>, <span class="st">"results.pptx"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">table2pptx</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"results.pptx"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpox9B2N/results.pptx</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 2: With title</span></span></span>
-<span class="r-in"><span><span class="fu">table2pptx</span><span class="op">(</span><span class="va">results</span>, <span class="st">"titled.pptx"</span>,</span></span>
+<span class="r-in"><span><span class="fu">table2pptx</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"titled.pptx"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>        caption <span class="op">=</span> <span class="st">"Multivariable Regression Results"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpox9B2N/titled.pptx</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 3: Larger font for visibility</span></span></span>
-<span class="r-in"><span><span class="fu">table2pptx</span><span class="op">(</span><span class="va">results</span>, <span class="st">"large_font.pptx"</span>,</span></span>
+<span class="r-in"><span><span class="fu">table2pptx</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"large_font.pptx"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>        font_size <span class="op">=</span> <span class="fl">12</span>,</span></span>
 <span class="r-in"><span>        caption <span class="op">=</span> <span class="st">"Main Findings"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpox9B2N/large_font.pptx</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 4: Condensed for slide space</span></span></span>
-<span class="r-in"><span><span class="fu">table2pptx</span><span class="op">(</span><span class="va">results</span>, <span class="st">"condensed.pptx"</span>,</span></span>
+<span class="r-in"><span><span class="fu">table2pptx</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"condensed.pptx"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>        condense_table <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>        caption <span class="op">=</span> <span class="st">"Key Results"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpox9B2N/condensed.pptx</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 5: Dark header for emphasis</span></span></span>
-<span class="r-in"><span><span class="fu">table2pptx</span><span class="op">(</span><span class="va">results</span>, <span class="st">"dark.pptx"</span>,</span></span>
+<span class="r-in"><span><span class="fu">table2pptx</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"dark.pptx"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>        dark_header <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>        caption <span class="op">=</span> <span class="st">"Risk Factors"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpox9B2N/dark.pptx</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 6: With zebra stripes</span></span></span>
-<span class="r-in"><span><span class="fu">table2pptx</span><span class="op">(</span><span class="va">results</span>, <span class="st">"striped.pptx"</span>,</span></span>
+<span class="r-in"><span><span class="fu">table2pptx</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"striped.pptx"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>        zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpox9B2N/striped.pptx</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 7: Blank layout with custom positioning</span></span></span>
-<span class="r-in"><span><span class="fu">table2pptx</span><span class="op">(</span><span class="va">results</span>, <span class="st">"blank.pptx"</span>,</span></span>
+<span class="r-in"><span><span class="fu">table2pptx</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"blank.pptx"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>        layout <span class="op">=</span> <span class="st">"Blank"</span>,</span></span>
 <span class="r-in"><span>        left <span class="op">=</span> <span class="fl">1</span>,</span></span>
 <span class="r-in"><span>        top <span class="op">=</span> <span class="fl">1.5</span>,</span></span>
 <span class="r-in"><span>        width <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpox9B2N/blank.pptx</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 8: Using company template</span></span></span>
-<span class="r-in"><span><span class="fu">table2pptx</span><span class="op">(</span><span class="va">results</span>, <span class="st">"branded.pptx"</span>,</span></span>
-<span class="r-in"><span>        template <span class="op">=</span> <span class="st">"company_template.pptx"</span>,</span></span>
-<span class="r-in"><span>        layout <span class="op">=</span> <span class="st">"Data Slide"</span>,</span></span>
-<span class="r-in"><span>        caption <span class="op">=</span> <span class="st">"Q4 Results"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Example 8: Get flextable for customization</span></span></span>
+<span class="r-in"><span><span class="va">ft</span> <span class="op">&lt;-</span> <span class="fu">table2pptx</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"base.pptx"</span><span class="op">)</span>, return_ft <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpox9B2N/base.pptx</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 9: Get flextable for customization</span></span></span>
-<span class="r-in"><span><span class="va">ft</span> <span class="op">&lt;-</span> <span class="fu">table2pptx</span><span class="op">(</span><span class="va">results</span>, <span class="st">"base.pptx"</span>, return_ft <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Customize colors</span></span></span>
+<span class="r-in"><span><span class="co"># Customize the returned flextable object</span></span></span>
 <span class="r-in"><span><span class="va">ft</span> <span class="op">&lt;-</span> <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/color.html" class="external-link">color</a></span><span class="op">(</span><span class="va">ft</span>, j <span class="op">=</span> <span class="st">"p-value"</span>, color <span class="op">=</span> <span class="st">"darkred"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">ft</span> <span class="op">&lt;-</span> <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/bold.html" class="external-link">bold</a></span><span class="op">(</span><span class="va">ft</span>, i <span class="op">=</span> <span class="op">~</span> <span class="va">p_value</span> <span class="op">&lt;</span> <span class="fl">0.01</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 10: Presentation-optimized table</span></span></span>
-<span class="r-in"><span><span class="fu">table2pptx</span><span class="op">(</span><span class="va">results</span>, <span class="st">"presentation.pptx"</span>,</span></span>
+<span class="r-in"><span><span class="co"># Example 9: Presentation-optimized table</span></span></span>
+<span class="r-in"><span><span class="fu">table2pptx</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"presentation.pptx"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>        caption <span class="op">=</span> <span class="st">"Main Analysis Results"</span>,</span></span>
 <span class="r-in"><span>        font_size <span class="op">=</span> <span class="fl">11</span>,</span></span>
 <span class="r-in"><span>        condense_table <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>        zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>        dark_header <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>        bold_significant <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpox9B2N/presentation.pptx</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 11: Descriptive statistics slide</span></span></span>
+<span class="r-in"><span><span class="co"># Example 10: Descriptive statistics slide</span></span></span>
 <span class="r-in"><span><span class="va">desc</span> <span class="op">&lt;-</span> <span class="fu"><a href="desctable.html">desctable</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>   data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>   by <span class="op">=</span> <span class="st">"treatment"</span>,</span></span>
@@ -447,18 +460,22 @@ print(pres, target = "custom.pptx")
 <span class="r-in"><span>   labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">table2pptx</span><span class="op">(</span><span class="va">desc</span>, <span class="st">"baseline.pptx"</span>,</span></span>
+<span class="r-in"><span><span class="fu">table2pptx</span><span class="op">(</span><span class="va">desc</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"baseline.pptx"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>        caption <span class="op">=</span> <span class="st">"Baseline Characteristics"</span>,</span></span>
 <span class="r-in"><span>        font_size <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpox9B2N/baseline.pptx</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 12: Conference presentation style</span></span></span>
-<span class="r-in"><span><span class="fu">table2pptx</span><span class="op">(</span><span class="va">results</span>, <span class="st">"conference.pptx"</span>,</span></span>
+<span class="r-in"><span><span class="co"># Example 11: Conference presentation style</span></span></span>
+<span class="r-in"><span><span class="fu">table2pptx</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"conference.pptx"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>        caption <span class="op">=</span> <span class="st">"Study Outcomes"</span>,</span></span>
 <span class="r-in"><span>        font_family <span class="op">=</span> <span class="st">"Calibri"</span>,</span></span>
 <span class="r-in"><span>        font_size <span class="op">=</span> <span class="fl">14</span>,  <span class="co"># Large for big rooms</span></span></span>
 <span class="r-in"><span>        dark_header <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>        condense_table <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpox9B2N/conference.pptx</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="va">old_width</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

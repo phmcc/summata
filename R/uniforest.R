@@ -172,12 +172,11 @@
 #' \code{\link{coxforest}}, \code{\link{glmforest}}, \code{\link{lmforest}} for
 #' single-model forest plots
 #'
-#' @examplesIf FALSE
-#' # Load example data
+#' @examples
 #' data(clintrial)
 #' data(clintrial_labels)
-#' 
-#' # Example 1: Basic logistic regression screening
+#'
+#' # Create example uniscreen result
 #' uni_results <- uniscreen(
 #'     data = clintrial,
 #'     outcome = "os_status",
@@ -185,10 +184,14 @@
 #'     labels = clintrial_labels,
 #'     parallel = FALSE
 #' )
+#'
+#' # Example 1: Basic univariable forest plot
+#' p <- uniforest(uni_results, title = "Univariable Associations with Mortality")
+#'
+#' \donttest{
 #' 
-#' uniforest(uni_results, title = "Univariable Associations with Mortality")
+#' old_width <- options(width = 180)
 #' 
-#'   options(width = 180)
 #' # Example 2: Survival analysis
 #' library(survival)
 #' surv_results <- uniscreen(
@@ -200,7 +203,7 @@
 #'     parallel = FALSE
 #' )
 #' 
-#' uniforest(surv_results, title = "Univariable Survival Analysis")
+#' p2 <- uniforest(surv_results, title = "Univariable Survival Analysis")
 #' 
 #' # Example 3: Linear regression
 #' lm_results <- uniscreen(
@@ -212,10 +215,10 @@
 #'     parallel = FALSE
 #' )
 #' 
-#' uniforest(lm_results, title = "Predictors of Length of Stay")
+#' p3 <- uniforest(lm_results, title = "Predictors of Length of Stay")
 #' 
 #' # Example 4: Customize appearance
-#' uniforest(
+#' p4 <- uniforest(
 #'     uni_results,
 #'     title = "Crude Associations with Mortality",
 #'     color = "#E74C3C",
@@ -224,16 +227,14 @@
 #'     bold_variables = TRUE
 #' )
 #' 
-#' # Example 5: Hide footer
-#' uniforest(uni_results, 
-#'           title = "Predictors of Overall Survival Status",
-#'           show_footer = FALSE)
-#' 
-#' # Example 6: Save with recommended dimensions
-#' p <- uniforest(uni_results)
-#' dims <- attr(p, "rec_dims")
-#' # ggsave("univariable_forest.pdf", p, width = dims$width, height = dims$height)
+#' # Example 5: Save with recommended dimensions
+#' dims <- attr(p4, "rec_dims")
+#' ggplot2::ggsave(file.path(tempdir(), "univariable_forest.pdf"),
+#'                 p4, width = dims$width, height = dims$height)
 #'
+#' options(old_width)
+#' 
+#' }
 #' @family visualization functions
 #' @export
 uniforest <- function(x,

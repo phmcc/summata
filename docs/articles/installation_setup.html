@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -107,20 +107,23 @@ additional components for document generation.</p>
 <div class="section level3">
 <h3 id="from-repository">From Repository<a class="anchor" aria-label="anchor" href="#from-repository"></a>
 </h3>
-<p>This package is not yet available on CRAN. The stable release may be
-installed from GitHub:</p>
+<p>Install the stable release from CRAN:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"summata"</span><span class="op">)</span></span></code></pre></div>
+<p>Alternatively, the latest development version may be installed from
+GitHub:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"phmcc/summata"</span><span class="op">)</span></span></code></pre></div>
 <p>The development version is available from Codeberg:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_git.html" class="external-link">install_git</a></span><span class="op">(</span><span class="st">"https://codeberg.org/phmcc/summata.git"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="verification">Verification<a class="anchor" aria-label="anchor" href="#verification"></a>
 </h3>
 <p>Confirm successful installation by loading the package:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://phmcc.github.io/summata/">summata</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/packageDescription.html" class="external-link">packageVersion</a></span><span class="op">(</span><span class="st">"summata"</span><span class="op">)</span></span></code></pre></div>
 <hr>
@@ -285,7 +288,7 @@ types</td>
 </tbody>
 </table>
 <p>Install optional dependencies as needed:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># For mixed-effects models</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lme4"</span>, <span class="st">"coxme"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -298,7 +301,7 @@ types</td>
 <span><span class="co"># For model diagnostics and selection</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MASS"</span>, <span class="st">"MuMIn"</span>, <span class="st">"pROC"</span>, <span class="st">"ResourceSelection"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Or install all suggested packages at once:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"summata"</span>, dependencies <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
@@ -312,11 +315,11 @@ types</td>
 <h3 id="tinytex-recommended">TinyTeX (Recommended)<a class="anchor" aria-label="anchor" href="#tinytex-recommended"></a>
 </h3>
 <p>TinyTeX provides a lightweight, R-integrated LaTeX distribution:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"tinytex"</span><span class="op">)</span></span>
 <span><span class="fu">tinytex</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tinytex/man/install_tinytex.html" class="external-link">install_tinytex</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Verify the installation:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">tinytex</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tinytex/man/is_tinytex.html" class="external-link">is_tinytex</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu">tinytex</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tinytex/man/tlmgr.html" class="external-link">tlmgr_version</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>TinyTeX installs required LaTeX packages automatically on first
@@ -351,7 +354,7 @@ use.</p>
 </tbody>
 </table>
 <p>For Debian/Ubuntu systems:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">sudo</span> apt install texlive-latex-base texlive-latex-extra texlive-fonts-recommended</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">sudo</span> apt install texlive-latex-base texlive-latex-extra texlive-fonts-recommended</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="required-latex-packages">Required LaTeX Packages<a class="anchor" aria-label="anchor" href="#required-latex-packages"></a>
@@ -387,8 +390,8 @@ use.</p>
 </table>
 <p>With TinyTeX, these packages install automatically. For standard
 distributions:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="ex">tlmgr</span> install fontenc inputenc array booktabs longtable graphicx geometry <span class="dt">\</span></span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  pdflscape lscape helvet standalone varwidth float caption xcolor colortbl</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="ex">tlmgr</span> install fontenc inputenc array booktabs longtable graphicx geometry <span class="dt">\</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  pdflscape lscape helvet standalone varwidth float caption xcolor colortbl</span></code></pre></div>
 <hr>
 </div>
 </div>
@@ -396,7 +399,7 @@ distributions:</p>
 <h2 id="microsoft-office-export">Microsoft Office Export<a class="anchor" aria-label="anchor" href="#microsoft-office-export"></a>
 </h2>
 <p>Export to Word, PowerPoint, and RTF formats requires:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"flextable"</span>, <span class="st">"officer"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>These packages enable creation of <code>.docx</code>,
 <code>.pptx</code>, and <code>.rtf</code> files that can be opened and
@@ -407,7 +410,7 @@ edited in Microsoft Office or compatible applications.</p>
 <h2 id="export-verification-procedure">Export Verification Procedure<a class="anchor" aria-label="anchor" href="#export-verification-procedure"></a>
 </h2>
 <p>Execute the following to verify complete functionality:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://phmcc.github.io/summata/">summata</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Create test data</span></span>
@@ -417,13 +420,16 @@ edited in Microsoft Office or compatible applications.</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Test Word export (requires flextable, officer)</span></span>
-<span><span class="fu"><a href="../reference/table2docx.html">table2docx</a></span><span class="op">(</span><span class="va">test_data</span>, file <span class="op">=</span> <span class="st">"verification_test.docx"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/table2docx.html">table2docx</a></span><span class="op">(</span><span class="va">test_data</span>, file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"verification_test.docx"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Test PDF export (requires xtable, LaTeX)</span></span>
-<span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span><span class="va">test_data</span>, file <span class="op">=</span> <span class="st">"verification_test.pdf"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span><span class="va">test_data</span>, file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"verification_test.pdf"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Clean up</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.remove</a></span><span class="op">(</span><span class="st">"verification_test.docx"</span>, <span class="st">"verification_test.pdf"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.remove</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"verification_test.docx"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"verification_test.pdf"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>Successful execution confirms proper configuration of all
 export-related dependencies.</p>
 <hr>
@@ -435,7 +441,7 @@ export-related dependencies.</p>
 <h3 id="latex-not-found">LaTeX Not Found<a class="anchor" aria-label="anchor" href="#latex-not-found"></a>
 </h3>
 <p>If PDF generation fails, verify LaTeX accessibility:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Sys.which.html" class="external-link">Sys.which</a></span><span class="op">(</span><span class="st">"pdflatex"</span><span class="op">)</span></span></code></pre></div>
 <p>An empty return value indicates LaTeX is not in the system PATH.
 Solutions include:</p>
@@ -450,26 +456,26 @@ Solutions include:</p>
 <h3 id="missing-latex-packages">Missing LaTeX Packages<a class="anchor" aria-label="anchor" href="#missing-latex-packages"></a>
 </h3>
 <p>For TinyTeX, install missing packages directly:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">tinytex</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tinytex/man/tlmgr.html" class="external-link">tlmgr_install</a></span><span class="op">(</span><span class="st">"package_name"</span><span class="op">)</span></span></code></pre></div>
 <p>For compilation errors, examine the log file:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span><span class="va">test_data</span>, file <span class="op">=</span> <span class="st">"debug.pdf"</span>, show_logs <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span><span class="va">test_data</span>, file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"debug.pdf"</span><span class="op">)</span>, show_logs <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="package-installation-failures">Package Installation Failures<a class="anchor" aria-label="anchor" href="#package-installation-failures"></a>
 </h3>
 <p>Ensure repository access is configured:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>CRAN <span class="op">=</span> <span class="st">"https://cloud.r-project.org"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>For packages requiring system libraries (Linux):</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="fu">sudo</span> apt install r-base-dev libcurl4-openssl-dev libssl-dev libxml2-dev</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="fu">sudo</span> apt install r-base-dev libcurl4-openssl-dev libssl-dev libxml2-dev</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="write-permission-errors">Write Permission Errors<a class="anchor" aria-label="anchor" href="#write-permission-errors"></a>
 </h3>
 <p>Verify write access to the target directory:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/file.access.html" class="external-link">file.access</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd</a></span><span class="op">(</span><span class="op">)</span>, mode <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>  <span class="co"># Returns 0 if writable</span></span></code></pre></div>
 <hr>

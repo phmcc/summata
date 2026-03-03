@@ -10,10 +10,7 @@ vignette: >
 ```{r, include = FALSE}
 ## Use ragg for better font rendering if available
 if (requireNamespace("ragg", quietly = TRUE)) {
-  options(summata.use_ragg = TRUE)
-}
-
-if (requireNamespace("ragg", quietly = TRUE)) {
+  old_opts <- options(summata.use_ragg = TRUE, width = 180)
   knitr::opts_chunk$set(
     dev = "ragg_png",
     fig.retina = 1,
@@ -26,6 +23,7 @@ if (requireNamespace("ragg", quietly = TRUE)) {
     out.width = "100%"
   )
 } else {
+  old_opts <- options(width = 180)
   knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "##>",
@@ -36,57 +34,33 @@ if (requireNamespace("ragg", quietly = TRUE)) {
     out.width = "100%"
   )
 }
-options(width = 180)
 
-## Only save figures when building pkgdown site (not for CRAN)
-save_figures <- identical(Sys.getenv("IN_PKGDOWN"), "true")
+## Dynamic figure sizing: queue_plot() stashes rec_dims from a plot object,
+## and the opts_hook on the NEXT chunk (with use_rec_dims = TRUE) applies them
+## before knitr opens the graphics device. Plots render via ragg (dev = "ragg_png"
+## set above) and knitr captures them natively. No files written to disk.
+.plot_dims <- new.env(parent = emptyenv())
+.plot_dims$width <- NULL
+.plot_dims$height <- NULL
 
-## Use vignettes/figures for generated plots (pkgdown only)
-fig_dir <- "figures"
-if (save_figures && !dir.exists(fig_dir)) {
-  dir.create(fig_dir, recursive = TRUE)
-}
-
-## Function for saving/displaying plots
-## For pkgdown: saves PNG and returns path for include_graphics
-## For CRAN: just prints the plot and returns empty string
-save_example_plot <- function(plot, filename, width = 8, height = 5) {
-  if (save_figures) {
-    filepath <- file.path(fig_dir, filename)
-    final_width <- attr(plot, "rec_dims")$width %||% width
-    final_height <- attr(plot, "rec_dims")$height %||% height
-    
-    if (requireNamespace("ragg", quietly = TRUE)) {
-      ## Use ragg directly - it uses 'res' not 'dpi', and defaults to 72
-      ragg::agg_png(filepath, 
-                    width = final_width, 
-                    height = final_height, 
-                    units = "in",
-                    res = 72)
-      print(plot)
-      grDevices::dev.off()
-    } else {
-      ggplot2::ggsave(filepath, plot, 
-                      width = final_width, 
-                      height = final_height, 
-                      dpi = 72)
-    }
-    return(filepath)
-  } else {
-    print(plot)
-    return(NULL)
+knitr::opts_hooks$set(use_rec_dims = function(options) {
+  if (isTRUE(options$use_rec_dims)) {
+    if (!is.null(.plot_dims$width))  options$fig.width  <- .plot_dims$width
+    if (!is.null(.plot_dims$height)) options$fig.height <- .plot_dims$height
+    .plot_dims$width <- NULL
+    .plot_dims$height <- NULL
   }
-}
+  options
+})
 
-## Wrapper for include_graphics that handles NULL (CRAN case)
-show_plot <- function(plot, filename, width = 8, height = 5) {
-  if (!save_figures) {
-    return(invisible(NULL))  # Do not render anything for CRAN
+## Call at the end of a plot-creation chunk to stash dimensions for the next chunk.
+queue_plot <- function(plot) {
+  dims <- attr(plot, "rec_dims")
+  if (!is.null(dims)) {
+    .plot_dims$width  <- dims$width
+    .plot_dims$height <- dims$height
   }
-  path <- save_example_plot(plot, filename, width, height)
-  if (!is.null(path)) {
-    knitr::include_graphics(path)
-  }
+  invisible(plot)
 }
 ```
 
@@ -111,6 +85,18 @@ table(clintrial$site)
 ```
 
 The `clintrial` dataset includes 10 study sites, providing a natural clustering variable for hierarchical analysis.
+
+> *n.b.:* To ensure correct font rendering and figure sizing, the forest plots below are displayed using a helper function (`queue_plot()`) that applies each plot's recommended dimensions (stored in the `"rec_dims"` attribute) via the [`ragg`](https://ragg.r-lib.org/) graphics device. In practice, replace `queue_plot()` with `ggplot2::ggsave()` using recommended plot dimensions for equivalent results:
+> 
+> ```{r, eval = FALSE}
+> p <- glmforest(model, data = mydata)
+> dims <- attr(p, "rec_dims")
+> ggplot2::ggsave("forest_plot.png", p,
+>                 width = dims$width, 
+>                 height = dims$height)
+> ```
+> 
+> This ensures that the figure size is always large enough to accommodate the constituent plot text and graphics, and it is generally the preferred method for saving forest plot outputs in `summata`.
 
 ---
 
@@ -234,10 +220,11 @@ example6 <- glmforest(
   indent_groups = TRUE,
   zebra_stripes = TRUE
 )
+queue_plot(example6)
 ```
 
-```{r, echo = FALSE, out.width = "100%"}
-show_plot(example6, "adv_ex6.png")
+```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+print(example6)
 ```
 
 ---
@@ -331,10 +318,11 @@ example11 <- glmforest(
   indent_groups = TRUE,
   zebra_stripes = TRUE
 )
+queue_plot(example11)
 ```
 
-```{r, echo = FALSE, out.width = "100%"}
-show_plot(example11, "adv_ex11.png")
+```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+print(example11)
 ```
 
 ## **Example 12:** Comparing Random-Effects Specifications
@@ -485,10 +473,11 @@ example18 <- uniforest(
   indent_groups = TRUE,
   zebra_stripes = TRUE
 )
+queue_plot(example18)
 ```
 
-```{r, echo = FALSE, out.width = "100%"}
-show_plot(example18, "adv_ex18.png")
+```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+print(example18)
 ```
 
 ---
@@ -594,10 +583,11 @@ forest_plot <- multiforest(
   indent_predictor = TRUE,
   zebra_stripes = TRUE
 )
+queue_plot(forest_plot)
 ```
 
-```{r, echo = FALSE, out.width = "100%"}
-show_plot(forest_plot, "adv_workflow_forest.png")
+```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+print(forest_plot)
 ```
 
 ---
@@ -662,6 +652,10 @@ summary(model)
 ## Forest Plots with Interactions
 
 Forest plots display all terms including interactions. For complex interaction patterns, consider stratified analyses or effect plots.
+
+```{r, include = FALSE}
+options(old_opts)
+```
 
 ---
 

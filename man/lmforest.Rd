@@ -295,19 +295,19 @@ The "\emph{n}" column shows:
 }
 }
 \examples{
-\dontshow{if (FALSE) withAutoprint(\{ # examplesIf}
-# Load example data
 data(clintrial)
 data(clintrial_labels)
 
+# Create example model
+model1 <- lm(bmi ~ age + sex + smoking, data = clintrial)
+
 # Example 1: Basic linear model forest plot
-model1 <- lm(bmi ~ age + sex + smoking,
-             data = clintrial)
+p <- lmforest(model1, data = clintrial)
 
-plot1 <- lmforest(model1, data = clintrial)
-print(plot1)
+\donttest{
 
-  options(width = 180)
+old_width <- options(width = 180)
+
 # Example 2: With custom labels and title
 plot2 <- lmforest(
     x = model1,
@@ -316,9 +316,8 @@ plot2 <- lmforest(
     effect_label = "Change in BMI (kg/m^2)",
     labels = clintrial_labels
 )
-print(plot2)
 
-# Example 3: More comprehensive model
+# Example 3: Comprehensive model with indented layout
 model3 <- lm(
     bmi ~ age + sex + smoking + hypertension + diabetes + creatinine,
     data = clintrial
@@ -328,166 +327,40 @@ plot3 <- lmforest(
     x = model3,
     data = clintrial,
     labels = clintrial_labels,
-    indent_groups = TRUE
+    indent_groups = TRUE,
+    zebra_stripes = TRUE
 )
-print(plot3)
 
-# Example 4: Check model diagnostics
-summary(model3)
-plot(model3)  # Diagnostic plots
+# Example 4: Condensed layout
+plot4 <- lmforest(
+    x = model3,
+    data = clintrial,
+    condense_table = TRUE,
+    labels = clintrial_labels
+)
 
-# Example 5: Condensed layout
+# Example 5: Different outcome (hemoglobin)
 model5 <- lm(
-    bmi ~ age + sex + smoking + hypertension + diabetes,
+    hemoglobin ~ age + sex + bmi + smoking + creatinine,
     data = clintrial
 )
 
 plot5 <- lmforest(
     x = model5,
     data = clintrial,
-    condense_table = TRUE,
-    labels = clintrial_labels
-)
-print(plot5)
-
-# Example 6: Custom color
-plot6 <- lmforest(
-    x = model1,
-    data = clintrial,
-    color = "#2ECC71",  # Bright green
-    labels = clintrial_labels
-)
-print(plot6)
-
-# Example 7: Hide sample sizes
-plot7 <- lmforest(
-    x = model1,
-    data = clintrial,
-    show_n = FALSE,
-    labels = clintrial_labels
-)
-print(plot7)
-
-# Example 8: Adjust table width
-plot8 <- lmforest(
-    x = model3,
-    data = clintrial,
-    table_width = 0.55,
-    labels = clintrial_labels
-)
-print(plot8)
-
-# Example 9: Get recommended dimensions
-plot9 <- lmforest(model1, data = clintrial)
-dims <- attr(plot9, "rec_dims")
-cat("Recommended:", dims$width, "x", dims$height, dims$units, "\n")
-
-# Example 10: Specify exact dimensions
-plot10 <- lmforest(
-    x = model1,
-    data = clintrial,
-    plot_width = 12,
-    plot_height = 7,
-    labels = clintrial_labels
-)
-
-# Example 11: Different units
-plot11 <- lmforest(
-    x = model1,
-    data = clintrial,
-    plot_width = 30,
-    plot_height = 20,
-    units = "cm",
-    labels = clintrial_labels
-)
-
-# Example 12: No zebra stripes
-plot12 <- lmforest(
-    x = model1,
-    data = clintrial,
-    zebra_stripes = FALSE,
-    labels = clintrial_labels
-)
-print(plot12)
-
-# Example 13: Custom reference label
-plot13 <- lmforest(
-    x = model1,
-    data = clintrial,
-    ref_label = "0.00 (ref)",
-    labels = clintrial_labels
-)
-print(plot13)
-
-# Example 14: Larger fonts for presentation
-plot14 <- lmforest(
-    x = model1,
-    data = clintrial,
-    font_size = 1.3,
-    title_size = 26,
-    labels = clintrial_labels
-)
-print(plot14)
-
-# Example 15: More decimal places
-plot15 <- lmforest(
-    x = model1,
-    data = clintrial,
-    digits = 3,
-    labels = clintrial_labels
-)
-print(plot15)
-
-# Example 16: Hemoglobin as outcome
-model16 <- lm(
-    hemoglobin ~ age + sex + bmi + smoking + creatinine,
-    data = clintrial
-)
-
-plot16 <- lmforest(
-    x = model16,
-    data = clintrial,
     title = "Predictors of Baseline Hemoglobin",
     effect_label = "Change in Hemoglobin (g/dL)",
     labels = clintrial_labels
 )
-print(plot16)
 
-# Check assumptions
-par(mfrow = c(2, 2))
-plot(model16)
-par(mfrow = c(1, 1))
+# Example 6: Save with recommended dimensions
+dims <- attr(plot5, "rec_dims")
+ggplot2::ggsave(file.path(tempdir(), "linear_forest.pdf"),
+                plot5, width = dims$width, height = dims$height)
 
-# Example 17: Publication-ready final plot
-final_model <- lm(
-    bmi ~ age + sex + race + smoking + hypertension + 
-        diabetes + creatinine + hemoglobin,
-    data = clintrial
-)
+options(old_width)
 
-# Check model fit
-summary(final_model)
-
-final_plot <- lmforest(
-    x = final_model,
-    data = clintrial,
-    title = "Multivariable Linear Regression: Predictors of Body Mass Index",
-    effect_label = "Change in BMI (kg/m^2)",
-    labels = clintrial_labels,
-    indent_groups = TRUE,
-    zebra_stripes = TRUE,
-    show_n = TRUE,
-    color = "#5A8F5A",
-    digits = 2
-)
-
-# Save for publication
-dims <- attr(final_plot, "rec_dims")
-# ggsave("figure3_linear.pdf", final_plot,
-#        width = dims$width, height = dims$height)
-# ggsave("figure3_linear.png", final_plot,
-#        width = dims$width, height = dims$height, dpi = 300)
-\dontshow{\}) # examplesIf}
+}
 }
 \seealso{
 \code{\link{autoforest}} for automatic model detection,

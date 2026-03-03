@@ -23,7 +23,13 @@ This document provides instructions for installing the `summata` package and con
 
 ## From Repository
 
-This package is not yet available on CRAN. The stable release may be installed from GitHub:
+Install the stable release from CRAN:
+
+```{r}
+install.packages("summata")
+```
+
+Alternatively, the latest development version may be installed from GitHub:
  
 ```{r}
 install.packages("remotes")
@@ -192,13 +198,16 @@ test_data <- data.frame(
 )
 
 # Test Word export (requires flextable, officer)
-table2docx(test_data, file = "verification_test.docx")
+table2docx(test_data, file = file.path(tempdir(), "verification_test.docx"))
 
 # Test PDF export (requires xtable, LaTeX)
-table2pdf(test_data, file = "verification_test.pdf")
+table2pdf(test_data, file = file.path(tempdir(), "verification_test.pdf"))
 
 # Clean up
-file.remove("verification_test.docx", "verification_test.pdf")
+file.remove(
+  file.path(tempdir(), "verification_test.docx"),
+  file.path(tempdir(), "verification_test.pdf")
+)
 ```
 
 Successful execution confirms proper configuration of all export-related dependencies.
@@ -232,7 +241,7 @@ tinytex::tlmgr_install("package_name")
 For compilation errors, examine the log file:
 
 ```{r}
-table2pdf(test_data, file = "debug.pdf", show_logs = TRUE)
+table2pdf(test_data, file = file.path(tempdir(), "debug.pdf"), show_logs = TRUE)
 ```
 
 ## Package Installation Failures

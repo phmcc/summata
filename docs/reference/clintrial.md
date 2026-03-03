@@ -193,6 +193,7 @@ desctable(clintrial,
 #> 13:       Biomarker X (ng/mL)    Median [IQR]    5.4 [3.9-7.5]    5.3 [4.1-7.2]    5.2 [3.8-7.3]    5.5 [3.8-7.7]   0.318
 #> 14: Overall Survival (months) Median (95% CI) 19.4 (16.2-23.4) 14.7 (10.5-19.2) 33.6 (24.5-42.2) 14.7 (11.0-21.8) < 0.001
 
+# \donttest{
 # Poisson regression for equidispersed counts
 fit(clintrial,
     outcome = "fu_count",
@@ -281,5 +282,6 @@ fullfit(clintrial,
 #> 22:                                            Drug B    362    274 0.94 (0.77-1.15)   0.567 0.77 (0.63-0.95)   0.014
 #>                    Variable                     Group      n Events      HR (95% CI)   Uni p     aHR (95% CI) Multi p
 #>                      <char>                    <char> <char> <char>           <char>  <char>           <char>  <char>
+# }
         
 ```

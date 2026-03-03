@@ -38,6 +38,58 @@ Throughout this article, we adopt the following notation:
 
 ---
 
+# Hypothesis Testing
+
+## Wald Test
+
+Tests H₀: *β* = 0 using:
+
+$$z = \frac{\hat{\beta}}{\text{SE}(\hat{\beta})}$$
+
+Under H₀, *z* ~ N(0, 1).
+
+## Likelihood Ratio Test
+
+Compares nested models:
+
+$$\Lambda = -2[\log L_{\text{reduced}} - \log L_{\text{full}}]$$
+
+Under H₀, Λ ~ χ²ₖ, where *k* is the difference in parameters.
+
+## Global Test
+
+Tests H₀: all *β*ⱼ = 0 (except intercept):
+
+- **Linear models**: F-test
+- **GLMs**: Likelihood ratio test
+- **Cox models**: Likelihood ratio, Wald, or score test
+
+---
+
+# Confidence Intervals
+
+## Wald Confidence Intervals
+
+For coefficient *β* with standard error SE(*β*):
+
+$$\beta \pm z_{1-\alpha/2} \cdot \text{SE}(\beta)$$
+
+where *z*₁₋α/₂ is the standard normal quantile (1.96 for 95% CI).
+
+## Profile Likelihood Intervals
+
+More accurate for small samples or boundary estimates; based on the likelihood ratio:
+
+$$\{\beta : 2[\log L(\hat{\beta}) - \log L(\beta)] \leq \chi^2_{1,1-\alpha}\}$$
+
+## Confidence Intervals for Effect Measures
+
+For exponentiated coefficients (OR, HR, RR):
+
+$$\exp\left(\beta \pm z_{1-\alpha/2} \cdot \text{SE}(\beta)\right)$$
+
+---
+
 # Linear Regression
 
 ## Model Specification
@@ -712,58 +764,6 @@ comparison_custom <- compfit(
   )
 )
 ```
-
----
-
-# Confidence Intervals
-
-## Wald Confidence Intervals
-
-For coefficient *β* with standard error SE(*β*):
-
-$$\beta \pm z_{1-\alpha/2} \cdot \text{SE}(\beta)$$
-
-where *z*₁₋α/₂ is the standard normal quantile (1.96 for 95% CI).
-
-## Profile Likelihood Intervals
-
-More accurate for small samples or boundary estimates; based on the likelihood ratio:
-
-$$\{\beta : 2[\log L(\hat{\beta}) - \log L(\beta)] \leq \chi^2_{1,1-\alpha}\}$$
-
-## Confidence Intervals for Effect Measures
-
-For exponentiated coefficients (OR, HR, RR):
-
-$$\exp\left(\beta \pm z_{1-\alpha/2} \cdot \text{SE}(\beta)\right)$$
-
----
-
-# Hypothesis Testing
-
-## Wald Test
-
-Tests H₀: *β* = 0 using:
-
-$$z = \frac{\hat{\beta}}{\text{SE}(\hat{\beta})}$$
-
-Under H₀, *z* ~ N(0, 1).
-
-## Likelihood Ratio Test
-
-Compares nested models:
-
-$$\Lambda = -2[\log L_{\text{reduced}} - \log L_{\text{full}}]$$
-
-Under H₀, Λ ~ χ²ₖ, where *k* is the difference in parameters.
-
-## Global Test
-
-Tests H₀: all *β*ⱼ = 0 (except intercept):
-
-- **Linear models**: F-test
-- **GLMs**: Likelihood ratio test
-- **Cox models**: Likelihood ratio, Wald, or score test
 
 ---
 

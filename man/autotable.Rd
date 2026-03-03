@@ -77,7 +77,18 @@ export functions directly:
 }
 }
 \examples{
-\dontshow{if (FALSE) withAutoprint(\{ # examplesIf}
+# Create example data
+data(clintrial)
+data(clintrial_labels)
+tbl <- desctable(clintrial, by = "treatment",
+    variables = c("age", "sex"), labels = clintrial_labels)
+
+# Auto-detect format from extension
+if (requireNamespace("xtable", quietly = TRUE)) {
+  autotable(tbl, file.path(tempdir(), "example.html"))
+}
+
+\donttest{
 # Load example data
 data(clintrial)
 data(clintrial_labels)
@@ -90,26 +101,46 @@ results <- fit(
     labels = clintrial_labels
 )
 
+# Test that LaTeX can actually compile (needed for PDF export)
+has_latex <- local({
+  if (!nzchar(Sys.which("pdflatex"))) return(FALSE)
+  test_tex <- file.path(tempdir(), "summata_latex_test.tex")
+  writeLines(c("\\\\documentclass{article}",
+               "\\\\usepackage{booktabs}",
+               "\\\\begin{document}", "test",
+               "\\\\end{document}"), test_tex)
+  result <- tryCatch(
+    system2("pdflatex", c("-interaction=nonstopmode",
+            paste0("-output-directory=", tempdir()), test_tex),
+            stdout = FALSE, stderr = FALSE),
+    error = function(e) 1L)
+  result == 0L
+})
+
 # Export automatically detects format from extension
-autotable(results, "results.pdf")   # Creates PDF
-autotable(results, "results.docx")  # Creates Word document
-autotable(results, "results.html")  # Creates HTML file
-autotable(results, "results.pptx")  # Creates PowerPoint slide
-autotable(results, "results.tex")   # Creates LaTeX source
-autotable(results, "results.rtf")   # Creates RTF document
+autotable(results, file.path(tempdir(), "results.html"))  # Creates HTML file
+autotable(results, file.path(tempdir(), "results.docx"))  # Creates Word document
+autotable(results, file.path(tempdir(), "results.pptx"))  # Creates PowerPoint slide
+autotable(results, file.path(tempdir(), "results.tex"))   # Creates LaTeX source
+autotable(results, file.path(tempdir(), "results.rtf"))   # Creates RTF document
+if (has_latex) {
+  autotable(results, file.path(tempdir(), "results.pdf")) # Creates PDF
+}
 
 # Pass format-specific parameters
-autotable(results, "results.pdf", 
-           orientation = "landscape",
-           paper = "a4",
-           font_size = 10)
+if (has_latex) {
+  autotable(results, file.path(tempdir(), "results.pdf"), 
+             orientation = "landscape",
+             paper = "a4",
+             font_size = 10)
+}
 
-autotable(results, "results.docx",
+autotable(results, file.path(tempdir(), "results.docx"),
            caption = "Table 1: Logistic Regression Results",
            font_family = "Times New Roman",
            condense_table = TRUE)
 
-autotable(results, "results.html",
+autotable(results, file.path(tempdir(), "results.html"),
            zebra_stripes = TRUE,
            dark_header = TRUE,
            bold_significant = TRUE)
@@ -118,7 +149,9 @@ autotable(results, "results.html",
 desc <- desctable(clintrial,
                   by = "treatment",
                   variables = c("age", "sex", "bmi"))
-autotable(desc, "demographics.pdf")
+if (has_latex) {
+  autotable(desc, file.path(tempdir(), "demographics.pdf"))
+}
 
 comparison <- compfit(
     data = clintrial,
@@ -128,8 +161,9 @@ comparison <- compfit(
         full = c("age", "sex", "treatment", "stage")
     )
 )
-autotable(comparison, "model_comparison.docx")
-\dontshow{\}) # examplesIf}
+autotable(comparison, file.path(tempdir(), "model_comparison.docx"))
+
+}
 }
 \seealso{
 \code{\link{table2pdf}}, \code{\link{table2docx}}, \code{\link{table2pptx}},

@@ -507,6 +507,7 @@ print(screen1)
 #> 9:                  Yes    331    242 1.15 (0.85-1.57)   0.369
 
 # \donttest{
+
 # Example 2: With custom variable labels
 screen2 <- uniscreen(
     data = clintrial,
@@ -847,23 +848,23 @@ screen13 <- uniscreen(
 )
 raw_data <- attr(screen13, "raw_data")
 print(raw_data)
-#>    model_scope model_type             term     n events coefficient          se        coef  coef_lower coef_upper  exp_coef exp_lower exp_upper        OR  ci_lower  ci_upper
-#>         <char>     <char>           <char> <int>  <num>       <num>       <num>       <num>       <num>      <num>     <num>     <num>     <num>     <num>     <num>     <num>
-#> 1: Univariable   Logistic              age   850    609  0.04695122 0.006987363  0.04695122  0.03325624  0.0606462 1.0480709 1.0338154 1.0625229 1.0480709 1.0338154 1.0625229
-#> 2: Univariable   Logistic        sexFemale   450    298  0.00000000          NA  0.00000000          NA         NA 1.0000000        NA        NA 1.0000000        NA        NA
-#> 3: Univariable   Logistic          sexMale   400    311  0.57794358 0.156160238  0.57794358  0.27187513  0.8840120 1.7823694 1.3124231 2.4205917 1.7823694 1.3124231 2.4205917
-#> 4: Univariable   Logistic treatmentControl   196    151  0.00000000          NA  0.00000000          NA         NA 1.0000000        NA        NA 1.0000000        NA        NA
-#> 5: Univariable   Logistic  treatmentDrug A   292    184 -0.67781282 0.208659382 -0.67781282 -1.08677769 -0.2688479 0.5077263 0.3373016 0.7642595 0.5077263 0.3373016 0.7642595
-#> 6: Univariable   Logistic  treatmentDrug B   362    274 -0.07482606 0.209422881 -0.07482606 -0.48528736  0.3356352 0.9279049 0.6155203 1.3988287 0.9279049 0.6155203 1.3988287
-#>     statistic      p_value  variable   group n_group events_group    sig sig_binary predictor reference
-#>         <num>        <num>    <char>  <char>   <num>        <num> <char>     <lgcl>    <char>    <char>
-#> 1:  6.7194471 1.824154e-11       age              NA           NA    ***       TRUE       age      <NA>
-#> 2:         NA           NA       sex  Female     450          298             FALSE       sex reference
-#> 3:  3.7009650 2.147811e-04       sex    Male     400          311    ***       TRUE       sex          
-#> 4:         NA           NA treatment Control     196          151             FALSE treatment reference
-#> 5: -3.2484176 1.160488e-03 treatment  Drug A     292          184     **       TRUE treatment          
-#> 6: -0.3572965 7.208699e-01 treatment  Drug B     362          274             FALSE treatment          
-# Contains unformatted coefficients, SEs, CIs, \emph{etc.}
+#>    model_scope model_type             term     n events coefficient          se        coef  coef_lower coef_upper  exp_coef exp_lower exp_upper        OR  ci_lower  ci_upper  statistic      p_value  variable   group n_group events_group
+#>         <char>     <char>           <char> <int>  <num>       <num>       <num>       <num>       <num>      <num>     <num>     <num>     <num>     <num>     <num>     <num>      <num>        <num>    <char>  <char>   <num>        <num>
+#> 1: Univariable   Logistic              age   850    609  0.04695122 0.006987363  0.04695122  0.03325624  0.0606462 1.0480709 1.0338154 1.0625229 1.0480709 1.0338154 1.0625229  6.7194471 1.824154e-11       age              NA           NA
+#> 2: Univariable   Logistic        sexFemale   450    298  0.00000000          NA  0.00000000          NA         NA 1.0000000        NA        NA 1.0000000        NA        NA         NA           NA       sex  Female     450          298
+#> 3: Univariable   Logistic          sexMale   400    311  0.57794358 0.156160238  0.57794358  0.27187513  0.8840120 1.7823694 1.3124231 2.4205917 1.7823694 1.3124231 2.4205917  3.7009650 2.147811e-04       sex    Male     400          311
+#> 4: Univariable   Logistic treatmentControl   196    151  0.00000000          NA  0.00000000          NA         NA 1.0000000        NA        NA 1.0000000        NA        NA         NA           NA treatment Control     196          151
+#> 5: Univariable   Logistic  treatmentDrug A   292    184 -0.67781282 0.208659382 -0.67781282 -1.08677769 -0.2688479 0.5077263 0.3373016 0.7642595 0.5077263 0.3373016 0.7642595 -3.2484176 1.160488e-03 treatment  Drug A     292          184
+#> 6: Univariable   Logistic  treatmentDrug B   362    274 -0.07482606 0.209422881 -0.07482606 -0.48528736  0.3356352 0.9279049 0.6155203 1.3988287 0.9279049 0.6155203 1.3988287 -0.3572965 7.208699e-01 treatment  Drug B     362          274
+#>       sig sig_binary predictor reference
+#>    <char>     <lgcl>    <char>    <char>
+#> 1:    ***       TRUE       age      <NA>
+#> 2:             FALSE       sex reference
+#> 3:    ***       TRUE       sex          
+#> 4:             FALSE treatment reference
+#> 5:     **       TRUE treatment          
+#> 6:             FALSE treatment          
+# Contains unformatted coefficients, SEs, CIs, etc.
 
 # Example 14: Force coefficient display instead of OR
 screen14 <- uniscreen(
@@ -1170,5 +1171,6 @@ print(invgauss_screen)
 #> 3:                                    Yes    370     1.26 (1.19-1.34) < 0.001
 #> 4: Postoperative Pain Score (0-10)      -    825     1.04 (1.03-1.06) < 0.001
 #> 5:  Length of Hospital Stay (days)      -    815     1.05 (1.04-1.06) < 0.001
+
 # }
 ```

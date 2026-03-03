@@ -236,7 +236,7 @@
 #' ft <- table2pptx(table, "base.pptx", return_ft = TRUE)
 #' 
 #' # Customize
-#' ft <- flextable::color(ft, j = "\emph{p}-value", color = "red")
+#' ft <- flextable::color(ft, j = "p-value", color = "red")
 #' ft <- flextable::bg(ft, i = 1, bg = "yellow")
 #' ft <- flextable::bold(ft, i = ~ estimate > 0, j = "estimate")
 #' 
@@ -248,8 +248,6 @@
 #' print(pres, target = "custom.pptx")
 #' }
 #' 
-#' \strong{Editability in PowerPoint:}
-#' 
 #' @seealso
 #' \code{\link{autotable}} for automatic format detection,
 #' \code{\link{table2docx}} for Word documents,
@@ -260,8 +258,21 @@
 #' \code{\link[flextable]{flextable}} for table customization,
 #' \code{\link[officer]{read_pptx}} for PowerPoint manipulation
 #'
-#' @examplesIf FALSE
-#' options(width = 180)
+#' @examples
+#' # Create example data
+#' data(clintrial)
+#' data(clintrial_labels)
+#' tbl <- desctable(clintrial, by = "treatment",
+#'     variables = c("age", "sex"), labels = clintrial_labels)
+#'
+#' # Basic PowerPoint export
+#' if (requireNamespace("flextable", quietly = TRUE) &&
+#'     requireNamespace("officer", quietly = TRUE)) {
+#'   table2pptx(tbl, file.path(tempdir(), "example.pptx"))
+#' }
+#'
+#' \donttest{
+#' old_width <- options(width = 180)
 #' # Load data
 #' data(clintrial)
 #' data(clintrial_labels)
@@ -275,53 +286,46 @@
 #' )
 #' 
 #' # Example 1: Basic PowerPoint slide
-#' table2pptx(results, "results.pptx")
+#' table2pptx(results, file.path(tempdir(), "results.pptx"))
 #' 
 #' # Example 2: With title
-#' table2pptx(results, "titled.pptx",
+#' table2pptx(results, file.path(tempdir(), "titled.pptx"),
 #'         caption = "Multivariable Regression Results")
 #' 
 #' # Example 3: Larger font for visibility
-#' table2pptx(results, "large_font.pptx",
+#' table2pptx(results, file.path(tempdir(), "large_font.pptx"),
 #'         font_size = 12,
 #'         caption = "Main Findings")
 #' 
 #' # Example 4: Condensed for slide space
-#' table2pptx(results, "condensed.pptx",
+#' table2pptx(results, file.path(tempdir(), "condensed.pptx"),
 #'         condense_table = TRUE,
 #'         caption = "Key Results")
 #' 
 #' # Example 5: Dark header for emphasis
-#' table2pptx(results, "dark.pptx",
+#' table2pptx(results, file.path(tempdir(), "dark.pptx"),
 #'         dark_header = TRUE,
 #'         caption = "Risk Factors")
 #' 
 #' # Example 6: With zebra stripes
-#' table2pptx(results, "striped.pptx",
+#' table2pptx(results, file.path(tempdir(), "striped.pptx"),
 #'         zebra_stripes = TRUE)
 #' 
 #' # Example 7: Blank layout with custom positioning
-#' table2pptx(results, "blank.pptx",
+#' table2pptx(results, file.path(tempdir(), "blank.pptx"),
 #'         layout = "Blank",
 #'         left = 1,
 #'         top = 1.5,
 #'         width = 8)
 #' 
-#' # Example 8: Using company template
-#' table2pptx(results, "branded.pptx",
-#'         template = "company_template.pptx",
-#'         layout = "Data Slide",
-#'         caption = "Q4 Results")
+#' # Example 8: Get flextable for customization
+#' ft <- table2pptx(results, file.path(tempdir(), "base.pptx"), return_ft = TRUE)
 #' 
-#' # Example 9: Get flextable for customization
-#' ft <- table2pptx(results, "base.pptx", return_ft = TRUE)
-#' 
-#' # Customize colors
+#' # Customize the returned flextable object
 #' ft <- flextable::color(ft, j = "p-value", color = "darkred")
-#' ft <- flextable::bold(ft, i = ~ p_value < 0.01)
 #' 
-#' # Example 10: Presentation-optimized table
-#' table2pptx(results, "presentation.pptx",
+#' # Example 9: Presentation-optimized table
+#' table2pptx(results, file.path(tempdir(), "presentation.pptx"),
 #'         caption = "Main Analysis Results",
 #'         font_size = 11,
 #'         condense_table = TRUE,
@@ -329,7 +333,7 @@
 #'         dark_header = TRUE,
 #'         bold_significant = TRUE)
 #' 
-#' # Example 11: Descriptive statistics slide
+#' # Example 10: Descriptive statistics slide
 #' desc <- desctable(
 #'    data = clintrial,
 #'    by = "treatment",
@@ -337,18 +341,20 @@
 #'    labels = clintrial_labels
 #' )
 #' 
-#' table2pptx(desc, "baseline.pptx",
+#' table2pptx(desc, file.path(tempdir(), "baseline.pptx"),
 #'         caption = "Baseline Characteristics",
 #'         font_size = 10)
 #' 
-#' # Example 12: Conference presentation style
-#' table2pptx(results, "conference.pptx",
+#' # Example 11: Conference presentation style
+#' table2pptx(results, file.path(tempdir(), "conference.pptx"),
 #'         caption = "Study Outcomes",
 #'         font_family = "Calibri",
 #'         font_size = 14,  # Large for big rooms
 #'         dark_header = TRUE,
 #'         condense_table = TRUE)
 #'
+#' options(old_width)
+#' }
 #' @family export functions
 #' @export
 table2pptx <- function(table,
@@ -499,6 +505,11 @@ table2pptx <- function(table,
 }
 
 #' Print method for table2pptx results
+#'
+#' @param x Object of class \code{table2pptx_result}.
+#' @param ... Additional arguments passed to print methods.
+#' @return Invisibly returns the input object \code{x}. Called for its
+#'   side effect of printing a formatted summary to the console.
 #' @keywords internal
 #' @export
 print.table2pptx_result <- function(x, ...) {

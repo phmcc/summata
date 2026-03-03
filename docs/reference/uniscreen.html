@@ -21,7 +21,7 @@ formatted results with optional p-value filtering."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -470,6 +470,7 @@ the following are needed:</p><ul><li><p>Model diagnostic plots</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 9:                  Yes    331    242 1.15 (0.85-1.57)   0.369</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 2: With custom variable labels</span></span></span>
 <span class="r-in"><span><span class="va">screen2</span> <span class="op">&lt;-</span> <span class="fu">uniscreen</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
@@ -810,23 +811,23 @@ the following are needed:</p><ul><li><p>Model diagnostic plots</p></li>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">raw_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">screen13</span>, <span class="st">"raw_data"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">raw_data</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    model_scope model_type             term     n events coefficient          se        coef  coef_lower coef_upper  exp_coef exp_lower exp_upper        OR  ci_lower  ci_upper</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         &lt;char&gt;     &lt;char&gt;           &lt;char&gt; &lt;int&gt;  &lt;num&gt;       &lt;num&gt;       &lt;num&gt;       &lt;num&gt;       &lt;num&gt;      &lt;num&gt;     &lt;num&gt;     &lt;num&gt;     &lt;num&gt;     &lt;num&gt;     &lt;num&gt;     &lt;num&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: Univariable   Logistic              age   850    609  0.04695122 0.006987363  0.04695122  0.03325624  0.0606462 1.0480709 1.0338154 1.0625229 1.0480709 1.0338154 1.0625229</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2: Univariable   Logistic        sexFemale   450    298  0.00000000          NA  0.00000000          NA         NA 1.0000000        NA        NA 1.0000000        NA        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3: Univariable   Logistic          sexMale   400    311  0.57794358 0.156160238  0.57794358  0.27187513  0.8840120 1.7823694 1.3124231 2.4205917 1.7823694 1.3124231 2.4205917</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4: Univariable   Logistic treatmentControl   196    151  0.00000000          NA  0.00000000          NA         NA 1.0000000        NA        NA 1.0000000        NA        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5: Univariable   Logistic  treatmentDrug A   292    184 -0.67781282 0.208659382 -0.67781282 -1.08677769 -0.2688479 0.5077263 0.3373016 0.7642595 0.5077263 0.3373016 0.7642595</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6: Univariable   Logistic  treatmentDrug B   362    274 -0.07482606 0.209422881 -0.07482606 -0.48528736  0.3356352 0.9279049 0.6155203 1.3988287 0.9279049 0.6155203 1.3988287</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     statistic      p_value  variable   group n_group events_group    sig sig_binary predictor reference</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         &lt;num&gt;        &lt;num&gt;    &lt;char&gt;  &lt;char&gt;   &lt;num&gt;        &lt;num&gt; &lt;char&gt;     &lt;lgcl&gt;    &lt;char&gt;    &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:  6.7194471 1.824154e-11       age              NA           NA    ***       TRUE       age      &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:         NA           NA       sex  Female     450          298             FALSE       sex reference</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:  3.7009650 2.147811e-04       sex    Male     400          311    ***       TRUE       sex          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:         NA           NA treatment Control     196          151             FALSE treatment reference</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5: -3.2484176 1.160488e-03 treatment  Drug A     292          184     **       TRUE treatment          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6: -0.3572965 7.208699e-01 treatment  Drug B     362          274             FALSE treatment          </span>
-<span class="r-in"><span><span class="co"># Contains unformatted coefficients, SEs, CIs, \emph{etc.}</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    model_scope model_type             term     n events coefficient          se        coef  coef_lower coef_upper  exp_coef exp_lower exp_upper        OR  ci_lower  ci_upper  statistic      p_value  variable   group n_group events_group</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         &lt;char&gt;     &lt;char&gt;           &lt;char&gt; &lt;int&gt;  &lt;num&gt;       &lt;num&gt;       &lt;num&gt;       &lt;num&gt;       &lt;num&gt;      &lt;num&gt;     &lt;num&gt;     &lt;num&gt;     &lt;num&gt;     &lt;num&gt;     &lt;num&gt;     &lt;num&gt;      &lt;num&gt;        &lt;num&gt;    &lt;char&gt;  &lt;char&gt;   &lt;num&gt;        &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1: Univariable   Logistic              age   850    609  0.04695122 0.006987363  0.04695122  0.03325624  0.0606462 1.0480709 1.0338154 1.0625229 1.0480709 1.0338154 1.0625229  6.7194471 1.824154e-11       age              NA           NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: Univariable   Logistic        sexFemale   450    298  0.00000000          NA  0.00000000          NA         NA 1.0000000        NA        NA 1.0000000        NA        NA         NA           NA       sex  Female     450          298</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3: Univariable   Logistic          sexMale   400    311  0.57794358 0.156160238  0.57794358  0.27187513  0.8840120 1.7823694 1.3124231 2.4205917 1.7823694 1.3124231 2.4205917  3.7009650 2.147811e-04       sex    Male     400          311</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4: Univariable   Logistic treatmentControl   196    151  0.00000000          NA  0.00000000          NA         NA 1.0000000        NA        NA 1.0000000        NA        NA         NA           NA treatment Control     196          151</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5: Univariable   Logistic  treatmentDrug A   292    184 -0.67781282 0.208659382 -0.67781282 -1.08677769 -0.2688479 0.5077263 0.3373016 0.7642595 0.5077263 0.3373016 0.7642595 -3.2484176 1.160488e-03 treatment  Drug A     292          184</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6: Univariable   Logistic  treatmentDrug B   362    274 -0.07482606 0.209422881 -0.07482606 -0.48528736  0.3356352 0.9279049 0.6155203 1.3988287 0.9279049 0.6155203 1.3988287 -0.3572965 7.208699e-01 treatment  Drug B     362          274</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       sig sig_binary predictor reference</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    &lt;char&gt;     &lt;lgcl&gt;    &lt;char&gt;    &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:    ***       TRUE       age      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:             FALSE       sex reference</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:    ***       TRUE       sex          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:             FALSE treatment reference</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:     **       TRUE treatment          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6:             FALSE treatment          </span>
+<span class="r-in"><span><span class="co"># Contains unformatted coefficients, SEs, CIs, etc.</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 14: Force coefficient display instead of OR</span></span></span>
 <span class="r-in"><span><span class="va">screen14</span> <span class="op">&lt;-</span> <span class="fu">uniscreen</span><span class="op">(</span></span></span>
@@ -1133,6 +1134,7 @@ the following are needed:</p><ul><li><p>Model diagnostic plots</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3:                                    Yes    370     1.26 (1.19-1.34) &lt; 0.001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4: Postoperative Pain Score (0-10)      -    825     1.04 (1.03-1.06) &lt; 0.001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5:  Length of Hospital Stay (days)      -    815     1.05 (1.04-1.06) &lt; 0.001</span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

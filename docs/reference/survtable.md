@@ -397,6 +397,7 @@ survtable(
 #> 4:   Drug B 54% (49-59%) 43% (38-48%) 33% (28-38%) 14.7 (11.0-21.8)        
 
 # \donttest{
+
 # Example 2: Median survival only
 survtable(
     data = clintrial,
@@ -639,22 +640,17 @@ result <- survtable(
 )
 raw <- attr(result, "raw_data")
 print(raw)
-#>    Variable 12_estimate  12_lower  12_upper 12_n_risk 12_n_event 24_estimate  24_lower  24_upper 24_n_risk 24_n_event Median (95% CI)_estimate Median (95% CI)_lower
-#>      <char>       <num>     <num>     <num>     <num>      <num>       <num>     <num>     <num>     <num>      <num>                    <num>                 <num>
-#> 1:    Total   0.5897650 0.5573977 0.6240118       488        345   0.4589077 0.4262187 0.4941037       369        107                     19.4                  16.2
-#> 2:  Control   0.5518225 0.4860549 0.6264890       106         87   0.3686484 0.3063818 0.4435696        70         35                     14.7                  10.5
-#> 3:   Drug A   0.6829195 0.6310704 0.7390285       192         91   0.5604338 0.5054384 0.6214131       154         34                     33.6                  24.5
-#> 4:   Drug B   0.5361330 0.4869622 0.5902688       190        167   0.4272844 0.3788226 0.4819458       145         38                     14.7                  11.0
-#>    Median (95% CI)_upper
-#>                    <num>
-#> 1:                  23.4
-#> 2:                  19.2
-#> 3:                  42.2
-#> 4:                  21.8
+#>    Variable 12_estimate  12_lower  12_upper 12_n_risk 12_n_event 24_estimate  24_lower  24_upper 24_n_risk 24_n_event Median (95% CI)_estimate Median (95% CI)_lower Median (95% CI)_upper
+#>      <char>       <num>     <num>     <num>     <num>      <num>       <num>     <num>     <num>     <num>      <num>                    <num>                 <num>                 <num>
+#> 1:    Total   0.5897650 0.5573977 0.6240118       488        345   0.4589077 0.4262187 0.4941037       369        107                     19.4                  16.2                  23.4
+#> 2:  Control   0.5518225 0.4860549 0.6264890       106         87   0.3686484 0.3063818 0.4435696        70         35                     14.7                  10.5                  19.2
+#> 3:   Drug A   0.6829195 0.6310704 0.7390285       192         91   0.5604338 0.5054384 0.6214131       154         34                     33.6                  24.5                  42.2
+#> 4:   Drug B   0.5361330 0.4869622 0.5902688       190        167   0.4272844 0.3788226 0.4819458       145         38                     14.7                  11.0                  21.8
 
 # Example 13: Access survfit objects for plotting
 fits <- attr(result, "survfit_objects")
-# plot(fits$overall)  # Plot overall survival curve
+plot(fits$overall)  # Plot overall survival curve
+
 
 # Example 14: Multiple survival outcomes stacked
 survtable(

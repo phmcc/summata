@@ -1,7 +1,7 @@
 Package: summata
 Type: Package
 Title: Publication-Ready Summary Tables and Forest Plots
-Version: 0.11.1
+Version: 0.11.2
 Authors@R: c(
     person(
         given = c("Paul", "Hsin-ti"), 
@@ -16,7 +16,7 @@ Description: A comprehensive framework for descriptive statistics and regression
     with support for linear models, generalized linear models, Cox proportional
     hazards, and mixed-effects models. Also includes univariable screening, 
     multivariate regression, model comparison, and export to multiple formats
-    including PDF, Word, PowerPoint, LaTeX, HTML, and RTF. Built on 'data.table'
+    including PDF, DOCX, PPTX, 'LaTeX', HTML, and RTF. Built on 'data.table'
     for computational efficiency.
 License: GPL (>= 3)
 Encoding: UTF-8

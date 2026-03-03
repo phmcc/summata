@@ -319,8 +319,8 @@ surv_table <- survtable(
 )
 
 # Export both for publication
-ggsave("km_curve.pdf", width = 8, height = 6)
-table2pdf(surv_table, "survival_table.pdf", 
+ggsave(file.path(tempdir(), "km_curve.pdf"), width = 8, height = 6)
+table2pdf(surv_table, file.path(tempdir(), "survival_table.pdf"), 
           caption = "Table 2. Survival Estimates by Treatment Group")
 ```
 
@@ -340,14 +340,14 @@ vignette for comprehensive documentation.
 # Microsoft Word
 table2docx(
   table = example1,
-  file = "SurvivalTable.docx",
+  file = file.path(tempdir(), "SurvivalTable.docx"),
   caption = "Table 2. Survival Estimates by Treatment Group"
 )
 
 # PDF (requires LaTeX)
 table2pdf(
   table = example1,
-  file = "SurvivalTable.pdf",
+  file = file.path(tempdir(), "SurvivalTable.pdf"),
   caption = "Table 2. Survival Estimates by Treatment Group"
 )
 ```

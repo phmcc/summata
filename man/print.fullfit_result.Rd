@@ -12,7 +12,8 @@
 \item{...}{Additional arguments passed to print methods.}
 }
 \value{
-Invisibly returns the input object.
+Invisibly returns the input object \code{x}. Called for its
+  side effect of printing a formatted summary to the console.
 }
 \description{
 Displays a summary header with outcome, model type, method, and number of

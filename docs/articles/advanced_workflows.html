@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -123,6 +123,25 @@ included with <code>summata</code>:</p>
 <span><span class="co">##&gt;           76           80           72           89           86           93           89           75          102           88</span></span></code></pre></div>
 <p>The <code>clintrial</code> dataset includes 10 study sites, providing
 a natural clustering variable for hierarchical analysis.</p>
+<blockquote>
+<p><em>n.b.:</em> To ensure correct font rendering and figure sizing,
+the forest plots below are displayed using a helper function
+(<code>queue_plot()</code>) that applies each plot’s recommended
+dimensions (stored in the <code>"rec_dims"</code> attribute) via the <a href="https://ragg.r-lib.org/" class="external-link"><code>ragg</code></a> graphics device. In
+practice, replace <code>queue_plot()</code> with
+<code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggplot2::ggsave()</a></code> using recommended plot dimensions for
+equivalent results:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glmforest.html">glmforest</a></span><span class="op">(</span><span class="va">model</span>, data <span class="op">=</span> <span class="va">mydata</span><span class="op">)</span></span>
+<span><span class="va">dims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">p</span>, <span class="st">"rec_dims"</span><span class="op">)</span></span>
+<span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"forest_plot.png"</span>, <span class="va">p</span>,</span>
+<span>                width <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">width</span>, </span>
+<span>                height <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">height</span><span class="op">)</span></span></code></pre></div>
+<p>This ensures that the figure size is always large enough to
+accommodate the constituent plot text and graphics, and it is generally
+the preferred method for saving forest plot outputs in
+<code>summata</code>.</p>
+</blockquote>
 <hr>
 </div>
 <div class="section level2">
@@ -139,7 +158,7 @@ included alongside the interaction term.</p>
 </h3>
 <p>Specify interactions using colon notation in the
 <code>interactions</code> parameter:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcome <span class="op">=</span> <span class="st">"surgery"</span>,</span>
@@ -175,7 +194,7 @@ included alongside the interaction term.</p>
 <strong>Example 2:</strong> Multiple Interactions<a class="anchor" aria-label="anchor" href="#example-2-multiple-interactions"></a>
 </h3>
 <p>Test multiple effect modifiers simultaneously:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcome <span class="op">=</span> <span class="st">"Surv(os_months, os_status)"</span>,</span>
@@ -218,7 +237,7 @@ included alongside the interaction term.</p>
 Interaction<a class="anchor" aria-label="anchor" href="#example-3-continuous-categorical-interaction"></a>
 </h3>
 <p>Test whether effects of a continuous variable vary by group:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcome <span class="op">=</span> <span class="st">"los_days"</span>,</span>
@@ -257,7 +276,7 @@ Interaction<a class="anchor" aria-label="anchor" href="#example-3-continuous-cat
 </h3>
 <p>Include interaction terms in combined univariable/multivariable
 analysis:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fullfit.html">fullfit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcome <span class="op">=</span> <span class="st">"surgery"</span>,</span>
@@ -301,7 +320,7 @@ analysis:</p>
 <p>Use <code><a href="../reference/compfit.html">compfit()</a></code> to formally evaluate whether interactions
 improve model fit (<em>see</em> <a href="model_comparison.html">Model
 Comparison</a>):</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example5</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/compfit.html">compfit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcome <span class="op">=</span> <span class="st">"surgery"</span>,</span>
@@ -351,7 +370,7 @@ Comparison</a>):</p>
 <strong>Example 6:</strong> Forest Plot with Interactions<a class="anchor" aria-label="anchor" href="#example-6-forest-plot-with-interactions"></a>
 </h3>
 <p>Visualize models including interaction terms:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">interaction_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcome <span class="op">=</span> <span class="st">"surgery"</span>,</span>
@@ -367,8 +386,9 @@ Comparison</a>):</p>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span>
 <span>  indent_groups <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/adv_ex6.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example6</span><span class="op">)</span></span></code></pre></div>
+<p><img src="advanced_workflows_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="100%"></p>
 <hr>
 </div>
 </div>
@@ -410,7 +430,7 @@ parameter:</p>
 </h3>
 <p>The <code>(1|site)</code> syntax specifies a random intercept for
 each site:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example7</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcome <span class="op">=</span> <span class="st">"los_days"</span>,</span>
@@ -444,7 +464,7 @@ each site:</p>
 </h3>
 <p>For binary outcomes with clustering (note the use of an independent
 <code>random</code> parameter):</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example8</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>    outcome <span class="op">=</span> <span class="st">"surgery"</span>,</span>
@@ -478,7 +498,7 @@ each site:</p>
 <strong>Example 9:</strong> Random Slopes<a class="anchor" aria-label="anchor" href="#example-9-random-slopes"></a>
 </h3>
 <p>Allow effects to vary by cluster:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example9</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcome <span class="op">=</span> <span class="st">"los_days"</span>,</span>
@@ -511,7 +531,7 @@ each site:</p>
 <strong>Example 10:</strong> Cox Mixed-Effects Model<a class="anchor" aria-label="anchor" href="#example-10-cox-mixed-effects-model"></a>
 </h3>
 <p>For survival outcomes with clustering:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example10</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcome <span class="op">=</span> <span class="st">"Surv(os_months, os_status)"</span>,</span>
@@ -544,15 +564,16 @@ each site:</p>
 <strong>Example 11:</strong> Forest Plot from Mixed Model<a class="anchor" aria-label="anchor" href="#example-11-forest-plot-from-mixed-model"></a>
 </h3>
 <p>Visualize fixed effects from mixed-effects models:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example11</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glmforest.html">glmforest</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">example8</span>, <span class="st">"model"</span><span class="op">)</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"Logistic Mixed Model (Fixed Effects)"</span>,</span>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span>
 <span>  indent_groups <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/adv_ex11.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example11</span><span class="op">)</span></span></code></pre></div>
+<p><img src="advanced_workflows_files/figure-html/unnamed-chunk-15-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-12-comparing-random-effects-specifications">
@@ -562,7 +583,7 @@ Specifications<a class="anchor" aria-label="anchor" href="#example-12-comparing-
 <p>Use <code><a href="../reference/compfit.html">compfit()</a></code> to compare different random-effects
 structures (<em>see</em> <a href="model_comparison.html">Model
 Comparison</a>):</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example12</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/compfit.html">compfit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcome <span class="op">=</span> <span class="st">"los_days"</span>,</span>
@@ -637,7 +658,7 @@ variable</td>
 </h3>
 <p>Stratification allows nonproportional hazards across strata without
 estimating stratum effects. Use the <code>strata</code> parameter:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example13</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcome <span class="op">=</span> <span class="st">"Surv(os_months, os_status)"</span>,</span>
@@ -669,7 +690,7 @@ estimating stratum effects. Use the <code>strata</code> parameter:</p>
 <p>For robust inference with correlated observations, cluster-robust
 standard errors account for within-cluster correlation. Use the
 <code>cluster</code> parameter:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example14</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcome <span class="op">=</span> <span class="st">"Surv(os_months, os_status)"</span>,</span>
@@ -710,7 +731,7 @@ non-response, or confounding adjustment.</p>
 <h3 id="example-15-weighted-analysis">
 <strong>Example 15:</strong> Weighted Analysis<a class="anchor" aria-label="anchor" href="#example-15-weighted-analysis"></a>
 </h3>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create example weights</span></span>
 <span><span class="va">clintrial</span><span class="op">$</span><span class="va">analysis_weight</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">clintrial</span><span class="op">)</span>, <span class="fl">0.5</span>, <span class="fl">2.0</span><span class="op">)</span></span>
 <span></span>
@@ -755,7 +776,7 @@ specifications including random effects and stratification.</p>
 Effects<a class="anchor" aria-label="anchor" href="#example-16-univariable-screening-with-random-effects"></a>
 </h3>
 <p>Screen multiple predictors while accounting for clustering:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example16</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/uniscreen.html">uniscreen</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcome <span class="op">=</span> <span class="st">"surgery"</span>,</span>
@@ -791,7 +812,7 @@ Effects<a class="anchor" aria-label="anchor" href="#example-16-univariable-scree
 <strong>Example 17:</strong> Cox Screening with Mixed Effects<a class="anchor" aria-label="anchor" href="#example-17-cox-screening-with-mixed-effects"></a>
 </h3>
 <p>For survival outcomes with clustering:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example17</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/uniscreen.html">uniscreen</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcome <span class="op">=</span> <span class="st">"Surv(os_months, os_status)"</span>,</span>
@@ -833,7 +854,7 @@ Screening<a class="anchor" aria-label="anchor" href="#example-18-forest-plot-fro
 </h3>
 <p>The <code><a href="../reference/uniforest.html">uniforest()</a></code> function visualizes univariable
 screening results:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">uni_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/uniscreen.html">uniscreen</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcome <span class="op">=</span> <span class="st">"Surv(os_months, os_status)"</span>,</span>
@@ -847,8 +868,9 @@ screening results:</p>
 <span>  title <span class="op">=</span> <span class="st">"Univariable Screening Results"</span>,</span>
 <span>  indent_groups <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/adv_ex18.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example18</span><span class="op">)</span></span></code></pre></div>
+<p><img src="advanced_workflows_files/figure-html/unnamed-chunk-23-1.png" class="r-plt" alt="" width="100%"></p>
 <hr>
 </div>
 </div>
@@ -863,7 +885,7 @@ outcomes.</p>
 <strong>Example 19:</strong> Multi-Outcome with Interactions<a class="anchor" aria-label="anchor" href="#example-19-multi-outcome-with-interactions"></a>
 </h3>
 <p>Test effect modification across multiple outcomes:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example19</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/multifit.html">multifit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcomes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"surgery"</span>, <span class="st">"pfs_status"</span>, <span class="st">"os_status"</span><span class="op">)</span>,</span>
@@ -904,7 +926,7 @@ outcomes.</p>
 <strong>Example 20:</strong> Multi-Outcome with Mixed Effects<a class="anchor" aria-label="anchor" href="#example-20-multi-outcome-with-mixed-effects"></a>
 </h3>
 <p>Account for clustering when testing effects across outcomes:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example20</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/multifit.html">multifit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcomes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"surgery"</span>, <span class="st">"pfs_status"</span><span class="op">)</span>,</span>
@@ -939,7 +961,7 @@ outcomes.</p>
 Effects<a class="anchor" aria-label="anchor" href="#example-21-survival-multi-outcome-with-mixed-effects"></a>
 </h3>
 <p>For multiple survival outcomes with clustering:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example21</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/multifit.html">multifit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcomes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Surv(pfs_months, pfs_status)"</span>,</span>
@@ -975,7 +997,7 @@ Effects<a class="anchor" aria-label="anchor" href="#example-21-survival-multi-ou
 <h2 id="complete-workflow-example">Complete Workflow Example<a class="anchor" aria-label="anchor" href="#complete-workflow-example"></a>
 </h2>
 <p>The following demonstrates a complete advanced analysis workflow:</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Step 1: Screen risk factors for primary outcome</span></span>
 <span><span class="va">risk_screening</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/uniscreen.html">uniscreen</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
@@ -1057,8 +1079,9 @@ Effects<a class="anchor" aria-label="anchor" href="#example-21-survival-multi-ou
 <span>  title <span class="op">=</span> <span class="st">"Effects Across Outcomes"</span>,</span>
 <span>  indent_predictor <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/adv_workflow_forest.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">forest_plot</span><span class="op">)</span></span></code></pre></div>
+<p><img src="advanced_workflows_files/figure-html/unnamed-chunk-28-1.png" class="r-plt" alt="" width="100%"></p>
 <hr>
 </div>
 <div class="section level2">
@@ -1141,7 +1164,7 @@ events</li>
 <h3 id="convergence-problems-in-mixed-models">Convergence Problems in Mixed Models<a class="anchor" aria-label="anchor" href="#convergence-problems-in-mixed-models"></a>
 </h3>
 <p>Simplify the random effects structure if convergence fails:</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Start with random intercepts only</span></span>
 <span><span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span><span class="va">data</span>, <span class="va">outcome</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">predictors</span>, <span class="st">"(1|site)"</span><span class="op">)</span>, model_type <span class="op">=</span> <span class="st">"lmer"</span><span class="op">)</span></span></code></pre></div>
 <p>Check for common problems such as few observations per cluster,
@@ -1153,7 +1176,7 @@ predictors.</p>
 </h3>
 <p>For categorical × categorical interactions, the coefficient
 represents the additional effect beyond the sum of main effects:</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Access model for detailed interpretation</span></span>
 <span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">result</span>, <span class="st">"model"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span></code></pre></div>

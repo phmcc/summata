@@ -215,9 +215,9 @@ A data.table with class "compfit_result" containing:
 
   Bayesian Information Criterion
 
-- Pseudo-*R*\\^2\\:
+- *R*\\^2\\ / Pseudo-*R*\\^2\\:
 
-  McFadden's pseudo-R-squared (GLM)
+  McFadden pseudo-R-squared (GLM)
 
 - Concordance:
 
@@ -362,6 +362,7 @@ comparison
 #> CMS interpretation: 85+ Excellent, 75-84 Very Good, 65-74 Good, 55-64 Fair, < 55 Poor
 
 # \donttest{
+
 # Example 2: Compare Cox survival models
 library(survival)
 surv_models <- list(

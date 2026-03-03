@@ -105,56 +105,44 @@ The function uses the following priority order for detection:
 }
 }
 \examples{
-\dontshow{if (FALSE) withAutoprint(\{ # examplesIf}
-# Load example data
 data(clintrial)
 data(clintrial_labels)
 library(survival)
 
-# Example 1: Logistic regression model
+# Create example model
 glm_model <- glm(surgery ~ age + sex + bmi + smoking,
                  family = binomial, data = clintrial)
 
-plot1 <- autoforest(glm_model, data = clintrial)
-print(plot1)
+# Example 1: Logistic regression model
+p <- autoforest(glm_model, data = clintrial)
 # Automatically detects GLM and routes to glmforest()
+
+\donttest{
 
 # Example 2: Cox proportional hazards model
 cox_model <- coxph(Surv(os_months, os_status) ~ age + sex + treatment + stage,
                    data = clintrial)
 
 plot2 <- autoforest(cox_model, data = clintrial)
-print(plot2)
 # Automatically detects coxph and routes to coxforest()
 
 # Example 3: Linear regression model
 lm_model <- lm(biomarker_x ~ age + sex + bmi + treatment, data = clintrial)
 
 plot3 <- autoforest(lm_model, data = clintrial)
-print(plot3)
 # Automatically detects lm and routes to lmforest()
 
-# Example 4: With custom labels
+# Example 4: With custom labels and formatting options
 plot4 <- autoforest(
-    glm_model,
-    data = clintrial,
-    labels = clintrial_labels,
-    title = "Risk Factors for Surgical Intervention"
-)
-print(plot4)
-
-# Example 5: Pass additional formatting options
-plot5 <- autoforest(
     cox_model,
     data = clintrial,
     labels = clintrial_labels,
+    title = "Prognostic Factors for Overall Survival",
     zebra_stripes = TRUE,
-    indent_groups = TRUE,
-    color = "#E74C3C"
+    indent_groups = TRUE
 )
-print(plot5)
 
-# Example 6: From fit() result - data and labels extracted automatically
+# Example 5: From fit() result - data and labels extracted automatically
 fit_result <- fit(
     data = clintrial,
     outcome = "surgery",
@@ -162,114 +150,15 @@ fit_result <- fit(
     labels = clintrial_labels
 )
 
-plot6 <- autoforest(fit_result)
-print(plot6)
+plot5 <- autoforest(fit_result)
 # No need to pass data or labels - extracted from fit_result
 
-# Example 7: From fullfit() result
-ff_result <- fullfit(
-    data = clintrial,
-    outcome = "surgery",
-    predictors = c("age", "sex", "bmi", "smoking", "treatment"),
-    labels = clintrial_labels
-)
+# Save with recommended dimensions
+dims <- attr(plot5, "rec_dims")
+ggplot2::ggsave(file.path(tempdir(), "forest.pdf"),
+                plot5, width = dims$width, height = dims$height)
 
-plot7 <- autoforest(ff_result)
-print(plot7)
-
-# Example 8: From uniscreen() result
-uni_result <- uniscreen(
-    data = clintrial,
-    outcome = "surgery",
-    predictors = c("age", "sex", "bmi", "smoking", "treatment", "stage"),
-    labels = clintrial_labels
-)
-
-plot8 <- autoforest(uni_result)
-print(plot8)
-# Automatically detects uniscreen_result and routes to uniforest()
-
-# Example 9: From multifit() result
-mf_result <- multifit(
-    data = clintrial,
-    outcomes = c("surgery", "any_complication", "readmission_30d"),
-    predictor = "treatment",
-    labels = clintrial_labels
-)
-
-plot9 <- autoforest(mf_result)
-print(plot9)
-# Automatically detects multifit result and routes to multiforest()
-
-# Example 10: Survival uniscreen
-surv_uni <- uniscreen(
-    data = clintrial,
-    outcome = "Surv(os_months, os_status)",
-    predictors = c("age", "sex", "treatment", "stage", "grade"),
-    model_type = "coxph",
-    labels = clintrial_labels
-)
-
-plot10 <- autoforest(surv_uni)
-print(plot10)
-# Title automatically set to "Univariable Survival Analysis Screening"
-
-# Example 11: Override auto-generated title
-plot11 <- autoforest(
-    surv_uni,
-    title = "Univariable Predictors of Overall Survival"
-)
-print(plot11)
-
-# Example 12: Save with recommended dimensions
-plot12 <- autoforest(cox_model, data = clintrial, labels = clintrial_labels)
-dims <- attr(plot12, "rec_dims")
-
-# Save to file
-# ggsave("forest_plot.pdf", plot12, width = dims$width, height = dims$height)
-# ggsave("forest_plot.png", plot12, width = dims$width, height = dims$height, dpi = 300)
-
-# Example 13: Poisson regression
-clintrial$event_count <- rpois(nrow(clintrial), lambda = 3)
-pois_model <- glm(event_count ~ age + sex + treatment,
-                  family = poisson, data = clintrial)
-
-plot13 <- autoforest(pois_model, data = clintrial)
-print(plot13)
-# Automatically detects Poisson GLM, title set to "Poisson Regression Model"
-
-# Example 14: Mixed-Effects uniscreen
-if (requireNamespace("lme4", quietly = TRUE)) {
-    me_uni <- uniscreen(
-        data = clintrial,
-        outcome = "surgery",
-        predictors = c("age", "sex", "treatment"),
-        model_type = "glmer",
-        random = "(1 | site)",
-        labels = clintrial_labels
-    )
-    
-    plot14 <- autoforest(me_uni)
-    print(plot14)
-    # Title: "Univariable Mixed-Effects Logistic Screening"
 }
-
-# Example 15: Quick comparison workflow
-# Fit multiple model types and visualize each
-models <- list(
-    logistic = glm(surgery ~ age + sex + treatment, binomial, clintrial),
-    survival = coxph(Surv(os_months, os_status) ~ age + sex + treatment, clintrial),
-    linear = lm(biomarker_x ~ age + sex + treatment, clintrial)
-)
-
-# autoforest handles each appropriately
-plots <- lapply(models, function(m) autoforest(m, data = clintrial))
-
-# Each plot uses the correct forest function automatically
-print(plots$logistic)
-print(plots$survival)
-print(plots$linear)
-\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link{glmforest}} for GLM forest plots,

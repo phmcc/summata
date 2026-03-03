@@ -137,7 +137,7 @@ A data.table with class "compfit_result" containing:
     \item{Converged}{Whether model converged properly}
     \item{AIC}{Akaike Information Criterion}
     \item{BIC}{Bayesian Information Criterion}
-    \item{Pseudo-\emph{R}\eqn{^2}}{McFadden's pseudo-R-squared (GLM)}
+    \item{\emph{R}\eqn{^2} / Pseudo-\emph{R}\eqn{^2}}{McFadden pseudo-R-squared (GLM)}
     \item{Concordance}{C-statistic (logistic/survival)}
     \item{Brier Score}{Brier accuracy score (logistic)}
     \item{Global \emph{p}}{Overall model \emph{p}-value}
@@ -212,6 +212,7 @@ comparison <- compfit(
 comparison
 
 \donttest{
+
 # Example 2: Compare Cox survival models
 library(survival)
 surv_models <- list(

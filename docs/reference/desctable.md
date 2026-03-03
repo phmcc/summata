@@ -370,8 +370,8 @@ desctable(clintrial,
 #> 4:                  Male      400 (47.1%)
 #> 5:      bmi Median [IQR] 28.0 [24.7-31.5]
 
-
 # \donttest{
+
 # Example 2: Grouped comparison with default tests
 desctable(clintrial,
         by = "treatment",
@@ -575,16 +575,7 @@ desctable(clintrial,
 #> 15:                                        Yes      331 (39.6%)       84 (43.8%)      109 (37.8%)      138 (38.9%)        
 #> 16: Surv(os_months, os_status) Median (95% CI) 19.4 (16.2-23.4) 14.7 (10.5-19.2) 33.6 (24.5-42.2) 14.7 (11.0-21.8) < 0.001
 
-# Example 15: Export table
-table1 <- desctable(clintrial,
-                  by = "treatment",
-                  variables = c("age", "sex", "bmi"))
-
-# Can export directly to PDF/LaTeX/HTML for publication
-# table2pdf(table1, "table1.pdf")
-# table2docx(table1, "table1.docx")
-
-# Example 16: Three or more groups
+# Example 15: Three or more groups
 desctable(clintrial,
         by = "stage",  # Assuming stage has 3+ levels
         variables = c("age", "sex", "bmi"))
@@ -597,7 +588,7 @@ desctable(clintrial,
 #> 5:      bmi Median [IQR] 28.0 [24.7-31.5] 27.9 [24.8-30.9] 28.1 [24.2-31.5] 27.8 [24.7-31.5] 28.5 [25.1-32.1]   0.595
 # Automatically uses ANOVA/Kruskal-Wallis and chi-squared
 
-# Example 17: Access raw unformatted data
+# Example 16: Access raw unformatted data
 result <- desctable(clintrial,
                   by = "treatment",
                   variables = c("age", "bmi"))
@@ -609,14 +600,14 @@ print(raw_data)
 #> 2:      bmi median_iqr median_iqr    28     24.7     31.5     838      28       24.4       31.9       194  28.25      24.9      31.3      288   27.8      24.7      31.5      356 0.8314435
 # Raw data includes unformatted numbers, SDs, quartiles, etc.
 
-# Example 18: Check which grouping variable was used
+# Example 17: Check which grouping variable was used
 result <- desctable(clintrial,
                   by = "treatment",
                   variables = c("age", "sex"))
 attr(result, "by_variable")  # "treatment"
 #> [1] "treatment"
 
-# Example 19: NA percentage calculation options
+# Example 18: NA percentage calculation options
 # Include NAs in percentage denominator (all sum to 100%)
 desctable(clintrial,
         by = "treatment",
@@ -645,7 +636,7 @@ desctable(clintrial,
 #> 4:          Current 185 (22.2%) 42 (22.0%)  64 (22.2%)  79 (22.3%)        
 #> 5:          Unknown          17          5           4           8        
 
-# Example 20: Passing additional test arguments
+# Example 19: Passing additional test arguments
 # Equal variance t-test
 desctable(clintrial,
         by = "sex",
@@ -657,7 +648,7 @@ desctable(clintrial,
 #> 1:        N                           850              450              400        
 #> 2:      age Median [IQR] 60.0 [52.0-67.0] 60.0 [52.0-67.0] 60.0 [51.5-69.0]   0.951
 
-# Example 21: European number formatting
+# Example 20: European number formatting
 desctable(clintrial,
         by = "treatment",
         variables = c("age", "sex", "bmi"),
@@ -670,7 +661,7 @@ desctable(clintrial,
 #> 4:                  Male      400 (47,1%)       96 (49,0%)      128 (43,8%)      176 (48,6%)        
 #> 5:      bmi Median [IQR] 28,0 [24,7–31,5] 28,0 [24,4–31,9] 28,2 [24,9–31,3] 27,8 [24,7–31,5]   0,831
 
-# Example 22: Complete Table 1 for publication
+# Example 21: Complete Table 1 for publication
 table1 <- desctable(
     data = clintrial,
     by = "treatment",
@@ -737,5 +728,6 @@ print(table1)
 #> 46:   Overall Survival (months)           Median (95% CI) 19.4 (16.2-23.4) 14.7 (10.5-19.2) 33.6 (24.5-42.2) 14.7 (11.0-21.8) < 0.001
 #>                        Variable                     Group            Total          Control           Drug A           Drug B p-value
 #>                          <char>                    <char>           <char>           <char>           <char>           <char>  <char>
+
 # }
 ```

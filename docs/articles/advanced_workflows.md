@@ -32,6 +32,27 @@ table(clintrial$site)
 The `clintrial` dataset includes 10 study sites, providing a natural
 clustering variable for hierarchical analysis.
 
+> *n.b.:* To ensure correct font rendering and figure sizing, the forest
+> plots below are displayed using a helper function (`queue_plot()`)
+> that applies each plot’s recommended dimensions (stored in the
+> `"rec_dims"` attribute) via the [`ragg`](https://ragg.r-lib.org/)
+> graphics device. In practice, replace `queue_plot()` with
+> [`ggplot2::ggsave()`](https://ggplot2.tidyverse.org/reference/ggsave.html)
+> using recommended plot dimensions for equivalent results:
+>
+> ``` r
+> p <- glmforest(model, data = mydata)
+> dims <- attr(p, "rec_dims")
+> ggplot2::ggsave("forest_plot.png", p,
+>                 width = dims$width, 
+>                 height = dims$height)
+> ```
+>
+> This ensures that the figure size is always large enough to
+> accommodate the constituent plot text and graphics, and it is
+> generally the preferred method for saving forest plot outputs in
+> `summata`.
+
 ------------------------------------------------------------------------
 
 ## Interaction Effects
@@ -275,9 +296,10 @@ example6 <- glmforest(
   indent_groups = TRUE,
   zebra_stripes = TRUE
 )
+queue_plot(example6)
 ```
 
-![](figures/adv_ex6.png)
+![](advanced_workflows_files/figure-html/unnamed-chunk-9-1.png)
 
 ------------------------------------------------------------------------
 
@@ -443,9 +465,10 @@ example11 <- glmforest(
   indent_groups = TRUE,
   zebra_stripes = TRUE
 )
+queue_plot(example11)
 ```
 
-![](figures/adv_ex11.png)
+![](advanced_workflows_files/figure-html/unnamed-chunk-15-1.png)
 
 ### **Example 12:** Comparing Random-Effects Specifications
 
@@ -719,9 +742,10 @@ example18 <- uniforest(
   indent_groups = TRUE,
   zebra_stripes = TRUE
 )
+queue_plot(example18)
 ```
 
-![](figures/adv_ex18.png)
+![](advanced_workflows_files/figure-html/unnamed-chunk-23-1.png)
 
 ------------------------------------------------------------------------
 
@@ -931,9 +955,10 @@ forest_plot <- multiforest(
   indent_predictor = TRUE,
   zebra_stripes = TRUE
 )
+queue_plot(forest_plot)
 ```
 
-![](figures/adv_workflow_forest.png)
+![](advanced_workflows_files/figure-html/unnamed-chunk-28-1.png)
 
 ------------------------------------------------------------------------
 

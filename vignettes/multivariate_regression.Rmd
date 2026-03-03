@@ -10,10 +10,7 @@ vignette: >
 ```{r, include = FALSE}
 ## Use ragg for better font rendering if available
 if (requireNamespace("ragg", quietly = TRUE)) {
-  options(summata.use_ragg = TRUE)
-}
-
-if (requireNamespace("ragg", quietly = TRUE)) {
+  old_opts <- options(summata.use_ragg = TRUE, width = 180)
   knitr::opts_chunk$set(
     dev = "ragg_png",
     fig.retina = 1,
@@ -26,6 +23,7 @@ if (requireNamespace("ragg", quietly = TRUE)) {
     out.width = "80%"
   )
 } else {
+  old_opts <- options(width = 180)
   knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "##>",
@@ -36,57 +34,33 @@ if (requireNamespace("ragg", quietly = TRUE)) {
     out.width = "80%"
   )
 }
-options(width = 180)
 
-## Only save figures when building pkgdown site (not for CRAN)
-save_figures <- identical(Sys.getenv("IN_PKGDOWN"), "true")
+## Dynamic figure sizing: queue_plot() stashes rec_dims from a plot object,
+## and the opts_hook on the NEXT chunk (with use_rec_dims = TRUE) applies them
+## before knitr opens the graphics device. Plots render via ragg (dev = "ragg_png"
+## set above) and knitr captures them natively. No files written to disk.
+.plot_dims <- new.env(parent = emptyenv())
+.plot_dims$width <- NULL
+.plot_dims$height <- NULL
 
-## Use vignettes/figures for generated plots (pkgdown only)
-fig_dir <- "figures"
-if (save_figures && !dir.exists(fig_dir)) {
-  dir.create(fig_dir, recursive = TRUE)
-}
-
-## Function for saving/displaying plots
-## For pkgdown: saves PNG and returns path for include_graphics
-## For CRAN: just prints the plot and returns empty string
-save_example_plot <- function(plot, filename, width = 8, height = 5) {
-  if (save_figures) {
-    filepath <- file.path(fig_dir, filename)
-    final_width <- attr(plot, "rec_dims")$width %||% width
-    final_height <- attr(plot, "rec_dims")$height %||% height
-    
-    if (requireNamespace("ragg", quietly = TRUE)) {
-      ## Use ragg directly - it uses 'res' not 'dpi', and defaults to 72
-      ragg::agg_png(filepath, 
-                    width = final_width, 
-                    height = final_height, 
-                    units = "in",
-                    res = 72)
-      print(plot)
-      grDevices::dev.off()
-    } else {
-      ggplot2::ggsave(filepath, plot, 
-                      width = final_width, 
-                      height = final_height, 
-                      dpi = 72)
-    }
-    return(filepath)
-  } else {
-    print(plot)
-    return(NULL)
+knitr::opts_hooks$set(use_rec_dims = function(options) {
+  if (isTRUE(options$use_rec_dims)) {
+    if (!is.null(.plot_dims$width))  options$fig.width  <- .plot_dims$width
+    if (!is.null(.plot_dims$height)) options$fig.height <- .plot_dims$height
+    .plot_dims$width <- NULL
+    .plot_dims$height <- NULL
   }
-}
+  options
+})
 
-## Wrapper for include_graphics that handles NULL (CRAN case)
-show_plot <- function(plot, filename, width = 8, height = 5) {
-  if (!save_figures) {
-    return(invisible(NULL))  # Do not render anything for CRAN
+## Call at the end of a plot-creation chunk to stash dimensions for the next chunk.
+queue_plot <- function(plot) {
+  dims <- attr(plot, "rec_dims")
+  if (!is.null(dims)) {
+    .plot_dims$width  <- dims$width
+    .plot_dims$height <- dims$height
   }
-  path <- save_example_plot(plot, filename, width, height)
-  if (!is.null(path)) {
-    knitr::include_graphics(path)
-  }
+  invisible(plot)
 }
 ```
 
@@ -126,6 +100,18 @@ The `clintrial` dataset includes multiple outcome types suitable for multivariat
 | Count (equidispersed) | `fu_count` | `glm` (poisson) |
 | Count (overdispersed) | `ae_count` | `negbin` or `quasipoisson` |
 | Time-to-event | `Surv(pfs_months, pfs_status)`, `Surv(os_months, os_status)` | `coxph` |
+
+> *n.b.:* To ensure correct font rendering and figure sizing, the forest plots below are displayed using a helper function (`queue_plot()`) that applies each plot's recommended dimensions (stored in the `"rec_dims"` attribute) via the [`ragg`](https://ragg.r-lib.org/) graphics device. In practice, replace `queue_plot()` with `ggplot2::ggsave()` using recommended plot dimensions for equivalent results:
+> 
+> ```{r, eval = FALSE}
+> p <- glmforest(model, data = mydata)
+> dims <- attr(p, "rec_dims")
+> ggplot2::ggsave("forest_plot.png", p,
+>                 width = dims$width, 
+>                 height = dims$height)
+> ```
+> 
+> This ensures that the figure size is always large enough to accommodate the constituent plot text and graphics, and it is generally the preferred method for saving forest plot outputs in `summata`.
 
 ---
 
@@ -381,10 +367,11 @@ example12 <- multiforest(
   indent_predictor = TRUE,
   zebra_stripes = TRUE
 )
+queue_plot(example12)
 ```
 
-```{r, echo = FALSE, out.width = "100%"}
-show_plot(example12, "multi_ex12.png")
+```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+print(example12)
 ```
 
 ## **Example 13:** Customization Options
@@ -401,10 +388,11 @@ example13 <- multiforest(
   table_width = 0.65,
   color = "#4BA6B6"
 )
+queue_plot(example13)
 ```
 
-```{r, echo = FALSE, out.width = "100%"}
-show_plot(example13, "multi_ex13.png")
+```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+print(example13)
 ```
 
 ## **Example 14:** Forest Plot for Continuous Outcomes
@@ -428,10 +416,11 @@ example14 <- multiforest(
   covariates_footer = TRUE,
   labels = clintrial_labels
 )
+queue_plot(example14)
 ```
 
-```{r, echo = FALSE, out.width = "100%"}
-show_plot(example14, "multi_ex14.png")
+```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+print(example14)
 ```
 
 ## **Example 15:** Forest Plot for Survival Outcomes
@@ -456,10 +445,11 @@ example15 <- multiforest(
   zebra_stripes = TRUE,
   labels = clintrial_labels
 )
+queue_plot(example15)
 ```
 
-```{r, echo = FALSE, out.width = "100%"}
-show_plot(example15, "multi_ex15.png")
+```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+print(example15)
 ```
 
 ---
@@ -473,13 +463,13 @@ Export tables using standard export functions:
 ```{r, eval = FALSE}
 table2docx(
   table = result,
-  file = "multioutcome_analysis.docx",
+  file = file.path(tempdir(), "multioutcome_analysis.docx"),
   caption = "Treatment Effects Across Outcomes"
 )
 
 table2pdf(
   table = result,
-  file = "multioutcome_analysis.pdf",
+  file = file.path(tempdir(), "multioutcome_analysis.pdf"),
   caption = "Treatment Effects Across Outcomes"
 )
 ```
@@ -492,7 +482,7 @@ Save forest plots using `ggsave()`:
 p <- multiforest(result, title = "Effect Estimates")
 dims <- attr(p, "rec_dims")
 
-ggsave("multioutcome_forest.pdf", p,
+ggsave(file.path(tempdir(), "multioutcome_forest.pdf"), p,
        width = attr(result, "rec_dims")$width,
        height = attr(result, "rec_dims")$height, 
        units = "in")
@@ -545,10 +535,11 @@ forest_plot <- multiforest(
   table_width = 0.65,
   labels = clintrial_labels
 )
+queue_plot(forest_plot)
 ```
 
-```{r, echo = FALSE, out.width = "100%"}
-show_plot(forest_plot, "multi_workflow_forest.png")
+```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+print(forest_plot)
 ```
 
 ---
@@ -629,7 +620,7 @@ clintrial$treatment_binary <- ifelse(clintrial$treatment == "Control",
 
 # Other Considerations
 
-## Multivariate vs. Univariable Screening
+## Multivariate Regression vs. Univariable Screening
 
 The distinction between `multifit()` and `uniscreen()` is important:
 
@@ -654,6 +645,10 @@ model <- multinom(treatment ~ age + sex + stage, data = clintrial)
 ## Ordinal regression (ordered categories)
 library(MASS)
 model <- polr(grade ~ age + sex + stage, data = clintrial, Hess = TRUE)
+```
+
+```{r, include = FALSE}
+options(old_opts)
 ```
 
 ---

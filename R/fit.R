@@ -356,8 +356,9 @@
 #' )
 #' print(uni_model)
 #' # Labeled as "Univariable OR"
-#' 
+#'
 #' \donttest{
+#' 
 #' # Example 2: Multivariable logistic regression
 #' multi_model <- fit(
 #'     data = clintrial,
@@ -476,7 +477,7 @@
 #' # Example 12: Access raw numeric data
 #' raw_data <- attr(result, "raw_data")
 #' print(raw_data)
-#' # Contains unformatted coefficients, SEs, CIs, AIC, BIC, \emph{etc.}
+#' # Contains unformatted coefficients, SEs, CIs, AIC, BIC, etc.
 #' 
 #' # Example 13: Multiple interactions
 #' complex_model <- fit(
@@ -529,10 +530,7 @@
 #' cat("AIC:", raw$AIC[1], "\n")
 #' cat("BIC:", raw$BIC[1], "\n")
 #' cat("C-statistic:", raw$c_statistic[1], "\n")
-#' }
 #' 
-#' \donttest{
-#'   options(width = 180)
 #' # Example 18: Interaction effects - treatment effect modified by stage
 #' interaction_model <- fit(
 #'     data = clintrial,
@@ -653,15 +651,16 @@
 #' }
 #' 
 #' # Example 28: Format a pre-fitted model (model-based workflow)
-#' # Useful for models fitted outside of fit(), like MASS::glm.nb()
+#' # Useful for models fitted outside of fit()
 #' pre_fitted <- glm(os_status ~ age + sex + treatment,
 #'                   family = binomial, data = clintrial)
 #' result <- fit(model = pre_fitted, 
 #'               data = clintrial,
 #'               labels = clintrial_labels)
 #' print(result)
-#' }
 #'
+#' }
+#' 
 #' @family regression functions
 #' @export
 fit <- function(data = NULL, 
@@ -1017,7 +1016,8 @@ fit <- function(data = NULL,
 #' 
 #' @param x fit_result object.
 #' @param ... Additional arguments passed to print methods.
-#' @return Invisibly returns the input object.
+#' @return Invisibly returns the input object \code{x}. Called for its
+#'   side effect of printing a formatted summary to the console.
 #' @keywords internal
 #' @family regression functions
 #' @export

@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -164,6 +164,71 @@ class.</p>
 </tbody>
 </table>
 <hr>
+</div>
+<div class="section level2">
+<h2 id="hypothesis-testing">Hypothesis Testing<a class="anchor" aria-label="anchor" href="#hypothesis-testing"></a>
+</h2>
+<div class="section level3">
+<h3 id="wald-test">Wald Test<a class="anchor" aria-label="anchor" href="#wald-test"></a>
+</h3>
+<p>Tests H₀: <em>β</em> = 0 using:</p>
+<p><span class="math display">\[z =
+\frac{\hat{\beta}}{\text{SE}(\hat{\beta})}\]</span></p>
+<p>Under H₀, <em>z</em> ~ N(0, 1).</p>
+</div>
+<div class="section level3">
+<h3 id="likelihood-ratio-test">Likelihood Ratio Test<a class="anchor" aria-label="anchor" href="#likelihood-ratio-test"></a>
+</h3>
+<p>Compares nested models:</p>
+<p><span class="math display">\[\Lambda = -2[\log L_{\text{reduced}} -
+\log L_{\text{full}}]\]</span></p>
+<p>Under H₀, Λ ~ χ²ₖ, where <em>k</em> is the difference in
+parameters.</p>
+</div>
+<div class="section level3">
+<h3 id="global-test">Global Test<a class="anchor" aria-label="anchor" href="#global-test"></a>
+</h3>
+<p>Tests H₀: all <em>β</em>ⱼ = 0 (except intercept):</p>
+<ul>
+<li>
+<strong>Linear models</strong>: F-test</li>
+<li>
+<strong>GLMs</strong>: Likelihood ratio test</li>
+<li>
+<strong>Cox models</strong>: Likelihood ratio, Wald, or score
+test</li>
+</ul>
+<hr>
+</div>
+</div>
+<div class="section level2">
+<h2 id="confidence-intervals">Confidence Intervals<a class="anchor" aria-label="anchor" href="#confidence-intervals"></a>
+</h2>
+<div class="section level3">
+<h3 id="wald-confidence-intervals">Wald Confidence Intervals<a class="anchor" aria-label="anchor" href="#wald-confidence-intervals"></a>
+</h3>
+<p>For coefficient <em>β</em> with standard error SE(<em>β</em>):</p>
+<p><span class="math display">\[\beta \pm z_{1-\alpha/2} \cdot
+\text{SE}(\beta)\]</span></p>
+<p>where <em>z</em>₁₋α/₂ is the standard normal quantile (1.96 for 95%
+CI).</p>
+</div>
+<div class="section level3">
+<h3 id="profile-likelihood-intervals">Profile Likelihood Intervals<a class="anchor" aria-label="anchor" href="#profile-likelihood-intervals"></a>
+</h3>
+<p>More accurate for small samples or boundary estimates; based on the
+likelihood ratio:</p>
+<p><span class="math display">\[\{\beta : 2[\log L(\hat{\beta}) - \log
+L(\beta)] \leq \chi^2_{1,1-\alpha}\}\]</span></p>
+</div>
+<div class="section level3">
+<h3 id="confidence-intervals-for-effect-measures">Confidence Intervals for Effect Measures<a class="anchor" aria-label="anchor" href="#confidence-intervals-for-effect-measures"></a>
+</h3>
+<p>For exponentiated coefficients (OR, HR, RR):</p>
+<p><span class="math display">\[\exp\left(\beta \pm z_{1-\alpha/2} \cdot
+\text{SE}(\beta)\right)\]</span></p>
+<hr>
+</div>
 </div>
 <div class="section level2">
 <h2 id="linear-regression">Linear Regression<a class="anchor" aria-label="anchor" href="#linear-regression"></a>
@@ -1293,71 +1358,6 @@ expertise</li>
 <span>    brier <span class="op">=</span> <span class="fl">0.05</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<hr>
-</div>
-</div>
-<div class="section level2">
-<h2 id="confidence-intervals">Confidence Intervals<a class="anchor" aria-label="anchor" href="#confidence-intervals"></a>
-</h2>
-<div class="section level3">
-<h3 id="wald-confidence-intervals">Wald Confidence Intervals<a class="anchor" aria-label="anchor" href="#wald-confidence-intervals"></a>
-</h3>
-<p>For coefficient <em>β</em> with standard error SE(<em>β</em>):</p>
-<p><span class="math display">\[\beta \pm z_{1-\alpha/2} \cdot
-\text{SE}(\beta)\]</span></p>
-<p>where <em>z</em>₁₋α/₂ is the standard normal quantile (1.96 for 95%
-CI).</p>
-</div>
-<div class="section level3">
-<h3 id="profile-likelihood-intervals">Profile Likelihood Intervals<a class="anchor" aria-label="anchor" href="#profile-likelihood-intervals"></a>
-</h3>
-<p>More accurate for small samples or boundary estimates; based on the
-likelihood ratio:</p>
-<p><span class="math display">\[\{\beta : 2[\log L(\hat{\beta}) - \log
-L(\beta)] \leq \chi^2_{1,1-\alpha}\}\]</span></p>
-</div>
-<div class="section level3">
-<h3 id="confidence-intervals-for-effect-measures">Confidence Intervals for Effect Measures<a class="anchor" aria-label="anchor" href="#confidence-intervals-for-effect-measures"></a>
-</h3>
-<p>For exponentiated coefficients (OR, HR, RR):</p>
-<p><span class="math display">\[\exp\left(\beta \pm z_{1-\alpha/2} \cdot
-\text{SE}(\beta)\right)\]</span></p>
-<hr>
-</div>
-</div>
-<div class="section level2">
-<h2 id="hypothesis-testing">Hypothesis Testing<a class="anchor" aria-label="anchor" href="#hypothesis-testing"></a>
-</h2>
-<div class="section level3">
-<h3 id="wald-test">Wald Test<a class="anchor" aria-label="anchor" href="#wald-test"></a>
-</h3>
-<p>Tests H₀: <em>β</em> = 0 using:</p>
-<p><span class="math display">\[z =
-\frac{\hat{\beta}}{\text{SE}(\hat{\beta})}\]</span></p>
-<p>Under H₀, <em>z</em> ~ N(0, 1).</p>
-</div>
-<div class="section level3">
-<h3 id="likelihood-ratio-test">Likelihood Ratio Test<a class="anchor" aria-label="anchor" href="#likelihood-ratio-test"></a>
-</h3>
-<p>Compares nested models:</p>
-<p><span class="math display">\[\Lambda = -2[\log L_{\text{reduced}} -
-\log L_{\text{full}}]\]</span></p>
-<p>Under H₀, Λ ~ χ²ₖ, where <em>k</em> is the difference in
-parameters.</p>
-</div>
-<div class="section level3">
-<h3 id="global-test">Global Test<a class="anchor" aria-label="anchor" href="#global-test"></a>
-</h3>
-<p>Tests H₀: all <em>β</em>ⱼ = 0 (except intercept):</p>
-<ul>
-<li>
-<strong>Linear models</strong>: F-test</li>
-<li>
-<strong>GLMs</strong>: Likelihood ratio test</li>
-<li>
-<strong>Cox models</strong>: Likelihood ratio, Wald, or score
-test</li>
-</ul>
 <hr>
 </div>
 </div>

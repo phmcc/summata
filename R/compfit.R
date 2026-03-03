@@ -117,7 +117,7 @@
 #'     \item{Converged}{Whether model converged properly}
 #'     \item{AIC}{Akaike Information Criterion}
 #'     \item{BIC}{Bayesian Information Criterion}
-#'     \item{Pseudo-\emph{R}\eqn{^2}}{McFadden's pseudo-R-squared (GLM)}
+#'     \item{\emph{R}\eqn{^2} / Pseudo-\emph{R}\eqn{^2}}{McFadden pseudo-R-squared (GLM)}
 #'     \item{Concordance}{C-statistic (logistic/survival)}
 #'     \item{Brier Score}{Brier accuracy score (logistic)}
 #'     \item{Global \emph{p}}{Overall model \emph{p}-value}
@@ -189,8 +189,9 @@
 #'     model_names = c("Base", "Clinical", "Full")
 #' )
 #' comparison
-#' 
+#'
 #' \donttest{
+#' 
 #' # Example 2: Compare Cox survival models
 #' library(survival)
 #' surv_models <- list(
@@ -491,11 +492,16 @@ compfit <- function(data,
 
     ## Rename columns from ASCII to Unicode superscripts for display
     col_renames <- c(
-        "Pseudo-R^2" = "Pseudo-R\u00b2",
         "Marginal R^2" = "Marginal R\u00b2",
         "Conditional R^2" = "Conditional R\u00b2",
         "Adjusted R^2" = "Adjusted R\u00b2"
     )
+    ## LM models use R² (actual R-squared); all others use Pseudo-R²
+    if (model_type == "lm") {
+        col_renames[["Pseudo-R^2"]] <- "R\u00b2"
+    } else {
+        col_renames[["Pseudo-R^2"]] <- "Pseudo-R\u00b2"
+    }
     for (old_name in names(col_renames)) {
         if (old_name %in% names(comparison)) {
             data.table::setnames(comparison, old_name, col_renames[[old_name]])
@@ -518,6 +524,9 @@ compfit <- function(data,
     } else if (model_type == "coxme") {
         preferred_order <- c("Model", "N", "Events", "Predictors", "Groups", "Converged",
                              "AIC", "BIC", "Concordance", "Global p")
+    } else if (model_type == "lm") {
+        preferred_order <- c("Model", "N", "Predictors", "Converged",
+                             "AIC", "BIC", "R\u00b2", "RMSE", "Global p")
     } else {
         preferred_order <- c("Model", "N", "Events", "Predictors", "Converged",
                              "AIC", "BIC", "Pseudo-R\u00b2", "Concordance", "Global p")
@@ -558,6 +567,11 @@ compfit <- function(data,
 }
 
 #' Print method showing scoring methodology
+#'
+#' @param x Object of class \code{compfit_result}.
+#' @param ... Additional arguments passed to print methods.
+#' @return Invisibly returns the input object \code{x}. Called for its
+#'   side effect of printing a formatted summary to the console.
 #' @keywords internal
 #' @family regression functions
 #' @export

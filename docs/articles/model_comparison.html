@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -129,52 +129,263 @@ included with <code>summata</code>:</p>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="model-quality-metrics">Model Quality Metrics<a class="anchor" aria-label="anchor" href="#model-quality-metrics"></a>
+<h2 id="quality-metrics-and-the-composite-model-score">Quality Metrics and the Composite Model Score<a class="anchor" aria-label="anchor" href="#quality-metrics-and-the-composite-model-score"></a>
 </h2>
-<p>The <code><a href="../reference/compfit.html">compfit()</a></code> function uses several metrics for
-comparing models.</p>
+<p>The <code><a href="../reference/compfit.html">compfit()</a></code> function evaluates models using several
+quality metrics, then combines them into a single Composite Model Score
+(CMS) ranging from 0 to 100 for rapid comparison. The metrics available
+depend on the model type.</p>
+<div class="section level3">
+<h3 id="available-metrics">Available Metrics<a class="anchor" aria-label="anchor" href="#available-metrics"></a>
+</h3>
 <table class="table">
 <colgroup>
-<col width="25%">
-<col width="50%">
-<col width="25%">
+<col width="19%">
+<col width="21%">
+<col width="39%">
+<col width="19%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">Metric</th>
+<th align="left">Used by</th>
 <th align="left">Interpretation</th>
 <th align="left">Better</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td align="left">AIC</td>
+<td align="left">All</td>
 <td align="left">Information criterion balancing fit and complexity</td>
 <td align="left">Lower</td>
 </tr>
 <tr class="even">
 <td align="left">BIC</td>
+<td align="left">Fallback</td>
 <td align="left">Information criterion with stronger complexity
 penalty</td>
 <td align="left">Lower</td>
 </tr>
 <tr class="odd">
 <td align="left">Concordance</td>
+<td align="left">GLM, Cox, GLMER, Cox ME</td>
 <td align="left">Discrimination ability (0.5 = random, 1.0 =
 perfect)</td>
 <td align="left">Higher</td>
 </tr>
 <tr class="even">
 <td align="left">Pseudo-<em>R</em>²</td>
-<td align="left">Proportion of variation explained (GLMs)</td>
+<td align="left">GLM, Cox ME</td>
+<td align="left">Proportion of variation explained (McFadden’s)</td>
 <td align="left">Higher</td>
 </tr>
 <tr class="odd">
+<td align="left">
+<em>R</em>²</td>
+<td align="left">LM</td>
+<td align="left">Proportion of variance explained</td>
+<td align="left">Higher</td>
+</tr>
+<tr class="even">
 <td align="left">Brier Score</td>
-<td align="left">Prediction accuracy for binary outcomes</td>
+<td align="left">GLM</td>
+<td align="left">Prediction accuracy for binary outcomes (0 =
+perfect)</td>
 <td align="left">Lower</td>
+</tr>
+<tr class="odd">
+<td align="left">Global <em>p</em>
+</td>
+<td align="left">Cox</td>
+<td align="left">Omnibus likelihood ratio test <em>p</em>-value</td>
+<td align="left">Lower</td>
+</tr>
+<tr class="even">
+<td align="left">RMSE</td>
+<td align="left">LM</td>
+<td align="left">Root mean squared error of residuals</td>
+<td align="left">Lower</td>
+</tr>
+<tr class="odd">
+<td align="left">Marginal <em>R</em>²</td>
+<td align="left">LMER, GLMER</td>
+<td align="left">Variance explained by fixed effects alone</td>
+<td align="left">Higher</td>
+</tr>
+<tr class="even">
+<td align="left">Conditional <em>R</em>²</td>
+<td align="left">LMER</td>
+<td align="left">Variance explained by fixed + random effects</td>
+<td align="left">Higher</td>
+</tr>
+<tr class="odd">
+<td align="left">ICC</td>
+<td align="left">LMER, GLMER, Cox ME</td>
+<td align="left">Intraclass correlation; proportion of variance from
+clustering</td>
+<td align="left">Moderate</td>
+</tr>
+<tr class="even">
+<td align="left">Convergence</td>
+<td align="left">All</td>
+<td align="left">Whether the model converged successfully</td>
+<td align="left">Yes</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="cms-interpretation">CMS Interpretation<a class="anchor" aria-label="anchor" href="#cms-interpretation"></a>
+</h3>
+<table class="table">
+<thead><tr class="header">
+<th align="left">Range</th>
+<th align="left">Interpretation</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">85–100</td>
+<td align="left">Excellent</td>
+</tr>
+<tr class="even">
+<td align="left">75–84</td>
+<td align="left">Very Good</td>
+</tr>
+<tr class="odd">
+<td align="left">65–74</td>
+<td align="left">Good</td>
+</tr>
+<tr class="even">
+<td align="left">55–64</td>
+<td align="left">Fair</td>
+</tr>
+<tr class="odd">
+<td align="left">&lt; 55</td>
+<td align="left">Poor</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="default-cms-weights-by-model-type">Default CMS Weights by Model Type<a class="anchor" aria-label="anchor" href="#default-cms-weights-by-model-type"></a>
+</h3>
+<p>The score components and their default weights vary by model
+type.</p>
+<table class="table">
+<thead><tr class="header">
+<th align="left">Component</th>
+<th align="center">LM</th>
+<th align="center">GLM</th>
+<th align="center">Cox</th>
+<th align="center">LMER</th>
+<th align="center">GLMER</th>
+<th align="center">Cox ME</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">Convergence</td>
+<td align="center">15%</td>
+<td align="center">15%</td>
+<td align="center">15%</td>
+<td align="center">20%</td>
+<td align="center">15%</td>
+<td align="center">15%</td>
+</tr>
+<tr class="even">
+<td align="left">AIC</td>
+<td align="center">25%</td>
+<td align="center">25%</td>
+<td align="center">30%</td>
+<td align="center">25%</td>
+<td align="center">25%</td>
+<td align="center">30%</td>
+</tr>
+<tr class="odd">
+<td align="left">
+<em>R</em>²</td>
+<td align="center">45%</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="even">
+<td align="left">Pseudo-<em>R</em>²</td>
+<td align="center"></td>
+<td align="center">15%</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">10%</td>
+</tr>
+<tr class="odd">
+<td align="left">Concordance</td>
+<td align="center"></td>
+<td align="center">40%</td>
+<td align="center">40%</td>
+<td align="center"></td>
+<td align="center">30%</td>
+<td align="center">35%</td>
+</tr>
+<tr class="even">
+<td align="left">Brier Score</td>
+<td align="center"></td>
+<td align="center">5%</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td align="left">Global <em>p</em>
+</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">15%</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="even">
+<td align="left">RMSE</td>
+<td align="center">15%</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td align="left">Marginal <em>R</em>²</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">25%</td>
+<td align="center">15%</td>
+<td align="center"></td>
+</tr>
+<tr class="even">
+<td align="left">Conditional <em>R</em>²</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">15%</td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td align="left">ICC</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">15%</td>
+<td align="center">15%</td>
+<td align="center">10%</td>
 </tr>
 </tbody>
 </table>
 <hr>
+</div>
 </div>
 <div class="section level2">
 <h2 id="basic-usage">Basic Usage<a class="anchor" aria-label="anchor" href="#basic-usage"></a>
@@ -252,11 +463,11 @@ perfect)</td>
 <span><span class="co">#&gt; Recommended Model: Treatment (CMS: 72.2)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Models ranked by selection score:</span></span>
-<span><span class="co">#&gt;        Model   CMS     N Events Predictors Converged    AIC    BIC Pseudo-R² Concordance Global p</span></span>
-<span><span class="co">#&gt;       &lt;char&gt; &lt;num&gt; &lt;int&gt;  &lt;num&gt;      &lt;int&gt;    &lt;char&gt;  &lt;num&gt;  &lt;num&gt;     &lt;num&gt;       &lt;num&gt;   &lt;char&gt;</span></span>
-<span><span class="co">#&gt; 1: Treatment  72.2   822     NA          6       Yes 4297.3 4358.6     0.550          NA  &lt; 0.001</span></span>
-<span><span class="co">#&gt; 2:   Disease  44.2   822     NA          4       Yes 4670.3 4717.5     0.287          NA  &lt; 0.001</span></span>
-<span><span class="co">#&gt; 3:    Simple  28.0   830     NA          2       Yes 4873.9 4892.8     0.122          NA  &lt; 0.001</span></span>
+<span><span class="co">#&gt;        Model   CMS     N Predictors Converged    AIC    BIC    R² Global p Events Concordance</span></span>
+<span><span class="co">#&gt;       &lt;char&gt; &lt;num&gt; &lt;int&gt;      &lt;int&gt;    &lt;char&gt;  &lt;num&gt;  &lt;num&gt; &lt;num&gt;   &lt;char&gt;  &lt;num&gt;       &lt;num&gt;</span></span>
+<span><span class="co">#&gt; 1: Treatment  72.2   822          6       Yes 4297.3 4358.6 0.550  &lt; 0.001     NA          NA</span></span>
+<span><span class="co">#&gt; 2:   Disease  44.2   822          4       Yes 4670.3 4717.5 0.287  &lt; 0.001     NA          NA</span></span>
+<span><span class="co">#&gt; 3:    Simple  28.0   830          2       Yes 4873.9 4892.8 0.122  &lt; 0.001     NA          NA</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; CMS interpretation: 85+ Excellent, 75-84 Very Good, 65-74 Good, 55-64 Fair, &lt; 55 Poor</span></span></code></pre></div>
 </div>
@@ -587,131 +798,8 @@ Composite Model Score (CMS):</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="the-composite-model-score-cms">The Composite Model Score (CMS)<a class="anchor" aria-label="anchor" href="#the-composite-model-score-cms"></a>
+<h2 id="custom-cms-weights">Custom CMS Weights<a class="anchor" aria-label="anchor" href="#custom-cms-weights"></a>
 </h2>
-<p>The Composite Model Score (CMS) is a metric designed to facilitate
-rapid model comparison. It combines multiple quality indicators into a
-single value ranging from 0 to 100.</p>
-<div class="section level3">
-<h3 id="score-interpretation">Score Interpretation<a class="anchor" aria-label="anchor" href="#score-interpretation"></a>
-</h3>
-<table class="table">
-<thead><tr class="header">
-<th align="left">Range</th>
-<th align="left">Interpretation</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">85–100</td>
-<td align="left">Excellent</td>
-</tr>
-<tr class="even">
-<td align="left">75–84</td>
-<td align="left">Very Good</td>
-</tr>
-<tr class="odd">
-<td align="left">65–74</td>
-<td align="left">Good</td>
-</tr>
-<tr class="even">
-<td align="left">55–64</td>
-<td align="left">Fair</td>
-</tr>
-<tr class="odd">
-<td align="left">&lt; 55</td>
-<td align="left">Poor</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section level3">
-<h3 id="default-weights-by-model-type">Default Weights by Model Type<a class="anchor" aria-label="anchor" href="#default-weights-by-model-type"></a>
-</h3>
-<p>The score components and their default weights vary by model
-type.</p>
-<p><strong>Linear regression:</strong></p>
-<table class="table">
-<thead><tr class="header">
-<th align="left">Component</th>
-<th align="left">Weight</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">Convergence</td>
-<td align="left">15%</td>
-</tr>
-<tr class="even">
-<td align="left">AIC</td>
-<td align="left">25%</td>
-</tr>
-<tr class="odd">
-<td align="left">Adjusted <em>R²</em>
-</td>
-<td align="left">45%</td>
-</tr>
-<tr class="even">
-<td align="left">RMSE</td>
-<td align="left">15%</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Logistic regression:</strong></p>
-<table class="table">
-<thead><tr class="header">
-<th align="left">Component</th>
-<th align="left">Weight</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">Convergence</td>
-<td align="left">15%</td>
-</tr>
-<tr class="even">
-<td align="left">AIC</td>
-<td align="left">25%</td>
-</tr>
-<tr class="odd">
-<td align="left">Concordance</td>
-<td align="left">40%</td>
-</tr>
-<tr class="even">
-<td align="left">Pseudo-<em>R²</em>
-</td>
-<td align="left">15%</td>
-</tr>
-<tr class="odd">
-<td align="left">Brier Score</td>
-<td align="left">5%</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Cox regression:</strong></p>
-<table class="table">
-<thead><tr class="header">
-<th align="left">Component</th>
-<th align="left">Weight</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">Convergence</td>
-<td align="left">15%</td>
-</tr>
-<tr class="even">
-<td align="left">AIC</td>
-<td align="left">30%</td>
-</tr>
-<tr class="odd">
-<td align="left">Concordance</td>
-<td align="left">40%</td>
-</tr>
-<tr class="even">
-<td align="left">Global <em>p</em>
-</td>
-<td align="left">15%</td>
-</tr>
-</tbody>
-</table>
-</div>
 <div class="section level3">
 <h3 id="example-10-custom-weights">
 <strong>Example 10:</strong> Custom Weights<a class="anchor" aria-label="anchor" href="#example-10-custom-weights"></a>
@@ -927,11 +1015,11 @@ type.</p>
 <span><span class="co">#&gt; Recommended Model: 8 Predictors (CMS: 75.1)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Models ranked by selection score:</span></span>
-<span><span class="co">#&gt;           Model   CMS     N Events Predictors Converged    AIC    BIC Pseudo-R² Concordance Global p</span></span>
-<span><span class="co">#&gt;          &lt;char&gt; &lt;num&gt; &lt;int&gt;  &lt;num&gt;      &lt;int&gt;    &lt;char&gt;  &lt;num&gt;  &lt;num&gt;     &lt;num&gt;       &lt;num&gt;   &lt;char&gt;</span></span>
-<span><span class="co">#&gt; 1: 8 Predictors  75.1   813     NA          8       Yes 4135.8 4211.0     0.613          NA  &lt; 0.001</span></span>
-<span><span class="co">#&gt; 2: 5 Predictors  64.1   822     NA          5       Yes 4310.6 4367.1     0.542          NA  &lt; 0.001</span></span>
-<span><span class="co">#&gt; 3: 3 Predictors  34.1   822     NA          3       Yes 4696.4 4729.4     0.258          NA  &lt; 0.001</span></span>
+<span><span class="co">#&gt;           Model   CMS     N Predictors Converged    AIC    BIC    R² Global p Events Concordance</span></span>
+<span><span class="co">#&gt;          &lt;char&gt; &lt;num&gt; &lt;int&gt;      &lt;int&gt;    &lt;char&gt;  &lt;num&gt;  &lt;num&gt; &lt;num&gt;   &lt;char&gt;  &lt;num&gt;       &lt;num&gt;</span></span>
+<span><span class="co">#&gt; 1: 8 Predictors  75.1   813          8       Yes 4135.8 4211.0 0.613  &lt; 0.001     NA          NA</span></span>
+<span><span class="co">#&gt; 2: 5 Predictors  64.1   822          5       Yes 4310.6 4367.1 0.542  &lt; 0.001     NA          NA</span></span>
+<span><span class="co">#&gt; 3: 3 Predictors  34.1   822          3       Yes 4696.4 4729.4 0.258  &lt; 0.001     NA          NA</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; CMS interpretation: 85+ Excellent, 75-84 Very Good, 65-74 Good, 55-64 Fair, &lt; 55 Poor</span></span></code></pre></div>
 <hr>
@@ -945,21 +1033,21 @@ type.</p>
 <code class="sourceCode R"><span><span class="co"># Main comparison table</span></span>
 <span><span class="fu"><a href="../reference/table2docx.html">table2docx</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">example1</span>,</span>
-<span>  file <span class="op">=</span> <span class="st">"Model_Comparison.docx"</span>,</span>
+<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Model_Comparison.docx"</span><span class="op">)</span>,</span>
 <span>  caption <span class="op">=</span> <span class="st">"Table 3. Model Comparison Results"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Coefficient table</span></span>
 <span><span class="fu"><a href="../reference/table2docx.html">table2docx</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">example6</span>, <span class="st">"coefficients"</span><span class="op">)</span>,</span>
-<span>  file <span class="op">=</span> <span class="st">"Coefficient_Comparison.docx"</span>,</span>
+<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Coefficient_Comparison.docx"</span><span class="op">)</span>,</span>
 <span>  caption <span class="op">=</span> <span class="st">"Table S1. Coefficient Estimates Across Models"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># PDF with landscape orientation for wide tables</span></span>
 <span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">example1</span>,</span>
-<span>  file <span class="op">=</span> <span class="st">"Model_Comparison.pdf"</span>,</span>
+<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Model_Comparison.pdf"</span><span class="op">)</span>,</span>
 <span>  caption <span class="op">=</span> <span class="st">"Model Comparison"</span>,</span>
 <span>  orientation <span class="op">=</span> <span class="st">"landscape"</span></span>
 <span><span class="op">)</span></span></code></pre></div>

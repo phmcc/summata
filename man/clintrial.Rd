@@ -74,6 +74,7 @@ desctable(clintrial,
                      "biomarker_x", "Surv(os_months, os_status)"),
         labels = clintrial_labels)
 
+\donttest{
 # Poisson regression for equidispersed counts
 fit(clintrial,
     outcome = "fu_count",
@@ -98,6 +99,7 @@ fullfit(clintrial,
         p_threshold = 0.20,
         model_type = "coxph",
         labels = clintrial_labels)
+}
         
 }
 \seealso{

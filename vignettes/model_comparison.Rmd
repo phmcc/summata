@@ -21,7 +21,7 @@ if (requireNamespace("ragg", quietly = TRUE)) {
   knitr::opts_chunk$set(dev = "ragg_png")
 }
 
-options(width = 180)
+old_opts <- options(width = 180)
 ```
 
 Model selection is a fundamental problem in applied statistics. Given a set of candidate models, it is important to determine which specification best balances goodness-of-fit against parsimony. Traditional approaches rely on information criteria (AIC, BIC), discrimination metrics (C-statistic), and hypothesis tests for nested models.
@@ -49,17 +49,54 @@ data(clintrial_labels)
 
 ---
 
-# Model Quality Metrics
+# Quality Metrics and the Composite Model Score
 
-The `compfit()` function uses several metrics for comparing models.
+The `compfit()` function evaluates models using several quality metrics, then combines them into a single Composite Model Score (CMS) ranging from 0 to 100 for rapid comparison. The metrics available depend on the model type.
 
-| Metric | Interpretation | Better |
-|:-------|:---------------|:-------|
-| AIC | Information criterion balancing fit and complexity | Lower |
-| BIC | Information criterion with stronger complexity penalty | Lower |
-| Concordance | Discrimination ability (0.5 = random, 1.0 = perfect) | Higher |
-| Pseudo-*R*² | Proportion of variation explained (GLMs) | Higher |
-| Brier Score | Prediction accuracy for binary outcomes | Lower |
+## Available Metrics
+
+| Metric | Used by | Interpretation | Better |
+|:-------|:--------|:---------------|:-------|
+| AIC | All | Information criterion balancing fit and complexity | Lower |
+| BIC | Fallback | Information criterion with stronger complexity penalty | Lower |
+| Concordance | GLM, Cox, GLMER, Cox ME | Discrimination ability (0.5 = random, 1.0 = perfect) | Higher |
+| Pseudo-*R*² | GLM, Cox ME | Proportion of variation explained (McFadden's) | Higher |
+| *R*² | LM | Proportion of variance explained | Higher |
+| Brier Score | GLM | Prediction accuracy for binary outcomes (0 = perfect) | Lower |
+| Global *p* | Cox | Omnibus likelihood ratio test *p*-value | Lower |
+| RMSE | LM | Root mean squared error of residuals | Lower |
+| Marginal *R*² | LMER, GLMER | Variance explained by fixed effects alone | Higher |
+| Conditional *R*² | LMER | Variance explained by fixed + random effects | Higher |
+| ICC | LMER, GLMER, Cox ME | Intraclass correlation; proportion of variance from clustering | Moderate |
+| Convergence | All | Whether the model converged successfully | Yes |
+
+## CMS Interpretation
+
+| Range | Interpretation |
+|:------|:---------------|
+| 85–100 | Excellent |
+| 75–84 | Very Good |
+| 65–74 | Good |
+| 55–64 | Fair |
+| < 55 | Poor |
+
+## Default CMS Weights by Model Type
+
+The score components and their default weights vary by model type.
+
+| Component | LM | GLM | Cox | LMER | GLMER | Cox ME |
+|:----------|:--:|:---:|:---:|:----:|:-----:|:------:|
+| Convergence | 15% | 15% | 15% | 20% | 15% | 15% |
+| AIC | 25% | 25% | 30% | 25% | 25% | 30% |
+| *R*² | 45% | | | | | |
+| Pseudo-*R*² | | 15% | | | | 10% |
+| Concordance | | 40% | 40% | | 30% | 35% |
+| Brier Score | | 5% | | | | |
+| Global *p* | | | 15% | | | |
+| RMSE | 15% | | | | | |
+| Marginal *R*² | | | | 25% | 15% | |
+| Conditional *R*² | | | | 15% | | |
+| ICC | | | | 15% | 15% | 10% |
 
 ---
 
@@ -261,51 +298,7 @@ cat("Recommended model:", recommended, "\n")
 
 ---
 
-# The Composite Model Score (CMS)
-
-The Composite Model Score (CMS) is a metric designed to facilitate rapid model comparison. It combines multiple quality indicators into a single value ranging from 0 to 100.
-
-## Score Interpretation
-
-| Range | Interpretation |
-|:------|:---------------|
-| 85–100 | Excellent |
-| 75–84 | Very Good |
-| 65–74 | Good |
-| 55–64 | Fair |
-| < 55 | Poor |
-
-## Default Weights by Model Type
-
-The score components and their default weights vary by model type.
-
-**Linear regression:**
-
-| Component | Weight |
-|:----------|:-------|
-| Convergence | 15% |
-| AIC | 25% |
-| Adjusted *R²* | 45% |
-| RMSE | 15% |
-
-**Logistic regression:**
-
-| Component | Weight |
-|:----------|:-------|
-| Convergence | 15% |
-| AIC | 25% |
-| Concordance | 40% |
-| Pseudo-*R²* | 15% |
-| Brier Score | 5% |
-
-**Cox regression:**
-
-| Component | Weight |
-|:----------|:-------|
-| Convergence | 15% |
-| AIC | 30% |
-| Concordance | 40% |
-| Global *p* | 15% |
+# Custom CMS Weights
 
 ## **Example 10:** Custom Weights
 
@@ -424,21 +417,21 @@ Comparison tables can be exported to various formats:
 # Main comparison table
 table2docx(
   table = example1,
-  file = "Model_Comparison.docx",
+  file = file.path(tempdir(), "Model_Comparison.docx"),
   caption = "Table 3. Model Comparison Results"
 )
 
 # Coefficient table
 table2docx(
   table = attr(example6, "coefficients"),
-  file = "Coefficient_Comparison.docx",
+  file = file.path(tempdir(), "Coefficient_Comparison.docx"),
   caption = "Table S1. Coefficient Estimates Across Models"
 )
 
 # PDF with landscape orientation for wide tables
 table2pdf(
   table = example1,
-  file = "Model_Comparison.pdf",
+  file = file.path(tempdir(), "Model_Comparison.pdf"),
   caption = "Model Comparison",
   orientation = "landscape"
 )
@@ -511,6 +504,10 @@ comparison[, .(Model, `Composite Model Score (CMS)`, AIC, Concordance)]
 
 # Prefer parsimony when scores are close
 # Consider interpretability
+```
+
+```{r, include = FALSE}
+options(old_opts)
 ```
 
 ---

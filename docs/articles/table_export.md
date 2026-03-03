@@ -95,7 +95,7 @@ beyond `data.table`, which `summata` already imports.
 ### **Example 1:** CSV Export
 
 ``` r
-data.table::fwrite(table1, "Table1.csv")
+data.table::fwrite(table1, file.path(tempdir(), "Table1.csv"))
 ```
 
 ### **Example 2:** TSV Export
@@ -103,7 +103,7 @@ data.table::fwrite(table1, "Table1.csv")
 Specify a tab delimiter for TSV output:
 
 ``` r
-data.table::fwrite(table1, "Table1.tsv", sep = "\t")
+data.table::fwrite(table1, file.path(tempdir(), "Table1.tsv"), sep = "\t")
 ```
 
 ### **Example 3:** Semicolon-Delimited (European Locale)
@@ -112,7 +112,7 @@ Use a semicolon delimiter for compatibility with locales where the comma
 is the decimal separator:
 
 ``` r
-data.table::fwrite(table1, "Table1.csv", sep = ";")
+data.table::fwrite(table1, file.path(tempdir(), "Table1.csv"), sep = ";")
 ```
 
 CSV and TSV files are useful for archiving raw table output, importing
@@ -137,7 +137,7 @@ The simplest usage requires only a table and filename:
 ``` r
 table2pdf(
   table = table1,
-  file = "Table1.pdf"
+  file = file.path(tempdir(), "Table1.pdf")
 )
 ```
 
@@ -148,7 +148,7 @@ Add a caption using the `caption` parameter:
 ``` r
 table2pdf(
   table = table1,
-  file = "Table1.pdf",
+  file = file.path(tempdir(), "Table1.pdf"),
   caption = "Table 1. Baseline Characteristics by Group"
 )
 ```
@@ -160,7 +160,7 @@ Multiple formatting options can be combined:
 ``` r
 table2pdf(
   table = table2,
-  file = "Table2.pdf",
+  file = file.path(tempdir(), "Table2.pdf"),
   caption = "Table 2. Regression Analysis",
   font_size = 8,
   bold_significant = TRUE,
@@ -178,7 +178,7 @@ Control page size and orientation:
 ``` r
 table2pdf(
   table = table2,
-  file = "Table2_Landscape.pdf",
+  file = file.path(tempdir(), "Table2_Landscape.pdf"),
   caption = "Table 2. Regression Results",
   paper = "letter",
   orientation = "landscape"
@@ -192,7 +192,7 @@ Adjust page margins (in inches):
 ``` r
 table2pdf(
   table = table2,
-  file = "Table2_Margins.pdf",
+  file = file.path(tempdir(), "Table2_Margins.pdf"),
   margins = c(0.5, 0.5, 0.5, 0.5)  # top, right, bottom, left
 )
 ```
@@ -204,7 +204,7 @@ Scale tables to fit the page width:
 ``` r
 table2pdf(
   table = table2,
-  file = "Table2_Fitted.pdf",
+  file = file.path(tempdir(), "Table2_Fitted.pdf"),
   fit_to_page = TRUE
 )
 ```
@@ -216,7 +216,7 @@ Standalone settings are useful for embedding tables in larger documents:
 ``` r
 table2pdf(
   table = table2,
-  file = "Table2_Auto.pdf",
+  file = file.path(tempdir(), "Table2_Auto.pdf"),
   paper = "auto"
 )
 ```
@@ -237,7 +237,7 @@ The simplest usage requires only a table and filename:
 ``` r
 table2docx(
   table = table1,
-  file = "Table1.docx"
+  file = file.path(tempdir(), "Table1.docx")
 )
 ```
 
@@ -248,7 +248,7 @@ Add a caption using the `caption` parameter:
 ``` r
 table2docx(
   table = table1,
-  file = "Table1.docx",
+  file = file.path(tempdir(), "Table1.docx"),
   caption = "Table 1. Baseline Characteristics by Group"
 )
 ```
@@ -260,7 +260,7 @@ Multiple formatting options can be combined:
 ``` r
 table2docx(
   table = table2,
-  file = "Table2.docx",
+  file = file.path(tempdir(), "Table2.docx"),
   caption = "Table 2. Regression Analysis",
   font_size = 9,
   font_family = "Times New Roman",
@@ -278,7 +278,7 @@ Control page size and orientation for wide tables:
 ``` r
 table2docx(
   table = table2,
-  file = "Table2_Landscape.docx",
+  file = file.path(tempdir(), "Table2_Landscape.docx"),
   caption = "Table 2. Regression Results",
   paper = "letter",
   orientation = "landscape"
@@ -292,7 +292,7 @@ Use a dark header background for visual emphasis:
 ``` r
 table2docx(
   table = table1,
-  file = "Table1_DarkHeader.docx",
+  file = file.path(tempdir(), "Table1_DarkHeader.docx"),
   caption = "Table 1. Baseline Characteristics",
   dark_header = TRUE,
   zebra_stripes = TRUE
@@ -315,7 +315,7 @@ The simplest usage requires only a table and filename:
 ``` r
 table2html(
   table = table1,
-  file = "Table1.html"
+  file = file.path(tempdir(), "Table1.html")
 )
 ```
 
@@ -326,7 +326,7 @@ Add a caption using the `caption` parameter:
 ``` r
 table2html(
   table = table1,
-  file = "Table1.html",
+  file = file.path(tempdir(), "Table1.html"),
   caption = "Table 1. Baseline Characteristics"
 )
 ```
@@ -338,7 +338,7 @@ Multiple formatting options can be combined:
 ``` r
 table2html(
   table = table2,
-  file = "Table2.html",
+  file = file.path(tempdir(), "Table2.html"),
   caption = "Table 2. Regression Analysis",
   bold_significant = TRUE,
   indent_groups = TRUE,
@@ -363,7 +363,7 @@ The simplest usage creates a single-slide presentation:
 ``` r
 table2pptx(
   table = table1,
-  file = "Table1.pptx"
+  file = file.path(tempdir(), "Table1.pptx")
 )
 ```
 
@@ -374,7 +374,7 @@ Add a slide title using the `slide_title` parameter:
 ``` r
 table2pptx(
   table = table1,
-  file = "Table1.pptx",
+  file = file.path(tempdir(), "Table1.pptx"),
   slide_title = "Baseline Characteristics"
 )
 ```
@@ -386,7 +386,7 @@ Multiple formatting options can be combined:
 ``` r
 table2pptx(
   table = table2,
-  file = "Table2.pptx",
+  file = file.path(tempdir(), "Table2.pptx"),
   slide_title = "Regression Analysis",
   font_size = 10,
   font_family = "Arial",
@@ -403,7 +403,7 @@ Use an existing PowerPoint template:
 ``` r
 table2pptx(
   table = table1,
-  file = "Table1_Custom.pptx",
+  file = file.path(tempdir(), "Table1_Custom.pptx"),
   template = "my_template.pptx",
   layout = "Title and Content",
   master = "Office Theme"
@@ -426,7 +426,7 @@ The simplest usage requires only a table and filename:
 ``` r
 table2tex(
   table = table1,
-  file = "Table1.tex"
+  file = file.path(tempdir(), "Table1.tex")
 )
 ```
 
@@ -437,7 +437,7 @@ Add caption and cross-reference label:
 ``` r
 table2tex(
   table = table1,
-  file = "Table1.tex",
+  file = file.path(tempdir(), "Table1.tex"),
   caption = "Baseline Characteristics by Group",
   label = "tab:demographics"
 )
@@ -450,7 +450,7 @@ Use the booktabs package for professional formatting:
 ``` r
 table2tex(
   table = table2,
-  file = "Table2.tex",
+  file = file.path(tempdir(), "Table2.tex"),
   caption = "Regression Analysis",
   label = "tab:regression",
   booktabs = TRUE,
@@ -475,7 +475,7 @@ The simplest usage requires only a table and filename:
 ``` r
 table2rtf(
   table = table1,
-  file = "Table1.rtf"
+  file = file.path(tempdir(), "Table1.rtf")
 )
 ```
 
@@ -486,7 +486,7 @@ Multiple formatting options can be combined:
 ``` r
 table2rtf(
   table = table2,
-  file = "Table2.rtf",
+  file = file.path(tempdir(), "Table2.rtf"),
   caption = "Table 2. Regression Analysis",
   font_size = 9,
   font_family = "Times New Roman",
@@ -503,7 +503,7 @@ Control page size and orientation:
 ``` r
 table2rtf(
   table = table2,
-  file = "Table2_Landscape.rtf",
+  file = file.path(tempdir(), "Table2_Landscape.rtf"),
   paper = "letter",
   orientation = "landscape"
 )
@@ -519,14 +519,14 @@ function detects the output format from the file extension, simplifying
 the export workflow:
 
 ``` r
-autotable(table1, "Table1.csv")   # CSV output
-autotable(table1, "Table1.tsv")   # TSV output
-autotable(table1, "Table1.pdf")   # PDF output
-autotable(table1, "Table1.docx")  # DOCX output
-autotable(table1, "Table1.html")  # HTML output
-autotable(table1, "Table1.pptx")  # PPTX output
-autotable(table1, "Table1.tex")   # TeX output
-autotable(table1, "Table1.rtf")   # RTF output
+autotable(table1, file.path(tempdir(), "Table1.csv"))   # CSV output
+autotable(table1, file.path(tempdir(), "Table1.tsv"))   # TSV output
+autotable(table1, file.path(tempdir(), "Table1.pdf"))   # PDF output
+autotable(table1, file.path(tempdir(), "Table1.docx"))  # DOCX output
+autotable(table1, file.path(tempdir(), "Table1.html"))  # HTML output
+autotable(table1, file.path(tempdir(), "Table1.pptx"))  # PPTX output
+autotable(table1, file.path(tempdir(), "Table1.tex"))   # TeX output
+autotable(table1, file.path(tempdir(), "Table1.rtf"))   # RTF output
 ```
 
 Format-specific parameters pass through to the underlying function:
@@ -534,7 +534,7 @@ Format-specific parameters pass through to the underlying function:
 ``` r
 autotable(
   table = table2,
-  file = "Table2.pdf",
+  file = file.path(tempdir(), "Table2.pdf"),
   caption = "Table 2. Regression Analysis",
   orientation = "landscape",
   font_size = 8,
@@ -577,12 +577,12 @@ height:
 
 ``` r
 # Full display
-table2docx(table1, "Table1_Full.docx")
+table2docx(table1, file.path(tempdir(), "Table1_Full.docx"))
 
 # Condense all variable types
 table2docx(
   table = table1,
-  file = "Table1_Condensed.docx",
+  file = file.path(tempdir(), "Table1_Condensed.docx"),
   condense_table = TRUE,
   zebra_stripes = TRUE
 )
@@ -590,7 +590,7 @@ table2docx(
 # Condense only continuous/survival (descriptive tables only)
 table2docx(
   table = table1,
-  file = "Table1_CondenseQuant.docx",
+  file = file.path(tempdir(), "Table1_CondenseQuant.docx"),
   condense_quantitative = TRUE,
   zebra_stripes = TRUE
 )
@@ -681,7 +681,7 @@ formats <- c("csv", "pdf", "docx", "html", "pptx", "rtf", "tex")
 for (fmt in formats) {
   autotable(
     table = table2,
-    file = paste0("Table2.", fmt),
+    file = file.path(tempdir(), paste0("Table2.", fmt)),
     caption = common_opts$caption,
     bold_significant = common_opts$bold_significant,
     indent_groups = common_opts$indent_groups,
@@ -706,7 +706,7 @@ Sys.which("pdflatex")
 # tinytex::install_tinytex()
 
 # Keep log files for debugging
-table2pdf(table, "debug.pdf", show_logs = TRUE)
+table2pdf(table, file.path(tempdir(), "debug.pdf"), show_logs = TRUE)
 ```
 
 See [Installation and
@@ -719,13 +719,13 @@ Several options address wide tables:
 
 ``` r
 # Use landscape orientation
-table2pdf(table, "wide.pdf", orientation = "landscape")
+table2pdf(table, file.path(tempdir(), "wide.pdf"), orientation = "landscape")
 
 # Enable fit-to-page scaling
-table2pdf(table, "wide.pdf", fit_to_page = TRUE)
+table2pdf(table, file.path(tempdir(), "wide.pdf"), fit_to_page = TRUE)
 
 # Reduce font size
-table2pdf(table, "wide.pdf", font_size = 7)
+table2pdf(table, file.path(tempdir(), "wide.pdf"), font_size = 7)
 ```
 
 ### Customizing flextable Output
@@ -733,14 +733,14 @@ table2pdf(table, "wide.pdf", font_size = 7)
 Get the flextable object for further customization:
 
 ``` r
-ft <- table2docx(table1, "Table1.docx", return_ft = TRUE)
+ft <- table2docx(table1, file.path(tempdir(), "Table1.docx"), return_ft = TRUE)
 
 library(flextable)
 ft <- ft %>%
   bold(i = 1, part = "header") %>%
   color(i = 1, color = "navy", part = "header")
 
-save_as_docx(ft, path = "Table1_Custom.docx")
+save_as_docx(ft, path = file.path(tempdir(), "Table1_Custom.docx"))
 ```
 
 ------------------------------------------------------------------------

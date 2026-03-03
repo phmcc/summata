@@ -23,7 +23,7 @@ manuscripts and presentations."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -382,19 +382,20 @@ BMI increases by 0.50 kg/m\(^2\) for each additional year of age.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="co"># Load example data</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">clintrial</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">clintrial</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">clintrial_labels</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Create example model</span></span></span>
+<span class="r-in"><span><span class="va">model1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">bmi</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">smoking</span>, data <span class="op">=</span> <span class="va">clintrial</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 1: Basic linear model forest plot</span></span></span>
-<span class="r-in"><span><span class="va">model1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">bmi</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">smoking</span>,</span></span>
-<span class="r-in"><span>             data <span class="op">=</span> <span class="va">clintrial</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu">lmforest</span><span class="op">(</span><span class="va">model1</span>, data <span class="op">=</span> <span class="va">clintrial</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Recommended plot dimensions: width = 13.0 in, height = 5.0 in</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">plot1</span> <span class="op">&lt;-</span> <span class="fu">lmforest</span><span class="op">(</span><span class="va">model1</span>, data <span class="op">=</span> <span class="va">clintrial</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">180</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">old_width</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">180</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 2: With custom labels and title</span></span></span>
 <span class="r-in"><span><span class="va">plot2</span> <span class="op">&lt;-</span> <span class="fu">lmforest</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    x <span class="op">=</span> <span class="va">model1</span>,</span></span>
@@ -403,9 +404,9 @@ BMI increases by 0.50 kg/m\(^2\) for each additional year of age.</p>
 <span class="r-in"><span>    effect_label <span class="op">=</span> <span class="st">"Change in BMI (kg/m^2)"</span>,</span></span>
 <span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot2</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Recommended plot dimensions: width = 13.7 in, height = 5.0 in</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 3: More comprehensive model</span></span></span>
+<span class="r-in"><span><span class="co"># Example 3: Comprehensive model with indented layout</span></span></span>
 <span class="r-in"><span><span class="va">model3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="va">bmi</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">smoking</span> <span class="op">+</span> <span class="va">hypertension</span> <span class="op">+</span> <span class="va">diabetes</span> <span class="op">+</span> <span class="va">creatinine</span>,</span></span>
 <span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span></span></span>
@@ -415,166 +416,43 @@ BMI increases by 0.50 kg/m\(^2\) for each additional year of age.</p>
 <span class="r-in"><span>    x <span class="op">=</span> <span class="va">model3</span>,</span></span>
 <span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span></span>
-<span class="r-in"><span>    indent_groups <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span>    indent_groups <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>    zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot3</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Recommended plot dimensions: width = 12.7 in, height = 6.8 in</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 4: Check model diagnostics</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">model3</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">model3</span><span class="op">)</span>  <span class="co"># Diagnostic plots</span></span></span>
+<span class="r-in"><span><span class="co"># Example 4: Condensed layout</span></span></span>
+<span class="r-in"><span><span class="va">plot4</span> <span class="op">&lt;-</span> <span class="fu">lmforest</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model3</span>,</span></span>
+<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
+<span class="r-in"><span>    condense_table <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Recommended plot dimensions: width = 12.7 in, height = 5.2 in</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 5: Condensed layout</span></span></span>
+<span class="r-in"><span><span class="co"># Example 5: Different outcome (hemoglobin)</span></span></span>
 <span class="r-in"><span><span class="va">model5</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    <span class="va">bmi</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">smoking</span> <span class="op">+</span> <span class="va">hypertension</span> <span class="op">+</span> <span class="va">diabetes</span>,</span></span>
+<span class="r-in"><span>    <span class="va">hemoglobin</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">bmi</span> <span class="op">+</span> <span class="va">smoking</span> <span class="op">+</span> <span class="va">creatinine</span>,</span></span>
 <span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">plot5</span> <span class="op">&lt;-</span> <span class="fu">lmforest</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    x <span class="op">=</span> <span class="va">model5</span>,</span></span>
 <span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    condense_table <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot5</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 6: Custom color</span></span></span>
-<span class="r-in"><span><span class="va">plot6</span> <span class="op">&lt;-</span> <span class="fu">lmforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model1</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    color <span class="op">=</span> <span class="st">"#2ECC71"</span>,  <span class="co"># Bright green</span></span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot6</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 7: Hide sample sizes</span></span></span>
-<span class="r-in"><span><span class="va">plot7</span> <span class="op">&lt;-</span> <span class="fu">lmforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model1</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    show_n <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot7</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 8: Adjust table width</span></span></span>
-<span class="r-in"><span><span class="va">plot8</span> <span class="op">&lt;-</span> <span class="fu">lmforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model3</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    table_width <span class="op">=</span> <span class="fl">0.55</span>,</span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot8</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 9: Get recommended dimensions</span></span></span>
-<span class="r-in"><span><span class="va">plot9</span> <span class="op">&lt;-</span> <span class="fu">lmforest</span><span class="op">(</span><span class="va">model1</span>, data <span class="op">=</span> <span class="va">clintrial</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">dims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">plot9</span>, <span class="st">"rec_dims"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Recommended:"</span>, <span class="va">dims</span><span class="op">$</span><span class="va">width</span>, <span class="st">"x"</span>, <span class="va">dims</span><span class="op">$</span><span class="va">height</span>, <span class="va">dims</span><span class="op">$</span><span class="va">units</span>, <span class="st">"\n"</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 10: Specify exact dimensions</span></span></span>
-<span class="r-in"><span><span class="va">plot10</span> <span class="op">&lt;-</span> <span class="fu">lmforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model1</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    plot_width <span class="op">=</span> <span class="fl">12</span>,</span></span>
-<span class="r-in"><span>    plot_height <span class="op">=</span> <span class="fl">7</span>,</span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 11: Different units</span></span></span>
-<span class="r-in"><span><span class="va">plot11</span> <span class="op">&lt;-</span> <span class="fu">lmforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model1</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    plot_width <span class="op">=</span> <span class="fl">30</span>,</span></span>
-<span class="r-in"><span>    plot_height <span class="op">=</span> <span class="fl">20</span>,</span></span>
-<span class="r-in"><span>    units <span class="op">=</span> <span class="st">"cm"</span>,</span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 12: No zebra stripes</span></span></span>
-<span class="r-in"><span><span class="va">plot12</span> <span class="op">&lt;-</span> <span class="fu">lmforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model1</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    zebra_stripes <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot12</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 13: Custom reference label</span></span></span>
-<span class="r-in"><span><span class="va">plot13</span> <span class="op">&lt;-</span> <span class="fu">lmforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model1</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    ref_label <span class="op">=</span> <span class="st">"0.00 (ref)"</span>,</span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot13</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 14: Larger fonts for presentation</span></span></span>
-<span class="r-in"><span><span class="va">plot14</span> <span class="op">&lt;-</span> <span class="fu">lmforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model1</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    font_size <span class="op">=</span> <span class="fl">1.3</span>,</span></span>
-<span class="r-in"><span>    title_size <span class="op">=</span> <span class="fl">26</span>,</span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot14</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 15: More decimal places</span></span></span>
-<span class="r-in"><span><span class="va">plot15</span> <span class="op">&lt;-</span> <span class="fu">lmforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model1</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    digits <span class="op">=</span> <span class="fl">3</span>,</span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot15</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 16: Hemoglobin as outcome</span></span></span>
-<span class="r-in"><span><span class="va">model16</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    <span class="va">hemoglobin</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">bmi</span> <span class="op">+</span> <span class="va">smoking</span> <span class="op">+</span> <span class="va">creatinine</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">plot16</span> <span class="op">&lt;-</span> <span class="fu">lmforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model16</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>    title <span class="op">=</span> <span class="st">"Predictors of Baseline Hemoglobin"</span>,</span></span>
 <span class="r-in"><span>    effect_label <span class="op">=</span> <span class="st">"Change in Hemoglobin (g/dL)"</span>,</span></span>
 <span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot16</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Recommended plot dimensions: width = 16.0 in, height = 5.0 in</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Check assumptions</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">model16</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Example 6: Save with recommended dimensions</span></span></span>
+<span class="r-in"><span><span class="va">dims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">plot5</span>, <span class="st">"rec_dims"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"linear_forest.pdf"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                <span class="va">plot5</span>, width <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">width</span>, height <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">height</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 17: Publication-ready final plot</span></span></span>
-<span class="r-in"><span><span class="va">final_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    <span class="va">bmi</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">race</span> <span class="op">+</span> <span class="va">smoking</span> <span class="op">+</span> <span class="va">hypertension</span> <span class="op">+</span> </span></span>
-<span class="r-in"><span>        <span class="va">diabetes</span> <span class="op">+</span> <span class="va">creatinine</span> <span class="op">+</span> <span class="va">hemoglobin</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="va">old_width</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Check model fit</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">final_model</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">final_plot</span> <span class="op">&lt;-</span> <span class="fu">lmforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">final_model</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    title <span class="op">=</span> <span class="st">"Multivariable Linear Regression: Predictors of Body Mass Index"</span>,</span></span>
-<span class="r-in"><span>    effect_label <span class="op">=</span> <span class="st">"Change in BMI (kg/m^2)"</span>,</span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span></span>
-<span class="r-in"><span>    indent_groups <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>    zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>    show_n <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>    color <span class="op">=</span> <span class="st">"#5A8F5A"</span>,</span></span>
-<span class="r-in"><span>    digits <span class="op">=</span> <span class="fl">2</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Save for publication</span></span></span>
-<span class="r-in"><span><span class="va">dims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">final_plot</span>, <span class="st">"rec_dims"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># ggsave("figure3_linear.pdf", final_plot,</span></span></span>
-<span class="r-in"><span><span class="co">#        width = dims$width, height = dims$height)</span></span></span>
-<span class="r-in"><span><span class="co"># ggsave("figure3_linear.png", final_plot,</span></span></span>
-<span class="r-in"><span><span class="co">#        width = dims$width, height = dims$height, dpi = 300)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

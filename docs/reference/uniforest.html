@@ -19,7 +19,7 @@ a single outcome."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -329,12 +329,10 @@ single-model forest plots</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="co"># Load example data</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">clintrial</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">clintrial</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">clintrial_labels</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 1: Basic logistic regression screening</span></span></span>
+<span class="r-in"><span><span class="co"># Create example uniscreen result</span></span></span>
 <span class="r-in"><span><span class="va">uni_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="uniscreen.html">uniscreen</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>    outcome <span class="op">=</span> <span class="st">"os_status"</span>,</span></span>
@@ -343,9 +341,14 @@ single-model forest plots</p>
 <span class="r-in"><span>    parallel <span class="op">=</span> <span class="cn">FALSE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">uniforest</span><span class="op">(</span><span class="va">uni_results</span>, title <span class="op">=</span> <span class="st">"Univariable Associations with Mortality"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Example 1: Basic univariable forest plot</span></span></span>
+<span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu">uniforest</span><span class="op">(</span><span class="va">uni_results</span>, title <span class="op">=</span> <span class="st">"Univariable Associations with Mortality"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Recommended plot dimensions: width = 11.4 in, height = 6.2 in</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">180</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">old_width</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">180</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 2: Survival analysis</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/therneau/survival" class="external-link">survival</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">surv_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="uniscreen.html">uniscreen</a></span><span class="op">(</span></span></span>
@@ -357,7 +360,8 @@ single-model forest plots</p>
 <span class="r-in"><span>    parallel <span class="op">=</span> <span class="cn">FALSE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">uniforest</span><span class="op">(</span><span class="va">surv_results</span>, title <span class="op">=</span> <span class="st">"Univariable Survival Analysis"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu">uniforest</span><span class="op">(</span><span class="va">surv_results</span>, title <span class="op">=</span> <span class="st">"Univariable Survival Analysis"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Recommended plot dimensions: width = 11.2 in, height = 5.5 in</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 3: Linear regression</span></span></span>
 <span class="r-in"><span><span class="va">lm_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="uniscreen.html">uniscreen</a></span><span class="op">(</span></span></span>
@@ -369,10 +373,11 @@ single-model forest plots</p>
 <span class="r-in"><span>    parallel <span class="op">=</span> <span class="cn">FALSE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">uniforest</span><span class="op">(</span><span class="va">lm_results</span>, title <span class="op">=</span> <span class="st">"Predictors of Length of Stay"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">p3</span> <span class="op">&lt;-</span> <span class="fu">uniforest</span><span class="op">(</span><span class="va">lm_results</span>, title <span class="op">=</span> <span class="st">"Predictors of Length of Stay"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Recommended plot dimensions: width = 10.0 in, height = 5.0 in</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 4: Customize appearance</span></span></span>
-<span class="r-in"><span><span class="fu">uniforest</span><span class="op">(</span></span></span>
+<span class="r-in"><span><span class="va">p4</span> <span class="op">&lt;-</span> <span class="fu">uniforest</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="va">uni_results</span>,</span></span>
 <span class="r-in"><span>    title <span class="op">=</span> <span class="st">"Crude Associations with Mortality"</span>,</span></span>
 <span class="r-in"><span>    color <span class="op">=</span> <span class="st">"#E74C3C"</span>,</span></span>
@@ -380,17 +385,16 @@ single-model forest plots</p>
 <span class="r-in"><span>    zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>    bold_variables <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Recommended plot dimensions: width = 10.2 in, height = 7.2 in</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 5: Hide footer</span></span></span>
-<span class="r-in"><span><span class="fu">uniforest</span><span class="op">(</span><span class="va">uni_results</span>, </span></span>
-<span class="r-in"><span>          title <span class="op">=</span> <span class="st">"Predictors of Overall Survival Status"</span>,</span></span>
-<span class="r-in"><span>          show_footer <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Example 5: Save with recommended dimensions</span></span></span>
+<span class="r-in"><span><span class="va">dims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">p4</span>, <span class="st">"rec_dims"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"univariable_forest.pdf"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                <span class="va">p4</span>, width <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">width</span>, height <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">height</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 6: Save with recommended dimensions</span></span></span>
-<span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu">uniforest</span><span class="op">(</span><span class="va">uni_results</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">dims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">p</span>, <span class="st">"rec_dims"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># ggsave("univariable_forest.pdf", p, width = dims$width, height = dims$height)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="va">old_width</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

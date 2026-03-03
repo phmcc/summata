@@ -250,6 +250,7 @@
 #' )
 #'
 #' \donttest{
+#' 
 #' # Example 2: Median survival only
 #' survtable(
 #'     data = clintrial,
@@ -352,7 +353,7 @@
 #'
 #' # Example 13: Access survfit objects for plotting
 #' fits <- attr(result, "survfit_objects")
-#' # plot(fits$overall)  # Plot overall survival curve
+#' plot(fits$overall)  # Plot overall survival curve
 #'
 #' # Example 14: Multiple survival outcomes stacked
 #' survtable(
@@ -379,7 +380,7 @@
 #' )
 #'
 #' }
-#'
+#' 
 #' @family descriptive functions
 #' @export
 survtable <- function(data,
@@ -809,6 +810,11 @@ process_single_outcome <- function(data,
 
 
 #' Print method for survtable
+#'
+#' @param x Object of class \code{survtable}.
+#' @param ... Additional arguments passed to print methods.
+#' @return Invisibly returns the input object \code{x}. Called for its
+#'   side effect of printing a formatted summary to the console.
 #' @family descriptive functions
 #' @export
 #' @keywords internal

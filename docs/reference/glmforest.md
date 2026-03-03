@@ -412,11 +412,11 @@ with recommended dimensions:
 
       p <- glmforest(model, data)
       dims <- attr(p, "rec_dims")
-      ggsave("forest.pdf", p, width = dims$width, height = dims$height)
+      ggplot2::ggsave("forest.pdf", p, width = dims$width, height = dims$height)
 
 Or specify custom dimensions:
 
-    ggsave("forest.png", p, width = 12, height = 8, dpi = 300)
+    ggplot2::ggsave("forest.png", p, width = 12, height = 8, dpi = 300)
 
 ## See also
 
@@ -444,20 +444,22 @@ Other visualization functions:
 ## Examples
 
 ``` r
-if (FALSE) {
-# Load example data
 data(clintrial)
 data(clintrial_labels)
 
-# Example 1: Basic logistic regression forest plot
+# Create example model
 model1 <- glm(os_status ~ age + sex + bmi + treatment,
-              data = clintrial,
-              family = binomial)
+              data = clintrial, family = binomial)
 
-plot1 <- glmforest(model1, data = clintrial)
-print(plot1)
+# Example 1: Basic logistic regression forest plot
+p <- glmforest(model1, data = clintrial)
+#> Waiting for profiling to be done...
+#> Recommended plot dimensions: width = 13.5 in, height = 5.0 in
 
-  options(width = 180)
+# \donttest{
+
+old_width <- options(width = 180)
+
 # Example 2: With custom variable labels
 plot2 <- glmforest(
     x = model1,
@@ -465,176 +467,57 @@ plot2 <- glmforest(
     title = "Risk Factors for Mortality",
     labels = clintrial_labels
 )
-print(plot2)
+#> Waiting for profiling to be done...
+#> Recommended plot dimensions: width = 15.3 in, height = 5.0 in
 
-# Example 3: Customize appearance
+# Example 3: Indented layout with formatting options
 plot3 <- glmforest(
     x = model1,
     data = clintrial,
-    title = "Adjusted Odds Ratios",
-    color = "#D62728",  # Red points
-    font_size = 1.2,    # Larger text
-    zebra_stripes = FALSE,
-    labels = clintrial_labels
-)
-print(plot3)
-
-# Example 4: Indented layout for hierarchical view
-plot4 <- glmforest(
-    x = model1,
-    data = clintrial,
     indent_groups = TRUE,
+    zebra_stripes = TRUE,
+    color = "#D62728",
     labels = clintrial_labels
 )
-print(plot4)
-# Group column hidden, levels indented under variables
+#> Waiting for profiling to be done...
+#> Recommended plot dimensions: width = 13.4 in, height = 5.2 in
 
-# Example 5: Condensed layout for many binary variables
-model5 <- glm(os_status ~ age + sex + smoking + hypertension + 
+# Example 4: Condensed layout for many binary variables
+model4 <- glm(os_status ~ age + sex + smoking + hypertension + 
                   diabetes + surgery,
               data = clintrial,
               family = binomial)
 
-plot5 <- glmforest(
-    x = model5,
+plot4 <- glmforest(
+    x = model4,
     data = clintrial,
     condense_table = TRUE,
     labels = clintrial_labels
 )
-print(plot5)
+#> Waiting for profiling to be done...
+#> Recommended plot dimensions: width = 12.7 in, height = 5.2 in
 # Binary variables shown in single rows
 
-# Example 6: Hide sample size and events columns
-plot6 <- glmforest(
-    x = model1,
-    data = clintrial,
-    show_n = FALSE,
-    show_events = FALSE,
-    labels = clintrial_labels
-)
-print(plot6)
-
-# Example 7: Adjust table/forest proportions
-plot7 <- glmforest(
-    x = model1,
-    data = clintrial,
-    table_width = 0.7,  # More space for table
-    labels = clintrial_labels
-)
-print(plot7)
-
-# Example 8: Get and use recommended dimensions
-plot8 <- glmforest(model1, data = clintrial)
-
-dims <- attr(plot8, "rec_dims")
-cat("Recommended: ", dims$width, "x", dims$height, "inches\n")
-
-# Save with recommended dimensions
-# ggsave("forest.pdf", plot8, width = dims$width, height = dims$height)
-
-# Example 9: Specify exact output dimensions
-plot9 <- glmforest(
-    x = model1,
-    data = clintrial,
-    plot_width = 14,
-    plot_height = 10,
-    labels = clintrial_labels
-)
-# No dimension recommendations printed
-
-# Example 10: Use different units (centimeters)
-plot10 <- glmforest(
-    x = model1,
-    data = clintrial,
-    plot_width = 30,  # 30 cm
-    plot_height = 20,  # 20 cm
-    units = "cm",
-    labels = clintrial_labels
-)
-
-# Example 11: Poisson regression for count data
-model11 <- glm(ae_count ~ age + treatment + diabetes + surgery,
+# Example 5: Poisson regression for count data
+model5 <- glm(ae_count ~ age + treatment + diabetes + surgery,
                data = clintrial,
                family = poisson)
 
-plot11 <- glmforest(
-    x = model11,
+plot5 <- glmforest(
+    x = model5,
     data = clintrial,
     title = "Rate Ratios for Adverse Events",
     labels = clintrial_labels
 )
-print(plot11)
-# Shows rate ratios with blue color for count models
+#> Waiting for profiling to be done...
+#> Recommended plot dimensions: width = 14.9 in, height = 5.0 in
 
-# Example 12: Gamma regression for positive continuous outcomes
-model12 <- glm(los_days ~ age + treatment + surgery + stage,
-               data = clintrial,
-               family = Gamma(link = "log"))
+# Example 6: Save with recommended dimensions
+dims <- attr(plot5, "rec_dims")
+ggplot2::ggsave(file.path(tempdir(), "forest.pdf"),
+                plot5, width = dims$width, height = dims$height)
 
-plot12 <- glmforest(
-    x = model12,
-    data = clintrial,
-    title = "Multiplicative Effects on Length of Stay",
-    labels = clintrial_labels
-)
-print(plot12)
-# Shows ratios with blue color (same as other ratio models)
+options(old_width)
 
-# Example 13: Force display of raw coefficients
-plot13 <- glmforest(
-    x = model1,
-    data = clintrial,
-    exponentiate = FALSE,  # Show log odds
-    effect_label = "Log Odds",
-    labels = clintrial_labels
-)
-print(plot13)
-# Reference line at 0 instead of 1
-
-# Example 14: Custom reference label
-plot14 <- glmforest(
-    x = model1,
-    data = clintrial,
-    ref_label = "1.00 (ref)",
-    labels = clintrial_labels
-)
-print(plot14)
-
-# Example 15: Adjust font sizes for presentations
-plot15 <- glmforest(
-    x = model1,
-    data = clintrial,
-    font_size = 1.5,      # 50% larger
-    title_size = 30,      # Larger title
-    labels = clintrial_labels
-)
-print(plot15)
-
-# Example 16: Complete publication-ready plot
-final_model <- glm(
-    os_status ~ age + sex + bmi + smoking + hypertension + 
-        diabetes + treatment + stage,
-    data = clintrial,
-    family = binomial
-)
-
-final_plot <- glmforest(
-    x = final_model,
-    data = clintrial,
-    title = "Multivariable Logistic Regression: Risk Factors for Mortality",
-    labels = clintrial_labels,
-    indent_groups = TRUE,
-    zebra_stripes = TRUE,
-    color = "#4BA6B6",
-    font_size = 1.0,
-    digits = 2
-)
-
-# Save for publication
-dims <- attr(final_plot, "rec_dims")
-# ggsave("figure1.pdf", final_plot, 
-#        width = dims$width, height = dims$height)
-# ggsave("figure1.png", final_plot,
-#        width = dims$width, height = dims$height, dpi = 300)
-}
+# }
 ```

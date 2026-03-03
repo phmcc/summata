@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -168,18 +168,25 @@ included with <code>summata</code>:</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">clintrial</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">clintrial_labels</span><span class="op">)</span></span></code></pre></div>
-<p>Moreover, note that all plots in this vignette are generated using
-the <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave()</a></code> function with recommended
-dimensions—<em>i.e.</em>,</p>
+<blockquote>
+<p><em>n.b.:</em> To ensure correct font rendering and figure sizing,
+the forest plots below are displayed using a helper function
+(<code>queue_plot()</code>) that applies each plot’s recommended
+dimensions (stored in the <code>"rec_dims"</code> attribute) via the <a href="https://ragg.r-lib.org/" class="external-link"><code>ragg</code></a> graphics device. In
+practice, replace <code>queue_plot()</code> with
+<code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggplot2::ggsave()</a></code> using recommended plot dimensions for
+equivalent results:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"output.png"</span>, <span class="va">plot</span>, </span>
-<span>       width <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">plot</span>, <span class="st">"rec_dims"</span><span class="op">)</span><span class="op">$</span><span class="va">width</span>, </span>
-<span>       height <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">plot</span>, <span class="st">"rec_dims"</span><span class="op">)</span><span class="op">$</span><span class="va">height</span>, </span>
-<span>       units <span class="op">=</span> <span class="st">"in"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glmforest.html">glmforest</a></span><span class="op">(</span><span class="va">model</span>, data <span class="op">=</span> <span class="va">mydata</span><span class="op">)</span></span>
+<span><span class="va">dims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">p</span>, <span class="st">"rec_dims"</span><span class="op">)</span></span>
+<span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"forest_plot.png"</span>, <span class="va">p</span>,</span>
+<span>                width <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">width</span>, </span>
+<span>                height <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">height</span><span class="op">)</span></span></code></pre></div>
 <p>This ensures that the figure size is always large enough to
 accommodate the constituent plot text and graphics, and it is generally
 the preferred method for saving forest plot outputs in
 <code>summata</code>.</p>
+</blockquote>
 <hr>
 </div>
 <div class="section level2">
@@ -204,8 +211,9 @@ the preferred method for saving forest plot outputs in
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"Logistic Regression: Predictors of Outcome"</span>,</span>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/forest_ex1.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example1</span><span class="op">)</span></span></code></pre></div>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-2-linear-regression">
@@ -223,8 +231,9 @@ the preferred method for saving forest plot outputs in
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"Linear Regression: Length of Stay"</span>,</span>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/forest_ex2.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example2</span><span class="op">)</span></span></code></pre></div>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-3-cox-regression">
@@ -242,8 +251,9 @@ the preferred method for saving forest plot outputs in
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"Cox Regression: Survival Analysis"</span>,</span>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/forest_ex3.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example3</span><span class="op">)</span></span></code></pre></div>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-4-automatic-model-detection">
@@ -256,8 +266,9 @@ automatically:</p>
 <span>  x <span class="op">=</span> <span class="va">cox_model</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/forest_ex4.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example4</span><span class="op">)</span></span></code></pre></div>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="100%"></p>
 <hr>
 </div>
 </div>
@@ -286,8 +297,9 @@ object.</p>
 <span>  title <span class="op">=</span> <span class="st">"Predictors of Surgical Intervention"</span>,</span>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span>
 <span>  zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/forest_ex5.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example5</span><span class="op">)</span></span></code></pre></div>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-6-model-attribute-from-fit-output">
@@ -308,8 +320,9 @@ object.</p>
 <span>  title <span class="op">=</span> <span class="st">"Predictors of Overall Survival"</span>,</span>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span>
 <span>  zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/forest_ex6.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example6</span><span class="op">)</span></span></code></pre></div>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-14-1.png" class="r-plt" alt="" width="100%"></p>
 <hr>
 </div>
 </div>
@@ -328,8 +341,9 @@ for a more compact aesthetic:</p>
 <span>  title <span class="op">=</span> <span class="st">"Indented Factor Levels"</span>,</span>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span>
 <span>  indent_groups <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/forest_ex7.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example7</span><span class="op">)</span></span></code></pre></div>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-16-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-8-condensing-binary-variables">
@@ -343,8 +357,9 @@ on single rows. Group indenting is applied automatically:</p>
 <span>  title <span class="op">=</span> <span class="st">"Condensed Display"</span>,</span>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span>
 <span>  condense_table <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/forest_ex8.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example8</span><span class="op">)</span></span></code></pre></div>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-18-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-9-toggle-zebra-striping">
@@ -359,8 +374,9 @@ on single rows. Group indenting is applied automatically:</p>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span>
 <span>  indent_groups <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  zebra_stripes <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/forest_ex9.png" class="r-plt" alt="" width="90%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example9</span><span class="op">)</span></span></code></pre></div>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-20-1.png" class="r-plt" alt="" width="90%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-10-sample-size-and-event-columns">
@@ -377,8 +393,9 @@ on single rows. Group indenting is applied automatically:</p>
 <span>  show_events <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  indent_groups <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/forest_ex10a.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example10a</span><span class="op">)</span></span></code></pre></div>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-22-1.png" class="r-plt" alt="" width="100%"></p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Minimal display</span></span>
 <span><span class="va">example10b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/coxforest.html">coxforest</a></span><span class="op">(</span></span>
@@ -388,8 +405,9 @@ on single rows. Group indenting is applied automatically:</p>
 <span>  show_n <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  show_events <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  indent_groups <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/forest_ex10b.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example10b</span><span class="op">)</span></span></code></pre></div>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-24-1.png" class="r-plt" alt="" width="100%"></p>
 <hr>
 </div>
 </div>
@@ -409,8 +427,9 @@ estimates and confidence intervals:</p>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span>
 <span>  digits <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  indent_groups <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/forest_ex11.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example11</span><span class="op">)</span></span></code></pre></div>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-26-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-12-custom-reference-label">
@@ -424,8 +443,9 @@ estimates and confidence intervals:</p>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span>
 <span>  ref_label <span class="op">=</span> <span class="st">"ref"</span>,</span>
 <span>  indent_groups <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/forest_ex12.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example12</span><span class="op">)</span></span></code></pre></div>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-28-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-13-custom-effect-measure-label">
@@ -439,8 +459,9 @@ estimates and confidence intervals:</p>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span>
 <span>  effect_label <span class="op">=</span> <span class="st">"Effect (95% CI)"</span>,</span>
 <span>  indent_groups <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/forest_ex13.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example13</span><span class="op">)</span></span></code></pre></div>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-30-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-14-custom-colors">
@@ -455,8 +476,9 @@ color:</p>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span>
 <span>  color <span class="op">=</span> <span class="st">"#E41A1C"</span>,</span>
 <span>  indent_groups <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/forest_ex14.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example14</span><span class="op">)</span></span></code></pre></div>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-32-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-15-change-font-sizes">
@@ -470,8 +492,9 @@ color:</p>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span>
 <span>  font_size <span class="op">=</span> <span class="fl">1.5</span>,</span>
 <span>  indent_groups <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/forest_ex15.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example15</span><span class="op">)</span></span></code></pre></div>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-34-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-16-table-width">
@@ -486,8 +509,9 @@ space allocated to the table vs. the forest plot:</p>
 <span>  title <span class="op">=</span> <span class="st">"Wide Table (75%)"</span>,</span>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span>
 <span>  table_width <span class="op">=</span> <span class="fl">0.75</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/forest_ex16a.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example16a</span><span class="op">)</span></span></code></pre></div>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-36-1.png" class="r-plt" alt="" width="100%"></p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Narrow table (emphasizes forest plot)</span></span>
 <span><span class="va">example16b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glmforest.html">glmforest</a></span><span class="op">(</span></span>
@@ -495,8 +519,9 @@ space allocated to the table vs. the forest plot:</p>
 <span>  title <span class="op">=</span> <span class="st">"Narrow Table (50%)"</span>,</span>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span>
 <span>  table_width <span class="op">=</span> <span class="fl">0.50</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/forest_ex16b.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example16b</span><span class="op">)</span></span></code></pre></div>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-38-1.png" class="r-plt" alt="" width="100%"></p>
 <hr>
 </div>
 </div>
@@ -526,7 +551,7 @@ sizing when saving to files.</p>
 <span></span>
 <span><span class="co"># Save with recommended dimensions</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span></span>
-<span>  filename <span class="op">=</span> <span class="st">"forest_plot.pdf"</span>,</span>
+<span>  filename <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"forest_plot.pdf"</span><span class="op">)</span>,</span>
 <span>  plot <span class="op">=</span> <span class="va">p</span>,</span>
 <span>  width <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">width</span>,</span>
 <span>  height <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">height</span>,</span>
@@ -548,16 +573,16 @@ sizing when saving to files.</p>
 <span><span class="va">dims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">p</span>, <span class="st">"rec_dims"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># PDF (vector, best for publications)</span></span>
-<span><span class="co"># ggsave("forest.pdf", p, width = dims$width, height = dims$height)</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"forest.pdf"</span>, <span class="va">p</span>, width <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">width</span>, height <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">height</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># PNG (raster, good for presentations)</span></span>
-<span><span class="co"># ggsave("forest.png", p, width = dims$width, height = dims$height, dpi = 300)</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"forest.png"</span>, <span class="va">p</span>, width <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">width</span>, height <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">height</span>, dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># TIFF (high-quality raster, often required by journals)</span></span>
-<span><span class="co"># ggsave("forest.tiff", p, width = dims$width, height = dims$height, dpi = 300)</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"forest.tiff"</span>, <span class="va">p</span>, width <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">width</span>, height <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">height</span>, dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># SVG (vector, good for web)</span></span>
-<span><span class="co"># ggsave("forest.svg", p, width = dims$width, height = dims$height)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"forest.svg"</span>, <span class="va">p</span>, width <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">width</span>, height <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">height</span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
 </div>
@@ -587,8 +612,9 @@ requirements.</p>
 <span>  font_size <span class="op">=</span> <span class="fl">1.0</span>,</span>
 <span>  table_width <span class="op">=</span> <span class="fl">0.62</span>,</span>
 <span>  color <span class="op">=</span> <span class="st">"#8A61D8"</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/forest_ex19.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example19</span><span class="op">)</span></span></code></pre></div>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-42-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-20-extensions-with-ggplot2">
@@ -608,8 +634,9 @@ further:</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span></span>
 <span>    plot.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>face <span class="op">=</span> <span class="st">"italic"</span>, color <span class="op">=</span> <span class="st">"#A72727"</span><span class="op">)</span>,</span>
 <span>    plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_rect</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"white"</span>, color <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
-<p><img src="figures/forest_ex20.png" class="r-plt" alt="" width="100%"></p>
+<span>  <span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example20_modified</span><span class="op">)</span></span></code></pre></div>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-44-1.png" class="r-plt" alt="" width="100%"></p>
 <hr>
 </div>
 </div>
@@ -638,8 +665,9 @@ regression:</p>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"Poisson Regression: Follow-Up Visits"</span>,</span>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/forest_ex21.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example21</span><span class="op">)</span></span></code></pre></div>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-46-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-22-negative-binomial-regression">
@@ -660,8 +688,9 @@ proper handling:</p>
 <span><span class="va">example22</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glmforest.html">glmforest</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="va">nb_result</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"Negative Binomial: Adverse Events"</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p><img src="figures/forest_ex22.png" class="r-plt" alt="" width="100%"></p>
+<span><span class="op">)</span></span>
+<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example22</span><span class="op">)</span></span></code></pre></div>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-48-1.png" class="r-plt" alt="" width="100%"></p>
 <hr>
 </div>
 </div>
@@ -815,7 +844,7 @@ visible</li>
 <p>Reduce font size or increase figure dimensions:</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glmforest.html">glmforest</a></span><span class="op">(</span><span class="va">model</span>, font_size <span class="op">=</span> <span class="fl">0.9</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"plot.pdf"</span>, <span class="va">p</span>, width <span class="op">=</span> <span class="fl">14</span>, height <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"plot.pdf"</span><span class="op">)</span>, <span class="va">p</span>, width <span class="op">=</span> <span class="fl">14</span>, height <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="missing-labels">Missing Labels<a class="anchor" aria-label="anchor" href="#missing-labels"></a>

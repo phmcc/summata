@@ -271,8 +271,8 @@ data(clintrial)
 desctable(clintrial,
         variables = c("age", "sex", "bmi"))
 
-
 \donttest{
+
 # Example 2: Grouped comparison with default tests
 desctable(clintrial,
         by = "treatment",
@@ -369,22 +369,13 @@ desctable(clintrial,
             "Surv(os_months, os_status)"    # Survival
         ))
 
-# Example 15: Export table
-table1 <- desctable(clintrial,
-                  by = "treatment",
-                  variables = c("age", "sex", "bmi"))
-
-# Can export directly to PDF/LaTeX/HTML for publication
-# table2pdf(table1, "table1.pdf")
-# table2docx(table1, "table1.docx")
-
-# Example 16: Three or more groups
+# Example 15: Three or more groups
 desctable(clintrial,
         by = "stage",  # Assuming stage has 3+ levels
         variables = c("age", "sex", "bmi"))
 # Automatically uses ANOVA/Kruskal-Wallis and chi-squared
 
-# Example 17: Access raw unformatted data
+# Example 16: Access raw unformatted data
 result <- desctable(clintrial,
                   by = "treatment",
                   variables = c("age", "bmi"))
@@ -392,13 +383,13 @@ raw_data <- attr(result, "raw_data")
 print(raw_data)
 # Raw data includes unformatted numbers, SDs, quartiles, etc.
 
-# Example 18: Check which grouping variable was used
+# Example 17: Check which grouping variable was used
 result <- desctable(clintrial,
                   by = "treatment",
                   variables = c("age", "sex"))
 attr(result, "by_variable")  # "treatment"
 
-# Example 19: NA percentage calculation options
+# Example 18: NA percentage calculation options
 # Include NAs in percentage denominator (all sum to 100\%)
 desctable(clintrial,
         by = "treatment",
@@ -413,7 +404,7 @@ desctable(clintrial,
         na_include = TRUE,
         na_percent = FALSE)
 
-# Example 20: Passing additional test arguments
+# Example 19: Passing additional test arguments
 # Equal variance t-test
 desctable(clintrial,
         by = "sex",
@@ -421,13 +412,13 @@ desctable(clintrial,
         test_continuous = "t",
         var.equal = TRUE)
 
-# Example 21: European number formatting
+# Example 20: European number formatting
 desctable(clintrial,
         by = "treatment",
         variables = c("age", "sex", "bmi"),
         number_format = "eu")
 
-# Example 22: Complete Table 1 for publication
+# Example 21: Complete Table 1 for publication
 table1 <- desctable(
     data = clintrial,
     by = "treatment",
@@ -444,7 +435,9 @@ table1 <- desctable(
     na_include = FALSE
 )
 print(table1)
+
 }
+
 }
 \seealso{
 \code{\link{survtable}} for detailed survival summary tables,

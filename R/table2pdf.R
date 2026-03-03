@@ -23,7 +23,6 @@
 #'   \itemize{
 #'     \item \code{"letter"} - US Letter (8.5" x 11") [default]
 #'     \item \code{"a4"} - A4 (210 mm x 297 mm)
-#'     \item \code{"legal"} - US Legal (8.5" x 14")
 #'     \item \code{"auto"} - Auto-size to content (no margins, crops to fit)
 #'   }
 #'   
@@ -218,71 +217,85 @@
 #' \code{\link{desctable}} for descriptive tables,
 #' \code{\link{fit}} for regression tables
 #'
-#' @examplesIf FALSE
-#' # These examples require a LaTeX installation (pdflatex)
-#' # Install TinyTeX with: tinytex::install_tinytex()
-#' 
-#' # Load example data and create a regression table
+#' @examples
 #' data(clintrial)
 #' data(clintrial_labels)
-#' library(survival)
-#' 
-#' # Create a regression table
+#'
+#' # Create example table
 #' results <- fit(
-#'      data = clintrial,
-#'      outcome = "os_status",
-#'      predictors = c("age", "sex", "treatment", "stage"),
-#'      labels = clintrial_labels
+#'     data = clintrial,
+#'     outcome = "os_status",
+#'     predictors = c("age", "sex", "treatment", "stage"),
+#'     labels = clintrial_labels
 #' )
-#' 
+#'
+#' # Test that LaTeX can compile (needed for all PDF examples)
+#' has_latex <- local({
+#'   if (!nzchar(Sys.which("pdflatex"))) return(FALSE)
+#'   test_tex <- file.path(tempdir(), "summata_latex_test.tex")
+#'   writeLines(c("\\documentclass{article}", "\\usepackage{booktabs}",
+#'                "\\begin{document}", "test", "\\end{document}"), test_tex)
+#'   tryCatch(
+#'     system2("pdflatex", c("-interaction=nonstopmode",
+#'             paste0("-output-directory=", tempdir()), test_tex),
+#'             stdout = FALSE, stderr = FALSE),
+#'     error = function(e) 1L) == 0L
+#' })
+#'
 #' # Example 1: Basic PDF export
-#' table2pdf(results, "basic_results.pdf")
+#' if(has_latex){
+#'   table2pdf(results, file.path(tempdir(), "basic_results.pdf"))
+#' }
+#'
+#' \donttest{
+#' 
+#' if(has_latex){
 #' 
 #' # Example 2: Landscape orientation for wide tables
-#' table2pdf(results, "wide_results.pdf",
+#' table2pdf(results, file.path(tempdir(), "wide_results.pdf"),
 #'          orientation = "landscape")
 #' 
 #' # Example 3: With caption
-#' table2pdf(results, "captioned.pdf",
+#' table2pdf(results, file.path(tempdir(), "captioned.pdf"),
 #'          caption = "Table 1: Multivariable logistic regression results")
 #' 
 #' # Example 4: Multi-line caption with formatting
-#' table2pdf(results, "formatted_caption.pdf",
+#' table2pdf(results, file.path(tempdir(), "formatted_caption.pdf"),
 #'          caption = "Table 1: Risk Factors for Mortality\\\\
 #'                    aOR = adjusted odds ratio; CI = confidence interval")
 #' 
 #' # Example 5: Auto-sized PDF (no fixed page dimensions)
-#' table2pdf(results, "autosize.pdf",
+#' table2pdf(results, file.path(tempdir(), "autosize.pdf"),
 #'          paper = "auto")
 #' 
 #' # Example 6: A4 paper with custom margins
-#' table2pdf(results, "a4_custom.pdf",
+#' table2pdf(results, file.path(tempdir(), "a4_custom.pdf"),
 #'          paper = "a4",
 #'          margins = c(0.75, 0.75, 0.75, 0.75))
 #' 
 #' # Example 7: Larger font for readability
-#' table2pdf(results, "large_font.pdf",
+#' table2pdf(results, file.path(tempdir(), "large_font.pdf"),
 #'          font_size = 11)
 #' 
 #' # Example 8: Indented hierarchical display
-#' table2pdf(results, "indented.pdf",
+#' table2pdf(results, file.path(tempdir(), "indented.pdf"),
 #'          indent_groups = TRUE)
 #' 
 #' # Example 9: Condensed table (reduced height)
-#' table2pdf(results, "condensed.pdf",
+#' table2pdf(results, file.path(tempdir(), "condensed.pdf"),
 #'          condense_table = TRUE)
 #' 
 #' # Example 10: With zebra stripes
-#' table2pdf(results, "striped.pdf",
+#' table2pdf(results, file.path(tempdir(), "striped.pdf"),
 #'          zebra_stripes = TRUE,
 #'          stripe_color = "gray!15")
 #' 
 #' # Example 11: Dark header style
-#' table2pdf(results, "dark_header.pdf",
+#' table2pdf(results, file.path(tempdir(), "dark_header.pdf"),
 #'          dark_header = TRUE)
 #' 
 #' # Example 12: Combination of formatting options
-#' table2pdf(results, "publication_ready.pdf",
+#' table2pdf(results, file.path(tempdir(), "publication_ready.pdf"),
 #'          orientation = "portrait",
 #'          paper = "letter",
 #'          font_size = 9,
@@ -294,31 +307,27 @@
 #'          p_threshold = 0.05)
 #' 
 #' # Example 13: Adjust cell padding
-#' table2pdf(results, "relaxed_padding.pdf",
+#' table2pdf(results, file.path(tempdir(), "relaxed_padding.pdf"),
 #'          cell_padding = "relaxed")  # More spacious
 #' 
 #' # Example 14: No scaling (natural table width)
-#' table2pdf(results, "no_scale.pdf",
+#' table2pdf(results, file.path(tempdir(), "no_scale.pdf"),
 #'          fit_to_page = FALSE,
 #'          font_size = 10)
 #' 
 #' # Example 15: Hide significance bolding
-#' table2pdf(results, "no_bold.pdf",
+#' table2pdf(results, file.path(tempdir(), "no_bold.pdf"),
 #'          bold_significant = FALSE)
 #' 
 #' # Example 16: Custom column alignment
-#' table2pdf(results, "custom_align.pdf",
+#' table2pdf(results, file.path(tempdir(), "custom_align.pdf"),
 #'          align = c("c", "c", "c", "c", "c", "c", "c"))
 #' 
 #' # Example 17: Descriptive statistics table
-#' desc_table <- desctable(
-#'      data = clintrial,
-#'      by = "treatment",
-#'      variables = c("age", "sex", "bmi", "stage"),
-#'      labels = clintrial_labels
-#' )
+#' desc_table <- desctable(clintrial, by = "treatment",
+#'      variables = c("age", "sex", "bmi", "stage"), labels = clintrial_labels)
 #' 
-#' table2pdf(desc_table, "descriptive.pdf",
+#' table2pdf(desc_table, file.path(tempdir(), "descriptive.pdf"),
 #'          caption = "Table 1: Baseline Characteristics by Treatment Group",
 #'          orientation = "landscape")
 #' 
@@ -334,7 +343,7 @@
 #'      model_list = models
 #' )
 #' 
-#' table2pdf(comparison, "model_comparison.pdf",
+#' table2pdf(comparison, file.path(tempdir(), "model_comparison.pdf"),
 #'          caption = "Table 3: Model Comparison Statistics")
 #' 
 #' # Example 19: Very wide table with aggressive fitting
@@ -345,25 +354,27 @@
 #'                    "hypertension", "diabetes", "treatment", "stage")
 #' )
 #' 
-#' table2pdf(wide_model, "very_wide.pdf",
+#' table2pdf(wide_model, file.path(tempdir(), "very_wide.pdf"),
 #'          orientation = "landscape",
-#'          paper = "legal",  # Even wider than letter
 #'          font_size = 7,
 #'          fit_to_page = TRUE,
 #'          condense_table = TRUE)
 #'
 #' # Example 20: With caption size control
-#' table2pdf(results, "caption_size.pdf",
+#' table2pdf(results, file.path(tempdir(), "caption_size.pdf"),
 #'          font_size = 8,
 #'          caption_size = 6,
 #'          caption = "Table 4: Results with Compact Caption\\\\
 #'                    Smaller caption fits better on constrained pages")
 #' 
 #' # Example 21: Troubleshooting - keep logs
-#' table2pdf(results, "debug.pdf",
+#' table2pdf(results, file.path(tempdir(), "debug.pdf"),
 #'          show_logs = TRUE)
 #' # If it fails, check debug.log for error messages
 #'
+#' }
+#' }
+#' 
 #' @family export functions
 #' @export
 table2pdf <- function (table,

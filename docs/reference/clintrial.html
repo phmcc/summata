@@ -17,7 +17,7 @@ the full capabilities of descriptive and regression analysis functions."></head>
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -225,6 +225,7 @@ the full capabilities of descriptive and regression analysis functions.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 13:       Biomarker X (ng/mL)    Median [IQR]    5.4 [3.9-7.5]    5.3 [4.1-7.2]    5.2 [3.8-7.3]    5.5 [3.8-7.7]   0.318</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 14: Overall Survival (months) Median (95% CI) 19.4 (16.2-23.4) 14.7 (10.5-19.2) 33.6 (24.5-42.2) 14.7 (11.0-21.8) &lt; 0.001</span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Poisson regression for equidispersed counts</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="fit.html">fit</a></span><span class="op">(</span><span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>    outcome <span class="op">=</span> <span class="st">"fu_count"</span>,</span></span>
@@ -313,6 +314,7 @@ the full capabilities of descriptive and regression analysis functions.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 22:                                            Drug B    362    274 0.94 (0.77-1.15)   0.567 0.77 (0.63-0.95)   0.014</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                    Variable                     Group      n Events      HR (95% CI)   Uni p     aHR (95% CI) Multi p</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                      &lt;char&gt;                    &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span>        </span></span>
 </code></pre></div>
     </div>

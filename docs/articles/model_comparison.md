@@ -39,18 +39,57 @@ data(clintrial_labels)
 
 ------------------------------------------------------------------------
 
-## Model Quality Metrics
+## Quality Metrics and the Composite Model Score
 
 The [`compfit()`](https://phmcc.github.io/summata/reference/compfit.md)
-function uses several metrics for comparing models.
+function evaluates models using several quality metrics, then combines
+them into a single Composite Model Score (CMS) ranging from 0 to 100 for
+rapid comparison. The metrics available depend on the model type.
 
-| Metric      | Interpretation                                         | Better |
-|:------------|:-------------------------------------------------------|:-------|
-| AIC         | Information criterion balancing fit and complexity     | Lower  |
-| BIC         | Information criterion with stronger complexity penalty | Lower  |
-| Concordance | Discrimination ability (0.5 = random, 1.0 = perfect)   | Higher |
-| Pseudo-*R*² | Proportion of variation explained (GLMs)               | Higher |
-| Brier Score | Prediction accuracy for binary outcomes                | Lower  |
+### Available Metrics
+
+| Metric | Used by | Interpretation | Better |
+|:---|:---|:---|:---|
+| AIC | All | Information criterion balancing fit and complexity | Lower |
+| BIC | Fallback | Information criterion with stronger complexity penalty | Lower |
+| Concordance | GLM, Cox, GLMER, Cox ME | Discrimination ability (0.5 = random, 1.0 = perfect) | Higher |
+| Pseudo-*R*² | GLM, Cox ME | Proportion of variation explained (McFadden’s) | Higher |
+| *R*² | LM | Proportion of variance explained | Higher |
+| Brier Score | GLM | Prediction accuracy for binary outcomes (0 = perfect) | Lower |
+| Global *p* | Cox | Omnibus likelihood ratio test *p*-value | Lower |
+| RMSE | LM | Root mean squared error of residuals | Lower |
+| Marginal *R*² | LMER, GLMER | Variance explained by fixed effects alone | Higher |
+| Conditional *R*² | LMER | Variance explained by fixed + random effects | Higher |
+| ICC | LMER, GLMER, Cox ME | Intraclass correlation; proportion of variance from clustering | Moderate |
+| Convergence | All | Whether the model converged successfully | Yes |
+
+### CMS Interpretation
+
+| Range  | Interpretation |
+|:-------|:---------------|
+| 85–100 | Excellent      |
+| 75–84  | Very Good      |
+| 65–74  | Good           |
+| 55–64  | Fair           |
+| \< 55  | Poor           |
+
+### Default CMS Weights by Model Type
+
+The score components and their default weights vary by model type.
+
+| Component        | LM  | GLM | Cox | LMER | GLMER | Cox ME |
+|:-----------------|:---:|:---:|:---:|:----:|:-----:|:------:|
+| Convergence      | 15% | 15% | 15% | 20%  |  15%  |  15%   |
+| AIC              | 25% | 25% | 30% | 25%  |  25%  |  30%   |
+| *R*²             | 45% |     |     |      |       |        |
+| Pseudo-*R*²      |     | 15% |     |      |       |  10%   |
+| Concordance      |     | 40% | 40% |      |  30%  |  35%   |
+| Brier Score      |     | 5%  |     |      |       |        |
+| Global *p*       |     |     | 15% |      |       |        |
+| RMSE             | 15% |     |     |      |       |        |
+| Marginal *R*²    |     |     |     | 25%  |  15%  |        |
+| Conditional *R*² |     |     |     | 15%  |       |        |
+| ICC              |     |     |     | 15%  |  15%  |  10%   |
 
 ------------------------------------------------------------------------
 
@@ -128,11 +167,11 @@ example2
 #> Recommended Model: Treatment (CMS: 72.2)
 #> 
 #> Models ranked by selection score:
-#>        Model   CMS     N Events Predictors Converged    AIC    BIC Pseudo-R² Concordance Global p
-#>       <char> <num> <int>  <num>      <int>    <char>  <num>  <num>     <num>       <num>   <char>
-#> 1: Treatment  72.2   822     NA          6       Yes 4297.3 4358.6     0.550          NA  < 0.001
-#> 2:   Disease  44.2   822     NA          4       Yes 4670.3 4717.5     0.287          NA  < 0.001
-#> 3:    Simple  28.0   830     NA          2       Yes 4873.9 4892.8     0.122          NA  < 0.001
+#>        Model   CMS     N Predictors Converged    AIC    BIC    R² Global p Events Concordance
+#>       <char> <num> <int>      <int>    <char>  <num>  <num> <num>   <char>  <num>       <num>
+#> 1: Treatment  72.2   822          6       Yes 4297.3 4358.6 0.550  < 0.001     NA          NA
+#> 2:   Disease  44.2   822          4       Yes 4670.3 4717.5 0.287  < 0.001     NA          NA
+#> 3:    Simple  28.0   830          2       Yes 4873.9 4892.8 0.122  < 0.001     NA          NA
 #> 
 #> CMS interpretation: 85+ Excellent, 75-84 Very Good, 65-74 Good, 55-64 Fair, < 55 Poor
 ```
@@ -462,53 +501,7 @@ cat("Recommended model:", recommended, "\n")
 
 ------------------------------------------------------------------------
 
-## The Composite Model Score (CMS)
-
-The Composite Model Score (CMS) is a metric designed to facilitate rapid
-model comparison. It combines multiple quality indicators into a single
-value ranging from 0 to 100.
-
-### Score Interpretation
-
-| Range  | Interpretation |
-|:-------|:---------------|
-| 85–100 | Excellent      |
-| 75–84  | Very Good      |
-| 65–74  | Good           |
-| 55–64  | Fair           |
-| \< 55  | Poor           |
-
-### Default Weights by Model Type
-
-The score components and their default weights vary by model type.
-
-**Linear regression:**
-
-| Component     | Weight |
-|:--------------|:-------|
-| Convergence   | 15%    |
-| AIC           | 25%    |
-| Adjusted *R²* | 45%    |
-| RMSE          | 15%    |
-
-**Logistic regression:**
-
-| Component   | Weight |
-|:------------|:-------|
-| Convergence | 15%    |
-| AIC         | 25%    |
-| Concordance | 40%    |
-| Pseudo-*R²* | 15%    |
-| Brier Score | 5%     |
-
-**Cox regression:**
-
-| Component   | Weight |
-|:------------|:-------|
-| Convergence | 15%    |
-| AIC         | 30%    |
-| Concordance | 40%    |
-| Global *p*  | 15%    |
+## Custom CMS Weights
 
 ### **Example 10:** Custom Weights
 
@@ -723,11 +716,11 @@ scenario3
 #> Recommended Model: 8 Predictors (CMS: 75.1)
 #> 
 #> Models ranked by selection score:
-#>           Model   CMS     N Events Predictors Converged    AIC    BIC Pseudo-R² Concordance Global p
-#>          <char> <num> <int>  <num>      <int>    <char>  <num>  <num>     <num>       <num>   <char>
-#> 1: 8 Predictors  75.1   813     NA          8       Yes 4135.8 4211.0     0.613          NA  < 0.001
-#> 2: 5 Predictors  64.1   822     NA          5       Yes 4310.6 4367.1     0.542          NA  < 0.001
-#> 3: 3 Predictors  34.1   822     NA          3       Yes 4696.4 4729.4     0.258          NA  < 0.001
+#>           Model   CMS     N Predictors Converged    AIC    BIC    R² Global p Events Concordance
+#>          <char> <num> <int>      <int>    <char>  <num>  <num> <num>   <char>  <num>       <num>
+#> 1: 8 Predictors  75.1   813          8       Yes 4135.8 4211.0 0.613  < 0.001     NA          NA
+#> 2: 5 Predictors  64.1   822          5       Yes 4310.6 4367.1 0.542  < 0.001     NA          NA
+#> 3: 3 Predictors  34.1   822          3       Yes 4696.4 4729.4 0.258  < 0.001     NA          NA
 #> 
 #> CMS interpretation: 85+ Excellent, 75-84 Very Good, 65-74 Good, 55-64 Fair, < 55 Poor
 ```
@@ -742,21 +735,21 @@ Comparison tables can be exported to various formats:
 # Main comparison table
 table2docx(
   table = example1,
-  file = "Model_Comparison.docx",
+  file = file.path(tempdir(), "Model_Comparison.docx"),
   caption = "Table 3. Model Comparison Results"
 )
 
 # Coefficient table
 table2docx(
   table = attr(example6, "coefficients"),
-  file = "Coefficient_Comparison.docx",
+  file = file.path(tempdir(), "Coefficient_Comparison.docx"),
   caption = "Table S1. Coefficient Estimates Across Models"
 )
 
 # PDF with landscape orientation for wide tables
 table2pdf(
   table = example1,
-  file = "Model_Comparison.pdf",
+  file = file.path(tempdir(), "Model_Comparison.pdf"),
   caption = "Model Comparison",
   orientation = "landscape"
 )

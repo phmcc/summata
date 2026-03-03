@@ -197,102 +197,98 @@
 #' \code{\link{fit}} for regression tables,
 #' \code{\link{desctable}} for descriptive tables
 #'
-#' @examplesIf FALSE
-#' # Load data and create table
+#' @examples
 #' data(clintrial)
 #' data(clintrial_labels)
-#' 
+#'
+#' # Create example table
 #' results <- fit(
 #'      data = clintrial,
 #'      outcome = "os_status",
 #'      predictors = c("age", "sex", "treatment", "stage"),
 #'      labels = clintrial_labels
 #' )
-#' 
+#'
 #' # Example 1: Basic HTML export (standalone)
-#' table2html(results, "results.html")
-#' # Open results.html in web browser
-#' 
+#' if (requireNamespace("xtable", quietly = TRUE)) {
+#'   table2html(results, file.path(tempdir(), "results.html"))
+#' }
+#'
+#' \donttest{
 #' # Example 2: With caption
-#' table2html(results, "captioned.html",
+#' table2html(results, file.path(tempdir(), "captioned.html"),
 #'           caption = "Table 1: Multivariable Logistic Regression Results")
 #' 
 #' # Example 3: For embedding (no CSS)
-#' table2html(results, "embed.html",
+#' table2html(results, file.path(tempdir(), "embed.html"),
 #'           include_css = FALSE)
 #' # Include in your HTML document
 #' 
 #' # Example 4: Hierarchical display
-#' table2html(results, "indented.html",
+#' table2html(results, file.path(tempdir(), "indented.html"),
 #'           indent_groups = TRUE)
 #' 
 #' # Example 5: Condensed table
-#' table2html(results, "condensed.html",
+#' table2html(results, file.path(tempdir(), "condensed.html"),
 #'           condense_table = TRUE)
 #' 
 #' # Example 6: With zebra stripes
-#' table2html(results, "striped.html",
+#' table2html(results, file.path(tempdir(), "striped.html"),
 #'           zebra_stripes = TRUE,
 #'           stripe_color = "#F0F0F0")
 #' 
 #' # Example 7: Dark header style
-#' table2html(results, "dark.html",
+#' table2html(results, file.path(tempdir(), "dark.html"),
 #'           dark_header = TRUE)
 #' 
 #' # Example 8: Combination styling
-#' table2html(results, "styled.html",
+#' table2html(results, file.path(tempdir(), "styled.html"),
 #'           zebra_stripes = TRUE,
 #'           dark_header = TRUE,
 #'           bold_significant = TRUE)
 #' 
 #' # Example 9: Custom stripe color
-#' table2html(results, "blue_stripes.html",
+#' table2html(results, file.path(tempdir(), "blue_stripes.html"),
 #'           zebra_stripes = TRUE,
 #'           stripe_color = "#E3F2FD")  # Light blue
 #' 
 #' # Example 10: Disable significance bolding
-#' table2html(results, "no_bold.html",
+#' table2html(results, file.path(tempdir(), "no_bold.html"),
 #'           bold_significant = FALSE)
 #' 
 #' # Example 11: Stricter significance threshold
-#' table2html(results, "strict.html",
+#' table2html(results, file.path(tempdir(), "strict.html"),
 #'           bold_significant = TRUE,
 #'           p_threshold = 0.01)
 #' 
 #' # Example 12: No header formatting
-#' table2html(results, "raw_headers.html",
+#' table2html(results, file.path(tempdir(), "raw_headers.html"),
 #'           format_headers = FALSE)
 #' 
 #' # Example 13: Descriptive statistics table
-#' desc_table <- desctable(
-#'      data = clintrial,
-#'      by = "treatment",
-#'      variables = c("age", "sex", "bmi"),
-#'      labels = clintrial_labels
-#' )
+#' desc_table <- desctable(clintrial, by = "treatment",
+#'      variables = c("age", "sex", "bmi"), labels = clintrial_labels)
 #' 
-#' table2html(desc_table, "baseline.html",
+#' table2html(desc_table, file.path(tempdir(), "baseline.html"),
 #'           caption = "Table 1: Baseline Characteristics by Treatment Group")
 #' 
 #' # Example 14: For R Markdown (no CSS, for inline display)
-#' table2html(results, "rmd_table.html",
+#' table2html(results, file.path(tempdir(), "rmd_table.html"),
 #'           include_css = FALSE,
 #'           indent_groups = TRUE)
 #' 
-#' # Then in R Markdown:
-#' # ```{r results='asis', echo=FALSE}
-#' # cat(readLines("rmd_table.html"), sep = "\n")
-#' # ```
+#' # Then in R Markdown, use a chunk with results='asis' to display inline:
+#' cat(readLines(file.path(tempdir(), "rmd_table.html")), sep = "\n")
 #' 
 #' # Example 15: Email-friendly version
-#' table2html(results, "email.html",
+#' table2html(results, file.path(tempdir(), "email.html"),
 #'           include_css = TRUE,  # Self-contained
 #'           zebra_stripes = TRUE,
 #'           caption = "Regression Results - See Attached")
 #' # Can be directly included in HTML emails
 #' 
 #' # Example 16: Publication-ready web version
-#' table2html(results, "publication.html",
+#' table2html(results, file.path(tempdir(), "publication.html"),
 #'           caption = "Table 2: Multivariable Analysis of Risk Factors",
 #'           indent_groups = TRUE,
 #'           zebra_stripes = FALSE,  # Clean look
@@ -300,13 +296,13 @@
 #'           dark_header = FALSE)
 #' 
 #' # Example 17: Modern dark theme
-#' table2html(results, "dark_theme.html",
+#' table2html(results, file.path(tempdir(), "dark_theme.html"),
 #'           dark_header = TRUE,
 #'           stripe_color = "#2A2A2A",  # Dark gray stripes
 #'           zebra_stripes = TRUE)
 #' 
 #' # Example 18: Minimal styling for custom CSS
-#' table2html(results, "minimal.html",
+#' table2html(results, file.path(tempdir(), "minimal.html"),
 #'           include_css = FALSE,
 #'           format_headers = FALSE,
 #'           bold_significant = FALSE)
@@ -324,9 +320,10 @@
 #'      model_list = models
 #' )
 #' 
-#' table2html(comparison, "comparison.html",
+#' table2html(comparison, file.path(tempdir(), "comparison.html"),
 #'           caption = "Model Comparison Statistics")
 #' 
+#' }
 #' @family export functions
 #' @export
 table2html <- function(table,

@@ -310,8 +310,9 @@
 #'     parallel = FALSE
 #' )
 #' print(screen1)
-#' 
+#'
 #' \donttest{
+#' 
 #' # Example 2: With custom variable labels
 #' screen2 <- uniscreen(
 #'     data = clintrial,
@@ -455,7 +456,7 @@
 #' )
 #' raw_data <- attr(screen13, "raw_data")
 #' print(raw_data)
-#' # Contains unformatted coefficients, SEs, CIs, \emph{etc.}
+#' # Contains unformatted coefficients, SEs, CIs, etc.
 #' 
 #' # Example 14: Force coefficient display instead of OR
 #' screen14 <- uniscreen(
@@ -612,8 +613,9 @@
 #'     parallel = FALSE
 #' )
 #' print(invgauss_screen)
-#' }
 #'
+#' }
+#' 
 #' @family regression functions
 #' @export
 uniscreen <- function(data,
@@ -919,6 +921,11 @@ uniscreen <- function(data,
 
 
 #' Print method for uniscreen results
+#'
+#' @param x Object of class \code{uniscreen_result}.
+#' @param ... Additional arguments passed to print methods.
+#' @return Invisibly returns the input object \code{x}. Called for its
+#'   side effect of printing a formatted summary to the console.
 #' @keywords internal
 #' @family regression functions
 #' @export

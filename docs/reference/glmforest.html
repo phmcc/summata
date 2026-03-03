@@ -23,7 +23,7 @@ for manuscripts and presentations."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -405,10 +405,10 @@ if available.</p>
 <p>Use <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggplot2::ggsave()</a></code> with recommended dimensions:</p><div class="sourceCode"><pre><code><span></span>
 <span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glmforest.html">glmforest</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">data</span><span class="op">)</span></span>
 <span>  <span class="va">dims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">p</span>, <span class="st">"rec_dims"</span><span class="op">)</span></span>
-<span>  <span class="fu">ggsave</span><span class="op">(</span><span class="st">"forest.pdf"</span>, <span class="va">p</span>, width <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">width</span>, height <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">height</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"forest.pdf"</span>, <span class="va">p</span>, width <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">width</span>, height <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">height</span><span class="op">)</span></span></code></pre></div>
 
 <p>Or specify custom dimensions:</p><div class="sourceCode"><pre><code><span></span>
-<span><span class="fu">ggsave</span><span class="op">(</span><span class="st">"forest.png"</span>, <span class="va">p</span>, width <span class="op">=</span> <span class="fl">12</span>, height <span class="op">=</span> <span class="fl">8</span>, dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"forest.png"</span>, <span class="va">p</span>, width <span class="op">=</span> <span class="fl">12</span>, height <span class="op">=</span> <span class="fl">8</span>, dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span></code></pre></div>
 
     </div>
     <div class="section level2">
@@ -430,20 +430,22 @@ if available.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="co"># Load example data</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">clintrial</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">clintrial</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">clintrial_labels</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 1: Basic logistic regression forest plot</span></span></span>
+<span class="r-in"><span><span class="co"># Create example model</span></span></span>
 <span class="r-in"><span><span class="va">model1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">os_status</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">bmi</span> <span class="op">+</span> <span class="va">treatment</span>,</span></span>
-<span class="r-in"><span>              data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>              family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span></span></span>
+<span class="r-in"><span>              data <span class="op">=</span> <span class="va">clintrial</span>, family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">plot1</span> <span class="op">&lt;-</span> <span class="fu">glmforest</span><span class="op">(</span><span class="va">model1</span>, data <span class="op">=</span> <span class="va">clintrial</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Example 1: Basic logistic regression forest plot</span></span></span>
+<span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu">glmforest</span><span class="op">(</span><span class="va">model1</span>, data <span class="op">=</span> <span class="va">clintrial</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Waiting for profiling to be done...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Recommended plot dimensions: width = 13.5 in, height = 5.0 in</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">180</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">old_width</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">180</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 2: With custom variable labels</span></span></span>
 <span class="r-in"><span><span class="va">plot2</span> <span class="op">&lt;-</span> <span class="fu">glmforest</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    x <span class="op">=</span> <span class="va">model1</span>,</span></span>
@@ -451,178 +453,59 @@ if available.</p>
 <span class="r-in"><span>    title <span class="op">=</span> <span class="st">"Risk Factors for Mortality"</span>,</span></span>
 <span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot2</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Waiting for profiling to be done...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Recommended plot dimensions: width = 15.3 in, height = 5.0 in</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 3: Customize appearance</span></span></span>
+<span class="r-in"><span><span class="co"># Example 3: Indented layout with formatting options</span></span></span>
 <span class="r-in"><span><span class="va">plot3</span> <span class="op">&lt;-</span> <span class="fu">glmforest</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    x <span class="op">=</span> <span class="va">model1</span>,</span></span>
 <span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    title <span class="op">=</span> <span class="st">"Adjusted Odds Ratios"</span>,</span></span>
-<span class="r-in"><span>    color <span class="op">=</span> <span class="st">"#D62728"</span>,  <span class="co"># Red points</span></span></span>
-<span class="r-in"><span>    font_size <span class="op">=</span> <span class="fl">1.2</span>,    <span class="co"># Larger text</span></span></span>
-<span class="r-in"><span>    zebra_stripes <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot3</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 4: Indented layout for hierarchical view</span></span></span>
-<span class="r-in"><span><span class="va">plot4</span> <span class="op">&lt;-</span> <span class="fu">glmforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model1</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>    indent_groups <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>    zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>    color <span class="op">=</span> <span class="st">"#D62728"</span>,</span></span>
 <span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot4</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># Group column hidden, levels indented under variables</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Waiting for profiling to be done...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Recommended plot dimensions: width = 13.4 in, height = 5.2 in</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 5: Condensed layout for many binary variables</span></span></span>
-<span class="r-in"><span><span class="va">model5</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">os_status</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">smoking</span> <span class="op">+</span> <span class="va">hypertension</span> <span class="op">+</span> </span></span>
+<span class="r-in"><span><span class="co"># Example 4: Condensed layout for many binary variables</span></span></span>
+<span class="r-in"><span><span class="va">model4</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">os_status</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">smoking</span> <span class="op">+</span> <span class="va">hypertension</span> <span class="op">+</span> </span></span>
 <span class="r-in"><span>                  <span class="va">diabetes</span> <span class="op">+</span> <span class="va">surgery</span>,</span></span>
 <span class="r-in"><span>              data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>              family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">plot5</span> <span class="op">&lt;-</span> <span class="fu">glmforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model5</span>,</span></span>
+<span class="r-in"><span><span class="va">plot4</span> <span class="op">&lt;-</span> <span class="fu">glmforest</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model4</span>,</span></span>
 <span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>    condense_table <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot5</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Waiting for profiling to be done...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Recommended plot dimensions: width = 12.7 in, height = 5.2 in</span>
 <span class="r-in"><span><span class="co"># Binary variables shown in single rows</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 6: Hide sample size and events columns</span></span></span>
-<span class="r-in"><span><span class="va">plot6</span> <span class="op">&lt;-</span> <span class="fu">glmforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model1</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    show_n <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>    show_events <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot6</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 7: Adjust table/forest proportions</span></span></span>
-<span class="r-in"><span><span class="va">plot7</span> <span class="op">&lt;-</span> <span class="fu">glmforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model1</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    table_width <span class="op">=</span> <span class="fl">0.7</span>,  <span class="co"># More space for table</span></span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot7</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 8: Get and use recommended dimensions</span></span></span>
-<span class="r-in"><span><span class="va">plot8</span> <span class="op">&lt;-</span> <span class="fu">glmforest</span><span class="op">(</span><span class="va">model1</span>, data <span class="op">=</span> <span class="va">clintrial</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">dims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">plot8</span>, <span class="st">"rec_dims"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Recommended: "</span>, <span class="va">dims</span><span class="op">$</span><span class="va">width</span>, <span class="st">"x"</span>, <span class="va">dims</span><span class="op">$</span><span class="va">height</span>, <span class="st">"inches\n"</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Save with recommended dimensions</span></span></span>
-<span class="r-in"><span><span class="co"># ggsave("forest.pdf", plot8, width = dims$width, height = dims$height)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 9: Specify exact output dimensions</span></span></span>
-<span class="r-in"><span><span class="va">plot9</span> <span class="op">&lt;-</span> <span class="fu">glmforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model1</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    plot_width <span class="op">=</span> <span class="fl">14</span>,</span></span>
-<span class="r-in"><span>    plot_height <span class="op">=</span> <span class="fl">10</span>,</span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># No dimension recommendations printed</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 10: Use different units (centimeters)</span></span></span>
-<span class="r-in"><span><span class="va">plot10</span> <span class="op">&lt;-</span> <span class="fu">glmforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model1</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    plot_width <span class="op">=</span> <span class="fl">30</span>,  <span class="co"># 30 cm</span></span></span>
-<span class="r-in"><span>    plot_height <span class="op">=</span> <span class="fl">20</span>,  <span class="co"># 20 cm</span></span></span>
-<span class="r-in"><span>    units <span class="op">=</span> <span class="st">"cm"</span>,</span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 11: Poisson regression for count data</span></span></span>
-<span class="r-in"><span><span class="va">model11</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">ae_count</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">treatment</span> <span class="op">+</span> <span class="va">diabetes</span> <span class="op">+</span> <span class="va">surgery</span>,</span></span>
+<span class="r-in"><span><span class="co"># Example 5: Poisson regression for count data</span></span></span>
+<span class="r-in"><span><span class="va">model5</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">ae_count</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">treatment</span> <span class="op">+</span> <span class="va">diabetes</span> <span class="op">+</span> <span class="va">surgery</span>,</span></span>
 <span class="r-in"><span>               data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>               family <span class="op">=</span> <span class="va">poisson</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">plot11</span> <span class="op">&lt;-</span> <span class="fu">glmforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model11</span>,</span></span>
+<span class="r-in"><span><span class="va">plot5</span> <span class="op">&lt;-</span> <span class="fu">glmforest</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model5</span>,</span></span>
 <span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>    title <span class="op">=</span> <span class="st">"Rate Ratios for Adverse Events"</span>,</span></span>
 <span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot11</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># Shows rate ratios with blue color for count models</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Waiting for profiling to be done...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Recommended plot dimensions: width = 14.9 in, height = 5.0 in</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 12: Gamma regression for positive continuous outcomes</span></span></span>
-<span class="r-in"><span><span class="va">model12</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">los_days</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">treatment</span> <span class="op">+</span> <span class="va">surgery</span> <span class="op">+</span> <span class="va">stage</span>,</span></span>
-<span class="r-in"><span>               data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>               family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">Gamma</a></span><span class="op">(</span>link <span class="op">=</span> <span class="st">"log"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Example 6: Save with recommended dimensions</span></span></span>
+<span class="r-in"><span><span class="va">dims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">plot5</span>, <span class="st">"rec_dims"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"forest.pdf"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                <span class="va">plot5</span>, width <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">width</span>, height <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">height</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">plot12</span> <span class="op">&lt;-</span> <span class="fu">glmforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model12</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    title <span class="op">=</span> <span class="st">"Multiplicative Effects on Length of Stay"</span>,</span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot12</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># Shows ratios with blue color (same as other ratio models)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="va">old_width</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 13: Force display of raw coefficients</span></span></span>
-<span class="r-in"><span><span class="va">plot13</span> <span class="op">&lt;-</span> <span class="fu">glmforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model1</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    exponentiate <span class="op">=</span> <span class="cn">FALSE</span>,  <span class="co"># Show log odds</span></span></span>
-<span class="r-in"><span>    effect_label <span class="op">=</span> <span class="st">"Log Odds"</span>,</span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot13</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># Reference line at 0 instead of 1</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 14: Custom reference label</span></span></span>
-<span class="r-in"><span><span class="va">plot14</span> <span class="op">&lt;-</span> <span class="fu">glmforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model1</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    ref_label <span class="op">=</span> <span class="st">"1.00 (ref)"</span>,</span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot14</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 15: Adjust font sizes for presentations</span></span></span>
-<span class="r-in"><span><span class="va">plot15</span> <span class="op">&lt;-</span> <span class="fu">glmforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model1</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    font_size <span class="op">=</span> <span class="fl">1.5</span>,      <span class="co"># 50% larger</span></span></span>
-<span class="r-in"><span>    title_size <span class="op">=</span> <span class="fl">30</span>,      <span class="co"># Larger title</span></span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot15</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 16: Complete publication-ready plot</span></span></span>
-<span class="r-in"><span><span class="va">final_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    <span class="va">os_status</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">bmi</span> <span class="op">+</span> <span class="va">smoking</span> <span class="op">+</span> <span class="va">hypertension</span> <span class="op">+</span> </span></span>
-<span class="r-in"><span>        <span class="va">diabetes</span> <span class="op">+</span> <span class="va">treatment</span> <span class="op">+</span> <span class="va">stage</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    family <span class="op">=</span> <span class="va">binomial</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">final_plot</span> <span class="op">&lt;-</span> <span class="fu">glmforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">final_model</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    title <span class="op">=</span> <span class="st">"Multivariable Logistic Regression: Risk Factors for Mortality"</span>,</span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span></span>
-<span class="r-in"><span>    indent_groups <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>    zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>    color <span class="op">=</span> <span class="st">"#4BA6B6"</span>,</span></span>
-<span class="r-in"><span>    font_size <span class="op">=</span> <span class="fl">1.0</span>,</span></span>
-<span class="r-in"><span>    digits <span class="op">=</span> <span class="fl">2</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Save for publication</span></span></span>
-<span class="r-in"><span><span class="va">dims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">final_plot</span>, <span class="st">"rec_dims"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># ggsave("figure1.pdf", final_plot, </span></span></span>
-<span class="r-in"><span><span class="co">#        width = dims$width, height = dims$height)</span></span></span>
-<span class="r-in"><span><span class="co"># ggsave("figure1.png", final_plot,</span></span></span>
-<span class="r-in"><span><span class="co">#        width = dims$width, height = dims$height, dpi = 300)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

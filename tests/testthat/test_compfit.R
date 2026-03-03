@@ -109,8 +109,8 @@ test_that("compfit works with linear models", {
     expect_equal(nrow(result), 3)
     expect_equal(attr(result, "model_type"), "lm")
     
-    ## Linear models should have Pseudo-R²
-    expect_true("Pseudo-R²" %in% names(result))
+    ## Linear models should have R²
+    expect_true("R\u00b2" %in% names(result))
 })
 
 

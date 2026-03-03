@@ -9,6 +9,21 @@ Print method for multifit results
 print(x, ...)
 ```
 
+## Arguments
+
+- x:
+
+  Object of class `multifit_result`.
+
+- ...:
+
+  Additional arguments passed to print methods.
+
+## Value
+
+Invisibly returns the input object `x`. Called for its side effect of
+printing a formatted summary to the console.
+
 ## See also
 
 Other regression functions:

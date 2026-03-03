@@ -1,14 +1,22 @@
 # Changelog
 
-## *summata* 0.11.0 (2026-02-22)
+## *summata* 0.11.2 (2026-03-02)
 
-- CRAN re-submission
+- CRAN initial release re-submission
+- Minimal executable examples added to all exported functions, with
+  lengthier demonstrations wrapped in `\donttest{}`
+- Modify file-writing examples in documentation headers to write to
+  [`tempdir()`](https://rdrr.io/r/base/tempfile.html)
+
+## *summata* 0.11.1 (2026-02-22)
+
+- CRAN initial release re-submission
 - Documentation LaTeX fixes
 - Broken link fixes
 
 ## *summata* 0.11.0 (2026-02-21)
 
-- CRAN submission
+- CRAN initial release submission
 - Upload documentation
 
 ## *summata* 0.10.9 (2026-02-20)

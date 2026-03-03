@@ -261,20 +261,23 @@
 #' \code{\link[survival]{coxph}} for fitting Cox models,
 #' \code{\link{fit}} for regression modeling
 #'
-#' @examplesIf FALSE
-#' # Load example data
+#' @examples
 #' data(clintrial)
 #' data(clintrial_labels)
 #' library(survival)
-#' 
+#'
+#' # Create example model
+#' model1 <- coxph(
+#'     survival::Surv(os_months, os_status) ~ age + sex + treatment,
+#'     data = clintrial)
+#'
 #' # Example 1: Basic Cox model forest plot
-#' model1 <- coxph(Surv(os_months, os_status) ~ age + sex + treatment,
-#'                 data = clintrial)
+#' p <- coxforest(model1, data = clintrial)
+#'
+#' \donttest{
 #' 
-#' plot1 <- coxforest(model1, data = clintrial)
-#' print(plot1)
+#' old_width <- options(width = 180)
 #' 
-#'   options(width = 180)
 #' # Example 2: With custom labels and title
 #' plot2 <- coxforest(
 #'     x = model1,
@@ -282,9 +285,8 @@
 #'     title = "Prognostic Factors for Overall Survival",
 #'     labels = clintrial_labels
 #' )
-#' print(plot2)
 #' 
-#' # Example 3: Comprehensive multivariable model
+#' # Example 3: Comprehensive model with indented layout
 #' model3 <- coxph(
 #'     Surv(os_months, os_status) ~ age + sex + bmi + smoking + 
 #'         treatment + stage + grade,
@@ -295,9 +297,9 @@
 #'     x = model3,
 #'     data = clintrial,
 #'     labels = clintrial_labels,
-#'     indent_groups = TRUE
+#'     indent_groups = TRUE,
+#'     zebra_stripes = TRUE
 #' )
-#' print(plot3)
 #' 
 #' # Example 4: Condensed layout for many binary predictors
 #' model4 <- coxph(
@@ -312,145 +314,28 @@
 #'     condense_table = TRUE,
 #'     labels = clintrial_labels
 #' )
-#' print(plot4)
 #' 
-#' # Example 5: Custom color scheme
-#' plot5 <- coxforest(
-#'     x = model1,
-#'     data = clintrial,
-#'     color = "#E74C3C",  # Red
-#'     zebra_stripes = FALSE,
-#'     labels = clintrial_labels
-#' )
-#' print(plot5)
-#' 
-#' # Example 6: Hide sample sizes, show only events
-#' plot6 <- coxforest(
-#'     x = model1,
-#'     data = clintrial,
-#'     show_n = FALSE,
-#'     show_events = TRUE,
-#'     labels = clintrial_labels
-#' )
-#' print(plot6)
-#' 
-#' # Example 7: Adjust table width
-#' plot7 <- coxforest(
-#'     x = model3,
-#'     data = clintrial,
-#'     table_width = 0.65,  # More space for long variable names
-#'     labels = clintrial_labels
-#' )
-#' print(plot7)
-#' 
-#' # Example 8: Specify exact dimensions
-#' plot8 <- coxforest(
-#'     x = model1,
-#'     data = clintrial,
-#'     plot_width = 14,
-#'     plot_height = 8,
-#'     labels = clintrial_labels
-#' )
-#' 
-#' # Example 9: Use recommended dimensions for saving
-#' plot9 <- coxforest(model1, data = clintrial)
-#' dims <- attr(plot9, "rec_dims")
-#' 
-#' # Save to PDF
-#' # ggsave("survival_forest.pdf", plot9,
-#' #        width = dims$width, height = dims$height)
-#' 
-#' # Example 10: Different units (centimeters)
-#' plot10 <- coxforest(
-#'     x = model1,
-#'     data = clintrial,
-#'     plot_width = 35,
-#'     plot_height = 25,
-#'     units = "cm",
-#'     labels = clintrial_labels
-#' )
-#' 
-#' # Example 11: Stratified Cox model
-#' # Stratification variable (site) won't appear in plot
-#' model11 <- coxph(
+#' # Example 5: Stratified Cox model
+#' model5 <- coxph(
 #'     Surv(os_months, os_status) ~ age + sex + treatment + strata(site),
 #'     data = clintrial
 #' )
 #' 
-#' plot11 <- coxforest(
-#'     x = model11,
+#' plot5 <- coxforest(
+#'     x = model5,
 #'     data = clintrial,
 #'     title = "Stratified by Study Site",
 #'     labels = clintrial_labels
 #' )
-#' print(plot11)
 #' 
-#' # Example 12: With clustering for robust SE
-#' model12 <- coxph(
-#'     Surv(os_months, os_status) ~ age + sex + treatment + cluster(site),
-#'     data = clintrial
-#' )
-#' 
-#' plot12 <- coxforest(
-#'     x = model12,
-#'     data = clintrial,
-#'     title = "Clustered by Study Site",
-#'     labels = clintrial_labels
-#' )
-#' print(plot12)
-#' # Standard errors account for site clustering
-#' 
-#' # Example 13: Custom reference label
-#' plot13 <- coxforest(
-#'     x = model1,
-#'     data = clintrial,
-#'     ref_label = "1.00 (ref)",
-#'     labels = clintrial_labels
-#' )
-#' print(plot13)
-#' 
-#' # Example 14: Presentation-sized fonts
-#' plot14 <- coxforest(
-#'     x = model1,
-#'     data = clintrial,
-#'     font_size = 1.4,
-#'     title_size = 28,
-#'     labels = clintrial_labels
-#' )
-#' print(plot14)
-#' 
-#' # Example 15: Publication-ready final plot
-#' final_model <- coxph(
-#'     Surv(os_months, os_status) ~ age + sex + bmi + smoking + 
-#'         hypertension + diabetes + ecog + treatment + stage + grade,
-#'     data = clintrial
-#' )
-#' 
-#' final_plot <- coxforest(
-#'     x = final_model,
-#'     data = clintrial,
-#'     title = "Multivariable Cox Regression: Prognostic Factors for Overall Survival",
-#'     labels = clintrial_labels,
-#'     indent_groups = TRUE,
-#'     zebra_stripes = TRUE,
-#'     show_n = TRUE,
-#'     show_events = TRUE,
-#'     color = "#8A61D8"
-#' )
-#' 
-#' # Check model fit
-#' summary(final_model)
-#' 
-#' # Verify proportional hazards assumption
-#' # cox.zph(final_model)
-#' 
-#' # Save for publication
-#' dims <- attr(final_plot, "rec_dims")
-#' # ggsave("figure2_survival.pdf", final_plot,
-#' #        width = dims$width, height = dims$height)
-#' # ggsave("figure2_survival.png", final_plot,
-#' #        width = dims$width, height = dims$height, dpi = 300)
+#' # Example 6: Save with recommended dimensions
+#' dims <- attr(plot5, "rec_dims")
+#' ggplot2::ggsave(file.path(tempdir(), "survival_forest.pdf"),
+#'                 plot5, width = dims$width, height = dims$height)
 #'
+#' options(old_width)
+#' 
+#' }
 #' @family visualization functions
 #' @export
 coxforest <- function(x, data = NULL,

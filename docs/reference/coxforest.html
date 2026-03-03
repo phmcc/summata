@@ -23,7 +23,7 @@ and presentations."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -386,20 +386,23 @@ should verify this assumption using:</p><ul><li><p><code>cox.zph(model)</code> f
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="co"># Load example data</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">clintrial</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">clintrial</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">clintrial_labels</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/therneau/survival" class="external-link">survival</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Create example model</span></span></span>
+<span class="r-in"><span><span class="va">model1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html" class="external-link">coxph</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="fu">survival</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html" class="external-link">Surv</a></span><span class="op">(</span><span class="va">os_months</span>, <span class="va">os_status</span><span class="op">)</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">treatment</span>,</span></span>
+<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 1: Basic Cox model forest plot</span></span></span>
-<span class="r-in"><span><span class="va">model1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html" class="external-link">coxph</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html" class="external-link">Surv</a></span><span class="op">(</span><span class="va">os_months</span>, <span class="va">os_status</span><span class="op">)</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">treatment</span>,</span></span>
-<span class="r-in"><span>                data <span class="op">=</span> <span class="va">clintrial</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu">coxforest</span><span class="op">(</span><span class="va">model1</span>, data <span class="op">=</span> <span class="va">clintrial</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Recommended plot dimensions: width = 12.9 in, height = 5.0 in</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">plot1</span> <span class="op">&lt;-</span> <span class="fu">coxforest</span><span class="op">(</span><span class="va">model1</span>, data <span class="op">=</span> <span class="va">clintrial</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">180</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">old_width</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">180</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 2: With custom labels and title</span></span></span>
 <span class="r-in"><span><span class="va">plot2</span> <span class="op">&lt;-</span> <span class="fu">coxforest</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    x <span class="op">=</span> <span class="va">model1</span>,</span></span>
@@ -407,9 +410,9 @@ should verify this assumption using:</p><ul><li><p><code>cox.zph(model)</code> f
 <span class="r-in"><span>    title <span class="op">=</span> <span class="st">"Prognostic Factors for Overall Survival"</span>,</span></span>
 <span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot2</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Recommended plot dimensions: width = 13.7 in, height = 5.0 in</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 3: Comprehensive multivariable model</span></span></span>
+<span class="r-in"><span><span class="co"># Example 3: Comprehensive model with indented layout</span></span></span>
 <span class="r-in"><span><span class="va">model3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html" class="external-link">coxph</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html" class="external-link">Surv</a></span><span class="op">(</span><span class="va">os_months</span>, <span class="va">os_status</span><span class="op">)</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">bmi</span> <span class="op">+</span> <span class="va">smoking</span> <span class="op">+</span> </span></span>
 <span class="r-in"><span>        <span class="va">treatment</span> <span class="op">+</span> <span class="va">stage</span> <span class="op">+</span> <span class="va">grade</span>,</span></span>
@@ -420,9 +423,10 @@ should verify this assumption using:</p><ul><li><p><code>cox.zph(model)</code> f
 <span class="r-in"><span>    x <span class="op">=</span> <span class="va">model3</span>,</span></span>
 <span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span></span>
-<span class="r-in"><span>    indent_groups <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span>    indent_groups <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>    zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot3</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Recommended plot dimensions: width = 13.7 in, height = 8.5 in</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 4: Condensed layout for many binary predictors</span></span></span>
 <span class="r-in"><span><span class="va">model4</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html" class="external-link">coxph</a></span><span class="op">(</span></span></span>
@@ -437,145 +441,30 @@ should verify this assumption using:</p><ul><li><p><code>cox.zph(model)</code> f
 <span class="r-in"><span>    condense_table <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot4</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Recommended plot dimensions: width = 12.2 in, height = 5.2 in</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 5: Custom color scheme</span></span></span>
-<span class="r-in"><span><span class="va">plot5</span> <span class="op">&lt;-</span> <span class="fu">coxforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model1</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    color <span class="op">=</span> <span class="st">"#E74C3C"</span>,  <span class="co"># Red</span></span></span>
-<span class="r-in"><span>    zebra_stripes <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot5</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 6: Hide sample sizes, show only events</span></span></span>
-<span class="r-in"><span><span class="va">plot6</span> <span class="op">&lt;-</span> <span class="fu">coxforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model1</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    show_n <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>    show_events <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot6</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 7: Adjust table width</span></span></span>
-<span class="r-in"><span><span class="va">plot7</span> <span class="op">&lt;-</span> <span class="fu">coxforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model3</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    table_width <span class="op">=</span> <span class="fl">0.65</span>,  <span class="co"># More space for long variable names</span></span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot7</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 8: Specify exact dimensions</span></span></span>
-<span class="r-in"><span><span class="va">plot8</span> <span class="op">&lt;-</span> <span class="fu">coxforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model1</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    plot_width <span class="op">=</span> <span class="fl">14</span>,</span></span>
-<span class="r-in"><span>    plot_height <span class="op">=</span> <span class="fl">8</span>,</span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 9: Use recommended dimensions for saving</span></span></span>
-<span class="r-in"><span><span class="va">plot9</span> <span class="op">&lt;-</span> <span class="fu">coxforest</span><span class="op">(</span><span class="va">model1</span>, data <span class="op">=</span> <span class="va">clintrial</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">dims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">plot9</span>, <span class="st">"rec_dims"</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Save to PDF</span></span></span>
-<span class="r-in"><span><span class="co"># ggsave("survival_forest.pdf", plot9,</span></span></span>
-<span class="r-in"><span><span class="co">#        width = dims$width, height = dims$height)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 10: Different units (centimeters)</span></span></span>
-<span class="r-in"><span><span class="va">plot10</span> <span class="op">&lt;-</span> <span class="fu">coxforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model1</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    plot_width <span class="op">=</span> <span class="fl">35</span>,</span></span>
-<span class="r-in"><span>    plot_height <span class="op">=</span> <span class="fl">25</span>,</span></span>
-<span class="r-in"><span>    units <span class="op">=</span> <span class="st">"cm"</span>,</span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 11: Stratified Cox model</span></span></span>
-<span class="r-in"><span><span class="co"># Stratification variable (site) won't appear in plot</span></span></span>
-<span class="r-in"><span><span class="va">model11</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html" class="external-link">coxph</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span><span class="co"># Example 5: Stratified Cox model</span></span></span>
+<span class="r-in"><span><span class="va">model5</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html" class="external-link">coxph</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html" class="external-link">Surv</a></span><span class="op">(</span><span class="va">os_months</span>, <span class="va">os_status</span><span class="op">)</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">treatment</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/survival/man/strata.html" class="external-link">strata</a></span><span class="op">(</span><span class="va">site</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">plot11</span> <span class="op">&lt;-</span> <span class="fu">coxforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model11</span>,</span></span>
+<span class="r-in"><span><span class="va">plot5</span> <span class="op">&lt;-</span> <span class="fu">coxforest</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model5</span>,</span></span>
 <span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>    title <span class="op">=</span> <span class="st">"Stratified by Study Site"</span>,</span></span>
 <span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot11</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Recommended plot dimensions: width = 13.7 in, height = 5.0 in</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 12: With clustering for robust SE</span></span></span>
-<span class="r-in"><span><span class="va">model12</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html" class="external-link">coxph</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html" class="external-link">Surv</a></span><span class="op">(</span><span class="va">os_months</span>, <span class="va">os_status</span><span class="op">)</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">treatment</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/survival/man/cluster.html" class="external-link">cluster</a></span><span class="op">(</span><span class="va">site</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Example 6: Save with recommended dimensions</span></span></span>
+<span class="r-in"><span><span class="va">dims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">plot5</span>, <span class="st">"rec_dims"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"survival_forest.pdf"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                <span class="va">plot5</span>, width <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">width</span>, height <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">height</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">plot12</span> <span class="op">&lt;-</span> <span class="fu">coxforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model12</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    title <span class="op">=</span> <span class="st">"Clustered by Study Site"</span>,</span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot12</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># Standard errors account for site clustering</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="va">old_width</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 13: Custom reference label</span></span></span>
-<span class="r-in"><span><span class="va">plot13</span> <span class="op">&lt;-</span> <span class="fu">coxforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model1</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    ref_label <span class="op">=</span> <span class="st">"1.00 (ref)"</span>,</span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot13</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 14: Presentation-sized fonts</span></span></span>
-<span class="r-in"><span><span class="va">plot14</span> <span class="op">&lt;-</span> <span class="fu">coxforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">model1</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    font_size <span class="op">=</span> <span class="fl">1.4</span>,</span></span>
-<span class="r-in"><span>    title_size <span class="op">=</span> <span class="fl">28</span>,</span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot14</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 15: Publication-ready final plot</span></span></span>
-<span class="r-in"><span><span class="va">final_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html" class="external-link">coxph</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html" class="external-link">Surv</a></span><span class="op">(</span><span class="va">os_months</span>, <span class="va">os_status</span><span class="op">)</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">bmi</span> <span class="op">+</span> <span class="va">smoking</span> <span class="op">+</span> </span></span>
-<span class="r-in"><span>        <span class="va">hypertension</span> <span class="op">+</span> <span class="va">diabetes</span> <span class="op">+</span> <span class="va">ecog</span> <span class="op">+</span> <span class="va">treatment</span> <span class="op">+</span> <span class="va">stage</span> <span class="op">+</span> <span class="va">grade</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">final_plot</span> <span class="op">&lt;-</span> <span class="fu">coxforest</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    x <span class="op">=</span> <span class="va">final_model</span>,</span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>    title <span class="op">=</span> <span class="st">"Multivariable Cox Regression: Prognostic Factors for Overall Survival"</span>,</span></span>
-<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span></span>
-<span class="r-in"><span>    indent_groups <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>    zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>    show_n <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>    show_events <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>    color <span class="op">=</span> <span class="st">"#8A61D8"</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Check model fit</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">final_model</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Verify proportional hazards assumption</span></span></span>
-<span class="r-in"><span><span class="co"># cox.zph(final_model)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Save for publication</span></span></span>
-<span class="r-in"><span><span class="va">dims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">final_plot</span>, <span class="st">"rec_dims"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># ggsave("figure2_survival.pdf", final_plot,</span></span></span>
-<span class="r-in"><span><span class="co">#        width = dims$width, height = dims$height)</span></span></span>
-<span class="r-in"><span><span class="co"># ggsave("figure2_survival.png", final_plot,</span></span></span>
-<span class="r-in"><span><span class="co">#        width = dims$width, height = dims$height, dpi = 300)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

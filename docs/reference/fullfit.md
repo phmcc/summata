@@ -556,14 +556,14 @@ Other regression functions:
 # Load example data
 data(clintrial)
 data(clintrial_labels)
-library(survival)
 
 # Example 1: Basic screening with p < 0.05 threshold
 result1 <- fullfit(
     data = clintrial,
     outcome = "os_status",
-    predictors = c("age", "sex", "bmi", "smoking", "hypertension", 
-                  "diabetes", "treatment", "stage"),
+    predictors = c("age", "sex", "bmi", "smoking",
+                   "hypertension", "diabetes",
+                   "treatment", "stage"),
     method = "screen",
     p_threshold = 0.05,
     labels = clintrial_labels
@@ -603,59 +603,9 @@ print(result1)
 # Only significant univariable predictors in multivariable model
 
 # \donttest{
-# Example 2: Liberal screening threshold (p < 0.20)
-result2 <- fullfit(
-    data = clintrial,
-    outcome = "os_status",
-    predictors = c("age", "sex", "bmi", "smoking", "hypertension",
-                  "diabetes", "ecog", "treatment", "stage", "grade"),
-    method = "screen",
-    p_threshold = 0.20,  # More liberal for screening
-    labels = clintrial_labels
-)
-#> Running univariable analysis...
-#> Fitting multivariable model with 7 predictors...
-print(result2)
-#> 
-#> Fullfit Analysis Results
-#> Outcome: os_status
-#> Model Type: glm
-#> Method: screen (p < 0.2)
-#> Predictors Screened: 10
-#> Multivariable Predictors: 7
-#> 
-#>                    Variable                     Group      n Events            OR (95% CI)   Uni p           aOR (95% CI) Multi p
-#>                      <char>                    <char> <char> <char>                 <char>  <char>                 <char>  <char>
-#>  1:             Age (years)                         -    850    609       1.05 (1.03-1.06) < 0.001       1.06 (1.04-1.08) < 0.001
-#>  2:                     Sex                    Female    450    298              reference       -              reference       -
-#>  3:                                              Male    400    311       1.78 (1.31-2.42) < 0.001       2.09 (1.46-2.98) < 0.001
-#>  4: Body Mass Index (kg/m²)                         -    838    599       1.01 (0.98-1.05)   0.347                      -       -
-#>  5:          Smoking Status                     Never    337    248              reference       -              reference       -
-#>  6:                                            Former    311    203       0.67 (0.48-0.94)   0.022       0.72 (0.49-1.06)   0.097
-#>  7:                                           Current    185    143       1.22 (0.80-1.86)   0.351       1.37 (0.85-2.20)   0.197
-#>  8:            Hypertension                        No    504    354              reference       -                      -       -
-#>  9:                                               Yes    331    242       1.15 (0.85-1.57)   0.369                      -       -
-#> 10:                Diabetes                        No    637    457              reference       -                      -       -
-#> 11:                                               Yes    197    138       0.92 (0.65-1.31)   0.646                      -       -
-#> 12: ECOG Performance Status                         0    265    159              reference       -              reference       -
-#> 13:                                                 1    302    212       1.57 (1.11-2.22)   0.011       1.88 (1.26-2.81)   0.002
-#> 14:                                                 2    238    194       2.94 (1.95-4.43) < 0.001       3.78 (2.37-6.02) < 0.001
-#> 15:                                                 3     37     37 10434240.53 (0.00-Inf)   0.967 40085625.57 (0.00-Inf)   0.976
-#> 16:         Treatment Group                   Control    196    151              reference       -              reference       -
-#> 17:                                            Drug A    292    184       0.51 (0.34-0.76)   0.001       0.38 (0.23-0.61) < 0.001
-#> 18:                                            Drug B    362    274       0.93 (0.62-1.40)   0.721       0.72 (0.45-1.15)   0.168
-#> 19:           Disease Stage                         I    211    127              reference       -              reference       -
-#> 20:                                                II    263    172       1.25 (0.86-1.82)   0.243       1.33 (0.86-2.04)   0.201
-#> 21:                                               III    241    186       2.24 (1.49-3.36) < 0.001       2.72 (1.70-4.36) < 0.001
-#> 22:                                                IV    132    121      7.28 (3.70-14.30) < 0.001     10.52 (5.06-21.90) < 0.001
-#> 23:             Tumor Grade       Well-differentiated    153     95              reference       -              reference       -
-#> 24:                         Moderately differentiated    412    297       1.58 (1.07-2.33)   0.023       1.93 (1.22-3.06)   0.005
-#> 25:                             Poorly differentiated    275    208       1.90 (1.24-2.91)   0.003       2.53 (1.53-4.20) < 0.001
-#>                    Variable                     Group      n Events            OR (95% CI)   Uni p           aOR (95% CI) Multi p
-#>                      <char>                    <char> <char> <char>                 <char>  <char>                 <char>  <char>
 
-# Example 3: Include all predictors (no selection)
-result3 <- fullfit(
+# Example 2: Include all predictors (no selection)
+result2 <- fullfit(
     data = clintrial,
     outcome = "os_status",
     predictors = c("age", "sex", "treatment", "stage"),
@@ -664,7 +614,7 @@ result3 <- fullfit(
 )
 #> Running univariable analysis...
 #> Fitting multivariable model with 4 predictors...
-print(result3)
+print(result2)
 #> 
 #> Fullfit Analysis Results
 #> Outcome: os_status
@@ -685,20 +635,19 @@ print(result3)
 #>  8:                      II    263    172  1.25 (0.86-1.82)   0.243  1.32 (0.88-1.97)   0.181
 #>  9:                     III    241    186  2.24 (1.49-3.36) < 0.001  2.70 (1.74-4.19) < 0.001
 #> 10:                      IV    132    121 7.28 (3.70-14.30) < 0.001 9.08 (4.49-18.37) < 0.001
-# All predictors in both analyses
 
-# Example 4: Custom variable selection
-result4 <- fullfit(
+# Example 3: Custom variable selection
+result3 <- fullfit(
     data = clintrial,
     outcome = "os_status",
     predictors = c("age", "sex", "bmi", "smoking", "treatment", "stage"),
     method = "custom",
-    multi_predictors = c("age", "treatment", "stage"),  # Manual selection
+    multi_predictors = c("age", "treatment", "stage"),
     labels = clintrial_labels
 )
 #> Running univariable analysis...
 #> Fitting multivariable model with 3 predictors...
-print(result4)
+print(result3)
 #> 
 #> Fullfit Analysis Results
 #> Outcome: os_status
@@ -725,269 +674,42 @@ print(result4)
 #> 14:                              IV    132    121 7.28 (3.70-14.30) < 0.001 8.43 (4.20-16.92) < 0.001
 # Univariable for all, multivariable for selected only
 
-# Example 5: Cox regression with screening
+# Example 4: Cox regression with screening
+library(survival)
 cox_result <- fullfit(
     data = clintrial,
     outcome = "Surv(os_months, os_status)",
-    predictors = c("age", "sex", "bmi", "treatment", "stage", "grade"),
+    predictors = c("age", "sex", "treatment", "stage"),
     model_type = "coxph",
     method = "screen",
     p_threshold = 0.10,
     labels = clintrial_labels
 )
 #> Running univariable analysis...
-#> Fitting multivariable model with 5 predictors...
+#> Fitting multivariable model with 4 predictors...
 print(cox_result)
 #> 
 #> Fullfit Analysis Results
 #> Outcome: Surv(os_months, os_status)
 #> Model Type: coxph
 #> Method: screen (p < 0.1)
-#> Predictors Screened: 6
-#> Multivariable Predictors: 5
-#> 
-#>                    Variable                     Group      n Events      HR (95% CI)   Uni p     aHR (95% CI) Multi p
-#>                      <char>                    <char> <char> <char>           <char>  <char>           <char>  <char>
-#>  1:             Age (years)                         -    850    609 1.03 (1.03-1.04) < 0.001 1.04 (1.03-1.04) < 0.001
-#>  2:                     Sex                    Female    450    298        reference       -        reference       -
-#>  3:                                              Male    400    311 1.30 (1.11-1.53)   0.001 1.36 (1.15-1.59) < 0.001
-#>  4: Body Mass Index (kg/m²)                         -    838    599 1.01 (0.99-1.03)   0.312                -       -
-#>  5:         Treatment Group                   Control    196    151        reference       -        reference       -
-#>  6:                                            Drug A    292    184 0.64 (0.52-0.80) < 0.001 0.54 (0.44-0.68) < 0.001
-#>  7:                                            Drug B    362    274 0.94 (0.77-1.15)   0.567 0.79 (0.64-0.97)   0.023
-#>  8:           Disease Stage                         I    211    127        reference       -        reference       -
-#>  9:                                                II    263    172 1.12 (0.89-1.41)   0.337 1.16 (0.92-1.47)   0.198
-#> 10:                                               III    241    186 1.69 (1.35-2.11) < 0.001 1.87 (1.48-2.35) < 0.001
-#> 11:                                                IV    132    121 3.18 (2.47-4.09) < 0.001 3.60 (2.78-4.65) < 0.001
-#> 12:             Tumor Grade       Well-differentiated    153     95        reference       -        reference       -
-#> 13:                         Moderately differentiated    412    297 1.36 (1.08-1.71)   0.010 1.40 (1.11-1.77)   0.005
-#> 14:                             Poorly differentiated    275    208 1.62 (1.27-2.06) < 0.001 1.71 (1.34-2.19) < 0.001
-# Returns hazard ratios (HR/aHR)
-
-# Example 6: Show only multivariable results
-multi_only <- fullfit(
-    data = clintrial,
-    outcome = "os_status",
-    predictors = c("age", "sex", "treatment", "stage"),
-    method = "all",
-    columns = "multi",  # Multivariable results only
-    labels = clintrial_labels
-)
-#> Fitting multivariable model with 4 predictors...
-print(multi_only)
-#> 
-#> Fullfit Analysis Results
-#> Outcome: os_status
-#> Model Type: glm
-#> Method: all
 #> Predictors Screened: 4
 #> Multivariable Predictors: 4
 #> 
-#>            Variable   Group      n Events      aOR (95% CI) p-value
-#>              <char>  <char> <char> <char>            <char>  <char>
-#>  1:     Age (years)       -    847    606  1.05 (1.04-1.07) < 0.001
-#>  2:             Sex  Female    449    297         reference       -
-#>  3:                    Male    398    309  2.02 (1.45-2.82) < 0.001
-#>  4: Treatment Group Control    194    149         reference       -
-#>  5:                  Drug A    292    184  0.44 (0.28-0.68) < 0.001
-#>  6:                  Drug B    361    273  0.74 (0.48-1.16)   0.192
-#>  7:   Disease Stage       I    211    127         reference       -
-#>  8:                      II    263    172  1.32 (0.88-1.97)   0.181
-#>  9:                     III    241    186  2.70 (1.74-4.19) < 0.001
-#> 10:                      IV    132    121 9.08 (4.49-18.37) < 0.001
+#>            Variable   Group      n Events      HR (95% CI)   Uni p     aHR (95% CI) Multi p
+#>              <char>  <char> <char> <char>           <char>  <char>           <char>  <char>
+#>  1:     Age (years)       -    850    609 1.03 (1.03-1.04) < 0.001 1.04 (1.03-1.04) < 0.001
+#>  2:             Sex  Female    450    298        reference       -        reference       -
+#>  3:                    Male    400    311 1.30 (1.11-1.53)   0.001 1.33 (1.13-1.56) < 0.001
+#>  4: Treatment Group Control    196    151        reference       -        reference       -
+#>  5:                  Drug A    292    184 0.64 (0.52-0.80) < 0.001 0.56 (0.45-0.70) < 0.001
+#>  6:                  Drug B    362    274 0.94 (0.77-1.15)   0.567 0.83 (0.67-1.01)   0.062
+#>  7:   Disease Stage       I    211    127        reference       -        reference       -
+#>  8:                      II    263    172 1.12 (0.89-1.41)   0.337 1.16 (0.92-1.46)   0.214
+#>  9:                     III    241    186 1.69 (1.35-2.11) < 0.001 1.90 (1.51-2.38) < 0.001
+#> 10:                      IV    132    121 3.18 (2.47-4.09) < 0.001 3.57 (2.77-4.60) < 0.001
 
-# Example 7: Show only univariable results
-uni_only <- fullfit(
-    data = clintrial,
-    outcome = "os_status",
-    predictors = c("age", "sex", "treatment", "stage"),
-    columns = "uni",  # Univariable results only
-    labels = clintrial_labels
-)
-#> Running univariable analysis...
-print(uni_only)
-#> 
-#> Fullfit Analysis Results
-#> Outcome: os_status
-#> Model Type: glm
-#> Method: screen (p < 0.05)
-#> Predictors Screened: 4
-#> 
-#>            Variable   Group      n Events       OR (95% CI) p-value
-#>              <char>  <char> <char> <char>            <char>  <char>
-#>  1:     Age (years)       -    850    609  1.05 (1.03-1.06) < 0.001
-#>  2:             Sex  Female    450    298         reference       -
-#>  3:                    Male    400    311  1.78 (1.31-2.42) < 0.001
-#>  4: Treatment Group Control    196    151         reference       -
-#>  5:                  Drug A    292    184  0.51 (0.34-0.76)   0.001
-#>  6:                  Drug B    362    274  0.93 (0.62-1.40)   0.721
-#>  7:   Disease Stage       I    211    127         reference       -
-#>  8:                      II    263    172  1.25 (0.86-1.82)   0.243
-#>  9:                     III    241    186  2.24 (1.49-3.36) < 0.001
-#> 10:                      IV    132    121 7.28 (3.70-14.30) < 0.001
-
-# Example 8: Show only effect estimates (no p-values)
-effects_only <- fullfit(
-    data = clintrial,
-    outcome = "os_status",
-    predictors = c("age", "sex", "treatment"),
-    metrics = "effect",  # Effect estimates only
-    labels = clintrial_labels
-)
-#> Running univariable analysis...
-#> Fitting multivariable model with 3 predictors...
-print(effects_only)
-#> 
-#> Fullfit Analysis Results
-#> Outcome: os_status
-#> Model Type: glm
-#> Method: screen (p < 0.05)
-#> Predictors Screened: 3
-#> Multivariable Predictors: 3
-#> 
-#>           Variable   Group      n Events      OR (95% CI)     aOR (95% CI)
-#>             <char>  <char> <char> <char>           <char>           <char>
-#> 1:     Age (years)       -    850    609 1.05 (1.03-1.06) 1.05 (1.04-1.07)
-#> 2:             Sex  Female    450    298        reference        reference
-#> 3:                    Male    400    311 1.78 (1.31-2.42) 1.83 (1.33-2.52)
-#> 4: Treatment Group Control    196    151        reference        reference
-#> 5:                  Drug A    292    184 0.51 (0.34-0.76) 0.48 (0.31-0.73)
-#> 6:                  Drug B    362    274 0.93 (0.62-1.40) 0.86 (0.56-1.32)
-
-# Example 9: Show only p-values (no effect estimates)
-pvals_only <- fullfit(
-    data = clintrial,
-    outcome = "os_status",
-    predictors = c("age", "sex", "treatment"),
-    metrics = "p",  # P-values only
-    labels = clintrial_labels
-)
-#> Running univariable analysis...
-#> Fitting multivariable model with 3 predictors...
-print(pvals_only)
-#> 
-#> Fullfit Analysis Results
-#> Outcome: os_status
-#> Model Type: glm
-#> Method: screen (p < 0.05)
-#> Predictors Screened: 3
-#> Multivariable Predictors: 3
-#> 
-#>           Variable   Group      n Events   Uni p Multi p
-#>             <char>  <char> <char> <char>  <char>  <char>
-#> 1:     Age (years)       -    850    609 < 0.001 < 0.001
-#> 2:             Sex  Female    450    298       -       -
-#> 3:                    Male    400    311 < 0.001 < 0.001
-#> 4: Treatment Group Control    196    151       -       -
-#> 5:                  Drug A    292    184   0.001 < 0.001
-#> 6:                  Drug B    362    274   0.721   0.492
-
-# Example 10: Return both table and model object
-both <- fullfit(
-    data = clintrial,
-    outcome = "os_status",
-    predictors = c("age", "sex", "treatment", "stage"),
-    method = "all",
-    return_type = "both"
-)
-#> Running univariable analysis...
-#> Fitting multivariable model with 4 predictors...
-
-# Access the table
-print(both$table)
-#> 
-#> Fullfit Analysis Results
-#> Outcome: os_status
-#> Model Type: glm
-#> Method: all
-#> Predictors Screened: 4
-#> Multivariable Predictors: 4
-#> 
-#>      Variable   Group      n Events       OR (95% CI)   Uni p      aOR (95% CI) Multi p
-#>        <char>  <char> <char> <char>            <char>  <char>            <char>  <char>
-#>  1:       age       -    850    609  1.05 (1.03-1.06) < 0.001  1.05 (1.04-1.07) < 0.001
-#>  2:       sex  Female    450    298         reference       -         reference       -
-#>  3:              Male    400    311  1.78 (1.31-2.42) < 0.001  2.02 (1.45-2.82) < 0.001
-#>  4: treatment Control    196    151         reference       -         reference       -
-#>  5:            Drug A    292    184  0.51 (0.34-0.76)   0.001  0.44 (0.28-0.68) < 0.001
-#>  6:            Drug B    362    274  0.93 (0.62-1.40)   0.721  0.74 (0.48-1.16)   0.192
-#>  7:     stage       I    211    127         reference       -         reference       -
-#>  8:                II    263    172  1.25 (0.86-1.82)   0.243  1.32 (0.88-1.97)   0.181
-#>  9:               III    241    186  2.24 (1.49-3.36) < 0.001  2.70 (1.74-4.19) < 0.001
-#> 10:                IV    132    121 7.28 (3.70-14.30) < 0.001 9.08 (4.49-18.37) < 0.001
-
-# Access the model
-summary(both$model)
-#> 
-#> Call:
-#> stats::glm(formula = formula, family = family, data = data)
-#> 
-#> Coefficients:
-#>                  Estimate Std. Error z value Pr(>|z|)    
-#> (Intercept)     -2.646316   0.491675  -5.382 7.36e-08 ***
-#> age              0.052666   0.007447   7.072 1.53e-12 ***
-#> sexMale          0.702430   0.170410   4.122 3.76e-05 ***
-#> treatmentDrug A -0.829478   0.227358  -3.648 0.000264 ***
-#> treatmentDrug B -0.297335   0.227823  -1.305 0.191854    
-#> stageII          0.274497   0.205201   1.338 0.180994    
-#> stageIII         0.992064   0.224514   4.419 9.93e-06 ***
-#> stageIV          2.205770   0.359692   6.132 8.66e-10 ***
-#> ---
-#> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-#> 
-#> (Dispersion parameter for binomial family taken to be 1)
-#> 
-#>     Null deviance: 1011.63  on 846  degrees of freedom
-#> Residual deviance:  869.99  on 839  degrees of freedom
-#>   (3 observations deleted due to missingness)
-#> AIC: 885.99
-#> 
-#> Number of Fisher Scoring iterations: 5
-#> 
-
-# Model diagnostics
-plot(both$model)
-
-
-
-
-
-# Example 11: Return only the model object
-model_only <- fullfit(
-    data = clintrial,
-    outcome = "os_status",
-    predictors = c("age", "sex", "treatment"),
-    return_type = "model"
-)
-#> Running univariable analysis...
-#> Fitting multivariable model with 3 predictors...
-
-# This returns a glm object directly
-summary(model_only)
-#> 
-#> Call:
-#> stats::glm(formula = formula, family = family, data = data)
-#> 
-#> Coefficients:
-#>                  Estimate Std. Error z value Pr(>|z|)    
-#> (Intercept)     -1.875423   0.447739  -4.189 2.81e-05 ***
-#> age              0.049051   0.007173   6.838 8.01e-12 ***
-#> sexMale          0.604650   0.163104   3.707 0.000210 ***
-#> treatmentDrug A -0.740041   0.217839  -3.397 0.000681 ***
-#> treatmentDrug B -0.149591   0.217516  -0.688 0.491627    
-#> ---
-#> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-#> 
-#> (Dispersion parameter for binomial family taken to be 1)
-#> 
-#>     Null deviance: 1013.64  on 849  degrees of freedom
-#> Residual deviance:  933.43  on 845  degrees of freedom
-#> AIC: 943.43
-#> 
-#> Number of Fisher Scoring iterations: 4
-#> 
-
-# Example 12: Linear regression
+# Example 5: Linear regression without screening
 linear_result <- fullfit(
     data = clintrial,
     outcome = "bmi",
@@ -1017,8 +739,7 @@ print(linear_result)
 #> 6:                             Current    185  0.31 (-0.57 to 1.20)  0.490      0.26 (-0.62 to 1.15)   0.558
 #> 7: Baseline Creatinine (mg/dL)       -    833  0.52 (-0.61 to 1.65)  0.367      0.55 (-0.58 to 1.68)   0.340
 
-# Example 13: Poisson regression for equidispersed count outcomes
-# fu_count has variance ~= mean, appropriate for standard Poisson
+# Example 6: Poisson regression for count outcomes
 poisson_result <- fullfit(
     data = clintrial,
     outcome = "fu_count",
@@ -1051,10 +772,99 @@ print(poisson_result)
 #>  8:                     Drug B    362  2,443 1.11 (1.04-1.19)   0.003 1.12 (1.04-1.20)   0.002
 #>  9: Surgical Resection      No    480  3,098        reference       -        reference       -
 #> 10:                        Yes    370  2,435 1.03 (0.97-1.08)   0.322 1.09 (1.03-1.16)   0.003
-# Returns rate ratios (RR/aRR)
-# For overdispersed counts (ae_count), use model_type = "negbin" instead
 
-# Example 14: Keep univariable models for diagnostics
+# Example 7: Show only multivariable results
+multi_only <- fullfit(
+    data = clintrial,
+    outcome = "os_status",
+    predictors = c("age", "sex", "treatment", "stage"),
+    method = "all",
+    columns = "multi",
+    labels = clintrial_labels
+)
+#> Fitting multivariable model with 4 predictors...
+print(multi_only)
+#> 
+#> Fullfit Analysis Results
+#> Outcome: os_status
+#> Model Type: glm
+#> Method: all
+#> Predictors Screened: 4
+#> Multivariable Predictors: 4
+#> 
+#>            Variable   Group      n Events      aOR (95% CI) p-value
+#>              <char>  <char> <char> <char>            <char>  <char>
+#>  1:     Age (years)       -    847    606  1.05 (1.04-1.07) < 0.001
+#>  2:             Sex  Female    449    297         reference       -
+#>  3:                    Male    398    309  2.02 (1.45-2.82) < 0.001
+#>  4: Treatment Group Control    194    149         reference       -
+#>  5:                  Drug A    292    184  0.44 (0.28-0.68) < 0.001
+#>  6:                  Drug B    361    273  0.74 (0.48-1.16)   0.192
+#>  7:   Disease Stage       I    211    127         reference       -
+#>  8:                      II    263    172  1.32 (0.88-1.97)   0.181
+#>  9:                     III    241    186  2.70 (1.74-4.19) < 0.001
+#> 10:                      IV    132    121 9.08 (4.49-18.37) < 0.001
+
+# Example 8: Return both table and model object
+both <- fullfit(
+    data = clintrial,
+    outcome = "os_status",
+    predictors = c("age", "sex", "treatment", "stage"),
+    method = "all",
+    return_type = "both"
+)
+#> Running univariable analysis...
+#> Fitting multivariable model with 4 predictors...
+print(both$table)
+#> 
+#> Fullfit Analysis Results
+#> Outcome: os_status
+#> Model Type: glm
+#> Method: all
+#> Predictors Screened: 4
+#> Multivariable Predictors: 4
+#> 
+#>      Variable   Group      n Events       OR (95% CI)   Uni p      aOR (95% CI) Multi p
+#>        <char>  <char> <char> <char>            <char>  <char>            <char>  <char>
+#>  1:       age       -    850    609  1.05 (1.03-1.06) < 0.001  1.05 (1.04-1.07) < 0.001
+#>  2:       sex  Female    450    298         reference       -         reference       -
+#>  3:              Male    400    311  1.78 (1.31-2.42) < 0.001  2.02 (1.45-2.82) < 0.001
+#>  4: treatment Control    196    151         reference       -         reference       -
+#>  5:            Drug A    292    184  0.51 (0.34-0.76)   0.001  0.44 (0.28-0.68) < 0.001
+#>  6:            Drug B    362    274  0.93 (0.62-1.40)   0.721  0.74 (0.48-1.16)   0.192
+#>  7:     stage       I    211    127         reference       -         reference       -
+#>  8:                II    263    172  1.25 (0.86-1.82)   0.243  1.32 (0.88-1.97)   0.181
+#>  9:               III    241    186  2.24 (1.49-3.36) < 0.001  2.70 (1.74-4.19) < 0.001
+#> 10:                IV    132    121 7.28 (3.70-14.30) < 0.001 9.08 (4.49-18.37) < 0.001
+summary(both$model)
+#> 
+#> Call:
+#> stats::glm(formula = formula, family = family, data = data)
+#> 
+#> Coefficients:
+#>                  Estimate Std. Error z value Pr(>|z|)    
+#> (Intercept)     -2.646316   0.491675  -5.382 7.36e-08 ***
+#> age              0.052666   0.007447   7.072 1.53e-12 ***
+#> sexMale          0.702430   0.170410   4.122 3.76e-05 ***
+#> treatmentDrug A -0.829478   0.227358  -3.648 0.000264 ***
+#> treatmentDrug B -0.297335   0.227823  -1.305 0.191854    
+#> stageII          0.274497   0.205201   1.338 0.180994    
+#> stageIII         0.992064   0.224514   4.419 9.93e-06 ***
+#> stageIV          2.205770   0.359692   6.132 8.66e-10 ***
+#> ---
+#> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#> 
+#> (Dispersion parameter for binomial family taken to be 1)
+#> 
+#>     Null deviance: 1011.63  on 846  degrees of freedom
+#> Residual deviance:  869.99  on 839  degrees of freedom
+#>   (3 observations deleted due to missingness)
+#> AIC: 885.99
+#> 
+#> Number of Fisher Scoring iterations: 5
+#> 
+
+# Example 9: Keep univariable models for diagnostics
 with_models <- fullfit(
     data = clintrial,
     outcome = "os_status",
@@ -1063,8 +873,6 @@ with_models <- fullfit(
 )
 #> Running univariable analysis...
 #> Fitting multivariable model with 1 predictors...
-
-# Access univariable models
 uni_results <- attr(with_models, "uni_results")
 uni_models <- attr(uni_results, "models")
 summary(uni_models[["age"]])
@@ -1089,172 +897,7 @@ summary(uni_models[["age"]])
 #> Number of Fisher Scoring iterations: 4
 #> 
 
-# Example 15: Check how many predictors made it to multivariable
-result <- fullfit(
-    data = clintrial,
-    outcome = "os_status",
-    predictors = c("age", "sex", "bmi", "smoking", "hypertension",
-                  "diabetes", "ecog", "treatment", "stage", "grade"),
-    method = "screen",
-    p_threshold = 0.10
-)
-#> Running univariable analysis...
-#> Fitting multivariable model with 7 predictors...
-
-n_multi <- attr(result, "n_multi")
-cat("Predictors in multivariable model:", n_multi, "\n")
-#> Predictors in multivariable model: 7 
-
-# Example 16: Complete publication workflow
-final_table <- fullfit(
-    data = clintrial,
-    outcome = "Surv(os_months, os_status)",
-    predictors = c("age", "sex", "race", "bmi", "smoking", 
-                  "hypertension", "diabetes", "ecog",
-                  "treatment", "stage", "grade"),
-    model_type = "coxph",
-    method = "screen",
-    p_threshold = 0.10,
-    columns = "both",
-    metrics = "both",
-    labels = clintrial_labels,
-    digits = 2,
-    p_digits = 3
-)
-#> Running univariable analysis...
-#> Fitting multivariable model with 7 predictors...
-print(final_table)
-#> 
-#> Fullfit Analysis Results
-#> Outcome: Surv(os_months, os_status)
-#> Model Type: coxph
-#> Method: screen (p < 0.1)
-#> Predictors Screened: 11
-#> Multivariable Predictors: 7
-#> 
-#>                    Variable                     Group      n Events      HR (95% CI)   Uni p     aHR (95% CI) Multi p
-#>                      <char>                    <char> <char> <char>           <char>  <char>           <char>  <char>
-#>  1:             Age (years)                         -    850    609 1.03 (1.03-1.04) < 0.001 1.04 (1.03-1.04) < 0.001
-#>  2:                     Sex                    Female    450    298        reference       -        reference       -
-#>  3:                                              Male    400    311 1.30 (1.11-1.53)   0.001 1.31 (1.11-1.54)   0.001
-#>  4:                    Race                     White    598    433        reference       -                -       -
-#>  5:                                             Black    126     84 0.87 (0.69-1.10)   0.249                -       -
-#>  6:                                             Asian     93     71 1.05 (0.82-1.35)   0.683                -       -
-#>  7:                                             Other     33     21 0.79 (0.51-1.22)   0.287                -       -
-#>  8: Body Mass Index (kg/m²)                         -    838    599 1.01 (0.99-1.03)   0.312                -       -
-#>  9:          Smoking Status                     Never    337    248        reference       -        reference       -
-#> 10:                                            Former    311    203 0.84 (0.70-1.02)   0.074 0.91 (0.75-1.10)   0.325
-#> 11:                                           Current    185    143 1.19 (0.97-1.46)   0.103 1.30 (1.05-1.61)   0.015
-#> 12:            Hypertension                        No    504    354        reference       -                -       -
-#> 13:                                               Yes    331    242 1.06 (0.90-1.25)   0.482                -       -
-#> 14:                Diabetes                        No    637    457        reference       -                -       -
-#> 15:                                               Yes    197    138 0.93 (0.77-1.12)   0.432                -       -
-#> 16: ECOG Performance Status                         0    265    159        reference       -        reference       -
-#> 17:                                                 1    302    212 1.36 (1.11-1.67)   0.003 1.50 (1.22-1.85) < 0.001
-#> 18:                                                 2    238    194 1.86 (1.51-2.29) < 0.001 2.00 (1.62-2.48) < 0.001
-#> 19:                                                 3     37     37 3.06 (2.13-4.38) < 0.001 3.35 (2.31-4.85) < 0.001
-#> 20:         Treatment Group                   Control    196    151        reference       -        reference       -
-#> 21:                                            Drug A    292    184 0.64 (0.52-0.80) < 0.001 0.52 (0.41-0.65) < 0.001
-#> 22:                                            Drug B    362    274 0.94 (0.77-1.15)   0.567 0.79 (0.65-0.98)   0.029
-#> 23:           Disease Stage                         I    211    127        reference       -        reference       -
-#> 24:                                                II    263    172 1.12 (0.89-1.41)   0.337 1.14 (0.90-1.43)   0.280
-#> 25:                                               III    241    186 1.69 (1.35-2.11) < 0.001 1.87 (1.48-2.36) < 0.001
-#> 26:                                                IV    132    121 3.18 (2.47-4.09) < 0.001 4.07 (3.13-5.29) < 0.001
-#> 27:             Tumor Grade       Well-differentiated    153     95        reference       -        reference       -
-#> 28:                         Moderately differentiated    412    297 1.36 (1.08-1.71)   0.010 1.48 (1.17-1.87)   0.001
-#> 29:                             Poorly differentiated    275    208 1.62 (1.27-2.06) < 0.001 1.87 (1.46-2.40) < 0.001
-#>                    Variable                     Group      n Events      HR (95% CI)   Uni p     aHR (95% CI) Multi p
-#>                      <char>                    <char> <char> <char>           <char>  <char>           <char>  <char>
-
-# Can export directly to PDF/LaTeX/HTML for publication
-# table2pdf(final_table, "regression_results.pdf")
-# table2docx(final_table, "regression_results.docx")
-
-# Example 17: Gamma regression with screening
-gamma_result <- fullfit(
-    data = clintrial,
-    outcome = "los_days",
-    predictors = c("age", "treatment", "surgery", "any_complication", 
-                  "stage", "ecog"),
-    model_type = "glm",
-    family = Gamma(link = "log"),
-    method = "screen",
-    p_threshold = 0.10,
-    labels = clintrial_labels
-)
-#> Running univariable analysis...
-#> Fitting multivariable model with 6 predictors...
-print(gamma_result)
-#> 
-#> Fullfit Analysis Results
-#> Outcome: los_days
-#> Model Type: glm
-#> Method: screen (p < 0.1)
-#> Predictors Screened: 6
-#> Multivariable Predictors: 6
-#> 
-#>                    Variable            Group      n Coefficient (95% CI)   Uni p Adj. Coefficient (95% CI) Multi p
-#>                      <char>           <char> <char>               <char>  <char>                    <char>  <char>
-#>  1:             Age (years)                -    830     1.01 (1.01-1.01) < 0.001          1.01 (1.01-1.01) < 0.001
-#>  2:         Treatment Group          Control    196            reference       -                 reference       -
-#>  3:                                   Drug A    292     0.96 (0.92-1.00)   0.067          0.93 (0.90-0.96) < 0.001
-#>  4:                                   Drug B    362     1.15 (1.10-1.19) < 0.001          1.16 (1.13-1.20) < 0.001
-#>  5:      Surgical Resection               No    480            reference       -                 reference       -
-#>  6:                                      Yes    370     1.03 (1.00-1.06)   0.091          1.25 (1.21-1.28) < 0.001
-#>  7:        Any Complication  No complication    370            reference       -                 reference       -
-#>  8:                         Any complication    480     1.17 (1.13-1.20) < 0.001          1.06 (1.03-1.09) < 0.001
-#>  9:           Disease Stage                I    211            reference       -                 reference       -
-#> 10:                                       II    263     1.06 (1.02-1.11)   0.006          1.08 (1.05-1.12) < 0.001
-#> 11:                                      III    241     1.15 (1.10-1.20) < 0.001          1.17 (1.14-1.21) < 0.001
-#> 12:                                       IV    132     1.16 (1.10-1.22) < 0.001          1.27 (1.22-1.32) < 0.001
-#> 13: ECOG Performance Status                0    265            reference       -                 reference       -
-#> 14:                                        1    302     1.12 (1.08-1.16) < 0.001          1.14 (1.11-1.18) < 0.001
-#> 15:                                        2    238     1.21 (1.16-1.26) < 0.001          1.28 (1.24-1.32) < 0.001
-#> 16:                                        3     37     1.27 (1.17-1.38) < 0.001          1.41 (1.33-1.50) < 0.001
-
-# Example 18: Quasipoisson for overdispersed counts
-quasi_result <- fullfit(
-    data = clintrial,
-    outcome = "ae_count",
-    predictors = c("age", "treatment", "diabetes", "surgery", 
-                  "stage", "ecog"),
-    model_type = "glm",
-    family = "quasipoisson",
-    method = "screen",
-    p_threshold = 0.20,
-    labels = clintrial_labels
-)
-#> Running univariable analysis...
-#> Fitting multivariable model with 5 predictors...
-print(quasi_result)
-#> 
-#> Fullfit Analysis Results
-#> Outcome: ae_count
-#> Model Type: glm
-#> Method: screen (p < 0.2)
-#> Predictors Screened: 6
-#> Multivariable Predictors: 5
-#> 
-#>                    Variable   Group      n Events      RR (95% CI)   Uni p     aRR (95% CI) Multi p
-#>                      <char>  <char> <char> <char>           <char>  <char>           <char>  <char>
-#>  1:             Age (years)       -    840  4,599 1.01 (1.01-1.02) < 0.001 1.01 (1.01-1.02) < 0.001
-#>  2:         Treatment Group Control    196    851        reference       -        reference       -
-#>  3:                          Drug A    292  1,240 0.97 (0.82-1.15)   0.741 0.94 (0.80-1.10)   0.444
-#>  4:                          Drug B    362  2,508 1.61 (1.38-1.88) < 0.001 1.54 (1.33-1.78) < 0.001
-#>  5:                Diabetes      No    637  2,998        reference       -        reference       -
-#>  6:                             Yes    197  1,508 1.63 (1.44-1.85) < 0.001 1.65 (1.47-1.85) < 0.001
-#>  7:      Surgical Resection      No    480  2,627        reference       -                -       -
-#>  8:                             Yes    370  1,972 0.97 (0.85-1.10)   0.602                -       -
-#>  9:           Disease Stage       I    211  1,103        reference       -        reference       -
-#> 10:                              II    263  1,291 0.94 (0.80-1.12)   0.508 0.90 (0.78-1.05)   0.180
-#> 11:                             III    241  1,494 1.18 (1.01-1.40)   0.043 1.11 (0.96-1.29)   0.145
-#> 12:                              IV    132    689 1.00 (0.82-1.23)   0.967 0.94 (0.79-1.12)   0.488
-#> 13: ECOG Performance Status       0    265  1,224        reference       -        reference       -
-#> 14:                               1    302  1,641 1.16 (0.99-1.35)   0.068 1.26 (1.10-1.44) < 0.001
-#> 15:                               2    238  1,424 1.28 (1.09-1.50)   0.003 1.28 (1.12-1.48) < 0.001
-#> 16:                               3     37    254 1.45 (1.09-1.93)   0.011 1.43 (1.12-1.83)   0.004
-
-# Example 19: Linear mixed effects with site clustering
+# Example 10: Linear mixed effects with site clustering
 if (requireNamespace("lme4", quietly = TRUE)) {
     lmer_result <- fullfit(
         data = clintrial,
@@ -1290,42 +933,5 @@ if (requireNamespace("lme4", quietly = TRUE)) {
 #>  9:                        III    235   2.68 (1.82 to 3.54) < 0.001       3.00 (2.28 to 3.72) < 0.001
 #> 10:                         IV    126   3.04 (2.02 to 4.06) < 0.001       4.35 (3.48 to 5.22) < 0.001
 
-# Example 20: Cox mixed effects with site clustering
-if (requireNamespace("coxme", quietly = TRUE)) {
-    coxme_result <- fullfit(
-        data = clintrial,
-        outcome = "Surv(os_months, os_status)",
-        predictors = c("age", "treatment", "stage", "grade"),
-        random = "(1|site)",
-        model_type = "coxme",
-        method = "screen",
-        p_threshold = 0.10,
-        labels = clintrial_labels
-    )
-    print(coxme_result)
-}
-#> Running univariable analysis...
-#> Fitting multivariable model with 4 predictors...
-#> 
-#> Fullfit Analysis Results
-#> Outcome: Surv(os_months, os_status)
-#> Model Type: coxme
-#> Method: screen (p < 0.1)
-#> Predictors Screened: 4
-#> Multivariable Predictors: 4
-#> 
-#>            Variable                     Group      n Events      HR (95% CI)   Uni p     aHR (95% CI) Multi p
-#>              <char>                    <char> <char> <char>           <char>  <char>           <char>  <char>
-#>  1:     Age (years)                         -    850    609 1.04 (1.03-1.04) < 0.001 1.04 (1.03-1.05) < 0.001
-#>  2: Treatment Group                   Control    196    151        reference       -        reference       -
-#>  3:                                    Drug A    292    184 0.65 (0.53-0.81) < 0.001 0.53 (0.42-0.66) < 0.001
-#>  4:                                    Drug B    362    274 1.04 (0.85-1.27)   0.735 0.86 (0.70-1.05)   0.138
-#>  5:   Disease Stage                         I    211    127        reference       -        reference       -
-#>  6:                                        II    263    172 1.13 (0.90-1.42)   0.307 1.17 (0.93-1.48)   0.186
-#>  7:                                       III    241    186 1.78 (1.41-2.23) < 0.001 1.93 (1.52-2.44) < 0.001
-#>  8:                                        IV    132    121 3.63 (2.81-4.69) < 0.001 4.05 (3.12-5.26) < 0.001
-#>  9:     Tumor Grade       Well-differentiated    153     95        reference       -        reference       -
-#> 10:                 Moderately differentiated    412    297 1.34 (1.06-1.69)   0.013 1.42 (1.13-1.80)   0.003
-#> 11:                     Poorly differentiated    275    208 1.69 (1.32-2.15) < 0.001 1.76 (1.37-2.26) < 0.001
 # }
 ```

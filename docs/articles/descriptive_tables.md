@@ -621,21 +621,21 @@ vignette for comprehensive documentation.
 # Microsoft Word
 table2docx(
   table = table1,
-  file = "Table1.docx",
+  file = file.path(tempdir(), "Table1.docx"),
   caption = "Table 1. Baseline Characteristics by Group"
 )
 
 # PDF (requires LaTeX)
 table2pdf(
   table = table1,
-  file = "Table1.pdf",
+  file = file.path(tempdir(), "Table1.pdf"),
   caption = "Table 1. Baseline Characteristics by Group"
 )
 
 # HTML
 table2html(
   table = table1,
-  file = "Table1.html",
+  file = file.path(tempdir(), "Table1.html"),
   caption = "Table 1. Baseline Characteristics by Group"
 )
 ```
@@ -695,7 +695,7 @@ For tables with many variables, consider splitting by category or using
 landscape orientation for export:
 
 ``` r
-table2pdf(table, "table1.pdf", orientation = "landscape", font_size = 8)
+table2pdf(table, file.path(tempdir(), "table1.pdf"), orientation = "landscape", font_size = 8)
 ```
 
 ------------------------------------------------------------------------

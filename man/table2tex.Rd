@@ -252,11 +252,10 @@ Variable names and labels should not include these characters unless
 intentionally using LaTeX commands.
 }
 \examples{
-\dontshow{if (FALSE) withAutoprint(\{ # examplesIf}
-# Load data and create regression table
 data(clintrial)
 data(clintrial_labels)
 
+# Create example table
 results <- fit(
    data = clintrial,
    outcome = "os_status",
@@ -265,16 +264,19 @@ results <- fit(
 )
 
 # Example 1: Basic LaTeX export
-table2tex(results, "basic.tex")
+if (requireNamespace("xtable", quietly = TRUE)) {
+  table2tex(results, file.path(tempdir(), "basic.tex"))
+}
 
+\donttest{
 # Example 2: With booktabs for publication
-table2tex(results, "publication.tex",
+table2tex(results, file.path(tempdir(), "publication.tex"),
        booktabs = TRUE,
        caption = "Multivariable logistic regression results",
        label = "tab:regression")
 
 # Example 3: Multi-line caption with abbreviations
-table2tex(results, "detailed.tex",
+table2tex(results, file.path(tempdir(), "detailed.tex"),
        booktabs = TRUE,
        caption = "Table 1: Risk Factors for Mortality\\\\\\\\
                  aOR = adjusted odds ratio; CI = confidence interval\\\\\\\\
@@ -282,60 +284,60 @@ table2tex(results, "detailed.tex",
        label = "tab:mortality")
 
 # Example 4: Hierarchical display with indentation
-table2tex(results, "indented.tex",
+table2tex(results, file.path(tempdir(), "indented.tex"),
        indent_groups = TRUE,
        booktabs = TRUE)
 
 # Example 5: Condensed table (reduced height)
-table2tex(results, "condensed.tex",
+table2tex(results, file.path(tempdir(), "condensed.tex"),
        condense_table = TRUE,
        booktabs = TRUE)
 
 # Example 6: With zebra stripes
-table2tex(results, "striped.tex",
+table2tex(results, file.path(tempdir(), "striped.tex"),
        zebra_stripes = TRUE,
        stripe_color = "gray!15",
        booktabs = TRUE)
 # Remember to add \usepackage[table]{xcolor} to the LaTeX document
 
 # Example 7: Dark header style
-table2tex(results, "dark_header.tex",
+table2tex(results, file.path(tempdir(), "dark_header.tex"),
        dark_header = TRUE,
        booktabs = TRUE)
 # Requires \usepackage[table]{xcolor}
 
 # Example 8: Custom cell padding
-table2tex(results, "relaxed.tex",
+table2tex(results, file.path(tempdir(), "relaxed.tex"),
        cell_padding = "relaxed",
        booktabs = TRUE)
 
 # Example 9: Custom column alignment (auto-detected by default)
-table2tex(results, "custom_align.tex",
+table2tex(results, file.path(tempdir(), "custom_align.tex"),
        align = c("c", "c", "c", "c", "c", "c", "c"))
 
 # Example 10: No header formatting (keep original names)
-table2tex(results, "raw_headers.tex",
+table2tex(results, file.path(tempdir(), "raw_headers.tex"),
        format_headers = FALSE)
 
 # Example 11: Disable significance bolding
-table2tex(results, "no_bold.tex",
+table2tex(results, file.path(tempdir(), "no_bold.tex"),
        bold_significant = FALSE,
        booktabs = TRUE)
 
 # Example 12: Stricter significance threshold
-table2tex(results, "strict_sig.tex",
+table2tex(results, file.path(tempdir(), "strict_sig.tex"),
        bold_significant = TRUE,
        p_threshold = 0.01,  # Bold only if p < 0.01
        booktabs = TRUE)
 
 # Example 13: With caption size control
-table2tex(results, "caption_size.tex",
+table2tex(results, file.path(tempdir(), "caption_size.tex"),
        caption_size = 6,
        caption = "Table 1 - Results with Compact Caption\\\\\\\\
                  Smaller caption fits better on constrained pages")
 
 # Example 14: Complete publication-ready table
-table2tex(results, "final_table1.tex",
+table2tex(results, file.path(tempdir(), "final_table1.tex"),
        booktabs = TRUE,
        caption = "Table 1: Multivariable Analysis of Mortality Risk Factors",
        label = "tab:main_results",
@@ -345,14 +347,10 @@ table2tex(results, "final_table1.tex",
        cell_padding = "normal")
 
 # Example 15: Descriptive statistics table
-desc_table <- desctable(
-   data = clintrial,
-   by = "treatment",
-   variables = c("age", "sex", "bmi"),
-   labels = clintrial_labels
-)
+desc_table <- desctable(clintrial, by = "treatment",
+   variables = c("age", "sex", "bmi"), labels = clintrial_labels)
 
-table2tex(desc_table, "table1_descriptive.tex",
+table2tex(desc_table, file.path(tempdir(), "table1_descriptive.tex"),
        booktabs = TRUE,
        caption = "Table 1: Baseline Characteristics",
        label = "tab:baseline")
@@ -369,38 +367,12 @@ comparison <- compfit(
    model_list = models
 )
 
-table2tex(comparison, "model_comparison.tex",
+table2tex(comparison, file.path(tempdir(), "model_comparison.tex"),
        booktabs = TRUE,
        caption = "Model Comparison Statistics",
        label = "tab:models")
 
-# Example 17: For integration in LaTeX document
-# After running table2tex(), use in LaTeX:
-#
-# \begin{table}[htbp]
-#   \centering
-#   \caption{Caption}
-#   \label{tab:label}
-#   \input{final_table1.tex}
-# \end{table}
-
-# Example 18: With resizing in LaTeX
-# \begin{table}[htbp]
-#   \centering
-#   \caption{Wide Table}
-#   \resizebox{\textwidth}{!}{\input{wide_results.tex}}
-# \end{table}
-
-# Example 19: Landscape table in LaTeX
-# \usepackage{pdflscape}
-# ...
-# \begin{landscape}
-#   \begin{table}[htbp]
-#     \centering
-#     \input{landscape_table.tex}
-#   \end{table}
-# \end{landscape}
-\dontshow{\}) # examplesIf}
+}
 }
 \seealso{
 \code{\link{autotable}} for automatic format detection,

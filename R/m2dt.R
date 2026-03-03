@@ -122,8 +122,9 @@
 #' 
 #' glm_result <- m2dt(clintrial, glm_model)
 #' glm_result
-#' 
+#'
 #' \donttest{
+#' 
 #' # Example 2: Extract from linear model
 #' lm_model <- lm(los_days ~ age + sex + surgery, data = clintrial)
 #' 

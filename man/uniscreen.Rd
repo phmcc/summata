@@ -336,6 +336,7 @@ screen1 <- uniscreen(
 print(screen1)
 
 \donttest{
+
 # Example 2: With custom variable labels
 screen2 <- uniscreen(
     data = clintrial,
@@ -479,7 +480,7 @@ screen13 <- uniscreen(
 )
 raw_data <- attr(screen13, "raw_data")
 print(raw_data)
-# Contains unformatted coefficients, SEs, CIs, \emph{etc.}
+# Contains unformatted coefficients, SEs, CIs, etc.
 
 # Example 14: Force coefficient display instead of OR
 screen14 <- uniscreen(
@@ -636,6 +637,7 @@ invgauss_screen <- uniscreen(
     parallel = FALSE
 )
 print(invgauss_screen)
+
 }
 
 }

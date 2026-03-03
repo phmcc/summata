@@ -277,6 +277,7 @@ survtable(
 )
 
 \donttest{
+
 # Example 2: Median survival only
 survtable(
     data = clintrial,
@@ -379,7 +380,7 @@ print(raw)
 
 # Example 13: Access survfit objects for plotting
 fits <- attr(result, "survfit_objects")
-# plot(fits$overall)  # Plot overall survival curve
+plot(fits$overall)  # Plot overall survival curve
 
 # Example 14: Multiple survival outcomes stacked
 survtable(
