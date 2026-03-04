@@ -248,7 +248,7 @@
 #' }
 #'
 #' \donttest{
-#' 
+#'
 #' if(has_latex){
 #' 
 #' # Example 2: Landscape orientation for wide tables
@@ -823,7 +823,9 @@ table2pdf <- function (table,
     message("Compiling PDF...")
     
     result <- system2("pdflatex",
-                      args = c("-interaction=nonstopmode", tex_file),
+                      args = c("-interaction=nonstopmode",
+                               paste0("-output-directory=", dirname(tex_file)),
+                               tex_file),
                       stdout = FALSE,
                       stderr = FALSE)
     

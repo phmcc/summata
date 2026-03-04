@@ -170,7 +170,7 @@ tbl <- desctable(clintrial, by = "treatment",
 if (requireNamespace("xtable", quietly = TRUE)) {
   autotable(tbl, file.path(tempdir(), "example.html"))
 }
-#> Table exported to /tmp/Rtmpox9B2N/example.html
+#> Table exported to /tmp/Rtmp9Tmfn9/example.html
 
 # \donttest{
 # Load example data
@@ -203,15 +203,15 @@ has_latex <- local({
 
 # Export automatically detects format from extension
 autotable(results, file.path(tempdir(), "results.html"))  # Creates HTML file
-#> Table exported to /tmp/Rtmpox9B2N/results.html
+#> Table exported to /tmp/Rtmp9Tmfn9/results.html
 autotable(results, file.path(tempdir(), "results.docx"))  # Creates Word document
-#> Table exported to /tmp/Rtmpox9B2N/results.docx
+#> Table exported to /tmp/Rtmp9Tmfn9/results.docx
 autotable(results, file.path(tempdir(), "results.pptx"))  # Creates PowerPoint slide
-#> Table exported to /tmp/Rtmpox9B2N/results.pptx
+#> Table exported to /tmp/Rtmp9Tmfn9/results.pptx
 autotable(results, file.path(tempdir(), "results.tex"))   # Creates LaTeX source
-#> Table exported to /tmp/Rtmpox9B2N/results.tex
+#> Table exported to /tmp/Rtmp9Tmfn9/results.tex
 autotable(results, file.path(tempdir(), "results.rtf"))   # Creates RTF document
-#> Table exported to /tmp/Rtmpox9B2N/results.rtf
+#> Table exported to /tmp/Rtmp9Tmfn9/results.rtf
 if (has_latex) {
   autotable(results, file.path(tempdir(), "results.pdf")) # Creates PDF
 }
@@ -228,13 +228,13 @@ autotable(results, file.path(tempdir(), "results.docx"),
            caption = "Table 1: Logistic Regression Results",
            font_family = "Times New Roman",
            condense_table = TRUE)
-#> Table exported to /tmp/Rtmpox9B2N/results.docx
+#> Table exported to /tmp/Rtmp9Tmfn9/results.docx
 
 autotable(results, file.path(tempdir(), "results.html"),
            zebra_stripes = TRUE,
            dark_header = TRUE,
            bold_significant = TRUE)
-#> Table exported to /tmp/Rtmpox9B2N/results.html
+#> Table exported to /tmp/Rtmp9Tmfn9/results.html
 
 # Works with any summata table output
 desc <- desctable(clintrial,
@@ -256,7 +256,7 @@ comparison <- compfit(
 #> Fitting base with 2 predictors...
 #> Fitting full with 4 predictors...
 autotable(comparison, file.path(tempdir(), "model_comparison.docx"))
-#> Table exported to /tmp/Rtmpox9B2N/model_comparison.docx
+#> Table exported to /tmp/Rtmp9Tmfn9/model_comparison.docx
 
 # }
 ```

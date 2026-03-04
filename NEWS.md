@@ -1,3 +1,9 @@
+# *summata* 0.11.3 (2026-03-03)
+
+* CRAN initial release re-submission
+* Fix `table2pdf()` to specify output directory for files
+* Minor WORDLIST changes
+
 # *summata* 0.11.2 (2026-03-02)
 
 * CRAN initial release re-submission
