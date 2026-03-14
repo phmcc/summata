@@ -21,6 +21,7 @@ uniscreen(
   labels = NULL,
   keep_models = FALSE,
   exponentiate = NULL,
+  conf_method = NULL,
   parallel = TRUE,
   n_cores = NULL,
   number_format = NULL,
@@ -101,7 +102,9 @@ Ignored for non-GLM/GLMER models.
 \strong{Positive continuous outcomes:}
 \itemize{
   \item \code{"Gamma"} or \code{Gamma()} - Gamma distribution for positive, 
-    right-skewed continuous data (\emph{e.g.,} costs, lengths of stay). Default log link.
+    right-skewed continuous data (\emph{e.g.,} costs, lengths of stay). When
+    passed as a string, resolves to log link for interpretable multiplicative
+    effects.
   \item \code{Gamma(link = "inverse")} - Gamma with inverse (canonical) link.
   \item \code{Gamma(link = "identity")} - Gamma with identity link for additive 
     effects on positive outcomes.
@@ -167,6 +170,21 @@ OR/HR/RR instead of log odds/log hazards). Default is \code{NULL}, which
 automatically exponentiates for logistic, Poisson, and Cox models, and 
 displays raw coefficients for linear models and other GLM families. Set 
 to \code{TRUE} to force exponentiation or \code{FALSE} to force coefficients.}
+
+\item{conf_method}{Character string controlling the confidence interval method.
+If \code{NULL} (default), uses \code{getOption("summata.conf_method", "profile")}.
+\itemize{
+  \item \code{"profile"} - Profile likelihood intervals for GLM and negative
+    binomial models (via \code{MASS::confint.glm()}), exact \emph{t}-distribution
+    intervals for linear models. Falls back to Wald on profiling failure.
+    Quasi-likelihood families always use Wald (no true likelihood).
+  \item \code{"wald"} - Wald intervals (coefficient \eqn{\pm} \emph{z}
+    \eqn{\times} SE) for all model types. Faster but less accurate near
+    boundary conditions or with small subgroups.
+}
+Cox and mixed-effects models use Wald intervals regardless of this setting.
+Set globally with \code{options(summata.conf_method = "wald")} to use Wald
+throughout a session.}
 
 \item{parallel}{Logical. If \code{TRUE} (default), fits models in parallel 
 using multiple CPU cores for improved performance with many predictors. 

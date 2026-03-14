@@ -23,7 +23,7 @@ mixed-effects models, stratification, and clustered standard errors."></head><bo
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -104,6 +104,7 @@ mixed-effects models, stratification, and clustered standard errors.</p>
 <span>  include_predictor <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  keep_models <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  exponentiate <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  conf_method <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  parallel <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  n_cores <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  number_format <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -215,7 +216,9 @@ Ignored for non-GLM/GLMER models.</p>
 <li><p><code>gaussian(link = "log")</code> - Log-linear model for positive continuous
     outcomes. Returns multiplicative effects.</p></li>
 </ul><p><strong>Positive continuous outcomes:</strong></p><ul><li><p><code>"Gamma"</code> or <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">Gamma()</a></code> - Gamma distribution for positive,
-    right-skewed continuous data (<em>e.g.,</em> costs, lengths of stay). Default log link.</p></li>
+    right-skewed continuous data (<em>e.g.,</em> costs, lengths of stay). When
+    passed as a string, resolves to log link for interpretable multiplicative
+    effects.</p></li>
 <li><p><code>Gamma(link = "inverse")</code> - Gamma with inverse (canonical) link.</p></li>
 <li><p><code>Gamma(link = "identity")</code> - Gamma with identity link for additive
     effects on positive outcomes.</p></li>
@@ -305,6 +308,20 @@ in the output as an attribute. Models are accessible via
 OR/HR/RR instead of log odds/log hazards). Default is <code>NULL</code>, which
 automatically displays raw coefficients for linear models and
 exponentiates for logistic, Poisson, and Cox models.</p></dd>
+
+
+<dt id="arg-conf-method">conf_method<a class="anchor" aria-label="anchor" href="#arg-conf-method"></a></dt>
+<dd><p>Character string controlling the confidence interval method.
+If <code>NULL</code> (default), uses <code>getOption("summata.conf_method", "profile")</code>.</p><ul><li><p><code>"profile"</code> - Profile likelihood intervals for GLM and negative
+    binomial models (via <code><a href="https://rdrr.io/pkg/MASS/man/confint.html" class="external-link">MASS::confint.glm()</a></code>), exact <em>t</em>-distribution
+    intervals for linear models. Falls back to Wald on profiling failure.
+    Quasi-likelihood families always use Wald (no true likelihood).</p></li>
+<li><p><code>"wald"</code> - Wald intervals (coefficient \(\pm\) <em>z</em>
+    \(\times\) SE) for all model types. Faster but less accurate near
+    boundary conditions or with small subgroups.</p></li>
+</ul><p>Cox and mixed-effects models use Wald intervals regardless of this setting.
+Set globally with <code>options(summata.conf_method = "wald")</code> to use Wald
+throughout a session.</p></dd>
 
 
 <dt id="arg-parallel">parallel<a class="anchor" aria-label="anchor" href="#arg-parallel"></a></dt>
@@ -568,10 +585,10 @@ calls for each type:</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                        &lt;char&gt;                   &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1:         Surgical Resection Treatment Group (Drug A)    292    173 1.58 (1.10-2.27)   0.014</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2:         Surgical Resection Treatment Group (Drug B)    362    103 0.43 (0.30-0.62) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3: Progression or Death Event Treatment Group (Drug A)    292    227 0.44 (0.26-0.74)   0.002</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4: Progression or Death Event Treatment Group (Drug B)    362    322 1.02 (0.59-1.77)   0.950</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3: Progression or Death Event Treatment Group (Drug A)    292    227 0.44 (0.26-0.73)   0.002</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4: Progression or Death Event Treatment Group (Drug B)    362    322 1.02 (0.58-1.75)   0.950</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5:                Death Event Treatment Group (Drug A)    292    184 0.51 (0.34-0.76)   0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6:                Death Event Treatment Group (Drug B)    362    274 0.93 (0.62-1.40)   0.721</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6:                Death Event Treatment Group (Drug B)    362    274 0.93 (0.61-1.39)   0.721</span>
 <span class="r-in"><span><span class="co"># Shows odds ratios comparing Drug A and Drug B to Control</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
@@ -597,12 +614,12 @@ calls for each type:</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       Outcome                Predictor      n Events     aOR (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                        &lt;char&gt;                   &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:         Surgical Resection Treatment Group (Drug A)    292    173 1.84 (1.23-2.75)   0.003</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:         Surgical Resection Treatment Group (Drug A)    292    173 1.84 (1.23-2.76)   0.003</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2:         Surgical Resection Treatment Group (Drug B)    361    102 0.45 (0.30-0.66) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3: Progression or Death Event Treatment Group (Drug A)    292    227 0.36 (0.21-0.63) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4: Progression or Death Event Treatment Group (Drug B)    361    321 0.77 (0.43-1.38)   0.374</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3: Progression or Death Event Treatment Group (Drug A)    292    227 0.36 (0.20-0.62) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4: Progression or Death Event Treatment Group (Drug B)    361    321 0.77 (0.42-1.36)   0.374</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5:                Death Event Treatment Group (Drug A)    292    184 0.44 (0.28-0.68) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6:                Death Event Treatment Group (Drug B)    361    273 0.74 (0.48-1.16)   0.192</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6:                Death Event Treatment Group (Drug B)    361    273 0.74 (0.47-1.16)   0.192</span>
 <span class="r-in"><span><span class="co"># Shows adjusted odds ratios (aOR)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 3: Compare unadjusted and adjusted results</span></span></span>
@@ -627,10 +644,10 @@ calls for each type:</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       Outcome                Predictor      n Events      OR (95% CI)   Uni p     aOR (95% CI) Multi p</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                        &lt;char&gt;                   &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1:                Death Event Treatment Group (Drug A)    292    184 0.51 (0.34-0.76)   0.001 0.44 (0.28-0.68) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:                Death Event Treatment Group (Drug B)    362    274 0.93 (0.62-1.40)   0.721 0.74 (0.48-1.16)   0.192</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3: Progression or Death Event Treatment Group (Drug A)    292    227 0.44 (0.26-0.74)   0.002 0.36 (0.21-0.63) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4: Progression or Death Event Treatment Group (Drug B)    362    322 1.02 (0.59-1.77)   0.950 0.77 (0.43-1.38)   0.374</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5:         Surgical Resection Treatment Group (Drug A)    292    173 1.58 (1.10-2.27)   0.014 1.84 (1.23-2.75)   0.003</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:                Death Event Treatment Group (Drug B)    362    274 0.93 (0.61-1.39)   0.721 0.74 (0.47-1.16)   0.192</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3: Progression or Death Event Treatment Group (Drug A)    292    227 0.44 (0.26-0.73)   0.002 0.36 (0.20-0.62) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4: Progression or Death Event Treatment Group (Drug B)    362    322 1.02 (0.58-1.75)   0.950 0.77 (0.42-1.36)   0.374</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:         Surgical Resection Treatment Group (Drug A)    292    173 1.58 (1.10-2.27)   0.014 1.84 (1.23-2.76)   0.003</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6:         Surgical Resection Treatment Group (Drug B)    362    103 0.43 (0.30-0.62) &lt; 0.001 0.45 (0.30-0.66) &lt; 0.001</span>
 <span class="r-in"><span><span class="co"># Useful for identifying confounding effects</span></span></span>
 <span class="r-in"><span></span></span>
@@ -764,14 +781,14 @@ calls for each type:</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               Outcome                             Predictor      n Events     aOR (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                &lt;char&gt;                                &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: Surgical Resection              Treatment Group (Drug A)    292    173 2.09 (1.20-3.62)   0.009</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2: Surgical Resection              Treatment Group (Drug B)    361    102 0.50 (0.29-0.87)   0.013</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1: Surgical Resection              Treatment Group (Drug A)    292    173 2.09 (1.21-3.64)   0.009</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: Surgical Resection              Treatment Group (Drug B)    361    102 0.50 (0.29-0.86)   0.013</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3: Surgical Resection Treatment Group (Drug A) × Sex (Male)      -      - 0.77 (0.34-1.71)   0.515</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4: Surgical Resection Treatment Group (Drug B) × Sex (Male)      -      - 0.79 (0.36-1.73)   0.554</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5:        Death Event              Treatment Group (Drug A)    292    184 0.39 (0.22-0.70)   0.002</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6:        Death Event              Treatment Group (Drug B)    361    273 0.61 (0.34-1.10)   0.099</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7:        Death Event Treatment Group (Drug A) × Sex (Male)      -      - 1.29 (0.53-3.18)   0.575</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8:        Death Event Treatment Group (Drug B) × Sex (Male)      -      - 1.59 (0.65-3.91)   0.308</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6:        Death Event              Treatment Group (Drug B)    361    273 0.61 (0.34-1.09)   0.099</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7:        Death Event Treatment Group (Drug A) × Sex (Male)      -      - 1.29 (0.52-3.17)   0.575</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8:        Death Event Treatment Group (Drug B) × Sex (Male)      -      - 1.59 (0.65-3.90)   0.308</span>
 <span class="r-in"><span><span class="co"># Shows main effects and interaction terms with × notation</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 9: Linear model for continuous outcomes</span></span></span>
@@ -849,12 +866,12 @@ calls for each type:</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       Outcome           Predictor      n Events        OR (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                        &lt;char&gt;              &lt;char&gt; &lt;char&gt; &lt;char&gt;             &lt;char&gt;  &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1:         Surgical Resection Disease Stage (III)    241     91   0.42 (0.29-0.61) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:         Surgical Resection  Disease Stage (IV)    132     19   0.12 (0.07-0.20) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3: Progression or Death Event  Disease Stage (II)    263    223   2.37 (1.52-3.71) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4: Progression or Death Event Disease Stage (III)    241    222   4.97 (2.86-8.65) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5: Progression or Death Event  Disease Stage (IV)    132    128 13.62 (4.82-38.46) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6:                Death Event Disease Stage (III)    241    186   2.24 (1.49-3.36) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7:                Death Event  Disease Stage (IV)    132    121  7.28 (3.70-14.30) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:         Surgical Resection  Disease Stage (IV)    132     19   0.12 (0.06-0.20) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3: Progression or Death Event  Disease Stage (II)    263    223   2.37 (1.52-3.73) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4: Progression or Death Event Disease Stage (III)    241    222   4.97 (2.91-8.86) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5: Progression or Death Event  Disease Stage (IV)    132    128 13.62 (5.43-45.73) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6:                Death Event Disease Stage (III)    241    186   2.24 (1.49-3.38) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7:                Death Event  Disease Stage (IV)    132    121  7.28 (3.85-15.04) &lt; 0.001</span>
 <span class="r-in"><span><span class="co"># Only outcomes with significant associations shown</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 12: Custom outcome labels</span></span></span>
@@ -882,10 +899,10 @@ calls for each type:</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                 &lt;char&gt;                   &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1:  Surgical Resection Treatment Group (Drug A)    292    173 1.58 (1.10-2.27)   0.014</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2:  Surgical Resection Treatment Group (Drug B)    362    103 0.43 (0.30-0.62) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3: Disease Progression Treatment Group (Drug A)    292    227 0.44 (0.26-0.74)   0.002</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4: Disease Progression Treatment Group (Drug B)    362    322 1.02 (0.59-1.77)   0.950</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3: Disease Progression Treatment Group (Drug A)    292    227 0.44 (0.26-0.73)   0.002</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4: Disease Progression Treatment Group (Drug B)    362    322 1.02 (0.58-1.75)   0.950</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5:               Death Treatment Group (Drug A)    292    184 0.51 (0.34-0.76)   0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6:               Death Treatment Group (Drug B)    362    274 0.93 (0.62-1.40)   0.721</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6:               Death Treatment Group (Drug B)    362    274 0.93 (0.61-1.39)   0.721</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 13: Keep models for diagnostics</span></span></span>
 <span class="r-in"><span><span class="va">result_models</span> <span class="op">&lt;-</span> <span class="fu">multifit</span><span class="op">(</span></span></span>
@@ -942,8 +959,8 @@ calls for each type:</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">raw_data</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      outcome predictor  group     n events coefficient          se exp_coef  ci_lower  ci_upper statistic      p_value effect_type adjusted</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt;    &lt;char&gt; &lt;char&gt; &lt;int&gt;  &lt;num&gt;       &lt;num&gt;       &lt;num&gt;    &lt;num&gt;     &lt;num&gt;     &lt;num&gt;     &lt;num&gt;        &lt;num&gt;      &lt;char&gt;   &lt;lgcl&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:   surgery       age      -   850    370 -0.03608738 0.006211760 0.964556 0.9528839 0.9763711 -5.809525 6.265023e-09          OR    FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2: os_status       age      -   850    609  0.04695122 0.006987363 1.048071 1.0338154 1.0625229  6.719447 1.824154e-11          OR    FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:   surgery       age      -   850    370 -0.03608738 0.006211760 0.964556 0.9527194 0.9762269 -5.809525 6.265023e-09          OR    FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: os_status       age      -   850    609  0.04695122 0.006987363 1.048071 1.0340279 1.0627756  6.719447 1.824154e-11          OR    FALSE</span>
 <span class="r-in"><span><span class="co"># Contains exp_coef, ci_lower, ci_upper, p_value, \emph{etc.}</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 15: Hide sample size and event columns</span></span></span>
@@ -968,7 +985,7 @@ calls for each type:</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1:   surgery treatment (Drug A) 1.58 (1.10-2.27)   0.014</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2:   surgery treatment (Drug B) 0.43 (0.30-0.62) &lt; 0.001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3: os_status treatment (Drug A) 0.51 (0.34-0.76)   0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4: os_status treatment (Drug B) 0.93 (0.62-1.40)   0.721</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4: os_status treatment (Drug B) 0.93 (0.61-1.39)   0.721</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 16: Customize decimal places</span></span></span>
 <span class="r-in"><span><span class="va">result_digits</span> <span class="op">&lt;-</span> <span class="fu">multifit</span><span class="op">(</span></span></span>
@@ -1036,9 +1053,9 @@ calls for each type:</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       Outcome                Predictor      n Events      OR (95% CI)   Uni p     aOR (95% CI) Multi p</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                        &lt;char&gt;                   &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1:                Death Event Treatment Group (Drug A)    292    184 0.51 (0.34-0.76)   0.001 0.41 (0.26-0.65) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:                Death Event Treatment Group (Drug B)    362    274 0.93 (0.62-1.40)   0.721 0.69 (0.44-1.08)   0.105</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3: Progression or Death Event Treatment Group (Drug A)    292    227 0.44 (0.26-0.74)   0.002 0.34 (0.20-0.60) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4: Progression or Death Event Treatment Group (Drug B)    362    322 1.02 (0.59-1.77)   0.950 0.73 (0.40-1.31)   0.291</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:                Death Event Treatment Group (Drug B)    362    274 0.93 (0.61-1.39)   0.721 0.69 (0.43-1.08)   0.105</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3: Progression or Death Event Treatment Group (Drug A)    292    227 0.44 (0.26-0.73)   0.002 0.34 (0.19-0.59) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4: Progression or Death Event Treatment Group (Drug B)    362    322 1.02 (0.58-1.75)   0.950 0.73 (0.40-1.30)   0.291</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5:         Surgical Resection Treatment Group (Drug A)    292    173 1.58 (1.10-2.27)   0.014 1.78 (1.19-2.67)   0.005</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6:         Surgical Resection Treatment Group (Drug B)    362    103 0.43 (0.30-0.62) &lt; 0.001 0.43 (0.29-0.64) &lt; 0.001</span>
 <span class="r-in"><span></span></span>
@@ -1181,40 +1198,40 @@ calls for each type:</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Interactions: treatment:stage, treatment:sex</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Display: adjusted</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                        Outcome                                      Predictor      n Events          aOR (95% CI) p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                         &lt;char&gt;                                         &lt;char&gt; &lt;char&gt; &lt;char&gt;                &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1:         Surgical Resection                       Treatment Group (Drug A)    292    173      2.29 (0.99-5.25)   0.052</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2:         Surgical Resection                       Treatment Group (Drug B)    361    102      0.49 (0.22-1.11)   0.087</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3:         Surgical Resection  Treatment Group (Drug A) × Disease Stage (II)      -      -      0.99 (0.36-2.72)   0.978</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  4:         Surgical Resection  Treatment Group (Drug B) × Disease Stage (II)      -      -      0.99 (0.37-2.61)   0.977</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  5:         Surgical Resection Treatment Group (Drug A) × Disease Stage (III)      -      -      0.98 (0.32-2.96)   0.973</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6:         Surgical Resection Treatment Group (Drug B) × Disease Stage (III)      -      -      0.98 (0.34-2.82)   0.969</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  7:         Surgical Resection  Treatment Group (Drug A) × Disease Stage (IV)      -      -      0.55 (0.13-2.35)   0.417</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  8:         Surgical Resection  Treatment Group (Drug B) × Disease Stage (IV)      -      -      1.53 (0.35-6.75)   0.577</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  9:         Surgical Resection          Treatment Group (Drug A) × Sex (Male)      -      -      0.75 (0.33-1.69)   0.487</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10:         Surgical Resection          Treatment Group (Drug B) × Sex (Male)      -      -      0.81 (0.37-1.76)   0.587</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11: Progression or Death Event                       Treatment Group (Drug A)    292    227      0.41 (0.16-1.06)   0.066</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12: Progression or Death Event                       Treatment Group (Drug B)    361    321      0.45 (0.17-1.25)   0.127</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13: Progression or Death Event  Treatment Group (Drug A) × Disease Stage (II)      -      -      1.55 (0.47-5.14)   0.472</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14: Progression or Death Event  Treatment Group (Drug B) × Disease Stage (II)      -      -     3.97 (1.10-14.31)   0.035</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15: Progression or Death Event Treatment Group (Drug A) × Disease Stage (III)      -      -      0.29 (0.03-2.74)   0.281</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16: Progression or Death Event Treatment Group (Drug B) × Disease Stage (III)      -      -     1.47 (0.14-15.30)   0.745</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17: Progression or Death Event  Treatment Group (Drug A) × Disease Stage (IV)      -      -     1.37 (0.12-16.05)   0.804</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18: Progression or Death Event  Treatment Group (Drug B) × Disease Stage (IV)      -      - 3691058.18 (0.00-Inf)   0.977</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 19: Progression or Death Event          Treatment Group (Drug A) × Sex (Male)      -      -      0.74 (0.24-2.27)   0.602</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20: Progression or Death Event          Treatment Group (Drug B) × Sex (Male)      -      -      0.68 (0.21-2.25)   0.529</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21:                Death Event                       Treatment Group (Drug A)    292    184      0.65 (0.29-1.48)   0.303</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 22:                Death Event                       Treatment Group (Drug B)    361    273      0.45 (0.19-1.07)   0.071</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 23:                Death Event  Treatment Group (Drug A) × Disease Stage (II)      -      -      0.68 (0.24-1.90)   0.460</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 24:                Death Event  Treatment Group (Drug B) × Disease Stage (II)      -      -      1.43 (0.50-4.05)   0.504</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 25:                Death Event Treatment Group (Drug A) × Disease Stage (III)      -      -      0.35 (0.10-1.23)   0.100</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 26:                Death Event Treatment Group (Drug B) × Disease Stage (III)      -      -      1.08 (0.30-3.81)   0.909</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 27:                Death Event  Treatment Group (Drug A) × Disease Stage (IV)      -      -      0.21 (0.02-1.98)   0.171</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 28:                Death Event  Treatment Group (Drug B) × Disease Stage (IV)      -      -     3.32 (0.18-61.53)   0.421</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 29:                Death Event          Treatment Group (Drug A) × Sex (Male)      -      -      1.25 (0.51-3.08)   0.624</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 30:                Death Event          Treatment Group (Drug B) × Sex (Male)      -      -      1.78 (0.71-4.45)   0.218</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                        Outcome                                      Predictor      n Events          aOR (95% CI) p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                         &lt;char&gt;                                         &lt;char&gt; &lt;char&gt; &lt;char&gt;                &lt;char&gt;  &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                        Outcome                                      Predictor      n Events                                                                                           aOR (95% CI) p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                         &lt;char&gt;                                         &lt;char&gt; &lt;char&gt; &lt;char&gt;                                                                                                 &lt;char&gt;  &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1:         Surgical Resection                       Treatment Group (Drug A)    292    173                                                                                       2.29 (1.00-5.30)   0.052</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:         Surgical Resection                       Treatment Group (Drug B)    361    102                                                                                       0.49 (0.21-1.10)   0.087</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:         Surgical Resection  Treatment Group (Drug A) × Disease Stage (II)      -      -                                                                                       0.99 (0.36-2.72)   0.978</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:         Surgical Resection  Treatment Group (Drug B) × Disease Stage (II)      -      -                                                                                       0.99 (0.37-2.62)   0.977</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:         Surgical Resection Treatment Group (Drug A) × Disease Stage (III)      -      -                                                                                       0.98 (0.32-2.97)   0.973</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:         Surgical Resection Treatment Group (Drug B) × Disease Stage (III)      -      -                                                                                       0.98 (0.34-2.84)   0.969</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:         Surgical Resection  Treatment Group (Drug A) × Disease Stage (IV)      -      -                                                                                       0.55 (0.13-2.46)   0.417</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:         Surgical Resection  Treatment Group (Drug B) × Disease Stage (IV)      -      -                                                                                       1.53 (0.34-6.99)   0.577</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:         Surgical Resection          Treatment Group (Drug A) × Sex (Male)      -      -                                                                                       0.75 (0.33-1.68)   0.487</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:         Surgical Resection          Treatment Group (Drug B) × Sex (Male)      -      -                                                                                       0.81 (0.37-1.76)   0.587</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11: Progression or Death Event                       Treatment Group (Drug A)    292    227                                                                                       0.41 (0.16-1.03)   0.066</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12: Progression or Death Event                       Treatment Group (Drug B)    361    321                                                                                       0.45 (0.16-1.23)   0.127</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13: Progression or Death Event  Treatment Group (Drug A) × Disease Stage (II)      -      -                                                                                       1.55 (0.46-5.17)   0.472</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14: Progression or Death Event  Treatment Group (Drug B) × Disease Stage (II)      -      -                                                                                      3.97 (1.11-14.56)   0.035</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15: Progression or Death Event Treatment Group (Drug A) × Disease Stage (III)      -      -                                                                                       0.29 (0.01-1.98)   0.281</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16: Progression or Death Event Treatment Group (Drug B) × Disease Stage (III)      -      -                                                                                      1.47 (0.07-11.72)   0.745</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17: Progression or Death Event  Treatment Group (Drug A) × Disease Stage (IV)      -      -                                                                                      1.37 (0.06-13.39)   0.804</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18: Progression or Death Event  Treatment Group (Drug B) × Disease Stage (IV)      -      - 3691058.18 (0.00-134010389873278090506202000352567889668070971366133408820007473295152617587998720.00)   0.977</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19: Progression or Death Event          Treatment Group (Drug A) × Sex (Male)      -      -                                                                                       0.74 (0.24-2.25)   0.602</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20: Progression or Death Event          Treatment Group (Drug B) × Sex (Male)      -      -                                                                                       0.68 (0.20-2.23)   0.529</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21:                Death Event                       Treatment Group (Drug A)    292    184                                                                                       0.65 (0.28-1.47)   0.303</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22:                Death Event                       Treatment Group (Drug B)    361    273                                                                                       0.45 (0.19-1.06)   0.071</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23:                Death Event  Treatment Group (Drug A) × Disease Stage (II)      -      -                                                                                       0.68 (0.24-1.90)   0.460</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24:                Death Event  Treatment Group (Drug B) × Disease Stage (II)      -      -                                                                                       1.43 (0.50-4.06)   0.504</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 25:                Death Event Treatment Group (Drug A) × Disease Stage (III)      -      -                                                                                       0.35 (0.09-1.19)   0.100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 26:                Death Event Treatment Group (Drug B) × Disease Stage (III)      -      -                                                                                       1.08 (0.29-3.70)   0.909</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 27:                Death Event  Treatment Group (Drug A) × Disease Stage (IV)      -      -                                                                                       0.21 (0.01-1.44)   0.171</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 28:                Death Event  Treatment Group (Drug B) × Disease Stage (IV)      -      -                                                                                      3.32 (0.12-92.82)   0.421</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 29:                Death Event          Treatment Group (Drug A) × Sex (Male)      -      -                                                                                       1.25 (0.51-3.07)   0.624</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 30:                Death Event          Treatment Group (Drug B) × Sex (Male)      -      -                                                                                       1.78 (0.71-4.45)   0.218</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                        Outcome                                      Predictor      n Events                                                                                           aOR (95% CI) p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                         &lt;char&gt;                                         &lt;char&gt; &lt;char&gt; &lt;char&gt;                                                                                                 &lt;char&gt;  &lt;char&gt;</span>
 <span class="r-in"><span><span class="co"># Shows how treatment effects vary by stage and sex across outcomes</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>

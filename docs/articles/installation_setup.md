@@ -17,15 +17,15 @@ Install the stable release from CRAN:
 install.packages("summata")
 ```
 
-Alternatively, the latest development version may be installed from
-GitHub:
+Alternatively, install the stable release directly from GitHub:
 
 ``` r
 install.packages("remotes")
 remotes::install_github("phmcc/summata")
 ```
 
-The development version is available from Codeberg:
+For experimental builds, the development version is available from
+Codeberg:
 
 ``` r
 remotes::install_git("https://codeberg.org/phmcc/summata.git")

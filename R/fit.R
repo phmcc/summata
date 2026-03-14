@@ -91,7 +91,12 @@
 #'   \strong{Positive continuous outcomes:}
 #'   \itemize{
 #'     \item \code{"Gamma"} or \code{Gamma()} - Gamma distribution for positive, 
-#'       right-skewed continuous data (\emph{e.g.,} costs, lengths of stay). Default log link.
+#'       right-skewed continuous data (\emph{e.g.,} costs, lengths of stay). When
+#'       passed as a string, resolves to log link for interpretable multiplicative
+#'       effects. The canonical inverse link can be specified explicitly with
+#'       \code{Gamma(link = "inverse")}.
+#'     \item \code{Gamma(link = "log")} - Gamma with log link (equivalent to
+#'       \code{"Gamma"} string shorthand).
 #'     \item \code{Gamma(link = "inverse")} - Gamma with inverse (canonical) link.
 #'     \item \code{Gamma(link = "identity")} - Gamma with identity link for additive 
 #'       effects on positive outcomes.
@@ -164,6 +169,19 @@
 #'   is \code{NULL}, which automatically exponentiates for logistic, Poisson, 
 #'   and Cox models, and displays raw coefficients for linear models. Set to 
 #'   \code{TRUE} to force exponentiation or \code{FALSE} to force coefficients.
+#'
+#' @param conf_method Character string controlling the confidence interval method.
+#'   If \code{NULL} (default), uses \code{getOption("summata.conf_method", "profile")}.
+#'   \itemize{
+#'     \item \code{"profile"} - Profile likelihood intervals for GLM and negative
+#'       binomial models (via \code{MASS::confint.glm()}), exact \emph{t}-distribution
+#'       intervals for linear models. Falls back to Wald on profiling failure.
+#'       Quasi-likelihood families always use Wald (no true likelihood).
+#'     \item \code{"wald"} - Wald intervals (coefficient \eqn{\pm} \emph{z}
+#'       \eqn{\times} SE) for all model types. Faster but less accurate near
+#'       boundary conditions or with small subgroups.
+#'   }
+#'   Cox and mixed-effects models use Wald intervals regardless of this setting.
 #'
 #' @param number_format Character string or two-element character vector
 #'   controlling thousand and decimal separators in formatted output. Named
@@ -322,19 +340,30 @@
 #' 
 #' \strong{Confidence Intervals:}
 #' 
-#' Confidence intervals are computed using the Wald method. This is the standard
-#' approach for GLM, Cox, and mixed-effects regression and is appropriate for
-#' standard sample sizes. The Wald interval is computed directly from the
-#' coefficient and standard error, avoiding redundant matrix operations.
-#' 
-#' For small samples, sparse data, or parameters near boundary values, profile 
-#' likelihood confidence intervals may be preferred. These can be obtained from 
-#' the underlying model object:
-#' 
-#' \preformatted{
-#' result <- fit(data, outcome, predictors)
-#' confint(attr(result, "model"))
+#' Confidence interval computation is tailored to each model class using the
+#' best available method:
+#' \itemize{
+#'   \item \strong{GLM and negative binomial}: Profile likelihood intervals via
+#'     \code{MASS::confint.glm()}, which invert the profile deviance and account
+#'     for asymmetry in the likelihood surface. More accurate than the Wald
+#'     approximation when subgroup sizes are small or estimates are near boundary
+#'     values. Quasi-likelihood families (\code{quasibinomial}, \code{quasipoisson})
+#'     fall back to Wald intervals because they lack a true likelihood function.
+#'   \item \strong{Linear models}: Exact \emph{t}-distribution intervals via
+#'     \code{confint.lm()}, based on the known sampling distribution under
+#'     normality.
+#'   \item \strong{Cox proportional hazards}: Wald intervals (\emph{i.e.,}
+#'     coefficient \eqn{\pm} \emph{z} \eqn{\times} SE), the standard approach in
+#'     the survival analysis literature.
+#'   \item \strong{Mixed-effects models} (lmer, glmer, coxme): Wald intervals.
+#'     Profile likelihood is available for \pkg{lme4} models via
+#'     \code{confint(model, method = "profile")} but can be prohibitively slow
+#'     for complex random-effects structures and is not used by default.
 #' }
+#' 
+#' If profile likelihood computation fails for any reason (\emph{e.g.,}
+#' non-convergence during profiling), the function falls back silently to Wald
+#' intervals.
 #'
 #' @seealso 
 #' \code{\link{uniscreen}} for univariable screening of multiple predictors,
@@ -518,7 +547,28 @@
 #' )
 #' print(coef_model)
 #' 
-#' # Example 17: Check model quality statistics
+#' # Example 17: Confidence interval method
+#' # Default: profile likelihood CIs for GLM (more accurate)
+#' profile_result <- fit(
+#'     data = clintrial,
+#'     outcome = "os_status",
+#'     predictors = c("age", "treatment"),
+#'     p_digits = 4,
+#'     conf_method = "profile"
+#' )
+#' print(profile_result)
+#'
+#' # Wald CIs (faster, suitable for simulation or exploratory work)
+#' wald_result <- fit(
+#'     data = clintrial,
+#'     outcome = "os_status",
+#'     predictors = c("age", "treatment"),
+#'     p_digits = 4,
+#'     conf_method = "wald"
+#' )
+#' print(wald_result)
+#' 
+#' # Example 18: Check model quality statistics
 #' result <- fit(
 #'     data = clintrial,
 #'     outcome = "os_status",
@@ -531,7 +581,7 @@
 #' cat("BIC:", raw$BIC[1], "\n")
 #' cat("C-statistic:", raw$c_statistic[1], "\n")
 #' 
-#' # Example 18: Interaction effects - treatment effect modified by stage
+#' # Example 19: Interaction effects - treatment effect modified by stage
 #' interaction_model <- fit(
 #'     data = clintrial,
 #'     outcome = "Surv(os_months, os_status)",
@@ -543,7 +593,7 @@
 #' print(interaction_model)
 #' # Shows main effects plus all treatment×stage interaction terms
 #' 
-#' # Example 19: Multiple interactions in logistic regression
+#' # Example 20: Multiple interactions in logistic regression
 #' multi_interaction <- fit(
 #'     data = clintrial,
 #'     outcome = "readmission_30d",
@@ -553,7 +603,7 @@
 #' )
 #' print(multi_interaction)
 #' 
-#' # Example 20: Quasipoisson for overdispersed count data
+#' # Example 21: Quasipoisson for overdispersed count data
 #' # Alternative to negative binomial when MASS not available
 #' quasi_model <- fit(
 #'     data = clintrial,
@@ -566,7 +616,7 @@
 #' print(quasi_model)
 #' # Adjusts standard errors for overdispersion
 #' 
-#' # Example 21: Quasibinomial for overdispersed binary data
+#' # Example 22: Quasibinomial for overdispersed binary data
 #' quasi_logistic <- fit(
 #'     data = clintrial,
 #'     outcome = "any_complication",
@@ -577,7 +627,7 @@
 #' )
 #' print(quasi_logistic)
 #' 
-#' # Example 22: Gamma regression with identity link for additive effects
+#' # Example 23: Gamma regression with identity link for additive effects
 #' gamma_identity <- fit(
 #'     data = clintrial,
 #'     outcome = "los_days",
@@ -589,7 +639,7 @@
 #' print(gamma_identity)
 #' # Shows additive effects (coefficients) instead of multiplicative (ratios)
 #' 
-#' # Example 23: Inverse Gaussian regression for highly skewed data
+#' # Example 24: Inverse Gaussian regression for highly skewed data
 #' inverse_gaussian <- fit(
 #'     data = clintrial,
 #'     outcome = "recovery_days",
@@ -600,7 +650,7 @@
 #' )
 #' print(inverse_gaussian)
 #' 
-#' # Example 24: Linear mixed effects with random intercepts
+#' # Example 25: Linear mixed effects with random intercepts
 #' # Accounts for clustering of patients within sites
 #' if (requireNamespace("lme4", quietly = TRUE)) {
 #'     lmer_model <- fit(
@@ -613,7 +663,7 @@
 #'     print(lmer_model)
 #' }
 #' 
-#' # Example 25: Generalized linear mixed effects (logistic with random effects)
+#' # Example 26: Generalized linear mixed effects (logistic with random effects)
 #' if (requireNamespace("lme4", quietly = TRUE)) {
 #'     glmer_model <- fit(
 #'         data = clintrial,
@@ -626,7 +676,7 @@
 #'     print(glmer_model)
 #' }
 #' 
-#' # Example 26: Cox mixed effects for clustered survival data
+#' # Example 27: Cox mixed effects for clustered survival data
 #' if (requireNamespace("coxme", quietly = TRUE)) {
 #'     coxme_model <- fit(
 #'         data = clintrial,
@@ -638,7 +688,7 @@
 #'     print(coxme_model)
 #' }
 #' 
-#' # Example 27: Random slopes - treatment effect varies by site
+#' # Example 28: Random slopes - treatment effect varies by site
 #' if (requireNamespace("lme4", quietly = TRUE)) {
 #'     random_slopes <- fit(
 #'         data = clintrial,
@@ -650,7 +700,7 @@
 #'     print(random_slopes)
 #' }
 #' 
-#' # Example 28: Format a pre-fitted model (model-based workflow)
+#' # Example 29: Format a pre-fitted model (model-based workflow)
 #' # Useful for models fitted outside of fit()
 #' pre_fitted <- glm(os_status ~ age + sex + treatment,
 #'                   family = binomial, data = clintrial)
@@ -683,6 +733,7 @@ fit <- function(data = NULL,
                 labels = NULL,
                 keep_qc_stats = TRUE,
                 exponentiate = NULL,
+                conf_method = NULL,
                 number_format = NULL,
                 verbose = NULL,
                 ...) {
@@ -727,8 +778,16 @@ fit <- function(data = NULL,
                          keep_qc_stats = keep_qc_stats,
                          include_intercept = FALSE,
                          reference_rows = reference_rows,
-                         skip_counts = (!show_n && !show_events))
-        
+                         skip_counts = (!show_n && !show_events),
+                         conf_method = conf_method)
+
+        ## Propagate cached confint from m2dt to model for downstream reuse
+        cached_ci <- attr(raw_data, "cached_confint")
+        if (!is.null(cached_ci)) {
+            attr(model, "cached_confint") <- cached_ci
+            attr(model, "cached_confint_level") <- attr(raw_data, "cached_confint_level")
+        }
+
         ## Format results for publication
         formatted <- format_model_table(raw_data,
                                         show_n = show_n,
@@ -799,6 +858,16 @@ fit <- function(data = NULL,
     ## Apply any auto-corrections
     if (validation$auto_corrected) {
         model_type <- validation$model_type
+    }
+
+    ## Resolve Gamma family string to log link
+    ## The canonical link for Gamma is inverse (1/μ), which produces
+    ## uninterpretable coefficients. The log link yields exp(β) = ratio,
+    ## consistent with the multiplicative effect interpretation used for
+    ## OR, HR, and RR throughout summata.
+    if (model_type %in% c("glm", "glmer") && is.character(family) &&
+        tolower(family) == "gamma") {
+        family <- stats::Gamma(link = "log")
     }
     
     ## Validate random effects for mixed-effects models
@@ -956,7 +1025,16 @@ fit <- function(data = NULL,
                      keep_qc_stats = keep_qc_stats,
                      include_intercept = FALSE,
                      reference_rows = reference_rows,
-                     skip_counts = (!show_n && !show_events))
+                     skip_counts = (!show_n && !show_events),
+                     conf_method = conf_method)
+
+    ## Propagate cached confint from m2dt to model for downstream reuse
+    ## (avoids redundant profiling in forest plot functions)
+    cached_ci <- attr(raw_data, "cached_confint")
+    if (!is.null(cached_ci)) {
+        attr(model, "cached_confint") <- cached_ci
+        attr(model, "cached_confint_level") <- attr(raw_data, "cached_confint_level")
+    }
 
     ## Format results for publication
     formatted <- format_model_table(raw_data,

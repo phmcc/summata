@@ -1482,14 +1482,14 @@ test_that("fullfit works with Gamma family (log link)", {
     test_data <- data.table::as.data.table(clintrial)
     test_data <- test_data[los_days > 0]
     
-    result <- fullfit(
+    result <- suppressMessages(fullfit(
         data = test_data,
         outcome = "los_days",
         predictors = c("age", "sex", "treatment"),
         model_type = "glm",
         family = Gamma(link = "log"),
         method = "all"
-    )
+    ))
     
     expect_fullfit_result(result)
 })
@@ -1501,7 +1501,7 @@ test_that("fullfit Gamma screening works", {
     test_data <- data.table::as.data.table(clintrial)
     test_data <- test_data[los_days > 0]
     
-    result <- fullfit(
+    result <- suppressMessages(fullfit(
         data = test_data,
         outcome = "los_days",
         predictors = c("age", "sex", "treatment", "stage"),
@@ -1509,7 +1509,7 @@ test_that("fullfit Gamma screening works", {
         family = Gamma(link = "log"),
         method = "screen",
         p_threshold = 0.20
-    )
+    ))
     
     expect_fullfit_result(result)
 })
@@ -1525,14 +1525,14 @@ test_that("fullfit works with inverse.gaussian family", {
     test_data <- data.table::as.data.table(clintrial)
     test_data <- test_data[los_days > 0]
     
-    result <- fullfit(
+    result <- suppressMessages(fullfit(
         data = test_data,
         outcome = "los_days",
         predictors = c("age", "sex", "treatment"),
         model_type = "glm",
         family = inverse.gaussian(link = "log"),
         method = "all"
-    )
+    ))
     
     expect_fullfit_result(result)
 })
@@ -1739,4 +1739,139 @@ test_that("fullfit with return_type='both' and method='screen'", {
     if (!is.null(result$model)) {
         expect_s3_class(result$model, "glm")
     }
+})
+
+
+## ============================================================================
+## SECTION 21: Complete-Case N/Events in Multivariable Rows
+## ============================================================================
+
+test_that("fullfit multivariable n matches model nobs", {
+    
+    result <- fullfit(
+        data = clintrial,
+        outcome = "response",
+        predictors = c("age", "sex", "bmi", "smoking", "stage"),
+        method = "all",
+        model_type = "glm",
+        show_n = TRUE,
+        columns = "both"
+    )
+    
+    ## Get the fitted model
+    model <- attr(result, "model")
+    expected_n <- stats::nobs(model)
+    
+    ## Only continuous predictor rows (Group == "-") should show
+    ## the model-level n; factor level rows show group-specific n
+    multi_effect_col <- grep("^aOR", names(result), value = TRUE)[1]
+    if (!is.na(multi_effect_col)) {
+        has_multi <- result[[multi_effect_col]] != "-"
+        is_continuous <- result$Group == "-"
+        continuous_multi <- has_multi & is_continuous
+        multi_n_values <- as.integer(result$n[continuous_multi])
+        multi_n_values <- multi_n_values[!is.na(multi_n_values)]
+        
+        if (length(multi_n_values) > 0) {
+            expect_true(all(multi_n_values == expected_n),
+                        info = paste("Continuous predictor n should be", expected_n,
+                                     "but found:", paste(unique(multi_n_values), collapse = ", ")))
+        }
+    }
+})
+
+
+test_that("fullfit screen method shows different n for uni-only vs multi rows", {
+    
+    ## Use predictors with varying missingness to create a gap
+    result <- fullfit(
+        data = clintrial,
+        outcome = "response",
+        predictors = c("age", "sex", "bmi", "smoking", "diabetes",
+                       "stage", "grade", "treatment"),
+        method = "screen",
+        p_threshold = 0.05,
+        model_type = "glm",
+        show_n = TRUE,
+        columns = "both"
+    )
+    
+    ## The function should produce a valid result regardless
+    expect_fullfit_result(result)
+    
+    ## If some variables were screened out, their n may differ from
+    ## multivariable n (due to complete-case differences)
+    model <- attr(result, "model")
+    if (!is.null(model)) {
+        model_n <- stats::nobs(model)
+        
+        ## Continuous predictor multi rows should have consistent n
+        multi_effect_col <- grep("^aOR", names(result), value = TRUE)[1]
+        if (!is.na(multi_effect_col)) {
+            has_multi <- result[[multi_effect_col]] != "-"
+            is_continuous <- result$Group == "-"
+            multi_n <- as.integer(result$n[has_multi & is_continuous])
+            multi_n <- multi_n[!is.na(multi_n)]
+            
+            if (length(multi_n) > 0) {
+                expect_true(all(multi_n == model_n),
+                            info = "All continuous multivariable rows should have same n")
+            }
+        }
+    }
+})
+
+
+test_that("fullfit multivariable Events match model events", {
+    
+    result <- fullfit(
+        data = clintrial,
+        outcome = "response",
+        predictors = c("age", "sex", "smoking", "stage"),
+        method = "all",
+        model_type = "glm",
+        show_events = TRUE,
+        columns = "both"
+    )
+    
+    ## Get expected events from fitted model
+    model <- attr(result, "model")
+    if (!is.null(model) && !is.null(model$y)) {
+        expected_events <- sum(model$y, na.rm = TRUE)
+        
+        ## Continuous predictor rows should show model-level events
+        ## (factor group rows show group-specific events)
+        age_row <- result[Variable != "" & grepl("age|Age", Variable, ignore.case = TRUE)]
+        if (nrow(age_row) > 0) {
+            row_events <- as.integer(age_row$Events[1])
+            if (!is.na(row_events)) {
+                expect_equal(row_events, expected_events,
+                             info = "Continuous predictor Events should match model events")
+            }
+        }
+    }
+})
+
+
+test_that("fullfit columns='uni' does not apply complete-case n", {
+    
+    ## When showing only univariable results, n should be per-variable
+    result <- fullfit(
+        data = clintrial,
+        outcome = "response",
+        predictors = c("age", "bmi"),
+        method = "all",
+        model_type = "glm",
+        show_n = TRUE,
+        columns = "uni"
+    )
+    
+    expect_fullfit_result(result)
+    
+    ## Per-variable n values may differ due to different missingness patterns
+    n_values <- as.integer(result$n)
+    n_values <- n_values[!is.na(n_values)]
+    
+    ## Should have valid n values
+    expect_true(all(n_values > 0))
 })

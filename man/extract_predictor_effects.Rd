@@ -10,7 +10,8 @@ extract_predictor_effects(
   outcome,
   conf_level = 0.95,
   adjusted = FALSE,
-  terms_to_extract = NULL
+  terms_to_extract = NULL,
+  conf_method = NULL
 )
 }
 \arguments{

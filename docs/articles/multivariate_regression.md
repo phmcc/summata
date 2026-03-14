@@ -112,7 +112,7 @@ example1
 ##>                   Outcome          Predictor      n Events      OR (95% CI) p-value
 ##>                    <char>             <char> <char> <char>           <char>  <char>
 ##> 1:       Any Complication Surgical Resection    370    236 1.70 (1.29-2.25) < 0.001
-##> 2:   Wound/Site Infection Surgical Resection    370    121 4.58 (3.16-6.66) < 0.001
+##> 2:   Wound/Site Infection Surgical Resection    370    121 4.58 (3.18-6.72) < 0.001
 ##> 3:     30-Day Readmission Surgical Resection    370    181 0.91 (0.69-1.19)   0.500
 ##> 4: ICU Admission Required Surgical Resection    370    179 2.25 (1.70-2.99) < 0.001
 ```
@@ -146,10 +146,10 @@ example2
 ##> 
 ##>                   Outcome          Predictor      n Events     aOR (95% CI) p-value
 ##>                    <char>             <char> <char> <char>           <char>  <char>
-##> 1:       Any Complication Surgical Resection    362    229 1.84 (1.38-2.47) < 0.001
-##> 2:   Wound/Site Infection Surgical Resection    362    117 5.21 (3.48-7.80) < 0.001
+##> 1:       Any Complication Surgical Resection    362    229 1.84 (1.38-2.48) < 0.001
+##> 2:   Wound/Site Infection Surgical Resection    362    117 5.21 (3.50-7.87) < 0.001
 ##> 3:     30-Day Readmission Surgical Resection    362    176 1.07 (0.80-1.43)   0.641
-##> 4: ICU Admission Required Surgical Resection    362    173 2.56 (1.90-3.46) < 0.001
+##> 4: ICU Admission Required Surgical Resection    362    173 2.56 (1.90-3.47) < 0.001
 ```
 
 ### **Example 3:** Unadjusted and Adjusted Comparison
@@ -180,10 +180,10 @@ example3
 ##> 
 ##>                   Outcome          Predictor      n Events      OR (95% CI)   Uni p     aOR (95% CI) Multi p
 ##>                    <char>             <char> <char> <char>           <char>  <char>           <char>  <char>
-##> 1:       Any Complication Surgical Resection    370    236 1.70 (1.29-2.25) < 0.001 1.82 (1.36-2.43) < 0.001
-##> 2: ICU Admission Required Surgical Resection    370    179 2.25 (1.70-2.99) < 0.001 2.57 (1.90-3.47) < 0.001
+##> 1:       Any Complication Surgical Resection    370    236 1.70 (1.29-2.25) < 0.001 1.82 (1.36-2.44) < 0.001
+##> 2: ICU Admission Required Surgical Resection    370    179 2.25 (1.70-2.99) < 0.001 2.57 (1.91-3.48) < 0.001
 ##> 3:     30-Day Readmission Surgical Resection    370    181 0.91 (0.69-1.19)   0.500 1.05 (0.79-1.40)   0.720
-##> 4:   Wound/Site Infection Surgical Resection    370    121 4.58 (3.16-6.66) < 0.001 4.98 (3.35-7.40) < 0.001
+##> 4:   Wound/Site Infection Surgical Resection    370    121 4.58 (3.18-6.72) < 0.001 4.98 (3.37-7.46) < 0.001
 ```
 
 Comparing columns reveals confounding (large differences) or robust
@@ -255,12 +255,12 @@ example5
 ##>                    <char>                   <char> <char> <char>           <char>  <char>
 ##> 1:       Any Complication Treatment Group (Drug A)    292    143 0.66 (0.45-0.96)   0.031
 ##> 2:       Any Complication Treatment Group (Drug B)    362    226 1.48 (1.03-2.14)   0.035
-##> 3:   Wound/Site Infection Treatment Group (Drug A)    292     72 1.90 (1.14-3.17)   0.013
-##> 4:   Wound/Site Infection Treatment Group (Drug B)    362     69 2.26 (1.34-3.79)   0.002
+##> 3:   Wound/Site Infection Treatment Group (Drug A)    292     72 1.90 (1.16-3.21)   0.013
+##> 4:   Wound/Site Infection Treatment Group (Drug B)    362     69 2.26 (1.36-3.85)   0.002
 ##> 5:     30-Day Readmission Treatment Group (Drug A)    292    127 0.86 (0.59-1.24)   0.415
-##> 6:     30-Day Readmission Treatment Group (Drug B)    362    209 1.61 (1.12-2.31)   0.010
-##> 7: ICU Admission Required Treatment Group (Drug A)    292    111 1.11 (0.74-1.65)   0.615
-##> 8: ICU Admission Required Treatment Group (Drug B)    362    145 1.70 (1.16-2.50)   0.007
+##> 6:     30-Day Readmission Treatment Group (Drug B)    362    209 1.61 (1.12-2.32)   0.010
+##> 7: ICU Admission Required Treatment Group (Drug A)    292    111 1.11 (0.75-1.65)   0.615
+##> 8: ICU Admission Required Treatment Group (Drug B)    362    145 1.70 (1.16-2.52)   0.007
 ```
 
 ------------------------------------------------------------------------
@@ -331,7 +331,7 @@ example7
 ##> 3: Postoperative Pain Score (0-10) Treatment Group (Drug A)    289    -0.56 (-0.84 to -0.27) < 0.001
 ##> 4: Postoperative Pain Score (0-10) Treatment Group (Drug B)    359       0.86 (0.59 to 1.13) < 0.001
 ##> 5:     Days to Functional Recovery Treatment Group (Drug A)    288    -1.73 (-2.96 to -0.50)   0.006
-##> 6:     Days to Functional Recovery Treatment Group (Drug B)    352       2.79 (1.60 to 3.98) < 0.001
+##> 6:     Days to Functional Recovery Treatment Group (Drug B)    352       2.79 (1.59 to 3.98) < 0.001
 ```
 
 ### **Example 8:** Mixed-Effects Models
@@ -403,10 +403,10 @@ example9
 ##> 2:     Any Complication              Treatment Group (Drug B)    362    226 1.27 (0.78-2.08)   0.340
 ##> 3:     Any Complication Treatment Group (Drug A) × Sex (Male)      -      - 1.41 (0.68-2.93)   0.360
 ##> 4:     Any Complication Treatment Group (Drug B) × Sex (Male)      -      - 0.99 (0.48-2.00)   0.968
-##> 5: Wound/Site Infection              Treatment Group (Drug A)    292     72 2.20 (1.13-4.28)   0.020
-##> 6: Wound/Site Infection              Treatment Group (Drug B)    362     69 1.30 (0.66-2.57)   0.455
-##> 7: Wound/Site Infection Treatment Group (Drug A) × Sex (Male)      -      - 0.93 (0.35-2.50)   0.884
-##> 8: Wound/Site Infection Treatment Group (Drug B) × Sex (Male)      -      - 1.43 (0.54-3.83)   0.472
+##> 5: Wound/Site Infection              Treatment Group (Drug A)    292     72 2.20 (1.16-4.41)   0.020
+##> 6: Wound/Site Infection              Treatment Group (Drug B)    362     69 1.30 (0.67-2.64)   0.455
+##> 7: Wound/Site Infection Treatment Group (Drug A) × Sex (Male)      -      - 0.93 (0.34-2.52)   0.884
+##> 8: Wound/Site Infection Treatment Group (Drug B) × Sex (Male)      -      - 1.43 (0.54-3.87)   0.472
 ```
 
 ### **Example 10:** Filtering by p-value
@@ -436,9 +436,9 @@ example10
 ##> 
 ##>                   Outcome                Predictor      n Events     aOR (95% CI) p-value
 ##>                    <char>                   <char> <char> <char>           <char>  <char>
-##> 1:   Wound/Site Infection Treatment Group (Drug B)    362     69 2.26 (1.34-3.79)   0.002
-##> 2:     30-Day Readmission Treatment Group (Drug B)    362    209 1.61 (1.12-2.31)   0.010
-##> 3: ICU Admission Required Treatment Group (Drug B)    362    145 1.70 (1.16-2.50)   0.007
+##> 1:   Wound/Site Infection Treatment Group (Drug B)    362     69 2.26 (1.36-3.85)   0.002
+##> 2:     30-Day Readmission Treatment Group (Drug B)    362    209 1.61 (1.12-2.32)   0.010
+##> 3: ICU Admission Required Treatment Group (Drug B)    362    145 1.70 (1.16-2.52)   0.007
 ```
 
 ### **Example 11:** Accessing Model Objects
@@ -658,11 +658,11 @@ unadjusted
 ##>                    <char>                   <char> <char> <char>           <char>  <char>
 ##> 1:       Any Complication Treatment Group (Drug A)    292    143 0.73 (0.51-1.06)   0.097
 ##> 2:       Any Complication Treatment Group (Drug B)    362    226 1.27 (0.89-1.81)   0.182
-##> 3:   Wound/Site Infection Treatment Group (Drug A)    292     72 2.14 (1.31-3.50)   0.002
-##> 4:   Wound/Site Infection Treatment Group (Drug B)    362     69 1.54 (0.94-2.51)   0.084
+##> 3:   Wound/Site Infection Treatment Group (Drug A)    292     72 2.14 (1.32-3.55)   0.002
+##> 4:   Wound/Site Infection Treatment Group (Drug B)    362     69 1.54 (0.95-2.55)   0.084
 ##> 5:     30-Day Readmission Treatment Group (Drug A)    292    127 0.89 (0.62-1.28)   0.523
 ##> 6:     30-Day Readmission Treatment Group (Drug B)    362    209 1.58 (1.11-2.24)   0.011
-##> 7: ICU Admission Required Treatment Group (Drug A)    292    111 1.26 (0.86-1.85)   0.226
+##> 7: ICU Admission Required Treatment Group (Drug A)    292    111 1.26 (0.87-1.86)   0.226
 ##> 8: ICU Admission Required Treatment Group (Drug B)    362    145 1.38 (0.96-1.99)   0.085
 
 ## Adjusted analysis with comparison
@@ -687,14 +687,14 @@ adjusted
 ##> 
 ##>                   Outcome                Predictor      n Events      OR (95% CI)  Uni p     aOR (95% CI) Multi p
 ##>                    <char>                   <char> <char> <char>           <char> <char>           <char>  <char>
-##> 1:       Any Complication Treatment Group (Drug A)    292    143 0.73 (0.51-1.06)  0.097 0.62 (0.43-0.92)   0.016
+##> 1:       Any Complication Treatment Group (Drug A)    292    143 0.73 (0.51-1.06)  0.097 0.62 (0.42-0.91)   0.016
 ##> 2:       Any Complication Treatment Group (Drug B)    362    226 1.27 (0.89-1.81)  0.182 1.44 (0.99-2.09)   0.057
-##> 3: ICU Admission Required Treatment Group (Drug A)    292    111 1.26 (0.86-1.85)  0.226 1.11 (0.74-1.67)   0.599
-##> 4: ICU Admission Required Treatment Group (Drug B)    362    145 1.38 (0.96-1.99)  0.085 1.75 (1.18-2.60)   0.005
+##> 3: ICU Admission Required Treatment Group (Drug A)    292    111 1.26 (0.87-1.86)  0.226 1.11 (0.75-1.67)   0.599
+##> 4: ICU Admission Required Treatment Group (Drug B)    362    145 1.38 (0.96-1.99)  0.085 1.75 (1.19-2.61)   0.005
 ##> 5:     30-Day Readmission Treatment Group (Drug A)    292    127 0.89 (0.62-1.28)  0.523 0.86 (0.59-1.25)   0.427
 ##> 6:     30-Day Readmission Treatment Group (Drug B)    362    209 1.58 (1.11-2.24)  0.011 1.56 (1.08-2.25)   0.018
-##> 7:   Wound/Site Infection Treatment Group (Drug A)    292     72 2.14 (1.31-3.50)  0.002 1.86 (1.10-3.15)   0.021
-##> 8:   Wound/Site Infection Treatment Group (Drug B)    362     69 1.54 (0.94-2.51)  0.084 2.22 (1.30-3.81)   0.004
+##> 7:   Wound/Site Infection Treatment Group (Drug A)    292     72 2.14 (1.32-3.55)  0.002 1.86 (1.11-3.19)   0.021
+##> 8:   Wound/Site Infection Treatment Group (Drug B)    362     69 1.54 (0.95-2.55)  0.084 2.22 (1.31-3.87)   0.004
 
 ## Forest plot visualization
 forest_plot <- multiforest(

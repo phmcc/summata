@@ -13,7 +13,8 @@ m2dt(
   terms_to_exclude = NULL,
   reference_rows = TRUE,
   reference_label = "reference",
-  skip_counts = FALSE
+  skip_counts = FALSE,
+  conf_method = NULL
 )
 }
 \arguments{
@@ -58,6 +59,21 @@ in the output. Appears in the \code{reference} column. Default is \code{"referen
 \item{skip_counts}{Logical. If \code{TRUE}, skips computation of group-level
 sample sizes and event counts (faster but less informative). Default is 
 \code{FALSE}.}
+
+\item{conf_method}{Character string controlling the confidence interval method.
+If \code{NULL} (default), uses \code{getOption("summata.conf_method", "profile")}.
+\itemize{
+  \item \code{"profile"} - Profile likelihood intervals for GLM and negative
+    binomial models (via \code{MASS::confint.glm()}), exact \emph{t}-distribution
+    intervals for linear models. Falls back to Wald on profiling failure.
+    Quasi-likelihood families always use Wald (no true likelihood).
+  \item \code{"wald"} - Wald intervals (coefficient \eqn{\pm} \emph{z}
+    \eqn{\times} SE) for all model types. Faster but less accurate near
+    boundary conditions or with small subgroups.
+}
+Cox and mixed-effects models use Wald intervals regardless of this setting.
+Set globally with \code{options(summata.conf_method = "wald")} to use Wald
+throughout a session.}
 }
 \value{
 A \code{data.table} containing extracted model information with the 
@@ -117,9 +133,23 @@ and provides a consistent output format suitable for tables and forest plots.
 The function automatically detects model type and applies appropriate:
 \itemize{
   \item Effect measure naming (OR, HR, RR, Coefficient)
-  \item Confidence interval calculation method
+  \item Confidence interval calculation (see below)
   \item Event counting for binary/survival outcomes
 }
+
+\strong{Confidence Interval Methods:}
+The CI method is selected per model class using \code{stats::confint()}
+dispatch:
+\itemize{
+  \item \strong{GLM/negative binomial}: Profile likelihood via
+    \code{MASS::confint.glm()}, except quasi-families which use Wald
+  \item \strong{Linear models}: Exact \emph{t}-distribution via
+    \code{confint.lm()}
+  \item \strong{Cox PH}: Wald intervals (coefficient \eqn{\pm}
+    \emph{z} \eqn{\times} SE)
+  \item \strong{Mixed-effects models}: Wald intervals
+}
+Falls back to Wald on profiling failure.
 
 \strong{Mixed Effects Models:}
 For \pkg{lme4} models (glmer, lmer), the function extracts fixed effects

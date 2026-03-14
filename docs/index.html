@@ -34,7 +34,7 @@
 
     <a class="navbar-brand me-2" href="index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -92,7 +92,7 @@
 
 <blockquote>
 <p><strong><em>summata</em></strong> | /suːˈmɑːtə/ | <em>Latin, n. pl. of</em> summātum<em>, gerundive of</em> summāre<em>: those that have been summarized</em></p>
-<p>Concise, publication-ready statistical summaries.</p>
+<p>Complete, publication-ready statistical summaries.</p>
 </blockquote>
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
@@ -104,8 +104,11 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>This package is not yet on CRAN. Install it from GitHub (stable) or Codeberg (development):</p>
+<p>The stable release of this package can be installed from CRAN.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"summata"</span><span class="op">)</span></span></code></pre></div>
+<p>Alternatively, install it directly from GitHub (stable) or Codeberg (development):</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Stable release</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"phmcc/summata"</span><span class="op">)</span></span>
 <span></span>
@@ -125,10 +128,10 @@
 <li><p><strong>Separation of concerns.</strong> Analysis, formatting, and export constitute distinct operations, allowing each stage to be modified independently.</p></li>
 </ol>
 <p>These principles manifest in the standard calling convention:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fit.html">fit</a></span><span class="op">(</span><span class="va">data</span>, <span class="va">variable</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"var1"</span>, <span class="st">"var2"</span>, <span class="va">...</span>, <span class="st">"varN"</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
 <p>where <code>data</code> is the dataset, <code>variable</code> is the variable of interest (dependent variable, endpoint/outcome, stratification/grouping variable, <em>etc.</em>), and <code>c("var1", "var2", ..., "varN")</code>is a vector of constituent/modifying variables (independent variables, model covariates, compared/explanatory factors, <em>etc.</em>). The result is a formatted table for export, with readily accessible attributes for further analysis.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># The formatted table</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
 <span></span>
@@ -512,7 +515,7 @@
 <strong>Step 0:</strong> Data Preparation<a class="anchor" aria-label="anchor" href="#step-0-data-preparation"></a>
 </h3>
 <p>Prior to analysis, load the dataset, apply labels, and define predictors:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://phmcc.github.io/summata/">summata</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Load example data</span></span>
@@ -530,7 +533,7 @@
 <strong>Step 1:</strong> Descriptive Statistics<a class="anchor" aria-label="anchor" href="#step-1-descriptive-statistics"></a>
 </h3>
 <p>Use the <code><a href="reference/desctable.html">desctable()</a></code> function to generate summary statistics with stratification by a grouping variable (in this case, 30-day readmission):</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">table1</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/desctable.html">desctable</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>    by <span class="op">=</span> <span class="st">"readmission_30d"</span>,</span>
@@ -552,7 +555,7 @@
 <strong>Step 2:</strong> Regression Analysis<a class="anchor" aria-label="anchor" href="#step-2-regression-analysis"></a>
 </h3>
 <p>Perform an integrated univariable-to-multivariable regression workflow using the <code><a href="reference/fullfit.html">fullfit()</a></code> function:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">table2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fullfit.html">fullfit</a></span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>    outcome <span class="op">=</span> <span class="st">"readmission_30d"</span>,</span>
@@ -577,7 +580,7 @@
 <strong>Step 3:</strong> Forest Plot<a class="anchor" aria-label="anchor" href="#step-3-forest-plot"></a>
 </h3>
 <p>Finally, generate a forest plot to provide a graphical representation of effect estimates using the <code><a href="reference/glmforest.html">glmforest()</a></code> function:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">forest_30d</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/glmforest.html">glmforest</a></span><span class="op">(</span><span class="va">table2</span>,</span>
 <span>                        title <span class="op">=</span> <span class="st">"Factors Affecting 30-Day Readmission"</span>,</span>
 <span>                        labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span>
@@ -638,21 +641,21 @@
 <div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
 </h2>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">citation</span>(<span class="st">"summata"</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a></span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>To cite summata <span class="cf">in</span> publications, use<span class="sc">:</span></span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a></span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>  McClelland <span class="fu">PH</span> (<span class="dv">2026</span>). _summata<span class="sc">:</span> Publication<span class="sc">-</span>Ready Summary Tables and Forest Plots_. R package version <span class="dv">0</span>.<span class="fl">11.0</span>, <span class="sc">&lt;</span>https<span class="sc">:</span><span class="er">//</span>phmcc.github.io<span class="sc">/</span>summata<span class="sc">/</span><span class="er">&gt;</span>.</span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a></span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>A BibTeX entry <span class="cf">for</span> LaTeX users is</span>
-<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a></span>
-<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>  <span class="sc">@</span>Manual{,</span>
-<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>    title <span class="ot">=</span> {summata<span class="sc">:</span> Publication<span class="sc">-</span>Ready Summary Tables and Forest Plots},</span>
-<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>    author <span class="ot">=</span> {Paul Hsin<span class="sc">-</span>ti McClelland},</span>
-<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a>    year <span class="ot">=</span> {<span class="dv">2026</span>},</span>
-<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>    note <span class="ot">=</span> {R package version <span class="dv">0</span>.<span class="fl">11.0</span>},</span>
-<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>    url <span class="ot">=</span> {https<span class="sc">:</span><span class="er">//</span>phmcc.github.io<span class="sc">/</span>summata<span class="sc">/</span>},</span>
-<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>  }</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">citation</span>(<span class="st">"summata"</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>To cite summata <span class="cf">in</span> publications, use<span class="sc">:</span></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>  McClelland <span class="fu">PH</span> (<span class="dv">2026</span>). _summata<span class="sc">:</span> Publication<span class="sc">-</span>Ready Summary Tables and Forest Plots_. R package version <span class="dv">0</span>.<span class="fl">11.4</span>, <span class="sc">&lt;</span>https<span class="sc">:</span><span class="er">//</span>phmcc.github.io<span class="sc">/</span>summata<span class="sc">/</span><span class="er">&gt;</span>.</span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>A BibTeX entry <span class="cf">for</span> LaTeX users is</span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>  <span class="sc">@</span>Manual{,</span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>    title <span class="ot">=</span> {summata<span class="sc">:</span> Publication<span class="sc">-</span>Ready Summary Tables and Forest Plots},</span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>    author <span class="ot">=</span> {Paul Hsin<span class="sc">-</span>ti McClelland},</span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a>    year <span class="ot">=</span> {<span class="dv">2026</span>},</span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a>    note <span class="ot">=</span> {R package version <span class="dv">0</span>.<span class="fl">11.4</span>},</span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a>    url <span class="ot">=</span> {https<span class="sc">:</span><span class="er">//</span>phmcc.github.io<span class="sc">/</span>summata<span class="sc">/</span>},</span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a>  }</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="further-resources">Further Resources<a class="anchor" aria-label="anchor" href="#further-resources"></a>
@@ -669,12 +672,13 @@
 </li>
 </ul>
 <hr>
-<p><sub>The <code>summata</code> package is under active development. The API may change prior to CRAN submission.</sub></p>
+<p><sub>The <code>summata</code> package is under active development.</sub></p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
+<li><a href="https://cloud.r-project.org/package=summata" class="external-link">View on CRAN</a></li>
 <li><a href="https://github.com/phmcc/summata/" class="external-link">Browse source code</a></li>
 <li><a href="https://github.com/phmcc/summata/issues" class="external-link">Report a bug</a></li>
 </ul>
@@ -715,7 +719,7 @@
 <li><a href="https://github.com/phmcc/summata/actions/workflows/test-coverage.yaml" class="external-link"><img src="https://github.com/phmcc/summata/actions/workflows/test-coverage.yaml/badge.svg" alt="test-coverage"></a></li>
 <li><a href="https://github.com/phmcc/summata/actions/workflows/lint.yaml" class="external-link"><img src="https://github.com/phmcc/summata/actions/workflows/lint.yaml/badge.svg" alt="lint"></a></li>
 <li><a href="https://CRAN.R-project.org/package=summata" class="external-link"><img src="https://www.r-pkg.org/badges/version/summata" alt="CRAN status"></a></li>
-<li><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a></li>
+<li><a href="https://lifecycle.r-lib.org/articles/stages.html#stable" class="external-link"><img src="https://img.shields.io/badge/lifecycle-stable-brightgreen.svg" alt="Lifecycle: stable"></a></li>
 </ul>
 </div>
 

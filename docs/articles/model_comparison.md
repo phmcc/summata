@@ -430,9 +430,9 @@ coef_table
 #> 14: Model C   Disease Stage       I    211    125        reference       -
 #> 15: Model C                      II    263    133 0.69 (0.47-1.03)   0.070
 #> 16: Model C                     III    241     91 0.41 (0.27-0.62) < 0.001
-#> 17: Model C                      IV    132     19 0.09 (0.05-0.17) < 0.001
+#> 17: Model C                      IV    132     19 0.09 (0.05-0.16) < 0.001
 #> 18: Model C Treatment Group Control    194     93        reference       -
-#> 19: Model C                  Drug A    292    173 1.84 (1.23-2.75)   0.003
+#> 19: Model C                  Drug A    292    173 1.84 (1.23-2.76)   0.003
 #> 20: Model C                  Drug B    361    102 0.45 (0.30-0.66) < 0.001
 #>       Model        Variable   Group      n Events     aOR (95% CI) p-value
 #>      <char>          <char>  <char> <char> <char>           <char>  <char>

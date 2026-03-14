@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -180,11 +180,11 @@ included alongside the interaction term.</p>
 <span><span class="co">##&gt;  2:                                   Sex  Female    449    203        reference       -</span></span>
 <span><span class="co">##&gt;  3:                                          Male    398    165 1.01 (0.55-1.87)   0.968</span></span>
 <span><span class="co">##&gt;  4:                       Treatment Group Control    194     93        reference       -</span></span>
-<span><span class="co">##&gt;  5:                                        Drug A    292    173 2.09 (1.20-3.62)   0.009</span></span>
-<span><span class="co">##&gt;  6:                                        Drug B    361    102 0.50 (0.29-0.87)   0.013</span></span>
+<span><span class="co">##&gt;  5:                                        Drug A    292    173 2.09 (1.21-3.64)   0.009</span></span>
+<span><span class="co">##&gt;  6:                                        Drug B    361    102 0.50 (0.29-0.86)   0.013</span></span>
 <span><span class="co">##&gt;  7:                         Disease Stage       I    211    125        reference       -</span></span>
 <span><span class="co">##&gt;  8:                                            II    263    133 0.69 (0.47-1.03)   0.069</span></span>
-<span><span class="co">##&gt;  9:                                           III    241     91 0.41 (0.27-0.62) &lt; 0.001</span></span>
+<span><span class="co">##&gt;  9:                                           III    241     91 0.41 (0.27-0.61) &lt; 0.001</span></span>
 <span><span class="co">##&gt; 10:                                            IV    132     19 0.09 (0.05-0.16) &lt; 0.001</span></span>
 <span><span class="co">##&gt; 11: Sex (Male) × Treatment Group (Drug A)       -    128     73 0.77 (0.34-1.71)   0.515</span></span>
 <span><span class="co">##&gt; 12: Sex (Male) × Treatment Group (Drug B)       -    175     49 0.79 (0.36-1.73)   0.554</span></span></code></pre></div>
@@ -259,10 +259,10 @@ Interaction<a class="anchor" aria-label="anchor" href="#example-3-continuous-cat
 <span><span class="co">##&gt;  2:                                    Sex  Female    441                 reference       -</span></span>
 <span><span class="co">##&gt;  3:                                           Male    386       0.99 (0.46 to 1.52) &lt; 0.001</span></span>
 <span><span class="co">##&gt;  4:                        Treatment Group Control    190                 reference       -</span></span>
-<span><span class="co">##&gt;  5:                                         Drug A    288     -2.39 (-6.00 to 1.23)   0.197</span></span>
-<span><span class="co">##&gt;  6:                                         Drug B    349      0.03 (-3.51 to 3.58)   0.985</span></span>
+<span><span class="co">##&gt;  5:                                         Drug A    288     -2.39 (-6.01 to 1.24)   0.197</span></span>
+<span><span class="co">##&gt;  6:                                         Drug B    349      0.03 (-3.52 to 3.58)   0.985</span></span>
 <span><span class="co">##&gt;  7:                          Disease Stage       I    207                 reference       -</span></span>
-<span><span class="co">##&gt;  8:                                             II    259       1.33 (0.62 to 2.04) &lt; 0.001</span></span>
+<span><span class="co">##&gt;  8:                                             II    259       1.33 (0.62 to 2.05) &lt; 0.001</span></span>
 <span><span class="co">##&gt;  9:                                            III    235       3.10 (2.36 to 3.84) &lt; 0.001</span></span>
 <span><span class="co">##&gt; 10:                                             IV    126       4.32 (3.42 to 5.22) &lt; 0.001</span></span>
 <span><span class="co">##&gt; 11:                     Surgical Resection      No    459                 reference       -</span></span>
@@ -297,20 +297,20 @@ analysis:</p>
 <span><span class="co">##&gt; </span></span>
 <span><span class="co">##&gt;                                     Variable   Group      n Events      OR (95% CI)   Uni p     aOR (95% CI) Multi p</span></span>
 <span><span class="co">##&gt;                                       &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
-<span><span class="co">##&gt;  1:                              Age (years)       -    850    370 0.96 (0.95-0.98) &lt; 0.001 0.96 (0.94-0.97) &lt; 0.001</span></span>
-<span><span class="co">##&gt;  2:                                      Sex  Female    450    204        reference       -        reference       -</span></span>
-<span><span class="co">##&gt;  3:                                             Male    400    166 0.86 (0.65-1.12)   0.261 1.01 (0.55-1.87)   0.968</span></span>
-<span><span class="co">##&gt;  4:                          Treatment Group Control    196     94        reference       -        reference       -</span></span>
-<span><span class="co">##&gt;  5:                                           Drug A    292    173 1.58 (1.10-2.27)   0.014 2.09 (1.20-3.62)   0.009</span></span>
-<span><span class="co">##&gt;  6:                                           Drug B    362    103 0.43 (0.30-0.62) &lt; 0.001 0.50 (0.29-0.87)   0.013</span></span>
+<span><span class="co">##&gt;  1:                              Age (years)       -    847    368 0.96 (0.95-0.98) &lt; 0.001 0.96 (0.94-0.97) &lt; 0.001</span></span>
+<span><span class="co">##&gt;  2:                                      Sex  Female    449    203        reference       -        reference       -</span></span>
+<span><span class="co">##&gt;  3:                                             Male    398    165 0.86 (0.65-1.12)   0.261 1.01 (0.55-1.87)   0.968</span></span>
+<span><span class="co">##&gt;  4:                          Treatment Group Control    194     93        reference       -        reference       -</span></span>
+<span><span class="co">##&gt;  5:                                           Drug A    292    173 1.58 (1.10-2.27)   0.014 2.09 (1.21-3.64)   0.009</span></span>
+<span><span class="co">##&gt;  6:                                           Drug B    361    102 0.43 (0.30-0.62) &lt; 0.001 0.50 (0.29-0.86)   0.013</span></span>
 <span><span class="co">##&gt;  7:                            Disease Stage       I    211    125        reference       -        reference       -</span></span>
 <span><span class="co">##&gt;  8:                                               II    263    133 0.70 (0.49-1.01)   0.060 0.69 (0.47-1.03)   0.069</span></span>
-<span><span class="co">##&gt;  9:                                              III    241     91 0.42 (0.29-0.61) &lt; 0.001 0.41 (0.27-0.62) &lt; 0.001</span></span>
-<span><span class="co">##&gt; 10:                                               IV    132     19 0.12 (0.07-0.20) &lt; 0.001 0.09 (0.05-0.16) &lt; 0.001</span></span>
-<span><span class="co">##&gt; 11: Sex (Female) × Treatment Group (Control)       -    100     51 2.62 (1.57-4.37) &lt; 0.001                -       -</span></span>
-<span><span class="co">##&gt; 12:   Sex (Male) × Treatment Group (Control)       -     96     43 2.04 (1.22-3.43)   0.007                -       -</span></span>
-<span><span class="co">##&gt; 13:  Sex (Female) × Treatment Group (Drug A)       -    164    100 3.94 (2.50-6.20) &lt; 0.001                -       -</span></span>
-<span><span class="co">##&gt; 14:    Sex (Male) × Treatment Group (Drug A)       -    128     73 3.34 (2.07-5.40) &lt; 0.001 0.77 (0.34-1.71)   0.515</span></span>
+<span><span class="co">##&gt;  9:                                              III    241     91 0.42 (0.29-0.61) &lt; 0.001 0.41 (0.27-0.61) &lt; 0.001</span></span>
+<span><span class="co">##&gt; 10:                                               IV    132     19 0.12 (0.06-0.20) &lt; 0.001 0.09 (0.05-0.16) &lt; 0.001</span></span>
+<span><span class="co">##&gt; 11: Sex (Female) × Treatment Group (Control)       -    100     51 2.62 (1.58-4.39) &lt; 0.001                -       -</span></span>
+<span><span class="co">##&gt; 12:   Sex (Male) × Treatment Group (Control)       -     96     43 2.04 (1.22-3.44)   0.007                -       -</span></span>
+<span><span class="co">##&gt; 13:  Sex (Female) × Treatment Group (Drug A)       -    164    100 3.94 (2.51-6.24) &lt; 0.001                -       -</span></span>
+<span><span class="co">##&gt; 14:    Sex (Male) × Treatment Group (Drug A)       -    128     73 3.34 (2.08-5.43) &lt; 0.001 0.77 (0.34-1.71)   0.515</span></span>
 <span><span class="co">##&gt; 15:  Sex (Female) × Treatment Group (Drug B)       -    186     53 1.00 (0.64-1.59)   0.986                -       -</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -908,18 +908,18 @@ outcomes.</p>
 <span><span class="co">##&gt; </span></span>
 <span><span class="co">##&gt;                        Outcome                             Predictor      n Events     aOR (95% CI) p-value</span></span>
 <span><span class="co">##&gt;                         &lt;char&gt;                                &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
-<span><span class="co">##&gt;  1:         Surgical Resection              Treatment Group (Drug A)    292    173 2.09 (1.20-3.62)   0.009</span></span>
-<span><span class="co">##&gt;  2:         Surgical Resection              Treatment Group (Drug B)    361    102 0.50 (0.29-0.87)   0.013</span></span>
+<span><span class="co">##&gt;  1:         Surgical Resection              Treatment Group (Drug A)    292    173 2.09 (1.21-3.64)   0.009</span></span>
+<span><span class="co">##&gt;  2:         Surgical Resection              Treatment Group (Drug B)    361    102 0.50 (0.29-0.86)   0.013</span></span>
 <span><span class="co">##&gt;  3:         Surgical Resection Treatment Group (Drug A) × Sex (Male)      -      - 0.77 (0.34-1.71)   0.515</span></span>
 <span><span class="co">##&gt;  4:         Surgical Resection Treatment Group (Drug B) × Sex (Male)      -      - 0.79 (0.36-1.73)   0.554</span></span>
-<span><span class="co">##&gt;  5: Progression or Death Event              Treatment Group (Drug A)    292    227 0.41 (0.20-0.84)   0.015</span></span>
-<span><span class="co">##&gt;  6: Progression or Death Event              Treatment Group (Drug B)    361    321 0.95 (0.43-2.09)   0.893</span></span>
-<span><span class="co">##&gt;  7: Progression or Death Event Treatment Group (Drug A) × Sex (Male)      -      - 0.75 (0.24-2.32)   0.618</span></span>
-<span><span class="co">##&gt;  8: Progression or Death Event Treatment Group (Drug B) × Sex (Male)      -      - 0.63 (0.20-2.06)   0.448</span></span>
+<span><span class="co">##&gt;  5: Progression or Death Event              Treatment Group (Drug A)    292    227 0.41 (0.19-0.82)   0.015</span></span>
+<span><span class="co">##&gt;  6: Progression or Death Event              Treatment Group (Drug B)    361    321 0.95 (0.42-2.07)   0.893</span></span>
+<span><span class="co">##&gt;  7: Progression or Death Event Treatment Group (Drug A) × Sex (Male)      -      - 0.75 (0.24-2.29)   0.618</span></span>
+<span><span class="co">##&gt;  8: Progression or Death Event Treatment Group (Drug B) × Sex (Male)      -      - 0.63 (0.19-2.04)   0.448</span></span>
 <span><span class="co">##&gt;  9:                Death Event              Treatment Group (Drug A)    292    184 0.39 (0.22-0.70)   0.002</span></span>
-<span><span class="co">##&gt; 10:                Death Event              Treatment Group (Drug B)    361    273 0.61 (0.34-1.10)   0.099</span></span>
-<span><span class="co">##&gt; 11:                Death Event Treatment Group (Drug A) × Sex (Male)      -      - 1.29 (0.53-3.18)   0.575</span></span>
-<span><span class="co">##&gt; 12:                Death Event Treatment Group (Drug B) × Sex (Male)      -      - 1.59 (0.65-3.91)   0.308</span></span></code></pre></div>
+<span><span class="co">##&gt; 10:                Death Event              Treatment Group (Drug B)    361    273 0.61 (0.34-1.09)   0.099</span></span>
+<span><span class="co">##&gt; 11:                Death Event Treatment Group (Drug A) × Sex (Male)      -      - 1.29 (0.52-3.17)   0.575</span></span>
+<span><span class="co">##&gt; 12:                Death Event Treatment Group (Drug B) × Sex (Male)      -      - 1.59 (0.65-3.90)   0.308</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="example-20-multi-outcome-with-mixed-effects">
@@ -1017,32 +1017,32 @@ Effects<a class="anchor" aria-label="anchor" href="#example-21-survival-multi-ou
 <span><span class="co">##&gt; Predictors Screened: 9</span></span>
 <span><span class="co">##&gt; Significant (p &lt; 0.2): 6</span></span>
 <span><span class="co">##&gt; </span></span>
-<span><span class="co">##&gt;                    Variable   Group      n Events            OR (95% CI) p-value</span></span>
-<span><span class="co">##&gt;                      &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;                 &lt;char&gt;  &lt;char&gt;</span></span>
-<span><span class="co">##&gt;  1:             Age (years)       -    850    609       1.05 (1.03-1.06) &lt; 0.001</span></span>
-<span><span class="co">##&gt;  2:                     Sex  Female    450    298              reference       -</span></span>
-<span><span class="co">##&gt;  3:                            Male    400    311       1.78 (1.31-2.42) &lt; 0.001</span></span>
-<span><span class="co">##&gt;  4: Body Mass Index (kg/m²)       -    838    599       1.01 (0.98-1.05)   0.347</span></span>
-<span><span class="co">##&gt;  5:          Smoking Status   Never    337    248              reference       -</span></span>
-<span><span class="co">##&gt;  6:                          Former    311    203       0.67 (0.48-0.94)   0.022</span></span>
-<span><span class="co">##&gt;  7:                         Current    185    143       1.22 (0.80-1.86)   0.351</span></span>
-<span><span class="co">##&gt;  8:                Diabetes      No    637    457              reference       -</span></span>
-<span><span class="co">##&gt;  9:                             Yes    197    138       0.92 (0.65-1.31)   0.646</span></span>
-<span><span class="co">##&gt; 10:            Hypertension      No    504    354              reference       -</span></span>
-<span><span class="co">##&gt; 11:                             Yes    331    242       1.15 (0.85-1.57)   0.369</span></span>
-<span><span class="co">##&gt; 12:           Disease Stage       I    211    127              reference       -</span></span>
-<span><span class="co">##&gt; 13:                              II    263    172       1.25 (0.86-1.82)   0.243</span></span>
-<span><span class="co">##&gt; 14:                             III    241    186       2.24 (1.49-3.36) &lt; 0.001</span></span>
-<span><span class="co">##&gt; 15:                              IV    132    121      7.28 (3.70-14.30) &lt; 0.001</span></span>
-<span><span class="co">##&gt; 16: ECOG Performance Status       0    265    159              reference       -</span></span>
-<span><span class="co">##&gt; 17:                               1    302    212       1.57 (1.11-2.22)   0.011</span></span>
-<span><span class="co">##&gt; 18:                               2    238    194       2.94 (1.95-4.43) &lt; 0.001</span></span>
-<span><span class="co">##&gt; 19:                               3     37     37 10434240.53 (0.00-Inf)   0.967</span></span>
-<span><span class="co">##&gt; 20:         Treatment Group Control    196    151              reference       -</span></span>
-<span><span class="co">##&gt; 21:                          Drug A    292    184       0.51 (0.34-0.76)   0.001</span></span>
-<span><span class="co">##&gt; 22:                          Drug B    362    274       0.93 (0.62-1.40)   0.721</span></span>
-<span><span class="co">##&gt;                    Variable   Group      n Events            OR (95% CI) p-value</span></span>
-<span><span class="co">##&gt;                      &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;                 &lt;char&gt;  &lt;char&gt;</span></span>
+<span><span class="co">##&gt;                    Variable   Group      n Events                                                                         OR (95% CI) p-value</span></span>
+<span><span class="co">##&gt;                      &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;                                                                              &lt;char&gt;  &lt;char&gt;</span></span>
+<span><span class="co">##&gt;  1:             Age (years)       -    850    609                                                                    1.05 (1.03-1.06) &lt; 0.001</span></span>
+<span><span class="co">##&gt;  2:                     Sex  Female    450    298                                                                           reference       -</span></span>
+<span><span class="co">##&gt;  3:                            Male    400    311                                                                    1.78 (1.31-2.43) &lt; 0.001</span></span>
+<span><span class="co">##&gt;  4: Body Mass Index (kg/m²)       -    838    599                                                                    1.01 (0.98-1.05)   0.347</span></span>
+<span><span class="co">##&gt;  5:          Smoking Status   Never    337    248                                                                           reference       -</span></span>
+<span><span class="co">##&gt;  6:                          Former    311    203                                                                    0.67 (0.48-0.94)   0.022</span></span>
+<span><span class="co">##&gt;  7:                         Current    185    143                                                                    1.22 (0.81-1.87)   0.351</span></span>
+<span><span class="co">##&gt;  8:                Diabetes      No    637    457                                                                           reference       -</span></span>
+<span><span class="co">##&gt;  9:                             Yes    197    138                                                                    0.92 (0.65-1.31)   0.646</span></span>
+<span><span class="co">##&gt; 10:            Hypertension      No    504    354                                                                           reference       -</span></span>
+<span><span class="co">##&gt; 11:                             Yes    331    242                                                                    1.15 (0.85-1.57)   0.369</span></span>
+<span><span class="co">##&gt; 12:           Disease Stage       I    211    127                                                                           reference       -</span></span>
+<span><span class="co">##&gt; 13:                              II    263    172                                                                    1.25 (0.86-1.82)   0.243</span></span>
+<span><span class="co">##&gt; 14:                             III    241    186                                                                    2.24 (1.49-3.38) &lt; 0.001</span></span>
+<span><span class="co">##&gt; 15:                              IV    132    121                                                                   7.28 (3.85-15.04) &lt; 0.001</span></span>
+<span><span class="co">##&gt; 16: ECOG Performance Status       0    265    159                                                                           reference       -</span></span>
+<span><span class="co">##&gt; 17:                               1    302    212                                                                    1.57 (1.11-2.23)   0.011</span></span>
+<span><span class="co">##&gt; 18:                               2    238    194                                                                    2.94 (1.96-4.46) &lt; 0.001</span></span>
+<span><span class="co">##&gt; 19:                               3     37     37 10434240.53 (0.14-2890457677984913571851268084302912518873843036449866285842432.00)   0.967</span></span>
+<span><span class="co">##&gt; 20:         Treatment Group Control    196    151                                                                           reference       -</span></span>
+<span><span class="co">##&gt; 21:                          Drug A    292    184                                                                    0.51 (0.34-0.76)   0.001</span></span>
+<span><span class="co">##&gt; 22:                          Drug B    362    274                                                                    0.93 (0.61-1.39)   0.721</span></span>
+<span><span class="co">##&gt;                    Variable   Group      n Events                                                                         OR (95% CI) p-value</span></span>
+<span><span class="co">##&gt;                      &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;                                                                              &lt;char&gt;  &lt;char&gt;</span></span>
 <span></span>
 <span><span class="co"># Step 2: Test key exposure across multiple outcomes</span></span>
 <span><span class="va">effects</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/multifit.html">multifit</a></span><span class="op">(</span></span>
@@ -1067,10 +1067,10 @@ Effects<a class="anchor" aria-label="anchor" href="#example-21-survival-multi-ou
 <span><span class="co">##&gt;                       Outcome                Predictor      n Events      OR (95% CI)   Uni p     aOR (95% CI) Multi p</span></span>
 <span><span class="co">##&gt;                        &lt;char&gt;                   &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
 <span><span class="co">##&gt; 1:                Death Event Treatment Group (Drug A)    292    184 0.51 (0.34-0.76)   0.001 0.44 (0.28-0.68) &lt; 0.001</span></span>
-<span><span class="co">##&gt; 2:                Death Event Treatment Group (Drug B)    362    274 0.93 (0.62-1.40)   0.721 0.74 (0.48-1.16)   0.192</span></span>
-<span><span class="co">##&gt; 3: Progression or Death Event Treatment Group (Drug A)    292    227 0.44 (0.26-0.74)   0.002 0.36 (0.21-0.63) &lt; 0.001</span></span>
-<span><span class="co">##&gt; 4: Progression or Death Event Treatment Group (Drug B)    362    322 1.02 (0.59-1.77)   0.950 0.77 (0.43-1.38)   0.374</span></span>
-<span><span class="co">##&gt; 5:         Surgical Resection Treatment Group (Drug A)    292    173 1.58 (1.10-2.27)   0.014 1.84 (1.23-2.75)   0.003</span></span>
+<span><span class="co">##&gt; 2:                Death Event Treatment Group (Drug B)    362    274 0.93 (0.61-1.39)   0.721 0.74 (0.47-1.16)   0.192</span></span>
+<span><span class="co">##&gt; 3: Progression or Death Event Treatment Group (Drug A)    292    227 0.44 (0.26-0.73)   0.002 0.36 (0.20-0.62) &lt; 0.001</span></span>
+<span><span class="co">##&gt; 4: Progression or Death Event Treatment Group (Drug B)    362    322 1.02 (0.58-1.75)   0.950 0.77 (0.42-1.36)   0.374</span></span>
+<span><span class="co">##&gt; 5:         Surgical Resection Treatment Group (Drug A)    292    173 1.58 (1.10-2.27)   0.014 1.84 (1.23-2.76)   0.003</span></span>
 <span><span class="co">##&gt; 6:         Surgical Resection Treatment Group (Drug B)    362    103 0.43 (0.30-0.62) &lt; 0.001 0.45 (0.30-0.66) &lt; 0.001</span></span>
 <span></span>
 <span><span class="co"># Step 3: Visualize effects</span></span>

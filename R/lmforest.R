@@ -551,7 +551,7 @@ Received class: ", paste(class(x), collapse = ", "))
     } else {
         ## For regular lm
         coef_summary <- summary(model)$coefficients
-        conf_int <- stats::confint(model, level = conf_level)
+        conf_int <- get_cached_confint(model, conf_level)
         t_values <- coef_summary[, "t value"]
         p_values <- coef_summary[, "Pr(>|t|)"]
     }

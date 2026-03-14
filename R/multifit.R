@@ -104,7 +104,9 @@
 #'   \strong{Positive continuous outcomes:}
 #'   \itemize{
 #'     \item \code{"Gamma"} or \code{Gamma()} - Gamma distribution for positive, 
-#'       right-skewed continuous data (\emph{e.g.,} costs, lengths of stay). Default log link.
+#'       right-skewed continuous data (\emph{e.g.,} costs, lengths of stay). When
+#'       passed as a string, resolves to log link for interpretable multiplicative
+#'       effects.
 #'     \item \code{Gamma(link = "inverse")} - Gamma with inverse (canonical) link.
 #'     \item \code{Gamma(link = "identity")} - Gamma with identity link for additive 
 #'       effects on positive outcomes.
@@ -176,6 +178,21 @@
 #'     OR/HR/RR instead of log odds/log hazards). Default is \code{NULL}, which
 #'     automatically displays raw coefficients for linear models and
 #'     exponentiates for logistic, Poisson, and Cox models.
+#'   
+#' @param conf_method Character string controlling the confidence interval method.
+#'   If \code{NULL} (default), uses \code{getOption("summata.conf_method", "profile")}.
+#'   \itemize{
+#'     \item \code{"profile"} - Profile likelihood intervals for GLM and negative
+#'       binomial models (via \code{MASS::confint.glm()}), exact \emph{t}-distribution
+#'       intervals for linear models. Falls back to Wald on profiling failure.
+#'       Quasi-likelihood families always use Wald (no true likelihood).
+#'     \item \code{"wald"} - Wald intervals (coefficient \eqn{\pm} \emph{z}
+#'       \eqn{\times} SE) for all model types. Faster but less accurate near
+#'       boundary conditions or with small subgroups.
+#'   }
+#'   Cox and mixed-effects models use Wald intervals regardless of this setting.
+#'   Set globally with \code{options(summata.conf_method = "wald")} to use Wald
+#'   throughout a session.
 #'   
 #' @param parallel Logical. If \code{TRUE} (default), fits models in parallel
 #'   for improved performance with many outcomes.
@@ -753,6 +770,7 @@ multifit <- function(data,
                      include_predictor = TRUE,
                      keep_models = FALSE,
                      exponentiate = NULL,
+                     conf_method = NULL,
                      parallel = TRUE,
                      n_cores = NULL,
                      number_format = NULL,
@@ -772,6 +790,12 @@ multifit <- function(data,
     ## Resolve verbose setting
     verbose <- if (is.null(verbose)) getOption("summata.verbose", FALSE) else verbose
     
+    ## Resolve Gamma family string to log link (see fit.R for rationale)
+    if (model_type %in% c("glm", "glmer") && is.character(family) &&
+        tolower(family) == "gamma") {
+        family <- stats::Gamma(link = "log")
+    }
+
     ## Validate model_type for mixed effects
     mixed_types <- c("glmer", "lmer", "coxme")
     
@@ -938,7 +962,8 @@ multifit <- function(data,
                     outcome = outcome,
                     conf_level = conf_level,
                     adjusted = FALSE,
-                    terms_to_extract = predictor  # Only main effect for univariable
+                    terms_to_extract = predictor,
+                    conf_method = conf_method
                 )
                 results_list$unadjusted <- unadj_raw
                 
@@ -1033,7 +1058,8 @@ multifit <- function(data,
                     outcome = outcome,
                     conf_level = conf_level,
                     adjusted = TRUE,
-                    terms_to_extract = terms_to_extract  # Include interaction terms
+                    terms_to_extract = terms_to_extract,
+                    conf_method = conf_method
                 )
                 results_list$adjusted <- adj_raw
                 
@@ -1082,7 +1108,7 @@ multifit <- function(data,
                                                 "random", "strata", "cluster", "model_type", 
                                                 "family", "conf_level", "columns", "keep_models",
                                                 "has_adjustment", "mixed_types", "terms_to_extract",
-                                                "extract_predictor_effects"),
+                                                "extract_predictor_effects", "conf_method"),
                                     envir = environment()
                                     )
             
@@ -1272,7 +1298,8 @@ format_interaction_term <- function(term, labels = NULL) {
 #' @keywords internal
 extract_predictor_effects <- function(model, predictor, outcome, 
                                       conf_level = 0.95, adjusted = FALSE,
-                                      terms_to_extract = NULL) {
+                                      terms_to_extract = NULL,
+                                      conf_method = NULL) {
     
     if (is.null(terms_to_extract)) {
         terms_to_extract <- predictor
@@ -1512,12 +1539,67 @@ extract_predictor_effects <- function(model, predictor, outcome,
         p_col <- colnames(pred_coefs)[4]
     }
     
-    ## Calculate confidence intervals
-    z_score <- stats::qnorm((1 + conf_level) / 2)
+    ## Resolve CI method
+    conf_method_resolved <- if (is.null(conf_method)) {
+        getOption("summata.conf_method", "profile")
+    } else {
+        match.arg(conf_method, c("profile", "wald"))
+    }
+
+    ## Compute CIs: profile/exact-t when conf_method="profile", Wald otherwise
     coefficients <- pred_coefs[, coef_col]
     se_values <- pred_coefs[, se_col]
-    ci_lower <- coefficients - z_score * se_values
-    ci_upper <- coefficients + z_score * se_values
+
+    use_confint <- FALSE
+    if (conf_method_resolved == "profile") {
+        if (inherits(model, c("glm", "negbin"))) {
+            use_confint <- !(inherits(model, "glm") &&
+                             grepl("^quasi", model$family$family))
+        } else if (inherits(model, "lm")) {
+            use_confint <- TRUE
+        }
+    }
+
+    if (use_confint) {
+        ## Profile likelihood CIs (GLM/negbin) or exact t CIs (lm)
+        better_ci <- tryCatch(
+            suppressMessages(suppressWarnings(
+                stats::confint(model, level = conf_level)
+            )),
+            error = function(e) NULL
+        )
+        if (!is.null(better_ci)) {
+            ## Remove intercept if present
+            if ("(Intercept)" %in% rownames(better_ci)) {
+                better_ci <- better_ci[rownames(better_ci) != "(Intercept)", ,
+                                         drop = FALSE]
+            }
+            ## Match terms to confint rows
+            term_match <- match(rownames(pred_coefs), rownames(better_ci))
+            if (all(!is.na(term_match))) {
+                ci_lower <- better_ci[term_match, 1L]
+                ci_upper <- better_ci[term_match, 2L]
+            } else {
+                ## Partial match: use confint where available, Wald otherwise
+                z_score <- stats::qnorm((1 + conf_level) / 2)
+                ci_lower <- coefficients - z_score * se_values
+                ci_upper <- coefficients + z_score * se_values
+                matched <- !is.na(term_match)
+                ci_lower[matched] <- better_ci[term_match[matched], 1L]
+                ci_upper[matched] <- better_ci[term_match[matched], 2L]
+            }
+        } else {
+            ## confint() failed; fall back to Wald
+            z_score <- stats::qnorm((1 + conf_level) / 2)
+            ci_lower <- coefficients - z_score * se_values
+            ci_upper <- coefficients + z_score * se_values
+        }
+    } else {
+        ## Wald CIs
+        z_score <- stats::qnorm((1 + conf_level) / 2)
+        ci_lower <- coefficients - z_score * se_values
+        ci_upper <- coefficients + z_score * se_values
+    }
     
     ## Determine effect type and calculate exponentiated values
     if (model_class == "coxph" || is_coxme) {

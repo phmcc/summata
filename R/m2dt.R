@@ -48,6 +48,21 @@
 #'   sample sizes and event counts (faster but less informative). Default is 
 #'   \code{FALSE}.
 #'
+#' @param conf_method Character string controlling the confidence interval method.
+#'   If \code{NULL} (default), uses \code{getOption("summata.conf_method", "profile")}.
+#'   \itemize{
+#'     \item \code{"profile"} - Profile likelihood intervals for GLM and negative
+#'       binomial models (via \code{MASS::confint.glm()}), exact \emph{t}-distribution
+#'       intervals for linear models. Falls back to Wald on profiling failure.
+#'       Quasi-likelihood families always use Wald (no true likelihood).
+#'     \item \code{"wald"} - Wald intervals (coefficient \eqn{\pm} \emph{z}
+#'       \eqn{\times} SE) for all model types. Faster but less accurate near
+#'       boundary conditions or with small subgroups.
+#'   }
+#'   Cox and mixed-effects models use Wald intervals regardless of this setting.
+#'   Set globally with \code{options(summata.conf_method = "wald")} to use Wald
+#'   throughout a session.
+#'
 #' @return A \code{data.table} containing extracted model information with the 
 #'   following standard columns:
 #'   \describe{
@@ -98,9 +113,23 @@
 #' The function automatically detects model type and applies appropriate:
 #' \itemize{
 #'   \item Effect measure naming (OR, HR, RR, Coefficient)
-#'   \item Confidence interval calculation method
+#'   \item Confidence interval calculation (see below)
 #'   \item Event counting for binary/survival outcomes
 #' }
+#'
+#' \strong{Confidence Interval Methods:}
+#' The CI method is selected per model class using \code{stats::confint()}
+#' dispatch:
+#' \itemize{
+#'   \item \strong{GLM/negative binomial}: Profile likelihood via
+#'     \code{MASS::confint.glm()}, except quasi-families which use Wald
+#'   \item \strong{Linear models}: Exact \emph{t}-distribution via
+#'     \code{confint.lm()}
+#'   \item \strong{Cox PH}: Wald intervals (coefficient \eqn{\pm}
+#'     \emph{z} \eqn{\times} SE)
+#'   \item \strong{Mixed-effects models}: Wald intervals
+#' }
+#' Falls back to Wald on profiling failure.
 #'
 #' \strong{Mixed Effects Models:}
 #' For \pkg{lme4} models (glmer, lmer), the function extracts fixed effects
@@ -159,7 +188,8 @@ m2dt <- function(data,
                  terms_to_exclude = NULL,
                  reference_rows = TRUE,
                  reference_label = "reference",
-                 skip_counts = FALSE) {
+                 skip_counts = FALSE,
+                 conf_method = NULL) {
 
     ## Validate inputs
     if (missing(data)) {
@@ -220,11 +250,76 @@ m2dt <- function(data,
     ## Get readable model type name
     model_type_name <- get_model_type_name(model)
     
+    ## Variable to hold confint result for downstream caching
+    .confint_cache <- NULL
+    .confint_cache_level <- NULL
+
+    ## Resolve CI method: "profile" (default) or "wald"
+    conf_method <- if (is.null(conf_method)) {
+        getOption("summata.conf_method", "profile")
+    } else {
+        match.arg(conf_method, c("profile", "wald"))
+    }
+
     ## Extract results based on model class
     if (model_class %in% c("glm", "lm", "negbin")) {
         
         coef_summary <- summary(model)$coefficients
-        conf_int <- stats::confint.default(model, level = conf_level)
+
+        ## Compute confidence intervals.
+        ## conf_method = "profile": profile likelihood for GLM/negbin, exact t
+        ##   for lm, Wald for quasi-families. Falls back to Wald on failure.
+        ## conf_method = "wald": Wald (normal approximation) for all models.
+        ##   Faster but less accurate near boundary conditions.
+        is_quasi <- inherits(model, "glm") &&
+            grepl("^quasi", model$family$family)
+
+        ## Skip profiling the intercept when it will be excluded from output.
+        all_terms <- rownames(coef_summary)
+        skip_intercept <- !include_intercept &&
+            "(Intercept)" %in% all_terms
+
+        parm <- if (skip_intercept) {
+            setdiff(all_terms, "(Intercept)")
+        } else {
+            all_terms
+        }
+
+        use_wald <- conf_method == "wald" || is_quasi
+
+        conf_int_raw <- if (use_wald) {
+            stats::confint.default(model, parm = parm, level = conf_level)
+        } else {
+            tryCatch(
+                suppressMessages(suppressWarnings(
+                    stats::confint(model, parm = parm, level = conf_level)
+                )),
+                error = function(e) {
+                    stats::confint.default(model, parm = parm, level = conf_level)
+                }
+            )
+        }
+
+        ## Ensure result is always a matrix (confint may return a named
+        ## vector when parm specifies a single parameter)
+        if (is.null(dim(conf_int_raw))) {
+            conf_int_raw <- matrix(conf_int_raw, nrow = 1,
+                                   dimnames = list(parm, names(conf_int_raw)))
+        }
+
+        ## Reconstruct full matrix aligned with coef_summary rows
+        ## (intercept row gets NA if it was skipped)
+        if (skip_intercept && nrow(conf_int_raw) < length(all_terms)) {
+            conf_int <- matrix(NA_real_, nrow = length(all_terms), ncol = 2,
+                               dimnames = list(all_terms, colnames(conf_int_raw)))
+            conf_int[rownames(conf_int_raw), ] <- conf_int_raw
+        } else {
+            conf_int <- conf_int_raw
+        }
+
+        ## Save confint for caching at end of function
+        .confint_cache <- conf_int
+        .confint_cache_level <- conf_level
         
         dt <- data.table::data.table(
                               model_scope = model_scope,
@@ -236,12 +331,12 @@ m2dt <- function(data,
                               se = coef_summary[, "Std. Error"]
                           )
         
-        ## Calculate confidence intervals
-        z_score <- stats::qnorm((1 + conf_level) / 2)
+        ## Use confint() output for CI bounds (profile likelihood for
+        ## GLM/negbin, exact t-distribution for lm, Wald for quasi-families)
         dt[, `:=`(
             coef = coefficient,
-            coef_lower = coefficient - z_score * se,
-            coef_upper = coefficient + z_score * se
+            coef_lower = conf_int[, 1],
+            coef_upper = conf_int[, 2]
         )]
         
         ## Special handling for logistic regression (including quasibinomial)
@@ -1344,6 +1439,12 @@ m2dt <- function(data,
         data.table::setattr(dt, "theta", model$theta)
     }
     
+    ## Cache confint result for downstream reuse by fit() and forest functions
+    if (!is.null(.confint_cache)) {
+        data.table::setattr(dt, "cached_confint", .confint_cache)
+        data.table::setattr(dt, "cached_confint_level", .confint_cache_level)
+    }
+
     dt[]
     return(dt)
 }

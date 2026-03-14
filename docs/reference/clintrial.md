@@ -258,7 +258,7 @@ fullfit(clintrial,
 #> 
 #>                    Variable                     Group      n Events      HR (95% CI)   Uni p     aHR (95% CI) Multi p
 #>                      <char>                    <char> <char> <char>           <char>  <char>           <char>  <char>
-#>  1:             Age (years)                         -    850    609 1.03 (1.03-1.04) < 0.001 1.03 (1.03-1.04) < 0.001
+#>  1:             Age (years)                         -    833    594 1.03 (1.03-1.04) < 0.001 1.03 (1.03-1.04) < 0.001
 #>  2:                     Sex                    Female    450    298        reference       -        reference       -
 #>  3:                                              Male    400    311 1.30 (1.11-1.53)   0.001 1.33 (1.13-1.57) < 0.001
 #>  4:           Disease Stage                         I    211    127        reference       -        reference       -
@@ -275,7 +275,7 @@ fullfit(clintrial,
 #> 15:          Smoking Status                     Never    337    248        reference       -        reference       -
 #> 16:                                            Former    311    203 0.84 (0.70-1.02)   0.074 0.94 (0.78-1.14)   0.546
 #> 17:                                           Current    185    143 1.19 (0.97-1.46)   0.103 1.29 (1.05-1.60)   0.017
-#> 18:     Biomarker X (ng/mL)                         -    842    602 1.11 (1.08-1.13) < 0.001 1.08 (1.05-1.11) < 0.001
+#> 18:     Biomarker X (ng/mL)                         -    833    594 1.11 (1.08-1.13) < 0.001 1.08 (1.05-1.11) < 0.001
 #> 19:       Biomarker Y (U/L)                         -    842    601 1.00 (1.00-1.00)   0.934                -       -
 #> 20:         Treatment Group                   Control    196    151        reference       -        reference       -
 #> 21:                                            Drug A    292    184 0.64 (0.52-0.80) < 0.001 0.53 (0.42-0.66) < 0.001

@@ -26,6 +26,7 @@ fullfit(
   return_type = "table",
   keep_models = FALSE,
   exponentiate = NULL,
+  conf_method = NULL,
   parallel = TRUE,
   n_cores = NULL,
   number_format = NULL,
@@ -134,7 +135,9 @@ Ignored for non-GLM/GLMER models.
 \strong{Positive continuous outcomes:}
 \itemize{
   \item \code{"Gamma"} or \code{Gamma()} - Gamma distribution for positive, 
-    right-skewed continuous data (\emph{e.g.,} costs, lengths of stay). Default log link.
+    right-skewed continuous data (\emph{e.g.,} costs, lengths of stay). When
+    passed as a string, resolves to log link for interpretable multiplicative
+    effects.
   \item \code{Gamma(link = "inverse")} - Gamma with inverse (canonical) link.
   \item \code{Gamma(link = "identity")} - Gamma with identity link for additive 
     effects on positive outcomes.
@@ -205,6 +208,23 @@ Default is \code{FALSE}.}
 is \code{NULL}, which automatically exponentiates for logistic, Poisson,
 and Cox models, and displays raw coefficients for linear models.}
 
+\item{conf_method}{Character string controlling the confidence interval method.
+If \code{NULL} (default), uses \code{getOption("summata.conf_method", "profile")}.
+\itemize{
+  \item \code{"profile"} - Profile likelihood intervals for GLM and negative
+    binomial models (via \code{MASS::confint.glm()}), exact \emph{t}-distribution
+    intervals for linear models. Falls back to Wald on profiling failure.
+    Quasi-likelihood families always use Wald (no true likelihood).
+  \item \code{"wald"} - Wald intervals (coefficient \eqn{\pm} \emph{z}
+    \eqn{\times} SE) for all model types. Faster but less accurate near
+    boundary conditions or with small subgroups.
+}
+Cox and mixed-effects models use Wald intervals regardless of this setting.
+Set globally with \code{options(summata.conf_method = "wald")} to use Wald
+throughout a session. Note: when \code{method = "screen"} and
+\code{columns = "multi"}, the internal screening pass always uses Wald
+since only \emph{p}-values are needed for variable selection.}
+
 \item{parallel}{Logical. If \code{TRUE} (default), fits univariable models
 in parallel using multiple CPU cores for improved performance.}
 
@@ -249,8 +269,18 @@ Depends on \code{return_type} parameter:
   \describe{
     \item{Variable}{Character. Predictor name or custom label}
     \item{Group}{Character. Category level for factors, empty for continuous}
-    \item{n/n_group}{Integer. Sample sizes (if \code{show_n = TRUE})}
-    \item{events/events_group}{Integer. Event counts (if \code{show_events = TRUE})}
+    \item{n/n_group}{Integer. Sample sizes (if \code{show_n = TRUE}). For
+      variables included in the multivariable model, reflects the
+      complete-case sample size from the fitted model (listwise deletion
+      across all included predictors). For variables not selected into the
+      multivariable model, reflects the per-variable sample size from the
+      univariable analysis. This follows STROBE guideline item 12,
+      which recommends reporting the number of participants included at
+      each stage of analysis.}
+    \item{events/events_group}{Integer. Event counts (if \code{show_events = TRUE}).
+      Same complete-case convention as \code{n}: multivariable rows show
+      events from the fitted model, univariable-only rows show
+      per-variable counts.}
     \item{OR/HR/RR/Coefficient (95\% CI)}{Character. Unadjusted effect 
       (if \code{columns} includes "uni" and \code{metrics} includes "effect")}
     \item{Uni p}{Character. Univariable \emph{p}-value (if \code{columns} includes 

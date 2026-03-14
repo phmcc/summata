@@ -30,7 +30,7 @@ areas of overlap and distinction between `summata` and its alternatives.
 | Descriptive Tables | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Stratified Summaries | ✓ | ✓ | ✓ | ✓ | — | ✓ | ✓ |
 | Univariable Screening | ✓ | ✓ | ✓ | ✓ | — | — | ✓ |
-| Multivariable Workflow | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ |
+| Multivariable Workflow | ✓ | ✓ | ✓ | ✓ | ✓ | — | — |
 | Multivariate Regression | ✓ | — | — | — | — | — | — |
 | Model Comparison | ✓ | ✓ | ◐ | — | ✓ | — | — |
 | Mixed-Effects Models | ✓ | ✓ | ◐ | — | ◐ | — | — |
@@ -39,7 +39,7 @@ areas of overlap and distinction between `summata` and its alternatives.
 | Forest Plots | ✓ | ◐ | ✓ | — | — | — | — |
 | Table Merge/Stack | — | ✓ | ◐ | — | — | — | — |
 | Export (Word/PDF) | ✓ | ✓ | ✓ | ✓ | ✓ | ◐ | ✓ |
-| Variable Labels | ✓ | ✓ | ✓ | ✓ | — | ✓ | ✓ |
+| Variable Labels | ✓ | ✓ | ✓ | ✓ | ◐ | ✓ | ✓ |
 
 **Legend:** ✓ Full support \| ◐ Partial support \| — Not available
 
@@ -107,9 +107,12 @@ multiforest(multi_result)
 
 ### Performance Optimization
 
-Built on `data.table` for computational efficiency, `summata`
-demonstrates 35–54% faster execution than comparable workflows in other
-packages with a smaller dependency footprint. See the
+Built on `data.table` for computational efficiency, `summata` provides
+competitive performance across all benchmarked workflows. With
+`conf_method = "wald"`, it is the fastest option tested for GLM-based
+regression tables and univariable screening. With the default profile
+likelihood CIs, performance is comparable to other packages that use the
+same CI method (`finalfit`, `broom`). See the
 [Benchmarks](https://phmcc.github.io/summata/articles/benchmarks.md)
 article for detailed comparisons.
 

@@ -500,3 +500,36 @@ should_condense_binary <- function(ref_category, non_ref_category, label = NULL)
     
     return(FALSE)
 }
+
+
+#' Retrieve confidence intervals with cache support
+#'
+#' Returns confidence intervals for a fitted model, using a cached result
+#' when available from upstream \code{fit()} or \code{m2dt()} calls to avoid
+#' redundant computation. This is particularly beneficial for GLM and negative
+#' binomial models where \code{confint()} performs profile likelihood profiling,
+#' which can be expensive for models with many parameters.
+#'
+#' @param model Fitted model object. If the model carries a
+#'   \code{"cached_confint"} attribute (set by \code{fit()} during table
+#'   generation) and the cached confidence level matches \code{conf_level},
+#'   the cached result is returned directly.
+#' @param conf_level Numeric confidence level. Must match the cached level
+#'   for the cache to be used.
+#' @return A matrix with one row per model coefficient and two columns
+#'   (lower and upper bounds), as returned by \code{stats::confint()}.
+#' @keywords internal
+get_cached_confint <- function(model, conf_level = 0.95) {
+
+    ## Check for cached result from upstream fit()/m2dt()
+    cached <- attr(model, "cached_confint")
+    if (!is.null(cached) &&
+        isTRUE(attr(model, "cached_confint_level") == conf_level)) {
+        return(cached)
+    }
+
+    ## Compute fresh; suppress MASS profiling messages
+    suppressMessages(suppressWarnings(
+        stats::confint(model, level = conf_level)
+    ))
+}

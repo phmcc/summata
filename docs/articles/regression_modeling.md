@@ -139,21 +139,21 @@ example1
 #>  4:                    Race   White    598    298         reference       -
 #>  5:                           Black    126     66  1.11 (0.75-1.63)   0.603
 #>  6:                           Asian     93     51  1.22 (0.79-1.90)   0.370
-#>  7:                           Other     33     12  0.58 (0.28-1.19)   0.136
+#>  7:                           Other     33     12  0.58 (0.27-1.17)   0.136
 #>  8: Body Mass Index (kg/m²)       -    838    418  1.00 (0.98-1.03)   0.787
 #>  9:          Smoking Status   Never    337    156         reference       -
 #> 10:                          Former    311    141  0.96 (0.71-1.31)   0.808
-#> 11:                         Current    185    119  2.09 (1.45-3.03) < 0.001
+#> 11:                         Current    185    119  2.09 (1.45-3.04) < 0.001
 #> 12:                Diabetes      No    637    301         reference       -
 #> 13:                             Yes    197    116  1.60 (1.16-2.21)   0.004
 #> 14:           Disease Stage       I    211     89         reference       -
 #> 15:                              II    263    126  1.26 (0.88-1.82)   0.213
-#> 16:                             III    241    133  1.69 (1.16-2.45)   0.006
-#> 17:                              IV    132     77  1.92 (1.23-2.98)   0.004
+#> 16:                             III    241    133  1.69 (1.16-2.46)   0.006
+#> 17:                              IV    132     77  1.92 (1.24-2.99)   0.004
 #> 18: ECOG Performance Status       0    265    108         reference       -
-#> 19:                               1    302    145  1.34 (0.96-1.87)   0.083
-#> 20:                               2    238    139  2.04 (1.43-2.91) < 0.001
-#> 21:                               3     37     30 6.23 (2.64-14.70) < 0.001
+#> 19:                               1    302    145  1.34 (0.96-1.88)   0.083
+#> 20:                               2    238    139  2.04 (1.43-2.92) < 0.001
+#> 21:                               3     37     30 6.23 (2.79-15.90) < 0.001
 #> 22:         Treatment Group Control    196     91         reference       -
 #> 23:                          Drug A    292    127  0.89 (0.62-1.28)   0.523
 #> 24:                          Drug B    362    209  1.58 (1.11-2.24)   0.011
@@ -195,21 +195,21 @@ example2
 #>  4:                    Race   White    598    298         reference       -
 #>  5:                           Black    126     66  1.11 (0.75-1.63)   0.603
 #>  6:                           Asian     93     51  1.22 (0.79-1.90)   0.370
-#>  7:                           Other     33     12  0.58 (0.28-1.19)   0.136
+#>  7:                           Other     33     12  0.58 (0.27-1.17)   0.136
 #>  8: Body Mass Index (kg/m²)       -    838    418  1.00 (0.98-1.03)   0.787
 #>  9:          Smoking Status   Never    337    156         reference       -
 #> 10:                          Former    311    141  0.96 (0.71-1.31)   0.808
-#> 11:                         Current    185    119  2.09 (1.45-3.03) < 0.001
+#> 11:                         Current    185    119  2.09 (1.45-3.04) < 0.001
 #> 12:                Diabetes      No    637    301         reference       -
 #> 13:                             Yes    197    116  1.60 (1.16-2.21)   0.004
 #> 14:           Disease Stage       I    211     89         reference       -
 #> 15:                              II    263    126  1.26 (0.88-1.82)   0.213
-#> 16:                             III    241    133  1.69 (1.16-2.45)   0.006
-#> 17:                              IV    132     77  1.92 (1.23-2.98)   0.004
+#> 16:                             III    241    133  1.69 (1.16-2.46)   0.006
+#> 17:                              IV    132     77  1.92 (1.24-2.99)   0.004
 #> 18: ECOG Performance Status       0    265    108         reference       -
-#> 19:                               1    302    145  1.34 (0.96-1.87)   0.083
-#> 20:                               2    238    139  2.04 (1.43-2.91) < 0.001
-#> 21:                               3     37     30 6.23 (2.64-14.70) < 0.001
+#> 19:                               1    302    145  1.34 (0.96-1.88)   0.083
+#> 20:                               2    238    139  2.04 (1.43-2.92) < 0.001
+#> 21:                               3     37     30 6.23 (2.79-15.90) < 0.001
 #> 22:         Treatment Group Control    196     91         reference       -
 #> 23:                          Drug A    292    127  0.89 (0.62-1.28)   0.523
 #> 24:                          Drug B    362    209  1.58 (1.11-2.24)   0.011
@@ -244,7 +244,7 @@ example4
 #>  2:                     Sex Female    450            reference       -
 #>  3:                           Male    400     0.86 (0.20-1.52)   0.010
 #>  4:           Disease Stage      I    211            reference       -
-#>  5:                             II    263     1.16 (0.30-2.02)   0.009
+#>  5:                             II    263     1.16 (0.29-2.02)   0.009
 #>  6:                            III    241     2.72 (1.84-3.60) < 0.001
 #>  7:                             IV    132     2.96 (1.92-4.01) < 0.001
 #>  8:                Diabetes     No    637            reference       -
@@ -378,12 +378,12 @@ example6
 #>  7:   Disease Stage       I    207     86        reference       -
 #>  8:                      II    261    124 1.25 (0.86-1.84)   0.242
 #>  9:                     III    237    131 1.77 (1.19-2.62)   0.005
-#> 10:                      IV    129     76 2.05 (1.29-3.24)   0.002
+#> 10:                      IV    129     76 2.05 (1.29-3.25)   0.002
 #> 11:        Diabetes      No    637    301        reference       -
 #> 12:                     Yes    197    116 1.67 (1.19-2.34)   0.003
 ```
 
-### **Example 8:** Linear Regression
+### **Example 7:** Linear Regression
 
 For continuous outcomes:
 
@@ -412,12 +412,12 @@ example8
 #>  6:                            III    235          2.92 (2.15-3.70) < 0.001
 #>  7:                             IV    124          3.18 (2.26-4.11) < 0.001
 #>  8: ECOG Performance Status      0    261                 reference       -
-#>  9:                              1    295          2.15 (1.46-2.83) < 0.001
+#>  9:                              1    295          2.15 (1.46-2.84) < 0.001
 #> 10:                              2    229          3.63 (2.89-4.36) < 0.001
 #> 11:                              3     37          4.93 (3.50-6.35) < 0.001
 ```
 
-### **Example 7:** Cox Regression
+### **Example 8:** Cox Regression
 
 For time-to-event outcomes:
 
@@ -518,8 +518,8 @@ example10
 #>             <char> <char> <char> <char>           <char>  <char>
 #> 1:             Sex   Male    398    216 1.38 (1.05-1.82)   0.022
 #> 2:   Disease Stage     II    263    126 1.23 (0.85-1.78)   0.270
-#> 3:                    III    241    133 1.59 (1.09-2.33)   0.016
-#> 4:                     IV    132     77 1.91 (1.22-2.99)   0.004
+#> 3:                    III    241    133 1.59 (1.09-2.34)   0.016
+#> 4:                     IV    132     77 1.91 (1.23-3.00)   0.004
 #> 5: Treatment Group Drug A    292    127 0.88 (0.61-1.28)   0.510
 #> 6:                 Drug B    361    208 1.50 (1.05-2.14)   0.027
 ```
@@ -550,17 +550,89 @@ example11
 #> 3:            Male    398    216 1.41 (1.12-1.79)   0.014
 #> 4:    stage      I    211     89        reference       -
 #> 5:              II    263    126 1.28 (0.94-1.75)   0.196
-#> 6:             III    241    133 1.83 (1.32-2.51)   0.002
+#> 6:             III    241    133 1.83 (1.33-2.52)   0.002
 #> 7:              IV    132     77 2.03 (1.39-2.96)   0.002
 ```
 
-### **Example 12:** Raw Coefficients
+### **Example 12:** Confidence Interval Method
+
+By default, `summata` computes confidence intervals based on per-model
+best practices:
+
+| Model Class | Default CI Method | Description |
+|:---|:---|:---|
+| GLM (binomial, poisson) | Profile likelihood | Via [`MASS::confint.glm()`](https://rdrr.io/pkg/MASS/man/confint.html). More accurate near boundary estimates |
+| Negative binomial | Profile likelihood | Via [`MASS::confint.glm()`](https://rdrr.io/pkg/MASS/man/confint.html) |
+| Quasi-likelihood | Wald | No true likelihood; Wald is the only option |
+| Linear model (`lm`) | Exact *t*-distribution | Via [`confint.lm()`](https://rdrr.io/r/stats/confint.html). Accounts for estimated residual variance |
+| Cox PH (`coxph`) | Wald | Standard in survival analysis literature |
+| Mixed-effects (`lmer`, `glmer`, `coxme`) | Wald | Profile too slow for routine use |
+
+The `conf_method` parameter controls this behavior. For faster modeling,
+Wald (normal approximation) intervals can be substituted; this is
+computationally simpler but may be less accurate in edge cases. To set
+Wald intervals as the default method globally, use
+`options(summata.conf_method = "wald")`.
+
+``` r
+# Default CIs (profile likelihood for GLM, slower but more accurate)
+example12a <- fit(
+  data = clintrial,
+  outcome = "readmission_30d",
+  predictors = c("age", "sex", "stage"),
+  model_type = "glm",
+  conf_method = "profile"
+)
+
+example12a
+#> 
+#> Multivariable Logistic Model
+#> Formula: readmission_30d ~ age + sex + stage
+#> n = 847, Events = 425
+#> 
+#>    Variable  Group      n Events     aOR (95% CI) p-value
+#>      <char> <char> <char> <char>           <char>  <char>
+#> 1:      age      -    847    425 1.03 (1.02-1.04) < 0.001
+#> 2:      sex Female    449    209        reference       -
+#> 3:            Male    398    216 1.41 (1.07-1.87)   0.014
+#> 4:    stage      I    211     89        reference       -
+#> 5:              II    263    126 1.28 (0.88-1.86)   0.196
+#> 6:             III    241    133 1.83 (1.25-2.68)   0.002
+#> 7:              IV    132     77 2.03 (1.30-3.19)   0.002
+
+# Wald CIs (faster, suitable for simulation studies or exploratory work)
+example12b <- fit(
+  data = clintrial,
+  outcome = "readmission_30d",
+  predictors = c("age", "sex", "stage"),
+  model_type = "glm",
+  conf_method = "wald"
+)
+
+example12b
+#> 
+#> Multivariable Logistic Model
+#> Formula: readmission_30d ~ age + sex + stage
+#> n = 847, Events = 425
+#> 
+#>    Variable  Group      n Events     aOR (95% CI) p-value
+#>      <char> <char> <char> <char>           <char>  <char>
+#> 1:      age      -    847    425 1.03 (1.02-1.04) < 0.001
+#> 2:      sex Female    449    209        reference       -
+#> 3:            Male    398    216 1.41 (1.07-1.87)   0.014
+#> 4:    stage      I    211     89        reference       -
+#> 5:              II    263    126 1.28 (0.88-1.86)   0.196
+#> 6:             III    241    133 1.83 (1.25-2.67)   0.002
+#> 7:              IV    132     77 2.03 (1.29-3.18)   0.002
+```
+
+### **Example 13:** Raw Coefficients
 
 For logistic and Cox models, set `exponentiate = FALSE` to display
 log-scale coefficients (*β* rather than *e^(β)*):
 
 ``` r
-example12 <- fit(
+example13 <- fit(
   data = clintrial,
   outcome = "readmission_30d",
   predictors = c("age", "sex", "stage"),
@@ -568,7 +640,7 @@ example12 <- fit(
   exponentiate = FALSE
 )
 
-example12
+example13
 #> 
 #> Multivariable Logistic Model
 #> Formula: readmission_30d ~ age + sex + stage
@@ -578,10 +650,10 @@ example12
 #>      <char> <char> <char> <char>                    <char>  <char>
 #> 1:      age      -    847    425       0.03 (0.02 to 0.04) < 0.001
 #> 2:      sex Female    449    209                 reference       -
-#> 3:            Male    398    216       0.35 (0.07 to 0.62)   0.014
+#> 3:            Male    398    216       0.35 (0.07 to 0.63)   0.014
 #> 4:    stage      I    211     89                 reference       -
 #> 5:              II    263    126      0.25 (-0.13 to 0.62)   0.196
-#> 6:             III    241    133       0.60 (0.22 to 0.98)   0.002
+#> 6:             III    241    133       0.60 (0.22 to 0.99)   0.002
 #> 7:              IV    132     77       0.71 (0.26 to 1.16)   0.002
 ```
 
@@ -612,14 +684,14 @@ entering the multivariable model:
 | `"all"` | All predictors are used in both univariable and multivariable analyses |
 | `"custom"` | Multivariable predictors are explicitly specified |
 
-### **Example 13:** Screening-Based Selection
+### **Example 14:** Screening-Based Selection
 
 The default `method = "screen"` approach specifies that only predictors
 with univariable *p*-value below `p_threshold` are subsequently used in
 the multivariable analysis:
 
 ``` r
-example13 <- fullfit(
+example14 <- fullfit(
   data = clintrial,
   outcome = "readmission_30d",
   predictors = c("age", "sex", "bmi", "smoking", "diabetes",
@@ -630,7 +702,7 @@ example13 <- fullfit(
   labels = clintrial_labels
 )
 
-example13
+example14
 #> 
 #> Fullfit Analysis Results
 #> Outcome: readmission_30d
@@ -641,31 +713,31 @@ example13
 #> 
 #>                    Variable   Group      n Events      OR (95% CI)   Uni p     aOR (95% CI) Multi p
 #>                      <char>  <char> <char> <char>           <char>  <char>           <char>  <char>
-#>  1:             Age (years)       -    850    427 1.03 (1.02-1.04) < 0.001 1.04 (1.02-1.05) < 0.001
-#>  2:                     Sex  Female    450    210        reference       -        reference       -
-#>  3:                            Male    400    217 1.36 (1.03-1.78)   0.027 1.39 (1.04-1.86)   0.024
+#>  1:             Age (years)       -    833    416 1.03 (1.02-1.04) < 0.001 1.04 (1.02-1.05) < 0.001
+#>  2:                     Sex  Female    443    206        reference       -        reference       -
+#>  3:                            Male    390    210 1.36 (1.03-1.78)   0.027 1.39 (1.05-1.86)   0.024
 #>  4: Body Mass Index (kg/m²)       -    838    418 1.00 (0.98-1.03)   0.787                -       -
 #>  5:          Smoking Status   Never    337    156        reference       -        reference       -
 #>  6:                          Former    311    141 0.96 (0.71-1.31)   0.808 1.00 (0.72-1.39)   0.988
-#>  7:                         Current    185    119 2.09 (1.45-3.03) < 0.001 2.44 (1.65-3.59) < 0.001
-#>  8:                Diabetes      No    637    301        reference       -        reference       -
-#>  9:                             Yes    197    116 1.60 (1.16-2.21)   0.004 1.80 (1.28-2.53) < 0.001
-#> 10:           Disease Stage       I    211     89        reference       -        reference       -
-#> 11:                              II    263    126 1.26 (0.88-1.82)   0.213 1.25 (0.85-1.85)   0.251
-#> 12:                             III    241    133 1.69 (1.16-2.45)   0.006 1.76 (1.18-2.63)   0.005
-#> 13:                              IV    132     77 1.92 (1.23-2.98)   0.004 2.03 (1.27-3.25)   0.003
-#> 14:         Treatment Group Control    196     91        reference       -        reference       -
-#> 15:                          Drug A    292    127 0.89 (0.62-1.28)   0.523 0.84 (0.57-1.24)   0.380
-#> 16:                          Drug B    362    209 1.58 (1.11-2.24)   0.011 1.39 (0.96-2.03)   0.083
+#>  7:                         Current    185    119 2.09 (1.45-3.04) < 0.001 2.44 (1.66-3.61) < 0.001
+#>  8:                Diabetes      No    636    300        reference       -        reference       -
+#>  9:                             Yes    197    116 1.60 (1.16-2.21)   0.004 1.80 (1.28-2.54) < 0.001
+#> 10:           Disease Stage       I    207     86        reference       -        reference       -
+#> 11:                              II    261    124 1.26 (0.88-1.82)   0.213 1.25 (0.85-1.85)   0.251
+#> 12:                             III    237    131 1.69 (1.16-2.46)   0.006 1.76 (1.18-2.64)   0.005
+#> 13:                              IV    128     75 1.92 (1.24-2.99)   0.004 2.03 (1.27-3.26)   0.003
+#> 14:         Treatment Group Control    191     88        reference       -        reference       -
+#> 15:                          Drug A    288    126 0.89 (0.62-1.28)   0.523 0.84 (0.57-1.24)   0.380
+#> 16:                          Drug B    354    202 1.58 (1.11-2.24)   0.011 1.39 (0.96-2.03)   0.083
 ```
 
-### **Example 14:** All Predictors
+### **Example 15:** All Predictors
 
 The `method = "all"` approach includes the same predictors in both
 univariable and multivariable analysis:
 
 ``` r
-example14 <- fullfit(
+example15 <- fullfit(
   data = clintrial,
   outcome = "any_complication",
   predictors = c("age", "sex", "treatment", "stage"),
@@ -674,7 +746,7 @@ example14 <- fullfit(
   labels = clintrial_labels
 )
 
-example14
+example15
 #> 
 #> Fullfit Analysis Results
 #> Outcome: any_complication
@@ -685,25 +757,25 @@ example14
 #> 
 #>            Variable   Group      n Events      OR (95% CI)  Uni p     aOR (95% CI) Multi p
 #>              <char>  <char> <char> <char>           <char> <char>           <char>  <char>
-#>  1:     Age (years)       -    850    480 1.01 (1.00-1.02)  0.220 1.01 (1.00-1.02)   0.244
-#>  2:             Sex  Female    450    241        reference      -        reference       -
-#>  3:                    Male    400    239 1.29 (0.98-1.69)  0.069 1.28 (0.97-1.69)   0.076
-#>  4: Treatment Group Control    196    111        reference      -        reference       -
+#>  1:     Age (years)       -    847    477 1.01 (1.00-1.02)  0.220 1.01 (1.00-1.02)   0.244
+#>  2:             Sex  Female    449    240        reference      -        reference       -
+#>  3:                    Male    398    237 1.29 (0.98-1.69)  0.069 1.28 (0.97-1.70)   0.076
+#>  4: Treatment Group Control    194    109        reference      -        reference       -
 #>  5:                  Drug A    292    143 0.73 (0.51-1.06)  0.097 0.74 (0.51-1.07)   0.113
-#>  6:                  Drug B    362    226 1.27 (0.89-1.81)  0.182 1.24 (0.87-1.78)   0.236
+#>  6:                  Drug B    361    225 1.27 (0.89-1.81)  0.182 1.24 (0.87-1.78)   0.236
 #>  7:   Disease Stage       I    211    120        reference      -        reference       -
-#>  8:                      II    263    133 0.78 (0.54-1.12)  0.172 0.76 (0.52-1.10)   0.140
+#>  8:                      II    263    133 0.78 (0.54-1.12)  0.172 0.76 (0.52-1.09)   0.140
 #>  9:                     III    241    147 1.19 (0.81-1.73)  0.374 1.14 (0.78-1.68)   0.490
 #> 10:                      IV    132     77 1.06 (0.68-1.65)  0.790 1.05 (0.68-1.65)   0.815
 ```
 
-### **Example 15:** Custom Selection
+### **Example 16:** Custom Selection
 
 The `method = "custom"` approach allows explicit specification of
 multivariable predictors via the `multi_predictors` argument:
 
 ``` r
-example15 <- fullfit(
+example16 <- fullfit(
   data = clintrial,
   outcome = "icu_admission",
   predictors = c("age", "sex", "bmi", "smoking", "stage", "treatment"),
@@ -713,7 +785,7 @@ example15 <- fullfit(
   labels = clintrial_labels
 )
 
-example15
+example16
 #> 
 #> Fullfit Analysis Results
 #> Outcome: icu_admission
@@ -724,29 +796,29 @@ example15
 #> 
 #>                    Variable   Group      n Events      OR (95% CI)   Uni p     aOR (95% CI) Multi p
 #>                      <char>  <char> <char> <char>           <char>  <char>           <char>  <char>
-#>  1:             Age (years)       -    850    320 1.02 (1.01-1.03) < 0.001 1.02 (1.01-1.03)   0.001
-#>  2:                     Sex  Female    450    173        reference       -        reference       -
-#>  3:                            Male    400    147 0.93 (0.70-1.23)   0.611 0.94 (0.71-1.25)   0.680
+#>  1:             Age (years)       -    847    317 1.02 (1.01-1.03) < 0.001 1.02 (1.01-1.03)   0.001
+#>  2:                     Sex  Female    449    172        reference       -        reference       -
+#>  3:                            Male    398    145 0.93 (0.70-1.23)   0.611 0.94 (0.71-1.25)   0.680
 #>  4: Body Mass Index (kg/m²)       -    838    315 0.99 (0.97-1.02)   0.717                -       -
 #>  5:          Smoking Status   Never    337    123        reference       -                -       -
-#>  6:                          Former    311    120 1.09 (0.80-1.50)   0.584                -       -
+#>  6:                          Former    311    120 1.09 (0.79-1.50)   0.584                -       -
 #>  7:                         Current    185     69 1.03 (0.71-1.50)   0.856                -       -
 #>  8:           Disease Stage       I    211     76        reference       -        reference       -
-#>  9:                              II    263     85 0.85 (0.58-1.24)   0.398 0.85 (0.58-1.24)   0.397
-#> 10:                             III    241    105 1.37 (0.94-2.00)   0.103 1.37 (0.93-2.01)   0.113
+#>  9:                              II    263     85 0.85 (0.58-1.24)   0.398 0.85 (0.58-1.25)   0.397
+#> 10:                             III    241    105 1.37 (0.94-2.01)   0.103 1.37 (0.93-2.02)   0.113
 #> 11:                              IV    132     51 1.12 (0.71-1.75)   0.625 1.12 (0.71-1.76)   0.631
-#> 12:         Treatment Group Control    196     64        reference       -        reference       -
-#> 13:                          Drug A    292    111 1.26 (0.86-1.85)   0.226 1.26 (0.85-1.85)   0.245
-#> 14:                          Drug B    362    145 1.38 (0.96-1.99)   0.085 1.31 (0.90-1.90)   0.159
+#> 12:         Treatment Group Control    194     62        reference       -        reference       -
+#> 13:                          Drug A    292    111 1.26 (0.87-1.86)   0.226 1.26 (0.86-1.86)   0.245
+#> 14:                          Drug B    361    144 1.38 (0.96-1.99)   0.085 1.31 (0.90-1.91)   0.159
 ```
 
-### **Example 16:** Controlling Output Columns
+### **Example 17:** Controlling Output Columns
 
 The `columns` parameter controls which results are displayed:
 
 ``` r
 # Univariable only
-example16a <- fullfit(
+example17a <- fullfit(
   data = clintrial,
   outcome = "wound_infection",
   predictors = c("age", "sex", "stage"),
@@ -754,7 +826,7 @@ example16a <- fullfit(
   columns = "uni"
 )
 
-example16a
+example17a
 #> 
 #> Fullfit Analysis Results
 #> Outcome: wound_infection
@@ -770,10 +842,10 @@ example16a
 #> 4:    stage      I    211     51        reference       -
 #> 5:              II    263     52 0.77 (0.50-1.20)   0.249
 #> 6:             III    241     40 0.62 (0.39-0.99)   0.046
-#> 7:              IV    132     23 0.66 (0.38-1.15)   0.141
+#> 7:              IV    132     23 0.66 (0.38-1.14)   0.141
 
 # Multivariable only
-example16b <- fullfit(
+example17b <- fullfit(
   data = clintrial,
   outcome = "wound_infection",
   predictors = c("age", "sex", "stage"),
@@ -781,7 +853,7 @@ example16b <- fullfit(
   columns = "multi"
 )
 
-example16b
+example17b
 #> 
 #> Fullfit Analysis Results
 #> Outcome: wound_infection
@@ -795,17 +867,17 @@ example16b
 #> 1:    stage      I    211     51        reference       -
 #> 2:              II    263     52 0.77 (0.50-1.20)   0.249
 #> 3:             III    241     40 0.62 (0.39-0.99)   0.046
-#> 4:              IV    132     23 0.66 (0.38-1.15)   0.141
+#> 4:              IV    132     23 0.66 (0.38-1.14)   0.141
 ```
 
-### **Example 17:** Survival Analysis
+### **Example 18:** Survival Analysis
 
 Output tables can use Cox regression for survival outcomes by specifying
 [`Surv()`](https://rdrr.io/pkg/survival/man/Surv.html) notation and
 `model_type = "coxph"`:
 
 ``` r
-example17 <- fullfit(
+example18 <- fullfit(
   data = clintrial,
   outcome = "Surv(os_months, os_status)",
   predictors = c("age", "sex", "treatment", "stage", "ecog"),
@@ -815,7 +887,7 @@ example17 <- fullfit(
   labels = clintrial_labels
 )
 
-example17
+example18
 #> 
 #> Fullfit Analysis Results
 #> Outcome: Surv(os_months, os_status)
@@ -826,7 +898,7 @@ example17
 #> 
 #>                    Variable   Group      n Events      HR (95% CI)   Uni p     aHR (95% CI) Multi p
 #>                      <char>  <char> <char> <char>           <char>  <char>           <char>  <char>
-#>  1:             Age (years)       -    850    609 1.03 (1.03-1.04) < 0.001 1.04 (1.03-1.04) < 0.001
+#>  1:             Age (years)       -    842    602 1.03 (1.03-1.04) < 0.001 1.04 (1.03-1.04) < 0.001
 #>  2:                     Sex  Female    450    298        reference       -        reference       -
 #>  3:                            Male    400    311 1.30 (1.11-1.53)   0.001 1.29 (1.10-1.52)   0.002
 #>  4:         Treatment Group Control    196    151        reference       -        reference       -
@@ -850,7 +922,7 @@ The `summata` package supports several additional model types for
 specialized analyses. These require external packages that are suggested
 dependencies.
 
-### **Example 18:** Negative Binomial
+### **Example 19:** Negative Binomial
 
 Negative binomial models are appropriate for overdispersed count data
 where the variance exceeds the mean—a common violation of the Poisson
@@ -859,7 +931,7 @@ variable in `clintrial` is generated with overdispersion, making it
 ideal for this demonstration.
 
 ``` r
-example18 <- fit(
+example19 <- fit(
   data = clintrial,
   outcome = "ae_count",
   predictors = c("age", "sex", "diabetes", "treatment"),
@@ -867,7 +939,7 @@ example18 <- fit(
   labels = clintrial_labels
 )
 
-example18
+example19
 #> 
 #> Multivariable Negative Binomial Model
 #> Formula: ae_count ~ age + sex + diabetes + treatment
@@ -879,33 +951,35 @@ example18
 #> 2:             Sex  Female    440  2,248        reference       -
 #> 3:                    Male    384  2,258 1.10 (0.99-1.23)   0.072
 #> 4:        Diabetes      No    630  2,998        reference       -
-#> 5:                     Yes    194  1,508 1.56 (1.38-1.76) < 0.001
+#> 5:                     Yes    194  1,508 1.56 (1.38-1.77) < 0.001
 #> 6: Treatment Group Control    189    826        reference       -
 #> 7:                  Drug A    287  1,221 0.96 (0.83-1.12)   0.635
 #> 8:                  Drug B    348  2,459 1.52 (1.32-1.75) < 0.001
 ```
 
-### **Example 19:** Gamma Regression
+### **Example 20:** Gamma Regression
 
 Gamma regression is appropriate for positive, continuous, right-skewed
 outcomes. In the `clintrial` dataset, length of hospital stay
-(`los_days`) fits this description. Note that the default link for Gamma
-is the *inverse* link, which produces coefficients on a
-difficult-to-interpret scale. The log link is generally preferred for
+(`los_days`) fits this description. Note that R’s canonical link for the
+Gamma family is the *inverse* link (1/μ), which produces coefficients on
+a difficult-to-interpret scale. The log link is generally preferred for
 interpretability—exponentiated coefficients then represent
-multiplicative effects on the mean.
+multiplicative effects on the mean. When `family = "Gamma"` is passed as
+a string, `summata` defaults to the log link:
 
 ``` r
-example19 <- fit(
+# String shorthand: resolves to Gamma(link = "log")
+example20 <- fit(
   data = clintrial,
   outcome = "los_days",
   predictors = c("age", "ecog", "stage", "treatment"),
   model_type = "glm",
-  family = Gamma(link = "log"),
+  family = "Gamma",
   labels = clintrial_labels
 )
 
-example19
+example20
 #> 
 #> Multivariable Gamma Model
 #> Formula: los_days ~ age + ecog + stage + treatment
@@ -927,7 +1001,7 @@ example19
 #> 12:                          Drug B    345          1.13 (1.09-1.17) < 0.001
 ```
 
-### **Example 20:** Random-Intercept Model
+### **Example 21:** Random-Intercept Model
 
 Linear mixed-effects models (LMMs) account for hierarchical or clustered
 data structures. The `clintrial` dataset includes a `site` variable
@@ -938,7 +1012,7 @@ Include random intercepts for study site using `(1|site)` notation in
 the predictors:
 
 ``` r
-example20 <- fit(
+example21 <- fit(
   data = clintrial,
   outcome = "los_days",
   predictors = c("age", "sex", "treatment", "stage", "(1|site)"),
@@ -946,7 +1020,7 @@ example20 <- fit(
   labels = clintrial_labels
 )
 
-example20
+example21
 #> 
 #> Multivariable Linear Mixed Model
 #> Formula: los_days ~ age + sex + treatment + stage + (1|site)
@@ -966,7 +1040,7 @@ example20
 #> 10:                      IV    126       2.96 (2.07 to 3.85) < 0.001
 ```
 
-### **Example 21:** GLMM for Binary Outcome
+### **Example 22:** GLMM for Binary Outcome
 
 Generalized linear mixed-effects models (GLMMs) extend mixed-effects
 models to non-normal outcomes (binary, count). This model type also
@@ -975,7 +1049,7 @@ requires the `lme4` package.
 Model 30-day readmission with site-level random effects:
 
 ``` r
-example21 <- fit(
+example22 <- fit(
   data = clintrial,
   outcome = "readmission_30d",
   predictors = c("age", "sex", "diabetes", "treatment", "(1|site)"),
@@ -984,7 +1058,7 @@ example21 <- fit(
   labels = clintrial_labels
 )
 
-example21
+example22
 #> 
 #> Multivariable glmerMod Model
 #> Formula: readmission_30d ~ age + sex + diabetes + treatment + (1|site)
@@ -1002,13 +1076,13 @@ example21
 #> 8:                  Drug B    355    203 1.58 (1.09-2.28)   0.016
 ```
 
-### **Example 22:** GLMM for Count Outcome
+### **Example 23:** GLMM for Count Outcome
 
 For count outcomes with clustering, use `fu_count` (equidispersed) with
 site-level random effects. Standard Poisson GLMMs assume equidispersion:
 
 ``` r
-example22 <- fit(
+example23 <- fit(
   data = clintrial,
   outcome = "fu_count",
   predictors = c("age", "stage", "treatment", "(1|site)"),
@@ -1017,7 +1091,7 @@ example22 <- fit(
   labels = clintrial_labels
 )
 
-example22
+example23
 #> 
 #> Multivariable glmerMod Model
 #> Formula: fu_count ~ age + stage + treatment + (1|site)
@@ -1035,7 +1109,7 @@ example22
 #> 8:                  Drug B    358  2,438 1.11 (1.03-1.19)   0.005
 ```
 
-### **Example 23:** Cox Mixed-Effects Model
+### **Example 24:** Cox Mixed-Effects Model
 
 Cox mixed-effects models account for within-cluster correlation in
 survival outcomes. This is useful when patients are nested within sites
@@ -1044,7 +1118,7 @@ type requires the `coxme` package. Model overall survival with
 site-level random effects:
 
 ``` r
-example23 <- fit(
+example24 <- fit(
   data = clintrial,
   outcome = "Surv(os_months, os_status)",
   predictors = c("age", "sex", "treatment", "stage", "(1|site)"),
@@ -1052,7 +1126,7 @@ example23 <- fit(
   labels = clintrial_labels
 )
 
-example23
+example24
 #> 
 #> Multivariable Mixed Effects Cox Model
 #> Formula: Surv(os_months, os_status) ~ age + sex + treatment + stage + (1|site)
@@ -1072,14 +1146,14 @@ example23
 #> 10:                      IV    132    121 4.09 (3.16-5.30) < 0.001
 ```
 
-### **Example 24:** Quasibinomial for Overdispersed Binary Data
+### **Example 25:** Quasibinomial for Overdispersed Binary Data
 
 When binary or count data exhibit overdispersion (residual deviance \>\>
 residual degrees of freedom), quasi-likelihood models provide more
 appropriate standard errors.
 
 ``` r
-example24 <- fit(
+example25 <- fit(
   data = clintrial,
   outcome = "any_complication",
   predictors = c("age", "sex", "diabetes", "stage"),
@@ -1088,7 +1162,7 @@ example24 <- fit(
   labels = clintrial_labels
 )
 
-example24
+example25
 #> 
 #> Multivariable Quasi-Binomial Model
 #> Formula: any_complication ~ age + sex + diabetes + stage
@@ -1107,7 +1181,7 @@ example24
 #> 9:                   IV    129     76 1.07 (0.68-1.69)   0.764
 ```
 
-### **Example 25:** Conditional Logistic Model for Matched Data
+### **Example 26:** Conditional Logistic Model for Matched Data
 
 Conditional logistic regression is used for matched case-control studies
 where cases and controls are matched within strata. The stratification
@@ -1131,7 +1205,7 @@ matched_data <- do.call(rbind, lapply(1:n_pairs, function(i) {
   )
 }))
 
-example25 <- fit(
+example26 <- fit(
   data = matched_data,
   outcome = "case",
   predictors = c("smoking", "diabetes", "bmi"),
@@ -1139,7 +1213,7 @@ example25 <- fit(
   strata = "match_id"
 )
 
-example25
+example26
 #> 
 #> Multivariable Conditional Logistic Model
 #> Formula: case ~ smoking + diabetes + bmi + strata( match_id )

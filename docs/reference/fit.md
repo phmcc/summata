@@ -30,6 +30,7 @@ fit(
   labels = NULL,
   keep_qc_stats = TRUE,
   exponentiate = NULL,
+  conf_method = NULL,
   number_format = NULL,
   verbose = NULL,
   ...
@@ -162,7 +163,13 @@ fit(
 
   - `"Gamma"` or [`Gamma()`](https://rdrr.io/r/stats/family.html) -
     Gamma distribution for positive, right-skewed continuous data
-    (*e.g.,* costs, lengths of stay). Default log link.
+    (*e.g.,* costs, lengths of stay). When passed as a string, resolves
+    to log link for interpretable multiplicative effects. The canonical
+    inverse link can be specified explicitly with
+    `Gamma(link = "inverse")`.
+
+  - `Gamma(link = "log")` - Gamma with log link (equivalent to `"Gamma"`
+    string shorthand).
 
   - `Gamma(link = "inverse")` - Gamma with inverse (canonical) link.
 
@@ -266,6 +273,25 @@ fit(
   which automatically exponentiates for logistic, Poisson, and Cox
   models, and displays raw coefficients for linear models. Set to `TRUE`
   to force exponentiation or `FALSE` to force coefficients.
+
+- conf_method:
+
+  Character string controlling the confidence interval method. If `NULL`
+  (default), uses `getOption("summata.conf_method", "profile")`.
+
+  - `"profile"` - Profile likelihood intervals for GLM and negative
+    binomial models (via
+    [`MASS::confint.glm()`](https://rdrr.io/pkg/MASS/man/confint.html)),
+    exact *t*-distribution intervals for linear models. Falls back to
+    Wald on profiling failure. Quasi-likelihood families always use Wald
+    (no true likelihood).
+
+  - `"wald"` - Wald intervals (coefficient \\\pm\\ *z* \\\times\\ SE)
+    for all model types. Faster but less accurate near boundary
+    conditions or with small subgroups.
+
+  Cox and mixed-effects models use Wald intervals regardless of this
+  setting.
 
 - number_format:
 
@@ -511,18 +537,33 @@ Mixed effects models handle hierarchical or clustered data:
 
 **Confidence Intervals:**
 
-Confidence intervals are computed using the Wald method. This is the
-standard approach for GLM, Cox, and mixed-effects regression and is
-appropriate for standard sample sizes. The Wald interval is computed
-directly from the coefficient and standard error, avoiding redundant
-matrix operations.
+Confidence interval computation is tailored to each model class using
+the best available method:
 
-For small samples, sparse data, or parameters near boundary values,
-profile likelihood confidence intervals may be preferred. These can be
-obtained from the underlying model object:
+- **GLM and negative binomial**: Profile likelihood intervals via
+  [`MASS::confint.glm()`](https://rdrr.io/pkg/MASS/man/confint.html),
+  which invert the profile deviance and account for asymmetry in the
+  likelihood surface. More accurate than the Wald approximation when
+  subgroup sizes are small or estimates are near boundary values.
+  Quasi-likelihood families (`quasibinomial`, `quasipoisson`) fall back
+  to Wald intervals because they lack a true likelihood function.
 
-    result <- fit(data, outcome, predictors)
-    confint(attr(result, "model"))
+- **Linear models**: Exact *t*-distribution intervals via
+  [`confint.lm()`](https://rdrr.io/r/stats/confint.html), based on the
+  known sampling distribution under normality.
+
+- **Cox proportional hazards**: Wald intervals (*i.e.,* coefficient
+  \\\pm\\ *z* \\\times\\ SE), the standard approach in the survival
+  analysis literature.
+
+- **Mixed-effects models** (lmer, glmer, coxme): Wald intervals. Profile
+  likelihood is available for lme4 models via
+  `confint(model, method = "profile")` but can be prohibitively slow for
+  complex random-effects structures and is not used by default.
+
+If profile likelihood computation fails for any reason (*e.g.,*
+non-convergence during profiling), the function falls back silently to
+Wald intervals.
 
 ## See also
 
@@ -590,7 +631,7 @@ print(multi_model)
 #>                     <char>  <char> <char> <char>           <char>  <char>
 #> 1:             Age (years)       -    838    599 1.05 (1.04-1.07) < 0.001
 #> 2:                     Sex  Female    445    294        reference       -
-#> 3:                            Male    393    305 1.86 (1.35-2.56) < 0.001
+#> 3:                            Male    393    305 1.86 (1.35-2.57) < 0.001
 #> 4: Body Mass Index (kg/m²)       -    838    599 1.03 (0.99-1.06)   0.115
 #> 5:         Treatment Group Control    194    149        reference       -
 #> 6:                          Drug A    288    181 0.48 (0.31-0.73) < 0.001
@@ -641,10 +682,10 @@ print(interact_model)
 #>                                    <char>  <char> <char> <char>           <char>  <char>
 #> 1:                            Age (years)       -    850    609 1.04 (1.01-1.07)   0.012
 #> 2:                        Treatment Group Control    196    151        reference       -
-#> 3:                                         Drug A    292    184 0.48 (0.06-4.21)   0.511
-#> 4:                                         Drug B    362    274 0.18 (0.02-1.68)   0.133
+#> 3:                                         Drug A    292    184 0.48 (0.06-4.25)   0.511
+#> 4:                                         Drug B    362    274 0.18 (0.02-1.69)   0.133
 #> 5:                                    Sex  Female    450    298        reference       -
-#> 6:                                           Male    400    311 1.86 (1.35-2.56) < 0.001
+#> 6:                                           Male    400    311 1.86 (1.35-2.57) < 0.001
 #> 7: Age (years) × Treatment Group (Drug A)       -    292    184 1.00 (0.96-1.04)   0.993
 #> 8: Age (years) × Treatment Group (Drug B)       -    362    274 1.03 (0.99-1.07)   0.164
 
@@ -715,7 +756,7 @@ print(linear_model)
 #> 3:                   Male    390     -0.33 (-1.00 to 0.34)   0.337
 #> 4: Smoking Status   Never    337                 reference       -
 #> 5:                 Former    311      0.15 (-0.61 to 0.92)   0.692
-#> 6:                Current    185      0.25 (-0.63 to 1.14)   0.577
+#> 6:                Current    185      0.25 (-0.64 to 1.14)   0.577
 
 # Example 8: Poisson regression for equidispersed count data
 # fu_count has variance ~= mean, appropriate for standard Poisson
@@ -773,7 +814,7 @@ if (requireNamespace("MASS", quietly = TRUE)) {
 #> 5:           Diabetes      No    630  2,998        reference       -
 #> 6:                        Yes    194  1,508 1.56 (1.38-1.77) < 0.001
 #> 7: Surgical Resection      No    465  2,578        reference       -
-#> 8:                        Yes    359  1,928 1.19 (1.06-1.33)   0.004
+#> 8:                        Yes    359  1,928 1.19 (1.06-1.34)   0.004
 
 # Example 10: Gamma regression for positive continuous outcomes
 gamma_model <- fit(
@@ -847,10 +888,10 @@ raw_data <- attr(result, "raw_data")
 print(raw_data)
 #>      model_scope model_type      term     n events coefficient          se       coef   coef_lower coef_upper exp_coef exp_lower exp_upper       OR  ci_lower ci_upper statistic      p_value      AIC      BIC deviance null_deviance
 #>           <char>     <char>    <char> <int>  <num>       <num>       <num>      <num>        <num>      <num>    <num>     <num>     <num>    <num>     <num>    <num>     <num>        <num>    <num>    <num>    <num>         <num>
-#> 1: Multivariable   Logistic       age   838    599  0.04801974 0.007174285 0.04801974  0.033958405 0.06208108 1.049191 1.0345416  1.064049 1.049191 1.0345416 1.064049  6.693315 2.181713e-11 945.9441 964.8681 937.9441      1001.913
+#> 1: Multivariable   Logistic       age   838    599  0.04801974 0.007174285 0.04801974  0.034176543 0.06233253 1.049191 1.0347673  1.064316 1.049191 1.0347673 1.064316  6.693315 2.181713e-11 945.9441 964.8681 937.9441      1001.913
 #> 2: Multivariable   Logistic sexFemale   445    294  0.00000000          NA 0.00000000           NA         NA 1.000000        NA        NA 1.000000        NA       NA        NA           NA 945.9441 964.8681 937.9441      1001.913
-#> 3: Multivariable   Logistic   sexMale   393    305  0.63042825 0.162565588 0.63042825  0.311805551 0.94905095 1.878415 1.3658891  2.583257 1.878415 1.3658891 2.583257  3.877993 1.053217e-04 945.9441 964.8681 937.9441      1001.913
-#> 4: Multivariable   Logistic       bmi   838    599  0.02423580 0.016289550 0.02423580 -0.007691127 0.05616274 1.024532 0.9923384  1.057770 1.024532 0.9923384 1.057770  1.487813 1.368002e-01 945.9441 964.8681 937.9441      1001.913
+#> 3: Multivariable   Logistic   sexMale   393    305  0.63042825 0.162565588 0.63042825  0.314098178 0.95192227 1.878415 1.3690241  2.590685 1.878415 1.3690241 2.590685  3.877993 1.053217e-04 945.9441 964.8681 937.9441      1001.913
+#> 4: Multivariable   Logistic       bmi   838    599  0.02423580 0.016289550 0.02423580 -0.007601571 0.05632589 1.024532 0.9924272  1.057942 1.024532 0.9924272 1.057942  1.487813 1.368002e-01 945.9441 964.8681 937.9441      1001.913
 #>    df_residual c_statistic hoslem_chi2  hoslem_p variable  group n_group events_group reference    sig sig_binary
 #>          <int>       <num>       <num>     <num>   <char> <char>   <num>        <num>    <char> <char>     <lgcl>
 #> 1:         834   0.6745587    3.109658 0.9272885      age             NA           NA              ***       TRUE
@@ -877,10 +918,10 @@ print(complex_model)
 #>                                     <char>  <char> <char> <char>            <char>  <char>
 #>  1:                            Age (years)       -    838    599  1.04 (1.01-1.07)   0.013
 #>  2:                                    Sex  Female    445    294         reference       -
-#>  3:                                           Male    393    305 3.20 (0.50-20.55)   0.220
+#>  3:                                           Male    393    305 3.20 (0.50-20.67)   0.220
 #>  4:                        Treatment Group Control    194    149         reference       -
-#>  5:                                         Drug A    288    181  0.52 (0.06-4.58)   0.553
-#>  6:                                         Drug B    356    269  0.17 (0.02-1.59)   0.121
+#>  5:                                         Drug A    288    181  0.52 (0.06-4.62)   0.553
+#>  6:                                         Drug B    356    269  0.17 (0.02-1.60)   0.121
 #>  7:                Body Mass Index (kg/m²)       -    838    599  1.03 (0.99-1.08)   0.121
 #>  8: Age (years) × Treatment Group (Drug A)       -    288    181  1.00 (0.96-1.04)   0.954
 #>  9: Age (years) × Treatment Group (Drug B)       -    356    269  1.03 (0.99-1.07)   0.150
@@ -904,9 +945,9 @@ print(minimal)
 #>     Variable  Group     aOR (95% CI) p-value
 #>       <char> <char>           <char>  <char>
 #> 1:       age      - 1.05 (1.04-1.07) < 0.001
-#> 2:       sex   Male 1.83 (1.33-2.52) < 0.001
+#> 2:       sex   Male 1.83 (1.33-2.53) < 0.001
 #> 3: treatment Drug A 0.48 (0.31-0.73) < 0.001
-#> 4:           Drug B 0.86 (0.56-1.32)   0.492
+#> 4:           Drug B 0.86 (0.56-1.31)   0.492
 
 # Example 15: Different confidence levels
 ci90 <- fit(
@@ -946,7 +987,50 @@ print(coef_model)
 #> 1:      age      -    838    599       0.05 (0.03 to 0.06) < 0.001
 #> 2:      bmi      -    838    599      0.02 (-0.01 to 0.05)   0.178
 
-# Example 17: Check model quality statistics
+# Example 17: Confidence interval method
+# Default: profile likelihood CIs for GLM (more accurate)
+profile_result <- fit(
+    data = clintrial,
+    outcome = "os_status",
+    predictors = c("age", "treatment"),
+    p_digits = 4,
+    conf_method = "profile"
+)
+print(profile_result)
+#> 
+#> Multivariable Logistic Model
+#> Formula: os_status ~ age + treatment
+#> n = 850, Events = 609
+#> 
+#>     Variable   Group      n Events     aOR (95% CI)  p-value
+#>       <char>  <char> <char> <char>           <char>   <char>
+#> 1:       age       -    850    609 1.05 (1.03-1.06) < 0.0001
+#> 2: treatment Control    196    151        reference        -
+#> 3:            Drug A    292    184 0.47 (0.31-0.72)   0.0005
+#> 4:            Drug B    362    274 0.87 (0.57-1.32)   0.5183
+
+# Wald CIs (faster, suitable for simulation or exploratory work)
+wald_result <- fit(
+    data = clintrial,
+    outcome = "os_status",
+    predictors = c("age", "treatment"),
+    p_digits = 4,
+    conf_method = "wald"
+)
+print(wald_result)
+#> 
+#> Multivariable Logistic Model
+#> Formula: os_status ~ age + treatment
+#> n = 850, Events = 609
+#> 
+#>     Variable   Group      n Events     aOR (95% CI)  p-value
+#>       <char>  <char> <char> <char>           <char>   <char>
+#> 1:       age       -    850    609 1.05 (1.03-1.06) < 0.0001
+#> 2: treatment Control    196    151        reference        -
+#> 3:            Drug A    292    184 0.47 (0.31-0.72)   0.0005
+#> 4:            Drug B    362    274 0.87 (0.57-1.33)   0.5183
+
+# Example 18: Check model quality statistics
 result <- fit(
     data = clintrial,
     outcome = "os_status",
@@ -962,7 +1046,7 @@ cat("BIC:", raw$BIC[1], "\n")
 cat("C-statistic:", raw$c_statistic[1], "\n")
 #> C-statistic: 0.7554538 
 
-# Example 18: Interaction effects - treatment effect modified by stage
+# Example 19: Interaction effects - treatment effect modified by stage
 interaction_model <- fit(
     data = clintrial,
     outcome = "Surv(os_months, os_status)",
@@ -995,7 +1079,7 @@ print(interaction_model)
 #> 14:  Treatment Group (Drug B) × Disease Stage (IV)       -     55     54 1.17 (0.63-2.18)   0.620
 # Shows main effects plus all treatment×stage interaction terms
 
-# Example 19: Multiple interactions in logistic regression
+# Example 20: Multiple interactions in logistic regression
 multi_interaction <- fit(
     data = clintrial,
     outcome = "readmission_30d",
@@ -1013,15 +1097,15 @@ print(multi_interaction)
 #>                                       <char> <char> <char> <char>            <char>  <char>
 #> 1:                               Age (years)      -    834    417  1.04 (1.02-1.06) < 0.001
 #> 2:                                       Sex Female    444    207         reference       -
-#> 3:                                             Male    390    210 2.64 (0.60-11.65)   0.200
+#> 3:                                             Male    390    210 2.64 (0.60-11.72)   0.200
 #> 4:                        Surgical Resection     No    472    241         reference       -
-#> 5:                                              Yes    362    176  1.16 (0.83-1.60)   0.384
+#> 5:                                              Yes    362    176  1.16 (0.83-1.61)   0.384
 #> 6:                                  Diabetes     No    637    301         reference       -
-#> 7:                                              Yes    197    116  1.99 (1.27-3.12)   0.003
+#> 7:                                              Yes    197    116  1.99 (1.28-3.14)   0.003
 #> 8:                  Age (years) × Sex (Male)      -    390    210  0.99 (0.97-1.01)   0.376
 #> 9: Surgical Resection (Yes) × Diabetes (Yes)      -     88     48  0.69 (0.35-1.33)   0.267
 
-# Example 20: Quasipoisson for overdispersed count data
+# Example 21: Quasipoisson for overdispersed count data
 # Alternative to negative binomial when MASS not available
 quasi_model <- fit(
     data = clintrial,
@@ -1049,7 +1133,7 @@ print(quasi_model)
 #> 8:                        Yes    359  1,928 1.19 (1.06-1.34)   0.003
 # Adjusts standard errors for overdispersion
 
-# Example 21: Quasibinomial for overdispersed binary data
+# Example 22: Quasibinomial for overdispersed binary data
 quasi_logistic <- fit(
     data = clintrial,
     outcome = "any_complication",
@@ -1073,7 +1157,7 @@ print(quasi_logistic)
 #> 5:      Surgical Resection     No    471    239        reference       -
 #> 6:                            Yes    362    229 1.79 (1.34-2.40) < 0.001
 
-# Example 22: Gamma regression with identity link for additive effects
+# Example 23: Gamma regression with identity link for additive effects
 gamma_identity <- fit(
     data = clintrial,
     outcome = "los_days",
@@ -1100,7 +1184,7 @@ print(gamma_identity)
 #> 8:                    Any complication    468       2.11 (1.56 to 2.66) < 0.001
 # Shows additive effects (coefficients) instead of multiplicative (ratios)
 
-# Example 23: Inverse Gaussian regression for highly skewed data
+# Example 24: Inverse Gaussian regression for highly skewed data
 inverse_gaussian <- fit(
     data = clintrial,
     outcome = "recovery_days",
@@ -1119,10 +1203,10 @@ print(inverse_gaussian)
 #>                             <char> <char> <char>                    <char>  <char>
 #> 1:                     Age (years)      -    825          1.01 (1.01-1.02) < 0.001
 #> 2:              Surgical Resection     No    464                 reference       -
-#> 3:                                    Yes    361          1.26 (1.18-1.34) < 0.001
+#> 3:                                    Yes    361          1.26 (1.19-1.34) < 0.001
 #> 4: Postoperative Pain Score (0-10)      -    825          1.04 (1.02-1.05) < 0.001
 
-# Example 24: Linear mixed effects with random intercepts
+# Example 25: Linear mixed effects with random intercepts
 # Accounts for clustering of patients within sites
 if (requireNamespace("lme4", quietly = TRUE)) {
     lmer_model <- fit(
@@ -1154,7 +1238,7 @@ if (requireNamespace("lme4", quietly = TRUE)) {
 #> 7:                     III    235       2.39 (1.62 to 3.15) < 0.001
 #> 8:                      IV    126       2.93 (2.04 to 3.82) < 0.001
 
-# Example 25: Generalized linear mixed effects (logistic with random effects)
+# Example 26: Generalized linear mixed effects (logistic with random effects)
 if (requireNamespace("lme4", quietly = TRUE)) {
     glmer_model <- fit(
         data = clintrial,
@@ -1178,7 +1262,7 @@ if (requireNamespace("lme4", quietly = TRUE)) {
 #> 3:                                   Yes    370    181 0.85 (0.62-1.15)   0.285
 #> 4: Length of Hospital Stay (days)      -    830    418 1.15 (1.11-1.19) < 0.001
 
-# Example 26: Cox mixed effects for clustered survival data
+# Example 27: Cox mixed effects for clustered survival data
 if (requireNamespace("coxme", quietly = TRUE)) {
     coxme_model <- fit(
         data = clintrial,
@@ -1205,7 +1289,7 @@ if (requireNamespace("coxme", quietly = TRUE)) {
 #> 7:                     III    241    186 1.98 (1.57-2.50) < 0.001
 #> 8:                      IV    132    121 3.95 (3.06-5.11) < 0.001
 
-# Example 27: Random slopes - treatment effect varies by site
+# Example 28: Random slopes - treatment effect varies by site
 if (requireNamespace("lme4", quietly = TRUE)) {
     random_slopes <- fit(
         data = clintrial,
@@ -1233,7 +1317,7 @@ if (requireNamespace("lme4", quietly = TRUE)) {
 #> 7:                     III    235       2.40 (1.64 to 3.17) < 0.001
 #> 8:                      IV    126       2.98 (2.08 to 3.87) < 0.001
 
-# Example 28: Format a pre-fitted model (model-based workflow)
+# Example 29: Format a pre-fitted model (model-based workflow)
 # Useful for models fitted outside of fit()
 pre_fitted <- glm(os_status ~ age + sex + treatment,
                   family = binomial, data = clintrial)
@@ -1250,10 +1334,10 @@ print(result)
 #>             <char>  <char> <char> <char>           <char>  <char>
 #> 1:     Age (years)       -    850    609 1.05 (1.04-1.07) < 0.001
 #> 2:             Sex  Female    450    298        reference       -
-#> 3:                    Male    400    311 1.83 (1.33-2.52) < 0.001
+#> 3:                    Male    400    311 1.83 (1.33-2.53) < 0.001
 #> 4: Treatment Group Control    196    151        reference       -
 #> 5:                  Drug A    292    184 0.48 (0.31-0.73) < 0.001
-#> 6:                  Drug B    362    274 0.86 (0.56-1.32)   0.492
+#> 6:                  Drug B    362    274 0.86 (0.56-1.31)   0.492
 
 # }
 ```

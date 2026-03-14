@@ -1,3 +1,13 @@
+# *summata* 0.11.4 (2026-03-14)
+
+* Use profile likelihood CIs for GLM/negbin and exact *t*-distribution CIs for linear models, replacing Wald approximation
+* Add `conf_method` parameter (`"profile"` / `"wald"`) to `fit()`, `uniscreen()`, `fullfit()`, `multifit()`, and `m2dt()`, with global option `summata.conf_method`
+* Report complete-case *n*/Events in `fullfit()` multivariable rows (STROBE item 12)
+* Cache profile likelihood CIs from `fit()` for reuse in forest plot functions
+* Resolve `family = "Gamma"` string to `Gamma(link = "log")` for interpretable multiplicative effects
+* Fix `survival::strata()` namespace in conditional logistic regression test
+* Update benchmarks feature comparison articles
+
 # *summata* 0.11.3 (2026-03-03)
 
 * CRAN initial release re-submission

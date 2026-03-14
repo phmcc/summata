@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -174,7 +174,9 @@ class.</p>
 <p>Tests H₀: <em>β</em> = 0 using:</p>
 <p><span class="math display">\[z =
 \frac{\hat{\beta}}{\text{SE}(\hat{\beta})}\]</span></p>
-<p>Under H₀, <em>z</em> ~ N(0, 1).</p>
+<p>Under H₀, <em>z</em> ~ N(0, 1) for GLM and Cox models. For linear
+models, the analogous statistic follows a <em>t</em>-distribution with
+<em>n</em> − <em>p</em> − 1 degrees of freedom.</p>
 </div>
 <div class="section level3">
 <h3 id="likelihood-ratio-test">Likelihood Ratio Test<a class="anchor" aria-label="anchor" href="#likelihood-ratio-test"></a>
@@ -211,22 +213,117 @@ test</li>
 <p><span class="math display">\[\beta \pm z_{1-\alpha/2} \cdot
 \text{SE}(\beta)\]</span></p>
 <p>where <em>z</em>₁₋α/₂ is the standard normal quantile (1.96 for 95%
-CI).</p>
+CI). Wald intervals are computationally inexpensive but may be
+inaccurate when the likelihood surface is asymmetric, which can occur
+with small samples, sparse data, or estimates near boundary values.</p>
+</div>
+<div class="section level3">
+<h3 id="exact-t-distribution-intervals">Exact <em>t</em>-Distribution Intervals<a class="anchor" aria-label="anchor" href="#exact-t-distribution-intervals"></a>
+</h3>
+<p>For linear models, confidence intervals use the
+<em>t</em>-distribution to account for estimation of the residual
+variance:</p>
+<p><span class="math display">\[\beta \pm t_{n-p-1, \; 1-\alpha/2} \cdot
+\text{SE}(\beta)\]</span></p>
+<p>where <em>t</em>ₙ₋ₚ₋₁ is the <em>t</em>-quantile with <em>n</em> −
+<em>p</em> − 1 degrees of freedom. This produces wider intervals than
+the normal approximation, particularly when <em>n</em> is small relative
+to <em>p</em>.</p>
 </div>
 <div class="section level3">
 <h3 id="profile-likelihood-intervals">Profile Likelihood Intervals<a class="anchor" aria-label="anchor" href="#profile-likelihood-intervals"></a>
 </h3>
-<p>More accurate for small samples or boundary estimates; based on the
-likelihood ratio:</p>
+<p>Profile likelihood intervals are based on inverting the likelihood
+ratio test. The confidence set for <em>β</em> is defined as:</p>
 <p><span class="math display">\[\{\beta : 2[\log L(\hat{\beta}) - \log
 L(\beta)] \leq \chi^2_{1,1-\alpha}\}\]</span></p>
+<p>Profile intervals are more accurate than Wald intervals for small
+samples or boundary estimates, because they respect the curvature of the
+likelihood surface rather than approximating it as quadratic. However,
+they require iterative computation (refitting the model for each
+parameter), which increases execution time.</p>
 </div>
 <div class="section level3">
 <h3 id="confidence-intervals-for-effect-measures">Confidence Intervals for Effect Measures<a class="anchor" aria-label="anchor" href="#confidence-intervals-for-effect-measures"></a>
 </h3>
-<p>For exponentiated coefficients (OR, HR, RR):</p>
-<p><span class="math display">\[\exp\left(\beta \pm z_{1-\alpha/2} \cdot
-\text{SE}(\beta)\right)\]</span></p>
+<p>For exponentiated coefficients (OR, HR, RR), the CI is obtained by
+exponentiating the interval endpoints from the coefficient scale:</p>
+<p><span class="math display">\[\left(\exp(\text{CI}_{\text{lower}}), \;
+\exp(\text{CI}_{\text{upper}})\right)\]</span></p>
+<p>where CI_lower and CI_upper are the confidence limits for <em>β</em>
+on the log scale, computed using whichever method (Wald, exact
+<em>t</em>, or profile likelihood) is appropriate for the model class.
+Note that exponentiation preserves coverage probability because exp(·)
+is a monotone transformation.</p>
+</div>
+<div class="section level3">
+<h3 id="implementation">Implementation<a class="anchor" aria-label="anchor" href="#implementation"></a>
+</h3>
+<p>The CI method is selected automatically based on model class, and can
+be overridden via the <code>conf_method</code> parameter:</p>
+<table class="table">
+<colgroup>
+<col width="17%">
+<col width="46%">
+<col width="36%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Model Class</th>
+<th align="left">Default (<code>conf_method = "profile"</code>)</th>
+<th align="left">With <code>conf_method = "wald"</code>
+</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">GLM (binomial, poisson)</td>
+<td align="left">Profile likelihood via
+<code><a href="https://rdrr.io/pkg/MASS/man/confint.html" class="external-link">MASS::confint.glm()</a></code>
+</td>
+<td align="left">Wald (normal approximation)</td>
+</tr>
+<tr class="even">
+<td align="left">Negative binomial</td>
+<td align="left">Profile likelihood via
+<code><a href="https://rdrr.io/pkg/MASS/man/confint.html" class="external-link">MASS::confint.glm()</a></code>
+</td>
+<td align="left">Wald (normal approximation)</td>
+</tr>
+<tr class="odd">
+<td align="left">Quasi-likelihood (quasibinomial, quasipoisson)</td>
+<td align="left">Wald (no true likelihood)</td>
+<td align="left">Wald (no true likelihood)</td>
+</tr>
+<tr class="even">
+<td align="left">Linear model (<code>lm</code>)</td>
+<td align="left">Exact <em>t</em>-distribution via
+<code><a href="https://rdrr.io/r/stats/confint.html" class="external-link">confint.lm()</a></code>
+</td>
+<td align="left">Wald (normal approximation)</td>
+</tr>
+<tr class="odd">
+<td align="left">Cox PH (<code>coxph</code>)</td>
+<td align="left">Wald</td>
+<td align="left">Wald</td>
+</tr>
+<tr class="even">
+<td align="left">Mixed-effects (<code>lmer</code>, <code>glmer</code>,
+<code>coxme</code>)</td>
+<td align="left">Wald</td>
+<td align="left">Wald</td>
+</tr>
+</tbody>
+</table>
+<p>Cox and mixed-effects models use Wald intervals regardless of the
+<code>conf_method</code> setting. For Cox models, Wald CIs are the
+standard convention in the survival analysis literature. For
+mixed-effects models, profile likelihood CIs are available in principle
+(via <code>lme4::confint.merMod(method = "profile")</code>), but are
+prohibitively slow for routine use and are not implemented in
+<code>summata</code>.</p>
+<p>The <code>conf_method</code> can be set globally for a session:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>summata.conf_method <span class="op">=</span> <span class="st">"profile"</span><span class="op">)</span>  <span class="co"># Profile/exact-t (default)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>summata.conf_method <span class="op">=</span> <span class="st">"wald"</span><span class="op">)</span>  <span class="co"># Wald CIs throughout</span></span></code></pre></div>
 <hr>
 </div>
 </div>
@@ -312,13 +409,17 @@ predictors constant.</p>
 - p - 1}\]</span></p>
 <p><strong>Root mean squared error (RMSE):</strong> <span class="math display">\[\text{RMSE} = \sqrt{\frac{1}{n}\sum_i (Y_i -
 \hat{Y}_i)^2}\]</span></p>
+<p>Note: this is the descriptive (biased) RMSE. The unbiased estimate of
+the residual standard deviation σ uses <em>n</em> − <em>p</em> − 1 in
+the denominator and is reported by <code><a href="https://rdrr.io/r/stats/summary.lm.html" class="external-link">summary.lm()</a></code> as the
+“residual standard error.”</p>
 </div>
 <div class="section level3">
-<h3 id="implementation">Implementation<a class="anchor" aria-label="anchor" href="#implementation"></a>
+<h3 id="implementation-1">Implementation<a class="anchor" aria-label="anchor" href="#implementation-1"></a>
 </h3>
 <p>In <code>summata</code>, linear regression is specified with
 <code>model_type = "lm"</code>:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span><span class="va">data</span>, outcome <span class="op">=</span> <span class="st">"continuous_var"</span>, <span class="va">predictors</span>, model_type <span class="op">=</span> <span class="st">"lm"</span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
@@ -409,9 +510,9 @@ change in odds per one-unit increase. For a categorical predictor, the
 OR compares each level to the reference category.</p>
 </div>
 <div class="section level4">
-<h4 id="implementation-1">Implementation<a class="anchor" aria-label="anchor" href="#implementation-1"></a>
+<h4 id="implementation-2">Implementation<a class="anchor" aria-label="anchor" href="#implementation-2"></a>
 </h4>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span><span class="va">data</span>, outcome <span class="op">=</span> <span class="st">"binary_var"</span>, <span class="va">predictors</span>, model_type <span class="op">=</span> <span class="st">"glm"</span>, family <span class="op">=</span> <span class="st">"binomial"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
@@ -467,9 +568,9 @@ component</li>
 </ul>
 </div>
 <div class="section level4">
-<h4 id="implementation-2">Implementation<a class="anchor" aria-label="anchor" href="#implementation-2"></a>
+<h4 id="implementation-3">Implementation<a class="anchor" aria-label="anchor" href="#implementation-3"></a>
 </h4>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Standard Poisson</span></span>
 <span><span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span><span class="va">data</span>, outcome <span class="op">=</span> <span class="st">"count_var"</span>, <span class="va">predictors</span>, model_type <span class="op">=</span> <span class="st">"glm"</span>, family <span class="op">=</span> <span class="st">"poisson"</span><span class="op">)</span></span>
 <span></span>
@@ -503,9 +604,9 @@ model</li>
 </ul>
 </div>
 <div class="section level4">
-<h4 id="implementation-3">Implementation<a class="anchor" aria-label="anchor" href="#implementation-3"></a>
+<h4 id="implementation-4">Implementation<a class="anchor" aria-label="anchor" href="#implementation-4"></a>
 </h4>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span><span class="va">data</span>, outcome <span class="op">=</span> <span class="st">"count_var"</span>, <span class="va">predictors</span>, model_type <span class="op">=</span> <span class="st">"negbin"</span><span class="op">)</span></span></code></pre></div>
 <p>Requires the <strong>MASS</strong> package.</p>
 </div>
@@ -520,8 +621,13 @@ model</li>
 models:</p>
 <p><span class="math display">\[Y_i \sim \text{Gamma}(\mu_i,
 \phi)\]</span></p>
-<p>With log link (default): <span class="math display">\[\log(E[Y_i |
-X_i]) = \beta_0 + \beta_1 X_{i1} + \cdots + \beta_p X_{ip}\]</span></p>
+<p>The canonical link for the Gamma family is the inverse (1/μ). In
+practice, the log link is often preferred because it yields more
+interpretable coefficients (multiplicative effects). When
+<code>family = "Gamma"</code> is passed as a string,
+<code>summata</code> defaults to the log link. The link can also be
+specified explicitly: <span class="math display">\[\log(E[Y_i | X_i]) =
+\beta_0 + \beta_1 X_{i1} + \cdots + \beta_p X_{ip}\]</span></p>
 </div>
 <div class="section level4">
 <h4 id="assumptions-3">Assumptions<a class="anchor" aria-label="anchor" href="#assumptions-3"></a>
@@ -555,10 +661,17 @@ effect</strong> (ratio):</p>
 </ul>
 </div>
 <div class="section level4">
-<h4 id="implementation-4">Implementation<a class="anchor" aria-label="anchor" href="#implementation-4"></a>
+<h4 id="implementation-5">Implementation<a class="anchor" aria-label="anchor" href="#implementation-5"></a>
 </h4>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span><span class="va">data</span>, outcome <span class="op">=</span> <span class="st">"positive_continuous"</span>, <span class="va">predictors</span>, model_type <span class="op">=</span> <span class="st">"glm"</span>, family <span class="op">=</span> <span class="st">"Gamma"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># String shorthand (resolves to log link)</span></span>
+<span><span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span><span class="va">data</span>, outcome <span class="op">=</span> <span class="st">"positive_continuous"</span>, <span class="va">predictors</span>, model_type <span class="op">=</span> <span class="st">"glm"</span>, family <span class="op">=</span> <span class="st">"Gamma"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Explicit link specification</span></span>
+<span><span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span><span class="va">data</span>, outcome <span class="op">=</span> <span class="st">"positive_continuous"</span>, <span class="va">predictors</span>, model_type <span class="op">=</span> <span class="st">"glm"</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">Gamma</a></span><span class="op">(</span>link <span class="op">=</span> <span class="st">"log"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Gamma with inverse link (canonical)</span></span>
+<span><span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span><span class="va">data</span>, outcome <span class="op">=</span> <span class="st">"positive_continuous"</span>, <span class="va">predictors</span>, model_type <span class="op">=</span> <span class="st">"glm"</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html" class="external-link">Gamma</a></span><span class="op">(</span>link <span class="op">=</span> <span class="st">"inverse"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
@@ -582,9 +695,9 @@ identical to binomial GLM, but standard errors are adjusted.</p>
 \mu_i\]</span></p>
 </div>
 <div class="section level4">
-<h4 id="implementation-5">Implementation<a class="anchor" aria-label="anchor" href="#implementation-5"></a>
+<h4 id="implementation-6">Implementation<a class="anchor" aria-label="anchor" href="#implementation-6"></a>
 </h4>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Overdispersed binary</span></span>
 <span><span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span><span class="va">data</span>, <span class="va">outcome</span>, <span class="va">predictors</span>, model_type <span class="op">=</span> <span class="st">"glm"</span>, family <span class="op">=</span> <span class="st">"quasibinomial"</span><span class="op">)</span></span>
 <span></span>
@@ -596,6 +709,12 @@ identical to binomial GLM, but standard errors are adjusted.</p>
 <h3 id="summary-of-glm-families">Summary of GLM Families<a class="anchor" aria-label="anchor" href="#summary-of-glm-families"></a>
 </h3>
 <table class="table">
+<colgroup>
+<col width="18%">
+<col width="31%">
+<col width="13%">
+<col width="36%">
+</colgroup>
 <thead><tr class="header">
 <th align="left">Family</th>
 <th align="left">Outcome Type</th>
@@ -636,8 +755,8 @@ identical to binomial GLM, but standard errors are adjusted.</p>
 <tr class="even">
 <td align="left"><code>Gamma</code></td>
 <td align="left">Positive continuous</td>
-<td align="left">log</td>
-<td align="left">Ratio</td>
+<td align="left">inverse (canonical); log (in <code>summata</code>)</td>
+<td align="left">Ratio (with log link)</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>inverse.gaussian</code></td>
@@ -738,9 +857,9 @@ C = 1 indicates perfect discrimination.</p>
 </ul>
 </div>
 <div class="section level4">
-<h4 id="implementation-6">Implementation<a class="anchor" aria-label="anchor" href="#implementation-6"></a>
+<h4 id="implementation-7">Implementation<a class="anchor" aria-label="anchor" href="#implementation-7"></a>
 </h4>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span><span class="va">data</span>, outcome <span class="op">=</span> <span class="st">"Surv(time, status)"</span>, <span class="va">predictors</span>, model_type <span class="op">=</span> <span class="st">"coxph"</span><span class="op">)</span></span></code></pre></div>
 <p>Requires the <strong>survival</strong> package.</p>
 </div>
@@ -768,9 +887,9 @@ parameters</li>
 </ul>
 </div>
 <div class="section level4">
-<h4 id="implementation-7">Implementation<a class="anchor" aria-label="anchor" href="#implementation-7"></a>
+<h4 id="implementation-8">Implementation<a class="anchor" aria-label="anchor" href="#implementation-8"></a>
 </h4>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span><span class="va">data</span>, outcome <span class="op">=</span> <span class="st">"case_status"</span>, <span class="va">predictors</span>, model_type <span class="op">=</span> <span class="st">"clogit"</span>, strata <span class="op">=</span> <span class="st">"match_id"</span><span class="op">)</span></span></code></pre></div>
 <p>Requires the <strong>survival</strong> package.</p>
 <hr>
@@ -791,7 +910,8 @@ correlation within clusters by incorporating random effects.</p>
 <p>where:</p>
 <ul>
 <li>
-<strong>β</strong> are fixed effects (population-averaged)</li>
+<strong>β</strong> are fixed effects (common across all
+clusters)</li>
 <li>
 <strong>u</strong>ⱼ ~ N(<strong>0</strong>, <strong>Σ</strong>) are
 random effects (cluster-specific deviations)</li>
@@ -850,9 +970,9 @@ random effects (cluster-specific deviations)</li>
 </table>
 </div>
 <div class="section level4">
-<h4 id="implementation-8">Implementation<a class="anchor" aria-label="anchor" href="#implementation-8"></a>
+<h4 id="implementation-9">Implementation<a class="anchor" aria-label="anchor" href="#implementation-9"></a>
 </h4>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span><span class="va">data</span>, <span class="va">outcome</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">predictors</span>, <span class="st">"(1|cluster)"</span><span class="op">)</span>, model_type <span class="op">=</span> <span class="st">"lmer"</span><span class="op">)</span></span></code></pre></div>
 <p>Requires the <strong>lme4</strong> package.</p>
 </div>
@@ -882,9 +1002,9 @@ random effects (cluster-specific deviations)</li>
 due to the non-linear link function.</p>
 </div>
 <div class="section level4">
-<h4 id="implementation-9">Implementation<a class="anchor" aria-label="anchor" href="#implementation-9"></a>
+<h4 id="implementation-10">Implementation<a class="anchor" aria-label="anchor" href="#implementation-10"></a>
 </h4>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Binary outcome with clustering</span></span>
 <span><span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span><span class="va">data</span>, <span class="va">outcome</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">predictors</span>, <span class="st">"(1|cluster)"</span><span class="op">)</span>, model_type <span class="op">=</span> <span class="st">"glmer"</span>, family <span class="op">=</span> <span class="st">"binomial"</span><span class="op">)</span></span>
 <span></span>
@@ -915,9 +1035,9 @@ term.</p>
 </ul>
 </div>
 <div class="section level4">
-<h4 id="implementation-10">Implementation<a class="anchor" aria-label="anchor" href="#implementation-10"></a>
+<h4 id="implementation-11">Implementation<a class="anchor" aria-label="anchor" href="#implementation-11"></a>
 </h4>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span><span class="va">data</span>, outcome <span class="op">=</span> <span class="st">"Surv(time, status)"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">predictors</span>, <span class="st">"(1|cluster)"</span><span class="op">)</span>, model_type <span class="op">=</span> <span class="st">"coxme"</span><span class="op">)</span></span></code></pre></div>
 <p>Requires the <strong>coxme</strong> package.</p>
 </div>
@@ -1016,9 +1136,9 @@ compare AIC/BIC</li>
 </ol>
 </div>
 <div class="section level3">
-<h3 id="implementation-11">Implementation<a class="anchor" aria-label="anchor" href="#implementation-11"></a>
+<h3 id="implementation-12">Implementation<a class="anchor" aria-label="anchor" href="#implementation-12"></a>
 </h3>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span><span class="va">data</span>, <span class="va">outcome</span>, <span class="va">predictors</span>, interactions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"X:Z"</span><span class="op">)</span>, model_type <span class="op">=</span> <span class="st">"glm"</span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
@@ -1130,9 +1250,9 @@ samples.</p>
 <div class="section level4">
 <h4 id="pseudo-r²-glms">Pseudo-R² (GLMs)<a class="anchor" aria-label="anchor" href="#pseudo-r%C2%B2-glms"></a>
 </h4>
-<p><strong>McFadden’s pseudo-R²:</strong> <span class="math display">\[R^2_{\text{McF}} = 1 - \frac{\log
+<p><strong>McFadden pseudo-R²:</strong> <span class="math display">\[R^2_{\text{McF}} = 1 - \frac{\log
 L_{\text{full}}}{\log L_{\text{null}}}\]</span></p>
-<p><strong>Nagelkerke’s pseudo-R²:</strong> <span class="math display">\[R^2_N = \frac{1 -
+<p><strong>Nagelkerke pseudo-R²:</strong> <span class="math display">\[R^2_N = \frac{1 -
 (L_{\text{null}}/L_{\text{full}})^{2/n}}{1 -
 L_{\text{null}}^{2/n}}\]</span></p>
 <p>Values are not directly comparable to linear <em>R</em>²; 0.2–0.4
@@ -1329,9 +1449,9 @@ expertise</li>
 </ol>
 </div>
 <div class="section level3">
-<h3 id="implementation-12">Implementation<a class="anchor" aria-label="anchor" href="#implementation-12"></a>
+<h3 id="implementation-13">Implementation<a class="anchor" aria-label="anchor" href="#implementation-13"></a>
 </h3>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Compare candidate models</span></span>
 <span><span class="va">comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/compfit.html">compfit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">mydata</span>,</span>
@@ -1385,16 +1505,16 @@ Press.</li>
 <h3 id="software">Software<a class="anchor" aria-label="anchor" href="#software"></a>
 </h3>
 <ul>
-<li>R Core Team (2024). <em>R: A Language and Environment for
+<li>R Core Team (2025). <em>R: A Language and Environment for
 Statistical Computing</em>. <a href="https://www.R-project.org/" class="external-link uri">https://www.R-project.org/</a>
 </li>
-<li>Therneau, T. (2024). <em>survival: Survival Analysis</em>. R
+<li>Therneau, T. (2025). <em>survival: Survival Analysis</em>. R
 package. <a href="https://CRAN.R-project.org/package=survival" class="external-link uri">https://CRAN.R-project.org/package=survival</a>
 </li>
 <li>Bates, D., Mächler, M., Bolker, B., &amp; Walker, S. (2015). Fitting
 linear mixed-effects models using lme4. <em>Journal of Statistical
 Software</em>, 67(1), 1–48.</li>
-<li>Therneau, T. (2024). <em>coxme: Cox Mixed-Effects Models</em>. R
+<li>Therneau, T. (2025). <em>coxme: Cox Mixed-Effects Models</em>. R
 package. <a href="https://CRAN.R-project.org/package=coxme" class="external-link uri">https://CRAN.R-project.org/package=coxme</a>
 </li>
 <li>Venables, W. N., &amp; Ripley, B. D. (2002). <em>Modern Applied

@@ -32,6 +32,16 @@ reproducibility. Timing measurements exclude package loading and data
 generation. All packages were tested using default parameters unless
 otherwise noted.
 
+Two `summata` configurations are benchmarked throughout: the **default**
+configuration, which uses profile likelihood confidence intervals for
+GLM models and includes full formatting (QC statistics, sample sizes,
+reference rows); and a **minimal** configuration (`summata_minimal`),
+which uses Wald CIs and disables optional output features. This
+distinction is important because profile likelihood CIs dominate GLM
+execution time, and the minimal configuration provides a way to measure
+`summata`’s formatting overhead in isolation. Note that `finalfit` and
+`broom` also use profile likelihood CIs by default for GLM models.
+
 ``` r
 library(summata)
 library(microbenchmark)
@@ -54,13 +64,13 @@ differing implementation strategies.
 | `finalfit` | `summary_factorlist()` | `tidyverse` ecosystem |
 | `gtsummary` | `tbl_summary()` | `gt` table framework |
 
-![](figures/benchmarks_desctable.png)
+![](figures/benchmark_desctable.png)
 
 | Dataset Size | `summata` | `arsenal` | `tableone` | `finalfit` | `gtsummary` |
 |:-------------|----------:|----------:|-----------:|-----------:|------------:|
-| *n* = 1,000  |     40 ms |     66 ms |      48 ms |     471 ms |    3,072 ms |
-| *n* = 5,000  |     54 ms |     80 ms |      84 ms |     481 ms |    3,113 ms |
-| *n* = 10,000 |     68 ms |    101 ms |     129 ms |     496 ms |    3,155 ms |
+| *n* = 1,000  |     42 ms |     64 ms |      46 ms |     429 ms |    2,901 ms |
+| *n* = 5,000  |     57 ms |     77 ms |      79 ms |     442 ms |    2,929 ms |
+| *n* = 10,000 |     73 ms |     98 ms |     126 ms |     464 ms |    3,001 ms |
 
 The observed timing differences reflect underlying implementation
 choices. Packages built on `data.table` or base R matrix operations
@@ -82,13 +92,13 @@ specified time points.
 | manual | [`survival::survfit()`](https://rdrr.io/pkg/survival/man/survfit.html) | Raw computation |
 | `gtsummary` | `tbl_survfit()` | `gt` integration |
 
-![](figures/benchmarks_survtable.png)
+![](figures/benchmark_survtable.png)
 
 | Dataset Size | `summata` | `gtsummary` | manual |
 |:-------------|----------:|------------:|-------:|
-| *n* = 1,000  |     22 ms |      289 ms |   7 ms |
-| *n* = 5,000  |     36 ms |      292 ms |  11 ms |
-| *n* = 10,000 |     52 ms |      293 ms |  15 ms |
+| *n* = 1,000  |     21 ms |      266 ms |   6 ms |
+| *n* = 5,000  |     35 ms |      271 ms |  11 ms |
+| *n* = 10,000 |     52 ms |      274 ms |  14 ms |
 
 Direct [`survfit()`](https://rdrr.io/pkg/survival/man/survfit.html)
 computation provides a baseline for the minimum time required. The
@@ -106,73 +116,84 @@ functions are as follows:
 
 | Package | Function | Notes |
 |:---|:---|:---|
-| `summata` | [`fit()`](https://phmcc.github.io/summata/reference/fit.md) | Formatted output with counts and reference rows |
-| `summata_minimal` | `fit(..., show_n = FALSE, show_events = FALSE, reference_rows = FALSE)` | Reduced output |
-| `finalfit` | `glmuni()` + `fit2df()` | Two-step extraction |
-| `broom` | `tidy()` | Minimal extraction |
+| `summata` | [`fit()`](https://phmcc.github.io/summata/reference/fit.md) | Profile likelihood CIs, QC stats, counts, and reference rows |
+| `summata_minimal` | `fit(..., conf_method = "wald", show_n = FALSE, show_events = FALSE, reference_rows = FALSE, keep_qc_stats = FALSE)` | Wald CIs, reduced output |
+| `finalfit` | `glmuni()` + `fit2df()` | Profile likelihood CIs (default) |
+| `broom` | `tidy()` | Profile likelihood CIs via [`confint()`](https://rdrr.io/r/stats/confint.html) dispatch |
 | `gtsummary` | `tbl_regression()` | `gt` formatting |
 
 ### Logistic Regression
 
-![](figures/benchmarks_logistic.png)
+![](figures/benchmark_logistic.png)
 
 | Dataset Size | `summata_minimal` | `summata` | `finalfit` |  `broom` | `gtsummary` |
 |:-------------|------------------:|----------:|-----------:|---------:|------------:|
-| *n* = 500    |             25 ms |     43 ms |     155 ms |   155 ms |    1,388 ms |
-| *n* = 1,000  |             27 ms |     49 ms |     219 ms |   222 ms |    1,454 ms |
-| *n* = 5,000  |             50 ms |     70 ms |     949 ms |   765 ms |    1,986 ms |
-| *n* = 10,000 |             71 ms |     95 ms |   1,626 ms | 1,629 ms |    2,861 ms |
+| *n* = 500    |             18 ms |    174 ms |     147 ms |   150 ms |    1,344 ms |
+| *n* = 1,000  |             22 ms |    234 ms |     212 ms |   214 ms |    1,399 ms |
+| *n* = 5,000  |             37 ms |    840 ms |     749 ms |   936 ms |    2,153 ms |
+| *n* = 10,000 |             45 ms |  1,532 ms |   1,562 ms | 1,564 ms |    2,756 ms |
 
-Among tested packages, `summata` performs the fastest summarization of
-logistic regression models. The `summata_minimal` configuration, which
-omits sample size counts and reference rows, provides additional speed
-at the cost of less-complete output.
+The default `summata` configuration uses profile likelihood confidence
+intervals for GLM models, as do `finalfit` and
+[`broom::tidy()`](https://generics.r-lib.org/reference/tidy.html). The
+three packages show comparable performance for logistic regression
+because profile likelihood profiling dominates execution time for all of
+them. The `summata_minimal` configuration uses Wald CIs instead,
+skipping the profiling step entirely, and achieves the fastest
+extraction times at all sample sizes. At large *n*, profiling cost grows
+with the number of IRLS iterations, causing all profile-based packages
+to converge toward similar timings.
 
 ### Linear Regression
 
-![](figures/benchmarks_linear.png)
+![](figures/benchmark_linear.png)
 
 | Dataset Size | `summata_minimal` | `summata` | `finalfit` | `broom` | `gtsummary` |
 |:-------------|------------------:|----------:|-----------:|--------:|------------:|
-| *n* = 500    |             21 ms |     33 ms |       8 ms |    6 ms |    1,222 ms |
-| *n* = 1,000  |             22 ms |     35 ms |       8 ms |    7 ms |    1,225 ms |
-| *n* = 5,000  |             27 ms |     39 ms |      11 ms |    9 ms |    1,228 ms |
-| *n* = 10,000 |             39 ms |     45 ms |      14 ms |   12 ms |    1,234 ms |
+| *n* = 500    |             20 ms |     35 ms |       6 ms |    6 ms |    1,179 ms |
+| *n* = 1,000  |             21 ms |     36 ms |       7 ms |    6 ms |    1,193 ms |
+| *n* = 5,000  |             27 ms |     43 ms |       9 ms |    9 ms |    1,192 ms |
+| *n* = 10,000 |             38 ms |     49 ms |      13 ms |   12 ms |    1,230 ms |
 
 For linear models,
 [`broom::tidy()`](https://generics.r-lib.org/reference/tidy.html) and
-`finalfit` achieve faster coefficient extraction due to the simpler
-structure of `lm` objects. The `summata` package applies additional
-formatting by default, accounting for the difference.
+`finalfit` achieve faster coefficient extraction due to lower formatting
+overhead. All three packages use exact *t*-distribution CIs for `lm`
+objects (via [`confint.lm()`](https://rdrr.io/r/stats/confint.html)), so
+the timing difference reflects formatting features (reference rows, QC
+statistics) rather than CI computation.
 
 ### Poisson Regression
 
-![](figures/benchmarks_poisson.png)
+![](figures/benchmark_poisson.png)
 
 | Dataset Size | `summata_minimal` | `summata` | `finalfit` |  `broom` | `gtsummary` |
 |:-------------|------------------:|----------:|-----------:|---------:|------------:|
-| *n* = 500    |             20 ms |     39 ms |     144 ms |   147 ms |    1,341 ms |
-| *n* = 1,000  |             22 ms |     41 ms |     191 ms |   193 ms |    1,386 ms |
-| *n* = 5,000  |             33 ms |     57 ms |     646 ms |   643 ms |    1,832 ms |
-| *n* = 10,000 |             45 ms |     71 ms |   1,433 ms | 1,491 ms |    2,644 ms |
+| *n* = 500    |             20 ms |    155 ms |     135 ms |   144 ms |    1,293 ms |
+| *n* = 1,000  |             24 ms |    201 ms |     181 ms |   184 ms |    1,325 ms |
+| *n* = 5,000  |             34 ms |    595 ms |     613 ms |   612 ms |    1,868 ms |
+| *n* = 10,000 |             47 ms |  1,351 ms |   1,409 ms | 1,402 ms |    2,577 ms |
 
-Poisson regression exhibits similar patterns to logistic regression,
-with GLM-based extraction showing comparable relative performance across
-packages in low-*n* scenarios.
+Poisson regression shows the same profile likelihood pattern as logistic
+regression: the default `summata`, `finalfit`, and `broom` all use
+profile CIs and show comparable performance. The `summata_minimal`
+configuration with Wald CIs is consistently the fastest option.
 
 ### Cox Regression
 
-![](figures/benchmarks_cox.png)
+![](figures/benchmark_cox.png)
 
 | Dataset Size | summata_minimal | summata | finalfit | broom | gtsummary |
 |:-------------|----------------:|--------:|---------:|------:|----------:|
-| *n* = 500    |           18 ms |   35 ms |     8 ms | 13 ms |  1,241 ms |
-| *n* = 1,000  |           21 ms |   40 ms |    10 ms | 15 ms |  1,222 ms |
-| *n* = 5,000  |           37 ms |   56 ms |    26 ms | 30 ms |  1,213 ms |
+| *n* = 500    |           17 ms |   34 ms |     7 ms | 12 ms |  1,149 ms |
+| *n* = 1,000  |           21 ms |   38 ms |     9 ms | 14 ms |  1,161 ms |
+| *n* = 5,000  |           40 ms |   61 ms |    25 ms | 30 ms |  1,227 ms |
 
-Similar to linear regression, Cox model coefficient extraction is
-fastest in `finalfit` and `broom`, when minimal formatting is required;
-`summata` takes slightly longer due to formatting overhead.
+Cox models use Wald CIs regardless of the `conf_method` setting (the
+standard approach in survival analysis), so the timing difference
+between `summata` and `summata_minimal` reflects formatting overhead
+only. `finalfit` and `broom` achieve faster extraction with less
+formatting.
 
 ------------------------------------------------------------------------
 
@@ -185,18 +206,18 @@ regardless of the wrapper package.
 | Package | Function | Notes |
 |:---|:---|:---|
 | `summata` | `fit(..., model_type = "lmer")` | Unified interface |
-| `summata_minimal` | `fit(..., model_type = "lmer", show_n = FALSE, show_events = FALSE, reference_rows = FALSE)` | Reduced output |
+| `summata_minimal` | `fit(..., model_type = "lmer", conf_method = "wald", show_n = FALSE, show_events = FALSE, reference_rows = FALSE, keep_qc_stats = FALSE)` | Reduced output |
 | `finalfit` | `lmmixed()` + `fit2df()` | Two-step process |
 | `broom.mixed` | `tidy()` | Minimal extraction |
 | `gtsummary` | `tbl_regression()` | gt formatting |
 
-![](figures/benchmarks_mixed.png)
+![](figures/benchmark_mixed.png)
 
 | Dataset Size | `summata_minimal` | `summata` | `finalfit` | `broom` | `gtsummary` |
 |:-------------|------------------:|----------:|-----------:|--------:|------------:|
-| *n* = 500    |             41 ms |     59 ms |      28 ms |   32 ms |    1,174 ms |
-| *n* = 1,000  |             43 ms |     62 ms |      30 ms |   35 ms |    1,174 ms |
-| *n* = 5,000  |             58 ms |     77 ms |      46 ms |   50 ms |    1,187 ms |
+| *n* = 500    |             35 ms |     58 ms |      26 ms |   31 ms |    1,141 ms |
+| *n* = 1,000  |             37 ms |     60 ms |      28 ms |   34 ms |    1,133 ms |
+| *n* = 5,000  |             52 ms |     76 ms |      43 ms |   47 ms |    1,185 ms |
 
 The relatively narrow spread among `summata`, `finalfit`, and `broom`
 reflects the dominance of model fitting time. Differences in wrapper
@@ -214,26 +235,30 @@ model fits.
 | Package | Function | Notes |
 |:---|:---|:---|
 | `summata` | [`uniscreen()`](https://phmcc.github.io/summata/reference/uniscreen.md) | Parallel-capable |
-| `summata_minimal` | `uniscreen(..., show_n = FALSE, show_events = FALSE, reference_rows = FALSE)` | Reduced output |
+| `summata_minimal` | `uniscreen(..., conf_method = "wald", show_n = FALSE, show_events = FALSE, reference_rows = FALSE)` | Wald CIs, reduced output |
 | `finalfit` | `glmuni()` + `fit2df()` | Sequential |
 | `broom` | Loop + `tidy()` | Manual implementation |
 | `arsenal` | `modelsum()` | Formula interface |
 | `gtsummary` | `tbl_uvregression()` | gt formatting |
 
-![](figures/benchmarks_uniscreen.png)
+![](figures/benchmark_uniscreen.png)
 
 Screening 14 predictors:
 
 | Dataset Size | `summata_minimal` | `summata` | `finalfit` | `broom` | `arsenal` | `gtsummary` |
 |:---|---:|---:|---:|---:|---:|---:|
-| *n* = 500 | 132 ms | 201 ms | 381 ms | 453 ms | 916 ms | 13,595 ms |
-| *n* = 1,000 | 146 ms | 216 ms | 499 ms | 577 ms | 1,173 ms | 13,764 ms |
-| *n* = 5,000 | 204 ms | 271 ms | 1,806 ms | 1,613 ms | 3,467 ms | 14,857 ms |
+| *n* = 500 | 117 ms | 319 ms | 360 ms | 440 ms | 877 ms | 12,963 ms |
+| *n* = 1,000 | 134 ms | 351 ms | 477 ms | 558 ms | 1,128 ms | 13,025 ms |
+| *n* = 5,000 | 196 ms | 624 ms | 1,763 ms | 1,799 ms | 3,401 ms | 14,001 ms |
 
-The performance differences in univariable screening are more pronounced
-than in single-model extraction, as overhead compounds across multiple
-model fits. The `gtsummary` timings reflect extensive table formatting
-applied to each predictor.
+The performance gap between `summata` (default) and `summata_minimal` is
+amplified during univariable screening because profile likelihood
+profiling is repeated for each of the 14 predictor models. All
+profile-based packages (`summata` default, `finalfit`, `broom`) show
+comparable performance, as profiling dominates their execution time.
+With Wald CIs, `summata_minimal` is the fastest option at all sample
+sizes, outperforming the next-fastest alternative by 2.6–9.0× due to
+`data.table` vectorization and parallel model fitting.
 
 ------------------------------------------------------------------------
 
@@ -245,23 +270,27 @@ represents a common analytical pattern in statistical research.
 | Package | Approach | Notes |
 |:---|:---|:---|
 | `summata` | [`fullfit()`](https://phmcc.github.io/summata/reference/fullfit.md) | Single function |
-| `summata_minimal` | `fullfit(..., show_n = FALSE, show_events = FALSE, reference_rows = FALSE)` | Reduced output |
+| `summata_minimal` | `fullfit(..., conf_method = "wald", show_n = FALSE, show_events = FALSE, reference_rows = FALSE)` | Wald CIs, reduced output |
 | `finalfit` | `finalfit()` | Single function |
 | manual | Loop + [`glm()`](https://rdrr.io/r/stats/glm.html) + [`broom::tidy()`](https://generics.r-lib.org/reference/tidy.html) + [`rbind()`](https://rdrr.io/r/base/cbind.html) | Custom |
 | `gtsummary` | `tbl_uvregression()` + `tbl_regression()` + `tbl_merge()` | Multi-step |
 
-![](figures/benchmarks_workflow.png)
+![](figures/benchmark_workflow.png)
 
 | Dataset Size | `summata_minimal` | `summata` | `finalfit` |   manual | `gtsummary` |
 |:-------------|------------------:|----------:|-----------:|---------:|------------:|
-| *n* = 500    |            139 ms |    235 ms |     237 ms |   429 ms |    9,991 ms |
-| *n* = 1,000  |            154 ms |    242 ms |     236 ms |   541 ms |   10,029 ms |
-| *n* = 5,000  |            224 ms |    297 ms |     239 ms | 1,929 ms |   11,428 ms |
+| *n* = 500    |            123 ms |    450 ms |     207 ms |   407 ms |    9,655 ms |
+| *n* = 1,000  |            136 ms |    549 ms |     200 ms |   541 ms |    9,726 ms |
+| *n* = 5,000  |            196 ms |  1,479 ms |     209 ms | 1,889 ms |   11,092 ms |
 
-The `summata` and `finalfit` packages show comparable performance for
-the complete workflow, reflecting their similar design philosophies.
-Both packages optimize the combined operation rather than simply
-chaining separate functions.
+The default `summata` and `finalfit` show comparable performance for GLM
+workflows because both use profile likelihood CIs. The difference
+between them reflects `summata`’s additional features (QC statistics,
+reference rows, complete-case sample sizes) versus `finalfit`’s
+inclusion of a descriptive statistics table. The `summata_minimal`
+configuration with Wald CIs is the fastest single-function option at
+small to moderate sample sizes, completing the combined analysis in
+roughly 60–70% of the time `finalfit` requires at *n* = 500–1,000.
 
 ------------------------------------------------------------------------
 
@@ -276,13 +305,13 @@ rendering.
 | `survminer` | `ggforest()` | Survival-focused |
 | manual | Custom `ggplot2` | Maximum flexibility |
 
-![](figures/benchmarks_forest.png)
+![](figures/benchmark_forest.png)
 
 | Dataset Size | `summata` | `survminer` | manual |
 |:-------------|----------:|------------:|-------:|
-| *n* = 500    |    164 ms |      348 ms |  57 ms |
-| *n* = 1,000  |    163 ms |      348 ms |  57 ms |
-| *n* = 5,000  |    164 ms |      335 ms |  56 ms |
+| *n* = 500    |    203 ms |      345 ms |  57 ms |
+| *n* = 1,000  |    198 ms |      338 ms |  54 ms |
+| *n* = 5,000  |    203 ms |      329 ms |  53 ms |
 
 The manual approach produces only the graphical element, while `summata`
 and `survminer` generate integrated displays with coefficient tables.
@@ -296,30 +325,57 @@ function.
 
 ## Relative Performance
 
-The following figure summarizes timing ratios across benchmarks. Values
+The following figures summarize timing ratios across benchmarks. Values
 greater than 1 indicate the comparison package requires more time than
-`summata`.
+the baseline.
 
-![](figures/benchmarks_speedup.png)
+### Relative to `summata` (default, profile likelihood CIs)
+
+![](figures/benchmark_speedup.png)
+
+### Relative to `summata_minimal` (Wald CIs, no QC stats)
+
+![](figures/benchmark_speedup_minimal.png)
 
 ### Summary of Ratios
 
+Ratios relative to `summata` (default):
+
 | Benchmark             | `gtsummary` | `finalfit` | `arsenal` |
 |:----------------------|------------:|-----------:|----------:|
-| Descriptive Tables    |      46–76× |      7–12× |  1.5–1.6× |
-| Survival Tables       |       6–13× |          — |         — |
-| Logistic Regression   |      29–32× |      4–17× |         — |
-| Poisson Regression    |      32–37× |      4–20× |         — |
-| Linear Regression     |      28–37× |   0.2–0.3× |         — |
-| Cox Regression        |      22–35× |   0.2–0.5× |         — |
-| Mixed-Effects         |      15–20× |   0.5–0.6× |         — |
-| Univariable Screening |      55–67× |       2–7× |     5–13× |
-| Complete Workflow     |      38–43× |   0.8–1.0× |         — |
+| Descriptive Tables    |      41–70× |      6–10× |  1.4–1.5× |
+| Survival Tables       |       5–12× |          — |         — |
+| Logistic Regression   |        6–8× |   0.8–1.0× |         — |
+| Poisson Regression    |        7–8× |   0.9–1.0× |         — |
+| Linear Regression     |      25–34× |   0.2–0.3× |         — |
+| Cox Regression        |      20–34× |   0.2–0.4× |         — |
+| Mixed-Effects         |      16–20× |   0.5–0.6× |         — |
+| Univariable Screening |      22–41× |   1.1–2.8× |  2.8–5.5× |
+| Complete Workflow     |       8–21× |   0.1–0.5× |         — |
 
-Ratios less than 1 indicate cases where the comparison package is faster
-than `summata`. These occur primarily for simple coefficient extraction
-from linear and Cox models, where `finalfit` and `broom` apply less
-formatting overhead.
+Ratios relative to `summata_minimal` (Wald CIs):
+
+| Benchmark             | `gtsummary` | `finalfit` | `summata` (default) |
+|:----------------------|------------:|-----------:|--------------------:|
+| Logistic Regression   |      58–74× |      8–35× |              10–34× |
+| Poisson Regression    |      55–63× |      7–30× |               8–29× |
+| Linear Regression     |      32–59× |       0.3× |            1.3–1.7× |
+| Cox Regression        |      31–68× |   0.4–0.6× |            1.5–2.0× |
+| Mixed-Effects         |      23–33× |   0.8–0.9× |            1.5–1.7× |
+| Univariable Screening |     71–111× |   3.1–9.0× |            2.6–3.2× |
+| Complete Workflow     |      57–78× |   1.1–1.7× |            3.7–7.5× |
+
+For GLM models (logistic and Poisson), `summata_minimal` outperforms all
+alternatives by a wide margin: 8–35× faster than `finalfit`, 7–30×
+faster than `broom`. This is because `summata_minimal` is the only
+configuration that uses Wald CIs — `finalfit`, `broom`, and the default
+`summata` all use profile likelihood CIs, which accounts for their
+comparable timings.
+
+For linear, Cox, and mixed-effects models, where all packages use the
+same CI method (exact *t*-distribution for lm, Wald for Cox and
+mixed-effects), the timing gap between `summata` and `summata_minimal`
+is narrow (1.3–2.0×) and reflects formatting overhead only.
 
 ------------------------------------------------------------------------
 
@@ -338,12 +394,15 @@ time at *n* = 1,000):
 | Operation             | Scaling Factor | Expected for *O*(*n*) |
 |:----------------------|---------------:|----------------------:|
 | Descriptive tables    |           1.7× |                   10× |
-| Logistic regression   |           1.9× |                   10× |
-| Univariable screening |           1.3× |                   10× |
+| Logistic regression   |           6.5× |                   10× |
+| Univariable screening |           1.8× |                   10× |
 
 The sublinear scaling reflects that fixed overhead (package loading,
-object construction) constitutes a significant fraction of total time at
-smaller dataset sizes.
+object construction, profile likelihood profiling) constitutes a
+significant fraction of total time at smaller dataset sizes. Logistic
+regression shows nearer-to-linear scaling because profile likelihood
+profiling cost scales with the number of IRLS iterations, which grows
+with *n*.
 
 ------------------------------------------------------------------------
 
@@ -353,52 +412,82 @@ The performance characteristics documented here reflect specific
 implementation choices:
 
 **summata**: Built on `data.table` for data manipulation, with
-coefficient extraction optimized for common model classes. Formatting is
-applied during extraction rather than as a separate step.
+coefficient extraction optimized for common model classes. Default
+configuration uses profile likelihood CIs for GLM/negbin models
+(matching `finalfit` and `broom`). The `conf_method = "wald"` option
+skips profiling entirely, producing a configuration faster than any
+alternative tested.
 
 **gtsummary**: Prioritizes output flexibility through the `gt` table
 framework. The additional abstraction layers enable extensive
 customization but increase computational overhead.
 
 **finalfit**: Balances functionality and performance with a
-tidyverse-compatible interface. The `finalfit()` function is
-particularly optimized for the combined workflow.
+tidyverse-compatible interface. Uses profile likelihood CIs by default
+for GLM models (`confint_type = "profile"`). The `finalfit()` function
+is particularly optimized for the combined workflow.
 
 **arsenal**: Uses formula-based syntax familiar to SAS users.
 Performance varies by operation type.
 
 **broom**: Provides minimal coefficient extraction with limited
-formatting. Suitable as a building block for custom pipelines.
+formatting. Uses profile likelihood CIs for GLM models via
+[`stats::confint()`](https://rdrr.io/r/stats/confint.html) dispatch.
+Suitable as a building block for custom pipelines.
 
 ------------------------------------------------------------------------
 
 ## Effect of Output Options
 
-By default, `summata` functions compute sample sizes, event counts, and
-reference rows for categorical variables. These features add
-computational overhead but produce more complete output for publication.
-For performance-sensitive applications, these options can be disabled.
+By default, `summata` regression functions compute profile likelihood
+confidence intervals (for GLM and negative binomial models), sample
+sizes, event counts, QC statistics, and reference rows for categorical
+variables. These features produce more complete and accurate output for
+publication but add computational overhead. For performance-sensitive
+applications, these options can be disabled.
 
-The `summata_minimal` configuration shown in the benchmarks generally
-represents:
+The `summata_minimal` configuration shown in the benchmarks represents:
 
 ``` r
 fit(data, outcome, predictors, 
+    conf_method = "wald",
     show_n = FALSE, 
     show_events = FALSE, 
-    reference_rows = FALSE)
+    reference_rows = FALSE,
+    keep_qc_stats = FALSE)
 ```
 
-This configuration reduces execution time by approximately 25–40%
-compared to default settings, producing output more comparable to
-`broom` and `finalfit`. The choice between configurations depends on the
-use-case:
+The `conf_method` parameter can also be set globally for an entire
+session:
 
-- **Publication tables**: Default settings provide complete output ready
-  for manuscripts
-- **Simulation studies**: Minimal settings reduce per-iteration overhead
-- **Exploratory analysis**: Either setting is appropriate depending on
-  information needs
+``` r
+options(summata.conf_method = "wald")
+```
+
+The impact of each option varies by model type:
+
+| Option | GLM/negbin models | Linear/Cox/mixed models |
+|:---|:---|:---|
+| `conf_method = "wald"` | Large effect (eliminates profile likelihood profiling) | Minimal effect (Wald already used for Cox/mixed; exact *t* is fast for lm) |
+| `keep_qc_stats = FALSE` | Moderate effect (skips C-statistic, Hosmer-Lemeshow) | Small effect |
+| `show_n/show_events = FALSE` | Small effect | Small effect |
+| `reference_rows = FALSE` | Small effect | Small effect |
+
+For logistic and Poisson models at *n* = 1,000, the minimal
+configuration is approximately 10× faster than the default (22 ms
+vs. 234 ms for logistic), with the majority of the difference
+attributable to `conf_method`. For linear and Cox models, the difference
+is roughly 1.5–2×, reflecting formatting overhead only.
+
+The choice between configurations depends on the use case:
+
+- **Publication tables**: Default settings provide profile likelihood
+  CIs and complete output ready for manuscripts
+- **Simulation studies**: `conf_method = "wald"` reduces per-iteration
+  overhead substantially for GLM models
+- **Exploratory analysis**: Either setting is appropriate;
+  `conf_method = "wald"` is recommended when iterating through many
+  model specifications
 
 ------------------------------------------------------------------------
 
@@ -430,7 +519,8 @@ The benchmark script is available in the package repository at
 `inst/benchmarks/benchmarks.R`. Execution produces:
 
 - Individual PNG figures for each benchmark category
-- Summary figures (`benchmark_speedup.png`)
+- Summary figures (`benchmark_speedup.png`,
+  `benchmark_speedup_minimal.png`)
 - CSV files with detailed timing data
 
 Results will vary across systems due to differences in hardware, R

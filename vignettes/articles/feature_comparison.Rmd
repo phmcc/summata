@@ -54,9 +54,9 @@ features <- data.frame(
   gtsummary = c("Yes", "Yes", "Yes", "Yes", "No", "Yes", "Yes", "Yes", "Partial", "Partial", "Yes", "Yes", "Yes"),
   finalfit = c("Yes", "Yes", "Yes", "Yes", "No", "Partial", "Partial", "Yes", "Partial", "Yes", "Partial", "Yes", "Yes"),
   arsenal = c("Yes", "Yes", "Yes", "Yes", "No", "No", "No", "Yes", "Partial", "No", "No", "Yes", "Yes"),
-  stargazer = c("Yes", "No", "No", "Yes", "No", "Yes", "Partial", "Yes", "No", "No", "No", "Yes", "No"),
+  stargazer = c("Yes", "No", "No", "Yes", "No", "Yes", "Partial", "Yes", "No", "No", "No", "Yes", "Partial"),
   tableone = c("Yes", "Yes", "No", "No", "No", "No", "No", "No", "No", "No", "No", "Partial", "Yes"),
-  compareGroups = c("Yes", "Yes", "Yes", "Yes", "No", "No", "No", "Yes", "No", "No", "No", "Yes", "Yes"),
+  compareGroups = c("Yes", "Yes", "Yes", "No", "No", "No", "No", "Yes", "No", "No", "No", "Yes", "Yes"),
   stringsAsFactors = FALSE
 )
 
@@ -154,7 +154,7 @@ multiforest(multi_result)
 
 ## Performance Optimization
 
-Built on `data.table` for computational efficiency, `summata` demonstrates 35–54% faster execution than comparable workflows in other packages with a smaller dependency footprint. See the [Benchmarks](benchmarks.html) article for detailed comparisons.
+Built on `data.table` for computational efficiency, `summata` provides competitive performance across all benchmarked workflows. With `conf_method = "wald"`, it is the fastest option tested for GLM-based regression tables and univariable screening. With the default profile likelihood CIs, performance is comparable to other packages that use the same CI method (`finalfit`, `broom`). See the [Benchmarks](benchmarks.html) article for detailed comparisons.
 
 ## Unified API
 

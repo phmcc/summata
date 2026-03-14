@@ -458,37 +458,37 @@ detailed <- compfit(
 # Access coefficient table
 coef_table <- attr(detailed, "coefficients")
 coef_table
-#>        Model                Variable   Group      n Events           aOR (95% CI) p-value
-#>       <char>                  <char>  <char> <char> <char>                 <char>  <char>
-#>  1:     base             Age (years)       -    850    609       1.05 (1.03-1.06) < 0.001
-#>  2:     base                     Sex  Female    450    298              reference       -
-#>  3:     base                            Male    400    311       1.86 (1.36-2.55) < 0.001
-#>  4: clinical             Age (years)       -    833    594       1.05 (1.03-1.06) < 0.001
-#>  5: clinical                     Sex  Female    443    292              reference       -
-#>  6: clinical                            Male    390    302       1.83 (1.33-2.52) < 0.001
-#>  7: clinical          Smoking Status   Never    337    248              reference       -
-#>  8: clinical                          Former    311    203       0.74 (0.52-1.05)   0.089
-#>  9: clinical                         Current    185    143       1.38 (0.89-2.13)   0.151
-#> 10: clinical                Diabetes      No    636    456              reference       -
-#> 11: clinical                             Yes    197    138       0.99 (0.69-1.43)   0.974
-#> 12:     full             Age (years)       -    833    594       1.06 (1.04-1.07) < 0.001
-#> 13:     full                     Sex  Female    443    292              reference       -
-#> 14:     full                            Male    390    302       2.00 (1.42-2.83) < 0.001
-#> 15:     full          Smoking Status   Never    337    248              reference       -
-#> 16:     full                          Former    311    203       0.72 (0.49-1.05)   0.089
-#> 17:     full                         Current    185    143       1.32 (0.83-2.10)   0.244
-#> 18:     full                Diabetes      No    636    456              reference       -
-#> 19:     full                             Yes    197    138       0.93 (0.62-1.39)   0.719
-#> 20:     full           Disease Stage       I    207    125              reference       -
-#> 21:     full                              II    261    170       1.32 (0.87-2.01)   0.197
-#> 22:     full                             III    237    182       2.66 (1.69-4.18) < 0.001
-#> 23:     full                              IV    128    117      9.69 (4.75-19.77) < 0.001
-#> 24:     full ECOG Performance Status       0    263    158              reference       -
-#> 25:     full                               1    298    208       1.70 (1.15-2.50)   0.007
-#> 26:     full                               2    235    191       3.35 (2.13-5.25) < 0.001
-#> 27:     full                               3     37     37 36022880.19 (0.00-Inf)   0.977
-#>        Model                Variable   Group      n Events           aOR (95% CI) p-value
-#>       <char>                  <char>  <char> <char> <char>                 <char>  <char>
+#>        Model                Variable   Group      n Events                                                                                                    aOR (95% CI) p-value
+#>       <char>                  <char>  <char> <char> <char>                                                                                                          <char>  <char>
+#>  1:     base             Age (years)       -    850    609                                                                                                1.05 (1.04-1.06) < 0.001
+#>  2:     base                     Sex  Female    450    298                                                                                                       reference       -
+#>  3:     base                            Male    400    311                                                                                                1.86 (1.36-2.56) < 0.001
+#>  4: clinical             Age (years)       -    833    594                                                                                                1.05 (1.03-1.06) < 0.001
+#>  5: clinical                     Sex  Female    443    292                                                                                                       reference       -
+#>  6: clinical                            Male    390    302                                                                                                1.83 (1.33-2.53) < 0.001
+#>  7: clinical          Smoking Status   Never    337    248                                                                                                       reference       -
+#>  8: clinical                          Former    311    203                                                                                                0.74 (0.52-1.05)   0.089
+#>  9: clinical                         Current    185    143                                                                                                1.38 (0.89-2.14)   0.151
+#> 10: clinical                Diabetes      No    636    456                                                                                                       reference       -
+#> 11: clinical                             Yes    197    138                                                                                                0.99 (0.69-1.44)   0.974
+#> 12:     full             Age (years)       -    833    594                                                                                                1.06 (1.04-1.07) < 0.001
+#> 13:     full                     Sex  Female    443    292                                                                                                       reference       -
+#> 14:     full                            Male    390    302                                                                                                2.00 (1.42-2.84) < 0.001
+#> 15:     full          Smoking Status   Never    337    248                                                                                                       reference       -
+#> 16:     full                          Former    311    203                                                                                                0.72 (0.49-1.05)   0.089
+#> 17:     full                         Current    185    143                                                                                                1.32 (0.83-2.11)   0.244
+#> 18:     full                Diabetes      No    636    456                                                                                                       reference       -
+#> 19:     full                             Yes    197    138                                                                                                0.93 (0.63-1.39)   0.719
+#> 20:     full           Disease Stage       I    207    125                                                                                                       reference       -
+#> 21:     full                              II    261    170                                                                                                1.32 (0.87-2.01)   0.197
+#> 22:     full                             III    237    182                                                                                                2.66 (1.70-4.20) < 0.001
+#> 23:     full                              IV    128    117                                                                                               9.69 (4.93-20.72) < 0.001
+#> 24:     full ECOG Performance Status       0    263    158                                                                                                       reference       -
+#> 25:     full                               1    298    208                                                                                                1.70 (1.15-2.51)   0.007
+#> 26:     full                               2    235    191                                                                                                3.35 (2.15-5.30) < 0.001
+#> 27:     full                               3     37     37 36022880.19 (0.00-23119118697429391683100875173163642152512738051347358308592830067904386018411451647000576.00)   0.977
+#>        Model                Variable   Group      n Events                                                                                                    aOR (95% CI) p-value
+#>       <char>                  <char>  <char> <char> <char>                                                                                                          <char>  <char>
 
 # Example 5: Access fitted model objects
 fitted_models <- attr(comparison, "models")

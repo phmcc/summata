@@ -88,7 +88,9 @@
 #'   \strong{Positive continuous outcomes:}
 #'   \itemize{
 #'     \item \code{"Gamma"} or \code{Gamma()} - Gamma distribution for positive, 
-#'       right-skewed continuous data (\emph{e.g.,} costs, lengths of stay). Default log link.
+#'       right-skewed continuous data (\emph{e.g.,} costs, lengths of stay). When
+#'       passed as a string, resolves to log link for interpretable multiplicative
+#'       effects.
 #'     \item \code{Gamma(link = "inverse")} - Gamma with inverse (canonical) link.
 #'     \item \code{Gamma(link = "identity")} - Gamma with identity link for additive 
 #'       effects on positive outcomes.
@@ -145,6 +147,21 @@
 #'   automatically exponentiates for logistic, Poisson, and Cox models, and 
 #'   displays raw coefficients for linear models and other GLM families. Set 
 #'   to \code{TRUE} to force exponentiation or \code{FALSE} to force coefficients.
+#'
+#' @param conf_method Character string controlling the confidence interval method.
+#'   If \code{NULL} (default), uses \code{getOption("summata.conf_method", "profile")}.
+#'   \itemize{
+#'     \item \code{"profile"} - Profile likelihood intervals for GLM and negative
+#'       binomial models (via \code{MASS::confint.glm()}), exact \emph{t}-distribution
+#'       intervals for linear models. Falls back to Wald on profiling failure.
+#'       Quasi-likelihood families always use Wald (no true likelihood).
+#'     \item \code{"wald"} - Wald intervals (coefficient \eqn{\pm} \emph{z}
+#'       \eqn{\times} SE) for all model types. Faster but less accurate near
+#'       boundary conditions or with small subgroups.
+#'   }
+#'   Cox and mixed-effects models use Wald intervals regardless of this setting.
+#'   Set globally with \code{options(summata.conf_method = "wald")} to use Wald
+#'   throughout a session.
 #'
 #' @param parallel Logical. If \code{TRUE} (default), fits models in parallel 
 #'   using multiple CPU cores for improved performance with many predictors. 
@@ -634,6 +651,7 @@ uniscreen <- function(data,
                       labels = NULL,
                       keep_models = FALSE,
                       exponentiate = NULL,
+                      conf_method = NULL,
                       parallel = TRUE,
                       n_cores = NULL,
                       number_format = NULL,
@@ -667,6 +685,12 @@ uniscreen <- function(data,
         model_type <- validation$model_type
     }
     
+    ## Resolve Gamma family string to log link (see fit.R for rationale)
+    if (model_type %in% c("glm", "glmer") && is.character(family) &&
+        tolower(family) == "gamma") {
+        family <- stats::Gamma(link = "log")
+    }
+
     ## Validate random effects for mixed-effects models
     ## Support both explicit 'random' parameter AND random effects embedded in predictors
     mixed_types <- c("glmer", "lmer", "coxme")
@@ -776,9 +800,10 @@ uniscreen <- function(data,
             keep_qc_stats = FALSE,
             include_intercept = FALSE,
             reference_rows = reference_rows,
-            skip_counts = (!show_n && !show_events)
+            skip_counts = (!show_n && !show_events),
+            conf_method = conf_method
         )
-        
+
         ## Add predictor name for tracking
         raw_result[, predictor := pred]
         
@@ -820,7 +845,8 @@ uniscreen <- function(data,
                                     varlist = c("fit_one_predictor", "data", "outcome", 
                                                 "model_type", "family", "random", 
                                                 "conf_level", "reference_rows", 
-                                                "keep_models", "show_n", "show_events"),
+                                                "keep_models", "show_n", "show_events",
+                                                "conf_method"),
                                     envir = environment()
                                     )
             

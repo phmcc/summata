@@ -404,54 +404,54 @@ if (requireNamespace("flextable", quietly = TRUE) &&
     requireNamespace("officer", quietly = TRUE)) {
   table2docx(results, file.path(tempdir(), "results.docx"))
 }
-#> Table exported to /tmp/Rtmp9Tmfn9/results.docx
+#> Table exported to /tmp/RtmpQw4LQZ/results.docx
 
 # \donttest{
 old_width <- options(width = 180)
 # Example 2: With caption
 table2docx(results, file.path(tempdir(), "captioned.docx"),
         caption = "Table 1: Multivariable Logistic Regression Results")
-#> Table exported to /tmp/Rtmp9Tmfn9/captioned.docx
+#> Table exported to /tmp/RtmpQw4LQZ/captioned.docx
 
 # Example 3: Landscape orientation for wide tables
 table2docx(results, file.path(tempdir(), "wide.docx"),
         orientation = "landscape")
-#> Table exported to /tmp/Rtmp9Tmfn9/wide.docx
+#> Table exported to /tmp/RtmpQw4LQZ/wide.docx
 
 # Example 4: Custom font and size
 table2docx(results, file.path(tempdir(), "custom_font.docx"),
         font_family = "Times New Roman",
         font_size = 11)
-#> Table exported to /tmp/Rtmp9Tmfn9/custom_font.docx
+#> Table exported to /tmp/RtmpQw4LQZ/custom_font.docx
 
 # Example 5: Hierarchical display
 table2docx(results, file.path(tempdir(), "indented.docx"),
         indent_groups = TRUE)
-#> Table exported to /tmp/Rtmp9Tmfn9/indented.docx
+#> Table exported to /tmp/RtmpQw4LQZ/indented.docx
 
 # Example 6: Condensed table
 table2docx(results, file.path(tempdir(), "condensed.docx"),
         condense_table = TRUE)
-#> Table exported to /tmp/Rtmp9Tmfn9/condensed.docx
+#> Table exported to /tmp/RtmpQw4LQZ/condensed.docx
 
 # Example 7: With zebra stripes
 table2docx(results, file.path(tempdir(), "striped.docx"),
         zebra_stripes = TRUE)
-#> Table exported to /tmp/Rtmp9Tmfn9/striped.docx
+#> Table exported to /tmp/RtmpQw4LQZ/striped.docx
 
 # Example 8: Dark header style
 table2docx(results, file.path(tempdir(), "dark.docx"),
         dark_header = TRUE)
-#> Table exported to /tmp/Rtmp9Tmfn9/dark.docx
+#> Table exported to /tmp/RtmpQw4LQZ/dark.docx
 
 # Example 9: A4 paper for international journals
 table2docx(results, file.path(tempdir(), "a4.docx"),
         paper = "a4")
-#> Table exported to /tmp/Rtmp9Tmfn9/a4.docx
+#> Table exported to /tmp/RtmpQw4LQZ/a4.docx
 
 # Example 10: Get flextable for customization
 result <- table2docx(results, file.path(tempdir(), "base.docx"))
-#> Table exported to /tmp/Rtmp9Tmfn9/base.docx
+#> Table exported to /tmp/RtmpQw4LQZ/base.docx
 ft <- attr(result, "flextable")
 
 # Customize the flextable
@@ -460,7 +460,7 @@ ft <- flextable::color(ft, j = "p-value", color = "blue")
 
 # Example 11: Direct flextable return
 ft <- table2docx(results, file.path(tempdir(), "direct.docx"), return_ft = TRUE)
-#> Table exported to /tmp/Rtmp9Tmfn9/direct.docx
+#> Table exported to /tmp/RtmpQw4LQZ/direct.docx
 ft <- flextable::bg(ft, bg = "yellow", part = "header")
 
 # Example 12: Publication-ready table
@@ -471,23 +471,23 @@ table2docx(results, file.path(tempdir(), "publication.docx"),
         indent_groups = TRUE,
         zebra_stripes = FALSE,
         bold_significant = TRUE)
-#> Table exported to /tmp/Rtmp9Tmfn9/publication.docx
+#> Table exported to /tmp/RtmpQw4LQZ/publication.docx
 
 # Example 13: Custom column alignment
 table2docx(results, file.path(tempdir(), "aligned.docx"),
         align = c("left", "left", "center", "right", "right"))
-#> Table exported to /tmp/Rtmp9Tmfn9/aligned.docx
+#> Table exported to /tmp/RtmpQw4LQZ/aligned.docx
 
 # Example 14: Disable significance bolding
 table2docx(results, file.path(tempdir(), "no_bold.docx"),
         bold_significant = FALSE)
-#> Table exported to /tmp/Rtmp9Tmfn9/no_bold.docx
+#> Table exported to /tmp/RtmpQw4LQZ/no_bold.docx
 
 # Example 15: Stricter significance threshold
 table2docx(results, file.path(tempdir(), "strict.docx"),
         bold_significant = TRUE,
         p_threshold = 0.01)
-#> Table exported to /tmp/Rtmp9Tmfn9/strict.docx
+#> Table exported to /tmp/RtmpQw4LQZ/strict.docx
 
 options(old_width)
 # }

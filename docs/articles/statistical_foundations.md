@@ -39,7 +39,9 @@ Tests H₀: *β* = 0 using:
 
 \\z = \frac{\hat{\beta}}{\text{SE}(\hat{\beta})}\\
 
-Under H₀, *z* ~ N(0, 1).
+Under H₀, *z* ~ N(0, 1) for GLM and Cox models. For linear models, the
+analogous statistic follows a *t*-distribution with *n* − *p* − 1
+degrees of freedom.
 
 ### Likelihood Ratio Test
 
@@ -67,21 +69,77 @@ For coefficient *β* with standard error SE(*β*):
 
 \\\beta \pm z\_{1-\alpha/2} \cdot \text{SE}(\beta)\\
 
-where *z*₁₋α/₂ is the standard normal quantile (1.96 for 95% CI).
+where *z*₁₋α/₂ is the standard normal quantile (1.96 for 95% CI). Wald
+intervals are computationally inexpensive but may be inaccurate when the
+likelihood surface is asymmetric, which can occur with small samples,
+sparse data, or estimates near boundary values.
+
+### Exact *t*-Distribution Intervals
+
+For linear models, confidence intervals use the *t*-distribution to
+account for estimation of the residual variance:
+
+\\\beta \pm t\_{n-p-1, \\ 1-\alpha/2} \cdot \text{SE}(\beta)\\
+
+where *t*ₙ₋ₚ₋₁ is the *t*-quantile with *n* − *p* − 1 degrees of
+freedom. This produces wider intervals than the normal approximation,
+particularly when *n* is small relative to *p*.
 
 ### Profile Likelihood Intervals
 
-More accurate for small samples or boundary estimates; based on the
-likelihood ratio:
+Profile likelihood intervals are based on inverting the likelihood ratio
+test. The confidence set for *β* is defined as:
 
 \\\\\beta : 2\[\log L(\hat{\beta}) - \log L(\beta)\] \leq
 \chi^2\_{1,1-\alpha}\\\\
 
+Profile intervals are more accurate than Wald intervals for small
+samples or boundary estimates, because they respect the curvature of the
+likelihood surface rather than approximating it as quadratic. However,
+they require iterative computation (refitting the model for each
+parameter), which increases execution time.
+
 ### Confidence Intervals for Effect Measures
 
-For exponentiated coefficients (OR, HR, RR):
+For exponentiated coefficients (OR, HR, RR), the CI is obtained by
+exponentiating the interval endpoints from the coefficient scale:
 
-\\\exp\left(\beta \pm z\_{1-\alpha/2} \cdot \text{SE}(\beta)\right)\\
+\\\left(\exp(\text{CI}\_{\text{lower}}), \\
+\exp(\text{CI}\_{\text{upper}})\right)\\
+
+where CI_lower and CI_upper are the confidence limits for *β* on the log
+scale, computed using whichever method (Wald, exact *t*, or profile
+likelihood) is appropriate for the model class. Note that exponentiation
+preserves coverage probability because exp(·) is a monotone
+transformation.
+
+### Implementation
+
+The CI method is selected automatically based on model class, and can be
+overridden via the `conf_method` parameter:
+
+| Model Class | Default (`conf_method = "profile"`) | With `conf_method = "wald"` |
+|:---|:---|:---|
+| GLM (binomial, poisson) | Profile likelihood via [`MASS::confint.glm()`](https://rdrr.io/pkg/MASS/man/confint.html) | Wald (normal approximation) |
+| Negative binomial | Profile likelihood via [`MASS::confint.glm()`](https://rdrr.io/pkg/MASS/man/confint.html) | Wald (normal approximation) |
+| Quasi-likelihood (quasibinomial, quasipoisson) | Wald (no true likelihood) | Wald (no true likelihood) |
+| Linear model (`lm`) | Exact *t*-distribution via [`confint.lm()`](https://rdrr.io/r/stats/confint.html) | Wald (normal approximation) |
+| Cox PH (`coxph`) | Wald | Wald |
+| Mixed-effects (`lmer`, `glmer`, `coxme`) | Wald | Wald |
+
+Cox and mixed-effects models use Wald intervals regardless of the
+`conf_method` setting. For Cox models, Wald CIs are the standard
+convention in the survival analysis literature. For mixed-effects
+models, profile likelihood CIs are available in principle (via
+`lme4::confint.merMod(method = "profile")`), but are prohibitively slow
+for routine use and are not implemented in `summata`.
+
+The `conf_method` can be set globally for a session:
+
+``` r
+options(summata.conf_method = "profile")  # Profile/exact-t (default)
+options(summata.conf_method = "wald")  # Wald CIs throughout
+```
 
 ------------------------------------------------------------------------
 
@@ -139,6 +197,12 @@ p - 1}\\
 
 **Root mean squared error (RMSE):** \\\text{RMSE} =
 \sqrt{\frac{1}{n}\sum_i (Y_i - \hat{Y}\_i)^2}\\
+
+Note: this is the descriptive (biased) RMSE. The unbiased estimate of
+the residual standard deviation σ uses *n* − *p* − 1 in the denominator
+and is reported by
+[`summary.lm()`](https://rdrr.io/r/stats/summary.lm.html) as the
+“residual standard error.”
 
 ### Implementation
 
@@ -286,8 +350,12 @@ models:
 
 \\Y_i \sim \text{Gamma}(\mu_i, \phi)\\
 
-With log link (default): \\\log(E\[Y_i \| X_i\]) = \beta_0 + \beta_1
-X\_{i1} + \cdots + \beta_p X\_{ip}\\
+The canonical link for the Gamma family is the inverse (1/μ). In
+practice, the log link is often preferred because it yields more
+interpretable coefficients (multiplicative effects). When
+`family = "Gamma"` is passed as a string, `summata` defaults to the log
+link. The link can also be specified explicitly: \\\log(E\[Y_i \| X_i\])
+= \beta_0 + \beta_1 X\_{i1} + \cdots + \beta_p X\_{ip}\\
 
 #### Assumptions
 
@@ -313,7 +381,14 @@ With log link, exp(*β*ⱼ) represents the **multiplicative effect**
 #### Implementation
 
 ``` r
+# String shorthand (resolves to log link)
 fit(data, outcome = "positive_continuous", predictors, model_type = "glm", family = "Gamma")
+
+# Explicit link specification
+fit(data, outcome = "positive_continuous", predictors, model_type = "glm", family = Gamma(link = "log"))
+
+# Gamma with inverse link (canonical)
+fit(data, outcome = "positive_continuous", predictors, model_type = "glm", family = Gamma(link = "inverse"))
 ```
 
 ### Quasi-Likelihood Models
@@ -346,15 +421,15 @@ fit(data, outcome, predictors, model_type = "glm", family = "quasipoisson")
 
 ### Summary of GLM Families
 
-| Family             | Outcome Type           | Link     | Effect Measure |
-|:-------------------|:-----------------------|:---------|:---------------|
-| `binomial`         | Binary                 | logit    | Odds ratio     |
-| `quasibinomial`    | Binary (overdispersed) | logit    | Odds ratio     |
-| `poisson`          | Count                  | log      | Rate ratio     |
-| `quasipoisson`     | Count (overdispersed)  | log      | Rate ratio     |
-| `gaussian`         | Continuous             | identity | Coefficient    |
-| `Gamma`            | Positive continuous    | log      | Ratio          |
-| `inverse.gaussian` | Positive continuous    | 1/μ²     | —              |
+| Family | Outcome Type | Link | Effect Measure |
+|:---|:---|:---|:---|
+| `binomial` | Binary | logit | Odds ratio |
+| `quasibinomial` | Binary (overdispersed) | logit | Odds ratio |
+| `poisson` | Count | log | Rate ratio |
+| `quasipoisson` | Count (overdispersed) | log | Rate ratio |
+| `gaussian` | Continuous | identity | Coefficient |
+| `Gamma` | Positive continuous | inverse (canonical); log (in `summata`) | Ratio (with log link) |
+| `inverse.gaussian` | Positive continuous | 1/μ² | — |
 
 ------------------------------------------------------------------------
 
@@ -461,7 +536,7 @@ For observation *i* within cluster *j*:
 
 where:
 
-- **β** are fixed effects (population-averaged)
+- **β** are fixed effects (common across all clusters)
 - **u**ⱼ ~ N(**0**, **Σ**) are random effects (cluster-specific
   deviations)
 - **Z**ᵢⱼ is the random effects design matrix
@@ -683,10 +758,10 @@ Proportion of variance explained.
 
 #### Pseudo-R² (GLMs)
 
-**McFadden’s pseudo-R²:** \\R^2\_{\text{McF}} = 1 - \frac{\log
+**McFadden pseudo-R²:** \\R^2\_{\text{McF}} = 1 - \frac{\log
 L\_{\text{full}}}{\log L\_{\text{null}}}\\
 
-**Nagelkerke’s pseudo-R²:** \\R^2_N = \frac{1 -
+**Nagelkerke pseudo-R²:** \\R^2_N = \frac{1 -
 (L\_{\text{null}}/L\_{\text{full}})^{2/n}}{1 - L\_{\text{null}}^{2/n}}\\
 
 Values are not directly comparable to linear *R*²; 0.2–0.4 typically
@@ -845,14 +920,14 @@ comparison_custom <- compfit(
 
 ### Software
 
-- R Core Team (2024). *R: A Language and Environment for Statistical
+- R Core Team (2025). *R: A Language and Environment for Statistical
   Computing*. <https://www.R-project.org/>
-- Therneau, T. (2024). *survival: Survival Analysis*. R package.
+- Therneau, T. (2025). *survival: Survival Analysis*. R package.
   <https://CRAN.R-project.org/package=survival>
 - Bates, D., Mächler, M., Bolker, B., & Walker, S. (2015). Fitting
   linear mixed-effects models using lme4. *Journal of Statistical
   Software*, 67(1), 1–48.
-- Therneau, T. (2024). *coxme: Cox Mixed-Effects Models*. R package.
+- Therneau, T. (2025). *coxme: Cox Mixed-Effects Models*. R package.
   <https://CRAN.R-project.org/package=coxme>
 - Venables, W. N., & Ripley, B. D. (2002). *Modern Applied Statistics
   with S* (4th ed.). Springer. (MASS package)

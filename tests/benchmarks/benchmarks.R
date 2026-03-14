@@ -328,7 +328,8 @@ benchmark_logistic <- function(data, df, n_times = 10) {
                       model_type = "glm", family = "binomial"),
         summata_minimal = fit(data, outcome = "response", predictors = predictors,
                               model_type = "glm", family = "binomial",
-                              show_n = FALSE, show_events = FALSE, reference_rows = FALSE),
+                              show_n = FALSE, show_events = FALSE, reference_rows = FALSE,
+                              conf_method = "wald", keep_qc_stats = FALSE),
         finalfit = fit2df(glmmulti(df, "response", predictors), estimate_suffix = " (multivariable)"),
         gtsummary = tbl_regression(glm(response ~ age + sex + bmi + smoking + hypertension + 
                                            diabetes + treatment + stage, data = df, family = binomial), exponentiate = TRUE),
@@ -380,7 +381,8 @@ benchmark_linear <- function(data, df, n_times = 10) {
     microbenchmark(
         summata = fit(data, outcome = "los_days", predictors = predictors, model_type = "lm"),
         summata_minimal = fit(data, outcome = "los_days", predictors = predictors, model_type = "lm",
-                              show_n = FALSE, reference_rows = FALSE),
+                              show_n = FALSE, reference_rows = FALSE,
+                              conf_method = "wald", keep_qc_stats = FALSE),
         finalfit = fit2df(lmmulti(df, "los_days", predictors)),
         gtsummary = tbl_regression(lm(los_days ~ age + sex + bmi + smoking + hypertension + 
                                           diabetes + treatment + stage, data = df)),
@@ -434,7 +436,8 @@ benchmark_poisson <- function(data, df, n_times = 10) {
                       model_type = "glm", family = "poisson"),
         summata_minimal = fit(data, outcome = "event_count", predictors = predictors,
                               model_type = "glm", family = "poisson",
-                              show_n = FALSE, show_events = FALSE, reference_rows = FALSE),
+                              show_n = FALSE, show_events = FALSE, reference_rows = FALSE,
+                              conf_method = "wald", keep_qc_stats = FALSE),
         finalfit = fit2df(glm(event_count ~ age + sex + bmi + smoking + treatment + stage,
                               data = df, family = poisson)),
         gtsummary = tbl_regression(glm(event_count ~ age + sex + bmi + smoking + treatment + stage,
@@ -487,7 +490,8 @@ benchmark_cox <- function(data, df, n_times = 10) {
     microbenchmark(
         summata = fit(data, outcome = "Surv(os_time, os_status)", predictors = predictors, model_type = "coxph"),
         summata_minimal = fit(data, outcome = "Surv(os_time, os_status)", predictors = predictors, model_type = "coxph",
-                              show_n = FALSE, show_events = FALSE, reference_rows = FALSE),
+                              show_n = FALSE, show_events = FALSE, reference_rows = FALSE,
+                              conf_method = "wald", keep_qc_stats = FALSE),
         finalfit = fit2df(coxphmulti(df, "Surv(os_time, os_status)", predictors)),
         gtsummary = tbl_regression(coxph(Surv(os_time, os_status) ~ age + sex + bmi + treatment + stage,
                                          data = df), exponentiate = TRUE),
@@ -538,7 +542,8 @@ benchmark_mixed <- function(data, df, n_times = 10) {
         summata = fit(data, outcome = "los_days", predictors = c("age", "sex", "treatment", "(1|site)"),
                       model_type = "lmer"),
         summata_minimal = fit(data, outcome = "los_days", predictors = c("age", "sex", "treatment", "(1|site)"),
-                              model_type = "lmer", show_n = FALSE, show_events = FALSE, reference_rows = FALSE),
+                              model_type = "lmer", show_n = FALSE, show_events = FALSE, reference_rows = FALSE,
+                              conf_method = "wald", keep_qc_stats = FALSE),
         finalfit = fit2df(lmmixed(df, "los_days", c("age", "sex", "treatment"), "(1|site)")),
         gtsummary = tbl_regression(lmer(los_days ~ age + sex + treatment + (1|site), data = df)),
         broom = tidy(lmer(los_days ~ age + sex + treatment + (1|site), data = df), conf.int = TRUE),
@@ -591,7 +596,8 @@ benchmark_uniscreen <- function(data, df, n_times = 10) {
                             model_type = "glm", family = "binomial"),
         summata_minimal = uniscreen(data, outcome = "response", predictors = predictors,
                                     model_type = "glm", family = "binomial",
-                                    show_n = FALSE, show_events = FALSE, reference_rows = FALSE),
+                                    show_n = FALSE, show_events = FALSE, reference_rows = FALSE,
+                                    conf_method = "wald"),
         finalfit = fit2df(glmuni(df, "response", predictors), estimate_suffix = " (univariable)"),
         gtsummary = tbl_uvregression(df[, c("response", predictors)], method = glm, y = response,
                                      method.args = list(family = binomial), exponentiate = TRUE),
@@ -649,7 +655,8 @@ benchmark_workflow <- function(data, df, n_times = 10) {
                           model_type = "glm", family = "binomial", columns = "both"),
         summata_minimal = fullfit(data, outcome = "response", predictors = predictors, method = "all",
                                   model_type = "glm", family = "binomial", columns = "both",
-                                  show_n = FALSE, show_events = FALSE, reference_rows = FALSE),
+                                  show_n = FALSE, show_events = FALSE, reference_rows = FALSE,
+                                  conf_method = "wald"),
         finalfit = finalfit(df, dependent = "response", explanatory = predictors),
         gtsummary = {
             uni_table <- tbl_uvregression(df[, c("response", predictors)], method = glm, y = response,
@@ -807,6 +814,30 @@ p_speedup <- ggplot(speedup_summary, aes(x = factor(n), y = speedup, fill = expr
 save_plot("benchmark_speedup.png", p_speedup, width = 10, height = 14)
 cat("Saved: benchmark_speedup.png\n")
 
+## Speedup relative to summata_minimal (Wald CIs, no QC stats, no n/Events)
+## This shows how alternatives compare against summata's fastest configuration
+speedup_min_data <- all_benchmarks[!expr %in% c("summata", "summata_minimal")]
+summata_min_times <- all_benchmarks[expr == "summata_minimal", 
+                                    .(summata_min_time = median(time_ms)), by = .(benchmark, n)]
+speedup_min_summary <- speedup_min_data[, .(median_ms = median(time_ms)), by = .(benchmark, n, expr)]
+speedup_min_summary <- speedup_min_summary[summata_min_times, on = .(benchmark, n)]
+speedup_min_summary <- speedup_min_summary[!is.na(summata_min_time) & !is.na(median_ms)]
+speedup_min_summary[, speedup := median_ms / summata_min_time]
+
+p_speedup_min <- ggplot(speedup_min_summary, aes(x = factor(n), y = speedup, fill = expr)) +
+    geom_col(position = "dodge", alpha = 0.8) +
+    geom_hline(yintercept = 1, linetype = "dashed", color = "red", linewidth = 0.5) +
+    facet_wrap(~ benchmark, scales = "free_y", ncol = 2) +
+    scale_fill_manual(values = pkg_colors) +
+    labs(title = "Relative Performance: Time Relative to summata_minimal",
+         subtitle = "summata_minimal uses Wald CIs, no QC stats, no n/Events (red line = equal)",
+         x = "Dataset Size (n)", y = "Relative Time", fill = "Package") +
+    theme_benchmark() +
+    theme(legend.position = "bottom") +
+    guides(fill = guide_legend(nrow = 2))
+save_plot("benchmark_speedup_minimal.png", p_speedup_min, width = 10, height = 14)
+cat("Saved: benchmark_speedup_minimal.png\n")
+
 ff_comparison <- all_benchmarks[expr %in% c("summata", "finalfit"), 
                                 .(median_time = median(time_ms)), by = .(benchmark, expr, n)]
 
@@ -838,7 +869,7 @@ setorder(final_summary, benchmark, n)
 cat("Median execution time in milliseconds:\n\n")
 print(final_summary)
 
-## Exclude summata_minimal from speedup table
+## Exclude summata_minimal from summata speedup table
 speedup_for_table <- all_benchmarks[!expr %in% c("summata_minimal")]
 speedup_table <- dcast(
     speedup_for_table[, .(median_ms = median(time_ms)), by = .(benchmark, n, expr)][
@@ -850,9 +881,33 @@ setorder(speedup_table, benchmark, n)
 cat("\n\nSpeedup factors (alternative / summata, >1 means summata is faster):\n\n")
 print(speedup_table)
 
+## Speedup relative to summata_minimal
+speedup_min_for_table <- all_benchmarks[!expr %in% c("summata", "summata_minimal")]
+summata_min_for_table <- all_benchmarks[expr == "summata_minimal",
+                                        .(summata_min_time = median(time_ms)), by = .(benchmark, n)]
+speedup_min_table_data <- speedup_min_for_table[, .(median_ms = median(time_ms)), by = .(benchmark, n, expr)]
+speedup_min_table_data <- speedup_min_table_data[summata_min_for_table, on = .(benchmark, n)]
+speedup_min_table_data <- speedup_min_table_data[!is.na(summata_min_time) & !is.na(median_ms)]
+speedup_min_table_data[, speedup := round(median_ms / summata_min_time, 2)]
+
+## Also include summata (default) vs summata_minimal
+summata_vs_min <- all_benchmarks[expr == "summata",
+                                 .(median_ms = median(time_ms)), by = .(benchmark, n, expr)]
+summata_vs_min <- summata_vs_min[summata_min_for_table, on = .(benchmark, n)]
+summata_vs_min <- summata_vs_min[!is.na(summata_min_time) & !is.na(median_ms)]
+summata_vs_min[, speedup := round(median_ms / summata_min_time, 2)]
+speedup_min_table_data <- rbindlist(list(summata_vs_min, speedup_min_table_data), use.names = TRUE)
+
+speedup_min_table <- dcast(speedup_min_table_data,
+                           benchmark + n ~ expr, value.var = "speedup")
+setorder(speedup_min_table, benchmark, n)
+cat("\n\nSpeedup factors (alternative / summata_minimal, >1 means summata_minimal is faster):\n\n")
+print(speedup_min_table)
+
 fwrite(final_summary, "benchmark_summary_times.csv")
 fwrite(speedup_table, "benchmark_summary_speedup.csv")
-cat("\nSaved: benchmark_summary_times.csv, benchmark_summary_speedup.csv\n")
+fwrite(speedup_min_table, "benchmark_summary_speedup_minimal.csv")
+cat("\nSaved: benchmark_summary_times.csv, benchmark_summary_speedup.csv, benchmark_summary_speedup_minimal.csv\n")
 
 ## =============================================================================
 ## SESSION INFO
@@ -869,5 +924,7 @@ cat(" - benchmark_survtable.png\n")
 cat(" - benchmark_logistic.png\n - benchmark_linear.png\n - benchmark_poisson.png\n")
 cat(" - benchmark_cox.png\n - benchmark_mixed.png\n - benchmark_uniscreen.png\n")
 cat(" - benchmark_workflow.png\n - benchmark_forest.png\n")
-cat(" - benchmark_speedup.png\n - benchmark_summata_vs_finalfit.png\n")
+cat(" - benchmark_speedup.png\n - benchmark_speedup_minimal.png\n")
+cat(" - benchmark_summata_vs_finalfit.png\n")
 cat(" - benchmark_summary_times.csv\n - benchmark_summary_speedup.csv\n")
+cat(" - benchmark_summary_speedup_minimal.csv\n")

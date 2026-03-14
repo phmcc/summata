@@ -631,7 +631,7 @@ Received class: ", paste(class(x), collapse = ", "))
     } else {
         ## For regular GLMs (including glm.nb from MASS)
         coef_summary <- summary(model)$coefficients
-        conf_int <- stats::confint(model, level = conf_level)
+        conf_int <- get_cached_confint(model, conf_level)
         
         ## Different GLM families use different column names for test statistics:
         ## - binomial, poisson, quasibinomial, quasipoisson, negbin: "z value", "Pr(>|z|)"

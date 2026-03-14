@@ -33,6 +33,7 @@ fullfit(
   return_type = "table",
   keep_models = FALSE,
   exponentiate = NULL,
+  conf_method = NULL,
   parallel = TRUE,
   n_cores = NULL,
   number_format = NULL,
@@ -184,7 +185,8 @@ fullfit(
 
   - `"Gamma"` or [`Gamma()`](https://rdrr.io/r/stats/family.html) -
     Gamma distribution for positive, right-skewed continuous data
-    (*e.g.,* costs, lengths of stay). Default log link.
+    (*e.g.,* costs, lengths of stay). When passed as a string, resolves
+    to log link for interpretable multiplicative effects.
 
   - `Gamma(link = "inverse")` - Gamma with inverse (canonical) link.
 
@@ -283,6 +285,28 @@ fullfit(
   which automatically exponentiates for logistic, Poisson, and Cox
   models, and displays raw coefficients for linear models.
 
+- conf_method:
+
+  Character string controlling the confidence interval method. If `NULL`
+  (default), uses `getOption("summata.conf_method", "profile")`.
+
+  - `"profile"` - Profile likelihood intervals for GLM and negative
+    binomial models (via
+    [`MASS::confint.glm()`](https://rdrr.io/pkg/MASS/man/confint.html)),
+    exact *t*-distribution intervals for linear models. Falls back to
+    Wald on profiling failure. Quasi-likelihood families always use Wald
+    (no true likelihood).
+
+  - `"wald"` - Wald intervals (coefficient \\\pm\\ *z* \\\times\\ SE)
+    for all model types. Faster but less accurate near boundary
+    conditions or with small subgroups.
+
+  Cox and mixed-effects models use Wald intervals regardless of this
+  setting. Set globally with `options(summata.conf_method = "wald")` to
+  use Wald throughout a session. Note: when `method = "screen"` and
+  `columns = "multi"`, the internal screening pass always uses Wald
+  since only *p*-values are needed for variable selection.
+
 - parallel:
 
   Logical. If `TRUE` (default), fits univariable models in parallel
@@ -347,11 +371,19 @@ When `return_type = "table"` (default): A data.table with S3 class
 
 - n/n_group:
 
-  Integer. Sample sizes (if `show_n = TRUE`)
+  Integer. Sample sizes (if `show_n = TRUE`). For variables included in
+  the multivariable model, reflects the complete-case sample size from
+  the fitted model (listwise deletion across all included predictors).
+  For variables not selected into the multivariable model, reflects the
+  per-variable sample size from the univariable analysis. This follows
+  STROBE guideline item 12, which recommends reporting the number of
+  participants included at each stage of analysis.
 
 - events/events_group:
 
-  Integer. Event counts (if `show_events = TRUE`)
+  Integer. Event counts (if `show_events = TRUE`). Same complete-case
+  convention as `n`: multivariable rows show events from the fitted
+  model, univariable-only rows show per-variable counts.
 
 - OR/HR/RR/Coefficient (95% CI):
 
@@ -581,24 +613,24 @@ print(result1)
 #> 
 #>                    Variable   Group      n Events       OR (95% CI)   Uni p      aOR (95% CI) Multi p
 #>                      <char>  <char> <char> <char>            <char>  <char>            <char>  <char>
-#>  1:             Age (years)       -    850    609  1.05 (1.03-1.06) < 0.001  1.05 (1.04-1.07) < 0.001
-#>  2:                     Sex  Female    450    298         reference       -         reference       -
-#>  3:                            Male    400    311  1.78 (1.31-2.42) < 0.001  1.98 (1.41-2.77) < 0.001
+#>  1:             Age (years)       -    833    594  1.05 (1.03-1.06) < 0.001  1.05 (1.04-1.07) < 0.001
+#>  2:                     Sex  Female    443    292         reference       -         reference       -
+#>  3:                            Male    390    302  1.78 (1.31-2.43) < 0.001  1.98 (1.41-2.78) < 0.001
 #>  4: Body Mass Index (kg/m²)       -    838    599  1.01 (0.98-1.05)   0.347                 -       -
 #>  5:          Smoking Status   Never    337    248         reference       -         reference       -
 #>  6:                          Former    311    203  0.67 (0.48-0.94)   0.022  0.72 (0.50-1.05)   0.087
-#>  7:                         Current    185    143  1.22 (0.80-1.86)   0.351  1.38 (0.88-2.18)   0.162
+#>  7:                         Current    185    143  1.22 (0.81-1.87)   0.351  1.38 (0.88-2.19)   0.162
 #>  8:            Hypertension      No    504    354         reference       -                 -       -
 #>  9:                             Yes    331    242  1.15 (0.85-1.57)   0.369                 -       -
 #> 10:                Diabetes      No    637    457         reference       -                 -       -
 #> 11:                             Yes    197    138  0.92 (0.65-1.31)   0.646                 -       -
-#> 12:         Treatment Group Control    196    151         reference       -         reference       -
-#> 13:                          Drug A    292    184  0.51 (0.34-0.76)   0.001  0.44 (0.28-0.68) < 0.001
-#> 14:                          Drug B    362    274  0.93 (0.62-1.40)   0.721  0.77 (0.49-1.21)   0.251
-#> 15:           Disease Stage       I    211    127         reference       -         reference       -
-#> 16:                              II    263    172  1.25 (0.86-1.82)   0.243  1.26 (0.84-1.90)   0.263
-#> 17:                             III    241    186  2.24 (1.49-3.36) < 0.001  2.54 (1.63-3.97) < 0.001
-#> 18:                              IV    132    121 7.28 (3.70-14.30) < 0.001 8.61 (4.25-17.47) < 0.001
+#> 12:         Treatment Group Control    191    146         reference       -         reference       -
+#> 13:                          Drug A    288    181  0.51 (0.34-0.76)   0.001  0.44 (0.28-0.68) < 0.001
+#> 14:                          Drug B    354    267  0.93 (0.61-1.39)   0.721  0.77 (0.49-1.20)   0.251
+#> 15:           Disease Stage       I    207    125         reference       -         reference       -
+#> 16:                              II    261    170  1.25 (0.86-1.82)   0.243  1.26 (0.84-1.90)   0.263
+#> 17:                             III    237    182  2.24 (1.49-3.38) < 0.001  2.54 (1.64-3.99) < 0.001
+#> 18:                              IV    128    117 7.28 (3.85-15.04) < 0.001 8.61 (4.40-18.33) < 0.001
 # Shows both univariable and multivariable results
 # Only significant univariable predictors in multivariable model
 
@@ -625,16 +657,16 @@ print(result2)
 #> 
 #>            Variable   Group      n Events       OR (95% CI)   Uni p      aOR (95% CI) Multi p
 #>              <char>  <char> <char> <char>            <char>  <char>            <char>  <char>
-#>  1:     Age (years)       -    850    609  1.05 (1.03-1.06) < 0.001  1.05 (1.04-1.07) < 0.001
-#>  2:             Sex  Female    450    298         reference       -         reference       -
-#>  3:                    Male    400    311  1.78 (1.31-2.42) < 0.001  2.02 (1.45-2.82) < 0.001
-#>  4: Treatment Group Control    196    151         reference       -         reference       -
+#>  1:     Age (years)       -    847    606  1.05 (1.03-1.06) < 0.001  1.05 (1.04-1.07) < 0.001
+#>  2:             Sex  Female    449    297         reference       -         reference       -
+#>  3:                    Male    398    309  1.78 (1.31-2.43) < 0.001  2.02 (1.45-2.83) < 0.001
+#>  4: Treatment Group Control    194    149         reference       -         reference       -
 #>  5:                  Drug A    292    184  0.51 (0.34-0.76)   0.001  0.44 (0.28-0.68) < 0.001
-#>  6:                  Drug B    362    274  0.93 (0.62-1.40)   0.721  0.74 (0.48-1.16)   0.192
+#>  6:                  Drug B    361    273  0.93 (0.61-1.39)   0.721  0.74 (0.47-1.16)   0.192
 #>  7:   Disease Stage       I    211    127         reference       -         reference       -
 #>  8:                      II    263    172  1.25 (0.86-1.82)   0.243  1.32 (0.88-1.97)   0.181
-#>  9:                     III    241    186  2.24 (1.49-3.36) < 0.001  2.70 (1.74-4.19) < 0.001
-#> 10:                      IV    132    121 7.28 (3.70-14.30) < 0.001 9.08 (4.49-18.37) < 0.001
+#>  9:                     III    241    186  2.24 (1.49-3.38) < 0.001  2.70 (1.74-4.21) < 0.001
+#> 10:                      IV    132    121 7.28 (3.85-15.04) < 0.001 9.08 (4.66-19.28) < 0.001
 
 # Example 3: Custom variable selection
 result3 <- fullfit(
@@ -658,20 +690,20 @@ print(result3)
 #> 
 #>                    Variable   Group      n Events       OR (95% CI)   Uni p      aOR (95% CI) Multi p
 #>                      <char>  <char> <char> <char>            <char>  <char>            <char>  <char>
-#>  1:             Age (years)       -    850    609  1.05 (1.03-1.06) < 0.001  1.05 (1.04-1.07) < 0.001
+#>  1:             Age (years)       -    847    606  1.05 (1.03-1.06) < 0.001  1.05 (1.04-1.07) < 0.001
 #>  2:                     Sex  Female    450    298         reference       -                 -       -
-#>  3:                            Male    400    311  1.78 (1.31-2.42) < 0.001                 -       -
+#>  3:                            Male    400    311  1.78 (1.31-2.43) < 0.001                 -       -
 #>  4: Body Mass Index (kg/m²)       -    838    599  1.01 (0.98-1.05)   0.347                 -       -
 #>  5:          Smoking Status   Never    337    248         reference       -                 -       -
 #>  6:                          Former    311    203  0.67 (0.48-0.94)   0.022                 -       -
-#>  7:                         Current    185    143  1.22 (0.80-1.86)   0.351                 -       -
-#>  8:         Treatment Group Control    196    151         reference       -         reference       -
+#>  7:                         Current    185    143  1.22 (0.81-1.87)   0.351                 -       -
+#>  8:         Treatment Group Control    194    149         reference       -         reference       -
 #>  9:                          Drug A    292    184  0.51 (0.34-0.76)   0.001  0.44 (0.28-0.68) < 0.001
-#> 10:                          Drug B    362    274  0.93 (0.62-1.40)   0.721  0.78 (0.50-1.20)   0.260
+#> 10:                          Drug B    361    273  0.93 (0.61-1.39)   0.721  0.78 (0.50-1.20)   0.260
 #> 11:           Disease Stage       I    211    127         reference       -         reference       -
 #> 12:                              II    263    172  1.25 (0.86-1.82)   0.243  1.31 (0.88-1.95)   0.181
-#> 13:                             III    241    186  2.24 (1.49-3.36) < 0.001  2.56 (1.66-3.94) < 0.001
-#> 14:                              IV    132    121 7.28 (3.70-14.30) < 0.001 8.43 (4.20-16.92) < 0.001
+#> 13:                             III    241    186  2.24 (1.49-3.38) < 0.001  2.56 (1.66-3.96) < 0.001
+#> 14:                              IV    132    121 7.28 (3.85-15.04) < 0.001 8.43 (4.36-17.76) < 0.001
 # Univariable for all, multivariable for selected only
 
 # Example 4: Cox regression with screening
@@ -698,7 +730,7 @@ print(cox_result)
 #> 
 #>            Variable   Group      n Events      HR (95% CI)   Uni p     aHR (95% CI) Multi p
 #>              <char>  <char> <char> <char>           <char>  <char>           <char>  <char>
-#>  1:     Age (years)       -    850    609 1.03 (1.03-1.04) < 0.001 1.04 (1.03-1.04) < 0.001
+#>  1:     Age (years)       -    847    606 1.03 (1.03-1.04) < 0.001 1.04 (1.03-1.04) < 0.001
 #>  2:             Sex  Female    450    298        reference       -        reference       -
 #>  3:                    Male    400    311 1.30 (1.11-1.53)   0.001 1.33 (1.13-1.56) < 0.001
 #>  4: Treatment Group Control    196    151        reference       -        reference       -
@@ -731,11 +763,11 @@ print(linear_result)
 #> 
 #>                       Variable   Group      n  Coefficient (95% CI)  Uni p Adj. Coefficient (95% CI) Multi p
 #>                         <char>  <char> <char>                <char> <char>                    <char>  <char>
-#> 1:                 Age (years)       -    838 -0.02 (-0.05 to 0.01)  0.140     -0.02 (-0.05 to 0.01)   0.138
-#> 2:                         Sex  Female    450             reference      -                 reference       -
-#> 3:                                Male    400 -0.36 (-1.03 to 0.31)  0.296     -0.34 (-1.01 to 0.34)   0.328
+#> 1:                 Age (years)       -    833 -0.02 (-0.05 to 0.01)  0.140     -0.02 (-0.05 to 0.01)   0.138
+#> 2:                         Sex  Female    443             reference      -                 reference       -
+#> 3:                                Male    390 -0.36 (-1.03 to 0.31)  0.296     -0.34 (-1.01 to 0.34)   0.328
 #> 4:              Smoking Status   Never    337             reference      -                 reference       -
-#> 5:                              Former    311  0.22 (-0.54 to 0.98)  0.578      0.15 (-0.61 to 0.91)   0.697
+#> 5:                              Former    311  0.22 (-0.55 to 0.98)  0.578      0.15 (-0.61 to 0.92)   0.697
 #> 6:                             Current    185  0.31 (-0.57 to 1.20)  0.490      0.26 (-0.62 to 1.15)   0.558
 #> 7: Baseline Creatinine (mg/dL)       -    833  0.52 (-0.61 to 1.65)  0.367      0.55 (-0.58 to 1.68)   0.340
 
@@ -762,16 +794,16 @@ print(poisson_result)
 #> 
 #>               Variable   Group      n Events      RR (95% CI)   Uni p     aRR (95% CI) Multi p
 #>                 <char>  <char> <char> <char>           <char>  <char>           <char>  <char>
-#>  1:        Age (years)       -    842  5,533 1.00 (0.99-1.00)   0.005 1.00 (1.00-1.00)   0.038
-#>  2:      Disease Stage       I    211  1,238        reference       -        reference       -
-#>  3:                         II    263  1,638 1.05 (0.97-1.13)   0.201 1.05 (0.98-1.13)   0.169
-#>  4:                        III    241  1,638 1.14 (1.06-1.23) < 0.001 1.14 (1.06-1.23) < 0.001
-#>  5:                         IV    132  1,003 1.28 (1.18-1.39) < 0.001 1.33 (1.21-1.45) < 0.001
-#>  6:    Treatment Group Control    196  1,180        reference       -        reference       -
-#>  7:                     Drug A    292  1,910 1.08 (1.00-1.16)   0.045 1.06 (0.99-1.14)   0.101
-#>  8:                     Drug B    362  2,443 1.11 (1.04-1.19)   0.003 1.12 (1.04-1.20)   0.002
-#>  9: Surgical Resection      No    480  3,098        reference       -        reference       -
-#> 10:                        Yes    370  2,435 1.03 (0.97-1.08)   0.322 1.09 (1.03-1.16)   0.003
+#>  1:        Age (years)       -    839  5,517 1.00 (0.99-1.00)   0.005 1.00 (1.00-1.00)   0.038
+#>  2:      Disease Stage       I    207  1,238        reference       -        reference       -
+#>  3:                         II    261  1,638 1.05 (0.97-1.13)   0.201 1.05 (0.98-1.13)   0.169
+#>  4:                        III    240  1,638 1.14 (1.06-1.23) < 0.001 1.14 (1.06-1.23) < 0.001
+#>  5:                         IV    131  1,003 1.28 (1.18-1.39) < 0.001 1.33 (1.21-1.45) < 0.001
+#>  6:    Treatment Group Control    191  1,169        reference       -        reference       -
+#>  7:                     Drug A    290  1,910 1.08 (1.00-1.16)   0.045 1.06 (0.99-1.14)   0.101
+#>  8:                     Drug B    358  2,438 1.11 (1.04-1.19)   0.003 1.12 (1.04-1.20)   0.002
+#>  9: Surgical Resection      No    476  3,091        reference       -        reference       -
+#> 10:                        Yes    363  2,426 1.03 (0.97-1.08)   0.322 1.09 (1.03-1.16)   0.003
 
 # Example 7: Show only multivariable results
 multi_only <- fullfit(
@@ -796,14 +828,14 @@ print(multi_only)
 #>              <char>  <char> <char> <char>            <char>  <char>
 #>  1:     Age (years)       -    847    606  1.05 (1.04-1.07) < 0.001
 #>  2:             Sex  Female    449    297         reference       -
-#>  3:                    Male    398    309  2.02 (1.45-2.82) < 0.001
+#>  3:                    Male    398    309  2.02 (1.45-2.83) < 0.001
 #>  4: Treatment Group Control    194    149         reference       -
 #>  5:                  Drug A    292    184  0.44 (0.28-0.68) < 0.001
-#>  6:                  Drug B    361    273  0.74 (0.48-1.16)   0.192
+#>  6:                  Drug B    361    273  0.74 (0.47-1.16)   0.192
 #>  7:   Disease Stage       I    211    127         reference       -
 #>  8:                      II    263    172  1.32 (0.88-1.97)   0.181
-#>  9:                     III    241    186  2.70 (1.74-4.19) < 0.001
-#> 10:                      IV    132    121 9.08 (4.49-18.37) < 0.001
+#>  9:                     III    241    186  2.70 (1.74-4.21) < 0.001
+#> 10:                      IV    132    121 9.08 (4.66-19.28) < 0.001
 
 # Example 8: Return both table and model object
 both <- fullfit(
@@ -826,16 +858,16 @@ print(both$table)
 #> 
 #>      Variable   Group      n Events       OR (95% CI)   Uni p      aOR (95% CI) Multi p
 #>        <char>  <char> <char> <char>            <char>  <char>            <char>  <char>
-#>  1:       age       -    850    609  1.05 (1.03-1.06) < 0.001  1.05 (1.04-1.07) < 0.001
-#>  2:       sex  Female    450    298         reference       -         reference       -
-#>  3:              Male    400    311  1.78 (1.31-2.42) < 0.001  2.02 (1.45-2.82) < 0.001
-#>  4: treatment Control    196    151         reference       -         reference       -
+#>  1:       age       -    847    606  1.05 (1.03-1.06) < 0.001  1.05 (1.04-1.07) < 0.001
+#>  2:       sex  Female    449    297         reference       -         reference       -
+#>  3:              Male    398    309  1.78 (1.31-2.43) < 0.001  2.02 (1.45-2.83) < 0.001
+#>  4: treatment Control    194    149         reference       -         reference       -
 #>  5:            Drug A    292    184  0.51 (0.34-0.76)   0.001  0.44 (0.28-0.68) < 0.001
-#>  6:            Drug B    362    274  0.93 (0.62-1.40)   0.721  0.74 (0.48-1.16)   0.192
+#>  6:            Drug B    361    273  0.93 (0.61-1.39)   0.721  0.74 (0.47-1.16)   0.192
 #>  7:     stage       I    211    127         reference       -         reference       -
 #>  8:                II    263    172  1.25 (0.86-1.82)   0.243  1.32 (0.88-1.97)   0.181
-#>  9:               III    241    186  2.24 (1.49-3.36) < 0.001  2.70 (1.74-4.19) < 0.001
-#> 10:                IV    132    121 7.28 (3.70-14.30) < 0.001 9.08 (4.49-18.37) < 0.001
+#>  9:               III    241    186  2.24 (1.49-3.38) < 0.001  2.70 (1.74-4.21) < 0.001
+#> 10:                IV    132    121 7.28 (3.85-15.04) < 0.001 9.08 (4.66-19.28) < 0.001
 summary(both$model)
 #> 
 #> Call:
@@ -922,12 +954,12 @@ if (requireNamespace("lme4", quietly = TRUE)) {
 #> 
 #>               Variable   Group      n  Coefficient (95% CI)   Uni p Adj. Coefficient (95% CI) Multi p
 #>                 <char>  <char> <char>                <char>  <char>                    <char>  <char>
-#>  1:        Age (years)       -    830   0.14 (0.11 to 0.16) < 0.001       0.16 (0.14 to 0.19) < 0.001
-#>  2:    Treatment Group Control    192             reference       -                 reference       -
+#>  1:        Age (years)       -    827   0.14 (0.11 to 0.16) < 0.001       0.16 (0.14 to 0.19) < 0.001
+#>  2:    Treatment Group Control    190             reference       -                 reference       -
 #>  3:                     Drug A    288 -0.74 (-1.55 to 0.07)   0.074    -1.37 (-2.07 to -0.68) < 0.001
-#>  4:                     Drug B    350   2.90 (2.12 to 3.68) < 0.001       2.95 (2.27 to 3.63) < 0.001
-#>  5: Surgical Resection      No    460             reference       -                 reference       -
-#>  6:                        Yes    370  0.62 (-0.03 to 1.28)   0.060       3.28 (2.70 to 3.85) < 0.001
+#>  4:                     Drug B    349   2.90 (2.12 to 3.68) < 0.001       2.95 (2.27 to 3.63) < 0.001
+#>  5: Surgical Resection      No    459             reference       -                 reference       -
+#>  6:                        Yes    368  0.62 (-0.03 to 1.28)   0.060       3.28 (2.70 to 3.85) < 0.001
 #>  7:      Disease Stage       I    207             reference       -                 reference       -
 #>  8:                         II    259   1.30 (0.46 to 2.15)   0.003       1.50 (0.81 to 2.19) < 0.001
 #>  9:                        III    235   2.68 (1.82 to 3.54) < 0.001       3.00 (2.28 to 3.72) < 0.001

@@ -219,7 +219,6 @@ glm_model <- glm(surgery ~ age + sex + bmi + smoking,
 
 # Example 1: Logistic regression model
 p <- autoforest(glm_model, data = clintrial)
-#> Waiting for profiling to be done...
 #> Recommended plot dimensions: width = 13.3 in, height = 5.0 in
 # Automatically detects GLM and routes to glmforest()
 
@@ -260,7 +259,6 @@ fit_result <- fit(
 )
 
 plot5 <- autoforest(fit_result)
-#> Waiting for profiling to be done...
 #> Recommended plot dimensions: width = 13.5 in, height = 5.0 in
 # No need to pass data or labels - extracted from fit_result
 

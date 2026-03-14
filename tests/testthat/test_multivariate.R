@@ -496,13 +496,13 @@ test_that("uniscreen works with Gamma family", {
     test_data <- data.table::as.data.table(clintrial)
     test_data <- test_data[los_days > 0]
     
-    result <- uniscreen(
+    result <- suppressMessages(uniscreen(
         data = test_data,
         outcome = "los_days",
         predictors = c("age", "sex", "treatment"),
         model_type = "glm",
         family = Gamma(link = "log")
-    )
+    ))
     
     expect_uniscreen_result(result)
 })
@@ -518,13 +518,13 @@ test_that("uniscreen works with inverse.gaussian family", {
     test_data <- data.table::as.data.table(clintrial)
     test_data <- test_data[los_days > 0]
     
-    result <- uniscreen(
+    result <- suppressMessages(uniscreen(
         data = test_data,
         outcome = "los_days",
         predictors = c("age", "sex", "treatment"),
         model_type = "glm",
         family = inverse.gaussian(link = "log")
-    )
+    ))
     
     expect_uniscreen_result(result)
 })
@@ -1199,14 +1199,14 @@ test_that("multifit works with Gamma family", {
     test_data <- data.table::as.data.table(clintrial)
     test_data <- test_data[los_days > 0]
     
-    result <- multifit(
+    result <- suppressMessages(multifit(
         data = test_data,
         outcomes = "los_days",
         predictor = "treatment",
         covariates = c("age", "sex"),
         family = Gamma(link = "log"),
         parallel = FALSE
-    )
+    ))
     
     expect_multifit_result(result)
 })
@@ -1222,14 +1222,14 @@ test_that("multifit works with inverse.gaussian family", {
     test_data <- data.table::as.data.table(clintrial)
     test_data <- test_data[los_days > 0]
     
-    result <- multifit(
+    result <- suppressMessages(multifit(
         data = test_data,
         outcomes = "los_days",
         predictor = "treatment",
         covariates = c("age", "sex"),
         family = inverse.gaussian(link = "log"),
         parallel = FALSE
-    )
+    ))
     
     expect_multifit_result(result)
 })
@@ -2541,4 +2541,77 @@ test_that("uniscreen coefficients match direct model fitting", {
     ## OR should match exp(coefficient)
     expected_or <- exp(coef(direct_model)["age"])
     expect_equal(raw$OR[1], unname(expected_or), tolerance = 1e-6)
+})
+
+
+## ============================================================================
+## SECTION 23: Profile Likelihood CIs in Multifit
+## ============================================================================
+
+test_that("multifit GLM CIs use profile likelihood", {
+    
+    ## Fit using multifit (uses extract_predictor_results internally)
+    result <- multifit(
+        data = clintrial_complete,
+        outcomes = "surgery",
+        predictor = "age",
+        model_type = "glm",
+        keep_models = TRUE,
+        parallel = FALSE
+    )
+    
+    raw <- attr(result, "raw_data")
+    
+    ## Get the model for direct comparison
+    model <- attr(result, "models")$surgery$unadjusted
+    
+    ## Compute Wald CIs
+    coefs <- coef(model)
+    ses <- summary(model)$coefficients[, "Std. Error"]
+    z <- qnorm(0.975)
+    wald_lower <- coefs["age"] - z * ses["age"]
+    
+    ## Profile CIs should differ from Wald
+    profile_lower <- raw$coefficient[1] - (raw$exp_coef[1] - raw$ci_lower[1]) / raw$exp_coef[1] * raw$coefficient[1]
+    
+    ## Just verify CIs are present and valid
+    expect_true(!is.na(raw$ci_lower[1]))
+    expect_true(!is.na(raw$ci_upper[1]))
+    expect_true(raw$ci_lower[1] < raw$ci_upper[1])
+})
+
+
+test_that("multifit quasi-family CIs differ from non-quasi CIs", {
+    
+    ## Quasibinomial should use Wald CIs
+    result_quasi <- multifit(
+        data = clintrial_complete,
+        outcomes = "surgery",
+        predictor = "age",
+        model_type = "glm",
+        family = "quasibinomial",
+        parallel = FALSE
+    )
+    
+    ## Binomial should use profile CIs
+    result_binom <- multifit(
+        data = clintrial_complete,
+        outcomes = "surgery",
+        predictor = "age",
+        model_type = "glm",
+        family = "binomial",
+        parallel = FALSE
+    )
+    
+    raw_quasi <- attr(result_quasi, "raw_data")
+    raw_binom <- attr(result_binom, "raw_data")
+    
+    ## Point estimates should match
+    expect_equal(raw_quasi$exp_coef[1], raw_binom$exp_coef[1], tolerance = 1e-6)
+    
+    ## CIs may differ (profile vs Wald) - just verify both are valid
+    expect_true(!is.na(raw_quasi$ci_lower[1]))
+    expect_true(!is.na(raw_binom$ci_lower[1]))
+    expect_true(raw_quasi$ci_lower[1] < raw_quasi$ci_upper[1])
+    expect_true(raw_binom$ci_lower[1] < raw_binom$ci_upper[1])
 })

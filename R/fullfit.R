@@ -107,7 +107,9 @@
 #'   \strong{Positive continuous outcomes:}
 #'   \itemize{
 #'     \item \code{"Gamma"} or \code{Gamma()} - Gamma distribution for positive, 
-#'       right-skewed continuous data (\emph{e.g.,} costs, lengths of stay). Default log link.
+#'       right-skewed continuous data (\emph{e.g.,} costs, lengths of stay). When
+#'       passed as a string, resolves to log link for interpretable multiplicative
+#'       effects.
 #'     \item \code{Gamma(link = "inverse")} - Gamma with inverse (canonical) link.
 #'     \item \code{Gamma(link = "identity")} - Gamma with identity link for additive 
 #'       effects on positive outcomes.
@@ -178,6 +180,23 @@
 #'   is \code{NULL}, which automatically exponentiates for logistic, Poisson,
 #'   and Cox models, and displays raw coefficients for linear models.
 #'
+#' @param conf_method Character string controlling the confidence interval method.
+#'   If \code{NULL} (default), uses \code{getOption("summata.conf_method", "profile")}.
+#'   \itemize{
+#'     \item \code{"profile"} - Profile likelihood intervals for GLM and negative
+#'       binomial models (via \code{MASS::confint.glm()}), exact \emph{t}-distribution
+#'       intervals for linear models. Falls back to Wald on profiling failure.
+#'       Quasi-likelihood families always use Wald (no true likelihood).
+#'     \item \code{"wald"} - Wald intervals (coefficient \eqn{\pm} \emph{z}
+#'       \eqn{\times} SE) for all model types. Faster but less accurate near
+#'       boundary conditions or with small subgroups.
+#'   }
+#'   Cox and mixed-effects models use Wald intervals regardless of this setting.
+#'   Set globally with \code{options(summata.conf_method = "wald")} to use Wald
+#'   throughout a session. Note: when \code{method = "screen"} and
+#'   \code{columns = "multi"}, the internal screening pass always uses Wald
+#'   since only \emph{p}-values are needed for variable selection.
+#'
 #' @param parallel Logical. If \code{TRUE} (default), fits univariable models
 #'   in parallel using multiple CPU cores for improved performance.
 #' 
@@ -221,8 +240,18 @@
 #'   \describe{
 #'     \item{Variable}{Character. Predictor name or custom label}
 #'     \item{Group}{Character. Category level for factors, empty for continuous}
-#'     \item{n/n_group}{Integer. Sample sizes (if \code{show_n = TRUE})}
-#'     \item{events/events_group}{Integer. Event counts (if \code{show_events = TRUE})}
+#'     \item{n/n_group}{Integer. Sample sizes (if \code{show_n = TRUE}). For
+#'       variables included in the multivariable model, reflects the
+#'       complete-case sample size from the fitted model (listwise deletion
+#'       across all included predictors). For variables not selected into the
+#'       multivariable model, reflects the per-variable sample size from the
+#'       univariable analysis. This follows STROBE guideline item 12,
+#'       which recommends reporting the number of participants included at
+#'       each stage of analysis.}
+#'     \item{events/events_group}{Integer. Event counts (if \code{show_events = TRUE}).
+#'       Same complete-case convention as \code{n}: multivariable rows show
+#'       events from the fitted model, univariable-only rows show
+#'       per-variable counts.}
 #'     \item{OR/HR/RR/Coefficient (95\% CI)}{Character. Unadjusted effect 
 #'       (if \code{columns} includes "uni" and \code{metrics} includes "effect")}
 #'     \item{Uni p}{Character. Univariable \emph{p}-value (if \code{columns} includes 
@@ -499,6 +528,7 @@ fullfit <- function(data,
                     return_type = "table",
                     keep_models = FALSE,
                     exponentiate = NULL,
+                    conf_method = NULL,
                     parallel = TRUE,
                     n_cores = NULL,
                     number_format = NULL,
@@ -602,6 +632,7 @@ fullfit <- function(data,
             labels = labels,
             keep_models = keep_models,
             exponentiate = exponentiate,
+            conf_method = conf_method,
             parallel = parallel,
             n_cores = n_cores,
             number_format = number_format,
@@ -630,6 +661,7 @@ fullfit <- function(data,
                                       reference_rows = FALSE,
                                       show_n = FALSE,
                                       show_events = FALSE,
+                                      conf_method = "wald",
                                       parallel = parallel, n_cores = n_cores,
                                       number_format = number_format,
                                       verbose = verbose,
@@ -675,6 +707,7 @@ fullfit <- function(data,
                 keep_qc_stats = FALSE,  # QC stats not needed for display
                 reference_rows = reference_rows,
                 exponentiate = exponentiate,
+                conf_method = conf_method,
                 number_format = number_format,
                 verbose = verbose,
                 ...
@@ -869,6 +902,15 @@ format_fullfit_combined <- function(uni_formatted, multi_formatted,
     multi_keep <- c(".var_group", ".row_in_var")
     if ("multi_effect" %in% names(multi_copy)) multi_keep <- c(multi_keep, "multi_effect")
     if ("multi_p" %in% names(multi_copy)) multi_keep <- c(multi_keep, "multi_p")
+    ## Also pull complete-case n/Events from multivariable model
+    if (show_n && "n" %in% names(multi_copy)) {
+        data.table::setnames(multi_copy, "n", ".multi_n")
+        multi_keep <- c(multi_keep, ".multi_n")
+    }
+    if (show_events && "Events" %in% names(multi_copy)) {
+        data.table::setnames(multi_copy, "Events", ".multi_Events")
+        multi_keep <- c(multi_keep, ".multi_Events")
+    }
     
     multi_subset <- multi_copy[, intersect(multi_keep, names(multi_copy)), with = FALSE]
     
@@ -883,6 +925,23 @@ format_fullfit_combined <- function(uni_formatted, multi_formatted,
     }
     if ("multi_p" %in% names(result)) {
         result[is.na(multi_p), multi_p := "-"]
+    }
+    
+    ## Replace per-variable n/Events with complete-case values for
+    ## variables included in the multivariable model (STROBE item 12)
+    if (".multi_n" %in% names(result)) {
+        has_multi <- !is.na(result[[".multi_n"]])
+        if (any(has_multi) && "n" %in% names(result)) {
+            result[has_multi, n := .multi_n]
+        }
+        result[, .multi_n := NULL]
+    }
+    if (".multi_Events" %in% names(result)) {
+        has_multi <- !is.na(result[[".multi_Events"]])
+        if (any(has_multi) && "Events" %in% names(result)) {
+            result[has_multi, Events := .multi_Events]
+        }
+        result[, .multi_Events := NULL]
     }
     
     ## Preserve original order from uni_formatted

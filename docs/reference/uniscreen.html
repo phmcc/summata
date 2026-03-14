@@ -21,7 +21,7 @@ formatted results with optional p-value filtering."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -95,6 +95,7 @@ formatted results with optional <em>p</em>-value filtering.</p>
 <span>  labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  keep_models <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  exponentiate <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  conf_method <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  parallel <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  n_cores <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  number_format <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -171,7 +172,9 @@ Ignored for non-GLM/GLMER models.</p>
     outcomes. Returns multiplicative effects.</p></li>
 <li><p><code>gaussian(link = "inverse")</code> - Inverse link for specific applications.</p></li>
 </ul><p><strong>Positive continuous outcomes:</strong></p><ul><li><p><code>"Gamma"</code> or <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">Gamma()</a></code> - Gamma distribution for positive,
-    right-skewed continuous data (<em>e.g.,</em> costs, lengths of stay). Default log link.</p></li>
+    right-skewed continuous data (<em>e.g.,</em> costs, lengths of stay). When
+    passed as a string, resolves to log link for interpretable multiplicative
+    effects.</p></li>
 <li><p><code>Gamma(link = "inverse")</code> - Gamma with inverse (canonical) link.</p></li>
 <li><p><code>Gamma(link = "identity")</code> - Gamma with identity link for additive
     effects on positive outcomes.</p></li>
@@ -256,6 +259,20 @@ OR/HR/RR instead of log odds/log hazards). Default is <code>NULL</code>, which
 automatically exponentiates for logistic, Poisson, and Cox models, and
 displays raw coefficients for linear models and other GLM families. Set
 to <code>TRUE</code> to force exponentiation or <code>FALSE</code> to force coefficients.</p></dd>
+
+
+<dt id="arg-conf-method">conf_method<a class="anchor" aria-label="anchor" href="#arg-conf-method"></a></dt>
+<dd><p>Character string controlling the confidence interval method.
+If <code>NULL</code> (default), uses <code>getOption("summata.conf_method", "profile")</code>.</p><ul><li><p><code>"profile"</code> - Profile likelihood intervals for GLM and negative
+    binomial models (via <code><a href="https://rdrr.io/pkg/MASS/man/confint.html" class="external-link">MASS::confint.glm()</a></code>), exact <em>t</em>-distribution
+    intervals for linear models. Falls back to Wald on profiling failure.
+    Quasi-likelihood families always use Wald (no true likelihood).</p></li>
+<li><p><code>"wald"</code> - Wald intervals (coefficient \(\pm\) <em>z</em>
+    \(\times\) SE) for all model types. Faster but less accurate near
+    boundary conditions or with small subgroups.</p></li>
+</ul><p>Cox and mixed-effects models use Wald intervals regardless of this setting.
+Set globally with <code>options(summata.conf_method = "wald")</code> to use Wald
+throughout a session.</p></dd>
 
 
 <dt id="arg-parallel">parallel<a class="anchor" aria-label="anchor" href="#arg-parallel"></a></dt>
@@ -461,11 +478,11 @@ the following are needed:</p><ul><li><p>Model diagnostic plots</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1:          age       -    850    609 1.05 (1.03-1.06) &lt; 0.001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2:          sex  Female    450    298        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:                 Male    400    311 1.78 (1.31-2.42) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:                 Male    400    311 1.78 (1.31-2.43) &lt; 0.001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4:          bmi       -    838    599 1.01 (0.98-1.05)   0.347</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5:      smoking   Never    337    248        reference       -</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6:               Former    311    203 0.67 (0.48-0.94)   0.022</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7:              Current    185    143 1.22 (0.80-1.86)   0.351</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7:              Current    185    143 1.22 (0.81-1.87)   0.351</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8: hypertension      No    504    354        reference       -</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 9:                  Yes    331    242 1.15 (0.85-1.57)   0.369</span>
 <span class="r-in"><span></span></span>
@@ -491,11 +508,11 @@ the following are needed:</p><ul><li><p>Model diagnostic plots</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                     &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1:             Age (years)       -    850    609 1.05 (1.03-1.06) &lt; 0.001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2:                     Sex  Female    450    298        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:                            Male    400    311 1.78 (1.31-2.42) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:                            Male    400    311 1.78 (1.31-2.43) &lt; 0.001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4: Body Mass Index (kg/m²)       -    838    599 1.01 (0.98-1.05)   0.347</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5:         Treatment Group Control    196    151        reference       -</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6:                          Drug A    292    184 0.51 (0.34-0.76)   0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7:                          Drug B    362    274 0.93 (0.62-1.40)   0.721</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7:                          Drug B    362    274 0.93 (0.61-1.39)   0.721</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 3: Filter by p-value threshold</span></span></span>
 <span class="r-in"><span><span class="co"># Only keep predictors with p &lt; 0.20 (common for screening)</span></span></span>
@@ -520,19 +537,19 @@ the following are needed:</p><ul><li><p>Model diagnostic plots</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                      &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;            &lt;char&gt;  &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  1:             Age (years)       -    850    609  1.05 (1.03-1.06) &lt; 0.001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  2:                     Sex  Female    450    298         reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3:                            Male    400    311  1.78 (1.31-2.42) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:                            Male    400    311  1.78 (1.31-2.43) &lt; 0.001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  4: Body Mass Index (kg/m²)       -    838    599  1.01 (0.98-1.05)   0.347</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  5:          Smoking Status   Never    337    248         reference       -</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  6:                          Former    311    203  0.67 (0.48-0.94)   0.022</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  7:                         Current    185    143  1.22 (0.80-1.86)   0.351</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:                         Current    185    143  1.22 (0.81-1.87)   0.351</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  8:            Hypertension      No    504    354         reference       -</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  9:                             Yes    331    242  1.15 (0.85-1.57)   0.369</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10:                Diabetes      No    637    457         reference       -</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 11:                             Yes    197    138  0.92 (0.65-1.31)   0.646</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 12:           Disease Stage       I    211    127         reference       -</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 13:                              II    263    172  1.25 (0.86-1.82)   0.243</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14:                             III    241    186  2.24 (1.49-3.36) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15:                              IV    132    121 7.28 (3.70-14.30) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14:                             III    241    186  2.24 (1.49-3.38) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15:                              IV    132    121 7.28 (3.85-15.04) &lt; 0.001</span>
 <span class="r-in"><span><span class="co"># Only significant predictors are shown</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 4: Cox proportional hazards screening</span></span></span>
@@ -631,7 +648,7 @@ the following are needed:</p><ul><li><p>Model diagnostic plots</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2:                         Sex  Female    450             reference       -</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3:                                Male    400 -0.36 (-1.03 to 0.31)   0.296</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4:              Smoking Status   Never    337             reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5:                              Former    311  0.22 (-0.54 to 0.98)   0.578</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:                              Former    311  0.22 (-0.55 to 0.98)   0.578</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6:                             Current    185  0.31 (-0.57 to 1.20)   0.490</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 7: Baseline Creatinine (mg/dL)       -    833  0.52 (-0.61 to 1.65)   0.367</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8:  Baseline Hemoglobin (g/dL)       -    834  0.10 (-0.08 to 0.27)   0.273</span>
@@ -748,11 +765,11 @@ the following are needed:</p><ul><li><p>Model diagnostic plots</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     Variable                     Group      n Events       OR (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt;                    &lt;char&gt; &lt;char&gt; &lt;char&gt;            &lt;char&gt;  &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1: treatment                    Drug A    292    184  0.51 (0.34-0.76)   0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:                              Drug B    362    274  0.93 (0.62-1.40)   0.721</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:                              Drug B    362    274  0.93 (0.61-1.39)   0.721</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3:     stage                        II    263    172  1.25 (0.86-1.82)   0.243</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                                 III    241    186  2.24 (1.49-3.36) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5:                                  IV    132    121 7.28 (3.70-14.30) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6:     grade Moderately differentiated    412    297  1.58 (1.07-2.33)   0.023</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                                 III    241    186  2.24 (1.49-3.38) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:                                  IV    132    121 7.28 (3.85-15.04) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6:     grade Moderately differentiated    412    297  1.58 (1.06-2.33)   0.023</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 7:               Poorly differentiated    275    208  1.90 (1.24-2.91)   0.003</span>
 <span class="r-in"><span><span class="co"># Reference categories not shown</span></span></span>
 <span class="r-in"><span></span></span>
@@ -776,7 +793,7 @@ the following are needed:</p><ul><li><p>Model diagnostic plots</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;char&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;              &lt;char&gt;   &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1:        age      -    850    609 1.048 (1.034-1.063) &lt; 0.0001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2:        bmi      -    838    599 1.015 (0.984-1.046)   0.3466</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3: creatinine      -    840    600 0.901 (0.546-1.488)   0.6848</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3: creatinine      -    840    600 0.901 (0.547-1.494)   0.6848</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 12: Hide sample size and event columns</span></span></span>
 <span class="r-in"><span><span class="va">screen12</span> <span class="op">&lt;-</span> <span class="fu">uniscreen</span><span class="op">(</span></span></span>
@@ -799,7 +816,7 @@ the following are needed:</p><ul><li><p>Model diagnostic plots</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1:      age      - 1.05 (1.03-1.06) &lt; 0.001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2:      sex Female        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:            Male 1.78 (1.31-2.42) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:            Male 1.78 (1.31-2.43) &lt; 0.001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4:      bmi      - 1.01 (0.98-1.05)   0.347</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 13: Access raw numeric data</span></span></span>
@@ -813,12 +830,12 @@ the following are needed:</p><ul><li><p>Model diagnostic plots</p></li>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">raw_data</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    model_scope model_type             term     n events coefficient          se        coef  coef_lower coef_upper  exp_coef exp_lower exp_upper        OR  ci_lower  ci_upper  statistic      p_value  variable   group n_group events_group</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         &lt;char&gt;     &lt;char&gt;           &lt;char&gt; &lt;int&gt;  &lt;num&gt;       &lt;num&gt;       &lt;num&gt;       &lt;num&gt;       &lt;num&gt;      &lt;num&gt;     &lt;num&gt;     &lt;num&gt;     &lt;num&gt;     &lt;num&gt;     &lt;num&gt;     &lt;num&gt;      &lt;num&gt;        &lt;num&gt;    &lt;char&gt;  &lt;char&gt;   &lt;num&gt;        &lt;num&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: Univariable   Logistic              age   850    609  0.04695122 0.006987363  0.04695122  0.03325624  0.0606462 1.0480709 1.0338154 1.0625229 1.0480709 1.0338154 1.0625229  6.7194471 1.824154e-11       age              NA           NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1: Univariable   Logistic              age   850    609  0.04695122 0.006987363  0.04695122  0.03346179  0.0608840 1.0480709 1.0340279 1.0627756 1.0480709 1.0340279 1.0627756  6.7194471 1.824154e-11       age              NA           NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2: Univariable   Logistic        sexFemale   450    298  0.00000000          NA  0.00000000          NA         NA 1.0000000        NA        NA 1.0000000        NA        NA         NA           NA       sex  Female     450          298</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3: Univariable   Logistic          sexMale   400    311  0.57794358 0.156160238  0.57794358  0.27187513  0.8840120 1.7823694 1.3124231 2.4205917 1.7823694 1.3124231 2.4205917  3.7009650 2.147811e-04       sex    Male     400          311</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3: Univariable   Logistic          sexMale   400    311  0.57794358 0.156160238  0.57794358  0.27382457  0.8864860 1.7823694 1.3149841 2.4265875 1.7823694 1.3149841 2.4265875  3.7009650 2.147811e-04       sex    Male     400          311</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4: Univariable   Logistic treatmentControl   196    151  0.00000000          NA  0.00000000          NA         NA 1.0000000        NA        NA 1.0000000        NA        NA         NA           NA treatment Control     196          151</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5: Univariable   Logistic  treatmentDrug A   292    184 -0.67781282 0.208659382 -0.67781282 -1.08677769 -0.2688479 0.5077263 0.3373016 0.7642595 0.5077263 0.3373016 0.7642595 -3.2484176 1.160488e-03 treatment  Drug A     292          184</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6: Univariable   Logistic  treatmentDrug B   362    274 -0.07482606 0.209422881 -0.07482606 -0.48528736  0.3356352 0.9279049 0.6155203 1.3988287 0.9279049 0.6155203 1.3988287 -0.3572965 7.208699e-01 treatment  Drug B     362          274</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5: Univariable   Logistic  treatmentDrug A   292    184 -0.67781282 0.208659382 -0.67781282 -1.09329078 -0.2739924 0.5077263 0.3351119 0.7603379 0.5077263 0.3351119 0.7603379 -3.2484176 1.160488e-03 treatment  Drug A     292          184</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6: Univariable   Logistic  treatmentDrug B   362    274 -0.07482606 0.209422881 -0.07482606 -0.49096519  0.3314820 0.9279049 0.6120354 1.3930311 0.9279049 0.6120354 1.3930311 -0.3572965 7.208699e-01 treatment  Drug B     362          274</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       sig sig_binary predictor reference</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    &lt;char&gt;     &lt;lgcl&gt;    &lt;char&gt;    &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1:    ***       TRUE       age      &lt;NA&gt;</span>
@@ -909,17 +926,17 @@ the following are needed:</p><ul><li><p>Model diagnostic plots</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              &lt;char&gt;                    &lt;char&gt; &lt;char&gt; &lt;char&gt;            &lt;char&gt;  &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  1:     Age (years)                         -    833    594  1.05 (1.04-1.07) &lt; 0.001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  2:             Sex                    Female    443    292         reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3:                                      Male    390    302  2.06 (1.47-2.90) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:                                      Male    390    302  2.06 (1.47-2.91) &lt; 0.001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  4:  Smoking Status                     Never    337    248         reference       -</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  5:                                    Former    311    203  0.74 (0.51-1.08)   0.121</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6:                                   Current    185    143  1.40 (0.89-2.22)   0.145</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:                                   Current    185    143  1.40 (0.89-2.23)   0.145</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  7: Treatment Group                   Control    191    146         reference       -</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  8:                                    Drug A    288    181  0.41 (0.26-0.65) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  9:                                    Drug B    354    267  0.71 (0.45-1.13)   0.150</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:                                    Drug B    354    267  0.71 (0.45-1.12)   0.150</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10:   Disease Stage                         I    207    125         reference       -</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 11:                                        II    261    170  1.26 (0.84-1.91)   0.263</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12:                                       III    237    182  2.56 (1.64-4.02) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13:                                        IV    128    117 8.92 (4.37-18.22) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12:                                       III    237    182  2.56 (1.64-4.04) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13:                                        IV    128    117 8.92 (4.53-19.10) &lt; 0.001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 14:     Tumor Grade       Well-differentiated    151     93         reference       -</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 15:                 Moderately differentiated    410    296  1.75 (1.13-2.72)   0.012</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 16:                     Poorly differentiated    272    205  2.18 (1.35-3.52)   0.002</span>

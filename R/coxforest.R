@@ -560,7 +560,7 @@ Received class: ", paste(class(x), collapse = ", "))
     } else {
         ## Standard coxph extraction
         coef_summary <- summary(model)$coefficients
-        conf_int <- stats::confint(model, level = conf_level)
+        conf_int <- get_cached_confint(model, conf_level)
     }    
 
     

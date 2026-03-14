@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -282,8 +282,8 @@ Multivariable Workflow
 <td style="background-color: #f8d7da; color: #721c24; text-align: center;">
 —
 </td>
-<td style="background-color: #d4edda; color: #155724; text-align: center;">
-✓
+<td style="background-color: #f8d7da; color: #721c24; text-align: center;">
+—
 </td>
 </tr>
 <tr>
@@ -510,8 +510,8 @@ Variable Labels
 <td style="background-color: #d4edda; color: #155724; text-align: center;">
 ✓
 </td>
-<td style="background-color: #f8d7da; color: #721c24; text-align: center;">
-—
+<td style="background-color: #fff3cd; color: #856404; text-align: center;">
+◐
 </td>
 <td style="background-color: #d4edda; color: #155724; text-align: center;">
 ✓
@@ -647,10 +647,13 @@ results without intermediate steps:</p>
 <h3 id="performance-optimization">Performance Optimization<a class="anchor" aria-label="anchor" href="#performance-optimization"></a>
 </h3>
 <p>Built on <code>data.table</code> for computational efficiency,
-<code>summata</code> demonstrates 35–54% faster execution than
-comparable workflows in other packages with a smaller dependency
-footprint. See the <a href="benchmarks.html">Benchmarks</a> article for
-detailed comparisons.</p>
+<code>summata</code> provides competitive performance across all
+benchmarked workflows. With <code>conf_method = "wald"</code>, it is the
+fastest option tested for GLM-based regression tables and univariable
+screening. With the default profile likelihood CIs, performance is
+comparable to other packages that use the same CI method
+(<code>finalfit</code>, <code>broom</code>). See the <a href="benchmarks.html">Benchmarks</a> article for detailed
+comparisons.</p>
 </div>
 <div class="section level3">
 <h3 id="unified-api">Unified API<a class="anchor" aria-label="anchor" href="#unified-api"></a>

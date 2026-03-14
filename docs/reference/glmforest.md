@@ -453,7 +453,6 @@ model1 <- glm(os_status ~ age + sex + bmi + treatment,
 
 # Example 1: Basic logistic regression forest plot
 p <- glmforest(model1, data = clintrial)
-#> Waiting for profiling to be done...
 #> Recommended plot dimensions: width = 13.5 in, height = 5.0 in
 
 # \donttest{
@@ -467,7 +466,6 @@ plot2 <- glmforest(
     title = "Risk Factors for Mortality",
     labels = clintrial_labels
 )
-#> Waiting for profiling to be done...
 #> Recommended plot dimensions: width = 15.3 in, height = 5.0 in
 
 # Example 3: Indented layout with formatting options
@@ -479,7 +477,6 @@ plot3 <- glmforest(
     color = "#D62728",
     labels = clintrial_labels
 )
-#> Waiting for profiling to be done...
 #> Recommended plot dimensions: width = 13.4 in, height = 5.2 in
 
 # Example 4: Condensed layout for many binary variables
@@ -494,7 +491,6 @@ plot4 <- glmforest(
     condense_table = TRUE,
     labels = clintrial_labels
 )
-#> Waiting for profiling to be done...
 #> Recommended plot dimensions: width = 12.7 in, height = 5.2 in
 # Binary variables shown in single rows
 
@@ -509,7 +505,6 @@ plot5 <- glmforest(
     title = "Rate Ratios for Adverse Events",
     labels = clintrial_labels
 )
-#> Waiting for profiling to be done...
 #> Recommended plot dimensions: width = 14.9 in, height = 5.0 in
 
 # Example 6: Save with recommended dimensions

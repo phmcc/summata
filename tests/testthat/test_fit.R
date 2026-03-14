@@ -1728,13 +1728,13 @@ test_that("fit works with Gamma family (log link)", {
     test_data <- data.table::as.data.table(clintrial)
     test_data <- test_data[los_days > 0]
     
-    result <- fit(
+    result <- suppressMessages(fit(
         data = test_data,
         outcome = "los_days",
         predictors = c("age", "sex"),
         model_type = "glm",
         family = Gamma(link = "log")
-    )
+    ))
     
     expect_fit_result(result)
     
@@ -1752,13 +1752,13 @@ test_that("fit works with Gamma family (inverse link - default)", {
     test_data <- data.table::as.data.table(clintrial)
     test_data <- test_data[los_days > 0]
     
-    result <- fit(
+    result <- suppressMessages(fit(
         data = test_data,
         outcome = "los_days",
         predictors = c("age", "sex"),
         model_type = "glm",
         family = Gamma()  ## Default inverse link
-    )
+    ))
     
     expect_fit_result(result)
 })
@@ -1770,13 +1770,13 @@ test_that("fit Gamma coefficients match direct glm", {
     test_data <- data.table::as.data.table(clintrial)
     test_data <- test_data[los_days > 0]
     
-    result <- fit(
+    result <- suppressMessages(fit(
         data = test_data,
         outcome = "los_days",
         predictors = c("age", "sex"),
         model_type = "glm",
         family = Gamma(link = "log")
-    )
+    ))
     
     ## Fit directly
     direct_model <- glm(los_days ~ age + sex, data = test_data, family = Gamma(link = "log"))
@@ -1795,14 +1795,14 @@ test_that("fit Gamma handles factor variables", {
     test_data <- data.table::as.data.table(clintrial)
     test_data <- test_data[los_days > 0]
     
-    result <- fit(
+    result <- suppressMessages(fit(
         data = test_data,
         outcome = "los_days",
         predictors = c("age", "stage"),
         model_type = "glm",
         family = Gamma(link = "log"),
         reference_rows = TRUE
-    )
+    ))
     
     expect_fit_result(result)
     
@@ -1823,13 +1823,13 @@ test_that("fit works with inverse.gaussian family", {
     test_data <- data.table::as.data.table(clintrial)
     test_data <- test_data[los_days > 0]
     
-    result <- fit(
+    result <- suppressMessages(fit(
         data = test_data,
         outcome = "los_days",
         predictors = c("age", "sex"),
         model_type = "glm",
         family = inverse.gaussian()
-    )
+    ))
     
     expect_fit_result(result)
 })
@@ -1841,13 +1841,13 @@ test_that("fit inverse.gaussian with log link works", {
     test_data <- data.table::as.data.table(clintrial)
     test_data <- test_data[los_days > 0]
     
-    result <- fit(
+    result <- suppressMessages(fit(
         data = test_data,
         outcome = "los_days",
         predictors = c("age", "sex"),
         model_type = "glm",
         family = inverse.gaussian(link = "log")
-    )
+    ))
     
     expect_fit_result(result)
     
@@ -1865,13 +1865,13 @@ test_that("fit inverse.gaussian coefficients match direct glm", {
     test_data <- data.table::as.data.table(clintrial)
     test_data <- test_data[los_days > 0]
     
-    result <- fit(
+    result <- suppressMessages(fit(
         data = test_data,
         outcome = "los_days",
         predictors = c("age", "sex"),
         model_type = "glm",
         family = inverse.gaussian(link = "log")
-    )
+    ))
     
     ## Fit directly
     direct_model <- glm(los_days ~ age + sex, data = test_data, 
@@ -2233,4 +2233,109 @@ test_that("fit formula includes all components correctly", {
     expect_true(grepl("age", formula_str))
     expect_true(grepl("treatment", formula_str))
     expect_true(grepl("strata\\(.*sex.*\\)", formula_str))
+})
+
+
+## ============================================================================
+## SECTION 22: Profile Likelihood CI and Caching
+## ============================================================================
+
+test_that("fit propagates cached confint to model attribute", {
+    
+    result <- fit(
+        data = clintrial,
+        outcome = "response",
+        predictors = c("age", "sex"),
+        model_type = "glm"
+    )
+    
+    model <- attr(result, "model")
+    
+    ## Model should carry cached confint from m2dt
+    cached <- attr(model, "cached_confint")
+    expect_true(!is.null(cached),
+                info = "fit() should propagate cached_confint to model object")
+    expect_true(is.matrix(cached))
+    expect_equal(attr(model, "cached_confint_level"), 0.95)
+})
+
+
+test_that("fit cached confint matches stats::confint output", {
+    
+    result <- fit(
+        data = clintrial,
+        outcome = "response",
+        predictors = c("age", "sex"),
+        model_type = "glm"
+    )
+    
+    model <- attr(result, "model")
+    cached <- attr(model, "cached_confint")
+    
+    ## Compute confint directly for comparison
+    direct_ci <- suppressMessages(suppressWarnings(
+        stats::confint(model, level = 0.95)
+    ))
+    
+    ## Cached values should match direct computation
+    ## (non-NA rows; intercept row may be NA if skipped)
+    shared_rows <- intersect(rownames(cached)[!is.na(cached[, 1])],
+                             rownames(direct_ci))
+    expect_true(length(shared_rows) > 0)
+    
+    for (rn in shared_rows) {
+        expect_equal(cached[rn, 1], direct_ci[rn, 1], tolerance = 1e-10,
+                     info = paste("Cached CI lower mismatch for", rn))
+        expect_equal(cached[rn, 2], direct_ci[rn, 2], tolerance = 1e-10,
+                     info = paste("Cached CI upper mismatch for", rn))
+    }
+})
+
+
+test_that("fit GLM profile CIs differ from Wald", {
+    
+    result <- fit(
+        data = clintrial,
+        outcome = "response",
+        predictors = c("age", "sex", "stage"),
+        model_type = "glm"
+    )
+    
+    raw <- attr(result, "raw_data")
+    non_ref <- raw[is.na(reference) | reference == ""]
+    
+    ## Compute Wald CIs
+    model <- attr(result, "model")
+    coefs <- coef(model)[-1]
+    ses <- summary(model)$coefficients[-1, "Std. Error"]
+    z <- qnorm(0.975)
+    wald_lower <- coefs - z * ses
+    
+    ## Profile should differ from Wald for at least one term
+    any_differs <- any(abs(non_ref$coef_lower - wald_lower) > 1e-6)
+    expect_true(any_differs,
+                info = "fit() GLM CIs should use profile likelihood, not Wald")
+})
+
+
+test_that("fit lm CIs use exact t-distribution", {
+    
+    result <- fit(
+        data = clintrial,
+        outcome = "los_days",
+        predictors = c("age", "sex"),
+        model_type = "lm"
+    )
+    
+    raw <- attr(result, "raw_data")
+    non_ref <- raw[is.na(reference) | reference == ""]
+    
+    ## Exact t CIs should match confint.lm() output
+    model <- attr(result, "model")
+    direct_ci <- confint(model, level = 0.95)
+    ## Remove intercept
+    direct_ci <- direct_ci[rownames(direct_ci) != "(Intercept)", , drop = FALSE]
+    
+    expect_equal(unname(non_ref$coef_lower), unname(direct_ci[, 1]), tolerance = 1e-10,
+                 info = "lm CIs should match confint.lm()")
 })

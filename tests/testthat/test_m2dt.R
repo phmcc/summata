@@ -247,7 +247,7 @@ test_that("m2dt works with conditional logistic regression", {
     test_data[, strata_var := rep(1:100, length.out = .N)]
     
     model <- survival::clogit(
-                           response ~ age + sex + strata(strata_var),
+                           response ~ age + sex + survival::strata(strata_var),
                            data = test_data
                        )
     
@@ -850,4 +850,143 @@ test_that("m2dt p-values match summary(model)", {
                      tolerance = 1e-10,
                      info = paste("P-value mismatch for", term_name))
     }
+})
+
+
+## ============================================================================
+## SECTION 21: Confidence Interval Methods
+## ============================================================================
+
+test_that("m2dt GLM CIs use profile likelihood (differ from Wald)", {
+    
+    model <- glm(response ~ age + sex + stage, data = clintrial, family = binomial)
+    
+    result <- m2dt(data = clintrial, model = model, include_intercept = FALSE)
+    
+    ## Compute Wald CIs for comparison
+    coefs <- coef(model)[-1]  # exclude intercept
+    ses <- summary(model)$coefficients[-1, "Std. Error"]
+    z <- qnorm(0.975)
+    wald_lower <- exp(coefs - z * ses)
+    wald_upper <- exp(coefs + z * ses)
+    
+    ## Profile CIs should differ from Wald (at least slightly)
+    ## Get non-reference rows only
+    non_ref <- result[is.na(reference) | reference == ""]
+    
+    ## Allow for the possibility that differences are very small for
+    ## well-behaved models, but at least one should differ
+    any_lower_differs <- any(abs(non_ref$ci_lower - wald_lower) > 1e-6)
+    any_upper_differs <- any(abs(non_ref$ci_upper - wald_upper) > 1e-6)
+    
+    expect_true(any_lower_differs || any_upper_differs,
+                info = "Profile CIs should differ from Wald for at least one term")
+})
+
+
+test_that("m2dt lm CIs use exact t-distribution (differ from normal)", {
+    
+    model <- lm(los_days ~ age + sex, data = clintrial)
+    
+    result <- m2dt(data = clintrial, model = model, include_intercept = FALSE)
+    
+    ## Compute normal-approximation (Wald) CIs for comparison
+    coefs <- coef(model)[-1]
+    ses <- summary(model)$coefficients[-1, "Std. Error"]
+    z <- qnorm(0.975)
+    wald_lower <- coefs - z * ses
+    
+    ## Exact t CIs use qt() which gives wider intervals than qnorm()
+    non_ref <- result[is.na(reference) | reference == ""]
+    
+    ## t-distribution CIs should be slightly wider than normal CIs
+    ## (because t quantile > z quantile for finite df)
+    expect_true(all(non_ref$ci_lower <= wald_lower + 1e-10),
+                info = "t-distribution lower bounds should be at most equal to normal bounds")
+})
+
+
+test_that("m2dt quasi-family CIs use Wald (match confint.default)", {
+    
+    model <- glm(response ~ age + sex, data = clintrial, family = quasibinomial)
+    
+    result <- m2dt(data = clintrial, model = model, include_intercept = FALSE)
+    
+    ## Compute Wald CIs explicitly
+    coefs <- coef(model)[-1]
+    ses <- summary(model)$coefficients[-1, "Std. Error"]
+    z <- qnorm(0.975)
+    wald_lower <- exp(coefs - z * ses)
+    wald_upper <- exp(coefs + z * ses)
+    
+    non_ref <- result[is.na(reference) | reference == ""]
+    
+    ## Quasi-family CIs should match Wald exactly
+    expect_equal(unname(non_ref$ci_lower), unname(wald_lower), tolerance = 1e-10,
+                 info = "Quasi-family should use Wald CIs")
+    expect_equal(unname(non_ref$ci_upper), unname(wald_upper), tolerance = 1e-10,
+                 info = "Quasi-family should use Wald CIs")
+})
+
+
+test_that("m2dt caches confint result as attribute", {
+    
+    model <- glm(response ~ age + sex, data = clintrial, family = binomial)
+    
+    result <- m2dt(data = clintrial, model = model)
+    
+    ## Should have cached confint attribute
+    cached <- attr(result, "cached_confint")
+    expect_true(!is.null(cached))
+    expect_true(is.matrix(cached))
+    
+    ## Cached level should match
+    expect_equal(attr(result, "cached_confint_level"), 0.95)
+})
+
+
+test_that("m2dt confint cache respects conf_level", {
+    
+    model <- glm(response ~ age, data = clintrial, family = binomial)
+    
+    result_95 <- m2dt(data = clintrial, model = model, conf_level = 0.95)
+    result_90 <- m2dt(data = clintrial, model = model, conf_level = 0.90)
+    
+    expect_equal(attr(result_95, "cached_confint_level"), 0.95)
+    expect_equal(attr(result_90, "cached_confint_level"), 0.90)
+    
+    ## CI bounds should differ between levels
+    cached_95 <- attr(result_95, "cached_confint")
+    cached_90 <- attr(result_90, "cached_confint")
+    expect_false(identical(cached_95, cached_90))
+})
+
+
+test_that("m2dt skips intercept profiling when include_intercept=FALSE", {
+    
+    model <- glm(response ~ age, data = clintrial, family = binomial)
+    
+    ## With intercept excluded, profiling should skip it
+    result <- m2dt(data = clintrial, model = model, include_intercept = FALSE)
+    
+    ## Should still produce valid CIs for non-intercept terms
+    expect_true(all(!is.na(result$ci_lower)))
+    expect_true(all(!is.na(result$ci_upper)))
+    
+    ## No intercept row should be present
+    expect_false("(Intercept)" %in% result$term)
+})
+
+
+test_that("m2dt profiles intercept when include_intercept=TRUE", {
+    
+    model <- glm(response ~ age, data = clintrial, family = binomial)
+    
+    result <- m2dt(data = clintrial, model = model, include_intercept = TRUE)
+    
+    ## Intercept should have valid CIs (not NA)
+    intercept_row <- result[term == "(Intercept)"]
+    expect_equal(nrow(intercept_row), 1)
+    expect_true(!is.na(intercept_row$ci_lower))
+    expect_true(!is.na(intercept_row$ci_upper))
 })

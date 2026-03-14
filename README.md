@@ -5,12 +5,12 @@
 [![test-coverage](https://github.com/phmcc/summata/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/phmcc/summata/actions/workflows/test-coverage.yaml)
 [![lint](https://github.com/phmcc/summata/actions/workflows/lint.yaml/badge.svg)](https://github.com/phmcc/summata/actions/workflows/lint.yaml)
 [![CRAN status](https://www.r-pkg.org/badges/version/summata)](https://CRAN.R-project.org/package=summata)
-[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 <!-- badges: end -->
 
 > ***summata*** | /suːˈmɑːtə/ | *Latin, n. pl. of* summātum*, gerundive of* summāre*: those that have been summarized*
 >
-> Concise, publication-ready statistical summaries.
+> Complete, publication-ready statistical summaries.
 
 ## Overview
 
@@ -22,7 +22,13 @@ For a more comprehensive description of this package and its features, see the [
 
 ## Installation
 
-This package is not yet on CRAN.  Install it from GitHub (stable) or Codeberg (development):
+The stable release of this package can be installed from CRAN.
+
+```r
+install.packages("summata")
+```
+
+Alternatively, install it directly from GitHub (stable) or Codeberg (development):
 
 ```r
 # Stable release
@@ -279,7 +285,7 @@ citation("summata")
 
 To cite summata in publications, use:
 
-  McClelland PH (2026). _summata: Publication-Ready Summary Tables and Forest Plots_. R package version 0.11.0, <https://phmcc.github.io/summata/>.
+  McClelland PH (2026). _summata: Publication-Ready Summary Tables and Forest Plots_. R package version 0.11.4, <https://phmcc.github.io/summata/>.
 
 A BibTeX entry for LaTeX users is
 
@@ -287,7 +293,7 @@ A BibTeX entry for LaTeX users is
     title = {summata: Publication-Ready Summary Tables and Forest Plots},
     author = {Paul Hsin-ti McClelland},
     year = {2026},
-    note = {R package version 0.11.0},
+    note = {R package version 0.11.4},
     url = {https://phmcc.github.io/summata/},
   }
 ```
@@ -300,4 +306,4 @@ A BibTeX entry for LaTeX users is
 
 ---
 
-<sub>The `summata` package is under active development. The API may change prior to CRAN submission.</sub>
+<sub>The `summata` package is under active development.</sub>

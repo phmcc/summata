@@ -27,6 +27,7 @@ uniscreen(
   labels = NULL,
   keep_models = FALSE,
   exponentiate = NULL,
+  conf_method = NULL,
   parallel = TRUE,
   n_cores = NULL,
   number_format = NULL,
@@ -141,7 +142,8 @@ uniscreen(
 
   - `"Gamma"` or [`Gamma()`](https://rdrr.io/r/stats/family.html) -
     Gamma distribution for positive, right-skewed continuous data
-    (*e.g.,* costs, lengths of stay). Default log link.
+    (*e.g.,* costs, lengths of stay). When passed as a string, resolves
+    to log link for interpretable multiplicative effects.
 
   - `Gamma(link = "inverse")` - Gamma with inverse (canonical) link.
 
@@ -231,6 +233,26 @@ uniscreen(
   displays raw coefficients for linear models and other GLM families.
   Set to `TRUE` to force exponentiation or `FALSE` to force
   coefficients.
+
+- conf_method:
+
+  Character string controlling the confidence interval method. If `NULL`
+  (default), uses `getOption("summata.conf_method", "profile")`.
+
+  - `"profile"` - Profile likelihood intervals for GLM and negative
+    binomial models (via
+    [`MASS::confint.glm()`](https://rdrr.io/pkg/MASS/man/confint.html)),
+    exact *t*-distribution intervals for linear models. Falls back to
+    Wald on profiling failure. Quasi-likelihood families always use Wald
+    (no true likelihood).
+
+  - `"wald"` - Wald intervals (coefficient \\\pm\\ *z* \\\times\\ SE)
+    for all model types. Faster but less accurate near boundary
+    conditions or with small subgroups.
+
+  Cox and mixed-effects models use Wald intervals regardless of this
+  setting. Set globally with `options(summata.conf_method = "wald")` to
+  use Wald throughout a session.
 
 - parallel:
 
@@ -498,11 +520,11 @@ print(screen1)
 #>          <char>  <char> <char> <char>           <char>  <char>
 #> 1:          age       -    850    609 1.05 (1.03-1.06) < 0.001
 #> 2:          sex  Female    450    298        reference       -
-#> 3:                 Male    400    311 1.78 (1.31-2.42) < 0.001
+#> 3:                 Male    400    311 1.78 (1.31-2.43) < 0.001
 #> 4:          bmi       -    838    599 1.01 (0.98-1.05)   0.347
 #> 5:      smoking   Never    337    248        reference       -
 #> 6:               Former    311    203 0.67 (0.48-0.94)   0.022
-#> 7:              Current    185    143 1.22 (0.80-1.86)   0.351
+#> 7:              Current    185    143 1.22 (0.81-1.87)   0.351
 #> 8: hypertension      No    504    354        reference       -
 #> 9:                  Yes    331    242 1.15 (0.85-1.57)   0.369
 
@@ -528,11 +550,11 @@ print(screen2)
 #>                     <char>  <char> <char> <char>           <char>  <char>
 #> 1:             Age (years)       -    850    609 1.05 (1.03-1.06) < 0.001
 #> 2:                     Sex  Female    450    298        reference       -
-#> 3:                            Male    400    311 1.78 (1.31-2.42) < 0.001
+#> 3:                            Male    400    311 1.78 (1.31-2.43) < 0.001
 #> 4: Body Mass Index (kg/m²)       -    838    599 1.01 (0.98-1.05)   0.347
 #> 5:         Treatment Group Control    196    151        reference       -
 #> 6:                          Drug A    292    184 0.51 (0.34-0.76)   0.001
-#> 7:                          Drug B    362    274 0.93 (0.62-1.40)   0.721
+#> 7:                          Drug B    362    274 0.93 (0.61-1.39)   0.721
 
 # Example 3: Filter by p-value threshold
 # Only keep predictors with p < 0.20 (common for screening)
@@ -557,19 +579,19 @@ print(screen3)
 #>                      <char>  <char> <char> <char>            <char>  <char>
 #>  1:             Age (years)       -    850    609  1.05 (1.03-1.06) < 0.001
 #>  2:                     Sex  Female    450    298         reference       -
-#>  3:                            Male    400    311  1.78 (1.31-2.42) < 0.001
+#>  3:                            Male    400    311  1.78 (1.31-2.43) < 0.001
 #>  4: Body Mass Index (kg/m²)       -    838    599  1.01 (0.98-1.05)   0.347
 #>  5:          Smoking Status   Never    337    248         reference       -
 #>  6:                          Former    311    203  0.67 (0.48-0.94)   0.022
-#>  7:                         Current    185    143  1.22 (0.80-1.86)   0.351
+#>  7:                         Current    185    143  1.22 (0.81-1.87)   0.351
 #>  8:            Hypertension      No    504    354         reference       -
 #>  9:                             Yes    331    242  1.15 (0.85-1.57)   0.369
 #> 10:                Diabetes      No    637    457         reference       -
 #> 11:                             Yes    197    138  0.92 (0.65-1.31)   0.646
 #> 12:           Disease Stage       I    211    127         reference       -
 #> 13:                              II    263    172  1.25 (0.86-1.82)   0.243
-#> 14:                             III    241    186  2.24 (1.49-3.36) < 0.001
-#> 15:                              IV    132    121 7.28 (3.70-14.30) < 0.001
+#> 14:                             III    241    186  2.24 (1.49-3.38) < 0.001
+#> 15:                              IV    132    121 7.28 (3.85-15.04) < 0.001
 # Only significant predictors are shown
 
 # Example 4: Cox proportional hazards screening
@@ -668,7 +690,7 @@ print(linear_screen)
 #> 2:                         Sex  Female    450             reference       -
 #> 3:                                Male    400 -0.36 (-1.03 to 0.31)   0.296
 #> 4:              Smoking Status   Never    337             reference       -
-#> 5:                              Former    311  0.22 (-0.54 to 0.98)   0.578
+#> 5:                              Former    311  0.22 (-0.55 to 0.98)   0.578
 #> 6:                             Current    185  0.31 (-0.57 to 1.20)   0.490
 #> 7: Baseline Creatinine (mg/dL)       -    833  0.52 (-0.61 to 1.65)   0.367
 #> 8:  Baseline Hemoglobin (g/dL)       -    834  0.10 (-0.08 to 0.27)   0.273
@@ -785,11 +807,11 @@ print(screen10)
 #>     Variable                     Group      n Events       OR (95% CI) p-value
 #>       <char>                    <char> <char> <char>            <char>  <char>
 #> 1: treatment                    Drug A    292    184  0.51 (0.34-0.76)   0.001
-#> 2:                              Drug B    362    274  0.93 (0.62-1.40)   0.721
+#> 2:                              Drug B    362    274  0.93 (0.61-1.39)   0.721
 #> 3:     stage                        II    263    172  1.25 (0.86-1.82)   0.243
-#> 4:                                 III    241    186  2.24 (1.49-3.36) < 0.001
-#> 5:                                  IV    132    121 7.28 (3.70-14.30) < 0.001
-#> 6:     grade Moderately differentiated    412    297  1.58 (1.07-2.33)   0.023
+#> 4:                                 III    241    186  2.24 (1.49-3.38) < 0.001
+#> 5:                                  IV    132    121 7.28 (3.85-15.04) < 0.001
+#> 6:     grade Moderately differentiated    412    297  1.58 (1.06-2.33)   0.023
 #> 7:               Poorly differentiated    275    208  1.90 (1.24-2.91)   0.003
 # Reference categories not shown
 
@@ -813,7 +835,7 @@ print(screen11)
 #>        <char> <char> <char> <char>              <char>   <char>
 #> 1:        age      -    850    609 1.048 (1.034-1.063) < 0.0001
 #> 2:        bmi      -    838    599 1.015 (0.984-1.046)   0.3466
-#> 3: creatinine      -    840    600 0.901 (0.546-1.488)   0.6848
+#> 3: creatinine      -    840    600 0.901 (0.547-1.494)   0.6848
 
 # Example 12: Hide sample size and event columns
 screen12 <- uniscreen(
@@ -836,7 +858,7 @@ print(screen12)
 #>      <char> <char>           <char>  <char>
 #> 1:      age      - 1.05 (1.03-1.06) < 0.001
 #> 2:      sex Female        reference       -
-#> 3:            Male 1.78 (1.31-2.42) < 0.001
+#> 3:            Male 1.78 (1.31-2.43) < 0.001
 #> 4:      bmi      - 1.01 (0.98-1.05)   0.347
 
 # Example 13: Access raw numeric data
@@ -850,12 +872,12 @@ raw_data <- attr(screen13, "raw_data")
 print(raw_data)
 #>    model_scope model_type             term     n events coefficient          se        coef  coef_lower coef_upper  exp_coef exp_lower exp_upper        OR  ci_lower  ci_upper  statistic      p_value  variable   group n_group events_group
 #>         <char>     <char>           <char> <int>  <num>       <num>       <num>       <num>       <num>      <num>     <num>     <num>     <num>     <num>     <num>     <num>      <num>        <num>    <char>  <char>   <num>        <num>
-#> 1: Univariable   Logistic              age   850    609  0.04695122 0.006987363  0.04695122  0.03325624  0.0606462 1.0480709 1.0338154 1.0625229 1.0480709 1.0338154 1.0625229  6.7194471 1.824154e-11       age              NA           NA
+#> 1: Univariable   Logistic              age   850    609  0.04695122 0.006987363  0.04695122  0.03346179  0.0608840 1.0480709 1.0340279 1.0627756 1.0480709 1.0340279 1.0627756  6.7194471 1.824154e-11       age              NA           NA
 #> 2: Univariable   Logistic        sexFemale   450    298  0.00000000          NA  0.00000000          NA         NA 1.0000000        NA        NA 1.0000000        NA        NA         NA           NA       sex  Female     450          298
-#> 3: Univariable   Logistic          sexMale   400    311  0.57794358 0.156160238  0.57794358  0.27187513  0.8840120 1.7823694 1.3124231 2.4205917 1.7823694 1.3124231 2.4205917  3.7009650 2.147811e-04       sex    Male     400          311
+#> 3: Univariable   Logistic          sexMale   400    311  0.57794358 0.156160238  0.57794358  0.27382457  0.8864860 1.7823694 1.3149841 2.4265875 1.7823694 1.3149841 2.4265875  3.7009650 2.147811e-04       sex    Male     400          311
 #> 4: Univariable   Logistic treatmentControl   196    151  0.00000000          NA  0.00000000          NA         NA 1.0000000        NA        NA 1.0000000        NA        NA         NA           NA treatment Control     196          151
-#> 5: Univariable   Logistic  treatmentDrug A   292    184 -0.67781282 0.208659382 -0.67781282 -1.08677769 -0.2688479 0.5077263 0.3373016 0.7642595 0.5077263 0.3373016 0.7642595 -3.2484176 1.160488e-03 treatment  Drug A     292          184
-#> 6: Univariable   Logistic  treatmentDrug B   362    274 -0.07482606 0.209422881 -0.07482606 -0.48528736  0.3356352 0.9279049 0.6155203 1.3988287 0.9279049 0.6155203 1.3988287 -0.3572965 7.208699e-01 treatment  Drug B     362          274
+#> 5: Univariable   Logistic  treatmentDrug A   292    184 -0.67781282 0.208659382 -0.67781282 -1.09329078 -0.2739924 0.5077263 0.3351119 0.7603379 0.5077263 0.3351119 0.7603379 -3.2484176 1.160488e-03 treatment  Drug A     292          184
+#> 6: Univariable   Logistic  treatmentDrug B   362    274 -0.07482606 0.209422881 -0.07482606 -0.49096519  0.3314820 0.9279049 0.6120354 1.3930311 0.9279049 0.6120354 1.3930311 -0.3572965 7.208699e-01 treatment  Drug B     362          274
 #>       sig sig_binary predictor reference
 #>    <char>     <lgcl>    <char>    <char>
 #> 1:    ***       TRUE       age      <NA>
@@ -946,17 +968,17 @@ print(multi_model)
 #>              <char>                    <char> <char> <char>            <char>  <char>
 #>  1:     Age (years)                         -    833    594  1.05 (1.04-1.07) < 0.001
 #>  2:             Sex                    Female    443    292         reference       -
-#>  3:                                      Male    390    302  2.06 (1.47-2.90) < 0.001
+#>  3:                                      Male    390    302  2.06 (1.47-2.91) < 0.001
 #>  4:  Smoking Status                     Never    337    248         reference       -
 #>  5:                                    Former    311    203  0.74 (0.51-1.08)   0.121
-#>  6:                                   Current    185    143  1.40 (0.89-2.22)   0.145
+#>  6:                                   Current    185    143  1.40 (0.89-2.23)   0.145
 #>  7: Treatment Group                   Control    191    146         reference       -
 #>  8:                                    Drug A    288    181  0.41 (0.26-0.65) < 0.001
-#>  9:                                    Drug B    354    267  0.71 (0.45-1.13)   0.150
+#>  9:                                    Drug B    354    267  0.71 (0.45-1.12)   0.150
 #> 10:   Disease Stage                         I    207    125         reference       -
 #> 11:                                        II    261    170  1.26 (0.84-1.91)   0.263
-#> 12:                                       III    237    182  2.56 (1.64-4.02) < 0.001
-#> 13:                                        IV    128    117 8.92 (4.37-18.22) < 0.001
+#> 12:                                       III    237    182  2.56 (1.64-4.04) < 0.001
+#> 13:                                        IV    128    117 8.92 (4.53-19.10) < 0.001
 #> 14:     Tumor Grade       Well-differentiated    151     93         reference       -
 #> 15:                 Moderately differentiated    410    296  1.75 (1.13-2.72)   0.012
 #> 16:                     Poorly differentiated    272    205  2.18 (1.35-3.52)   0.002

@@ -56,6 +56,8 @@ utils::globalVariables(c(
            ".int_term",
            ".is_ref",
            ".group_order",
+           ".multi_n",
+           ".multi_Events",
            ".orig_order",
            ".row_in_var",
            ".temp_var_order",
@@ -184,7 +186,7 @@ utils::globalVariables(c(
            "variables",
            "x_pos",
            ".events_calc",
-           
+
            ## ggplot2 aesthetics and coordinate variables
            "x",
            "y",

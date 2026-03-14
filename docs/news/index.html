@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,8 +60,20 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.11.4" id="summata-0114-2026-03-14">
+<em>summata</em> 0.11.4 (2026-03-14)<a class="anchor" aria-label="anchor" href="#summata-0114-2026-03-14"></a></h2>
+<ul><li>Use profile likelihood CIs for GLM/negbin and exact <em>t</em>-distribution CIs for linear models, replacing Wald approximation</li>
+<li>Add <code>conf_method</code> parameter (<code>"profile"</code> / <code>"wald"</code>) to <code><a href="../reference/fit.html">fit()</a></code>, <code><a href="../reference/uniscreen.html">uniscreen()</a></code>, <code><a href="../reference/fullfit.html">fullfit()</a></code>, <code><a href="../reference/multifit.html">multifit()</a></code>, and <code><a href="../reference/m2dt.html">m2dt()</a></code>, with global option <code>summata.conf_method</code>
+</li>
+<li>Report complete-case <em>n</em>/Events in <code><a href="../reference/fullfit.html">fullfit()</a></code> multivariable rows (STROBE item 12)</li>
+<li>Cache profile likelihood CIs from <code><a href="../reference/fit.html">fit()</a></code> for reuse in forest plot functions</li>
+<li>Resolve <code>family = "Gamma"</code> string to <code>Gamma(link = "log")</code> for interpretable multiplicative effects</li>
+<li>Fix <code><a href="https://rdrr.io/pkg/survival/man/strata.html" class="external-link">survival::strata()</a></code> namespace in conditional logistic regression test</li>
+<li>Update benchmarks feature comparison articles</li>
+</ul></div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.11.3" id="summata-0113-2026-03-03">
-<em>summata</em> 0.11.3 (2026-03-03)<a class="anchor" aria-label="anchor" href="#summata-0113-2026-03-03"></a></h2>
+<em>summata</em> 0.11.3 (2026-03-03)<a class="anchor" aria-label="anchor" href="#summata-0113-2026-03-03"></a></h2><p class="text-muted">CRAN release: 2026-03-08</p>
 <ul><li>CRAN initial release re-submission</li>
 <li>Fix <code><a href="../reference/table2pdf.html">table2pdf()</a></code> to specify output directory for files</li>
 <li>Minor WORDLIST changes</li>
