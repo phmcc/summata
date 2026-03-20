@@ -17,7 +17,7 @@ template:
   bootstrap: 5
   bootswatch: cosmo
   bslib:
-    bg: "#F8F9FA"
+    bg: "#FAF9F8"
     fg: "#2F2F2F"
     primary: "#2F2F2F"
     body-color: "#2F2F2F"

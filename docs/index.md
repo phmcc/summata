@@ -360,4 +360,4 @@ A BibTeX entry for LaTeX users is
 
 ------------------------------------------------------------------------
 
-_(The `summata` package is under active development.)
+_(The `summata` package is under active development. Any breaking changes to the API will be reported in the changelog.)

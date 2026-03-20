@@ -311,69 +311,69 @@ non-breaking spaces:</p><div class="sourceCode"><pre><code>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"xtable"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu">table2html</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"results.html"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/RtmpQw4LQZ/results.html</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpv9iBxt/results.html</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Example 2: With caption</span></span></span>
 <span class="r-in"><span><span class="fu">table2html</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"captioned.html"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>          caption <span class="op">=</span> <span class="st">"Table 1: Multivariable Logistic Regression Results"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/RtmpQw4LQZ/captioned.html</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpv9iBxt/captioned.html</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 3: For embedding (no CSS)</span></span></span>
 <span class="r-in"><span><span class="fu">table2html</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"embed.html"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>          include_css <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/RtmpQw4LQZ/embed.html</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpv9iBxt/embed.html</span>
 <span class="r-in"><span><span class="co"># Include in your HTML document</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 4: Hierarchical display</span></span></span>
 <span class="r-in"><span><span class="fu">table2html</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"indented.html"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>          indent_groups <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/RtmpQw4LQZ/indented.html</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpv9iBxt/indented.html</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 5: Condensed table</span></span></span>
 <span class="r-in"><span><span class="fu">table2html</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"condensed.html"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>          condense_table <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/RtmpQw4LQZ/condensed.html</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpv9iBxt/condensed.html</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 6: With zebra stripes</span></span></span>
 <span class="r-in"><span><span class="fu">table2html</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"striped.html"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>          zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>          stripe_color <span class="op">=</span> <span class="st">"#F0F0F0"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/RtmpQw4LQZ/striped.html</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpv9iBxt/striped.html</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 7: Dark header style</span></span></span>
 <span class="r-in"><span><span class="fu">table2html</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"dark.html"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>          dark_header <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/RtmpQw4LQZ/dark.html</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpv9iBxt/dark.html</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 8: Combination styling</span></span></span>
 <span class="r-in"><span><span class="fu">table2html</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"styled.html"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>          zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>          dark_header <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>          bold_significant <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/RtmpQw4LQZ/styled.html</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpv9iBxt/styled.html</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 9: Custom stripe color</span></span></span>
 <span class="r-in"><span><span class="fu">table2html</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"blue_stripes.html"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>          zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>          stripe_color <span class="op">=</span> <span class="st">"#E3F2FD"</span><span class="op">)</span>  <span class="co"># Light blue</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/RtmpQw4LQZ/blue_stripes.html</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpv9iBxt/blue_stripes.html</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 10: Disable significance bolding</span></span></span>
 <span class="r-in"><span><span class="fu">table2html</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"no_bold.html"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>          bold_significant <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/RtmpQw4LQZ/no_bold.html</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpv9iBxt/no_bold.html</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 11: Stricter significance threshold</span></span></span>
 <span class="r-in"><span><span class="fu">table2html</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"strict.html"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>          bold_significant <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>          p_threshold <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/RtmpQw4LQZ/strict.html</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpv9iBxt/strict.html</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 12: No header formatting</span></span></span>
 <span class="r-in"><span><span class="fu">table2html</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"raw_headers.html"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>          format_headers <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/RtmpQw4LQZ/raw_headers.html</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpv9iBxt/raw_headers.html</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 13: Descriptive statistics table</span></span></span>
 <span class="r-in"><span><span class="va">desc_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="desctable.html">desctable</a></span><span class="op">(</span><span class="va">clintrial</span>, by <span class="op">=</span> <span class="st">"treatment"</span>,</span></span>
@@ -381,18 +381,18 @@ non-breaking spaces:</p><div class="sourceCode"><pre><code>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">table2html</span><span class="op">(</span><span class="va">desc_table</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"baseline.html"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>          caption <span class="op">=</span> <span class="st">"Table 1: Baseline Characteristics by Treatment Group"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/RtmpQw4LQZ/baseline.html</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpv9iBxt/baseline.html</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 14: For R Markdown (no CSS, for inline display)</span></span></span>
 <span class="r-in"><span><span class="fu">table2html</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"rmd_table.html"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>          include_css <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
 <span class="r-in"><span>          indent_groups <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/RtmpQw4LQZ/rmd_table.html</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpv9iBxt/rmd_table.html</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Then in R Markdown, use a chunk with results='asis' to display inline:</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/readLines.html" class="external-link">readLines</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"rmd_table.html"</span><span class="op">)</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"\n"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;!-- html table generated in R 4.5.2 by xtable 1.8-4 package --&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;!-- Sat Mar 14 17:08:39 2026 --&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;!-- Fri Mar 20 12:55:01 2026 --&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;table border=1&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;tr&gt; &lt;th&gt; Variable &lt;/th&gt; &lt;th&gt; &lt;i&gt;n&lt;/i&gt; &lt;/th&gt; &lt;th&gt; Events &lt;/th&gt; &lt;th&gt; aOR (95% CI) &lt;/th&gt; &lt;th&gt; &lt;i&gt;p&lt;/i&gt;-value &lt;/th&gt;  &lt;/tr&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   &lt;tr&gt; &lt;td&gt; Age (years) &lt;/td&gt; &lt;td&gt; 847 &lt;/td&gt; &lt;td&gt; 606 &lt;/td&gt; &lt;td&gt; 1.05 (1.04-1.07) &lt;/td&gt; &lt;td&gt; &lt;b&gt;&lt; 0.001&lt;/b&gt; &lt;/td&gt; &lt;/tr&gt;</span>
@@ -415,7 +415,7 @@ non-breaking spaces:</p><div class="sourceCode"><pre><code>
 <span class="r-in"><span>          include_css <span class="op">=</span> <span class="cn">TRUE</span>,  <span class="co"># Self-contained</span></span></span>
 <span class="r-in"><span>          zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>          caption <span class="op">=</span> <span class="st">"Regression Results - See Attached"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/RtmpQw4LQZ/email.html</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpv9iBxt/email.html</span>
 <span class="r-in"><span><span class="co"># Can be directly included in HTML emails</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 16: Publication-ready web version</span></span></span>
@@ -425,21 +425,21 @@ non-breaking spaces:</p><div class="sourceCode"><pre><code>
 <span class="r-in"><span>          zebra_stripes <span class="op">=</span> <span class="cn">FALSE</span>,  <span class="co"># Clean look</span></span></span>
 <span class="r-in"><span>          bold_significant <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>          dark_header <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/RtmpQw4LQZ/publication.html</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpv9iBxt/publication.html</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 17: Modern dark theme</span></span></span>
 <span class="r-in"><span><span class="fu">table2html</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"dark_theme.html"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>          dark_header <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>          stripe_color <span class="op">=</span> <span class="st">"#2A2A2A"</span>,  <span class="co"># Dark gray stripes</span></span></span>
 <span class="r-in"><span>          zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/RtmpQw4LQZ/dark_theme.html</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpv9iBxt/dark_theme.html</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 18: Minimal styling for custom CSS</span></span></span>
 <span class="r-in"><span><span class="fu">table2html</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"minimal.html"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>          include_css <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
 <span class="r-in"><span>          format_headers <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
 <span class="r-in"><span>          bold_significant <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/RtmpQw4LQZ/minimal.html</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpv9iBxt/minimal.html</span>
 <span class="r-in"><span><span class="co"># Apply your own CSS classes and styling</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 19: Model comparison table</span></span></span>
@@ -459,7 +459,7 @@ non-breaking spaces:</p><div class="sourceCode"><pre><code>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">table2html</span><span class="op">(</span><span class="va">comparison</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"comparison.html"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>          caption <span class="op">=</span> <span class="st">"Model Comparison Statistics"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/RtmpQw4LQZ/comparison.html</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpv9iBxt/comparison.html</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>

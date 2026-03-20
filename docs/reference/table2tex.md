@@ -355,7 +355,7 @@ results <- fit(
 if (requireNamespace("xtable", quietly = TRUE)) {
   table2tex(results, file.path(tempdir(), "basic.tex"))
 }
-#> Table exported to /tmp/RtmpQw4LQZ/basic.tex
+#> Table exported to /tmp/Rtmpv9iBxt/basic.tex
 
 # \donttest{
 # Example 2: With booktabs for publication
@@ -363,7 +363,7 @@ table2tex(results, file.path(tempdir(), "publication.tex"),
        booktabs = TRUE,
        caption = "Multivariable logistic regression results",
        label = "tab:regression")
-#> Table exported to /tmp/RtmpQw4LQZ/publication.tex
+#> Table exported to /tmp/Rtmpv9iBxt/publication.tex
 
 # Example 3: Multi-line caption with abbreviations
 table2tex(results, file.path(tempdir(), "detailed.tex"),
@@ -372,70 +372,70 @@ table2tex(results, file.path(tempdir(), "detailed.tex"),
                  aOR = adjusted odds ratio; CI = confidence interval\\\\
                  Model adjusted for age, sex, treatment, and disease stage",
        label = "tab:mortality")
-#> Table exported to /tmp/RtmpQw4LQZ/detailed.tex
+#> Table exported to /tmp/Rtmpv9iBxt/detailed.tex
 
 # Example 4: Hierarchical display with indentation
 table2tex(results, file.path(tempdir(), "indented.tex"),
        indent_groups = TRUE,
        booktabs = TRUE)
-#> Table exported to /tmp/RtmpQw4LQZ/indented.tex
+#> Table exported to /tmp/Rtmpv9iBxt/indented.tex
 
 # Example 5: Condensed table (reduced height)
 table2tex(results, file.path(tempdir(), "condensed.tex"),
        condense_table = TRUE,
        booktabs = TRUE)
-#> Table exported to /tmp/RtmpQw4LQZ/condensed.tex
+#> Table exported to /tmp/Rtmpv9iBxt/condensed.tex
 
 # Example 6: With zebra stripes
 table2tex(results, file.path(tempdir(), "striped.tex"),
        zebra_stripes = TRUE,
        stripe_color = "gray!15",
        booktabs = TRUE)
-#> Table exported to /tmp/RtmpQw4LQZ/striped.tex
+#> Table exported to /tmp/Rtmpv9iBxt/striped.tex
 # Remember to add \usepackage[table]{xcolor} to the LaTeX document
 
 # Example 7: Dark header style
 table2tex(results, file.path(tempdir(), "dark_header.tex"),
        dark_header = TRUE,
        booktabs = TRUE)
-#> Table exported to /tmp/RtmpQw4LQZ/dark_header.tex
+#> Table exported to /tmp/Rtmpv9iBxt/dark_header.tex
 # Requires \usepackage[table]{xcolor}
 
 # Example 8: Custom cell padding
 table2tex(results, file.path(tempdir(), "relaxed.tex"),
        cell_padding = "relaxed",
        booktabs = TRUE)
-#> Table exported to /tmp/RtmpQw4LQZ/relaxed.tex
+#> Table exported to /tmp/Rtmpv9iBxt/relaxed.tex
 
 # Example 9: Custom column alignment (auto-detected by default)
 table2tex(results, file.path(tempdir(), "custom_align.tex"),
        align = c("c", "c", "c", "c", "c", "c", "c"))
-#> Table exported to /tmp/RtmpQw4LQZ/custom_align.tex
+#> Table exported to /tmp/Rtmpv9iBxt/custom_align.tex
 
 # Example 10: No header formatting (keep original names)
 table2tex(results, file.path(tempdir(), "raw_headers.tex"),
        format_headers = FALSE)
-#> Table exported to /tmp/RtmpQw4LQZ/raw_headers.tex
+#> Table exported to /tmp/Rtmpv9iBxt/raw_headers.tex
 
 # Example 11: Disable significance bolding
 table2tex(results, file.path(tempdir(), "no_bold.tex"),
        bold_significant = FALSE,
        booktabs = TRUE)
-#> Table exported to /tmp/RtmpQw4LQZ/no_bold.tex
+#> Table exported to /tmp/Rtmpv9iBxt/no_bold.tex
 
 # Example 12: Stricter significance threshold
 table2tex(results, file.path(tempdir(), "strict_sig.tex"),
        bold_significant = TRUE,
        p_threshold = 0.01,  # Bold only if p < 0.01
        booktabs = TRUE)
-#> Table exported to /tmp/RtmpQw4LQZ/strict_sig.tex
+#> Table exported to /tmp/Rtmpv9iBxt/strict_sig.tex
 
 # Example 13: With caption size control
 table2tex(results, file.path(tempdir(), "caption_size.tex"),
        caption_size = 6,
        caption = "Table 1 - Results with Compact Caption\\\\
                  Smaller caption fits better on constrained pages")
-#> Table exported to /tmp/RtmpQw4LQZ/caption_size.tex
+#> Table exported to /tmp/Rtmpv9iBxt/caption_size.tex
 
 # Example 14: Complete publication-ready table
 table2tex(results, file.path(tempdir(), "final_table1.tex"),
@@ -446,7 +446,7 @@ table2tex(results, file.path(tempdir(), "final_table1.tex"),
        zebra_stripes = FALSE,  # Many journals prefer no stripes
        bold_significant = TRUE,
        cell_padding = "normal")
-#> Table exported to /tmp/RtmpQw4LQZ/final_table1.tex
+#> Table exported to /tmp/Rtmpv9iBxt/final_table1.tex
 
 # Example 15: Descriptive statistics table
 desc_table <- desctable(clintrial, by = "treatment",
@@ -456,7 +456,7 @@ table2tex(desc_table, file.path(tempdir(), "table1_descriptive.tex"),
        booktabs = TRUE,
        caption = "Table 1: Baseline Characteristics",
        label = "tab:baseline")
-#> Table exported to /tmp/RtmpQw4LQZ/table1_descriptive.tex
+#> Table exported to /tmp/Rtmpv9iBxt/table1_descriptive.tex
 
 # Example 16: Model comparison table
 models <- list(
@@ -477,7 +477,7 @@ table2tex(comparison, file.path(tempdir(), "model_comparison.tex"),
        booktabs = TRUE,
        caption = "Model Comparison Statistics",
        label = "tab:models")
-#> Table exported to /tmp/RtmpQw4LQZ/model_comparison.tex
+#> Table exported to /tmp/Rtmpv9iBxt/model_comparison.tex
 
 # }
 ```

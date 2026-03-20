@@ -40,11 +40,11 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="pt"
      inkscape:zoom="3.85643"
-     inkscape:cx="166.47521"
+     inkscape:cx="124.98606"
      inkscape:cy="150.52782"
-     inkscape:window-width="3796"
+     inkscape:window-width="1886"
      inkscape:window-height="2078"
-     inkscape:window-x="1220"
+     inkscape:window-x="3130"
      inkscape:window-y="58"
      inkscape:window-maximized="1"
      inkscape:current-layer="g55" />
@@ -314,9 +314,9 @@
        style="font-weight:bold;font-size:16px;line-height:1.25;font-family:Helvetica;-inkscape-font-specification:'Helvetica, Bold';letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect55);display:inline;stroke-width:0.687436"><tspan
          x="0.20507812"
          y="34.69785"
-         id="tspan2"><tspan
+         id="tspan5"><tspan
            style="font-weight:normal;font-size:114.667px;font-family:'Libertinus Math';-inkscape-font-specification:'Libertinus Math, Normal';opacity:1;fill:#424242"
-           id="tspan1">Σ</tspan></tspan></text>
+           id="tspan3">Σ</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.75,0,0,0.75,26.137984,129.28454)"
@@ -324,45 +324,45 @@
        style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:1.25;font-family:'Libertinus Serif';-inkscape-font-specification:'Libertinus Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:-0.8px;word-spacing:0px;white-space:pre;shape-inside:url(#rect56);display:inline"><tspan
          x="-18.226562"
          y="-69.235095"
-         id="tspan4"><tspan
-           style="font-family:Junicode;-inkscape-font-specification:'Junicode, Italic';fill:#f8f9fa"
-           id="tspan3">summata</tspan></tspan></text>
+         id="tspan7"><tspan
+           style="font-family:Junicode;-inkscape-font-specification:'Junicode, Italic';fill:#faf9f8"
+           id="tspan6">summata</tspan></tspan></text>
     <path
-       style="fill:none;stroke:#f8f9fa;stroke-width:0.75px;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
+       style="fill:none;stroke:#faf9f8;stroke-width:0.75px;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
        d="m 27.263406,90.875657 c 69.859351,0 69.859351,0 69.859351,0"
        id="path58" />
     <rect
-       style="opacity:1;fill:#fc8d62;fill-opacity:1;stroke:#f8f9fa;stroke-width:1;stroke-dasharray:none;stroke-opacity:1"
+       style="opacity:1;fill:#fc8d62;fill-opacity:1;stroke:#faf9f8;stroke-width:1;stroke-dasharray:none;stroke-opacity:1"
        id="rect57"
        width="6.011023"
        height="6.011023"
        x="74.187569"
        y="87.942719" />
     <path
-       style="fill:none;stroke:#f8f9fa;stroke-width:0.750001px;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1"
+       style="fill:none;stroke:#faf9f8;stroke-width:0.750001px;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1"
        d="m 27.244968,89.660387 c 0,2.462436 0,2.462436 0,2.462436"
        id="path59" />
     <path
-       style="fill:none;stroke:#f8f9fa;stroke-width:0.750001px;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
+       style="fill:none;stroke:#faf9f8;stroke-width:0.750001px;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
        d="m 97.13971,89.655492 c 0,2.462436 0,2.462436 0,2.462436"
        id="path59-6" />
     <path
-       style="fill:none;stroke:#f8f9fa;stroke-width:0.75px;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-opacity:1"
+       style="fill:none;stroke:#faf9f8;stroke-width:0.75px;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-opacity:1"
        d="m 27.264148,51.389455 c 69.859351,0 69.859351,0 69.859351,0"
        id="path58-8" />
     <rect
-       style="fill:#fc8d62;fill-opacity:1;stroke:#f8f9fa;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#fc8d62;fill-opacity:1;stroke:#faf9f8;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
        id="rect57-5"
        width="6.011023"
        height="6.011023"
        x="44.188316"
        y="48.456535" />
     <path
-       style="fill:none;stroke:#f8f9fa;stroke-width:0.750001px;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
+       style="fill:none;stroke:#faf9f8;stroke-width:0.750001px;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
        d="m 27.24571,50.174185 c 0,2.462436 0,2.462436 0,2.462436"
        id="path59-0" />
     <path
-       style="fill:none;stroke:#f8f9fa;stroke-width:0.750001px;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
+       style="fill:none;stroke:#faf9f8;stroke-width:0.750001px;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1"
        d="m 97.140452,50.16929 c 0,2.462436 0,2.462436 0,2.462436"
        id="path59-6-9" />
   </g>
