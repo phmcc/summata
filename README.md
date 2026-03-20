@@ -306,4 +306,4 @@ A BibTeX entry for LaTeX users is
 
 ---
 
-<sub>The `summata` package is under active development.</sub>
+<sub>The `summata` package is under active development. Any breaking changes to the API will be reported in the changelog.</sub>
