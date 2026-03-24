@@ -1,7 +1,7 @@
 # summata [![summata website](reference/figures/summata.png)](https://phmcc.github.io/summata/)
 
-> ***summata*** \| /suːˈmɑːtə/ \| *Latin, n. pl. of* summātum*,
-> gerundive of* summāre*: those that have been summarized*
+> ***summata*** \| /suːˈmɑːtə/ \| *Latin, n. pl. of* summātum*, perfect
+> passive participle of* summāre*: those that have been summarized*
 >
 > Complete, publication-ready statistical summaries.
 

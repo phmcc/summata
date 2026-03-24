@@ -8,7 +8,7 @@
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 <!-- badges: end -->
 
-> ***summata*** | /suːˈmɑːtə/ | *Latin, n. pl. of* summātum*, gerundive of* summāre*: those that have been summarized*
+> ***summata*** | /suːˈmɑːtə/ | *Latin, n. pl. of* summātum*, perfect passive participle of* summāre*: those that have been summarized*
 >
 > Complete, publication-ready statistical summaries.
 

@@ -194,7 +194,7 @@ export functions directly:</p><ul><li><p>PDF exports support orientation, paper 
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"xtable"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu">autotable</span><span class="op">(</span><span class="va">tbl</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"example.html"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpv9iBxt/example.html</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/RtmphwDdUy/example.html</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Load example data</span></span></span>
@@ -227,15 +227,15 @@ export functions directly:</p><ul><li><p>PDF exports support orientation, paper 
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Export automatically detects format from extension</span></span></span>
 <span class="r-in"><span><span class="fu">autotable</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"results.html"</span><span class="op">)</span><span class="op">)</span>  <span class="co"># Creates HTML file</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpv9iBxt/results.html</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/RtmphwDdUy/results.html</span>
 <span class="r-in"><span><span class="fu">autotable</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"results.docx"</span><span class="op">)</span><span class="op">)</span>  <span class="co"># Creates Word document</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpv9iBxt/results.docx</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/RtmphwDdUy/results.docx</span>
 <span class="r-in"><span><span class="fu">autotable</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"results.pptx"</span><span class="op">)</span><span class="op">)</span>  <span class="co"># Creates PowerPoint slide</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpv9iBxt/results.pptx</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/RtmphwDdUy/results.pptx</span>
 <span class="r-in"><span><span class="fu">autotable</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"results.tex"</span><span class="op">)</span><span class="op">)</span>   <span class="co"># Creates LaTeX source</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpv9iBxt/results.tex</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/RtmphwDdUy/results.tex</span>
 <span class="r-in"><span><span class="fu">autotable</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"results.rtf"</span><span class="op">)</span><span class="op">)</span>   <span class="co"># Creates RTF document</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpv9iBxt/results.rtf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/RtmphwDdUy/results.rtf</span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="va">has_latex</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu">autotable</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"results.pdf"</span><span class="op">)</span><span class="op">)</span> <span class="co"># Creates PDF</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
@@ -252,13 +252,13 @@ export functions directly:</p><ul><li><p>PDF exports support orientation, paper 
 <span class="r-in"><span>           caption <span class="op">=</span> <span class="st">"Table 1: Logistic Regression Results"</span>,</span></span>
 <span class="r-in"><span>           font_family <span class="op">=</span> <span class="st">"Times New Roman"</span>,</span></span>
 <span class="r-in"><span>           condense_table <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpv9iBxt/results.docx</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/RtmphwDdUy/results.docx</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">autotable</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"results.html"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>           zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>           dark_header <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>           bold_significant <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpv9iBxt/results.html</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/RtmphwDdUy/results.html</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Works with any summata table output</span></span></span>
 <span class="r-in"><span><span class="va">desc</span> <span class="op">&lt;-</span> <span class="fu"><a href="desctable.html">desctable</a></span><span class="op">(</span><span class="va">clintrial</span>,</span></span>
@@ -280,7 +280,7 @@ export functions directly:</p><ul><li><p>PDF exports support orientation, paper 
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting base with 2 predictors...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting full with 4 predictors...</span>
 <span class="r-in"><span><span class="fu">autotable</span><span class="op">(</span><span class="va">comparison</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"model_comparison.docx"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpv9iBxt/model_comparison.docx</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/RtmphwDdUy/model_comparison.docx</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>

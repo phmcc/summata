@@ -2,6 +2,8 @@
 
 ## *summata* 0.11.4 (2026-03-14)
 
+CRAN release: 2026-03-20
+
 - Use profile likelihood CIs for GLM/negbin and exact *t*-distribution
   CIs for linear models, replacing Wald approximation
 - Add `conf_method` parameter (`"profile"` / `"wald"`) to
