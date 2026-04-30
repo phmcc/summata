@@ -10,13 +10,13 @@ format-specific options where needed.
 | Function | Format | Dependencies |
 |:---|:---|:---|
 | [`data.table::fwrite()`](https://rdrr.io/pkg/data.table/man/fwrite.html) | CSV / TSV | `data.table` |
-| [`table2pdf()`](https://phmcc.github.io/summata/reference/table2pdf.md) | PDF | `xtable`, LaTeX distribution |
-| [`table2docx()`](https://phmcc.github.io/summata/reference/table2docx.md) | Microsoft Word (.docx) | `flextable`, `officer` |
-| [`table2html()`](https://phmcc.github.io/summata/reference/table2html.md) | HTML | `xtable` |
-| [`table2pptx()`](https://phmcc.github.io/summata/reference/table2pptx.md) | PowerPoint (.pptx) | `flextable`, `officer` |
-| [`table2tex()`](https://phmcc.github.io/summata/reference/table2tex.md) | LaTeX source (.tex) | `xtable` |
-| [`table2rtf()`](https://phmcc.github.io/summata/reference/table2rtf.md) | Rich Text Format (.rtf) | `flextable` |
-| [`autotable()`](https://phmcc.github.io/summata/reference/autotable.md) | Auto-detect from extension | Varies |
+| [`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md) | PDF | `xtable`, LaTeX distribution |
+| [`table2docx()`](https://phmcc.codeberg.page/summata/reference/table2docx.md) | Microsoft Word (.docx) | `flextable`, `officer` |
+| [`table2html()`](https://phmcc.codeberg.page/summata/reference/table2html.md) | HTML | `xtable` |
+| [`table2pptx()`](https://phmcc.codeberg.page/summata/reference/table2pptx.md) | PowerPoint (.pptx) | `flextable`, `officer` |
+| [`table2tex()`](https://phmcc.codeberg.page/summata/reference/table2tex.md) | LaTeX source (.tex) | `xtable` |
+| [`table2rtf()`](https://phmcc.codeberg.page/summata/reference/table2rtf.md) | Rich Text Format (.rtf) | `flextable` |
+| [`autotable()`](https://phmcc.codeberg.page/summata/reference/autotable.md) | Auto-detect from extension | Varies |
 
 For delimited text formats (CSV, TSV), tables can be written directly
 with
@@ -125,7 +125,7 @@ functions described in the sections that follow.
 ## PDF Export
 
 The
-[`table2pdf()`](https://phmcc.github.io/summata/reference/table2pdf.md)
+[`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md)
 function creates PDF documents using LaTeX typesetting via the `xtable`
 package. A LaTeX distribution (TinyTeX, TeX Live, MiKTeX, or MacTeX) is
 required.
@@ -226,7 +226,7 @@ table2pdf(
 ## Microsoft Word Export
 
 The
-[`table2docx()`](https://phmcc.github.io/summata/reference/table2docx.md)
+[`table2docx()`](https://phmcc.codeberg.page/summata/reference/table2docx.md)
 function creates editable Word documents using the `flextable` and
 `officer` packages.
 
@@ -304,7 +304,7 @@ table2docx(
 ## HTML Export
 
 The
-[`table2html()`](https://phmcc.github.io/summata/reference/table2html.md)
+[`table2html()`](https://phmcc.codeberg.page/summata/reference/table2html.md)
 function exports tables to HTML file output for web use via the `xtable`
 package.
 
@@ -352,7 +352,7 @@ table2html(
 ## PowerPoint Export
 
 The
-[`table2pptx()`](https://phmcc.github.io/summata/reference/table2pptx.md)
+[`table2pptx()`](https://phmcc.codeberg.page/summata/reference/table2pptx.md)
 function creates PowerPoint presentations with tables using the
 `flextable` and `officer` packages.
 
@@ -415,7 +415,7 @@ table2pptx(
 ## LaTeX Export
 
 The
-[`table2tex()`](https://phmcc.github.io/summata/reference/table2tex.md)
+[`table2tex()`](https://phmcc.codeberg.page/summata/reference/table2tex.md)
 function creates LaTeX source files for inclusion in manuscripts via the
 `xtable` package.
 
@@ -464,7 +464,7 @@ table2tex(
 ## RTF Export
 
 The
-[`table2rtf()`](https://phmcc.github.io/summata/reference/table2rtf.md)
+[`table2rtf()`](https://phmcc.codeberg.page/summata/reference/table2rtf.md)
 function creates Rich Text Format files using the `flextable` and
 `officer` packages.
 
@@ -514,7 +514,7 @@ table2rtf(
 ## Automatic Format Detection
 
 The
-[`autotable()`](https://phmcc.github.io/summata/reference/autotable.md)
+[`autotable()`](https://phmcc.codeberg.page/summata/reference/autotable.md)
 function detects the output format from the file extension, simplifying
 the export workflow:
 
@@ -559,7 +559,7 @@ All export functions share common parameters for consistent results:
 | `p_threshold` | Significance threshold | 0.05 |
 | `indent_groups` | Indent factor levels | `FALSE` |
 | `condense_table` | Show essential rows only | `FALSE` |
-| `condense_quantitative` | Condense continuous/survival only ([`desctable()`](https://phmcc.github.io/summata/reference/desctable.md) only) | `FALSE` |
+| `condense_quantitative` | Condense continuous/survival only ([`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md) only) | `FALSE` |
 | `zebra_stripes` | Alternating row shading | `FALSE` |
 | `dark_header` | Dark header background | `FALSE` |
 
@@ -572,7 +572,7 @@ height:
   categorical variables
 - `condense_quantitative = TRUE`: Condenses only continuous and survival
   variables
-  ([`desctable()`](https://phmcc.github.io/summata/reference/desctable.md)
+  ([`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
   outputs only)
 
 ``` r
@@ -710,7 +710,7 @@ table2pdf(table, file.path(tempdir(), "debug.pdf"), show_logs = TRUE)
 ```
 
 See [Installation and
-Setup](https://phmcc.github.io/summata/articles/installation_setup.md)
+Setup](https://phmcc.codeberg.page/summata/articles/installation_setup.md)
 for LaTeX configuration details.
 
 ### Table Too Wide
@@ -748,26 +748,26 @@ save_as_docx(ft, path = file.path(tempdir(), "Table1_Custom.docx"))
 ## Further Reading
 
 - [Descriptive
-  Tables](https://phmcc.github.io/summata/articles/descriptive_tables.md):
-  [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md)
+  Tables](https://phmcc.codeberg.page/summata/articles/descriptive_tables.md):
+  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
   for baseline characteristics
 - [Regression
-  Modeling](https://phmcc.github.io/summata/articles/regression_modeling.md):
-  [`fit()`](https://phmcc.github.io/summata/reference/fit.md),
-  [`uniscreen()`](https://phmcc.github.io/summata/reference/uniscreen.md),
+  Modeling](https://phmcc.codeberg.page/summata/articles/regression_modeling.md):
+  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
+  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
   and
-  [`fullfit()`](https://phmcc.github.io/summata/reference/fullfit.md)
+  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
 - [Model
-  Comparison](https://phmcc.github.io/summata/articles/model_comparison.md):
-  [`compfit()`](https://phmcc.github.io/summata/reference/compfit.md)
+  Comparison](https://phmcc.codeberg.page/summata/articles/model_comparison.md):
+  [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
   for comparing models
 - [Forest
-  Plots](https://phmcc.github.io/summata/articles/forest_plots.md):
+  Plots](https://phmcc.codeberg.page/summata/articles/forest_plots.md):
   Visualization of regression results
 - [Multivariate
-  Regression](https://phmcc.github.io/summata/articles/multivariate_regression.md):
-  [`multifit()`](https://phmcc.github.io/summata/reference/multifit.md)
+  Regression](https://phmcc.codeberg.page/summata/articles/multivariate_regression.md):
+  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
   for multi-outcome analysis
 - [Advanced
-  Workflows](https://phmcc.github.io/summata/articles/advanced_workflows.md):
+  Workflows](https://phmcc.codeberg.page/summata/articles/advanced_workflows.md):
   Interactions and mixed-effects models

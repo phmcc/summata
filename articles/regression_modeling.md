@@ -14,9 +14,9 @@ analysis:
 
 | Function | Purpose |
 |:---|:---|
-| [`uniscreen()`](https://phmcc.github.io/summata/reference/uniscreen.md) | Univariable screening of multiple predictors |
-| [`fit()`](https://phmcc.github.io/summata/reference/fit.md) | Single univariable/multivariable model |
-| [`fullfit()`](https://phmcc.github.io/summata/reference/fullfit.md) | Combined univariable and multivariable analysis |
+| [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md) | Univariable screening of multiple predictors |
+| [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md) | Single univariable/multivariable model |
+| [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md) | Combined univariable and multivariable analysis |
 
 All functions support a wide range of model types including linear
 models, generalized linear models (logistic, Poisson, Gaussian, Gamma,
@@ -100,7 +100,7 @@ coefficients.
 ## Univariable Screening
 
 The
-[`uniscreen()`](https://phmcc.github.io/summata/reference/uniscreen.md)
+[`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md)
 function fits separate regression models for each predictor, combining
 results into a single table. This approach identifies candidate
 predictors for multivariable modeling.
@@ -342,10 +342,10 @@ summary(models[["age"]])
 
 ## Multivariable Modeling
 
-The [`fit()`](https://phmcc.github.io/summata/reference/fit.md) function
-estimates a single regression model with multiple predictors, producing
-adjusted effect estimates. It is effectively a wrapper for existing
-model functions in R and other supported packages that enforces
+The [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md)
+function estimates a single regression model with multiple predictors,
+producing adjusted effect estimates. It is effectively a wrapper for
+existing model functions in R and other supported packages that enforces
 `summata` syntax for more consistent function calling.
 
 ### **Example 6:** Logistic Regression
@@ -661,13 +661,14 @@ example13
 
 ## Combined Analysis
 
-The [`fullfit()`](https://phmcc.github.io/summata/reference/fullfit.md)
+The
+[`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
 function integrates univariable screening and multivariable modeling
 into a single workflow, producing a combined table with both unadjusted
 and adjusted estimates.
 
 This function extends
-[`fit()`](https://phmcc.github.io/summata/reference/fit.md) with an
+[`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md) with an
 additional parameter (`method`) for variable selection:
 
 ``` r
@@ -1253,7 +1254,7 @@ table2pdf(
 ```
 
 See the [Table
-Export](https://phmcc.github.io/summata/articles/table_export.md)
+Export](https://phmcc.codeberg.page/summata/articles/table_export.md)
 vignette for comprehensive documentation.
 
 ------------------------------------------------------------------------
@@ -1263,18 +1264,18 @@ vignette for comprehensive documentation.
 ### Variable Selection Strategy
 
 1.  **Exploratory phase**: Use
-    [`uniscreen()`](https://phmcc.github.io/summata/reference/uniscreen.md)
+    [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md)
     with liberal *p*-threshold (e.g., 0.20)
 2.  **Model building**: Use
-    [`fullfit()`](https://phmcc.github.io/summata/reference/fullfit.md)
+    [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
     with `method = "screen"` or `method = "custom"`
 3.  **Confirmatory analysis**: Use
-    [`fit()`](https://phmcc.github.io/summata/reference/fit.md) with
+    [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md) with
     pre-specified predictors
 4.  **Sensitivity analysis**: Compare specifications with
-    [`compfit()`](https://phmcc.github.io/summata/reference/compfit.md)
+    [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
     (*see* [Model
-    Comparison](https://phmcc.github.io/summata/articles/model_comparison.md))
+    Comparison](https://phmcc.codeberg.page/summata/articles/model_comparison.md))
 
 ### Choosing the Right Model
 
@@ -1402,23 +1403,23 @@ regression.
 ## Further Reading
 
 - [Descriptive
-  Tables](https://phmcc.github.io/summata/articles/descriptive_tables.md):
-  [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md)
+  Tables](https://phmcc.codeberg.page/summata/articles/descriptive_tables.md):
+  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
   for baseline characteristics
 - [Model
-  Comparison](https://phmcc.github.io/summata/articles/model_comparison.md):
-  [`compfit()`](https://phmcc.github.io/summata/reference/compfit.md)
+  Comparison](https://phmcc.codeberg.page/summata/articles/model_comparison.md):
+  [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
   for comparing models
 - [Table
-  Export](https://phmcc.github.io/summata/articles/table_export.md):
+  Export](https://phmcc.codeberg.page/summata/articles/table_export.md):
   Export to PDF, Word, and other formats
 - [Forest
-  Plots](https://phmcc.github.io/summata/articles/forest_plots.md):
+  Plots](https://phmcc.codeberg.page/summata/articles/forest_plots.md):
   Visualization of regression results
 - [Multivariate
-  Regression](https://phmcc.github.io/summata/articles/multivariate_regression.md):
-  [`multifit()`](https://phmcc.github.io/summata/reference/multifit.md)
+  Regression](https://phmcc.codeberg.page/summata/articles/multivariate_regression.md):
+  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
   for multi-outcome analysis
 - [Advanced
-  Workflows](https://phmcc.github.io/summata/articles/advanced_workflows.md):
+  Workflows](https://phmcc.codeberg.page/summata/articles/advanced_workflows.md):
   Interactions and mixed-effects models

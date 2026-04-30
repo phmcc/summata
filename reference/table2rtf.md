@@ -40,13 +40,13 @@ table2rtf(
 - table:
 
   Data frame, data.table, or matrix to export. Can be output from
-  [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md),
-  [`survtable()`](https://phmcc.github.io/summata/reference/survtable.md),
-  [`fit()`](https://phmcc.github.io/summata/reference/fit.md),
-  [`uniscreen()`](https://phmcc.github.io/summata/reference/uniscreen.md),
-  [`fullfit()`](https://phmcc.github.io/summata/reference/fullfit.md),
-  [`compfit()`](https://phmcc.github.io/summata/reference/compfit.md),
-  [`multifit()`](https://phmcc.github.io/summata/reference/multifit.md),
+  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md),
+  [`survtable()`](https://phmcc.codeberg.page/summata/reference/survtable.md),
+  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
+  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
+  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md),
+  [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md),
+  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md),
   or any tabular data.
 
 - file:
@@ -110,7 +110,7 @@ table2rtf(
   Logical. If `TRUE`, condenses continuous and survival variables into
   single rows while preserving all categorical variable rows (including
   binary). Only applies to descriptive tables from
-  [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md).
+  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md).
   Automatically sets `indent_groups = TRUE`. Unlike `condense_table`,
   this does not collapse binary categorical variables. Default is
   `FALSE`.
@@ -345,17 +345,17 @@ The function applies professional typography:
 
 ## See also
 
-[`autotable`](https://phmcc.github.io/summata/reference/autotable.md)
+[`autotable`](https://phmcc.codeberg.page/summata/reference/autotable.md)
 for automatic format detection,
-[`table2docx`](https://phmcc.github.io/summata/reference/table2docx.md)
+[`table2docx`](https://phmcc.codeberg.page/summata/reference/table2docx.md)
 for Word documents,
-[`table2pptx`](https://phmcc.github.io/summata/reference/table2pptx.md)
+[`table2pptx`](https://phmcc.codeberg.page/summata/reference/table2pptx.md)
 for PowerPoint slides,
-[`table2pdf`](https://phmcc.github.io/summata/reference/table2pdf.md)
+[`table2pdf`](https://phmcc.codeberg.page/summata/reference/table2pdf.md)
 for PDF output,
-[`table2html`](https://phmcc.github.io/summata/reference/table2html.md)
+[`table2html`](https://phmcc.codeberg.page/summata/reference/table2html.md)
 for HTML tables,
-[`table2tex`](https://phmcc.github.io/summata/reference/table2tex.md)
+[`table2tex`](https://phmcc.codeberg.page/summata/reference/table2tex.md)
 for LaTeX output,
 [`flextable`](https://davidgohel.github.io/flextable/reference/flextable.html)
 for the underlying table object,
@@ -363,12 +363,12 @@ for the underlying table object,
 for direct RTF export
 
 Other export functions:
-[`autotable()`](https://phmcc.github.io/summata/reference/autotable.md),
-[`table2docx()`](https://phmcc.github.io/summata/reference/table2docx.md),
-[`table2html()`](https://phmcc.github.io/summata/reference/table2html.md),
-[`table2pdf()`](https://phmcc.github.io/summata/reference/table2pdf.md),
-[`table2pptx()`](https://phmcc.github.io/summata/reference/table2pptx.md),
-[`table2tex()`](https://phmcc.github.io/summata/reference/table2tex.md)
+[`autotable()`](https://phmcc.codeberg.page/summata/reference/autotable.md),
+[`table2docx()`](https://phmcc.codeberg.page/summata/reference/table2docx.md),
+[`table2html()`](https://phmcc.codeberg.page/summata/reference/table2html.md),
+[`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md),
+[`table2pptx()`](https://phmcc.codeberg.page/summata/reference/table2pptx.md),
+[`table2tex()`](https://phmcc.codeberg.page/summata/reference/table2tex.md)
 
 ## Examples
 
@@ -388,54 +388,54 @@ results <- fit(
 if (requireNamespace("flextable", quietly = TRUE)) {
   table2rtf(results, file.path(tempdir(), "results.rtf"))
 }
-#> Table exported to /tmp/RtmpLSeNVB/results.rtf
+#> Table exported to /tmp/RtmpsIjHNN/results.rtf
 
 # \donttest{
 old_width <- options(width = 180)
 # Example 2: With caption
 table2rtf(results, file.path(tempdir(), "captioned.rtf"),
        caption = "Table 1: Multivariable Logistic Regression Results")
-#> Table exported to /tmp/RtmpLSeNVB/captioned.rtf
+#> Table exported to /tmp/RtmpsIjHNN/captioned.rtf
 
 # Example 3: Landscape orientation for wide tables
 table2rtf(results, file.path(tempdir(), "wide.rtf"),
        orientation = "landscape")
-#> Table exported to /tmp/RtmpLSeNVB/wide.rtf
+#> Table exported to /tmp/RtmpsIjHNN/wide.rtf
 
 # Example 4: Custom font and size
 table2rtf(results, file.path(tempdir(), "custom_font.rtf"),
        font_family = "Times New Roman",
        font_size = 11)
-#> Table exported to /tmp/RtmpLSeNVB/custom_font.rtf
+#> Table exported to /tmp/RtmpsIjHNN/custom_font.rtf
 
 # Example 5: Hierarchical display
 table2rtf(results, file.path(tempdir(), "indented.rtf"),
        indent_groups = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/indented.rtf
+#> Table exported to /tmp/RtmpsIjHNN/indented.rtf
 
 # Example 6: Condensed table
 table2rtf(results, file.path(tempdir(), "condensed.rtf"),
        condense_table = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/condensed.rtf
+#> Table exported to /tmp/RtmpsIjHNN/condensed.rtf
 
 # Example 7: With zebra stripes
 table2rtf(results, file.path(tempdir(), "striped.rtf"),
        zebra_stripes = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/striped.rtf
+#> Table exported to /tmp/RtmpsIjHNN/striped.rtf
 
 # Example 8: Dark header style
 table2rtf(results, file.path(tempdir(), "dark.rtf"),
        dark_header = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/dark.rtf
+#> Table exported to /tmp/RtmpsIjHNN/dark.rtf
 
 # Example 9: A4 paper for international submissions
 table2rtf(results, file.path(tempdir(), "a4.rtf"),
        paper = "a4")
-#> Table exported to /tmp/RtmpLSeNVB/a4.rtf
+#> Table exported to /tmp/RtmpsIjHNN/a4.rtf
 
 # Example 10: Get flextable for customization
 result <- table2rtf(results, file.path(tempdir(), "base.rtf"))
-#> Table exported to /tmp/RtmpLSeNVB/base.rtf
+#> Table exported to /tmp/RtmpsIjHNN/base.rtf
 ft <- attr(result, "flextable")
 
 # Customize the flextable
@@ -447,7 +447,7 @@ flextable::save_as_rtf(ft, path = file.path(tempdir(), "customized.rtf"))
 
 # Example 11: Direct flextable return
 ft <- table2rtf(results, file.path(tempdir(), "direct.rtf"), return_ft = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/direct.rtf
+#> Table exported to /tmp/RtmpsIjHNN/direct.rtf
 ft <- flextable::bg(ft, bg = "yellow", part = "header")
 
 # Example 12: Regulatory submission table
@@ -458,23 +458,23 @@ table2rtf(results, file.path(tempdir(), "submission.rtf"),
        indent_groups = TRUE,
        zebra_stripes = FALSE,
        bold_significant = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/submission.rtf
+#> Table exported to /tmp/RtmpsIjHNN/submission.rtf
 
 # Example 13: Custom column alignment
 table2rtf(results, file.path(tempdir(), "aligned.rtf"),
        align = c("left", "left", "center", "right", "right"))
-#> Table exported to /tmp/RtmpLSeNVB/aligned.rtf
+#> Table exported to /tmp/RtmpsIjHNN/aligned.rtf
 
 # Example 14: Disable significance bolding
 table2rtf(results, file.path(tempdir(), "no_bold.rtf"),
        bold_significant = FALSE)
-#> Table exported to /tmp/RtmpLSeNVB/no_bold.rtf
+#> Table exported to /tmp/RtmpsIjHNN/no_bold.rtf
 
 # Example 15: Stricter significance threshold
 table2rtf(results, file.path(tempdir(), "strict.rtf"),
        bold_significant = TRUE,
        p_threshold = 0.01)
-#> Table exported to /tmp/RtmpLSeNVB/strict.rtf
+#> Table exported to /tmp/RtmpsIjHNN/strict.rtf
 
 # Example 16: Descriptive statistics for baseline characteristics
 desc <- desctable(clintrial, by = "treatment",
@@ -483,7 +483,7 @@ desc <- desctable(clintrial, by = "treatment",
 table2rtf(desc, file.path(tempdir(), "baseline.rtf"),
        caption = "Table 1: Baseline Patient Characteristics",
        zebra_stripes = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/baseline.rtf
+#> Table exported to /tmp/RtmpsIjHNN/baseline.rtf
 
 # Example 17: Clinical trial efficacy table
 table2rtf(results, file.path(tempdir(), "efficacy.rtf"),
@@ -492,7 +492,7 @@ table2rtf(results, file.path(tempdir(), "efficacy.rtf"),
        paper = "letter",
        orientation = "landscape",
        condense_table = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/efficacy.rtf
+#> Table exported to /tmp/RtmpsIjHNN/efficacy.rtf
 
 options(old_width)
 # }

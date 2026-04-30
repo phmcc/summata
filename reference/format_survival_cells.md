@@ -67,7 +67,7 @@ format_survival_cells(
 - marks:
 
   List with `big.mark` and `decimal.mark` as returned by
-  [`resolve_number_marks`](https://phmcc.github.io/summata/reference/resolve_number_marks.md).
+  [`resolve_number_marks`](https://phmcc.codeberg.page/summata/reference/resolve_number_marks.md).
 
 ## Value
 

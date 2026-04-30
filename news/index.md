@@ -7,18 +7,18 @@ CRAN release: 2026-03-20
 - Use profile likelihood CIs for GLM/negbin and exact *t*-distribution
   CIs for linear models, replacing Wald approximation
 - Add `conf_method` parameter (`"profile"` / `"wald"`) to
-  [`fit()`](https://phmcc.github.io/summata/reference/fit.md),
-  [`uniscreen()`](https://phmcc.github.io/summata/reference/uniscreen.md),
-  [`fullfit()`](https://phmcc.github.io/summata/reference/fullfit.md),
-  [`multifit()`](https://phmcc.github.io/summata/reference/multifit.md),
-  and [`m2dt()`](https://phmcc.github.io/summata/reference/m2dt.md),
+  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
+  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
+  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md),
+  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md),
+  and [`m2dt()`](https://phmcc.codeberg.page/summata/reference/m2dt.md),
   with global option `summata.conf_method`
 - Report complete-case *n*/Events in
-  [`fullfit()`](https://phmcc.github.io/summata/reference/fullfit.md)
+  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
   multivariable rows (STROBE item 12)
 - Cache profile likelihood CIs from
-  [`fit()`](https://phmcc.github.io/summata/reference/fit.md) for reuse
-  in forest plot functions
+  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md) for
+  reuse in forest plot functions
 - Resolve `family = "Gamma"` string to `Gamma(link = "log")` for
   interpretable multiplicative effects
 - Fix
@@ -32,7 +32,7 @@ CRAN release: 2026-03-08
 
 - CRAN initial release re-submission
 - Fix
-  [`table2pdf()`](https://phmcc.github.io/summata/reference/table2pdf.md)
+  [`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md)
   to specify output directory for files
 - Minor WORDLIST changes
 
@@ -94,18 +94,18 @@ CRAN release: 2026-03-08
   dataset
 - Fix color coding in forest plots
 - Fix
-  [`glmforest()`](https://phmcc.github.io/summata/reference/glmforest.md)
+  [`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md)
   to correctly extract values from
   [`MASS::glm.nb()`](https://rdrr.io/pkg/MASS/man/glm.nb.html)
 - Fix regression functions to respect level order in categorical
   functions
 - Fix bug in
-  [`uniscreen()`](https://phmcc.github.io/summata/reference/uniscreen.md)
+  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md)
   where specified `p_threshold` values were not generating screened
   outputs
 - Fixes to print outputs in regression functions
 - Multiple
-  [`multifit()`](https://phmcc.github.io/summata/reference/multifit.md)
+  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
   revisions, including improved “n” and “Events” column handling and
   interaction effect formatting
 
@@ -138,7 +138,7 @@ CRAN release: 2026-03-08
 - Fix formatting for negative coefficients in forest plots
 - Fix “negative zero” formatting issues
 - Add safeguards to avoid multiple model types in
-  [`multifit()`](https://phmcc.github.io/summata/reference/multifit.md)
+  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
   calls
 - Add intelligent handling of binary categorical variables for
   `condense_table`
@@ -146,12 +146,12 @@ CRAN release: 2026-03-08
 ## *summata* 0.9.4 (2026-01-02)
 
 - Add `show_logs` parameter to
-  [`table2tex()`](https://phmcc.github.io/summata/reference/table2tex.md)
+  [`table2tex()`](https://phmcc.codeberg.page/summata/reference/table2tex.md)
 - Consistent Unicode formatting for files
 - Increased R version requirement to \>= 4.2.0 for better Unicode
   compatability
 - Add
-  [`survtable()`](https://phmcc.github.io/summata/reference/survtable.md)
+  [`survtable()`](https://phmcc.codeberg.page/summata/reference/survtable.md)
   function with utilities
 - Minor optimizations and function cleanup, with notation
   standardization
@@ -166,9 +166,9 @@ CRAN release: 2026-03-08
 - Expand “affirmative level” string criteria for binary categorical
   variables
 - Add option to remove “Predictors” column in
-  [`multifit()`](https://phmcc.github.io/summata/reference/multifit.md)
+  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
   and
-  [`multiforest()`](https://phmcc.github.io/summata/reference/multiforest.md)
+  [`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md)
 - Update documentation
 
 ## *summata* 0.9.1 (2025-12-27)
@@ -177,39 +177,39 @@ CRAN release: 2026-03-08
   all regression and forest plot functions
 - Add parameter for toggling the footer in forest plot functions
 - Update
-  [`uniscreen()`](https://phmcc.github.io/summata/reference/uniscreen.md)
+  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md)
   to accept mixed-effect models
 - Update
-  [`autoforest()`](https://phmcc.github.io/summata/reference/autoforest.md)
+  [`autoforest()`](https://phmcc.codeberg.page/summata/reference/autoforest.md)
   to accept lmer and glmer objects
 
 ## *summata* 0.9.0 (2025-12-27)
 
 - Add multivariate analysis support
-  ([`multifit()`](https://phmcc.github.io/summata/reference/multifit.md)
+  ([`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
   and
-  [`multiforest()`](https://phmcc.github.io/summata/reference/multiforest.md))
+  [`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md))
 - New vignette: “Multivariate Analysis”
 - Modify core forest plot functions
-  ([`lmforest()`](https://phmcc.github.io/summata/reference/lmforest.md),
-  [`glmforest()`](https://phmcc.github.io/summata/reference/glmforest.md),
+  ([`lmforest()`](https://phmcc.codeberg.page/summata/reference/lmforest.md),
+  [`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md),
   and
-  [`coxforest()`](https://phmcc.github.io/summata/reference/coxforest.md))
+  [`coxforest()`](https://phmcc.codeberg.page/summata/reference/coxforest.md))
   to accept *Summata* objects or models
 - Add univariable screening forest plot
-  ([`uniforest()`](https://phmcc.github.io/summata/reference/uniforest.md))
+  ([`uniforest()`](https://phmcc.codeberg.page/summata/reference/uniforest.md))
 - Rename `uscreen()` to
-  [`uniscreen()`](https://phmcc.github.io/summata/reference/uniscreen.md)
+  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md)
   for consistency
 - Update
-  [`autoforest()`](https://phmcc.github.io/summata/reference/autoforest.md)
+  [`autoforest()`](https://phmcc.codeberg.page/summata/reference/autoforest.md)
   to handle new forest plot functions
 
 ## *summata* 0.8.3 (2025-12-24)
 
 - Add optimizations to descriptive statistics workflows
 - Add `p_per_stat` parameter to
-  [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md)
+  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
 - Change `add_reference_rows` parameter to just `reference_rows` in
   regression functions
 
@@ -233,7 +233,7 @@ CRAN release: 2026-03-08
 ## *summata* 0.7.14 (2025-12-20)
 
 - Add
-  [`autotable()`](https://phmcc.github.io/summata/reference/autotable.md)
+  [`autotable()`](https://phmcc.codeberg.page/summata/reference/autotable.md)
   function
 
 ## *summata* 0.7.13 (2025-12-19)
@@ -246,8 +246,9 @@ CRAN release: 2026-03-08
 ## *summata* 0.7.12 (2025-12-15)
 
 - Add `condense_quantitative` parameter to table export functions
-- Modify [`fit()`](https://phmcc.github.io/summata/reference/fit.md) and
-  [`glmforest()`](https://phmcc.github.io/summata/reference/glmforest.md)
+- Modify [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md)
+  and
+  [`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md)
   to correctly display Poisson model statistics
 - Fix LaTeX/PDF export bugs
 
@@ -260,33 +261,33 @@ CRAN release: 2026-03-08
 
 - Update MuMIn package dependency and QC statistics in lmer models
 - Ensure that lme4 and coxme models work with
-  [`compfit()`](https://phmcc.github.io/summata/reference/compfit.md)
+  [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
 
 ## *summata* 0.7.9 (2025-12-06)
 
 - Fix “n” and “Events” columns for interaction effects
 - Fix lmerMod compatibility with
-  [`fit()`](https://phmcc.github.io/summata/reference/fit.md) and
-  [`m2dt()`](https://phmcc.github.io/summata/reference/m2dt.md)
+  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md) and
+  [`m2dt()`](https://phmcc.codeberg.page/summata/reference/m2dt.md)
 - Fix lmer compatibility for
-  [`lmforest()`](https://phmcc.github.io/summata/reference/lmforest.md)
+  [`lmforest()`](https://phmcc.codeberg.page/summata/reference/lmforest.md)
 - Get interaction effects to show on forest plots
 
 ## *summata* 0.7.8 (2025-11-24)
 
 - Add GLM and Cox mixed-effect compatibility with
-  [`m2dt()`](https://phmcc.github.io/summata/reference/m2dt.md) and
-  [`fit()`](https://phmcc.github.io/summata/reference/fit.md)
+  [`m2dt()`](https://phmcc.codeberg.page/summata/reference/m2dt.md) and
+  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md)
 - Add GLM and Cox mixed-effect compatibility with
-  [`glmforest()`](https://phmcc.github.io/summata/reference/glmforest.md)
+  [`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md)
   and
-  [`coxforest()`](https://phmcc.github.io/summata/reference/coxforest.md)
+  [`coxforest()`](https://phmcc.codeberg.page/summata/reference/coxforest.md)
 
 ## *summata* 0.7.7 (2025-11-20)
 
 - Add data requirement to
-  [`m2dt()`](https://phmcc.github.io/summata/reference/m2dt.md) to allow
-  for accurate per-group “n” and “events” columns for all models
+  [`m2dt()`](https://phmcc.codeberg.page/summata/reference/m2dt.md) to
+  allow for accurate per-group “n” and “events” columns for all models
 - Multiple `R CMD check` fixes
 
 ## *summata* 0.7.6 (2025-11-12)
@@ -304,7 +305,7 @@ CRAN release: 2026-03-08
 ## *summata* 0.7.3 (2025-11-03)
 
 - Add coefficient table combination function for
-  [`compfit()`](https://phmcc.github.io/summata/reference/compfit.md)
+  [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
 - Global and imported variable fixes
 
 ## *summata* 0.7.2 (2025-11-03)
@@ -368,9 +369,9 @@ CRAN release: 2026-03-08
 ## *summata* 0.5.5 (2025-10-11)
 
 - Add
-  [`lmforest()`](https://phmcc.github.io/summata/reference/lmforest.md)
+  [`lmforest()`](https://phmcc.codeberg.page/summata/reference/lmforest.md)
   and
-  [`autoforest()`](https://phmcc.github.io/summata/reference/autoforest.md)
+  [`autoforest()`](https://phmcc.codeberg.page/summata/reference/autoforest.md)
   functions
 
 ## *summata* 0.5.4 (2025-10-11)
@@ -380,46 +381,46 @@ CRAN release: 2026-03-08
 ## *summata* 0.5.3 (2025-10-10)
 
 - Fix
-  [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md)
+  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
   ordering to follow variable levels
 - Add “events” columns in
-  [`glmforest()`](https://phmcc.github.io/summata/reference/glmforest.md)
+  [`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md)
   and
-  [`coxforest()`](https://phmcc.github.io/summata/reference/coxforest.md)
+  [`coxforest()`](https://phmcc.codeberg.page/summata/reference/coxforest.md)
 - Fix outcome factor handling in
-  [`glmforest()`](https://phmcc.github.io/summata/reference/glmforest.md)
+  [`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md)
   and
-  [`coxforest()`](https://phmcc.github.io/summata/reference/coxforest.md)
+  [`coxforest()`](https://phmcc.codeberg.page/summata/reference/coxforest.md)
 - Implement exponentiation options for “fit” functions
 
 ## *summata* 0.5.2 (2025-10-09)
 
 - Fix “n” and “events” columns in `uscreen()`,
-  [`fit()`](https://phmcc.github.io/summata/reference/fit.md), and
+  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md), and
   `*summata*()`
 - Add hyphen space fillers for “p-value”, “Uni p”, and “Multi p” columns
 
 ## *summata* 0.5.1 (2025-10-08)
 
 - Add N rows to
-  [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md)
+  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
 - Fix errors with “rolling” p-values in
-  [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md)
-- Fix [`m2dt()`](https://phmcc.github.io/summata/reference/m2dt.md) edge
-  cases
+  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
+- Fix [`m2dt()`](https://phmcc.codeberg.page/summata/reference/m2dt.md)
+  edge cases
 
 ## *summata* 0.5.0 (2025-10-06)
 
 - Add export functions
-  [`table2pdf()`](https://phmcc.github.io/summata/reference/table2pdf.md),
-  [`table2tex()`](https://phmcc.github.io/summata/reference/table2tex.md),
+  [`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md),
+  [`table2tex()`](https://phmcc.codeberg.page/summata/reference/table2tex.md),
   and
-  [`table2html()`](https://phmcc.github.io/summata/reference/table2html.md)
+  [`table2html()`](https://phmcc.codeberg.page/summata/reference/table2html.md)
 
 ## *summata* 0.4.1 (2025-10-06)
 
 - Added
-  [`compfit()`](https://phmcc.github.io/summata/reference/compfit.md)
+  [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
   function
 - Reorganized helper functions
 - Function name cleanup
@@ -427,20 +428,20 @@ CRAN release: 2026-03-08
 ## *summata* 0.4.0 (2025-10-05)
 
 - Replacement of `mmodel()` function with
-  [`fit()`](https://phmcc.github.io/summata/reference/fit.md)
+  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md)
 - Standardization of output formats
 
 ## *summata* 0.3.1 (2025-10-02)
 
 - Fixes for unknown/missing rows, reporting of ranges, and non-grouped
   tables in
-  [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md)
+  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
 
 ## *summata* 0.3.0 (2025-09-30)
 
 - Edits to
-  [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md)
-  and [`fit()`](https://phmcc.github.io/summata/reference/fit.md)
+  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
+  and [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md)
 - Addition of “raw data” outputs
 - Expand internal documentation
 
@@ -451,9 +452,9 @@ CRAN release: 2026-03-08
 ## *summata* 0.2.0 (2025-09-26)
 
 - Add
-  [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md)
+  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
   function
-- Add [`fit()`](https://phmcc.github.io/summata/reference/fit.md)
+- Add [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md)
   function
 
 ## *summata* 0.1.0 (2025-09-23)

@@ -6,7 +6,7 @@ the package vignettes, detailing the mathematical foundations,
 assumptions, and interpretation of each supported model class.
 
 For practical guidance on using these methods, see the [Regression
-Modeling](https://phmcc.github.io/summata/articles/regression_modeling.md)
+Modeling](https://phmcc.codeberg.page/summata/articles/regression_modeling.md)
 vignette.
 
 ------------------------------------------------------------------------
@@ -686,7 +686,7 @@ beyond the sum of main effects.
 2.  **Likelihood ratio test**: Compare models with and without
     interaction
 3.  **Model comparison**: Use
-    [`compfit()`](https://phmcc.github.io/summata/reference/compfit.md)
+    [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
     to compare AIC/BIC
 
 ### Implementation
@@ -937,19 +937,19 @@ comparison_custom <- compfit(
 ## See Also
 
 - [Regression
-  Modeling](https://phmcc.github.io/summata/articles/regression_modeling.md):
+  Modeling](https://phmcc.codeberg.page/summata/articles/regression_modeling.md):
   Practical examples using
-  [`fit()`](https://phmcc.github.io/summata/reference/fit.md),
-  [`uniscreen()`](https://phmcc.github.io/summata/reference/uniscreen.md),
+  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
+  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
   and
-  [`fullfit()`](https://phmcc.github.io/summata/reference/fullfit.md)
+  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
 - [Advanced
-  Workflows](https://phmcc.github.io/summata/articles/advanced_workflows.md):
+  Workflows](https://phmcc.codeberg.page/summata/articles/advanced_workflows.md):
   Interactions and mixed-effects models
 - [Model
-  Comparison](https://phmcc.github.io/summata/articles/model_comparison.md):
+  Comparison](https://phmcc.codeberg.page/summata/articles/model_comparison.md):
   Comparing alternative specifications with
-  [`compfit()`](https://phmcc.github.io/summata/reference/compfit.md)
+  [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
 - [Forest
-  Plots](https://phmcc.github.io/summata/articles/forest_plots.md):
+  Plots](https://phmcc.codeberg.page/summata/articles/forest_plots.md):
   Visualization of regression results

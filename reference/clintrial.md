@@ -162,7 +162,7 @@ follow-up is approximately 30 months
 ## See also
 
 Other sample data:
-[`clintrial_labels`](https://phmcc.github.io/summata/reference/clintrial_labels.md)
+[`clintrial_labels`](https://phmcc.codeberg.page/summata/reference/clintrial_labels.md)
 
 ## Examples
 

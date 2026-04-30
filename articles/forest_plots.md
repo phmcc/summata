@@ -12,12 +12,12 @@ each model type, plus an automatic detection function:
 
 | Function | Model Type | Effect Measure |
 |:---|:---|:---|
-| [`lmforest()`](https://phmcc.github.io/summata/reference/lmforest.md) | Linear regression | Coefficient (*β*) |
-| [`glmforest()`](https://phmcc.github.io/summata/reference/glmforest.md) | Logistic/Poisson | Odds ratio / Rate ratio |
-| [`coxforest()`](https://phmcc.github.io/summata/reference/coxforest.md) | Cox regression | Hazard ratio |
-| [`uniforest()`](https://phmcc.github.io/summata/reference/uniforest.md) | Univariable screening | Model-dependent |
-| [`multiforest()`](https://phmcc.github.io/summata/reference/multiforest.md) | Multi-outcome analysis | Model-dependent |
-| [`autoforest()`](https://phmcc.github.io/summata/reference/autoforest.md) | Auto-detect | Auto-detect |
+| [`lmforest()`](https://phmcc.codeberg.page/summata/reference/lmforest.md) | Linear regression | Coefficient (*β*) |
+| [`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md) | Logistic/Poisson | Odds ratio / Rate ratio |
+| [`coxforest()`](https://phmcc.codeberg.page/summata/reference/coxforest.md) | Cox regression | Hazard ratio |
+| [`uniforest()`](https://phmcc.codeberg.page/summata/reference/uniforest.md) | Univariable screening | Model-dependent |
+| [`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md) | Multi-outcome analysis | Model-dependent |
+| [`autoforest()`](https://phmcc.codeberg.page/summata/reference/autoforest.md) | Auto-detect | Auto-detect |
 
 These functions follow a standard syntax when called:
 
@@ -26,10 +26,11 @@ forest_plot <- autoforest(x, data, ...)
 ```
 
 where `x` is either a model or a `summata` fitted output (e.g., from
-[`uniscreen()`](https://phmcc.github.io/summata/reference/uniscreen.md),
-[`fit()`](https://phmcc.github.io/summata/reference/fit.md),
-[`fullfit()`](https://phmcc.github.io/summata/reference/fullfit.md), or
-[`multifit()`](https://phmcc.github.io/summata/reference/multifit.md)),
+[`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
+[`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
+[`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md),
+or
+[`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)),
 and `data` is the name of the dataset used. The `data` argument is
 optional and is primarily used to derive *n* and Events counts for
 various groups/subgroups.
@@ -107,7 +108,7 @@ queue_plot(example1)
 ### **Example 2:** Linear Regression
 
 For continuous outcomes, use
-[`lmforest()`](https://phmcc.github.io/summata/reference/lmforest.md):
+[`lmforest()`](https://phmcc.codeberg.page/summata/reference/lmforest.md):
 
 ``` r
 linear_model <- lm(
@@ -129,7 +130,7 @@ queue_plot(example2)
 ### **Example 3:** Cox Regression
 
 For survival models, use
-[`coxforest()`](https://phmcc.github.io/summata/reference/coxforest.md):
+[`coxforest()`](https://phmcc.codeberg.page/summata/reference/coxforest.md):
 
 ``` r
 cox_model <- coxph(
@@ -151,7 +152,7 @@ queue_plot(example3)
 ### **Example 4:** Automatic Model Detection
 
 The
-[`autoforest()`](https://phmcc.github.io/summata/reference/autoforest.md)
+[`autoforest()`](https://phmcc.codeberg.page/summata/reference/autoforest.md)
 function detects the model type automatically:
 
 ``` r
@@ -170,8 +171,8 @@ queue_plot(example4)
 ## Creating Forest Plots from *summata* Output
 
 Forest plots integrate seamlessly with
-[`fit()`](https://phmcc.github.io/summata/reference/fit.md) and
-[`fullfit()`](https://phmcc.github.io/summata/reference/fullfit.md)
+[`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md) and
+[`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
 output by extracting the attached model object.
 
 ### **Example 5:** Direct Extraction from Fit Output
@@ -555,10 +556,10 @@ queue_plot(example20_modified)
 ## Additional GLM Families
 
 The
-[`glmforest()`](https://phmcc.github.io/summata/reference/glmforest.md)
+[`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md)
 function supports all GLM families. These can be plotted in a similar
 fashion to standard logistic regression forest plots. See [Regression
-Modeling](https://phmcc.github.io/summata/articles/regression_modeling.md)
+Modeling](https://phmcc.codeberg.page/summata/articles/regression_modeling.md)
 for the full list of supported model types.
 
 ### **Example 21:** Poisson Regression
@@ -588,7 +589,7 @@ queue_plot(example21)
 
 For overdispersed count outcomes (variance \> mean), negative binomial
 regression is preferred. Using
-[`fit()`](https://phmcc.github.io/summata/reference/fit.md) ensures
+[`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md) ensures
 proper handling:
 
 ``` r
@@ -615,7 +616,7 @@ queue_plot(example22)
 
 | Parameter | Description | Default |
 |:---|:---|:---|
-| `x` | Model object or model from [`fit()`](https://phmcc.github.io/summata/reference/fit.md) output | Required |
+| `x` | Model object or model from [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md) output | Required |
 | `data` | Data frame (required for model objects) | `NULL` |
 | `title` | Plot title | `NULL` |
 | `labels` | Named vector for variable labels | `NULL` |
@@ -697,30 +698,30 @@ p <- glmforest(model, labels = labels)
 ## Further Reading
 
 - [Descriptive
-  Tables](https://phmcc.github.io/summata/articles/descriptive_tables.md):
-  [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md)
+  Tables](https://phmcc.codeberg.page/summata/articles/descriptive_tables.md):
+  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
   for baseline characteristics
 - [Survival
-  Tables](https://phmcc.github.io/summata/articles/survival_tables.md):
-  [`survtable()`](https://phmcc.github.io/summata/reference/survtable.md)
+  Tables](https://phmcc.codeberg.page/summata/articles/survival_tables.md):
+  [`survtable()`](https://phmcc.codeberg.page/summata/reference/survtable.md)
   for time-to-event summaries
 - [Regression
-  Modeling](https://phmcc.github.io/summata/articles/regression_modeling.md):
-  [`fit()`](https://phmcc.github.io/summata/reference/fit.md),
-  [`uniscreen()`](https://phmcc.github.io/summata/reference/uniscreen.md),
+  Modeling](https://phmcc.codeberg.page/summata/articles/regression_modeling.md):
+  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
+  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
   and
-  [`fullfit()`](https://phmcc.github.io/summata/reference/fullfit.md)
+  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
 - [Model
-  Comparison](https://phmcc.github.io/summata/articles/model_comparison.md):
-  [`compfit()`](https://phmcc.github.io/summata/reference/compfit.md)
+  Comparison](https://phmcc.codeberg.page/summata/articles/model_comparison.md):
+  [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
   for comparing models
 - [Table
-  Export](https://phmcc.github.io/summata/articles/table_export.md):
+  Export](https://phmcc.codeberg.page/summata/articles/table_export.md):
   Export to PDF, Word, and other formats
 - [Multivariate
-  Regression](https://phmcc.github.io/summata/articles/multivariate_regression.md):
-  [`multifit()`](https://phmcc.github.io/summata/reference/multifit.md)
+  Regression](https://phmcc.codeberg.page/summata/articles/multivariate_regression.md):
+  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
   for multi-outcome analysis
 - [Advanced
-  Workflows](https://phmcc.github.io/summata/articles/advanced_workflows.md):
+  Workflows](https://phmcc.codeberg.page/summata/articles/advanced_workflows.md):
   Interactions and mixed-effects models

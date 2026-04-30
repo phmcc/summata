@@ -48,9 +48,9 @@ glmforest(
 
   Either a fitted GLM object (class `glm` or `glmerMod`), a `fit_result`
   object from
-  [`fit()`](https://phmcc.github.io/summata/reference/fit.md), or a
+  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md), or a
   `fullfit_result` object from
-  [`fullfit()`](https://phmcc.github.io/summata/reference/fullfit.md).
+  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md).
   When a `fit_result` or `fullfit_result` is provided, the model, data,
   and labels are automatically extracted.
 
@@ -206,9 +206,9 @@ glmforest(
 
   Gaussian with log link), and `"#5A8F5A"` (green) for coefficients
   (Gaussian/identity link). This scheme matches
-  [`uniforest()`](https://phmcc.github.io/summata/reference/uniforest.md)
+  [`uniforest()`](https://phmcc.codeberg.page/summata/reference/uniforest.md)
   and
-  [`multiforest()`](https://phmcc.github.io/summata/reference/multiforest.md).
+  [`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md).
   Choose colors that contrast well with black error bars.
 
 - exponentiate:
@@ -420,26 +420,26 @@ Or specify custom dimensions:
 
 ## See also
 
-[`autoforest`](https://phmcc.github.io/summata/reference/autoforest.md)
+[`autoforest`](https://phmcc.codeberg.page/summata/reference/autoforest.md)
 for automatic model detection,
-[`coxforest`](https://phmcc.github.io/summata/reference/coxforest.md)
+[`coxforest`](https://phmcc.codeberg.page/summata/reference/coxforest.md)
 for Cox proportional hazards forest plots,
-[`lmforest`](https://phmcc.github.io/summata/reference/lmforest.md) for
-linear model forest plots,
-[`uniforest`](https://phmcc.github.io/summata/reference/uniforest.md)
+[`lmforest`](https://phmcc.codeberg.page/summata/reference/lmforest.md)
+for linear model forest plots,
+[`uniforest`](https://phmcc.codeberg.page/summata/reference/uniforest.md)
 for univariable screening forest plots,
-[`multiforest`](https://phmcc.github.io/summata/reference/multiforest.md)
+[`multiforest`](https://phmcc.codeberg.page/summata/reference/multiforest.md)
 for multi-outcome forest plots,
 [`glm`](https://rdrr.io/r/stats/glm.html) for fitting GLMs,
-[`fit`](https://phmcc.github.io/summata/reference/fit.md) for regression
-modeling
+[`fit`](https://phmcc.codeberg.page/summata/reference/fit.md) for
+regression modeling
 
 Other visualization functions:
-[`autoforest()`](https://phmcc.github.io/summata/reference/autoforest.md),
-[`coxforest()`](https://phmcc.github.io/summata/reference/coxforest.md),
-[`lmforest()`](https://phmcc.github.io/summata/reference/lmforest.md),
-[`multiforest()`](https://phmcc.github.io/summata/reference/multiforest.md),
-[`uniforest()`](https://phmcc.github.io/summata/reference/uniforest.md)
+[`autoforest()`](https://phmcc.codeberg.page/summata/reference/autoforest.md),
+[`coxforest()`](https://phmcc.codeberg.page/summata/reference/coxforest.md),
+[`lmforest()`](https://phmcc.codeberg.page/summata/reference/lmforest.md),
+[`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md),
+[`uniforest()`](https://phmcc.codeberg.page/summata/reference/uniforest.md)
 
 ## Examples
 

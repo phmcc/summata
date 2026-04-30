@@ -34,13 +34,13 @@ table2html(
 - table:
 
   Data frame, data.table, or matrix to export. Can be output from
-  [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md),
-  [`survtable()`](https://phmcc.github.io/summata/reference/survtable.md),
-  [`fit()`](https://phmcc.github.io/summata/reference/fit.md),
-  [`uniscreen()`](https://phmcc.github.io/summata/reference/uniscreen.md),
-  [`fullfit()`](https://phmcc.github.io/summata/reference/fullfit.md),
-  [`compfit()`](https://phmcc.github.io/summata/reference/compfit.md),
-  [`multifit()`](https://phmcc.github.io/summata/reference/multifit.md),
+  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md),
+  [`survtable()`](https://phmcc.codeberg.page/summata/reference/survtable.md),
+  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
+  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
+  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md),
+  [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md),
+  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md),
   or any tabular data.
 
 - file:
@@ -97,7 +97,7 @@ table2html(
   Logical. If `TRUE`, condenses continuous and survival variables into
   single rows while preserving all categorical variable rows (including
   binary). Only applies to descriptive tables from
-  [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md).
+  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md).
   Automatically sets `indent_groups = TRUE`. Unlike `condense_table`,
   this does not collapse binary categorical variables. Default is
   `FALSE`.
@@ -267,30 +267,30 @@ The generated HTML follows accessibility best practices:
 
 ## See also
 
-[`autotable`](https://phmcc.github.io/summata/reference/autotable.md)
+[`autotable`](https://phmcc.codeberg.page/summata/reference/autotable.md)
 for automatic format detection,
-[`table2pdf`](https://phmcc.github.io/summata/reference/table2pdf.md)
+[`table2pdf`](https://phmcc.codeberg.page/summata/reference/table2pdf.md)
 for PDF output,
-[`table2tex`](https://phmcc.github.io/summata/reference/table2tex.md)
+[`table2tex`](https://phmcc.codeberg.page/summata/reference/table2tex.md)
 for LaTeX output,
-[`table2docx`](https://phmcc.github.io/summata/reference/table2docx.md)
+[`table2docx`](https://phmcc.codeberg.page/summata/reference/table2docx.md)
 for Word documents,
-[`table2pptx`](https://phmcc.github.io/summata/reference/table2pptx.md)
+[`table2pptx`](https://phmcc.codeberg.page/summata/reference/table2pptx.md)
 for PowerPoint,
-[`table2rtf`](https://phmcc.github.io/summata/reference/table2rtf.md)
+[`table2rtf`](https://phmcc.codeberg.page/summata/reference/table2rtf.md)
 for Rich Text Format,
-[`fit`](https://phmcc.github.io/summata/reference/fit.md) for regression
-tables,
-[`desctable`](https://phmcc.github.io/summata/reference/desctable.md)
+[`fit`](https://phmcc.codeberg.page/summata/reference/fit.md) for
+regression tables,
+[`desctable`](https://phmcc.codeberg.page/summata/reference/desctable.md)
 for descriptive tables
 
 Other export functions:
-[`autotable()`](https://phmcc.github.io/summata/reference/autotable.md),
-[`table2docx()`](https://phmcc.github.io/summata/reference/table2docx.md),
-[`table2pdf()`](https://phmcc.github.io/summata/reference/table2pdf.md),
-[`table2pptx()`](https://phmcc.github.io/summata/reference/table2pptx.md),
-[`table2rtf()`](https://phmcc.github.io/summata/reference/table2rtf.md),
-[`table2tex()`](https://phmcc.github.io/summata/reference/table2tex.md)
+[`autotable()`](https://phmcc.codeberg.page/summata/reference/autotable.md),
+[`table2docx()`](https://phmcc.codeberg.page/summata/reference/table2docx.md),
+[`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md),
+[`table2pptx()`](https://phmcc.codeberg.page/summata/reference/table2pptx.md),
+[`table2rtf()`](https://phmcc.codeberg.page/summata/reference/table2rtf.md),
+[`table2tex()`](https://phmcc.codeberg.page/summata/reference/table2tex.md)
 
 ## Examples
 
@@ -310,69 +310,69 @@ results <- fit(
 if (requireNamespace("xtable", quietly = TRUE)) {
   table2html(results, file.path(tempdir(), "results.html"))
 }
-#> Table exported to /tmp/RtmpLSeNVB/results.html
+#> Table exported to /tmp/RtmpsIjHNN/results.html
 
 # \donttest{
 # Example 2: With caption
 table2html(results, file.path(tempdir(), "captioned.html"),
           caption = "Table 1: Multivariable Logistic Regression Results")
-#> Table exported to /tmp/RtmpLSeNVB/captioned.html
+#> Table exported to /tmp/RtmpsIjHNN/captioned.html
 
 # Example 3: For embedding (no CSS)
 table2html(results, file.path(tempdir(), "embed.html"),
           include_css = FALSE)
-#> Table exported to /tmp/RtmpLSeNVB/embed.html
+#> Table exported to /tmp/RtmpsIjHNN/embed.html
 # Include in your HTML document
 
 # Example 4: Hierarchical display
 table2html(results, file.path(tempdir(), "indented.html"),
           indent_groups = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/indented.html
+#> Table exported to /tmp/RtmpsIjHNN/indented.html
 
 # Example 5: Condensed table
 table2html(results, file.path(tempdir(), "condensed.html"),
           condense_table = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/condensed.html
+#> Table exported to /tmp/RtmpsIjHNN/condensed.html
 
 # Example 6: With zebra stripes
 table2html(results, file.path(tempdir(), "striped.html"),
           zebra_stripes = TRUE,
           stripe_color = "#F0F0F0")
-#> Table exported to /tmp/RtmpLSeNVB/striped.html
+#> Table exported to /tmp/RtmpsIjHNN/striped.html
 
 # Example 7: Dark header style
 table2html(results, file.path(tempdir(), "dark.html"),
           dark_header = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/dark.html
+#> Table exported to /tmp/RtmpsIjHNN/dark.html
 
 # Example 8: Combination styling
 table2html(results, file.path(tempdir(), "styled.html"),
           zebra_stripes = TRUE,
           dark_header = TRUE,
           bold_significant = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/styled.html
+#> Table exported to /tmp/RtmpsIjHNN/styled.html
 
 # Example 9: Custom stripe color
 table2html(results, file.path(tempdir(), "blue_stripes.html"),
           zebra_stripes = TRUE,
           stripe_color = "#E3F2FD")  # Light blue
-#> Table exported to /tmp/RtmpLSeNVB/blue_stripes.html
+#> Table exported to /tmp/RtmpsIjHNN/blue_stripes.html
 
 # Example 10: Disable significance bolding
 table2html(results, file.path(tempdir(), "no_bold.html"),
           bold_significant = FALSE)
-#> Table exported to /tmp/RtmpLSeNVB/no_bold.html
+#> Table exported to /tmp/RtmpsIjHNN/no_bold.html
 
 # Example 11: Stricter significance threshold
 table2html(results, file.path(tempdir(), "strict.html"),
           bold_significant = TRUE,
           p_threshold = 0.01)
-#> Table exported to /tmp/RtmpLSeNVB/strict.html
+#> Table exported to /tmp/RtmpsIjHNN/strict.html
 
 # Example 12: No header formatting
 table2html(results, file.path(tempdir(), "raw_headers.html"),
           format_headers = FALSE)
-#> Table exported to /tmp/RtmpLSeNVB/raw_headers.html
+#> Table exported to /tmp/RtmpsIjHNN/raw_headers.html
 
 # Example 13: Descriptive statistics table
 desc_table <- desctable(clintrial, by = "treatment",
@@ -380,18 +380,18 @@ desc_table <- desctable(clintrial, by = "treatment",
 
 table2html(desc_table, file.path(tempdir(), "baseline.html"),
           caption = "Table 1: Baseline Characteristics by Treatment Group")
-#> Table exported to /tmp/RtmpLSeNVB/baseline.html
+#> Table exported to /tmp/RtmpsIjHNN/baseline.html
 
 # Example 14: For R Markdown (no CSS, for inline display)
 table2html(results, file.path(tempdir(), "rmd_table.html"),
           include_css = FALSE,
           indent_groups = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/rmd_table.html
+#> Table exported to /tmp/RtmpsIjHNN/rmd_table.html
 
 # Then in R Markdown, use a chunk with results='asis' to display inline:
 cat(readLines(file.path(tempdir(), "rmd_table.html")), sep = "\n")
 #> <!-- html table generated in R 4.5.2 by xtable 1.8-4 package -->
-#> <!-- Thu Apr 30 00:57:09 2026 -->
+#> <!-- Thu Apr 30 01:03:46 2026 -->
 #> <table border=1>
 #> <tr> <th> Variable </th> <th> <i>n</i> </th> <th> Events </th> <th> aOR (95% CI) </th> <th> <i>p</i>-value </th>  </tr>
 #>   <tr> <td> Age (years) </td> <td> 847 </td> <td> 606 </td> <td> 1.05 (1.04-1.07) </td> <td> <b>< 0.001</b> </td> </tr>
@@ -414,7 +414,7 @@ table2html(results, file.path(tempdir(), "email.html"),
           include_css = TRUE,  # Self-contained
           zebra_stripes = TRUE,
           caption = "Regression Results - See Attached")
-#> Table exported to /tmp/RtmpLSeNVB/email.html
+#> Table exported to /tmp/RtmpsIjHNN/email.html
 # Can be directly included in HTML emails
 
 # Example 16: Publication-ready web version
@@ -424,21 +424,21 @@ table2html(results, file.path(tempdir(), "publication.html"),
           zebra_stripes = FALSE,  # Clean look
           bold_significant = TRUE,
           dark_header = FALSE)
-#> Table exported to /tmp/RtmpLSeNVB/publication.html
+#> Table exported to /tmp/RtmpsIjHNN/publication.html
 
 # Example 17: Modern dark theme
 table2html(results, file.path(tempdir(), "dark_theme.html"),
           dark_header = TRUE,
           stripe_color = "#2A2A2A",  # Dark gray stripes
           zebra_stripes = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/dark_theme.html
+#> Table exported to /tmp/RtmpsIjHNN/dark_theme.html
 
 # Example 18: Minimal styling for custom CSS
 table2html(results, file.path(tempdir(), "minimal.html"),
           include_css = FALSE,
           format_headers = FALSE,
           bold_significant = FALSE)
-#> Table exported to /tmp/RtmpLSeNVB/minimal.html
+#> Table exported to /tmp/RtmpsIjHNN/minimal.html
 # Apply your own CSS classes and styling
 
 # Example 19: Model comparison table
@@ -458,7 +458,7 @@ comparison <- compfit(
 
 table2html(comparison, file.path(tempdir(), "comparison.html"),
           caption = "Model Comparison Statistics")
-#> Table exported to /tmp/RtmpLSeNVB/comparison.html
+#> Table exported to /tmp/RtmpsIjHNN/comparison.html
 
 # }
 ```

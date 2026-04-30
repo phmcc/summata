@@ -40,13 +40,13 @@ table2tex(
 - table:
 
   Data frame, data.table, or matrix to export. Can be output from
-  [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md),
-  [`survtable()`](https://phmcc.github.io/summata/reference/survtable.md),
-  [`fit()`](https://phmcc.github.io/summata/reference/fit.md),
-  [`uniscreen()`](https://phmcc.github.io/summata/reference/uniscreen.md),
-  [`fullfit()`](https://phmcc.github.io/summata/reference/fullfit.md),
-  [`compfit()`](https://phmcc.github.io/summata/reference/compfit.md),
-  [`multifit()`](https://phmcc.github.io/summata/reference/multifit.md),
+  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md),
+  [`survtable()`](https://phmcc.codeberg.page/summata/reference/survtable.md),
+  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
+  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
+  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md),
+  [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md),
+  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md),
   or any tabular data.
 
 - file:
@@ -126,7 +126,7 @@ table2tex(
   Logical. If `TRUE`, condenses continuous and survival variables into
   single rows while preserving all categorical variable rows (including
   binary). Only applies to descriptive tables from
-  [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md).
+  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md).
   Automatically sets `indent_groups = TRUE`. Unlike `condense_table`,
   this does not collapse binary categorical variables. Default is
   `FALSE`.
@@ -312,30 +312,30 @@ intentionally using LaTeX commands.
 
 ## See also
 
-[`autotable`](https://phmcc.github.io/summata/reference/autotable.md)
+[`autotable`](https://phmcc.codeberg.page/summata/reference/autotable.md)
 for automatic format detection,
-[`table2pdf`](https://phmcc.github.io/summata/reference/table2pdf.md)
+[`table2pdf`](https://phmcc.codeberg.page/summata/reference/table2pdf.md)
 for direct PDF output,
-[`table2html`](https://phmcc.github.io/summata/reference/table2html.md)
+[`table2html`](https://phmcc.codeberg.page/summata/reference/table2html.md)
 for HTML tables,
-[`table2docx`](https://phmcc.github.io/summata/reference/table2docx.md)
+[`table2docx`](https://phmcc.codeberg.page/summata/reference/table2docx.md)
 for Word documents,
-[`table2pptx`](https://phmcc.github.io/summata/reference/table2pptx.md)
+[`table2pptx`](https://phmcc.codeberg.page/summata/reference/table2pptx.md)
 for PowerPoint,
-[`table2rtf`](https://phmcc.github.io/summata/reference/table2rtf.md)
+[`table2rtf`](https://phmcc.codeberg.page/summata/reference/table2rtf.md)
 for Rich Text Format,
-[`fit`](https://phmcc.github.io/summata/reference/fit.md) for regression
-tables,
-[`desctable`](https://phmcc.github.io/summata/reference/desctable.md)
+[`fit`](https://phmcc.codeberg.page/summata/reference/fit.md) for
+regression tables,
+[`desctable`](https://phmcc.codeberg.page/summata/reference/desctable.md)
 for descriptive tables
 
 Other export functions:
-[`autotable()`](https://phmcc.github.io/summata/reference/autotable.md),
-[`table2docx()`](https://phmcc.github.io/summata/reference/table2docx.md),
-[`table2html()`](https://phmcc.github.io/summata/reference/table2html.md),
-[`table2pdf()`](https://phmcc.github.io/summata/reference/table2pdf.md),
-[`table2pptx()`](https://phmcc.github.io/summata/reference/table2pptx.md),
-[`table2rtf()`](https://phmcc.github.io/summata/reference/table2rtf.md)
+[`autotable()`](https://phmcc.codeberg.page/summata/reference/autotable.md),
+[`table2docx()`](https://phmcc.codeberg.page/summata/reference/table2docx.md),
+[`table2html()`](https://phmcc.codeberg.page/summata/reference/table2html.md),
+[`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md),
+[`table2pptx()`](https://phmcc.codeberg.page/summata/reference/table2pptx.md),
+[`table2rtf()`](https://phmcc.codeberg.page/summata/reference/table2rtf.md)
 
 ## Examples
 
@@ -355,7 +355,7 @@ results <- fit(
 if (requireNamespace("xtable", quietly = TRUE)) {
   table2tex(results, file.path(tempdir(), "basic.tex"))
 }
-#> Table exported to /tmp/RtmpLSeNVB/basic.tex
+#> Table exported to /tmp/RtmpsIjHNN/basic.tex
 
 # \donttest{
 # Example 2: With booktabs for publication
@@ -363,7 +363,7 @@ table2tex(results, file.path(tempdir(), "publication.tex"),
        booktabs = TRUE,
        caption = "Multivariable logistic regression results",
        label = "tab:regression")
-#> Table exported to /tmp/RtmpLSeNVB/publication.tex
+#> Table exported to /tmp/RtmpsIjHNN/publication.tex
 
 # Example 3: Multi-line caption with abbreviations
 table2tex(results, file.path(tempdir(), "detailed.tex"),
@@ -372,70 +372,70 @@ table2tex(results, file.path(tempdir(), "detailed.tex"),
                  aOR = adjusted odds ratio; CI = confidence interval\\\\
                  Model adjusted for age, sex, treatment, and disease stage",
        label = "tab:mortality")
-#> Table exported to /tmp/RtmpLSeNVB/detailed.tex
+#> Table exported to /tmp/RtmpsIjHNN/detailed.tex
 
 # Example 4: Hierarchical display with indentation
 table2tex(results, file.path(tempdir(), "indented.tex"),
        indent_groups = TRUE,
        booktabs = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/indented.tex
+#> Table exported to /tmp/RtmpsIjHNN/indented.tex
 
 # Example 5: Condensed table (reduced height)
 table2tex(results, file.path(tempdir(), "condensed.tex"),
        condense_table = TRUE,
        booktabs = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/condensed.tex
+#> Table exported to /tmp/RtmpsIjHNN/condensed.tex
 
 # Example 6: With zebra stripes
 table2tex(results, file.path(tempdir(), "striped.tex"),
        zebra_stripes = TRUE,
        stripe_color = "gray!15",
        booktabs = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/striped.tex
+#> Table exported to /tmp/RtmpsIjHNN/striped.tex
 # Remember to add \usepackage[table]{xcolor} to the LaTeX document
 
 # Example 7: Dark header style
 table2tex(results, file.path(tempdir(), "dark_header.tex"),
        dark_header = TRUE,
        booktabs = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/dark_header.tex
+#> Table exported to /tmp/RtmpsIjHNN/dark_header.tex
 # Requires \usepackage[table]{xcolor}
 
 # Example 8: Custom cell padding
 table2tex(results, file.path(tempdir(), "relaxed.tex"),
        cell_padding = "relaxed",
        booktabs = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/relaxed.tex
+#> Table exported to /tmp/RtmpsIjHNN/relaxed.tex
 
 # Example 9: Custom column alignment (auto-detected by default)
 table2tex(results, file.path(tempdir(), "custom_align.tex"),
        align = c("c", "c", "c", "c", "c", "c", "c"))
-#> Table exported to /tmp/RtmpLSeNVB/custom_align.tex
+#> Table exported to /tmp/RtmpsIjHNN/custom_align.tex
 
 # Example 10: No header formatting (keep original names)
 table2tex(results, file.path(tempdir(), "raw_headers.tex"),
        format_headers = FALSE)
-#> Table exported to /tmp/RtmpLSeNVB/raw_headers.tex
+#> Table exported to /tmp/RtmpsIjHNN/raw_headers.tex
 
 # Example 11: Disable significance bolding
 table2tex(results, file.path(tempdir(), "no_bold.tex"),
        bold_significant = FALSE,
        booktabs = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/no_bold.tex
+#> Table exported to /tmp/RtmpsIjHNN/no_bold.tex
 
 # Example 12: Stricter significance threshold
 table2tex(results, file.path(tempdir(), "strict_sig.tex"),
        bold_significant = TRUE,
        p_threshold = 0.01,  # Bold only if p < 0.01
        booktabs = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/strict_sig.tex
+#> Table exported to /tmp/RtmpsIjHNN/strict_sig.tex
 
 # Example 13: With caption size control
 table2tex(results, file.path(tempdir(), "caption_size.tex"),
        caption_size = 6,
        caption = "Table 1 - Results with Compact Caption\\\\
                  Smaller caption fits better on constrained pages")
-#> Table exported to /tmp/RtmpLSeNVB/caption_size.tex
+#> Table exported to /tmp/RtmpsIjHNN/caption_size.tex
 
 # Example 14: Complete publication-ready table
 table2tex(results, file.path(tempdir(), "final_table1.tex"),
@@ -446,7 +446,7 @@ table2tex(results, file.path(tempdir(), "final_table1.tex"),
        zebra_stripes = FALSE,  # Many journals prefer no stripes
        bold_significant = TRUE,
        cell_padding = "normal")
-#> Table exported to /tmp/RtmpLSeNVB/final_table1.tex
+#> Table exported to /tmp/RtmpsIjHNN/final_table1.tex
 
 # Example 15: Descriptive statistics table
 desc_table <- desctable(clintrial, by = "treatment",
@@ -456,7 +456,7 @@ table2tex(desc_table, file.path(tempdir(), "table1_descriptive.tex"),
        booktabs = TRUE,
        caption = "Table 1: Baseline Characteristics",
        label = "tab:baseline")
-#> Table exported to /tmp/RtmpLSeNVB/table1_descriptive.tex
+#> Table exported to /tmp/RtmpsIjHNN/table1_descriptive.tex
 
 # Example 16: Model comparison table
 models <- list(
@@ -477,7 +477,7 @@ table2tex(comparison, file.path(tempdir(), "model_comparison.tex"),
        booktabs = TRUE,
        caption = "Model Comparison Statistics",
        label = "tab:models")
-#> Table exported to /tmp/RtmpLSeNVB/model_comparison.tex
+#> Table exported to /tmp/RtmpsIjHNN/model_comparison.tex
 
 # }
 ```

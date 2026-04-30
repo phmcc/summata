@@ -338,20 +338,20 @@ ambiguity:
 
 ## See also
 
-[`survtable`](https://phmcc.github.io/summata/reference/survtable.md)
+[`survtable`](https://phmcc.codeberg.page/summata/reference/survtable.md)
 for detailed survival summary tables,
-[`fit`](https://phmcc.github.io/summata/reference/fit.md) for regression
-modeling,
-[`table2pdf`](https://phmcc.github.io/summata/reference/table2pdf.md)
+[`fit`](https://phmcc.codeberg.page/summata/reference/fit.md) for
+regression modeling,
+[`table2pdf`](https://phmcc.codeberg.page/summata/reference/table2pdf.md)
 for PDF export,
-[`table2docx`](https://phmcc.github.io/summata/reference/table2docx.md)
+[`table2docx`](https://phmcc.codeberg.page/summata/reference/table2docx.md)
 for Word export,
-[`table2html`](https://phmcc.github.io/summata/reference/table2html.md)
+[`table2html`](https://phmcc.codeberg.page/summata/reference/table2html.md)
 for HTML export
 
 Other descriptive functions:
-[`print.survtable()`](https://phmcc.github.io/summata/reference/print.survtable.md),
-[`survtable()`](https://phmcc.github.io/summata/reference/survtable.md)
+[`print.survtable()`](https://phmcc.codeberg.page/summata/reference/print.survtable.md),
+[`survtable()`](https://phmcc.codeberg.page/summata/reference/survtable.md)
 
 ## Examples
 

@@ -27,7 +27,7 @@ format_continuous_stat(stats, stat_type, fmt_str, marks)
 - marks:
 
   List with `big.mark` and `decimal.mark` as returned by
-  [`resolve_number_marks`](https://phmcc.github.io/summata/reference/resolve_number_marks.md).
+  [`resolve_number_marks`](https://phmcc.codeberg.page/summata/reference/resolve_number_marks.md).
 
 ## Value
 

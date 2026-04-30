@@ -3,14 +3,14 @@
 Survival analysis requires specialized summary tables that report
 time-to-event outcomes in formats appropriate for longitudinal research.
 While
-[`desctable()`](https://phmcc.github.io/summata/reference/desctable.md)
+[`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
 includes basic survival summaries (median with 95% CI), detailed
 survival analysis often requires more comprehensive reporting: survival
 probabilities at specified time points, multiple quantiles, and group
 comparisons with appropriate statistical tests.
 
 The
-[`survtable()`](https://phmcc.github.io/summata/reference/survtable.md)
+[`survtable()`](https://phmcc.codeberg.page/summata/reference/survtable.md)
 function generates publication-ready survival tables with flexible
 output options. It uses the familiar
 [`Surv()`](https://rdrr.io/pkg/survival/man/Surv.html) syntax for
@@ -162,7 +162,7 @@ example3
 
 Studies often include multiple time-to-event outcomes, such as
 progression-free survival (PFS) and overall survival (OS). The
-[`survtable()`](https://phmcc.github.io/summata/reference/survtable.md)
+[`survtable()`](https://phmcc.codeberg.page/summata/reference/survtable.md)
 function handles multiple endpoints in a single call.
 
 ### **Example 4:** PFS and OS Comparison
@@ -333,7 +333,7 @@ report consistent time points and groupings.
 
 Survival tables can be exported to various formats using the standard
 `summata` export functions. See the [Table
-Export](https://phmcc.github.io/summata/articles/table_export.md)
+Export](https://phmcc.codeberg.page/summata/articles/table_export.md)
 vignette for comprehensive documentation.
 
 ``` r
@@ -378,29 +378,29 @@ When selecting landmark time points, consider the following:
 ## Further Reading
 
 - [Descriptive
-  Tables](https://phmcc.github.io/summata/articles/descriptive_tables.md):
-  [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md)
+  Tables](https://phmcc.codeberg.page/summata/articles/descriptive_tables.md):
+  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
   for baseline characteristics
 - [Regression
-  Modeling](https://phmcc.github.io/summata/articles/regression_modeling.md):
-  [`fit()`](https://phmcc.github.io/summata/reference/fit.md),
-  [`uniscreen()`](https://phmcc.github.io/summata/reference/uniscreen.md),
+  Modeling](https://phmcc.codeberg.page/summata/articles/regression_modeling.md):
+  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
+  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
   and
-  [`fullfit()`](https://phmcc.github.io/summata/reference/fullfit.md)
+  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
 - [Model
-  Comparison](https://phmcc.github.io/summata/articles/model_comparison.md):
-  [`compfit()`](https://phmcc.github.io/summata/reference/compfit.md)
+  Comparison](https://phmcc.codeberg.page/summata/articles/model_comparison.md):
+  [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
   for comparing models
 - [Table
-  Export](https://phmcc.github.io/summata/articles/table_export.md):
+  Export](https://phmcc.codeberg.page/summata/articles/table_export.md):
   Export to PDF, Word, and other formats
 - [Forest
-  Plots](https://phmcc.github.io/summata/articles/forest_plots.md):
+  Plots](https://phmcc.codeberg.page/summata/articles/forest_plots.md):
   Visualization of regression results
 - [Multivariate
-  Regression](https://phmcc.github.io/summata/articles/multivariate_regression.md):
-  [`multifit()`](https://phmcc.github.io/summata/reference/multifit.md)
+  Regression](https://phmcc.codeberg.page/summata/articles/multivariate_regression.md):
+  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
   for multi-outcome analysis
 - [Advanced
-  Workflows](https://phmcc.github.io/summata/articles/advanced_workflows.md):
+  Workflows](https://phmcc.codeberg.page/summata/articles/advanced_workflows.md):
   Interactions and mixed-effects models

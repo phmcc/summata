@@ -2,10 +2,10 @@
 
 Returns confidence intervals for a fitted model, using a cached result
 when available from upstream
-[`fit()`](https://phmcc.github.io/summata/reference/fit.md) or
-[`m2dt()`](https://phmcc.github.io/summata/reference/m2dt.md) calls to
-avoid redundant computation. This is particularly beneficial for GLM and
-negative binomial models where
+[`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md) or
+[`m2dt()`](https://phmcc.codeberg.page/summata/reference/m2dt.md) calls
+to avoid redundant computation. This is particularly beneficial for GLM
+and negative binomial models where
 [`confint()`](https://rdrr.io/r/stats/confint.html) performs profile
 likelihood profiling, which can be expensive for models with many
 parameters.
@@ -22,7 +22,7 @@ get_cached_confint(model, conf_level = 0.95)
 
   Fitted model object. If the model carries a `"cached_confint"`
   attribute (set by
-  [`fit()`](https://phmcc.github.io/summata/reference/fit.md) during
+  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md) during
   table generation) and the cached confidence level matches
   `conf_level`, the cached result is returned directly.
 

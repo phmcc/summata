@@ -64,14 +64,14 @@ Additional packages extend functionality for specific use-cases:
 |:---|:---|:---|
 | `lme4` | Linear mixed-effects models | `lmer()`, `glmer()` model types |
 | `coxme` | Mixed-effects Cox models | `coxme()` model type |
-| `xtable` | LaTeX table generation | [`table2pdf()`](https://phmcc.github.io/summata/reference/table2pdf.md), [`table2tex()`](https://phmcc.github.io/summata/reference/table2tex.md), [`table2html()`](https://phmcc.github.io/summata/reference/table2html.md) |
-| `flextable` | Office document tables | [`table2docx()`](https://phmcc.github.io/summata/reference/table2docx.md), [`table2pptx()`](https://phmcc.github.io/summata/reference/table2pptx.md), [`table2rtf()`](https://phmcc.github.io/summata/reference/table2rtf.md) |
-| `officer` | Office document creation | [`table2docx()`](https://phmcc.github.io/summata/reference/table2docx.md), [`table2pptx()`](https://phmcc.github.io/summata/reference/table2pptx.md) |
+| `xtable` | LaTeX table generation | [`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md), [`table2tex()`](https://phmcc.codeberg.page/summata/reference/table2tex.md), [`table2html()`](https://phmcc.codeberg.page/summata/reference/table2html.md) |
+| `flextable` | Office document tables | [`table2docx()`](https://phmcc.codeberg.page/summata/reference/table2docx.md), [`table2pptx()`](https://phmcc.codeberg.page/summata/reference/table2pptx.md), [`table2rtf()`](https://phmcc.codeberg.page/summata/reference/table2rtf.md) |
+| `officer` | Office document creation | [`table2docx()`](https://phmcc.codeberg.page/summata/reference/table2docx.md), [`table2pptx()`](https://phmcc.codeberg.page/summata/reference/table2pptx.md) |
 | `knitr` | Dynamic document generation | R Markdown integration, vignettes |
 | `rmarkdown` | R Markdown documents | Vignette rendering |
 | `ragg` | High-quality graphics | Enhanced PNG rendering with better fonts |
 | `systemfonts` | Font management | Font detection for graphics |
-| `tinytex` | R-integrated LaTeX distribution | PDF table export via [`table2pdf()`](https://phmcc.github.io/summata/reference/table2pdf.md) |
+| `tinytex` | R-integrated LaTeX distribution | PDF table export via [`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md) |
 | `MASS` | Statistical methods | Model diagnostics and testing |
 | `MuMIn` | Multi-model inference | Model selection and averaging |
 | `pROC` | ROC curve analysis | Diagnostic performance evaluation |
@@ -107,9 +107,9 @@ install.packages("summata", dependencies = TRUE)
 ## LaTeX Configuration
 
 PDF and LaTeX export through
-[`table2pdf()`](https://phmcc.github.io/summata/reference/table2pdf.md)
+[`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md)
 and
-[`table2tex()`](https://phmcc.github.io/summata/reference/table2tex.md)
+[`table2tex()`](https://phmcc.codeberg.page/summata/reference/table2tex.md)
 require a LaTeX distribution.
 
 ### TinyTeX (Recommended)

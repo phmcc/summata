@@ -562,25 +562,25 @@ not met.
 
 ## See also
 
-[`uniscreen`](https://phmcc.github.io/summata/reference/uniscreen.md)
+[`uniscreen`](https://phmcc.codeberg.page/summata/reference/uniscreen.md)
 for univariable screening only,
-[`fit`](https://phmcc.github.io/summata/reference/fit.md) for fitting a
-single multivariable model,
-[`compfit`](https://phmcc.github.io/summata/reference/compfit.md) for
-comparing multiple models,
-[`desctable`](https://phmcc.github.io/summata/reference/desctable.md)
+[`fit`](https://phmcc.codeberg.page/summata/reference/fit.md) for
+fitting a single multivariable model,
+[`compfit`](https://phmcc.codeberg.page/summata/reference/compfit.md)
+for comparing multiple models,
+[`desctable`](https://phmcc.codeberg.page/summata/reference/desctable.md)
 for descriptive statistics
 
 Other regression functions:
-[`compfit()`](https://phmcc.github.io/summata/reference/compfit.md),
-[`fit()`](https://phmcc.github.io/summata/reference/fit.md),
-[`multifit()`](https://phmcc.github.io/summata/reference/multifit.md),
-[`print.compfit_result()`](https://phmcc.github.io/summata/reference/print.compfit_result.md),
-[`print.fit_result()`](https://phmcc.github.io/summata/reference/print.fit_result.md),
-[`print.fullfit_result()`](https://phmcc.github.io/summata/reference/print.fullfit_result.md),
-[`print.multifit_result()`](https://phmcc.github.io/summata/reference/print.multifit_result.md),
-[`print.uniscreen_result()`](https://phmcc.github.io/summata/reference/print.uniscreen_result.md),
-[`uniscreen()`](https://phmcc.github.io/summata/reference/uniscreen.md)
+[`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md),
+[`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
+[`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md),
+[`print.compfit_result()`](https://phmcc.codeberg.page/summata/reference/print.compfit_result.md),
+[`print.fit_result()`](https://phmcc.codeberg.page/summata/reference/print.fit_result.md),
+[`print.fullfit_result()`](https://phmcc.codeberg.page/summata/reference/print.fullfit_result.md),
+[`print.multifit_result()`](https://phmcc.codeberg.page/summata/reference/print.multifit_result.md),
+[`print.uniscreen_result()`](https://phmcc.codeberg.page/summata/reference/print.uniscreen_result.md),
+[`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md)
 
 ## Examples
 

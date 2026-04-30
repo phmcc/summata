@@ -24,7 +24,7 @@ format_number(x, digits, marks = NULL)
 - marks:
 
   Optional list with `big.mark` and `decimal.mark` as returned by
-  [`resolve_number_marks`](https://phmcc.github.io/summata/reference/resolve_number_marks.md).
+  [`resolve_number_marks`](https://phmcc.codeberg.page/summata/reference/resolve_number_marks.md).
 
 ## Value
 

@@ -38,13 +38,13 @@ table2docx(
 - table:
 
   Data frame, data.table, or matrix to export. Can be output from
-  [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md),
-  [`survtable()`](https://phmcc.github.io/summata/reference/survtable.md),
-  [`fit()`](https://phmcc.github.io/summata/reference/fit.md),
-  [`uniscreen()`](https://phmcc.github.io/summata/reference/uniscreen.md),
-  [`fullfit()`](https://phmcc.github.io/summata/reference/fullfit.md),
-  [`compfit()`](https://phmcc.github.io/summata/reference/compfit.md),
-  [`multifit()`](https://phmcc.github.io/summata/reference/multifit.md),
+  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md),
+  [`survtable()`](https://phmcc.codeberg.page/summata/reference/survtable.md),
+  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
+  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
+  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md),
+  [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md),
+  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md),
   or any tabular data.
 
 - file:
@@ -108,7 +108,7 @@ table2docx(
   Logical. If `TRUE`, condenses continuous and survival variables into
   single rows while preserving all categorical variable rows (including
   binary). Only applies to descriptive tables from
-  [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md).
+  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md).
   Automatically sets `indent_groups = TRUE`. Unlike `condense_table`,
   this does not collapse binary categorical variables. Default is
   `FALSE`.
@@ -360,17 +360,17 @@ Or use `flextable` directly in chunks:
 
 ## See also
 
-[`autotable`](https://phmcc.github.io/summata/reference/autotable.md)
+[`autotable`](https://phmcc.codeberg.page/summata/reference/autotable.md)
 for automatic format detection,
-[`table2pptx`](https://phmcc.github.io/summata/reference/table2pptx.md)
+[`table2pptx`](https://phmcc.codeberg.page/summata/reference/table2pptx.md)
 for PowerPoint slides,
-[`table2pdf`](https://phmcc.github.io/summata/reference/table2pdf.md)
+[`table2pdf`](https://phmcc.codeberg.page/summata/reference/table2pdf.md)
 for PDF output,
-[`table2html`](https://phmcc.github.io/summata/reference/table2html.md)
+[`table2html`](https://phmcc.codeberg.page/summata/reference/table2html.md)
 for HTML tables,
-[`table2rtf`](https://phmcc.github.io/summata/reference/table2rtf.md)
+[`table2rtf`](https://phmcc.codeberg.page/summata/reference/table2rtf.md)
 for Rich Text Format,
-[`table2tex`](https://phmcc.github.io/summata/reference/table2tex.md)
+[`table2tex`](https://phmcc.codeberg.page/summata/reference/table2tex.md)
 for LaTeX output,
 [`flextable`](https://davidgohel.github.io/flextable/reference/flextable.html)
 for the underlying table object,
@@ -378,12 +378,12 @@ for the underlying table object,
 for Word document manipulation
 
 Other export functions:
-[`autotable()`](https://phmcc.github.io/summata/reference/autotable.md),
-[`table2html()`](https://phmcc.github.io/summata/reference/table2html.md),
-[`table2pdf()`](https://phmcc.github.io/summata/reference/table2pdf.md),
-[`table2pptx()`](https://phmcc.github.io/summata/reference/table2pptx.md),
-[`table2rtf()`](https://phmcc.github.io/summata/reference/table2rtf.md),
-[`table2tex()`](https://phmcc.github.io/summata/reference/table2tex.md)
+[`autotable()`](https://phmcc.codeberg.page/summata/reference/autotable.md),
+[`table2html()`](https://phmcc.codeberg.page/summata/reference/table2html.md),
+[`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md),
+[`table2pptx()`](https://phmcc.codeberg.page/summata/reference/table2pptx.md),
+[`table2rtf()`](https://phmcc.codeberg.page/summata/reference/table2rtf.md),
+[`table2tex()`](https://phmcc.codeberg.page/summata/reference/table2tex.md)
 
 ## Examples
 
@@ -404,54 +404,54 @@ if (requireNamespace("flextable", quietly = TRUE) &&
     requireNamespace("officer", quietly = TRUE)) {
   table2docx(results, file.path(tempdir(), "results.docx"))
 }
-#> Table exported to /tmp/RtmpLSeNVB/results.docx
+#> Table exported to /tmp/RtmpsIjHNN/results.docx
 
 # \donttest{
 old_width <- options(width = 180)
 # Example 2: With caption
 table2docx(results, file.path(tempdir(), "captioned.docx"),
         caption = "Table 1: Multivariable Logistic Regression Results")
-#> Table exported to /tmp/RtmpLSeNVB/captioned.docx
+#> Table exported to /tmp/RtmpsIjHNN/captioned.docx
 
 # Example 3: Landscape orientation for wide tables
 table2docx(results, file.path(tempdir(), "wide.docx"),
         orientation = "landscape")
-#> Table exported to /tmp/RtmpLSeNVB/wide.docx
+#> Table exported to /tmp/RtmpsIjHNN/wide.docx
 
 # Example 4: Custom font and size
 table2docx(results, file.path(tempdir(), "custom_font.docx"),
         font_family = "Times New Roman",
         font_size = 11)
-#> Table exported to /tmp/RtmpLSeNVB/custom_font.docx
+#> Table exported to /tmp/RtmpsIjHNN/custom_font.docx
 
 # Example 5: Hierarchical display
 table2docx(results, file.path(tempdir(), "indented.docx"),
         indent_groups = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/indented.docx
+#> Table exported to /tmp/RtmpsIjHNN/indented.docx
 
 # Example 6: Condensed table
 table2docx(results, file.path(tempdir(), "condensed.docx"),
         condense_table = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/condensed.docx
+#> Table exported to /tmp/RtmpsIjHNN/condensed.docx
 
 # Example 7: With zebra stripes
 table2docx(results, file.path(tempdir(), "striped.docx"),
         zebra_stripes = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/striped.docx
+#> Table exported to /tmp/RtmpsIjHNN/striped.docx
 
 # Example 8: Dark header style
 table2docx(results, file.path(tempdir(), "dark.docx"),
         dark_header = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/dark.docx
+#> Table exported to /tmp/RtmpsIjHNN/dark.docx
 
 # Example 9: A4 paper for international journals
 table2docx(results, file.path(tempdir(), "a4.docx"),
         paper = "a4")
-#> Table exported to /tmp/RtmpLSeNVB/a4.docx
+#> Table exported to /tmp/RtmpsIjHNN/a4.docx
 
 # Example 10: Get flextable for customization
 result <- table2docx(results, file.path(tempdir(), "base.docx"))
-#> Table exported to /tmp/RtmpLSeNVB/base.docx
+#> Table exported to /tmp/RtmpsIjHNN/base.docx
 ft <- attr(result, "flextable")
 
 # Customize the flextable
@@ -460,7 +460,7 @@ ft <- flextable::color(ft, j = "p-value", color = "blue")
 
 # Example 11: Direct flextable return
 ft <- table2docx(results, file.path(tempdir(), "direct.docx"), return_ft = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/direct.docx
+#> Table exported to /tmp/RtmpsIjHNN/direct.docx
 ft <- flextable::bg(ft, bg = "yellow", part = "header")
 
 # Example 12: Publication-ready table
@@ -471,23 +471,23 @@ table2docx(results, file.path(tempdir(), "publication.docx"),
         indent_groups = TRUE,
         zebra_stripes = FALSE,
         bold_significant = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/publication.docx
+#> Table exported to /tmp/RtmpsIjHNN/publication.docx
 
 # Example 13: Custom column alignment
 table2docx(results, file.path(tempdir(), "aligned.docx"),
         align = c("left", "left", "center", "right", "right"))
-#> Table exported to /tmp/RtmpLSeNVB/aligned.docx
+#> Table exported to /tmp/RtmpsIjHNN/aligned.docx
 
 # Example 14: Disable significance bolding
 table2docx(results, file.path(tempdir(), "no_bold.docx"),
         bold_significant = FALSE)
-#> Table exported to /tmp/RtmpLSeNVB/no_bold.docx
+#> Table exported to /tmp/RtmpsIjHNN/no_bold.docx
 
 # Example 15: Stricter significance threshold
 table2docx(results, file.path(tempdir(), "strict.docx"),
         bold_significant = TRUE,
         p_threshold = 0.01)
-#> Table exported to /tmp/RtmpLSeNVB/strict.docx
+#> Table exported to /tmp/RtmpsIjHNN/strict.docx
 
 options(old_width)
 # }

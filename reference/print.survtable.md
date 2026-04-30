@@ -27,5 +27,5 @@ printing a formatted summary to the console.
 ## See also
 
 Other descriptive functions:
-[`desctable()`](https://phmcc.github.io/summata/reference/desctable.md),
-[`survtable()`](https://phmcc.github.io/summata/reference/survtable.md)
+[`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md),
+[`survtable()`](https://phmcc.codeberg.page/summata/reference/survtable.md)

@@ -47,9 +47,9 @@ coxforest(
 
   Either a fitted Cox model object (class `coxph` or `coxme`), a
   `fit_result` object from
-  [`fit()`](https://phmcc.github.io/summata/reference/fit.md), or a
+  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md), or a
   `fullfit_result` object from
-  [`fullfit()`](https://phmcc.github.io/summata/reference/fullfit.md).
+  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md).
   When a `fit_result` or `fullfit_result` is provided, the model, data,
   and labels are automatically extracted.
 
@@ -377,26 +377,26 @@ Users should verify this assumption using:
 
 ## See also
 
-[`autoforest`](https://phmcc.github.io/summata/reference/autoforest.md)
+[`autoforest`](https://phmcc.codeberg.page/summata/reference/autoforest.md)
 for automatic model detection,
-[`glmforest`](https://phmcc.github.io/summata/reference/glmforest.md)
+[`glmforest`](https://phmcc.codeberg.page/summata/reference/glmforest.md)
 for logistic/GLM forest plots,
-[`lmforest`](https://phmcc.github.io/summata/reference/lmforest.md) for
-linear model forest plots,
-[`uniforest`](https://phmcc.github.io/summata/reference/uniforest.md)
+[`lmforest`](https://phmcc.codeberg.page/summata/reference/lmforest.md)
+for linear model forest plots,
+[`uniforest`](https://phmcc.codeberg.page/summata/reference/uniforest.md)
 for univariable screening forest plots,
-[`multiforest`](https://phmcc.github.io/summata/reference/multiforest.md)
+[`multiforest`](https://phmcc.codeberg.page/summata/reference/multiforest.md)
 for multi-outcome forest plots,
 [`coxph`](https://rdrr.io/pkg/survival/man/coxph.html) for fitting Cox
-models, [`fit`](https://phmcc.github.io/summata/reference/fit.md) for
-regression modeling
+models, [`fit`](https://phmcc.codeberg.page/summata/reference/fit.md)
+for regression modeling
 
 Other visualization functions:
-[`autoforest()`](https://phmcc.github.io/summata/reference/autoforest.md),
-[`glmforest()`](https://phmcc.github.io/summata/reference/glmforest.md),
-[`lmforest()`](https://phmcc.github.io/summata/reference/lmforest.md),
-[`multiforest()`](https://phmcc.github.io/summata/reference/multiforest.md),
-[`uniforest()`](https://phmcc.github.io/summata/reference/uniforest.md)
+[`autoforest()`](https://phmcc.codeberg.page/summata/reference/autoforest.md),
+[`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md),
+[`lmforest()`](https://phmcc.codeberg.page/summata/reference/lmforest.md),
+[`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md),
+[`uniforest()`](https://phmcc.codeberg.page/summata/reference/uniforest.md)
 
 ## Examples
 

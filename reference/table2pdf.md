@@ -43,12 +43,12 @@ table2pdf(
 - table:
 
   Data frame, data.table, or matrix to export. Can be output from
-  [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md),
-  [`survtable()`](https://phmcc.github.io/summata/reference/survtable.md),
-  [`fit()`](https://phmcc.github.io/summata/reference/fit.md),
-  [`uniscreen()`](https://phmcc.github.io/summata/reference/uniscreen.md),
-  [`fullfit()`](https://phmcc.github.io/summata/reference/fullfit.md),
-  [`compfit()`](https://phmcc.github.io/summata/reference/compfit.md),
+  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md),
+  [`survtable()`](https://phmcc.codeberg.page/summata/reference/survtable.md),
+  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
+  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
+  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md),
+  [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md),
   or any tabular data structure.
 
 - file:
@@ -187,7 +187,7 @@ table2pdf(
   Logical. If `TRUE`, condenses continuous and survival variables into
   single rows while preserving all categorical variable rows (including
   binary). Only applies to descriptive tables from
-  [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md).
+  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md).
   Automatically sets `indent_groups = TRUE`. Unlike `condense_table`,
   this does not collapse binary categorical variables. Default is
   `FALSE`.
@@ -325,30 +325,30 @@ If PDF compilation fails:
 
 ## See also
 
-[`autotable`](https://phmcc.github.io/summata/reference/autotable.md)
+[`autotable`](https://phmcc.codeberg.page/summata/reference/autotable.md)
 for automatic format detection,
-[`table2tex`](https://phmcc.github.io/summata/reference/table2tex.md)
+[`table2tex`](https://phmcc.codeberg.page/summata/reference/table2tex.md)
 for LaTeX source files,
-[`table2html`](https://phmcc.github.io/summata/reference/table2html.md)
+[`table2html`](https://phmcc.codeberg.page/summata/reference/table2html.md)
 for HTML output,
-[`table2docx`](https://phmcc.github.io/summata/reference/table2docx.md)
+[`table2docx`](https://phmcc.codeberg.page/summata/reference/table2docx.md)
 for Microsoft Word,
-[`table2pptx`](https://phmcc.github.io/summata/reference/table2pptx.md)
+[`table2pptx`](https://phmcc.codeberg.page/summata/reference/table2pptx.md)
 for PowerPoint,
-[`table2rtf`](https://phmcc.github.io/summata/reference/table2rtf.md)
+[`table2rtf`](https://phmcc.codeberg.page/summata/reference/table2rtf.md)
 for Rich Text Format,
-[`desctable`](https://phmcc.github.io/summata/reference/desctable.md)
+[`desctable`](https://phmcc.codeberg.page/summata/reference/desctable.md)
 for descriptive tables,
-[`fit`](https://phmcc.github.io/summata/reference/fit.md) for regression
-tables
+[`fit`](https://phmcc.codeberg.page/summata/reference/fit.md) for
+regression tables
 
 Other export functions:
-[`autotable()`](https://phmcc.github.io/summata/reference/autotable.md),
-[`table2docx()`](https://phmcc.github.io/summata/reference/table2docx.md),
-[`table2html()`](https://phmcc.github.io/summata/reference/table2html.md),
-[`table2pptx()`](https://phmcc.github.io/summata/reference/table2pptx.md),
-[`table2rtf()`](https://phmcc.github.io/summata/reference/table2rtf.md),
-[`table2tex()`](https://phmcc.github.io/summata/reference/table2tex.md)
+[`autotable()`](https://phmcc.codeberg.page/summata/reference/autotable.md),
+[`table2docx()`](https://phmcc.codeberg.page/summata/reference/table2docx.md),
+[`table2html()`](https://phmcc.codeberg.page/summata/reference/table2html.md),
+[`table2pptx()`](https://phmcc.codeberg.page/summata/reference/table2pptx.md),
+[`table2rtf()`](https://phmcc.codeberg.page/summata/reference/table2rtf.md),
+[`table2tex()`](https://phmcc.codeberg.page/summata/reference/table2tex.md)
 
 ## Examples
 
@@ -382,7 +382,7 @@ if(has_latex){
   table2pdf(results, file.path(tempdir(), "basic_results.pdf"))
 }
 #> Compiling PDF...
-#> Table exported to /tmp/RtmpLSeNVB/basic_results.pdf
+#> Table exported to /tmp/RtmpsIjHNN/basic_results.pdf
 
 # \donttest{
 
@@ -511,48 +511,48 @@ table2pdf(results, file.path(tempdir(), "debug.pdf"),
 
 }
 #> Compiling PDF...
-#> Table exported to /tmp/RtmpLSeNVB/wide_results.pdf
+#> Table exported to /tmp/RtmpsIjHNN/wide_results.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/RtmpLSeNVB/captioned.pdf
+#> Table exported to /tmp/RtmpsIjHNN/captioned.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/RtmpLSeNVB/formatted_caption.pdf
+#> Table exported to /tmp/RtmpsIjHNN/formatted_caption.pdf
 #> Using standalone class for auto-sized output
 #> Compiling PDF...
-#> Table exported to /tmp/RtmpLSeNVB/autosize.pdf
+#> Table exported to /tmp/RtmpsIjHNN/autosize.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/RtmpLSeNVB/a4_custom.pdf
+#> Table exported to /tmp/RtmpsIjHNN/a4_custom.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/RtmpLSeNVB/large_font.pdf
+#> Table exported to /tmp/RtmpsIjHNN/large_font.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/RtmpLSeNVB/indented.pdf
+#> Table exported to /tmp/RtmpsIjHNN/indented.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/RtmpLSeNVB/condensed.pdf
+#> Table exported to /tmp/RtmpsIjHNN/condensed.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/RtmpLSeNVB/striped.pdf
+#> Table exported to /tmp/RtmpsIjHNN/striped.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/RtmpLSeNVB/dark_header.pdf
+#> Table exported to /tmp/RtmpsIjHNN/dark_header.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/RtmpLSeNVB/publication_ready.pdf
+#> Table exported to /tmp/RtmpsIjHNN/publication_ready.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/RtmpLSeNVB/relaxed_padding.pdf
+#> Table exported to /tmp/RtmpsIjHNN/relaxed_padding.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/RtmpLSeNVB/no_scale.pdf
+#> Table exported to /tmp/RtmpsIjHNN/no_scale.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/RtmpLSeNVB/no_bold.pdf
+#> Table exported to /tmp/RtmpsIjHNN/no_bold.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/RtmpLSeNVB/custom_align.pdf
+#> Table exported to /tmp/RtmpsIjHNN/custom_align.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/RtmpLSeNVB/descriptive.pdf
+#> Table exported to /tmp/RtmpsIjHNN/descriptive.pdf
 #> Auto-detected binary outcome, using logistic regression
 #> Fitting base with 2 predictors...
 #> Fitting full with 4 predictors...
 #> Compiling PDF...
-#> Table exported to /tmp/RtmpLSeNVB/model_comparison.pdf
+#> Table exported to /tmp/RtmpsIjHNN/model_comparison.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/RtmpLSeNVB/very_wide.pdf
+#> Table exported to /tmp/RtmpsIjHNN/very_wide.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/RtmpLSeNVB/caption_size.pdf
+#> Table exported to /tmp/RtmpsIjHNN/caption_size.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/RtmpLSeNVB/debug.pdf
+#> Table exported to /tmp/RtmpsIjHNN/debug.pdf
 # }
 ```

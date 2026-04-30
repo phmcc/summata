@@ -473,7 +473,7 @@ workflow that inverts the typical regression paradigm:
 5.  Optionally filters by *p*-value threshold
 
 This is conceptually opposite to
-[`uniscreen()`](https://phmcc.github.io/summata/reference/uniscreen.md),
+[`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
 which tests multiple predictors against a single outcome. Use
 `multifit()` when you have one exposure of interest and want to screen
 across multiple endpoints.
@@ -626,25 +626,25 @@ calls for each type:
 
 ## See also
 
-[`uniscreen`](https://phmcc.github.io/summata/reference/uniscreen.md)
+[`uniscreen`](https://phmcc.codeberg.page/summata/reference/uniscreen.md)
 for screening multiple predictors against one outcome,
-[`multiforest`](https://phmcc.github.io/summata/reference/multiforest.md)
+[`multiforest`](https://phmcc.codeberg.page/summata/reference/multiforest.md)
 for creating forest plots from multifit results,
-[`fit`](https://phmcc.github.io/summata/reference/fit.md) for
+[`fit`](https://phmcc.codeberg.page/summata/reference/fit.md) for
 single-outcome regression with full coefficient output,
-[`fullfit`](https://phmcc.github.io/summata/reference/fullfit.md) for
-complete univariable-to-multivariable workflow
+[`fullfit`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
+for complete univariable-to-multivariable workflow
 
 Other regression functions:
-[`compfit()`](https://phmcc.github.io/summata/reference/compfit.md),
-[`fit()`](https://phmcc.github.io/summata/reference/fit.md),
-[`fullfit()`](https://phmcc.github.io/summata/reference/fullfit.md),
-[`print.compfit_result()`](https://phmcc.github.io/summata/reference/print.compfit_result.md),
-[`print.fit_result()`](https://phmcc.github.io/summata/reference/print.fit_result.md),
-[`print.fullfit_result()`](https://phmcc.github.io/summata/reference/print.fullfit_result.md),
-[`print.multifit_result()`](https://phmcc.github.io/summata/reference/print.multifit_result.md),
-[`print.uniscreen_result()`](https://phmcc.github.io/summata/reference/print.uniscreen_result.md),
-[`uniscreen()`](https://phmcc.github.io/summata/reference/uniscreen.md)
+[`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md),
+[`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
+[`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md),
+[`print.compfit_result()`](https://phmcc.codeberg.page/summata/reference/print.compfit_result.md),
+[`print.fit_result()`](https://phmcc.codeberg.page/summata/reference/print.fit_result.md),
+[`print.fullfit_result()`](https://phmcc.codeberg.page/summata/reference/print.fullfit_result.md),
+[`print.multifit_result()`](https://phmcc.codeberg.page/summata/reference/print.multifit_result.md),
+[`print.uniscreen_result()`](https://phmcc.codeberg.page/summata/reference/print.uniscreen_result.md),
+[`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md)
 
 ## Examples
 

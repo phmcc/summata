@@ -15,13 +15,13 @@ autotable(table, file, ...)
 - table:
 
   Data frame, data.table, or matrix to export. Can be output from
-  [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md),
-  [`survtable()`](https://phmcc.github.io/summata/reference/survtable.md),
-  [`fit()`](https://phmcc.github.io/summata/reference/fit.md),
-  [`uniscreen()`](https://phmcc.github.io/summata/reference/uniscreen.md),
-  [`fullfit()`](https://phmcc.github.io/summata/reference/fullfit.md),
-  [`compfit()`](https://phmcc.github.io/summata/reference/compfit.md),
-  [`multifit()`](https://phmcc.github.io/summata/reference/multifit.md),
+  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md),
+  [`survtable()`](https://phmcc.codeberg.page/summata/reference/survtable.md),
+  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
+  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
+  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md),
+  [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md),
+  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md),
   or any tabular data structure.
 
 - file:
@@ -30,22 +30,22 @@ autotable(table, file, ...)
   determines the export format:
 
   - `.pdf` - PDF via LaTeX (uses
-    [`table2pdf()`](https://phmcc.github.io/summata/reference/table2pdf.md))
+    [`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md))
 
   - `.docx` - Microsoft Word (uses
-    [`table2docx()`](https://phmcc.github.io/summata/reference/table2docx.md))
+    [`table2docx()`](https://phmcc.codeberg.page/summata/reference/table2docx.md))
 
   - `.html` or `.htm` - HTML (uses
-    [`table2html()`](https://phmcc.github.io/summata/reference/table2html.md))
+    [`table2html()`](https://phmcc.codeberg.page/summata/reference/table2html.md))
 
   - `.pptx` - Microsoft PowerPoint (uses
-    [`table2pptx()`](https://phmcc.github.io/summata/reference/table2pptx.md))
+    [`table2pptx()`](https://phmcc.codeberg.page/summata/reference/table2pptx.md))
 
   - `.tex` - LaTeX source (uses
-    [`table2tex()`](https://phmcc.github.io/summata/reference/table2tex.md))
+    [`table2tex()`](https://phmcc.codeberg.page/summata/reference/table2tex.md))
 
   - `.rtf` - Rich Text Format (uses
-    [`table2rtf()`](https://phmcc.github.io/summata/reference/table2rtf.md))
+    [`table2rtf()`](https://phmcc.codeberg.page/summata/reference/table2rtf.md))
 
 - ...:
 
@@ -54,32 +54,32 @@ autotable(table, file, ...)
 
   PDF
 
-  :   [`table2pdf()`](https://phmcc.github.io/summata/reference/table2pdf.md) -
+  :   [`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md) -
       `orientation`, `paper`, `margins`, `fit_to_page`, *etc.*
 
   DOCX
 
-  :   [`table2docx()`](https://phmcc.github.io/summata/reference/table2docx.md) -
+  :   [`table2docx()`](https://phmcc.codeberg.page/summata/reference/table2docx.md) -
       `font_size`, `font_family`, `caption`, *etc.*
 
   HTML
 
-  :   [`table2html()`](https://phmcc.github.io/summata/reference/table2html.md) -
+  :   [`table2html()`](https://phmcc.codeberg.page/summata/reference/table2html.md) -
       `format_headers`, `zebra_stripes`, *etc.*
 
   PPTX
 
-  :   [`table2pptx()`](https://phmcc.github.io/summata/reference/table2pptx.md) -
+  :   [`table2pptx()`](https://phmcc.codeberg.page/summata/reference/table2pptx.md) -
       `font_size`, `font_family`, `caption`, *etc.*
 
   TEX
 
-  :   [`table2tex()`](https://phmcc.github.io/summata/reference/table2tex.md) -
+  :   [`table2tex()`](https://phmcc.codeberg.page/summata/reference/table2tex.md) -
       `caption`, `format_headers`, `align`, *etc.*
 
   RTF
 
-  :   [`table2rtf()`](https://phmcc.github.io/summata/reference/table2rtf.md) -
+  :   [`table2rtf()`](https://phmcc.codeberg.page/summata/reference/table2rtf.md) -
       `font_size`, `font_family`, `caption`, *etc.*
 
   Common parameters across formats include:
@@ -142,20 +142,20 @@ individual export functions directly:
 
 ## See also
 
-[`table2pdf`](https://phmcc.github.io/summata/reference/table2pdf.md),
-[`table2docx`](https://phmcc.github.io/summata/reference/table2docx.md),
-[`table2pptx`](https://phmcc.github.io/summata/reference/table2pptx.md),
-[`table2html`](https://phmcc.github.io/summata/reference/table2html.md),
-[`table2rtf`](https://phmcc.github.io/summata/reference/table2rtf.md),
-[`table2tex`](https://phmcc.github.io/summata/reference/table2tex.md)
+[`table2pdf`](https://phmcc.codeberg.page/summata/reference/table2pdf.md),
+[`table2docx`](https://phmcc.codeberg.page/summata/reference/table2docx.md),
+[`table2pptx`](https://phmcc.codeberg.page/summata/reference/table2pptx.md),
+[`table2html`](https://phmcc.codeberg.page/summata/reference/table2html.md),
+[`table2rtf`](https://phmcc.codeberg.page/summata/reference/table2rtf.md),
+[`table2tex`](https://phmcc.codeberg.page/summata/reference/table2tex.md)
 
 Other export functions:
-[`table2docx()`](https://phmcc.github.io/summata/reference/table2docx.md),
-[`table2html()`](https://phmcc.github.io/summata/reference/table2html.md),
-[`table2pdf()`](https://phmcc.github.io/summata/reference/table2pdf.md),
-[`table2pptx()`](https://phmcc.github.io/summata/reference/table2pptx.md),
-[`table2rtf()`](https://phmcc.github.io/summata/reference/table2rtf.md),
-[`table2tex()`](https://phmcc.github.io/summata/reference/table2tex.md)
+[`table2docx()`](https://phmcc.codeberg.page/summata/reference/table2docx.md),
+[`table2html()`](https://phmcc.codeberg.page/summata/reference/table2html.md),
+[`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md),
+[`table2pptx()`](https://phmcc.codeberg.page/summata/reference/table2pptx.md),
+[`table2rtf()`](https://phmcc.codeberg.page/summata/reference/table2rtf.md),
+[`table2tex()`](https://phmcc.codeberg.page/summata/reference/table2tex.md)
 
 ## Examples
 
@@ -170,7 +170,7 @@ tbl <- desctable(clintrial, by = "treatment",
 if (requireNamespace("xtable", quietly = TRUE)) {
   autotable(tbl, file.path(tempdir(), "example.html"))
 }
-#> Table exported to /tmp/RtmpLSeNVB/example.html
+#> Table exported to /tmp/RtmpsIjHNN/example.html
 
 # \donttest{
 # Load example data
@@ -203,20 +203,20 @@ has_latex <- local({
 
 # Export automatically detects format from extension
 autotable(results, file.path(tempdir(), "results.html"))  # Creates HTML file
-#> Table exported to /tmp/RtmpLSeNVB/results.html
+#> Table exported to /tmp/RtmpsIjHNN/results.html
 autotable(results, file.path(tempdir(), "results.docx"))  # Creates Word document
-#> Table exported to /tmp/RtmpLSeNVB/results.docx
+#> Table exported to /tmp/RtmpsIjHNN/results.docx
 autotable(results, file.path(tempdir(), "results.pptx"))  # Creates PowerPoint slide
-#> Table exported to /tmp/RtmpLSeNVB/results.pptx
+#> Table exported to /tmp/RtmpsIjHNN/results.pptx
 autotable(results, file.path(tempdir(), "results.tex"))   # Creates LaTeX source
-#> Table exported to /tmp/RtmpLSeNVB/results.tex
+#> Table exported to /tmp/RtmpsIjHNN/results.tex
 autotable(results, file.path(tempdir(), "results.rtf"))   # Creates RTF document
-#> Table exported to /tmp/RtmpLSeNVB/results.rtf
+#> Table exported to /tmp/RtmpsIjHNN/results.rtf
 if (has_latex) {
   autotable(results, file.path(tempdir(), "results.pdf")) # Creates PDF
 }
 #> Compiling PDF...
-#> Table exported to /tmp/RtmpLSeNVB/results.pdf
+#> Table exported to /tmp/RtmpsIjHNN/results.pdf
 
 # Pass format-specific parameters
 if (has_latex) {
@@ -226,19 +226,19 @@ if (has_latex) {
              font_size = 10)
 }
 #> Compiling PDF...
-#> Table exported to /tmp/RtmpLSeNVB/results.pdf
+#> Table exported to /tmp/RtmpsIjHNN/results.pdf
 
 autotable(results, file.path(tempdir(), "results.docx"),
            caption = "Table 1: Logistic Regression Results",
            font_family = "Times New Roman",
            condense_table = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/results.docx
+#> Table exported to /tmp/RtmpsIjHNN/results.docx
 
 autotable(results, file.path(tempdir(), "results.html"),
            zebra_stripes = TRUE,
            dark_header = TRUE,
            bold_significant = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/results.html
+#> Table exported to /tmp/RtmpsIjHNN/results.html
 
 # Works with any summata table output
 desc <- desctable(clintrial,
@@ -248,7 +248,7 @@ if (has_latex) {
   autotable(desc, file.path(tempdir(), "demographics.pdf"))
 }
 #> Compiling PDF...
-#> Table exported to /tmp/RtmpLSeNVB/demographics.pdf
+#> Table exported to /tmp/RtmpsIjHNN/demographics.pdf
 
 comparison <- compfit(
     data = clintrial,
@@ -262,7 +262,7 @@ comparison <- compfit(
 #> Fitting base with 2 predictors...
 #> Fitting full with 4 predictors...
 autotable(comparison, file.path(tempdir(), "model_comparison.docx"))
-#> Table exported to /tmp/RtmpLSeNVB/model_comparison.docx
+#> Table exported to /tmp/RtmpsIjHNN/model_comparison.docx
 
 # }
 ```

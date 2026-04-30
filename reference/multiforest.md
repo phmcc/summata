@@ -1,7 +1,7 @@
 # Create Forest Plot for Multivariate Regression
 
 Generates a publication-ready forest plot from a
-[`multifit()`](https://phmcc.github.io/summata/reference/multifit.md)
+[`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
 output object. The plot displays effect estimates (OR, HR, RR, or
 coefficients) with confidence intervals across multiple outcomes,
 organized by outcome with the predictor levels shown for each.
@@ -46,7 +46,7 @@ multiforest(
 - x:
 
   Multifit result object (data.table with class attributes from
-  [`multifit()`](https://phmcc.github.io/summata/reference/multifit.md)).
+  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)).
 
 - title:
 
@@ -62,7 +62,7 @@ multiforest(
 - column:
 
   Character string specifying which results to plot when
-  [`multifit()`](https://phmcc.github.io/summata/reference/multifit.md)
+  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
   was called with `columns = "both"`. Options are `"adjusted"` (default)
   or `"unadjusted"`. Ignored when the `multifit` result contains only
   one column type.
@@ -139,7 +139,7 @@ multiforest(
   level of a factor predictor is being compared. If `FALSE`, omits the
   column (useful when predictor info is in the caption). Default is
   `NULL`, which uses the `include_predictor` setting from
-  [`multifit()`](https://phmcc.github.io/summata/reference/multifit.md)
+  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
   if available, otherwise `TRUE`.
 
 - covariates_footer:
@@ -291,25 +291,25 @@ the formatted table output.
 
 ## See also
 
-[`autoforest`](https://phmcc.github.io/summata/reference/autoforest.md)
+[`autoforest`](https://phmcc.codeberg.page/summata/reference/autoforest.md)
 for automatic model detection,
-[`multifit`](https://phmcc.github.io/summata/reference/multifit.md) for
-multi-outcome regression analysis,
-[`glmforest`](https://phmcc.github.io/summata/reference/glmforest.md)
+[`multifit`](https://phmcc.codeberg.page/summata/reference/multifit.md)
+for multi-outcome regression analysis,
+[`glmforest`](https://phmcc.codeberg.page/summata/reference/glmforest.md)
 for single GLM forest plots,
-[`coxforest`](https://phmcc.github.io/summata/reference/coxforest.md)
+[`coxforest`](https://phmcc.codeberg.page/summata/reference/coxforest.md)
 for single Cox model forest plots,
-[`lmforest`](https://phmcc.github.io/summata/reference/lmforest.md) for
-single linear model forest plots,
-[`uniforest`](https://phmcc.github.io/summata/reference/uniforest.md)
+[`lmforest`](https://phmcc.codeberg.page/summata/reference/lmforest.md)
+for single linear model forest plots,
+[`uniforest`](https://phmcc.codeberg.page/summata/reference/uniforest.md)
 for univariable screening forest plots
 
 Other visualization functions:
-[`autoforest()`](https://phmcc.github.io/summata/reference/autoforest.md),
-[`coxforest()`](https://phmcc.github.io/summata/reference/coxforest.md),
-[`glmforest()`](https://phmcc.github.io/summata/reference/glmforest.md),
-[`lmforest()`](https://phmcc.github.io/summata/reference/lmforest.md),
-[`uniforest()`](https://phmcc.github.io/summata/reference/uniforest.md)
+[`autoforest()`](https://phmcc.codeberg.page/summata/reference/autoforest.md),
+[`coxforest()`](https://phmcc.codeberg.page/summata/reference/coxforest.md),
+[`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md),
+[`lmforest()`](https://phmcc.codeberg.page/summata/reference/lmforest.md),
+[`uniforest()`](https://phmcc.codeberg.page/summata/reference/uniforest.md)
 
 ## Examples
 

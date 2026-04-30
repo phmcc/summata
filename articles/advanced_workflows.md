@@ -224,10 +224,11 @@ example4
 
 ### **Example 5:** Testing Interaction Significance
 
-Use [`compfit()`](https://phmcc.github.io/summata/reference/compfit.md)
+Use
+[`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
 to formally evaluate whether interactions improve model fit (*see*
 [Model
-Comparison](https://phmcc.github.io/summata/articles/model_comparison.md)):
+Comparison](https://phmcc.codeberg.page/summata/articles/model_comparison.md)):
 
 ``` r
 example5 <- compfit(
@@ -472,9 +473,10 @@ queue_plot(example11)
 
 ### **Example 12:** Comparing Random-Effects Specifications
 
-Use [`compfit()`](https://phmcc.github.io/summata/reference/compfit.md)
+Use
+[`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
 to compare different random-effects structures (*see* [Model
-Comparison](https://phmcc.github.io/summata/articles/model_comparison.md)):
+Comparison](https://phmcc.codeberg.page/summata/articles/model_comparison.md)):
 
 ``` r
 example12 <- compfit(
@@ -641,7 +643,7 @@ example15
 ## Advanced Univariable Screening Features
 
 The
-[`uniscreen()`](https://phmcc.github.io/summata/reference/uniscreen.md)
+[`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md)
 function supports advanced model specifications including random effects
 and stratification.
 
@@ -724,7 +726,7 @@ example17
 ### **Example 18:** Forest Plot from Univariable Screening
 
 The
-[`uniforest()`](https://phmcc.github.io/summata/reference/uniforest.md)
+[`uniforest()`](https://phmcc.codeberg.page/summata/reference/uniforest.md)
 function visualizes univariable screening results:
 
 ``` r
@@ -752,7 +754,7 @@ queue_plot(example18)
 ## Advanced Multivariate Regression Features
 
 The
-[`multifit()`](https://phmcc.github.io/summata/reference/multifit.md)
+[`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
 function supports interactions and mixed-effects models when testing a
 predictor across multiple outcomes.
 
@@ -977,7 +979,7 @@ queue_plot(forest_plot)
 2.  Start with random intercepts; add random slopes if justified
 3.  Monitor convergence; simplify if necessary
 4.  Compare to fixed-effects models using
-    [`compfit()`](https://phmcc.github.io/summata/reference/compfit.md)
+    [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
 
 ### Method Selection
 
@@ -1032,26 +1034,26 @@ interaction patterns, consider stratified analyses or effect plots.
 ## Further Reading
 
 - [Descriptive
-  Tables](https://phmcc.github.io/summata/articles/descriptive_tables.md):
-  [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md)
+  Tables](https://phmcc.codeberg.page/summata/articles/descriptive_tables.md):
+  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
   for baseline characteristics
 - [Regression
-  Modeling](https://phmcc.github.io/summata/articles/regression_modeling.md):
-  [`fit()`](https://phmcc.github.io/summata/reference/fit.md),
-  [`uniscreen()`](https://phmcc.github.io/summata/reference/uniscreen.md),
+  Modeling](https://phmcc.codeberg.page/summata/articles/regression_modeling.md):
+  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
+  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
   and
-  [`fullfit()`](https://phmcc.github.io/summata/reference/fullfit.md)
+  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
 - [Model
-  Comparison](https://phmcc.github.io/summata/articles/model_comparison.md):
-  [`compfit()`](https://phmcc.github.io/summata/reference/compfit.md)
+  Comparison](https://phmcc.codeberg.page/summata/articles/model_comparison.md):
+  [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
   for comparing models
 - [Table
-  Export](https://phmcc.github.io/summata/articles/table_export.md):
+  Export](https://phmcc.codeberg.page/summata/articles/table_export.md):
   Export to PDF, Word, and other formats
 - [Forest
-  Plots](https://phmcc.github.io/summata/articles/forest_plots.md):
+  Plots](https://phmcc.codeberg.page/summata/articles/forest_plots.md):
   Visualization of regression results
 - [Multivariate
-  Regression](https://phmcc.github.io/summata/articles/multivariate_regression.md):
-  [`multifit()`](https://phmcc.github.io/summata/reference/multifit.md)
+  Regression](https://phmcc.codeberg.page/summata/articles/multivariate_regression.md):
+  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
   for multi-outcome analysis

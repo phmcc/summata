@@ -472,25 +472,25 @@ when the following are needed:
 
 ## See also
 
-[`fit`](https://phmcc.github.io/summata/reference/fit.md) for fitting a
-single multivariable model,
-[`fullfit`](https://phmcc.github.io/summata/reference/fullfit.md) for
-complete univariable-to-multivariable workflow,
-[`compfit`](https://phmcc.github.io/summata/reference/compfit.md) for
-comparing multiple models,
-[`m2dt`](https://phmcc.github.io/summata/reference/m2dt.md) for
+[`fit`](https://phmcc.codeberg.page/summata/reference/fit.md) for
+fitting a single multivariable model,
+[`fullfit`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
+for complete univariable-to-multivariable workflow,
+[`compfit`](https://phmcc.codeberg.page/summata/reference/compfit.md)
+for comparing multiple models,
+[`m2dt`](https://phmcc.codeberg.page/summata/reference/m2dt.md) for
 converting individual models to tables
 
 Other regression functions:
-[`compfit()`](https://phmcc.github.io/summata/reference/compfit.md),
-[`fit()`](https://phmcc.github.io/summata/reference/fit.md),
-[`fullfit()`](https://phmcc.github.io/summata/reference/fullfit.md),
-[`multifit()`](https://phmcc.github.io/summata/reference/multifit.md),
-[`print.compfit_result()`](https://phmcc.github.io/summata/reference/print.compfit_result.md),
-[`print.fit_result()`](https://phmcc.github.io/summata/reference/print.fit_result.md),
-[`print.fullfit_result()`](https://phmcc.github.io/summata/reference/print.fullfit_result.md),
-[`print.multifit_result()`](https://phmcc.github.io/summata/reference/print.multifit_result.md),
-[`print.uniscreen_result()`](https://phmcc.github.io/summata/reference/print.uniscreen_result.md)
+[`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md),
+[`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
+[`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md),
+[`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md),
+[`print.compfit_result()`](https://phmcc.codeberg.page/summata/reference/print.compfit_result.md),
+[`print.fit_result()`](https://phmcc.codeberg.page/summata/reference/print.fit_result.md),
+[`print.fullfit_result()`](https://phmcc.codeberg.page/summata/reference/print.fullfit_result.md),
+[`print.multifit_result()`](https://phmcc.codeberg.page/summata/reference/print.multifit_result.md),
+[`print.uniscreen_result()`](https://phmcc.codeberg.page/summata/reference/print.uniscreen_result.md)
 
 ## Examples
 

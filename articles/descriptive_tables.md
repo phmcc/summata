@@ -11,7 +11,7 @@ categorical variables, and tests for systematic differences between
 groups.
 
 The
-[`desctable()`](https://phmcc.github.io/summata/reference/desctable.md)
+[`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
 function generates publication-ready descriptive tables with automatic
 detection of variable types, appropriate summary statistics, and
 optional hypothesis testing. It adheres to the to the standard `summata`
@@ -50,7 +50,7 @@ human-readable labels for display.
 ## Summary Statistics and Tests
 
 The
-[`desctable()`](https://phmcc.github.io/summata/reference/desctable.md)
+[`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
 function automatically selects appropriate summary statistics and
 hypothesis tests based on variable type:
 
@@ -603,9 +603,9 @@ head(raw_data)
 
 For detailed survival analysis—including landmark survival estimates,
 survival quantiles, and multiple endpoints—see the dedicated [Survival
-Tables](https://phmcc.github.io/summata/articles/survival_tables.md)
+Tables](https://phmcc.codeberg.page/summata/articles/survival_tables.md)
 vignette. The
-[`survtable()`](https://phmcc.github.io/summata/reference/survtable.md)
+[`survtable()`](https://phmcc.codeberg.page/summata/reference/survtable.md)
 function provides comprehensive options for reporting time-to-event
 outcomes.
 
@@ -614,7 +614,7 @@ outcomes.
 ## Exporting Tables
 
 Descriptive tables can be exported to various formats. See the [Table
-Export](https://phmcc.github.io/summata/articles/table_export.md)
+Export](https://phmcc.codeberg.page/summata/articles/table_export.md)
 vignette for comprehensive documentation.
 
 ``` r
@@ -703,29 +703,29 @@ table2pdf(table, file.path(tempdir(), "table1.pdf"), orientation = "landscape", 
 ## Further Reading
 
 - [Survival
-  Tables](https://phmcc.github.io/summata/articles/survival_tables.md):
-  [`survtable()`](https://phmcc.github.io/summata/reference/survtable.md)
+  Tables](https://phmcc.codeberg.page/summata/articles/survival_tables.md):
+  [`survtable()`](https://phmcc.codeberg.page/summata/reference/survtable.md)
   for time-to-event summaries
 - [Regression
-  Modeling](https://phmcc.github.io/summata/articles/regression_modeling.md):
-  [`fit()`](https://phmcc.github.io/summata/reference/fit.md),
-  [`uniscreen()`](https://phmcc.github.io/summata/reference/uniscreen.md),
+  Modeling](https://phmcc.codeberg.page/summata/articles/regression_modeling.md):
+  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
+  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
   and
-  [`fullfit()`](https://phmcc.github.io/summata/reference/fullfit.md)
+  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
 - [Model
-  Comparison](https://phmcc.github.io/summata/articles/model_comparison.md):
-  [`compfit()`](https://phmcc.github.io/summata/reference/compfit.md)
+  Comparison](https://phmcc.codeberg.page/summata/articles/model_comparison.md):
+  [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
   for comparing models
 - [Table
-  Export](https://phmcc.github.io/summata/articles/table_export.md):
+  Export](https://phmcc.codeberg.page/summata/articles/table_export.md):
   Export to PDF, Word, and other formats
 - [Forest
-  Plots](https://phmcc.github.io/summata/articles/forest_plots.md):
+  Plots](https://phmcc.codeberg.page/summata/articles/forest_plots.md):
   Visualization of regression results
 - [Multivariate
-  Regression](https://phmcc.github.io/summata/articles/multivariate_regression.md):
-  [`multifit()`](https://phmcc.github.io/summata/reference/multifit.md)
+  Regression](https://phmcc.codeberg.page/summata/articles/multivariate_regression.md):
+  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
   for multi-outcome analysis
 - [Advanced
-  Workflows](https://phmcc.github.io/summata/articles/advanced_workflows.md):
+  Workflows](https://phmcc.codeberg.page/summata/articles/advanced_workflows.md):
   Interactions and mixed-effects models

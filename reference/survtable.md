@@ -349,13 +349,13 @@ within confidence intervals adapt automatically to avoid ambiguity:
 
 ## See also
 
-[`desctable`](https://phmcc.github.io/summata/reference/desctable.md)
+[`desctable`](https://phmcc.codeberg.page/summata/reference/desctable.md)
 for baseline characteristics tables,
-[`fit`](https://phmcc.github.io/summata/reference/fit.md) for regression
-analysis,
-[`table2pdf`](https://phmcc.github.io/summata/reference/table2pdf.md)
+[`fit`](https://phmcc.codeberg.page/summata/reference/fit.md) for
+regression analysis,
+[`table2pdf`](https://phmcc.codeberg.page/summata/reference/table2pdf.md)
 for PDF export,
-[`table2docx`](https://phmcc.github.io/summata/reference/table2docx.md)
+[`table2docx`](https://phmcc.codeberg.page/summata/reference/table2docx.md)
 for Word export,
 [`survfit`](https://rdrr.io/pkg/survival/man/survfit.html) for
 underlying survival estimation,
@@ -363,8 +363,8 @@ underlying survival estimation,
 survival curve comparison tests
 
 Other descriptive functions:
-[`desctable()`](https://phmcc.github.io/summata/reference/desctable.md),
-[`print.survtable()`](https://phmcc.github.io/summata/reference/print.survtable.md)
+[`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md),
+[`print.survtable()`](https://phmcc.codeberg.page/summata/reference/print.survtable.md)
 
 ## Examples
 

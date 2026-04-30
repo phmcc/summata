@@ -58,7 +58,7 @@ differing implementation strategies.
 
 | Package | Function | Implementation Notes |
 |:---|:---|:---|
-| `summata` | [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md) | `data.table` operations |
+| `summata` | [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md) | `data.table` operations |
 | `arsenal` | `tableby()` | Formula-based interface |
 | `tableone` | `CreateTableOne()` | Matrix-based computation |
 | `finalfit` | `summary_factorlist()` | `tidyverse` ecosystem |
@@ -88,7 +88,7 @@ specified time points.
 
 | Package | Function | Notes |
 |:---|:---|:---|
-| `summata` | [`survtable()`](https://phmcc.github.io/summata/reference/survtable.md) | Formatted output |
+| `summata` | [`survtable()`](https://phmcc.codeberg.page/summata/reference/survtable.md) | Formatted output |
 | manual | [`survival::survfit()`](https://rdrr.io/pkg/survival/man/survfit.html) | Raw computation |
 | `gtsummary` | `tbl_survfit()` | `gt` integration |
 
@@ -116,7 +116,7 @@ functions are as follows:
 
 | Package | Function | Notes |
 |:---|:---|:---|
-| `summata` | [`fit()`](https://phmcc.github.io/summata/reference/fit.md) | Profile likelihood CIs, QC stats, counts, and reference rows |
+| `summata` | [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md) | Profile likelihood CIs, QC stats, counts, and reference rows |
 | `summata_minimal` | `fit(..., conf_method = "wald", show_n = FALSE, show_events = FALSE, reference_rows = FALSE, keep_qc_stats = FALSE)` | Wald CIs, reduced output |
 | `finalfit` | `glmuni()` + `fit2df()` | Profile likelihood CIs (default) |
 | `broom` | `tidy()` | Profile likelihood CIs via [`confint()`](https://rdrr.io/r/stats/confint.html) dispatch |
@@ -234,7 +234,7 @@ model fits.
 
 | Package | Function | Notes |
 |:---|:---|:---|
-| `summata` | [`uniscreen()`](https://phmcc.github.io/summata/reference/uniscreen.md) | Parallel-capable |
+| `summata` | [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md) | Parallel-capable |
 | `summata_minimal` | `uniscreen(..., conf_method = "wald", show_n = FALSE, show_events = FALSE, reference_rows = FALSE)` | Wald CIs, reduced output |
 | `finalfit` | `glmuni()` + `fit2df()` | Sequential |
 | `broom` | Loop + `tidy()` | Manual implementation |
@@ -269,7 +269,7 @@ represents a common analytical pattern in statistical research.
 
 | Package | Approach | Notes |
 |:---|:---|:---|
-| `summata` | [`fullfit()`](https://phmcc.github.io/summata/reference/fullfit.md) | Single function |
+| `summata` | [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md) | Single function |
 | `summata_minimal` | `fullfit(..., conf_method = "wald", show_n = FALSE, show_events = FALSE, reference_rows = FALSE)` | Wald CIs, reduced output |
 | `finalfit` | `finalfit()` | Single function |
 | manual | Loop + [`glm()`](https://rdrr.io/r/stats/glm.html) + [`broom::tidy()`](https://generics.r-lib.org/reference/tidy.html) + [`rbind()`](https://rdrr.io/r/base/cbind.html) | Custom |
@@ -301,7 +301,7 @@ rendering.
 
 | Package | Function | Notes |
 |:---|:---|:---|
-| `summata` | [`coxforest()`](https://phmcc.github.io/summata/reference/coxforest.md) | Integrated table and plot |
+| `summata` | [`coxforest()`](https://phmcc.codeberg.page/summata/reference/coxforest.md) | Integrated table and plot |
 | `survminer` | `ggforest()` | Survival-focused |
 | manual | Custom `ggplot2` | Maximum flexibility |
 

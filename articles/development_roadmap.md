@@ -33,7 +33,7 @@ Features planned for subsequent releases:
 | Competing risks regression | Fine-Gray models via the `cmprsk` package | `finalfit` |
 | Multinomial regression | Support for [`nnet::multinom()`](https://rdrr.io/pkg/nnet/man/multinom.html) with multi-level categorical outcomes | `gtsummary`, `nnet` |
 | Ordinal regression | Support for [`MASS::polr()`](https://rdrr.io/pkg/MASS/man/polr.html) and [`ordinal::clm()`](https://rdrr.io/pkg/ordinal/man/clm.html) for ordered categorical outcomes | `MASS`, `ordinal` |
-| Custom statistics | User-defined summary statistics functions for [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md) | `gtsummary` |
+| Custom statistics | User-defined summary statistics functions for [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md) | `gtsummary` |
 
 ### Lower Priority
 
@@ -72,17 +72,17 @@ either on [Codeberg](https://codeberg.org/phmcc/summata/issues) or
 ## Version History
 
 See the
-[Changelog](https://phmcc.github.io/summata/articles/news/index.md) for
-a detailed history of changes in each release.
+[Changelog](https://phmcc.codeberg.page/summata/articles/news/index.md)
+for a detailed history of changes in each release.
 
 ------------------------------------------------------------------------
 
 ## Additional Resources
 
 - [Feature
-  Comparison](https://phmcc.github.io/summata/articles/feature_comparison.md):
+  Comparison](https://phmcc.codeberg.page/summata/articles/feature_comparison.md):
   Comparison with related packages
-- [Benchmarks](https://phmcc.github.io/summata/articles/benchmarks.md):
+- [Benchmarks](https://phmcc.codeberg.page/summata/articles/benchmarks.md):
   Performance comparisons
 - [gtsummary documentation](https://www.danieldsjoberg.com/gtsummary/)
 - [finalfit documentation](https://finalfit.org/)

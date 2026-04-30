@@ -42,13 +42,13 @@ table2pptx(
 - table:
 
   Data frame, data.table, or matrix to export. Can be output from
-  [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md),
-  [`survtable()`](https://phmcc.github.io/summata/reference/survtable.md),
-  [`fit()`](https://phmcc.github.io/summata/reference/fit.md),
-  [`uniscreen()`](https://phmcc.github.io/summata/reference/uniscreen.md),
-  [`fullfit()`](https://phmcc.github.io/summata/reference/fullfit.md),
-  [`compfit()`](https://phmcc.github.io/summata/reference/compfit.md),
-  [`multifit()`](https://phmcc.github.io/summata/reference/multifit.md),
+  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md),
+  [`survtable()`](https://phmcc.codeberg.page/summata/reference/survtable.md),
+  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
+  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
+  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md),
+  [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md),
+  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md),
   or any tabular data.
 
 - file:
@@ -111,7 +111,7 @@ table2pptx(
   Logical. If `TRUE`, condenses continuous and survival variables into
   single rows while preserving all categorical variable rows (including
   binary). Only applies to descriptive tables from
-  [`desctable()`](https://phmcc.github.io/summata/reference/desctable.md).
+  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md).
   Automatically sets `indent_groups = TRUE`. Unlike `condense_table`,
   this does not collapse binary categorical variables. Default is
   `FALSE`.
@@ -353,17 +353,17 @@ Access the `flextable` object for advanced formatting:
 
 ## See also
 
-[`autotable`](https://phmcc.github.io/summata/reference/autotable.md)
+[`autotable`](https://phmcc.codeberg.page/summata/reference/autotable.md)
 for automatic format detection,
-[`table2docx`](https://phmcc.github.io/summata/reference/table2docx.md)
+[`table2docx`](https://phmcc.codeberg.page/summata/reference/table2docx.md)
 for Word documents,
-[`table2pdf`](https://phmcc.github.io/summata/reference/table2pdf.md)
+[`table2pdf`](https://phmcc.codeberg.page/summata/reference/table2pdf.md)
 for PDF output,
-[`table2html`](https://phmcc.github.io/summata/reference/table2html.md)
+[`table2html`](https://phmcc.codeberg.page/summata/reference/table2html.md)
 for HTML tables,
-[`table2rtf`](https://phmcc.github.io/summata/reference/table2rtf.md)
+[`table2rtf`](https://phmcc.codeberg.page/summata/reference/table2rtf.md)
 for Rich Text Format,
-[`table2tex`](https://phmcc.github.io/summata/reference/table2tex.md)
+[`table2tex`](https://phmcc.codeberg.page/summata/reference/table2tex.md)
 for LaTeX output,
 [`flextable`](https://davidgohel.github.io/flextable/reference/flextable.html)
 for table customization,
@@ -371,12 +371,12 @@ for table customization,
 for PowerPoint manipulation
 
 Other export functions:
-[`autotable()`](https://phmcc.github.io/summata/reference/autotable.md),
-[`table2docx()`](https://phmcc.github.io/summata/reference/table2docx.md),
-[`table2html()`](https://phmcc.github.io/summata/reference/table2html.md),
-[`table2pdf()`](https://phmcc.github.io/summata/reference/table2pdf.md),
-[`table2rtf()`](https://phmcc.github.io/summata/reference/table2rtf.md),
-[`table2tex()`](https://phmcc.github.io/summata/reference/table2tex.md)
+[`autotable()`](https://phmcc.codeberg.page/summata/reference/autotable.md),
+[`table2docx()`](https://phmcc.codeberg.page/summata/reference/table2docx.md),
+[`table2html()`](https://phmcc.codeberg.page/summata/reference/table2html.md),
+[`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md),
+[`table2rtf()`](https://phmcc.codeberg.page/summata/reference/table2rtf.md),
+[`table2tex()`](https://phmcc.codeberg.page/summata/reference/table2tex.md)
 
 ## Examples
 
@@ -392,7 +392,7 @@ if (requireNamespace("flextable", quietly = TRUE) &&
     requireNamespace("officer", quietly = TRUE)) {
   table2pptx(tbl, file.path(tempdir(), "example.pptx"))
 }
-#> Table exported to /tmp/RtmpLSeNVB/example.pptx
+#> Table exported to /tmp/RtmpsIjHNN/example.pptx
 
 # \donttest{
 old_width <- options(width = 180)
@@ -410,35 +410,35 @@ results <- fit(
 
 # Example 1: Basic PowerPoint slide
 table2pptx(results, file.path(tempdir(), "results.pptx"))
-#> Table exported to /tmp/RtmpLSeNVB/results.pptx
+#> Table exported to /tmp/RtmpsIjHNN/results.pptx
 
 # Example 2: With title
 table2pptx(results, file.path(tempdir(), "titled.pptx"),
         caption = "Multivariable Regression Results")
-#> Table exported to /tmp/RtmpLSeNVB/titled.pptx
+#> Table exported to /tmp/RtmpsIjHNN/titled.pptx
 
 # Example 3: Larger font for visibility
 table2pptx(results, file.path(tempdir(), "large_font.pptx"),
         font_size = 12,
         caption = "Main Findings")
-#> Table exported to /tmp/RtmpLSeNVB/large_font.pptx
+#> Table exported to /tmp/RtmpsIjHNN/large_font.pptx
 
 # Example 4: Condensed for slide space
 table2pptx(results, file.path(tempdir(), "condensed.pptx"),
         condense_table = TRUE,
         caption = "Key Results")
-#> Table exported to /tmp/RtmpLSeNVB/condensed.pptx
+#> Table exported to /tmp/RtmpsIjHNN/condensed.pptx
 
 # Example 5: Dark header for emphasis
 table2pptx(results, file.path(tempdir(), "dark.pptx"),
         dark_header = TRUE,
         caption = "Risk Factors")
-#> Table exported to /tmp/RtmpLSeNVB/dark.pptx
+#> Table exported to /tmp/RtmpsIjHNN/dark.pptx
 
 # Example 6: With zebra stripes
 table2pptx(results, file.path(tempdir(), "striped.pptx"),
         zebra_stripes = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/striped.pptx
+#> Table exported to /tmp/RtmpsIjHNN/striped.pptx
 
 # Example 7: Blank layout with custom positioning
 table2pptx(results, file.path(tempdir(), "blank.pptx"),
@@ -446,11 +446,11 @@ table2pptx(results, file.path(tempdir(), "blank.pptx"),
         left = 1,
         top = 1.5,
         width = 8)
-#> Table exported to /tmp/RtmpLSeNVB/blank.pptx
+#> Table exported to /tmp/RtmpsIjHNN/blank.pptx
 
 # Example 8: Get flextable for customization
 ft <- table2pptx(results, file.path(tempdir(), "base.pptx"), return_ft = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/base.pptx
+#> Table exported to /tmp/RtmpsIjHNN/base.pptx
 
 # Customize the returned flextable object
 ft <- flextable::color(ft, j = "p-value", color = "darkred")
@@ -463,7 +463,7 @@ table2pptx(results, file.path(tempdir(), "presentation.pptx"),
         zebra_stripes = TRUE,
         dark_header = TRUE,
         bold_significant = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/presentation.pptx
+#> Table exported to /tmp/RtmpsIjHNN/presentation.pptx
 
 # Example 10: Descriptive statistics slide
 desc <- desctable(
@@ -476,7 +476,7 @@ desc <- desctable(
 table2pptx(desc, file.path(tempdir(), "baseline.pptx"),
         caption = "Baseline Characteristics",
         font_size = 10)
-#> Table exported to /tmp/RtmpLSeNVB/baseline.pptx
+#> Table exported to /tmp/RtmpsIjHNN/baseline.pptx
 
 # Example 11: Conference presentation style
 table2pptx(results, file.path(tempdir(), "conference.pptx"),
@@ -485,7 +485,7 @@ table2pptx(results, file.path(tempdir(), "conference.pptx"),
         font_size = 14,  # Large for big rooms
         dark_header = TRUE,
         condense_table = TRUE)
-#> Table exported to /tmp/RtmpLSeNVB/conference.pptx
+#> Table exported to /tmp/RtmpsIjHNN/conference.pptx
 
 options(old_width)
 # }
