@@ -263,7 +263,7 @@ ggsave("forest_30d.pdf", forest_30d,
 
 ### Contributing
 
-Bug reports and feature requests may be submitted via the [issue tracker](https://github.com/phmcc/summata/issues). Contributions are welcome; please consult the contributing guidelines prior to submitting pull requests.
+Bug reports and feature requests may be submitted via the issue tracker ([Codeberg](https://codeberg.org/phmcc/summata/issues) or [Github](https://github.com/phmcc/summata/issues)). Contributions are welcome; please consult the contributing guidelines prior to submitting pull requests.
 
 ## Acknowledgments
 
