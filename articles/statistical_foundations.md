@@ -1,0 +1,955 @@
+# Statistical Foundations
+
+This article provides a comprehensive reference for the statistical
+methods implemented in `summata`. It serves as a technical companion to
+the package vignettes, detailing the mathematical foundations,
+assumptions, and interpretation of each supported model class.
+
+For practical guidance on using these methods, see the [Regression
+Modeling](https://phmcc.github.io/summata/articles/regression_modeling.md)
+vignette.
+
+------------------------------------------------------------------------
+
+## Notation and Conventions
+
+Throughout this article, we adopt the following notation:
+
+| Symbol        | Description                           |
+|:--------------|:--------------------------------------|
+| *Y*           | Response (outcome) variable           |
+| *X*₁, …, *X*ₚ | Predictor (covariate) variables       |
+| *β*₀          | Intercept                             |
+| *β*₁, …, *β*ₚ | Regression coefficients               |
+| *n*           | Sample size                           |
+| *i*           | Observation index (*i* = 1, …, *n*)   |
+| *j*           | Cluster index (for hierarchical data) |
+| *t*           | Time (for survival models)            |
+| *g*(·)        | Link function                         |
+| exp(·)        | Exponential function                  |
+| log(·)        | Natural logarithm                     |
+
+------------------------------------------------------------------------
+
+## Hypothesis Testing
+
+### Wald Test
+
+Tests H₀: *β* = 0 using:
+
+\\z = \frac{\hat{\beta}}{\text{SE}(\hat{\beta})}\\
+
+Under H₀, *z* ~ N(0, 1) for GLM and Cox models. For linear models, the
+analogous statistic follows a *t*-distribution with *n* − *p* − 1
+degrees of freedom.
+
+### Likelihood Ratio Test
+
+Compares nested models:
+
+\\\Lambda = -2\[\log L\_{\text{reduced}} - \log L\_{\text{full}}\]\\
+
+Under H₀, Λ ~ χ²ₖ, where *k* is the difference in parameters.
+
+### Global Test
+
+Tests H₀: all *β*ⱼ = 0 (except intercept):
+
+- **Linear models**: F-test
+- **GLMs**: Likelihood ratio test
+- **Cox models**: Likelihood ratio, Wald, or score test
+
+------------------------------------------------------------------------
+
+## Confidence Intervals
+
+### Wald Confidence Intervals
+
+For coefficient *β* with standard error SE(*β*):
+
+\\\beta \pm z\_{1-\alpha/2} \cdot \text{SE}(\beta)\\
+
+where *z*₁₋α/₂ is the standard normal quantile (1.96 for 95% CI). Wald
+intervals are computationally inexpensive but may be inaccurate when the
+likelihood surface is asymmetric, which can occur with small samples,
+sparse data, or estimates near boundary values.
+
+### Exact *t*-Distribution Intervals
+
+For linear models, confidence intervals use the *t*-distribution to
+account for estimation of the residual variance:
+
+\\\beta \pm t\_{n-p-1, \\ 1-\alpha/2} \cdot \text{SE}(\beta)\\
+
+where *t*ₙ₋ₚ₋₁ is the *t*-quantile with *n* − *p* − 1 degrees of
+freedom. This produces wider intervals than the normal approximation,
+particularly when *n* is small relative to *p*.
+
+### Profile Likelihood Intervals
+
+Profile likelihood intervals are based on inverting the likelihood ratio
+test. The confidence set for *β* is defined as:
+
+\\\\\beta : 2\[\log L(\hat{\beta}) - \log L(\beta)\] \leq
+\chi^2\_{1,1-\alpha}\\\\
+
+Profile intervals are more accurate than Wald intervals for small
+samples or boundary estimates, because they respect the curvature of the
+likelihood surface rather than approximating it as quadratic. However,
+they require iterative computation (refitting the model for each
+parameter), which increases execution time.
+
+### Confidence Intervals for Effect Measures
+
+For exponentiated coefficients (OR, HR, RR), the CI is obtained by
+exponentiating the interval endpoints from the coefficient scale:
+
+\\\left(\exp(\text{CI}\_{\text{lower}}), \\
+\exp(\text{CI}\_{\text{upper}})\right)\\
+
+where CI_lower and CI_upper are the confidence limits for *β* on the log
+scale, computed using whichever method (Wald, exact *t*, or profile
+likelihood) is appropriate for the model class. Note that exponentiation
+preserves coverage probability because exp(·) is a monotone
+transformation.
+
+### Implementation
+
+The CI method is selected automatically based on model class, and can be
+overridden via the `conf_method` parameter:
+
+| Model Class | Default (`conf_method = "profile"`) | With `conf_method = "wald"` |
+|:---|:---|:---|
+| GLM (binomial, poisson) | Profile likelihood via [`MASS::confint.glm()`](https://rdrr.io/pkg/MASS/man/confint.html) | Wald (normal approximation) |
+| Negative binomial | Profile likelihood via [`MASS::confint.glm()`](https://rdrr.io/pkg/MASS/man/confint.html) | Wald (normal approximation) |
+| Quasi-likelihood (quasibinomial, quasipoisson) | Wald (no true likelihood) | Wald (no true likelihood) |
+| Linear model (`lm`) | Exact *t*-distribution via [`confint.lm()`](https://rdrr.io/r/stats/confint.html) | Wald (normal approximation) |
+| Cox PH (`coxph`) | Wald | Wald |
+| Mixed-effects (`lmer`, `glmer`, `coxme`) | Wald | Wald |
+
+Cox and mixed-effects models use Wald intervals regardless of the
+`conf_method` setting. For Cox models, Wald CIs are the standard
+convention in the survival analysis literature. For mixed-effects
+models, profile likelihood CIs are available in principle (via
+`lme4::confint.merMod(method = "profile")`), but are prohibitively slow
+for routine use and are not implemented in `summata`.
+
+The `conf_method` can be set globally for a session:
+
+``` r
+options(summata.conf_method = "profile")  # Profile/exact-t (default)
+options(summata.conf_method = "wald")  # Wald CIs throughout
+```
+
+------------------------------------------------------------------------
+
+## Linear Regression
+
+### Model Specification
+
+Linear regression models the expected value of a continuous response as
+a linear combination of predictors:
+
+\\E\[Y_i \| X_i\] = \beta_0 + \beta_1 X\_{i1} + \beta_2 X\_{i2} +
+\cdots + \beta_p X\_{ip}\\
+
+Equivalently, in matrix notation:
+
+\\\mathbf{Y} = \mathbf{X}\mathbf{\beta} + \mathbf{\varepsilon}\\
+
+where \\\mathbf{\varepsilon} \sim N(\mathbf{0}, \sigma^2\mathbf{I})\\.
+
+### Assumptions
+
+1.  **Linearity**: The relationship between predictors and response is
+    linear
+2.  **Independence**: Observations are independent
+3.  **Homoscedasticity**: Constant error variance across all levels of
+    predictors
+4.  **Normality**: Errors are normally distributed (for inference)
+5.  **No multicollinearity**: Predictors are not perfectly correlated
+
+### Parameter Estimation
+
+Coefficients are estimated by ordinary least squares (OLS):
+
+\\\hat{\mathbf{\beta}} =
+(\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'\mathbf{Y}\\
+
+### Interpretation
+
+Each coefficient *β*ⱼ represents the expected change in *Y* for a
+one-unit increase in *X*ⱼ, holding all other predictors constant.
+
+| Predictor Type | Interpretation of *β*                  |
+|:---------------|:---------------------------------------|
+| Continuous     | Change in *Y* per unit increase in *X* |
+| Binary (0/1)   | Difference in *Y* between groups       |
+| Categorical    | Difference from reference category     |
+
+### Goodness of Fit
+
+**Coefficient of determination (*R*²):** \\R^2 = 1 - \frac{\sum_i (Y_i -
+\hat{Y}\_i)^2}{\sum_i (Y_i - \bar{Y})^2}\\
+
+**Adjusted *R*²:** \\R^2\_{\text{adj}} = 1 - \frac{(1 - R^2)(n - 1)}{n -
+p - 1}\\
+
+**Root mean squared error (RMSE):** \\\text{RMSE} =
+\sqrt{\frac{1}{n}\sum_i (Y_i - \hat{Y}\_i)^2}\\
+
+Note: this is the descriptive (biased) RMSE. The unbiased estimate of
+the residual standard deviation σ uses *n* − *p* − 1 in the denominator
+and is reported by
+[`summary.lm()`](https://rdrr.io/r/stats/summary.lm.html) as the
+“residual standard error.”
+
+### Implementation
+
+In `summata`, linear regression is specified with `model_type = "lm"`:
+
+``` r
+fit(data, outcome = "continuous_var", predictors, model_type = "lm")
+```
+
+------------------------------------------------------------------------
+
+## Generalized Linear Models
+
+Generalized linear models (GLMs) extend linear regression to accommodate
+non-normal response distributions through three components:
+
+1.  **Random component**: Distribution of *Y* from the exponential
+    family
+2.  **Systematic component**: Linear predictor \\\eta =
+    \mathbf{X}\mathbf{\beta}\\
+3.  **Link function**: \\g(\mu) = \eta\\, where \\\mu = E\[Y\]\\
+
+### Logistic Regression
+
+#### Model Specification
+
+For binary outcomes *Y* ∈ {0, 1}, logistic regression models the
+log-odds of the event:
+
+\\\log\left(\frac{P(Y_i = 1 \| X_i)}{1 - P(Y_i = 1 \| X_i)}\right) =
+\beta_0 + \beta_1 X\_{i1} + \cdots + \beta_p X\_{ip}\\
+
+Equivalently: \\P(Y_i = 1 \| X_i) = \frac{\exp(\beta_0 + \beta_1
+X\_{i1} + \cdots + \beta_p X\_{ip})}{1 + \exp(\beta_0 + \beta_1
+X\_{i1} + \cdots + \beta_p X\_{ip})}\\
+
+#### Assumptions
+
+1.  **Binary outcome**: *Y* takes values 0 or 1
+2.  **Independence**: Observations are independent
+3.  **Linearity in log-odds**: Log-odds is a linear function of
+    predictors
+4.  **No multicollinearity**: Predictors are not perfectly correlated
+5.  **Large sample**: Adequate events per predictor (≥10 rule of thumb)
+
+#### Interpretation: Odds Ratios
+
+The exponentiated coefficient exp(*β*ⱼ) yields the **odds ratio (OR)**:
+
+\\\text{OR} = \exp(\beta_j) = \frac{\text{Odds}(Y = 1 \| X_j +
+1)}{\text{Odds}(Y = 1 \| X_j)}\\
+
+| OR Value | Interpretation            |
+|:---------|:--------------------------|
+| OR = 1   | No association            |
+| OR \> 1  | Increased odds of outcome |
+| OR \< 1  | Decreased odds of outcome |
+
+For a continuous predictor, the OR represents the multiplicative change
+in odds per one-unit increase. For a categorical predictor, the OR
+compares each level to the reference category.
+
+#### Implementation
+
+``` r
+fit(data, outcome = "binary_var", predictors, model_type = "glm", family = "binomial")
+```
+
+### Poisson Regression
+
+#### Model Specification
+
+For count outcomes *Y* ∈ {0, 1, 2, …}, Poisson regression models the log
+of the expected count:
+
+\\\log(E\[Y_i \| X_i\]) = \beta_0 + \beta_1 X\_{i1} + \cdots + \beta_p
+X\_{ip}\\
+
+#### Assumptions
+
+1.  **Count outcome**: *Y* is a non-negative integer
+2.  **Independence**: Observations are independent
+3.  **Equidispersion**: Mean equals variance (E\[*Y*\] = Var(*Y*))
+4.  **Log-linear relationship**: Log of expected count is linear in
+    predictors
+
+#### Interpretation: Rate Ratios
+
+The exponentiated coefficient exp(*β*ⱼ) yields the **rate ratio (RR)**:
+
+\\\text{RR} = \exp(\beta_j) = \frac{E\[Y \| X_j + 1\]}{E\[Y \| X_j\]}\\
+
+#### Overdispersion
+
+When Var(*Y*) \> E\[*Y*\] (overdispersion), standard Poisson SEs are
+underestimated. Solutions include:
+
+- **Quasipoisson**: Estimates dispersion parameter *φ*
+- **Negative binomial**: Models additional variance component
+
+#### Implementation
+
+``` r
+# Standard Poisson
+fit(data, outcome = "count_var", predictors, model_type = "glm", family = "poisson")
+
+# Overdispersed counts
+fit(data, outcome = "count_var", predictors, model_type = "glm", family = "quasipoisson")
+```
+
+### Negative Binomial Regression
+
+#### Model Specification
+
+Negative binomial regression extends Poisson regression with an
+additional dispersion parameter *θ*:
+
+\\Y_i \sim \text{NegBin}(\mu_i, \theta)\\ \\\log(\mu_i) = \beta_0 +
+\beta_1 X\_{i1} + \cdots + \beta_p X\_{ip}\\
+
+The variance is: \\\text{Var}(Y_i) = \mu_i + \frac{\mu_i^2}{\theta}\\
+
+As *θ* → ∞, the negative binomial converges to Poisson.
+
+#### When to Use
+
+- Residual deviance \>\> residual degrees of freedom in Poisson model
+- Variance substantially exceeds mean
+- Overdispersion test is significant
+
+#### Implementation
+
+``` r
+fit(data, outcome = "count_var", predictors, model_type = "negbin")
+```
+
+Requires the **MASS** package.
+
+### Gamma Regression
+
+#### Model Specification
+
+For positive, continuous, right-skewed outcomes, Gamma regression
+models:
+
+\\Y_i \sim \text{Gamma}(\mu_i, \phi)\\
+
+The canonical link for the Gamma family is the inverse (1/μ). In
+practice, the log link is often preferred because it yields more
+interpretable coefficients (multiplicative effects). When
+`family = "Gamma"` is passed as a string, `summata` defaults to the log
+link. The link can also be specified explicitly: \\\log(E\[Y_i \| X_i\])
+= \beta_0 + \beta_1 X\_{i1} + \cdots + \beta_p X\_{ip}\\
+
+#### Assumptions
+
+1.  **Positive outcome**: *Y* \> 0
+2.  **Gamma distribution**: Right-skewed, variance proportional to mean
+    squared
+3.  **Independence**: Observations are independent
+
+#### Interpretation
+
+With log link, exp(*β*ⱼ) represents the **multiplicative effect**
+(ratio):
+
+\\\frac{E\[Y \| X_j + 1\]}{E\[Y \| X_j\]} = \exp(\beta_j)\\
+
+#### Common Applications
+
+- Healthcare costs
+- Length of hospital stay
+- Biomarker concentrations
+- Time durations
+
+#### Implementation
+
+``` r
+# String shorthand (resolves to log link)
+fit(data, outcome = "positive_continuous", predictors, model_type = "glm", family = "Gamma")
+
+# Explicit link specification
+fit(data, outcome = "positive_continuous", predictors, model_type = "glm", family = Gamma(link = "log"))
+
+# Gamma with inverse link (canonical)
+fit(data, outcome = "positive_continuous", predictors, model_type = "glm", family = Gamma(link = "inverse"))
+```
+
+### Quasi-Likelihood Models
+
+#### Quasibinomial
+
+For overdispersed binary data, quasibinomial regression estimates a
+dispersion parameter:
+
+\\\text{Var}(Y_i) = \phi \cdot \mu_i(1 - \mu_i)\\
+
+where *φ* \> 1 indicates overdispersion. Coefficients are identical to
+binomial GLM, but standard errors are adjusted.
+
+#### Quasipoisson
+
+For overdispersed count data:
+
+\\\text{Var}(Y_i) = \phi \cdot \mu_i\\
+
+#### Implementation
+
+``` r
+# Overdispersed binary
+fit(data, outcome, predictors, model_type = "glm", family = "quasibinomial")
+
+# Overdispersed counts
+fit(data, outcome, predictors, model_type = "glm", family = "quasipoisson")
+```
+
+### Summary of GLM Families
+
+| Family | Outcome Type | Link | Effect Measure |
+|:---|:---|:---|:---|
+| `binomial` | Binary | logit | Odds ratio |
+| `quasibinomial` | Binary (overdispersed) | logit | Odds ratio |
+| `poisson` | Count | log | Rate ratio |
+| `quasipoisson` | Count (overdispersed) | log | Rate ratio |
+| `gaussian` | Continuous | identity | Coefficient |
+| `Gamma` | Positive continuous | inverse (canonical); log (in `summata`) | Ratio (with log link) |
+| `inverse.gaussian` | Positive continuous | 1/μ² | — |
+
+------------------------------------------------------------------------
+
+## Survival Analysis
+
+### Cox Proportional Hazards Model
+
+#### Model Specification
+
+The Cox model relates the hazard function to predictors:
+
+\\h(t \| X_i) = h_0(t) \exp(\beta_1 X\_{i1} + \beta_2 X\_{i2} + \cdots +
+\beta_p X\_{ip})\\
+
+where:
+
+- *h*(*t* \| *X*) is the hazard (instantaneous risk) at time *t*
+- *h*₀(*t*) is the baseline hazard (unspecified)
+- exp(*β*ⱼ) is the hazard ratio for predictor *j*
+
+#### Assumptions
+
+1.  **Proportional hazards**: Hazard ratios are constant over time
+2.  **Independence**: Observations are independent (or appropriately
+    modeled)
+3.  **Censoring**: Non-informative censoring
+4.  **No multicollinearity**: Predictors are not perfectly correlated
+
+#### Interpretation: Hazard Ratios
+
+The **hazard ratio (HR)** = exp(*β*ⱼ) represents the relative hazard:
+
+\\\text{HR} = \frac{h(t \| X_j + 1)}{h(t \| X_j)} = \exp(\beta_j)\\
+
+| HR Value | Interpretation                      |
+|:---------|:------------------------------------|
+| HR = 1   | No association with survival        |
+| HR \> 1  | Increased hazard (shorter survival) |
+| HR \< 1  | Decreased hazard (longer survival)  |
+
+#### Goodness of Fit
+
+**Concordance (Harrell’s C-index):** \\C = P(\hat{h}\_i \> \hat{h}\_j \|
+T_i \< T_j)\\
+
+Proportion of concordant pairs; C = 0.5 indicates no discrimination, C =
+1 indicates perfect discrimination.
+
+#### Testing Proportional Hazards
+
+The proportional hazards assumption can be tested using:
+
+- Scaled Schoenfeld residuals
+- Log-log survival plots
+- Time-dependent covariates
+
+#### Implementation
+
+``` r
+fit(data, outcome = "Surv(time, status)", predictors, model_type = "coxph")
+```
+
+Requires the **survival** package.
+
+### Conditional Logistic Regression
+
+#### Model Specification
+
+For matched case-control studies, conditional logistic regression
+conditions on the stratum:
+
+\\\log\left(\frac{P(Y_i = 1 \| X_i, \text{stratum})}{P(Y_i = 0 \| X_i,
+\text{stratum})}\right) = \beta_1 X\_{i1} + \cdots + \beta_p X\_{ip}\\
+
+Note: No intercept is estimated; it is absorbed by the stratum.
+
+#### When to Use
+
+- 1:1 or 1:*m* matched case-control designs
+- Stratified analyses where stratum-specific effects are nuisance
+  parameters
+
+#### Implementation
+
+``` r
+fit(data, outcome = "case_status", predictors, model_type = "clogit", strata = "match_id")
+```
+
+Requires the **survival** package.
+
+------------------------------------------------------------------------
+
+## Mixed-Effects Models
+
+Mixed-effects models (hierarchical or multilevel models) account for
+correlation within clusters by incorporating random effects.
+
+### General Framework
+
+For observation *i* within cluster *j*:
+
+\\g(E\[Y\_{ij} \| X\_{ij}, u_j\]) = \mathbf{X}\_{ij}\mathbf{\beta} +
+\mathbf{Z}\_{ij}\mathbf{u}\_j\\
+
+where:
+
+- **β** are fixed effects (common across all clusters)
+- **u**ⱼ ~ N(**0**, **Σ**) are random effects (cluster-specific
+  deviations)
+- **Z**ᵢⱼ is the random effects design matrix
+
+### Linear Mixed-Effects Models
+
+#### Model Specification
+
+For continuous outcomes:
+
+\\Y\_{ij} = \beta_0 + \beta_1 X\_{1ij} + \cdots + \beta_p X\_{pij} +
+u\_{0j} + u\_{1j}X\_{1ij} + \varepsilon\_{ij}\\
+
+where:
+
+- *u*₀ⱼ ~ N(0, σ²ᵤ₀) is the random intercept for cluster *j*
+- *u*₁ⱼ ~ N(0, σ²ᵤ₁) is the random slope (if included)
+- εᵢⱼ ~ N(0, σ²) is the residual error
+
+#### Random Effects Syntax
+
+| Syntax                      | Meaning                              |
+|:----------------------------|:-------------------------------------|
+| `(1\|group)`                | Random intercepts by group           |
+| `(x\|group)`                | Random intercepts and slopes for *x* |
+| `(1\|group1) + (1\|group2)` | Crossed random effects               |
+| `(1\|group1/group2)`        | Nested random effects                |
+
+#### Implementation
+
+``` r
+fit(data, outcome, c(predictors, "(1|cluster)"), model_type = "lmer")
+```
+
+Requires the **lme4** package.
+
+### Generalized Linear Mixed-Effects Models
+
+#### Model Specification
+
+GLMMs extend mixed-effects models to non-normal outcomes:
+
+\\g(E\[Y\_{ij} \| X\_{ij}, u_j\]) = \beta_0 + \beta_1 X\_{1ij} +
+\cdots + \beta_p X\_{pij} + u\_{0j}\\
+
+Common families:
+
+- **Binomial**: Clustered binary outcomes
+- **Poisson**: Clustered count outcomes
+
+#### Interpretation
+
+Fixed effects are interpreted as **conditional** (cluster-specific)
+effects. The population-averaged effect may differ due to the non-linear
+link function.
+
+#### Implementation
+
+``` r
+# Binary outcome with clustering
+fit(data, outcome, c(predictors, "(1|cluster)"), model_type = "glmer", family = "binomial")
+
+# Count outcome with clustering
+fit(data, outcome, c(predictors, "(1|cluster)"), model_type = "glmer", family = "poisson")
+```
+
+Requires the **lme4** package.
+
+### Cox Mixed-Effects Models
+
+#### Model Specification
+
+For clustered survival data:
+
+\\h\_{ij}(t) = h_0(t) \exp(\beta_1 X\_{1ij} + \cdots + \beta_p
+X\_{pij} + u_j)\\
+
+where *u*ⱼ ~ N(0, σ²ᵤ) is the cluster-specific frailty term.
+
+#### When to Use
+
+- Patients nested within hospitals or physicians
+- Repeated events within subjects
+- Multi-center clinical trials
+
+#### Implementation
+
+``` r
+fit(data, outcome = "Surv(time, status)", c(predictors, "(1|cluster)"), model_type = "coxme")
+```
+
+Requires the **coxme** package.
+
+### Sample Size Considerations
+
+Mixed-effects models require adequate sample sizes at both levels:
+
+| Level                    | Recommendation                        |
+|:-------------------------|:--------------------------------------|
+| Clusters                 | ≥ 20–30 for stable variance estimates |
+| Observations per cluster | ≥ 5 for random intercepts             |
+| Total observations       | Standard regression guidelines apply  |
+
+------------------------------------------------------------------------
+
+## Interaction Effects
+
+### Model Specification
+
+An interaction occurs when the effect of one predictor depends on the
+level of another. For predictors *X* and *Z*:
+
+\\g(E\[Y\]) = \beta_0 + \beta_1 X + \beta_2 Z + \beta_3 (X \times Z)\\
+
+where:
+
+- *β*₁ is the effect of *X* when *Z* = 0
+- *β*₂ is the effect of *Z* when *X* = 0
+- *β*₃ is the interaction effect (modification of *X* effect by *Z*)
+
+### Interpretation
+
+#### Continuous × Continuous
+
+For continuous *X* and *Z*, the effect of *X* on *Y* is:
+
+\\\frac{\partial E\[Y\]}{\partial X} = \beta_1 + \beta_3 Z\\
+
+The effect of *X* varies linearly with *Z*.
+
+#### Continuous × Categorical
+
+For continuous *X* and binary *Z* (0/1):
+
+- When *Z* = 0: Effect of *X* is *β*₁
+- When *Z* = 1: Effect of *X* is *β*₁ + *β*₃
+
+#### Categorical × Categorical
+
+For two categorical variables, each combination of levels has a distinct
+effect. The interaction coefficient represents the additional effect
+beyond the sum of main effects.
+
+### Testing Interactions
+
+1.  **Wald test**: Test H₀: *β*₃ = 0
+2.  **Likelihood ratio test**: Compare models with and without
+    interaction
+3.  **Model comparison**: Use
+    [`compfit()`](https://phmcc.github.io/summata/reference/compfit.md)
+    to compare AIC/BIC
+
+### Implementation
+
+``` r
+fit(data, outcome, predictors, interactions = c("X:Z"), model_type = "glm")
+```
+
+------------------------------------------------------------------------
+
+## Model Quality Metrics
+
+### Information Criteria
+
+#### Akaike Information Criterion (AIC)
+
+\\\text{AIC} = -2\log L + 2k\\
+
+where *L* is the maximized likelihood and *k* is the number of
+parameters. AIC balances fit and complexity; lower values indicate
+better models.
+
+#### Bayesian Information Criterion (BIC)
+
+\\\text{BIC} = -2\log L + k\log n\\
+
+BIC penalizes complexity more heavily than AIC, especially for large
+samples.
+
+#### Interpretation
+
+| Comparison | Guideline                          |
+|:-----------|:-----------------------------------|
+| ΔAIC \< 2  | Models essentially equivalent      |
+| ΔAIC 2–7   | Some support for lower-AIC model   |
+| ΔAIC \> 10 | Strong support for lower-AIC model |
+
+### Discrimination Metrics
+
+#### Concordance (C-statistic)
+
+For binary outcomes or survival models:
+
+\\C = P(\hat{p}\_i \> \hat{p}\_j \| Y_i = 1, Y_j = 0)\\
+
+| C Value | Discrimination             |
+|:--------|:---------------------------|
+| 0.5     | No discrimination (random) |
+| 0.6–0.7 | Poor                       |
+| 0.7–0.8 | Acceptable                 |
+| 0.8–0.9 | Excellent                  |
+| \> 0.9  | Outstanding                |
+
+#### Brier Score
+
+For binary outcomes:
+
+\\\text{Brier} = \frac{1}{n}\sum_i (Y_i - \hat{p}\_i)^2\\
+
+Lower values indicate better calibration; Brier = 0 is perfect.
+
+### Explained Variation
+
+#### R² (Linear Models)
+
+\\R^2 = 1 - \frac{SS\_{\text{res}}}{SS\_{\text{tot}}}\\
+
+Proportion of variance explained.
+
+#### Pseudo-R² (GLMs)
+
+**McFadden pseudo-R²:** \\R^2\_{\text{McF}} = 1 - \frac{\log
+L\_{\text{full}}}{\log L\_{\text{null}}}\\
+
+**Nagelkerke pseudo-R²:** \\R^2_N = \frac{1 -
+(L\_{\text{null}}/L\_{\text{full}})^{2/n}}{1 - L\_{\text{null}}^{2/n}}\\
+
+Values are not directly comparable to linear *R*²; 0.2–0.4 typically
+indicates good fit for logistic models.
+
+------------------------------------------------------------------------
+
+## Composite Model Score (CMS)
+
+### Rationale
+
+When comparing multiple candidate models, researchers typically examine
+several quality metrics: information criteria (AIC, BIC), discrimination
+(concordance), calibration (Brier score), and explained variation (*R*²
+or pseudo-*R*²). Each metric captures a different aspect of model
+performance, and no single measure is universally optimal for model
+selection.
+
+The **Composite Model Score (CMS)** addresses this challenge by
+combining multiple metrics into a single summary value, facilitating
+rapid comparison across candidate models. This approach:
+
+1.  Synthesizes complementary information from diverse metrics
+2.  Provides model-type-specific weighting based on statistical
+    conventions
+3.  Normalizes metrics to a common 0–100 scale for interpretability
+4.  Accounts for convergence issues that may invalidate model results
+
+The CMS is intended as a screening tool to identify promising models,
+not as a replacement for substantive evaluation. Final model selection
+should always consider domain knowledge, parsimony, and the specific
+research objectives.
+
+### Methodology
+
+#### Normalization
+
+Each component metric is transformed to a 0–100 scale where higher
+values indicate better performance:
+
+**Information criteria** (AIC, BIC) — Lower is better: \\S\_{\text{AIC}}
+= 100 \times \left(1 - \frac{\text{AIC}\_i -
+\text{AIC}\_{\min}}{\text{AIC}\_{\max} - \text{AIC}\_{\min}}\right)\\
+
+**Concordance** (*C*-statistic) — Higher is better, with 0.5 as floor:
+\\S_C = \begin{cases} 0 & C \leq 0.5 \\ 200 \times (C - 0.5) & C \> 0.5
+\end{cases}\\
+
+**Pseudo-*R*²** (McFadden) — Scaled recognizing typical range:
+\\S\_{R^2} = \min(100, \\ 250 \times R^2\_{\text{McF}})\\
+
+This scaling reflects that McFadden’s *R*² rarely exceeds 0.4 even for
+well-fitting models.
+
+**Brier score** — Lower is better, with 0.25 as no-skill baseline:
+\\S\_{\text{Brier}} = 100 \times \left(1 -
+\frac{\text{Brier}}{0.25}\right)\\
+
+**Convergence** — Categorical assessment: \\S\_{\text{conv}} =
+\begin{cases} 100 & \text{converged normally} \\ 70 & \text{suspect
+(warnings)} \\ 30 & \text{failed to converge} \end{cases}\\
+
+#### Weighting
+
+Component scores are combined using model-type-specific weights that
+reflect the relative importance of each metric for that model class:
+
+| Model Type     | Convergence | AIC  | Concordance | Pseudo-*R*² | Brier | Global *p* |
+|:---------------|:-----------:|:----:|:-----------:|:-----------:|:-----:|:----------:|
+| GLM (logistic) |    0.15     | 0.25 |    0.40     |    0.15     | 0.05  |     —      |
+| Cox PH         |    0.15     | 0.30 |    0.40     |      —      |   —   |    0.15    |
+| Linear         |    0.15     | 0.25 |      —      |    0.45     |   —   |    0.15    |
+
+For mixed-effects models, additional components include marginal *R*²,
+conditional *R*², and ICC.
+
+#### Final Score
+
+The CMS is computed as a weighted sum:
+
+\\\text{CMS} = \sum_j w_j \times S_j\\
+
+where *w*ⱼ are the weights and *S*ⱼ are the normalized component scores.
+
+### Interpretation
+
+| CMS Range | Interpretation          |
+|:----------|:------------------------|
+| 85–100    | Excellent model quality |
+| 75–84     | Very good               |
+| 65–74     | Good                    |
+| 55–64     | Fair                    |
+| \< 55     | Poor                    |
+
+These thresholds provide general guidance. A model with CMS = 80 is not
+necessarily “better” than one with CMS = 78—small differences should
+prompt examination of individual metrics and substantive considerations.
+
+### Limitations
+
+1.  **Relative ranking**: CMS values are relative to the set of models
+    being compared; they do not indicate absolute model quality
+2.  **Weight sensitivity**: Results depend on the chosen weights; users
+    with strong priors about metric importance can supply custom weights
+3.  **Metric availability**: Not all metrics are available for all model
+    types; weights are renormalized when components are missing
+4.  **No substitute for judgment**: The CMS facilitates screening but
+    does not replace careful model diagnostics and domain expertise
+
+### Implementation
+
+``` r
+# Compare candidate models
+comparison <- compfit(
+  data = mydata,
+  outcome = "y",
+  predictors = list(
+    "Model 1" = c("x1", "x2"),
+    "Model 2" = c("x1", "x2", "x3"),
+    "Model 3" = c("x1", "x2", "x3", "x4")
+  ),
+  model_type = "logistic"
+)
+
+# Custom weights emphasizing discrimination
+comparison_custom <- compfit(
+  data = mydata,
+  outcome = "y",
+  predictors = model_list,
+  model_type = "logistic",
+  scoring_weights = list(
+    convergence = 0.10,
+    aic = 0.20,
+    concordance = 0.50,
+    pseudo_r2 = 0.15,
+    brier = 0.05
+  )
+)
+```
+
+------------------------------------------------------------------------
+
+## References
+
+### Methodological
+
+- Agresti, A. (2013). *Categorical Data Analysis* (3rd ed.). Wiley.
+- Harrell, F. E. (2015). *Regression Modeling Strategies* (2nd ed.).
+  Springer.
+- Hosmer, D. W., Lemeshow, S., & Sturdivant, R. X. (2013). *Applied
+  Logistic Regression* (3rd ed.). Wiley.
+- Therneau, T. M., & Grambsch, P. M. (2000). *Modeling Survival Data*.
+  Springer.
+- Gelman, A., & Hill, J. (2007). *Data Analysis Using Regression and
+  Multilevel/Hierarchical Models*. Cambridge University Press.
+
+### Software
+
+- R Core Team (2025). *R: A Language and Environment for Statistical
+  Computing*. <https://www.R-project.org/>
+- Therneau, T. (2025). *survival: Survival Analysis*. R package.
+  <https://CRAN.R-project.org/package=survival>
+- Bates, D., Mächler, M., Bolker, B., & Walker, S. (2015). Fitting
+  linear mixed-effects models using lme4. *Journal of Statistical
+  Software*, 67(1), 1–48.
+- Therneau, T. (2025). *coxme: Cox Mixed-Effects Models*. R package.
+  <https://CRAN.R-project.org/package=coxme>
+- Venables, W. N., & Ripley, B. D. (2002). *Modern Applied Statistics
+  with S* (4th ed.). Springer. (MASS package)
+
+------------------------------------------------------------------------
+
+## See Also
+
+- [Regression
+  Modeling](https://phmcc.github.io/summata/articles/regression_modeling.md):
+  Practical examples using
+  [`fit()`](https://phmcc.github.io/summata/reference/fit.md),
+  [`uniscreen()`](https://phmcc.github.io/summata/reference/uniscreen.md),
+  and
+  [`fullfit()`](https://phmcc.github.io/summata/reference/fullfit.md)
+- [Advanced
+  Workflows](https://phmcc.github.io/summata/articles/advanced_workflows.md):
+  Interactions and mixed-effects models
+- [Model
+  Comparison](https://phmcc.github.io/summata/articles/model_comparison.md):
+  Comparing alternative specifications with
+  [`compfit()`](https://phmcc.github.io/summata/reference/compfit.md)
+- [Forest
+  Plots](https://phmcc.github.io/summata/articles/forest_plots.md):
+  Visualization of regression results
