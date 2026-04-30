@@ -1,7 +1,7 @@
 env:
   IN_PKGDOWN: "true"
 
-url: https://phmcc.github.io/summata/
+url: https://phmcc.codeberg.page/summata
 
 destination: docs
 
@@ -149,4 +149,4 @@ footer:
     left: developed_by
     right: [built_with, legal]
   components:
-    legal: "[GPLv3 License](https://phmcc.github.io/summata/LICENSE.html) | [Code of Conduct](https://phmcc.github.io/summata/CODE_OF_CONDUCT.html)"
+    legal: "[GPLv3 License](https://phmcc.codeberg.page/summata/LICENSE.html) | [Code of Conduct](https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html)"

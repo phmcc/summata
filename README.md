@@ -1,4 +1,4 @@
-# <span class="pkg-name">summata</span> <a href="https://phmcc.github.io/summata/"><img src="man/figures/summata.png" align="right" height="139" alt="summata website" /></a>
+# <span class="pkg-name">summata</span> <a href="https://phmcc.codeberg.page/summata/"><img src="man/figures/summata.png" align="right" height="139" alt="summata website" /></a>
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/phmcc/summata/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/phmcc/summata/actions/workflows/R-CMD-check.yaml)
@@ -16,7 +16,7 @@
 
 The `summata` package provides a comprehensive framework for generating summary tables and visualizations from statistical analyses. Built on `data.table` for computational efficiency, it streamlines the workflow from descriptive statistics, through regression modeling, to final output—all using a unified interface with standardized, presentation-ready results.
 
-For a more comprehensive description of this package and its features, see the [full documentation and vignettes](https://phmcc.github.io/summata/).
+For a more comprehensive description of this package and its features, see the [full documentation and vignettes](https://phmcc.codeberg.page/summata/).
 
 <img src="man/figures/README_coxforest.png" alt="Cox regression forest plot" width="100%">
 
@@ -162,7 +162,7 @@ The R ecosystem includes several established packages for regression table gener
 
 <sub>✓ Full support | ◐ Partial support | — Not available</sub>
 
-A detailed feature comparison is available in the [package documentation](https://phmcc.github.io/summata/articles/feature_comparison.html).
+A detailed feature comparison is available in the [package documentation](https://phmcc.codeberg.page/summata/articles/feature_comparison.html).
 
 ## Illustrative Example
 
@@ -285,7 +285,7 @@ citation("summata")
 
 To cite summata in publications, use:
 
-  McClelland PH (2026). _summata: Publication-Ready Summary Tables and Forest Plots_. R package version 0.11.4, <https://phmcc.github.io/summata/>.
+  McClelland PH (2026). _summata: Publication-Ready Summary Tables and Forest Plots_. R package version 0.11.4, <https://phmcc.codeberg.page/summata/>.
 
 A BibTeX entry for LaTeX users is
 
@@ -294,14 +294,14 @@ A BibTeX entry for LaTeX users is
     author = {Paul Hsin-ti McClelland},
     year = {2026},
     note = {R package version 0.11.4},
-    url = {https://phmcc.github.io/summata/},
+    url = {https://phmcc.codeberg.page/summata/},
   }
 ```
 
 ## Further Resources
 
-- **Function documentation**: `?function_name` or the [reference index](https://phmcc.github.io/summata/reference/index.html)
-- **Vignettes**: `vignette("summata")` or [online articles](https://phmcc.github.io/summata/articles/index.html)
+- **Function documentation**: `?function_name` or the [reference index](https://phmcc.codeberg.page/summata/reference/index.html)
+- **Vignettes**: `vignette("summata")` or [online articles](https://phmcc.codeberg.page/summata/articles/index.html)
 - **Issue tracker**: [Codeberg Issues](https://codeberg.org/phmcc/summata/issues), [GitHub Issues](https://github.com/phmcc/summata/issues)
 
 ---
