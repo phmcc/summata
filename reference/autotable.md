@@ -170,7 +170,7 @@ tbl <- desctable(clintrial, by = "treatment",
 if (requireNamespace("xtable", quietly = TRUE)) {
   autotable(tbl, file.path(tempdir(), "example.html"))
 }
-#> Table exported to /tmp/Rtmp5Fz076/example.html
+#> Table exported to /tmp/Rtmppp0ueS/example.html
 
 # \donttest{
 # Load example data
@@ -203,20 +203,20 @@ has_latex <- local({
 
 # Export automatically detects format from extension
 autotable(results, file.path(tempdir(), "results.html"))  # Creates HTML file
-#> Table exported to /tmp/Rtmp5Fz076/results.html
+#> Table exported to /tmp/Rtmppp0ueS/results.html
 autotable(results, file.path(tempdir(), "results.docx"))  # Creates Word document
-#> Table exported to /tmp/Rtmp5Fz076/results.docx
+#> Table exported to /tmp/Rtmppp0ueS/results.docx
 autotable(results, file.path(tempdir(), "results.pptx"))  # Creates PowerPoint slide
-#> Table exported to /tmp/Rtmp5Fz076/results.pptx
+#> Table exported to /tmp/Rtmppp0ueS/results.pptx
 autotable(results, file.path(tempdir(), "results.tex"))   # Creates LaTeX source
-#> Table exported to /tmp/Rtmp5Fz076/results.tex
+#> Table exported to /tmp/Rtmppp0ueS/results.tex
 autotable(results, file.path(tempdir(), "results.rtf"))   # Creates RTF document
-#> Table exported to /tmp/Rtmp5Fz076/results.rtf
+#> Table exported to /tmp/Rtmppp0ueS/results.rtf
 if (has_latex) {
   autotable(results, file.path(tempdir(), "results.pdf")) # Creates PDF
 }
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmp5Fz076/results.pdf
+#> Table exported to /tmp/Rtmppp0ueS/results.pdf
 
 # Pass format-specific parameters
 if (has_latex) {
@@ -226,19 +226,19 @@ if (has_latex) {
              font_size = 10)
 }
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmp5Fz076/results.pdf
+#> Table exported to /tmp/Rtmppp0ueS/results.pdf
 
 autotable(results, file.path(tempdir(), "results.docx"),
            caption = "Table 1: Logistic Regression Results",
            font_family = "Times New Roman",
            condense_table = TRUE)
-#> Table exported to /tmp/Rtmp5Fz076/results.docx
+#> Table exported to /tmp/Rtmppp0ueS/results.docx
 
 autotable(results, file.path(tempdir(), "results.html"),
            zebra_stripes = TRUE,
            dark_header = TRUE,
            bold_significant = TRUE)
-#> Table exported to /tmp/Rtmp5Fz076/results.html
+#> Table exported to /tmp/Rtmppp0ueS/results.html
 
 # Works with any summata table output
 desc <- desctable(clintrial,
@@ -248,7 +248,7 @@ if (has_latex) {
   autotable(desc, file.path(tempdir(), "demographics.pdf"))
 }
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmp5Fz076/demographics.pdf
+#> Table exported to /tmp/Rtmppp0ueS/demographics.pdf
 
 comparison <- compfit(
     data = clintrial,
@@ -262,7 +262,7 @@ comparison <- compfit(
 #> Fitting base with 2 predictors...
 #> Fitting full with 4 predictors...
 autotable(comparison, file.path(tempdir(), "model_comparison.docx"))
-#> Table exported to /tmp/Rtmp5Fz076/model_comparison.docx
+#> Table exported to /tmp/Rtmppp0ueS/model_comparison.docx
 
 # }
 ```
