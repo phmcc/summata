@@ -392,7 +392,7 @@ if (requireNamespace("flextable", quietly = TRUE) &&
     requireNamespace("officer", quietly = TRUE)) {
   table2pptx(tbl, file.path(tempdir(), "example.pptx"))
 }
-#> Table exported to /tmp/RtmpsIjHNN/example.pptx
+#> Table exported to /tmp/RtmpTulUTc/example.pptx
 
 # \donttest{
 old_width <- options(width = 180)
@@ -410,35 +410,35 @@ results <- fit(
 
 # Example 1: Basic PowerPoint slide
 table2pptx(results, file.path(tempdir(), "results.pptx"))
-#> Table exported to /tmp/RtmpsIjHNN/results.pptx
+#> Table exported to /tmp/RtmpTulUTc/results.pptx
 
 # Example 2: With title
 table2pptx(results, file.path(tempdir(), "titled.pptx"),
         caption = "Multivariable Regression Results")
-#> Table exported to /tmp/RtmpsIjHNN/titled.pptx
+#> Table exported to /tmp/RtmpTulUTc/titled.pptx
 
 # Example 3: Larger font for visibility
 table2pptx(results, file.path(tempdir(), "large_font.pptx"),
         font_size = 12,
         caption = "Main Findings")
-#> Table exported to /tmp/RtmpsIjHNN/large_font.pptx
+#> Table exported to /tmp/RtmpTulUTc/large_font.pptx
 
 # Example 4: Condensed for slide space
 table2pptx(results, file.path(tempdir(), "condensed.pptx"),
         condense_table = TRUE,
         caption = "Key Results")
-#> Table exported to /tmp/RtmpsIjHNN/condensed.pptx
+#> Table exported to /tmp/RtmpTulUTc/condensed.pptx
 
 # Example 5: Dark header for emphasis
 table2pptx(results, file.path(tempdir(), "dark.pptx"),
         dark_header = TRUE,
         caption = "Risk Factors")
-#> Table exported to /tmp/RtmpsIjHNN/dark.pptx
+#> Table exported to /tmp/RtmpTulUTc/dark.pptx
 
 # Example 6: With zebra stripes
 table2pptx(results, file.path(tempdir(), "striped.pptx"),
         zebra_stripes = TRUE)
-#> Table exported to /tmp/RtmpsIjHNN/striped.pptx
+#> Table exported to /tmp/RtmpTulUTc/striped.pptx
 
 # Example 7: Blank layout with custom positioning
 table2pptx(results, file.path(tempdir(), "blank.pptx"),
@@ -446,11 +446,11 @@ table2pptx(results, file.path(tempdir(), "blank.pptx"),
         left = 1,
         top = 1.5,
         width = 8)
-#> Table exported to /tmp/RtmpsIjHNN/blank.pptx
+#> Table exported to /tmp/RtmpTulUTc/blank.pptx
 
 # Example 8: Get flextable for customization
 ft <- table2pptx(results, file.path(tempdir(), "base.pptx"), return_ft = TRUE)
-#> Table exported to /tmp/RtmpsIjHNN/base.pptx
+#> Table exported to /tmp/RtmpTulUTc/base.pptx
 
 # Customize the returned flextable object
 ft <- flextable::color(ft, j = "p-value", color = "darkred")
@@ -463,7 +463,7 @@ table2pptx(results, file.path(tempdir(), "presentation.pptx"),
         zebra_stripes = TRUE,
         dark_header = TRUE,
         bold_significant = TRUE)
-#> Table exported to /tmp/RtmpsIjHNN/presentation.pptx
+#> Table exported to /tmp/RtmpTulUTc/presentation.pptx
 
 # Example 10: Descriptive statistics slide
 desc <- desctable(
@@ -476,7 +476,7 @@ desc <- desctable(
 table2pptx(desc, file.path(tempdir(), "baseline.pptx"),
         caption = "Baseline Characteristics",
         font_size = 10)
-#> Table exported to /tmp/RtmpsIjHNN/baseline.pptx
+#> Table exported to /tmp/RtmpTulUTc/baseline.pptx
 
 # Example 11: Conference presentation style
 table2pptx(results, file.path(tempdir(), "conference.pptx"),
@@ -485,7 +485,7 @@ table2pptx(results, file.path(tempdir(), "conference.pptx"),
         font_size = 14,  # Large for big rooms
         dark_header = TRUE,
         condense_table = TRUE)
-#> Table exported to /tmp/RtmpsIjHNN/conference.pptx
+#> Table exported to /tmp/RtmpTulUTc/conference.pptx
 
 options(old_width)
 # }

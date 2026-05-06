@@ -8,16 +8,16 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/phmcc/summata/tree/main/inst/CITATION)
+[`inst/CITATION`](https://codeberg.org/phmcc/summata/tree/main/inst/CITATION)
 
 McClelland PH (2026). *summata: Publication-Ready Summary Tables and
-Forest Plots*. R package version 0.11.4,
-<https://phmcc.github.io/summata/>.
+Forest Plots*. R package version 0.11.5,
+<https://phmcc.codeberg.page/summata/>.
 
     @Manual{,
       title = {summata: Publication-Ready Summary Tables and Forest Plots},
       author = {Paul Hsin-ti McClelland},
       year = {2026},
-      note = {R package version 0.11.4},
-      url = {https://phmcc.github.io/summata/},
+      note = {R package version 0.11.5},
+      url = {https://phmcc.codeberg.page/summata/},
     }
