@@ -1,7 +1,7 @@
 Package: summata
 Type: Package
 Title: Publication-Ready Summary Tables and Forest Plots
-Version: 0.11.4
+Version: 0.11.5
 Authors@R: c(
     person(
         given = c("Paul", "Hsin-ti"), 
@@ -21,7 +21,7 @@ Description: A comprehensive framework for descriptive statistics and regression
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
-URL: https://phmcc.github.io/summata/, https://github.com/phmcc/summata
+URL: https://phmcc.codeberg.page/summata/, https://codeberg.org/phmcc/summata, https://github.com/phmcc/summata
 BugReports: https://github.com/phmcc/summata/issues
 RoxygenNote: 7.3.3
 Depends: 

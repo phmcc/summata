@@ -1,3 +1,9 @@
+# *summata* 0.11.5 (2026-05-06)
+
+* Explicitly define `%||%` operator for backward compatability
+* Move main documentation to Codeberg Pages
+* Minor documentation edits
+
 # *summata* 0.11.4 (2026-03-14)
 
 * Use profile likelihood CIs for GLM/negbin and exact *t*-distribution CIs for linear models, replacing Wald approximation

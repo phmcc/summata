@@ -14,8 +14,11 @@
 #' @importFrom stats formula terms model.frame model.matrix
 #' @importFrom stats na.omit complete.cases
 #' @importFrom stats cor pnorm qnorm
-#' @importFrom stats nobs pchisq pf setNames
+#' @importFrom stats nobs pchisq pf
 #' @importFrom grDevices axisTicks
 #' @importFrom utils head tail str capture.output
 #' @keywords internal
 NULL
+
+#' @noRd
+`%||%` <- function(x, y) if (is.null(x)) y else x
