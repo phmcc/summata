@@ -285,7 +285,7 @@ citation("summata")
 
 To cite summata in publications, use:
 
-  McClelland PH (2026). _summata: Publication-Ready Summary Tables and Forest Plots_. R package version 0.11.4, <https://phmcc.codeberg.page/summata/>.
+  McClelland PH (2026). _summata: Publication-Ready Summary Tables and Forest Plots_. R package version 0.11.5, <https://phmcc.codeberg.page/summata/>.
 
 A BibTeX entry for LaTeX users is
 
@@ -293,7 +293,7 @@ A BibTeX entry for LaTeX users is
     title = {summata: Publication-Ready Summary Tables and Forest Plots},
     author = {Paul Hsin-ti McClelland},
     year = {2026},
-    note = {R package version 0.11.4},
+    note = {R package version 0.11.5},
     url = {https://phmcc.codeberg.page/summata/},
   }
 ```
