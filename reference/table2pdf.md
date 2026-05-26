@@ -382,7 +382,7 @@ if(has_latex){
   table2pdf(results, file.path(tempdir(), "basic_results.pdf"))
 }
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmp2vLXIU/basic_results.pdf
+#> Table exported to /tmp/Rtmpn8SzwZ/basic_results.pdf
 
 # \donttest{
 
@@ -511,48 +511,48 @@ table2pdf(results, file.path(tempdir(), "debug.pdf"),
 
 }
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmp2vLXIU/wide_results.pdf
+#> Table exported to /tmp/Rtmpn8SzwZ/wide_results.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmp2vLXIU/captioned.pdf
+#> Table exported to /tmp/Rtmpn8SzwZ/captioned.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmp2vLXIU/formatted_caption.pdf
+#> Table exported to /tmp/Rtmpn8SzwZ/formatted_caption.pdf
 #> Using standalone class for auto-sized output
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmp2vLXIU/autosize.pdf
+#> Table exported to /tmp/Rtmpn8SzwZ/autosize.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmp2vLXIU/a4_custom.pdf
+#> Table exported to /tmp/Rtmpn8SzwZ/a4_custom.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmp2vLXIU/large_font.pdf
+#> Table exported to /tmp/Rtmpn8SzwZ/large_font.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmp2vLXIU/indented.pdf
+#> Table exported to /tmp/Rtmpn8SzwZ/indented.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmp2vLXIU/condensed.pdf
+#> Table exported to /tmp/Rtmpn8SzwZ/condensed.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmp2vLXIU/striped.pdf
+#> Table exported to /tmp/Rtmpn8SzwZ/striped.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmp2vLXIU/dark_header.pdf
+#> Table exported to /tmp/Rtmpn8SzwZ/dark_header.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmp2vLXIU/publication_ready.pdf
+#> Table exported to /tmp/Rtmpn8SzwZ/publication_ready.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmp2vLXIU/relaxed_padding.pdf
+#> Table exported to /tmp/Rtmpn8SzwZ/relaxed_padding.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmp2vLXIU/no_scale.pdf
+#> Table exported to /tmp/Rtmpn8SzwZ/no_scale.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmp2vLXIU/no_bold.pdf
+#> Table exported to /tmp/Rtmpn8SzwZ/no_bold.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmp2vLXIU/custom_align.pdf
+#> Table exported to /tmp/Rtmpn8SzwZ/custom_align.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmp2vLXIU/descriptive.pdf
+#> Table exported to /tmp/Rtmpn8SzwZ/descriptive.pdf
 #> Auto-detected binary outcome, using logistic regression
 #> Fitting base with 2 predictors...
 #> Fitting full with 4 predictors...
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmp2vLXIU/model_comparison.pdf
+#> Table exported to /tmp/Rtmpn8SzwZ/model_comparison.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmp2vLXIU/very_wide.pdf
+#> Table exported to /tmp/Rtmpn8SzwZ/very_wide.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmp2vLXIU/caption_size.pdf
+#> Table exported to /tmp/Rtmpn8SzwZ/caption_size.pdf
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmp2vLXIU/debug.pdf
+#> Table exported to /tmp/Rtmpn8SzwZ/debug.pdf
 # }
 ```

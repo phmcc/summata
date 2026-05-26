@@ -2,6 +2,8 @@
 
 ## *summata* 0.11.5 (2026-05-06)
 
+CRAN release: 2026-05-07
+
 - Explicitly define `%||%` operator for backward compatability
 - Move main documentation to Codeberg Pages
 - Minor documentation edits
