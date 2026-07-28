@@ -373,7 +373,7 @@ plot3 <- multiforest(
 
 # Example 4: Save with recommended dimensions
 forestsave(plot3, file.path(tempdir(), "multioutcome_forest.pdf"))
-#> Forest plot saved to /tmp/RtmptN10wa/multioutcome_forest.pdf (width = 16.7 in, height = 5.0 in)
+#> Forest plot saved to /tmp/RtmpVRC0ab/multioutcome_forest.pdf (width = 16.7 in, height = 5.0 in)
 
 options(old_width)
 
