@@ -55,7 +55,7 @@ format_model_table <- function(data,
                                conf_level = 0.95,
                                marks = NULL) {
     
-    ## Determine which columns we actually need to avoid copying everything
+    ## Determine the required columns, to avoid copying the whole table
     ## Start with columns that will be in output
     needed_cols <- c("variable", "group", "n", "n_group", "events", "events_group",
                      "p_value", "ci_lower", "ci_upper", "reference", "model_type",
@@ -700,23 +700,31 @@ validate_fit_inputs <- function(data, outcome, predictors, model_type,
 #' @keywords internal
 quiet_fit <- function(expr, verbose = FALSE) {
     if (verbose) {
-        eval.parent(expr)
-    } else {
-        withCallingHandlers(
-            eval.parent(expr),
-            warning = function(w) {
-                msg <- conditionMessage(w)
-                if (grepl(
-                    paste0("singular|convergence|step size|maxfun|",
-                           "fitted probabilities numerically 0 or 1|",
-                           "fitted rates numerically 0|",
-                           "algorithm did not converge|",
-                           "number of observations.*less than"),
-                    msg, ignore.case = TRUE
-                )) {
-                    invokeRestart("muffleWarning")
-                }
-            }
-        )
+        return(eval.parent(expr))
     }
+
+    ## Diagnostics that are expected during screening and are reported through
+    ## the fitted result rather than the console
+    fit_noise <- paste0("singular|convergence|step size|maxfun|",
+                        "fitted probabilities numerically 0 or 1|",
+                        "fitted rates numerically 0|",
+                        "algorithm did not converge|",
+                        "number of observations.*less than")
+
+    ## Both condition classes are handled: lme4 raises a singular fit as a
+    ## message rather than a warning, so a warning handler alone leaves
+    ## "boundary (singular) fit" on the console.
+    withCallingHandlers(
+        eval.parent(expr),
+        warning = function(w) {
+            if (grepl(fit_noise, conditionMessage(w), ignore.case = TRUE)) {
+                invokeRestart("muffleWarning")
+            }
+        },
+        message = function(m) {
+            if (grepl(fit_noise, conditionMessage(m), ignore.case = TRUE)) {
+                invokeRestart("muffleMessage")
+            }
+        }
+    )
 }

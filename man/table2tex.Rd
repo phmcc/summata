@@ -25,6 +25,7 @@ table2tex(
   caption_size = NULL,
   label = NULL,
   show_logs = FALSE,
+  quiet = FALSE,
   ...
 )
 }
@@ -110,7 +111,7 @@ Supports multi-line captions using double backslash. Default is \code{NULL}.}
 \item{caption_size}{Numeric. Caption font size in points. If \code{NULL} (default), 
 caption will use the document's default caption size (typically slightly smaller 
 than body text). Set to a specific value (\emph{e.g.,} 6, 7, 8, 9) to control caption 
-size explicitly. This generates a LaTeX comment that you can use when wrapping 
+size explicitly. This generates a LaTeX comment for use when wrapping 
 the table. Typical range: 6-10 points.}
 
 \item{label}{Character string. LaTeX label for cross-references. 
@@ -120,11 +121,16 @@ Example: \code{"tab:regression"}. Default is \code{NULL}.}
 about required LaTeX packages and formatting options applied. If 
 \code{FALSE}, suppresses these messages. Default is \code{FALSE}.}
 
+\item{quiet}{Logical. Suppress progress and confirmation messages, such
+as the notice reporting the file written. Errors and warnings are
+unaffected. Default is \code{FALSE}.}
+
 \item{...}{Additional arguments passed to \code{\link[xtable]{xtable}}.}
 }
 \value{
-Invisibly returns \code{NULL}. Creates a \code{.tex} file at the specified 
-  location containing a LaTeX tabular environment.
+Invisibly returns the file path, matching \code{tablesave()} and
+  \code{forestsave()}. Called for its side effect of creating a \code{.tex}
+  file at the specified location containing a LaTeX tabular environment.
 }
 \description{
 Converts a data frame, data.table, or matrix to LaTeX source code suitable for 
@@ -154,7 +160,7 @@ The output includes:
 
 \strong{Required LaTeX Packages:}
 
-Add these to your LaTeX document preamble:
+The following are required in the LaTeX document preamble:
 
 \emph{Always required:}
 \preformatted{
@@ -199,7 +205,7 @@ Creates high-contrast header row:
 dark_header = TRUE  # Black background, white text
 }
 
-Both require the xcolor package with table option in your document.
+Both require the xcolor package with the table option in the document preamble.
 
 \strong{Integration with LaTeX Documents:}
 
@@ -241,7 +247,7 @@ in a table environment (see examples above).
 
 \strong{Special Characters:}
 
-The function automatically escapes LaTeX special characters in your data:
+The function automatically escapes LaTeX special characters in the data:
 \itemize{
   \item Ampersand, percent, dollar sign, hash, underscore
   \item Left and right braces
@@ -361,8 +367,12 @@ models <- list(
    full = c("age", "sex", "treatment", "stage")
 )
 
+# Information criteria assume a common sample, so the candidate
+# predictors are restricted to complete cases before comparison
+comparison_data <- na.omit(clintrial[, c("os_status", "age", "sex", "treatment", "stage")])
+
 comparison <- compfit(
-   data = clintrial,
+   data = comparison_data,
    outcome = "os_status",
    model_list = models
 )
@@ -375,7 +385,7 @@ table2tex(comparison, file.path(tempdir(), "model_comparison.tex"),
 }
 }
 \seealso{
-\code{\link{autotable}} for automatic format detection,
+\code{\link{tablesave}} for saving in the format given by the file extension,
 \code{\link{table2pdf}} for direct PDF output,
 \code{\link{table2html}} for HTML tables,
 \code{\link{table2docx}} for Word documents,
@@ -384,12 +394,12 @@ table2tex(comparison, file.path(tempdir(), "model_comparison.tex"),
 \code{\link{fit}} for regression tables,
 \code{\link{desctable}} for descriptive tables
 
-Other export functions: 
-\code{\link{autotable}()},
-\code{\link{table2docx}()},
-\code{\link{table2html}()},
-\code{\link{table2pdf}()},
-\code{\link{table2pptx}()},
-\code{\link{table2rtf}()}
+Other export functions:
+\code{\link[=table2docx]{table2docx()}},
+\code{\link[=table2html]{table2html()}},
+\code{\link[=table2pdf]{table2pdf()}},
+\code{\link[=table2pptx]{table2pptx()}},
+\code{\link[=table2rtf]{table2rtf()}},
+\code{\link[=tablesave]{tablesave()}}
 }
 \concept{export functions}

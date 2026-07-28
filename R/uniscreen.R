@@ -231,6 +231,14 @@
 #'     \item{raw_data}{data.table. Unformatted numeric results with separate 
 #'       columns for coefficients, standard errors, confidence interval bounds, 
 #'       \emph{etc.} Suitable for further statistical analysis or custom formatting}
+#'     \item{analysis_counts}{List. How much of the supplied data reached the
+#'       model, with elements \code{n_supplied}, \code{n_analyzed},
+#'       \code{n_missing_outcome} and \code{n_missing_predictor}, plus
+#'       \code{events_supplied} and \code{events_analyzed} where the model
+#'       type carries an event count. Each predictor is screened in its
+#'       own model, so \code{n_analyzed} holds one value per predictor and
+#'       the reported sample may be a range. The \code{print()} method always
+#'       reports the analyzed sample}
 #'     \item{models}{List (if \code{keep_models = TRUE}). Named list of fitted 
 #'       model objects, with predictor names as list names. Access specific models 
 #'       via \code{attr(result, "models")[["predictor_name"]]}}
@@ -310,7 +318,10 @@
 #' \code{\link{fit}} for fitting a single multivariable model,
 #' \code{\link{fullfit}} for complete univariable-to-multivariable workflow,
 #' \code{\link{compfit}} for comparing multiple models,
-#' \code{\link{m2dt}} for converting individual models to tables
+#' \code{\link{m2dt}} for converting individual models to tables,
+#' \code{\link{uniforest}} for forest plots of screening results,
+#' \code{\link{forestsave}} for exporting forest plots,
+#' \code{\link{tablesave}} for exporting tables
 #'
 #' @examples
 #' # Load example data
@@ -324,6 +335,7 @@
 #'     predictors = c("age", "sex", "bmi", "smoking", "hypertension"),
 #'     model_type = "glm",
 #'     family = "binomial",
+#'     labels = clintrial_labels,
 #'     parallel = FALSE
 #' )
 #' print(screen1)
@@ -438,10 +450,10 @@
 #'     outcome = "os_status",
 #'     predictors = c("treatment", "stage", "grade"),
 #'     reference_rows = FALSE,
+#'     labels = clintrial_labels,
 #'     parallel = FALSE
 #' )
 #' print(screen10)
-#' # Reference categories not shown
 #' 
 #' # Example 11: Customize decimal places
 #' screen11 <- uniscreen(
@@ -449,7 +461,8 @@
 #'     outcome = "os_status",
 #'     predictors = c("age", "bmi", "creatinine"),
 #'     digits = 3,      # 3 decimal places for OR
-#'     p_digits = 4     # 4 decimal places for p-values
+#'     p_digits = 4,    # 4 decimal places for p-values
+#'     labels = clintrial_labels
 #' )
 #' print(screen11)
 #' 
@@ -460,6 +473,7 @@
 #'     predictors = c("age", "sex", "bmi"),
 #'     show_n = FALSE,
 #'     show_events = FALSE,
+#'     labels = clintrial_labels,
 #'     parallel = FALSE
 #' )
 #' print(screen12)
@@ -473,7 +487,6 @@
 #' )
 #' raw_data <- attr(screen13, "raw_data")
 #' print(raw_data)
-#' # Contains unformatted coefficients, SEs, CIs, etc.
 #' 
 #' # Example 14: Force coefficient display instead of OR
 #' screen14 <- uniscreen(
@@ -482,6 +495,7 @@
 #'     predictors = c("age", "bmi"),
 #'     model_type = "glm",
 #'     family = "binomial",
+#'     labels = clintrial_labels,
 #'     parallel = FALSE,
 #'     exponentiate = FALSE  # Show log odds instead of OR
 #' )
@@ -494,6 +508,7 @@
 #'     predictors = c("age", "sex", "bmi"),
 #'     model_type = "coxph",
 #'     weights = runif(nrow(clintrial), min = 0.5, max = 2),  # Random numbers for example
+#'     labels = clintrial_labels,
 #'     parallel = FALSE
 #' )
 #' 
@@ -589,6 +604,7 @@
 #'         model_type = "glmer",
 #'         random = "(1|site/patient_id)",
 #'         family = "binomial",
+#'         labels = clintrial_labels,
 #'         parallel = FALSE
 #'     )
 #' }
@@ -921,6 +937,26 @@ uniscreen <- function(data,
     
     ## Attach attributes
     data.table::setattr(formatted, "raw_data", combined_raw)
+
+    ## Each predictor is screened in its own model, so the analyzed sample
+    ## is recorded per predictor and reported as a range where it varies.
+    us_outcome_vars <- all.vars(stats::as.formula(paste("~", outcome)))
+    data.table::setattr(
+        formatted, "analysis_counts",
+        get_analysis_counts(
+            data,
+            us_outcome_vars,
+            lapply(predictors, function(p) {
+                all.vars(stats::as.formula(paste("~", p)))
+            }),
+            get_event_variable_for_counts(us_outcome_vars, model_type, family)
+        )
+    )
+    data.table::setattr(formatted, "number_marks", marks)
+    ## Variable labels travel with the result so that the forest plot
+    ## functions can apply the same labels without being given them again.
+    ## An explicit labels argument to those functions still takes precedence.
+    data.table::setattr(formatted, "labels", labels)
     
     if (keep_models) {
         data.table::setattr(formatted, "models", models)
@@ -956,7 +992,7 @@ uniscreen <- function(data,
 #' @family regression functions
 #' @export
 print.uniscreen_result <- function(x, ...) {
-    cat("\nUnivariable Screening Results\n")
+    cat("\nUnivariable Screening Results\n\n")
     cat("Outcome: ", attr(x, "outcome"), "\n", sep = "")
     cat("Model Type: ", attr(x, "model_type"), "\n", sep = "")
     
@@ -971,6 +1007,25 @@ print.uniscreen_result <- function(x, ...) {
         sig_predictors <- unique(raw[p_value < p_thresh]$predictor)
         n_sig <- length(sig_predictors)
         cat("Significant (p < ", p_thresh, "): ", n_sig, "\n", sep = "")
+    }
+    
+    ## Always reported, so that a complete sample is stated rather than left
+    ## to be distinguished from an absent disclosure. Each predictor is
+    ## screened separately, so the analyzed sample may be a range.
+    us_counts <- attr(x, "analysis_counts")
+    
+    us_marks <- attr(x, "number_marks")
+    
+    analyzed <- format_analysis_counts(us_counts, marks = us_marks)
+    if (!is.null(analyzed)) {
+        cat(analyzed, "\n", sep = "")
+    }
+    
+    ## Events, not observations, constrain a screening workflow, so they are
+    ## reported alongside where the model type carries them
+    events_line <- format_event_counts(us_counts, marks = us_marks)
+    if (!is.null(events_line)) {
+        cat(events_line, "\n", sep = "")
     }
     
     if (!is.null(attr(x, "models"))) {

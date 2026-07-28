@@ -6,17 +6,12 @@
 #' 
 #' @details Run with testthat::test_file("tests/testthat/test-table2export.R")
 
-library(testthat)
 library(data.table)
-library(summata)
 
 ## ============================================================================
 ## Setup: Create test data
 ## ============================================================================
 
-## Use package's built-in clinical trial data
-data(clintrial)
-data(clintrial_labels)
 
 ## Create sample tables for testing
 clintrial$response <- as.integer(clintrial$os_status == 1 & clintrial$os_months < 24)
@@ -62,7 +57,7 @@ test_that("table2docx validates paper parameter", {
     
     ## match.arg throws error mentioning the valid options
     expect_error(
-        table2docx(simple_table, "output.docx", paper = "invalid")
+        table2docx(simple_table, tempfile(fileext = ".docx"), paper = "invalid")
     )
 })
 
@@ -74,7 +69,7 @@ test_that("table2docx validates orientation parameter", {
     
     ## match.arg throws error mentioning the valid options
     expect_error(
-        table2docx(simple_table, "output.docx", orientation = "invalid")
+        table2docx(simple_table, tempfile(fileext = ".docx"), orientation = "invalid")
     )
 })
 

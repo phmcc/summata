@@ -5,17 +5,12 @@
 #' 
 #' @details Run with testthat::test_file("tests/testthat/test_multivariate.R")
 
-library(testthat)
 library(data.table)
-library(summata)
 
 ## ============================================================================
 ## Setup: Load test data and define helper functions
 ## ============================================================================
 
-## Use package's built-in clinical trial data
-data(clintrial)
-data(clintrial_labels)
 
 ## Create a complete-case subset for tests requiring no missing data
 clintrial_complete <- na.omit(clintrial)
@@ -74,44 +69,9 @@ expect_multifit_result <- function(result) {
 
 
 ## ----------------------------------------------------------------------------
-## Helper: Check effect column exists with correct type
-## ----------------------------------------------------------------------------
-expect_effect_column <- function(result, effect_type = NULL) {
-    col_names <- names(result)
-    
-    ## Find effect column (contains OR, HR, RR, Coefficient, or Estimate with CI)
-    effect_cols <- grep("(OR|HR|RR|Coefficient|Estimate).*CI", col_names, value = TRUE)
-    expect_true(length(effect_cols) >= 1, 
-                info = paste("Expected effect column, found:", paste(col_names, collapse = ", ")))
-    
-    if (!is.null(effect_type)) {
-        ## For linear models, both "Coefficient" and "Estimate" are valid
-        if (effect_type == "Coefficient") {
-            expect_true(any(grepl("Coefficient|Estimate", effect_cols)),
-                        info = paste("Expected Coefficient or Estimate in columns, found:", 
-                                     paste(effect_cols, collapse = ", ")))
-        } else {
-            expect_true(any(grepl(effect_type, effect_cols)),
-                        info = paste("Expected", effect_type, "in columns, found:", 
-                                     paste(effect_cols, collapse = ", ")))
-        }
-    }
-}
 
 
 ## ----------------------------------------------------------------------------
-## Helper: Check p-value column formatting
-## ----------------------------------------------------------------------------
-expect_pvalue_column <- function(result) {
-    expect_true("p-value" %in% names(result))
-    
-    ## P-values should be formatted as numeric string, < threshold, or -
-    pvals <- result$`p-value`
-    valid_pvals <- grepl("^[0-9]\\.[0-9]+$|^< 0\\.0*1$|^-$|^$", pvals)
-    expect_true(all(valid_pvals), 
-                info = paste("Invalid p-values found:", 
-                             paste(pvals[!valid_pvals], collapse = ", ")))
-}
 
 
 ## ----------------------------------------------------------------------------
@@ -2172,7 +2132,7 @@ test_that("multiforest errors on non-multifit input", {
 ## SECTION 15: Edge Cases
 ## ============================================================================
 
-test_that("uniscreen handles single predictor", {
+test_that("uniscreen handles single predictor with labels", {
     
     result <- uniscreen(
         data = clintrial,

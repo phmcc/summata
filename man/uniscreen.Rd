@@ -255,6 +255,14 @@ A data.table with S3 class \code{"uniscreen_result"} containing formatted
     \item{raw_data}{data.table. Unformatted numeric results with separate 
       columns for coefficients, standard errors, confidence interval bounds, 
       \emph{etc.} Suitable for further statistical analysis or custom formatting}
+    \item{analysis_counts}{List. How much of the supplied data reached the
+      model, with elements \code{n_supplied}, \code{n_analyzed},
+      \code{n_missing_outcome} and \code{n_missing_predictor}, plus
+      \code{events_supplied} and \code{events_analyzed} where the model
+      type carries an event count. Each predictor is screened in its
+      own model, so \code{n_analyzed} holds one value per predictor and
+      the reported sample may be a range. The \code{print()} method always
+      reports the analyzed sample}
     \item{models}{List (if \code{keep_models = TRUE}). Named list of fitted 
       model objects, with predictor names as list names. Access specific models 
       via \code{attr(result, "models")[["predictor_name"]]}}
@@ -349,6 +357,7 @@ screen1 <- uniscreen(
     predictors = c("age", "sex", "bmi", "smoking", "hypertension"),
     model_type = "glm",
     family = "binomial",
+    labels = clintrial_labels,
     parallel = FALSE
 )
 print(screen1)
@@ -463,10 +472,10 @@ screen10 <- uniscreen(
     outcome = "os_status",
     predictors = c("treatment", "stage", "grade"),
     reference_rows = FALSE,
+    labels = clintrial_labels,
     parallel = FALSE
 )
 print(screen10)
-# Reference categories not shown
 
 # Example 11: Customize decimal places
 screen11 <- uniscreen(
@@ -474,7 +483,8 @@ screen11 <- uniscreen(
     outcome = "os_status",
     predictors = c("age", "bmi", "creatinine"),
     digits = 3,      # 3 decimal places for OR
-    p_digits = 4     # 4 decimal places for p-values
+    p_digits = 4,    # 4 decimal places for p-values
+    labels = clintrial_labels
 )
 print(screen11)
 
@@ -485,6 +495,7 @@ screen12 <- uniscreen(
     predictors = c("age", "sex", "bmi"),
     show_n = FALSE,
     show_events = FALSE,
+    labels = clintrial_labels,
     parallel = FALSE
 )
 print(screen12)
@@ -498,7 +509,6 @@ screen13 <- uniscreen(
 )
 raw_data <- attr(screen13, "raw_data")
 print(raw_data)
-# Contains unformatted coefficients, SEs, CIs, etc.
 
 # Example 14: Force coefficient display instead of OR
 screen14 <- uniscreen(
@@ -507,6 +517,7 @@ screen14 <- uniscreen(
     predictors = c("age", "bmi"),
     model_type = "glm",
     family = "binomial",
+    labels = clintrial_labels,
     parallel = FALSE,
     exponentiate = FALSE  # Show log odds instead of OR
 )
@@ -519,6 +530,7 @@ screen15 <- uniscreen(
     predictors = c("age", "sex", "bmi"),
     model_type = "coxph",
     weights = runif(nrow(clintrial), min = 0.5, max = 2),  # Random numbers for example
+    labels = clintrial_labels,
     parallel = FALSE
 )
 
@@ -614,6 +626,7 @@ if (requireNamespace("lme4", quietly = TRUE)) {
         model_type = "glmer",
         random = "(1|site/patient_id)",
         family = "binomial",
+        labels = clintrial_labels,
         parallel = FALSE
     )
 }
@@ -663,17 +676,20 @@ print(invgauss_screen)
 \code{\link{fit}} for fitting a single multivariable model,
 \code{\link{fullfit}} for complete univariable-to-multivariable workflow,
 \code{\link{compfit}} for comparing multiple models,
-\code{\link{m2dt}} for converting individual models to tables
+\code{\link{m2dt}} for converting individual models to tables,
+\code{\link{uniforest}} for forest plots of screening results,
+\code{\link{forestsave}} for exporting forest plots,
+\code{\link{tablesave}} for exporting tables
 
-Other regression functions: 
-\code{\link{compfit}()},
-\code{\link{fit}()},
-\code{\link{fullfit}()},
-\code{\link{multifit}()},
-\code{\link{print.compfit_result}()},
-\code{\link{print.fit_result}()},
-\code{\link{print.fullfit_result}()},
-\code{\link{print.multifit_result}()},
-\code{\link{print.uniscreen_result}()}
+Other regression functions:
+\code{\link[=compfit]{compfit()}},
+\code{\link[=fit]{fit()}},
+\code{\link[=fullfit]{fullfit()}},
+\code{\link[=multifit]{multifit()}},
+\code{\link[=print.compfit_result]{print.compfit_result()}},
+\code{\link[=print.fit_result]{print.fit_result()}},
+\code{\link[=print.fullfit_result]{print.fullfit_result()}},
+\code{\link[=print.multifit_result]{print.multifit_result()}},
+\code{\link[=print.uniscreen_result]{print.uniscreen_result()}}
 }
 \concept{regression functions}

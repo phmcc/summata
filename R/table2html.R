@@ -67,8 +67,14 @@
 #'   
 #' @param ... Additional arguments passed to \code{\link[xtable]{xtable}}.
 #'
-#' @return Invisibly returns \code{NULL}. Creates an HTML file at the specified 
-#'   location that can be opened in web browsers or embedded in HTML documents.
+#' @param quiet Logical. Suppress progress and confirmation messages, such
+#'   as the notice reporting the file written. Errors and warnings are
+#'   unaffected. Default is \code{FALSE}.
+#'
+#' @return Invisibly returns the file path, matching \code{tablesave()} and
+#'   \code{forestsave()}. Called for its side effect of creating an HTML file at
+#'   the specified location, which can be opened in web browsers or embedded in
+#'   HTML documents.
 #'
 #' @details
 #' \strong{Output Format:}
@@ -145,7 +151,7 @@
 #' table2html(results, "table.html", include_css = FALSE)
 #' }
 #' 
-#' Then include in your document chunk with \code{results='asis'}:
+#' Then include in the document chunk with \code{results='asis'}:
 #' \preformatted{
 #' cat(readLines("table.html"), sep = "\n")
 #' }
@@ -188,7 +194,7 @@
 #' }
 #' 
 #' @seealso
-#' \code{\link{autotable}} for automatic format detection,
+#' \code{\link{tablesave}} for saving in the format given by the file extension,
 #' \code{\link{table2pdf}} for PDF output,
 #' \code{\link{table2tex}} for LaTeX output,
 #' \code{\link{table2docx}} for Word documents,
@@ -222,7 +228,7 @@
 #' # Example 3: For embedding (no CSS)
 #' table2html(results, file.path(tempdir(), "embed.html"),
 #'           include_css = FALSE)
-#' # Include in your HTML document
+#' # Include in the HTML document
 #' 
 #' # Example 4: Hierarchical display
 #' table2html(results, file.path(tempdir(), "indented.html"),
@@ -306,7 +312,7 @@
 #'           include_css = FALSE,
 #'           format_headers = FALSE,
 #'           bold_significant = FALSE)
-#' # Apply your own CSS classes and styling
+#' # Apply personal CSS classes and styling
 #' 
 #' # Example 19: Model comparison table
 #' models <- list(
@@ -314,8 +320,12 @@
 #'      full = c("age", "sex", "treatment", "stage")
 #' )
 #' 
+#' # Information criteria assume a common sample, so the candidate
+#' # predictors are restricted to complete cases before comparison
+#' comparison_data <- na.omit(clintrial[, c("os_status", "age", "sex", "treatment", "stage")])
+#' 
 #' comparison <- compfit(
-#'      data = clintrial,
+#'      data = comparison_data,
 #'      outcome = "os_status",
 #'      model_list = models
 #' )
@@ -341,6 +351,7 @@ table2html <- function(table,
                      stripe_color = "#EEEEEE",
                      dark_header = FALSE,
                      include_css = TRUE,
+                     quiet = FALSE,
                      ...) {
     
     if (!requireNamespace("xtable", quietly = TRUE)) {
@@ -578,7 +589,7 @@ table2html <- function(table,
         }
     }
     
-    message(sprintf("Table exported to %s", file))
+    if (!quiet) message(sprintf("Table saved to %s", file))
     
-    invisible(NULL)
+    invisible(file)
 }

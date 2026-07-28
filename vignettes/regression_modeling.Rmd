@@ -36,7 +36,7 @@ The `summata` package provides three principal functions for regression analysis
 | `fit()` | Single univariable/multivariable model |
 | `fullfit()` | Combined univariable and multivariable analysis |
 
-All functions support a wide range of model types including linear models, generalized linear models (logistic, Poisson, Gaussian, Gamma, negative binomial), Cox proportional hazards models, and mixed-effects models, with consistent syntax and formatted output.
+All functions support a wide range of model types including linear models, generalized linear models (logistic, Poisson, Gaussian, Gamma, negative binomial, *etc.*), Cox proportional hazards models, and mixed-effects models, with consistent syntax and formatted output.
 
 As with other `summata` functions, these functions adhere to the standard calling convention:
 
@@ -107,7 +107,7 @@ The `uniscreen()` function fits separate regression models for each predictor, c
 
 ## **Example 1:** Binary Outcome Screen (Logistic Regression)
 
-For binary outcomes, use `model_type = "glm"` (logistic regression is the default family). Here we examine predictors of 30-day hospital readmission:
+For binary outcomes, use `model_type = "glm"` (logistic regression is the default family). The following example examines predictors of 30-day hospital readmission:
 
 ```{r}
 screening_vars <- c("age", "sex", "race", "bmi", "smoking", 
@@ -184,6 +184,7 @@ example5 <- uniscreen(
   data = clintrial,
   outcome = "readmission_30d",
   predictors = c("age", "sex", "stage"),
+  labels = clintrial_labels,
   model_type = "glm",
   keep_models = TRUE
 )
@@ -295,6 +296,7 @@ example11 <- fit(
   data = clintrial,
   outcome = "readmission_30d",
   predictors = c("age", "sex", "stage"),
+  labels = clintrial_labels,
   model_type = "glm",
   conf_level = 0.90
 )
@@ -323,6 +325,7 @@ example12a <- fit(
   data = clintrial,
   outcome = "readmission_30d",
   predictors = c("age", "sex", "stage"),
+  labels = clintrial_labels,
   model_type = "glm",
   conf_method = "profile"
 )
@@ -334,6 +337,7 @@ example12b <- fit(
   data = clintrial,
   outcome = "readmission_30d",
   predictors = c("age", "sex", "stage"),
+  labels = clintrial_labels,
   model_type = "glm",
   conf_method = "wald"
 )
@@ -441,6 +445,7 @@ example17a <- fullfit(
   data = clintrial,
   outcome = "wound_infection",
   predictors = c("age", "sex", "stage"),
+  labels = clintrial_labels,
   model_type = "glm",
   columns = "uni"
 )
@@ -452,6 +457,7 @@ example17b <- fullfit(
   data = clintrial,
   outcome = "wound_infection",
   predictors = c("age", "sex", "stage"),
+  labels = clintrial_labels,
   model_type = "glm",
   columns = "multi"
 )
@@ -642,20 +648,20 @@ The output shows odds ratios conditional on the matching strata.
 
 # Exporting Results
 
-Regression tables can be exported to various formats:
+Regression tables can be exported to various formats using the `tablesave()` dispatcher or the various per-format export functions:
 
 ```{r, eval = FALSE}
 # Microsoft Word
 table2docx(
   table = example13,
-  file = file.path(tempdir(), "Table2_Regression.docx"),
+  file = "table2_regression.docx",
   caption = "Table 2. Univariable and Multivariable Analysis"
 )
 
 # PDF
 table2pdf(
   table = example13,
-  file = file.path(tempdir(), "Table2_Regression.pdf"),
+  file = "table2_regression.pdf",
   caption = "Table 2. Regression Results"
 )
 ```
@@ -702,9 +708,9 @@ The comparison between univariable and multivariable estimates reveals confoundi
 
 Adequate events per predictor are required for stable estimation:
 
-- Logistic/Cox models: ≥10 events per predictor (rule of thumb)
-- Linear models: ≥10–20 observations per predictor
-- Mixed-effects models: ≥5–10 clusters recommended
+- Logistic/Cox models: ≥ 10 events per predictor (rule of thumb)
+- Linear models: ≥ 10–20 observations per predictor
+- Mixed-effects models: ≥ 5–10 clusters recommended
 - Use `method = "screen"` to reduce predictors when sample size is limited
 
 ---
@@ -722,6 +728,15 @@ sapply(clintrial[, c("age", "sex", "stage")], function(x) sum(is.na(x)))
 # Create complete-case dataset explicitly
 complete_data <- na.omit(clintrial[, c("readmission_30d", "age", "sex", "stage")])
 ```
+
+Printed output reports the analyzed sample against the data supplied, and, for model types that carry an event count, the analyzed events on the same basis:
+
+```
+Observations analyzed: 750 of 850 (88.2%)
+Events analyzed: 382 of 382 (100.0%)
+```
+
+The event denominator counts only events among observations with an observed outcome, since an observation whose outcome is missing cannot be classified as an event or a non-event. Where missingness is confined to the outcome, every identifiable event is therefore analyzed and that line reads 100%; a figure below 100% indicates events lost to missing covariates.
 
 ## Factor Reference Levels
 

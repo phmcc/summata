@@ -57,8 +57,9 @@
 #'   specified \code{units}. Default is \code{NULL} (automatic based on number 
 #'   of rows).
 #'   
-#' @param show_n Logical. If \code{TRUE}, includes a column showing sample sizes. 
-#'   Default is \code{TRUE}.
+#' @param show_n Logical. If \code{TRUE}, includes a column showing sample sizes.
+#'   Counts describe the observations used in fitting rather than every row
+#'   supplied. Default is \code{TRUE}.
 #'   
 #' @param show_events Logical. If \code{TRUE}, includes a column showing the 
 #'   number of events for each row. Default is \code{TRUE} for binomial and 
@@ -108,9 +109,9 @@
 #'   
 #' @param labels Named character vector providing custom display labels for 
 #'   outcomes and variables. Applied to outcome names in the plot.
-#'   Default is \code{NULL} (uses labels already applied in multifit, or 
-#'   original names).
-#'   
+#'   Default is \code{NULL}, in which case the labels attached by
+#'   \code{multifit()} are used. Original names are used where neither is
+#'   available.
 #' @param units Character string specifying units for plot dimensions: 
 #'   \code{"in"} (inches), \code{"cm"}, or \code{"mm"}. Default is \code{"in"}.
 #'
@@ -138,7 +139,7 @@
 #'   can be:
 #'   \itemize{
 #'     \item Displayed directly: \code{print(plot)}
-#'     \item Saved to file: \code{ggsave("forest.pdf", plot, width = 12, height = 8)}
+#'     \item Saved to file: \code{forestsave(plot, "forest.pdf")}
 #'     \item Further customized with \pkg{ggplot2} functions
 #'   }
 #'   
@@ -148,11 +149,20 @@
 #'   \describe{
 #'     \item{width}{Numeric. Recommended plot width in specified units}
 #'     \item{height}{Numeric. Recommended plot height in specified units}
+#'     \item{units}{Character. The units the dimensions are expressed in,
+#'       matching the \code{units} argument}
 #'   }
 #'   
 #'   These recommendations are automatically calculated based on the number of 
 #'   variables, text sizes, and layout parameters, and are printed to console 
 #'   if \code{plot_width} or \code{plot_height} are not specified.
+#'   \code{forestsave()} reads all three and requires no further handling.
+#'
+#'   The returned object also includes an attribute \code{"table_data"}
+#'   accessible via \code{attr(plot, "table_data")}, a data.table holding the
+#'   values drawn in the plot, in the order of the model terms. Sample sizes
+#'   and event counts describe the observations used in fitting rather than
+#'   every row supplied.
 #'
 #' @details
 #' \strong{Plot Layout:}
@@ -193,7 +203,8 @@
 #' \code{\link{glmforest}} for single GLM forest plots,
 #' \code{\link{coxforest}} for single Cox model forest plots,
 #' \code{\link{lmforest}} for single linear model forest plots,
-#' \code{\link{uniforest}} for univariable screening forest plots
+#' \code{\link{uniforest}} for univariable screening forest plots,
+#'   \code{\link{forestsave}} for saving with recommended dimensions
 #'
 #' @examples
 #' data(clintrial)
@@ -232,9 +243,7 @@
 #' )
 #' 
 #' # Example 4: Save with recommended dimensions
-#' dims <- attr(plot3, "rec_dims")
-#' ggplot2::ggsave(file.path(tempdir(), "multioutcome_forest.pdf"),
-#'                 plot3, width = dims$width, height = dims$height)
+#' forestsave(plot3, file.path(tempdir(), "multioutcome_forest.pdf"))
 #'
 #' options(old_width)
 #' 
@@ -298,6 +307,13 @@ multiforest <- function(x,
              "\nInput is of class: ", paste(class(x), collapse = ", "))
     }
     
+    ## Labels attached by the producing function are used when none are given
+    ## here, so that a labeled result does not need them supplied twice. An
+    ## explicit argument takes precedence.
+    if (is.null(labels)) {
+        labels <- attr(x, "labels")
+    }
+
     raw_data <- attr(x, "raw_data")
     if (is.null(raw_data)) {
         stop("Input does not appear to be a multifit() result (missing raw_data attribute).\n",
@@ -558,10 +574,9 @@ multiforest <- function(x,
                                                       )]
 
     ## Format N and events with locale-aware thousands separator
-    to_show_exp_clean[, n_formatted := data.table::fifelse(is.na(N), "",
-        vapply(N, format_count_forest, character(1), marks = marks))]
-    to_show_exp_clean[, events_formatted := data.table::fifelse(is.na(Events), "",
-        vapply(as.integer(Events), format_count_forest, character(1), marks = marks))]
+    to_show_exp_clean[, n_formatted := format_count(N, marks, na = "")]
+    to_show_exp_clean[, events_formatted := format_count(as.integer(Events), marks,
+                                                         na = "")]
     
     ## Clean up variable names for display
     to_show_exp_clean[, var_display := as.character(var)]
@@ -651,6 +666,11 @@ multiforest <- function(x,
     to_show_exp_clean[is.na(estimate), estimate := 0]
     
     ## Reorder (flip) - but maintain the variable grouping
+    ## Retain the assembled table for return as an attribute. The copy is taken
+    ## before the row order is reversed for plotting, so that the returned table
+    ## follows the order of the model terms rather than the drawing order.
+    table_data <- data.table::copy(to_show_exp_clean)
+    
     to_show_exp_clean <- to_show_exp_clean[order(rev(seq_len(nrow(to_show_exp_clean))))]
     to_show_exp_clean[, x_pos := .I]
     
@@ -984,7 +1004,14 @@ multiforest <- function(x,
     }
     
     ## Add recommended dimensions as an attribute
-    attr(p, "rec_dims") <- list(width = rec_width, height = rec_height)
+    ## The units are recorded alongside the dimensions. Both are converted to
+    ## the requested units above, so a consumer that assumed inches would
+    ## otherwise mis-size the output by the conversion factor.
+    attr(p, "rec_dims") <- list(width = rec_width, height = rec_height,
+                                units = units)
+
+    ## Add the assembled table as an attribute
+    attr(p, "table_data") <- table_data
 
     return(p)
 }

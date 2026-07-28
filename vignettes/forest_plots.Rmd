@@ -35,33 +35,30 @@ if (requireNamespace("ragg", quietly = TRUE)) {
   )
 }
 
-## Dynamic figure sizing: queue_plot() stashes rec_dims from a plot object,
-## and the opts_hook on the NEXT chunk (with use_rec_dims = TRUE) applies them
-## before knitr opens the graphics device. Plots render via ragg (dev = "ragg_png"
-## set above) and knitr captures them natively. No files written to disk.
-.plot_dims <- new.env(parent = emptyenv())
-.plot_dims$width <- NULL
-.plot_dims$height <- NULL
+## Dynamic figure sizing. A chunk that renders a forest plot names the object it
+## is about to print, by giving the chunk option rec_dims_from = "example1".
+##
+## Chunk options are resolved before knitr opens the graphics device, so this
+## hook reads the plot's recommended dimensions from its "rec_dims" attribute
+## and sets fig.width and fig.height from them. The object was created in an
+## earlier chunk and so already exists in the knit environment. Plots render via
+## ragg (dev = "ragg_png" set above) and knitr captures them natively; no files
+## are written to disk.
+##
+## A plot without recommended dimensions, or a name that does not resolve,
+## falls through to the default figure size rather than failing the build.
+knitr::opts_hooks$set(rec_dims_from = function(options) {
+  plot <- get0(options$rec_dims_from, envir = knitr::knit_global(),
+               ifnotfound = NULL)
+  dims <- attr(plot, "rec_dims")
 
-knitr::opts_hooks$set(use_rec_dims = function(options) {
-  if (isTRUE(options$use_rec_dims)) {
-    if (!is.null(.plot_dims$width))  options$fig.width  <- .plot_dims$width
-    if (!is.null(.plot_dims$height)) options$fig.height <- .plot_dims$height
-    .plot_dims$width <- NULL
-    .plot_dims$height <- NULL
+  if (!is.null(dims)) {
+    options$fig.width  <- dims$width
+    options$fig.height <- dims$height
   }
+
   options
 })
-
-## Call at the end of a plot-creation chunk to stash dimensions for the next chunk.
-queue_plot <- function(plot) {
-  dims <- attr(plot, "rec_dims")
-  if (!is.null(dims)) {
-    .plot_dims$width  <- dims$width
-    .plot_dims$height <- dims$height
-  }
-  invisible(plot)
-}
 ```
 
 Forest plots provide a graphical representation of effect estimates and their precision. Each row displays a point estimate (typically an odds ratio, hazard ratio, or regression coefficient) with a confidence interval, enabling rapid visual assessment of effect magnitude, direction, and statistical significance. The format is standard in published research and regulatory submissions.
@@ -102,17 +99,14 @@ data(clintrial)
 data(clintrial_labels)
 ```
 
-> *n.b.:* To ensure correct font rendering and figure sizing, the forest plots below are displayed using a helper function (`queue_plot()`) that applies each plot's recommended dimensions (stored in the `"rec_dims"` attribute) via the [`ragg`](https://ragg.r-lib.org/) graphics device. In practice, replace `queue_plot()` with `ggplot2::ggsave()` using recommended plot dimensions for equivalent results:
+> *n.b.:* The forest plots below are sized by this vignette from each plot's recommended dimensions, stored in its `"rec_dims"` attribute, and rendered via the [`ragg`](https://ragg.r-lib.org/) graphics device for correct font metrics. That sizing is applied behind the scenes and is not shown in the code. Writing a plot to file elsewhere is performed with `forestsave()`, which applies the same dimensions and selects a suitable graphics device:
 > 
 > ```{r, eval = FALSE}
 > p <- glmforest(model, data = mydata)
-> dims <- attr(p, "rec_dims")
-> ggplot2::ggsave("forest_plot.png", p,
->                 width = dims$width, 
->                 height = dims$height)
+> forestsave(p, "forest_plot.png")
 > ```
 > 
-> This ensures that the figure size is always large enough to accommodate the constituent plot text and graphics, and it is generally the preferred method for saving forest plot outputs in `summata`.
+> This ensures that the figure size is always large enough to accommodate the constituent plot text and graphics, and it is the preferred method for saving forest plot outputs in `summata`.
 
 ---
 
@@ -137,10 +131,9 @@ example1 <- glmforest(
   title = "Logistic Regression: Predictors of Outcome",
   labels = clintrial_labels
 )
-queue_plot(example1)
 ```
 
-```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+```{r, echo = FALSE, out.width = "100%", rec_dims_from = "example1"}
 print(example1)
 ```
 
@@ -160,10 +153,9 @@ example2 <- lmforest(
   title = "Linear Regression: Length of Stay",
   labels = clintrial_labels
 )
-queue_plot(example2)
 ```
 
-```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+```{r, echo = FALSE, out.width = "100%", rec_dims_from = "example2"}
 print(example2)
 ```
 
@@ -183,10 +175,9 @@ example3 <- coxforest(
   title = "Cox Regression: Survival Analysis",
   labels = clintrial_labels
 )
-queue_plot(example3)
 ```
 
-```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+```{r, echo = FALSE, out.width = "100%", rec_dims_from = "example3"}
 print(example3)
 ```
 
@@ -200,10 +191,9 @@ example4 <- autoforest(
   data = clintrial,
   labels = clintrial_labels
 )
-queue_plot(example4)
 ```
 
-```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+```{r, echo = FALSE, out.width = "100%", rec_dims_from = "example4"}
 print(example4)
 ```
 
@@ -215,7 +205,7 @@ Forest plots integrate seamlessly with `fit()` and `fullfit()` output by extract
 
 ## **Example 5:** Direct Extraction from Fit Output
 
-The same approach works for logistic models:
+Input a `summata` regression object (*i.e.*, from `fit()` or `fullfit()`) directly into a forest plot function:
 
 ```{r}
 table_logistic <- fit(
@@ -232,16 +222,15 @@ example5 <- glmforest(
   labels = clintrial_labels,
   zebra_stripes = TRUE
 )
-queue_plot(example5)
 ```
 
-```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+```{r, echo = FALSE, out.width = "100%", rec_dims_from = "example5"}
 print(example5)
 ```
 
 ## **Example 6:** Model Attribute from Fit Output
 
-And for Cox models:
+Alternatively, input the attached model attribute from a `summata` regression object:
 
 ```{r}
 table_cox <- fit(
@@ -258,10 +247,9 @@ example6 <- coxforest(
   labels = clintrial_labels,
   zebra_stripes = TRUE
 )
-queue_plot(example6)
 ```
 
-```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+```{r, echo = FALSE, out.width = "100%", rec_dims_from = "example6"}
 print(example6)
 ```
 
@@ -280,10 +268,9 @@ example7 <- glmforest(
   labels = clintrial_labels,
   indent_groups = TRUE
 )
-queue_plot(example7)
 ```
 
-```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+```{r, echo = FALSE, out.width = "100%", rec_dims_from = "example7"}
 print(example7)
 ```
 
@@ -298,10 +285,9 @@ example8 <- glmforest(
   labels = clintrial_labels,
   condense_table = TRUE
 )
-queue_plot(example8)
 ```
 
-```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+```{r, echo = FALSE, out.width = "100%", rec_dims_from = "example8"}
 print(example8)
 ```
 
@@ -317,10 +303,9 @@ example9 <- glmforest(
   indent_groups = TRUE,
   zebra_stripes = FALSE
 )
-queue_plot(example9)
 ```
 
-```{r, echo = FALSE, out.width = "90%", use_rec_dims = TRUE}
+```{r, echo = FALSE, out.width = "90%", rec_dims_from = "example9"}
 print(example9)
 ```
 
@@ -339,10 +324,9 @@ example10a <- coxforest(
   indent_groups = TRUE,
   zebra_stripes = TRUE
 )
-queue_plot(example10a)
 ```
 
-```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+```{r, echo = FALSE, out.width = "100%", rec_dims_from = "example10a"}
 print(example10a)
 ```
 
@@ -356,10 +340,9 @@ example10b <- coxforest(
   show_events = FALSE,
   indent_groups = TRUE
 )
-queue_plot(example10b)
 ```
 
-```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+```{r, echo = FALSE, out.width = "100%", rec_dims_from = "example10b"}
 print(example10b)
 ```
 
@@ -379,10 +362,9 @@ example11 <- glmforest(
   digits = 3,
   indent_groups = TRUE
 )
-queue_plot(example11)
 ```
 
-```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+```{r, echo = FALSE, out.width = "100%", rec_dims_from = "example11"}
 print(example11)
 ```
 
@@ -398,10 +380,9 @@ example12 <- glmforest(
   ref_label = "ref",
   indent_groups = TRUE
 )
-queue_plot(example12)
 ```
 
-```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+```{r, echo = FALSE, out.width = "100%", rec_dims_from = "example12"}
 print(example12)
 ```
 
@@ -417,10 +398,9 @@ example13 <- coxforest(
   effect_label = "Effect (95% CI)",
   indent_groups = TRUE
 )
-queue_plot(example13)
 ```
 
-```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+```{r, echo = FALSE, out.width = "100%", rec_dims_from = "example13"}
 print(example13)
 ```
 
@@ -436,10 +416,9 @@ example14 <- glmforest(
   color = "#E41A1C",
   indent_groups = TRUE
 )
-queue_plot(example14)
 ```
 
-```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+```{r, echo = FALSE, out.width = "100%", rec_dims_from = "example14"}
 print(example14)
 ```
 
@@ -453,12 +432,12 @@ example15 <- glmforest(
   title = "Larger Font (1.5×)",
   labels = clintrial_labels,
   font_size = 1.5,
-  indent_groups = TRUE
+  indent_groups = TRUE,
+  qc_footer = FALSE
 )
-queue_plot(example15)
 ```
 
-```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+```{r, echo = FALSE, out.width = "100%", rec_dims_from = "example15"}
 print(example15)
 ```
 
@@ -474,10 +453,9 @@ example16a <- glmforest(
   labels = clintrial_labels,
   table_width = 0.75
 )
-queue_plot(example16a)
 ```
 
-```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+```{r, echo = FALSE, out.width = "100%", rec_dims_from = "example16a"}
 print(example16a)
 ```
 
@@ -489,10 +467,9 @@ example16b <- glmforest(
   labels = clintrial_labels,
   table_width = 0.50
 )
-queue_plot(example16b)
 ```
 
-```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+```{r, echo = FALSE, out.width = "100%", rec_dims_from = "example16b"}
 print(example16b)
 ```
 
@@ -500,11 +477,11 @@ print(example16b)
 
 # Saving Forest Plots
 
-Forest plots include a `rec_dims` attribute for optimal sizing when saving to files.
+Forest plots include a `rec_dims` attribute recording the dimensions best suited to their content. `forestsave()` reads it, so no manual sizing is required.
 
 ## **Example 17:** Recommended Dimensions
 
-Use the recommended dimensions for optimal output:
+`forestsave()` applies the recommended dimensions and reports the size it used:
 
 ```{r, eval = FALSE}
 p <- glmforest(
@@ -515,19 +492,13 @@ p <- glmforest(
   zebra_stripes = TRUE
 )
 
-# Get recommended dimensions
+# Inspect the recommendation, which also records its units
 dims <- attr(p, "rec_dims")
-cat("Width:", dims$width, "inches\n")
-cat("Height:", dims$height, "inches\n")
+cat("Width:", dims$width, dims$units, "\n")
+cat("Height:", dims$height, dims$units, "\n")
 
-# Save with recommended dimensions
-ggsave(
-  filename = file.path(tempdir(), "forest_plot.pdf"),
-  plot = p,
-  width = dims$width,
-  height = dims$height,
-  units = "in"
-)
+# Or simply let forestsave() apply them
+forestsave(p, "forest_plot.pdf")
 ```
 
 ## **Example 18:** Multiple Formats
@@ -541,19 +512,20 @@ p <- glmforest(
   labels = clintrial_labels
 )
 
-dims <- attr(p, "rec_dims")
+# The format follows the file extension, and the dimensions are applied
+# automatically in every case
 
 # PDF (vector, best for publications)
-ggsave("forest.pdf", p, width = dims$width, height = dims$height)
+forestsave(p, "forest.pdf")
 
 # PNG (raster, good for presentations)
-ggsave("forest.png", p, width = dims$width, height = dims$height, dpi = 300)
+forestsave(p, "forest.png", dpi = 300)
 
 # TIFF (high-quality raster, often required by journals)
-ggsave("forest.tiff", p, width = dims$width, height = dims$height, dpi = 300)
+forestsave(p, "forest.tiff", dpi = 300)
 
 # SVG (vector, good for web)
-ggsave("forest.svg", p, width = dims$width, height = dims$height)
+forestsave(p, "forest.svg")
 ```
 
 ---
@@ -581,12 +553,11 @@ example19 <- coxforest(
   ref_label = "reference",
   font_size = 1.0,
   table_width = 0.62,
-  color = "#8A61D8"
+  color = "#B5394C"
 )
-queue_plot(example19)
 ```
 
-```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+```{r, echo = FALSE, out.width = "100%", rec_dims_from = "example19"}
 print(example19)
 ```
 
@@ -607,10 +578,9 @@ example20_modified <- example20 +
     plot.title = element_text(face = "italic", color = "#A72727"),
     plot.background = element_rect(fill = "white", color = NA)
   )
-queue_plot(example20_modified)
 ```
 
-```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+```{r, echo = FALSE, out.width = "100%", rec_dims_from = "example20_modified"}
 print(example20_modified)
 ```
 
@@ -637,10 +607,9 @@ example21 <- glmforest(
   title = "Poisson Regression: Follow-Up Visits",
   labels = clintrial_labels
 )
-queue_plot(example21)
 ```
 
-```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+```{r, echo = FALSE, out.width = "100%", rec_dims_from = "example21"}
 print(example21)
 ```
 
@@ -661,10 +630,9 @@ example22 <- glmforest(
   x = nb_result,
   title = "Negative Binomial: Adverse Events"
 )
-queue_plot(example22)
 ```
 
-```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+```{r, echo = FALSE, out.width = "100%", rec_dims_from = "example22"}
 print(example22)
 ```
 
@@ -733,7 +701,7 @@ Reduce font size or increase figure dimensions:
   
 ```{r, eval = FALSE}
 p <- glmforest(model, font_size = 0.9)
-ggsave(file.path(tempdir(), "plot.pdf"), p, width = 14, height = 8)
+forestsave(p, "plot.pdf", width = 14, height = 8)
 ```
 
 ## Missing Labels
@@ -759,7 +727,7 @@ options(old_opts)
 
 - [Descriptive Tables](descriptive_tables.html): `desctable()` for baseline characteristics
 - [Survival Tables](survival_tables.html): `survtable()` for time-to-event summaries
-- [Regression Modeling](regression_modeling.html): `fit()`, `uniscreen()`, and `fullfit()`
+- [Regression Modeling](regression_modeling.html): `uniscreen()`, `fit()`, and `fullfit()`
 - [Model Comparison](model_comparison.html): `compfit()` for comparing models
 - [Table Export](table_export.html): Export to PDF, Word, and other formats
 - [Multivariate Regression](multivariate_regression.html): `multifit()` for multi-outcome analysis

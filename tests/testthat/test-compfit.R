@@ -5,17 +5,12 @@
 #' 
 #' @details Run with testthat::test_file("tests/testthat/test-compfit.R")
 
-library(testthat)
 library(data.table)
-library(summata)
 
 ## ============================================================================
 ## Setup: Create test data and helper functions
 ## ============================================================================
 
-## Use package's built-in clinical trial data
-data(clintrial)
-data(clintrial_labels)
 
 ## Create a complete-case subset for tests requiring no missing data
 clintrial_complete <- na.omit(clintrial)
@@ -70,7 +65,7 @@ test_that("compfit works with basic GLM models", {
     )
     
     result <- compfit(
-        data = clintrial,
+        data = clintrial_complete,
         outcome = "response",
         model_list = models,
         model_type = "glm",
@@ -99,7 +94,7 @@ test_that("compfit works with linear models", {
     )
     
     result <- compfit(
-        data = clintrial,
+        data = clintrial_complete,
         outcome = "los_days",
         model_list = models,
         model_type = "lm"
@@ -123,7 +118,7 @@ test_that("compfit works with Cox models", {
     )
     
     result <- compfit(
-        data = clintrial,
+        data = clintrial_complete,
         outcome = "Surv(os_months, os_status)",
         model_list = models,
         model_type = "coxph"
@@ -438,7 +433,7 @@ test_that("compfit uses provided model_names", {
     custom_names <- c("Baseline", "Extended")
     
     result <- compfit(
-        data = clintrial,
+        data = clintrial_complete,
         outcome = "response",
         model_list = models,
         model_names = custom_names,
@@ -457,7 +452,7 @@ test_that("compfit uses list names as model names when no model_names provided",
     )
     
     result <- compfit(
-        data = clintrial,
+        data = clintrial_complete,
         outcome = "response",
         model_list = models,
         model_type = "glm"
@@ -475,7 +470,7 @@ test_that("compfit generates default model names for unnamed list", {
     )
     
     result <- compfit(
-        data = clintrial,
+        data = clintrial_complete,
         outcome = "response",
         model_list = models,
         model_type = "glm"
@@ -521,7 +516,7 @@ test_that("compfit ranks models by CMS in descending order", {
     )
     
     result <- compfit(
-        data = clintrial,
+        data = clintrial_complete,
         outcome = "Surv(os_months, os_status)",
         model_list = models,
         model_type = "coxph"
@@ -543,7 +538,7 @@ test_that("compfit identifies best model correctly", {
     )
     
     result <- compfit(
-        data = clintrial,
+        data = clintrial_complete,
         outcome = "response",
         model_list = models,
         model_type = "glm"
@@ -592,7 +587,7 @@ test_that("compfit returns coefficient table when requested", {
     )
     
     result <- compfit(
-        data = clintrial,
+        data = clintrial_complete,
         outcome = "response",
         model_list = models,
         model_type = "glm",
@@ -660,7 +655,7 @@ test_that("compfit continues when one model fails", {
     )
     
     result <- compfit(
-        data = clintrial,
+        data = clintrial_complete,
         outcome = "response",
         model_list = models,
         model_type = "glm"
@@ -690,11 +685,16 @@ test_that("compfit handles missing data appropriately", {
         complete = c("age", "sex")  # No NAs in these
     )
     
-    result <- compfit(
-        data = clintrial,
-        outcome = "response",
-        model_list = models,
-        model_type = "glm"
+    ## The candidates are deliberately fitted to different samples, which
+    ## compfit() reports.
+    result <- expect_warning(
+        compfit(
+            data = clintrial,
+            outcome = "response",
+            model_list = models,
+            model_type = "glm"
+        ),
+        "different numbers of observations"
     )
     
     expect_compfit_result(result)
@@ -860,7 +860,7 @@ test_that("print.compfit_result works without error", {
     )
     
     result <- compfit(
-        data = clintrial,
+        data = clintrial_complete,
         outcome = "response",
         model_list = models,
         model_type = "glm"
@@ -885,7 +885,7 @@ test_that("compfit detects convergence status", {
     )
     
     result <- compfit(
-        data = clintrial,
+        data = clintrial_complete,
         outcome = "response",
         model_list = models,
         model_type = "glm"
@@ -942,7 +942,7 @@ test_that("compfit preserves fitted models in attributes", {
     )
     
     result <- compfit(
-        data = clintrial,
+        data = clintrial_complete,
         outcome = "response",
         model_list = models,
         model_type = "glm"
@@ -998,7 +998,7 @@ test_that("compfit supports full clinical trial analysis workflow", {
     )
     
     result <- compfit(
-        data = clintrial,
+        data = clintrial_complete,
         outcome = "Surv(os_months, os_status)",
         model_list = models,
         model_names = c("Demographics", "Clinical", "Disease", "Full"),
@@ -1092,7 +1092,7 @@ test_that("compfit handles many models efficiently", {
     ## Should complete in reasonable time
     time_start <- Sys.time()
     result <- compfit(
-        data = clintrial,
+        data = clintrial_complete,
         outcome = "response",
         model_list = models,
         model_type = "glm"

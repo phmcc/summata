@@ -53,8 +53,9 @@
 #'   specified \code{units}. Default is \code{NULL} (automatic based on number 
 #'   of rows).
 #'   
-#' @param show_n Logical. If \code{TRUE}, includes a column showing sample sizes. 
-#'   Default is \code{TRUE}.
+#' @param show_n Logical. If \code{TRUE}, includes a column showing sample sizes.
+#'   Counts describe the observations used in fitting rather than every row
+#'   supplied. Default is \code{TRUE}.
 #'   
 #' @param show_events Logical. If \code{TRUE}, includes a column showing the 
 #'   number of events for each row. Default is \code{NULL}, which auto-detects
@@ -98,7 +99,11 @@
 #'   
 #' @param labels Named character vector providing custom display labels for 
 #'   variables. Applied to predictor names in the plot.
-#'   Default is \code{NULL} (uses original variable names).
+#'   Default is \code{NULL}, in which case the labels attached by the function
+#'   that produced \code{x} are used where \code{x} is a \pkg{summata} result
+#'   rather than a model object, so that labels supplied once are carried
+#'   through the workflow. Original variable names are used where neither is
+#'   available.
 #'
 #' @param show_footer Logical. If \code{TRUE}, displays a footer with the
 #'   outcome variable name. Default is \code{TRUE}.
@@ -130,7 +135,7 @@
 #'   can be:
 #'   \itemize{
 #'     \item Displayed directly: \code{print(plot)}
-#'     \item Saved to file: \code{ggsave("forest.pdf", plot, width = 12, height = 8)}
+#'     \item Saved to file: \code{forestsave(plot, "forest.pdf")}
 #'     \item Further customized with \pkg{ggplot2} functions
 #'   }
 #'   
@@ -140,11 +145,20 @@
 #'   \describe{
 #'     \item{width}{Numeric. Recommended plot width in specified units}
 #'     \item{height}{Numeric. Recommended plot height in specified units}
+#'     \item{units}{Character. The units the dimensions are expressed in,
+#'       matching the \code{units} argument}
 #'   }
 #'   
 #'   These recommendations are automatically calculated based on the number of 
 #'   variables, text sizes, and layout parameters, and are printed to console 
 #'   if \code{plot_width} or \code{plot_height} are not specified.
+#'   \code{forestsave()} reads all three and requires no further handling.
+#'
+#'   The returned object also includes an attribute \code{"table_data"}
+#'   accessible via \code{attr(plot, "table_data")}, a data.table holding the
+#'   values drawn in the plot, in the order of the model terms. Sample sizes
+#'   and event counts describe the observations used in fitting rather than
+#'   every row supplied.
 #'
 #' @details
 #' The forest plot displays univariable (unadjusted) associations between each
@@ -170,7 +184,8 @@
 #' \code{\link{uniscreen}} for generating univariable screening results,
 #' \code{\link{multiforest}} for multi-outcome forest plots,
 #' \code{\link{coxforest}}, \code{\link{glmforest}}, \code{\link{lmforest}} for
-#' single-model forest plots
+#' single-model forest plots,
+#'   \code{\link{forestsave}} for saving with recommended dimensions
 #'
 #' @examples
 #' data(clintrial)
@@ -203,6 +218,7 @@
 #'     parallel = FALSE
 #' )
 #' 
+#' # Labels attached by uniscreen() are applied automatically
 #' p2 <- uniforest(surv_results, title = "Univariable Survival Analysis")
 #' 
 #' # Example 3: Linear regression
@@ -228,9 +244,7 @@
 #' )
 #' 
 #' # Example 5: Save with recommended dimensions
-#' dims <- attr(p4, "rec_dims")
-#' ggplot2::ggsave(file.path(tempdir(), "univariable_forest.pdf"),
-#'                 p4, width = dims$width, height = dims$height)
+#' forestsave(p4, file.path(tempdir(), "univariable_forest.pdf"))
 #'
 #' options(old_width)
 #' 
@@ -299,6 +313,13 @@ uniforest <- function(x,
     }
     
     ## Extract raw data from uscreen result
+    ## Labels attached by the producing function are used when none are given
+    ## here, so that a labeled result does not need them supplied twice. An
+    ## explicit argument takes precedence.
+    if (is.null(labels)) {
+        labels <- attr(x, "labels")
+    }
+
     raw_data <- attr(x, "raw_data")
     
     if (is.null(raw_data) || !data.table::is.data.table(raw_data)) {
@@ -381,7 +402,7 @@ uniforest <- function(x,
     }
     
     ## Handle CI columns - m2dt() uses ci_lower/ci_upper (exponentiated) or coef_lower/coef_upper (raw)
-    ## For forest plots, we need the raw (log scale) values for log_scale models
+    ## Forest plots require the raw (log scale) values for log_scale models
     ## and raw values for linear models
     if (!"conf_low" %in% names(to_show)) {
         if ("coef_lower" %in% names(to_show)) {
@@ -488,10 +509,8 @@ uniforest <- function(x,
     
     ## Calculate N and events formatting
     to_show[, N := n_obs]
-    to_show[, n_formatted := data.table::fifelse(is.na(n_obs), "",
-        vapply(n_obs, format_count_forest, character(1), marks = marks))]
-    to_show[, events_formatted := data.table::fifelse(is.na(n_events), "",
-        vapply(n_events, format_count_forest, character(1), marks = marks))]
+    to_show[, n_formatted := format_count(n_obs, marks, na = "")]
+    to_show[, events_formatted := format_count(n_events, marks, na = "")]
     
     ## Format the values for display based on log_scale
     to_show_exp_clean <- data.table::copy(to_show)
@@ -590,7 +609,7 @@ uniforest <- function(x,
                     ## Get label for this predictor
                     var_label <- pred_rows$var_display[1]
                     
-                    ## Use greedy approach to determine if we should condense
+                    ## Use a greedy approach to determine whether to condense
                     if (should_condense_binary(ref_category, non_ref_category, var_label)) {
                         ## Keep the non-reference row but update display
                         to_show_exp_clean[predictor == pred & is_reference == FALSE, 
@@ -654,6 +673,11 @@ uniforest <- function(x,
         ## Check which predictors have multiple rows (categorical variables)
         multi_level_predictors <- to_show_exp_clean[, .N, by = predictor][N > 1]$predictor
         
+        ## Record the incoming row order. Rows arrive in the order of the
+        ## model terms, which follows the factor level order, and that order
+        ## must survive the interleaving of header rows below.
+        to_show_exp_clean[, level_order := .I]
+        
         ## Create new data for header rows
         if (length(multi_level_predictors) > 0) {
             header_rows <- to_show_exp_clean[predictor %in% multi_level_predictors & is_header == TRUE]
@@ -681,9 +705,12 @@ uniforest <- function(x,
             ## Combine and sort
             to_show_exp_clean <- rbind(header_rows, to_show_exp_clean, fill = TRUE)
             
-            ## Sort by var_order and then by row_type (header first)
+            ## Sort by variable, then header before its levels, then the
+            ## incoming order within each variable. Sorting on
+            ## level_display here would order the levels alphabetically and
+            ## discard the factor level order established by the model.
             to_show_exp_clean[, sort_key := data.table::fifelse(row_type == "header", 0, 1)]
-            data.table::setorder(to_show_exp_clean, var_order, sort_key, level_display)
+            data.table::setorder(to_show_exp_clean, var_order, sort_key, level_order)
         } else {
             to_show_exp_clean[, row_type := "data"]
         }
@@ -704,6 +731,11 @@ uniforest <- function(x,
     to_show_exp_clean[is.na(estimate), estimate := 0]
     
     ## Reorder (flip) - maintain variable grouping
+    ## Retain the assembled table for return as an attribute. The copy is taken
+    ## before the row order is reversed for plotting, so that the returned table
+    ## follows the order of the model terms rather than the drawing order.
+    table_data <- data.table::copy(to_show_exp_clean)
+    
     to_show_exp_clean <- to_show_exp_clean[order(rev(seq_len(nrow(to_show_exp_clean))))]
     to_show_exp_clean[, x_pos := .I]
     
@@ -1016,7 +1048,14 @@ uniforest <- function(x,
     }
 
     ## Add recommended dimensions as attribute
-    attr(p, "rec_dims") <- list(width = rec_width, height = rec_height)
+    ## The units are recorded alongside the dimensions. Both are converted to
+    ## the requested units above, so a consumer that assumed inches would
+    ## otherwise mis-size the output by the conversion factor.
+    attr(p, "rec_dims") <- list(width = rec_width, height = rec_height,
+                                units = units)
+
+    ## Add the assembled table as an attribute
+    attr(p, "table_data") <- table_data
 
     return(p)
 }

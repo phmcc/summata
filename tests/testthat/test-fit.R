@@ -5,22 +5,12 @@
 #' 
 #' @details Run with testthat::test_file("tests/testthat/test-fit.R")
 
-library(testthat)
 library(data.table)
-library(summata)
-
-## Load survival package for Surv() and strata() functions in formula evaluation
-if (requireNamespace("survival", quietly = TRUE)) {
-    library(survival)
-}
 
 ## ============================================================================
 ## Setup: Create test data and helper functions
 ## ============================================================================
 
-## Use package's built-in clinical trial data
-data(clintrial)
-data(clintrial_labels)
 
 ## Create a complete-case subset for tests requiring no missing data
 clintrial_complete <- na.omit(clintrial)
@@ -60,33 +50,7 @@ expect_fit_result <- function(result) {
     expect_true(!is.null(attr(result, "model_type")))
 }
 
-## Helper to check effect column exists and is properly formatted
-expect_effect_column <- function(result, effect_type = NULL) {
-    col_names <- names(result)
-    
-    ## Find effect column (contains OR, HR, RR, Coefficient, or Estimate with CI)
-    effect_cols <- grep("(OR|HR|RR|Coefficient|Estimate).*CI", col_names, value = TRUE)
-    expect_true(length(effect_cols) >= 1, 
-                info = paste("Expected effect column, found:", paste(col_names, collapse = ", ")))
-    
-    if (!is.null(effect_type)) {
-        expect_true(any(grepl(effect_type, effect_cols)),
-                    info = paste("Expected", effect_type, "in columns, found:", 
-                                 paste(effect_cols, collapse = ", ")))
-    }
-}
 
-## Helper to check p-value column
-expect_pvalue_column <- function(result) {
-    expect_true("p-value" %in% names(result))
-    
-    ## Check p-values are properly formatted (numeric string, < 0.001, or -)
-    pvals <- result$`p-value`
-    valid_pvals <- grepl("^[0-9]\\.[0-9]+$|^< 0\\.001$|^-$", pvals)
-    expect_true(all(valid_pvals), 
-                info = paste("Invalid p-values found:", 
-                             paste(pvals[!valid_pvals], collapse = ", ")))
-}
 
 ## Helper to verify reference rows
 expect_reference_rows <- function(result, vars_with_refs) {
@@ -391,8 +355,6 @@ test_that("fit linear model QC stats are captured", {
 
 test_that("fit works with Cox regression - univariable", {
     
-    skip_if_not_installed("survival")
-    
     result <- fit(
         data = clintrial,
         outcome = "Surv(os_months, os_status)",
@@ -411,8 +373,6 @@ test_that("fit works with Cox regression - univariable", {
 
 test_that("fit works with Cox regression - multivariable", {
     
-    skip_if_not_installed("survival")
-    
     result <- fit(
         data = clintrial,
         outcome = "Surv(os_months, os_status)",
@@ -430,8 +390,6 @@ test_that("fit works with Cox regression - multivariable", {
 
 
 test_that("fit Cox model with stratification", {
-    
-    skip_if_not_installed("survival")
     
     result <- fit(
         data = clintrial,
@@ -459,8 +417,6 @@ test_that("fit Cox model with stratification", {
 
 test_that("fit Cox model with clustering", {
     
-    skip_if_not_installed("survival")
-    
     result <- fit(
         data = clintrial,
         outcome = "Surv(os_months, os_status)",
@@ -482,10 +438,9 @@ test_that("fit Cox model with clustering", {
 
 test_that("fit Cox model with both strata and cluster", {
     
-    skip_if_not_installed("survival")
-    
     ## Create a second grouping variable for stratification
     clintrial_test <- data.table::as.data.table(clintrial)
+    set.seed(2024)
     clintrial_test[, region := sample(c("North", "South"), .N, replace = TRUE)]
     
     result <- fit(
@@ -511,6 +466,7 @@ test_that("fit works with Poisson regression", {
     
     ## Create count outcome
     clintrial_test <- data.table::as.data.table(clintrial)
+    set.seed(2024)
     clintrial_test[, complications := rpois(.N, lambda = 2)]
     
     result <- fit(
@@ -882,7 +838,6 @@ test_that("fit works with glmer (generalized linear mixed effects)", {
 test_that("fit works with coxme (mixed effects Cox)", {
     
     skip_if_not_installed("coxme")
-    skip_if_not_installed("survival")
     skip_on_cran()
     
     gc()
@@ -909,8 +864,6 @@ test_that("fit works with coxme (mixed effects Cox)", {
 ## ============================================================================
 
 test_that("fit works with conditional logistic regression", {
-    
-    skip_if_not_installed("survival")
     
     ## Create matched case-control data
     set.seed(123)
@@ -1346,16 +1299,16 @@ test_that("print.fit_result produces output", {
     ## Capture print output
     output <- capture.output(print(result))
     
-    ## Should contain model information
+    ## Should contain model information. The sample size is carried by the
+    ## "Observations analyzed" line, which states it with its denominator
+    ## rather than as a bare count.
     expect_true(any(grepl("Multivariable|Univariable", output)))
     expect_true(any(grepl("Formula", output)))
-    expect_true(any(grepl("n =", output)))
+    expect_true(any(grepl("Observations analyzed:", output, fixed = TRUE)))
 })
 
 
 test_that("print.fit_result shows events for survival models", {
-    
-    skip_if_not_installed("survival")
     
     result <- fit(
         data = clintrial,
@@ -2169,9 +2122,9 @@ test_that("fit handles extreme coefficient values", {
 })
 
 
-test_that("fit handles perfect separation gracefully",
-{
+test_that("fit handles perfect separation gracefully", {
     ## Create data with near-perfect separation
+    set.seed(2024)
     test_data <- data.table(
         outcome = c(rep(0, 50), rep(1, 50)),
         predictor = c(rep(0, 50), rep(1, 50)),

@@ -128,6 +128,7 @@ utils::globalVariables(c(
            "label",
            "level",
            "level_display",
+           "level_order",
            "level_row",
            "level_term",
            "matching",

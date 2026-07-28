@@ -92,7 +92,9 @@ total plot width allocated to the data table. Default is 0.6 (60\% table,
 40\% forest plot).}
 
 \item{show_n}{Logical. If \code{TRUE}, includes a column showing group-specific 
-sample sizes. Default is \code{TRUE}.}
+sample sizes.
+Counts describe the observations used in fitting rather than every row
+supplied. Default is \code{TRUE}.}
 
 \item{show_events}{Logical. If \code{TRUE}, includes a column showing the 
 number of events (deaths, failures) for each group. Critical for survival 
@@ -123,7 +125,10 @@ Default is \code{"reference"}.}
 
 \item{labels}{Named character vector providing custom display labels for 
 variables. Example: \code{c(age = "Age (years)", stage = "Disease Stage")}. 
-Default is \code{NULL}.}
+Default is \code{NULL}, in which case the labels attached by the function
+that produced \code{x} are used, where \code{x} is a \pkg{summata} result
+rather than a model object. Original variable names are used where neither
+is available.}
 
 \item{color}{Character string specifying the color for hazard ratio point 
 estimates in the forest plot. Default is \code{"#8A61D8"} (purple). Use 
@@ -161,7 +166,7 @@ A \code{ggplot} object containing the complete forest plot. The plot
   can be:
   \itemize{
     \item Displayed directly: \code{print(plot)}
-    \item Saved to file: \code{ggsave("forest.pdf", plot, width = 12, height = 8)}
+    \item Saved to file: \code{forestsave(plot, "forest.pdf")}
     \item Further customized with \pkg{ggplot2} functions
   }
   
@@ -175,7 +180,18 @@ A \code{ggplot} object containing the complete forest plot. The plot
   
   These recommendations are automatically calculated based on the number of 
   variables, text sizes, and layout parameters, and are printed to console 
-  if \code{plot_width} or \code{plot_height} are not specified.
+  if \code{plot_width} or \code{plot_height} are not specified. The list also 
+  carries a \code{units} element recording the units the dimensions are 
+  expressed in, matching the \code{units} argument. \code{forestsave()} reads 
+  all three and requires no further handling.
+
+  The returned object also includes an attribute \code{"table_data"}
+  accessible via \code{attr(plot, "table_data")}, a data.table holding the
+  values drawn in the plot: one row per term in model order, with the
+  variable, factor level, sample size, event count, estimate, confidence
+  bounds and p-value. Sample sizes and event counts describe the
+  observations used in fitting rather than every row supplied, so they sum
+  to the model sample size within each variable.
 }
 \description{
 Generates a publication-ready forest plot that combines a formatted data table 
@@ -219,7 +235,7 @@ The Cox forest plot includes several survival analysis-specific components:
     }
   \item \strong{Model Statistics} (footer):
     \itemize{
-      \item Events analyzed (with percentage of total)
+      \item Events analyzed (with total events and percentage)
       \item Global log-rank test \emph{p}-value
       \item Concordance (C-index) with standard error
       \item AIC
@@ -243,7 +259,7 @@ The "Events" column is particularly important in survival analysis:
     in each group
   \item Essential for assessing statistical power
   \item Categories with very few events may have unreliable HR estimates
-  \item The footer shows total events analyzed and percentage of all events 
+  \item The footer shows events analyzed, total events, and percentage 
     in the original data
 }
 
@@ -357,9 +373,7 @@ plot5 <- coxforest(
 )
 
 # Example 6: Save with recommended dimensions
-dims <- attr(plot5, "rec_dims")
-ggplot2::ggsave(file.path(tempdir(), "survival_forest.pdf"),
-                plot5, width = dims$width, height = dims$height)
+forestsave(plot5, file.path(tempdir(), "survival_forest.pdf"))
 
 options(old_width)
 
@@ -372,13 +386,15 @@ options(old_width)
 \code{\link{uniforest}} for univariable screening forest plots,
 \code{\link{multiforest}} for multi-outcome forest plots,
 \code{\link[survival]{coxph}} for fitting Cox models,
-\code{\link{fit}} for regression modeling
+\code{\link{fit}} for regression modeling,
+  \code{\link{forestsave}} for saving with recommended dimensions
 
-Other visualization functions: 
-\code{\link{autoforest}()},
-\code{\link{glmforest}()},
-\code{\link{lmforest}()},
-\code{\link{multiforest}()},
-\code{\link{uniforest}()}
+Other visualization functions:
+\code{\link[=autoforest]{autoforest()}},
+\code{\link[=forestsave]{forestsave()}},
+\code{\link[=glmforest]{glmforest()}},
+\code{\link[=lmforest]{lmforest()}},
+\code{\link[=multiforest]{multiforest()}},
+\code{\link[=uniforest]{uniforest()}}
 }
 \concept{visualization functions}

@@ -146,7 +146,7 @@
 #'   \describe{
 #'     \item{Variable}{Variable name or label (from \code{labels})}
 #'     \item{Group}{For continuous variables: statistic type (\emph{e.g.},
-#'       "Mean \eqn{\pm} SD", "Median [IQR]"). For categorical variables:
+#'       "Mean ± SD", "Median [IQR]"). For categorical variables:
 #'       category level. Empty for variable name rows.}
 #'     \item{Total}{Statistics for the total sample (if
 #'       \code{total = TRUE})}
@@ -221,8 +221,8 @@
 #' within ranges and confidence intervals adapt automatically to avoid
 #' ambiguity:
 #' \itemize{
-#'   \item Mean \eqn{\pm} SD: \code{"45.2 \eqn{\pm} 12.3"} (US) or
-#'     \code{"45,2 \eqn{\pm} 12,3"} (EU)
+#'   \item Mean ± SD: \code{"45.2 ± 12.3"} (US) or
+#'     \code{"45,2 ± 12,3"} (EU)
 #'   \item Median [IQR]: \code{"38.0 [28.0-52.0]"} (US) or
 #'     \code{"38,0 [28,0-52,0]"} (EU, en-dash separator)
 #'   \item Range: \code{"18.0-75.0"} (positive, US),
@@ -236,6 +236,7 @@
 #' @seealso
 #' \code{\link{survtable}} for detailed survival summary tables,
 #' \code{\link{fit}} for regression modeling,
+#' \code{\link{tablesave}} for export in any supported format,
 #' \code{\link{table2pdf}} for PDF export,
 #' \code{\link{table2docx}} for Word export,
 #' \code{\link{table2html}} for HTML export
@@ -246,53 +247,61 @@
 #'
 #' # Example 1: Basic descriptive table without grouping
 #' desctable(clintrial,
-#'         variables = c("age", "sex", "bmi"))
+#'         variables = c("age", "sex", "bmi"),
+#'         labels = clintrial_labels)
 #'
 #' \donttest{
 #' 
 #' # Example 2: Grouped comparison with default tests
 #' desctable(clintrial,
 #'         by = "treatment",
-#'         variables = c("age", "sex", "race", "bmi"))
+#'         variables = c("age", "sex", "race", "bmi"),
+#'         labels = clintrial_labels)
 #'
 #' # Example 3: Customize continuous statistics
 #' desctable(clintrial,
 #'         by = "treatment",
 #'         variables = c("age", "bmi", "creatinine"),
-#'         stats_continuous = c("median_iqr", "range"))
+#'         stats_continuous = c("median_iqr", "range"),
+#'         labels = clintrial_labels)
 #'
 #' # Example 4: Change categorical display format
 #' desctable(clintrial,
 #'         by = "treatment",
 #'         variables = c("sex", "race", "smoking"),
-#'         stats_categorical = "n")  # Show counts only
+#'         stats_categorical = "n",  # Show counts only
+#'         labels = clintrial_labels)
 #'
 #' # Example 5: Include missing values
 #' desctable(clintrial,
 #'         by = "treatment",
 #'         variables = c("age", "smoking", "hypertension"),
 #'         na_include = TRUE,
-#'         na_label = "Missing")
+#'         na_label = "Missing",
+#'         labels = clintrial_labels)
 #'
 #' # Example 6: Disable statistical testing
 #' desctable(clintrial,
 #'         by = "treatment",
 #'         variables = c("age", "sex", "bmi"),
-#'         test = FALSE)
+#'         test = FALSE,
+#'         labels = clintrial_labels)
 #'
 #' # Example 7: Force specific tests
 #' desctable(clintrial,
 #'         by = "surgery",
 #'         variables = c("age", "sex"),
-#'         test_continuous = "t",      # t-test instead of auto
-#'         test_categorical = "fisher") # Fisher test instead of auto
+#'         test_continuous = "t",        # t-test instead of auto
+#'         test_categorical = "fisher",  # Fisher test instead of auto
+#'         labels = clintrial_labels)
 #'
 #' # Example 8: Adjust decimal places
 #' desctable(clintrial,
 #'         by = "treatment",
 #'         variables = c("age", "bmi"),
 #'         digits = 2,    # 2 decimals for continuous
-#'         p_digits = 4)  # 4 decimals for p-values
+#'         p_digits = 4,  # 4 decimals for p-values
+#'         labels = clintrial_labels)
 #'
 #' # Example 9: Custom variable labels
 #' labels <- c(
@@ -311,18 +320,21 @@
 #' desctable(clintrial,
 #'         by = "treatment",
 #'         variables = c("age", "sex"),
-#'         total = "last")
+#'         total = "last",
+#'         labels = clintrial_labels)
 #'
 #' # Example 11: Exclude total column
 #' desctable(clintrial,
 #'         by = "treatment",
 #'         variables = c("age", "sex"),
-#'         total = FALSE)
+#'         total = FALSE,
+#'         labels = clintrial_labels)
 #'
 #' # Example 12: Survival analysis
 #' desctable(clintrial,
 #'         by = "treatment",
-#'         variables = "Surv(os_months, os_status)")
+#'         variables = "Surv(os_months, os_status)",
+#'         labels = clintrial_labels)
 #'
 #' # Example 13: Multiple survival endpoints
 #' desctable(clintrial,
@@ -344,12 +356,14 @@
 #'             "bmi", "creatinine",            # Labs
 #'             "smoking", "hypertension",      # Risk factors
 #'             "Surv(os_months, os_status)"    # Survival
-#'         ))
+#'         ),
+#'         labels = clintrial_labels)
 #'
 #' # Example 15: Three or more groups
 #' desctable(clintrial,
 #'         by = "stage",  # Assuming stage has 3+ levels
-#'         variables = c("age", "sex", "bmi"))
+#'         variables = c("age", "sex", "bmi"),
+#'         labels = clintrial_labels)
 #' # Automatically uses ANOVA/Kruskal-Wallis and chi-squared
 #'
 #' # Example 16: Access raw unformatted data
@@ -372,14 +386,16 @@
 #'         by = "treatment",
 #'         variables = "smoking",
 #'         na_include = TRUE,
-#'         na_percent = TRUE)
+#'         na_percent = TRUE,
+#'         labels = clintrial_labels)
 #'
 #' # Exclude NAs from denominator (non-missing sum to 100%)
 #' desctable(clintrial,
 #'         by = "treatment",
 #'         variables = "smoking",
 #'         na_include = TRUE,
-#'         na_percent = FALSE)
+#'         na_percent = FALSE,
+#'         labels = clintrial_labels)
 #'
 #' # Example 19: Passing additional test arguments
 #' # Equal variance t-test
@@ -387,13 +403,15 @@
 #'         by = "sex",
 #'         variables = "age",
 #'         test_continuous = "t",
-#'         var.equal = TRUE)
+#'         var.equal = TRUE,
+#'         labels = clintrial_labels)
 #'
 #' # Example 20: European number formatting
 #' desctable(clintrial,
 #'         by = "treatment",
 #'         variables = c("age", "sex", "bmi"),
-#'         number_format = "eu")
+#'         number_format = "eu",
+#'         labels = clintrial_labels)
 #'
 #' # Example 21: Complete Table 1 for publication
 #' table1 <- desctable(

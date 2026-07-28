@@ -285,6 +285,15 @@
 #'     \item{significant}{Character vector. Names of variables with p < 0.05
 #'       in the multivariable model (or univariable if multivariable was not
 #'       fitted)}
+#'     \item{analysis_counts}{List. How much of the supplied data reached the
+#'       models, with elements \code{n_supplied}, \code{n_analyzed},
+#'       \code{n_missing_outcome} and \code{n_missing_predictor}, plus
+#'       \code{events_supplied} and \code{events_analyzed} where the model
+#'       type carries an event count. The screening models and the
+#'       multivariable model rest on different samples whenever a predictor
+#'       carries missing values, so \code{n_analyzed} holds one value per
+#'       model and the reported sample may be a range. The \code{print()}
+#'       method always reports the analyzed sample}
 #'   }
 #'
 #' @details
@@ -323,7 +332,7 @@
 #' 
 #' \emph{"All" Method} (\code{method = "all"}):
 #' \itemize{
-#'   \item No variable selection - includes all predictors
+#'   \item No variable selection; includes all predictors
 #'   \item Appropriate when all variables are theoretically important
 #'   \item Risk of overfitting with many predictors relative to sample size
 #'   \item Useful for confirmatory analyses with pre-specified models
@@ -374,7 +383,10 @@
 #' \code{\link{uniscreen}} for univariable screening only,
 #' \code{\link{fit}} for fitting a single multivariable model,
 #' \code{\link{compfit}} for comparing multiple models,
-#' \code{\link{desctable}} for descriptive statistics
+#' \code{\link{desctable}} for descriptive statistics,
+#' \code{\link{autoforest}} for forest plots of the multivariable models,
+#' \code{\link{forestsave}} for exporting forest plots,
+#' \code{\link{tablesave}} for exporting tables
 #'
 #' @examples
 #' # Load example data
@@ -393,8 +405,6 @@
 #'     labels = clintrial_labels
 #' )
 #' print(result1)
-#' # Shows both univariable and multivariable results
-#' # Only significant univariable predictors in multivariable model
 #'
 #' \donttest{
 #' 
@@ -418,7 +428,6 @@
 #'     labels = clintrial_labels
 #' )
 #' print(result3)
-#' # Univariable for all, multivariable for selected only
 #' 
 #' # Example 4: Cox regression with screening
 #' library(survival)
@@ -473,7 +482,8 @@
 #'     outcome = "os_status",
 #'     predictors = c("age", "sex", "treatment", "stage"),
 #'     method = "all",
-#'     return_type = "both"
+#'     return_type = "both",
+#'     labels = clintrial_labels
 #' )
 #' print(both$table)
 #' summary(both$model)
@@ -686,7 +696,7 @@ fullfit <- function(data,
             multi_vars <- multi_predictors
         }
         
-        ## Fit multivariable model if we have predictors
+        ## Fit the multivariable model where predictors remain
         if (length(multi_vars) > 0) {
             message(sprintf("Fitting multivariable model with %d predictors...", 
                             length(multi_vars)))
@@ -748,6 +758,32 @@ fullfit <- function(data,
     data.table::setattr(result, "uni_raw", uni_raw)
     data.table::setattr(result, "multi_raw", multi_raw)
     data.table::setattr(result, "p_threshold", p_threshold)
+
+    ## The table shows univariable estimates alongside multivariable ones,
+    ## and the two rest on different samples whenever a predictor carries
+    ## missing values. The range therefore spans the screening models and
+    ## the multivariable model together.
+    ff_outcome_vars <- all.vars(stats::as.formula(paste("~", outcome)))
+    ff_predictor_sets <- lapply(predictors, function(p) {
+        all.vars(stats::as.formula(paste("~", p)))
+    })
+    if (!is.null(multi_vars) && length(multi_vars) > 0) {
+        ff_predictor_sets <- c(ff_predictor_sets,
+                               list(all.vars(stats::as.formula(
+                                   paste("~", paste(multi_vars, collapse = "+"))))))
+    }
+    data.table::setattr(
+        result, "analysis_counts",
+        get_analysis_counts(data, ff_outcome_vars, ff_predictor_sets,
+                            get_event_variable_for_counts(ff_outcome_vars,
+                                                          model_type, family))
+    )
+    data.table::setattr(result, "number_marks",
+                        resolve_number_marks(number_format))
+    ## Variable labels travel with the result so that the forest plot
+    ## functions can apply the same labels without being given them again.
+    ## An explicit labels argument to those functions still takes precedence.
+    data.table::setattr(result, "labels", labels)
     data.table::setattr(result, "n_screened", length(predictors))
     
     if (!is.null(random)) {
@@ -1072,7 +1108,7 @@ determine_effect_type <- function(uni_raw, multi_raw, exponentiate, adjusted = F
 #' @family regression functions
 #' @export
 print.fullfit_result <- function(x, ...) {
-    cat("\nFullfit Analysis Results\n")
+    cat("\nFullfit Analysis Results\n\n")
     cat("Outcome: ", attr(x, "outcome"), "\n", sep = "")
     cat("Model Type: ", attr(x, "model_type"), "\n", sep = "")
     
@@ -1092,6 +1128,24 @@ print.fullfit_result <- function(x, ...) {
     n_multi <- attr(x, "n_multi")
     if (!is.null(n_multi)) {
         cat("Multivariable Predictors: ", n_multi, "\n", sep = "")
+    }
+    
+    ## Always reported. The screening models and the multivariable model may
+    ## rest on different samples, so the analyzed sample may be a range.
+    ff_counts <- attr(x, "analysis_counts")
+    
+    ff_marks <- attr(x, "number_marks")
+    
+    analyzed <- format_analysis_counts(ff_counts, marks = ff_marks)
+    if (!is.null(analyzed)) {
+        cat(analyzed, "\n", sep = "")
+    }
+    
+    ## Events per retained variable is the constraint on a multivariable
+    ## model, so events are reported alongside the observations
+    events_line <- format_event_counts(ff_counts, marks = ff_marks)
+    if (!is.null(events_line)) {
+        cat(events_line, "\n", sep = "")
     }
     
     cat("\n")

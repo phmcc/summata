@@ -28,6 +28,7 @@ table2pdf(
   stripe_color = "gray!20",
   dark_header = FALSE,
   show_logs = FALSE,
+  quiet = FALSE,
   ...
 )
 }
@@ -146,13 +147,18 @@ Default is \code{FALSE}.}
 files after PDF compilation for troubleshooting. If \code{FALSE}, deletes 
 these files. Default is \code{FALSE}.}
 
+\item{quiet}{Logical. Suppress progress and confirmation messages, such
+as the notice reporting the file written. Errors and warnings are
+unaffected. Default is \code{FALSE}.}
+
 \item{...}{Additional arguments passed to \code{\link[xtable]{xtable}} for 
 advanced LaTeX table customization.}
 }
 \value{
-Invisibly returns \code{NULL}. Creates a PDF file at the specified 
-  location. If compilation fails, check the \code{.log} file (if 
-  \code{show_logs = TRUE}) for error details.
+Invisibly returns the file path, matching \code{tablesave()} and
+  \code{forestsave()}. Called for its side effect of creating a PDF file at
+  the specified location. If compilation fails, check the \code{.log} file
+  (if \code{show_logs = TRUE}) for error details.
 }
 \description{
 Converts a data frame, data.table, or matrix to a professionally formatted PDF 
@@ -248,7 +254,7 @@ data(clintrial_labels)
 # Create example table
 results <- fit(
     data = clintrial,
-    outcome = "os_status",
+    outcome = "readmission_30d",
     predictors = c("age", "sex", "treatment", "stage"),
     labels = clintrial_labels
 )
@@ -273,135 +279,176 @@ if(has_latex){
 
 \donttest{
 
-if(has_latex){
-
 # Example 2: Landscape orientation for wide tables
-table2pdf(results, file.path(tempdir(), "wide_results.pdf"),
-         orientation = "landscape")
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "wide_results.pdf"),
+           orientation = "landscape")
+}
 
 # Example 3: With caption
-table2pdf(results, file.path(tempdir(), "captioned.pdf"),
-         caption = "Table 1: Multivariable logistic regression results")
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "captioned.pdf"),
+           caption = "Table 1: Multivariable logistic regression results")
+}
 
 # Example 4: Multi-line caption with formatting
-table2pdf(results, file.path(tempdir(), "formatted_caption.pdf"),
-         caption = "Table 1: Risk Factors for Mortality\\\\\\\\
-                   aOR = adjusted odds ratio; CI = confidence interval")
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "formatted_caption.pdf"),
+           caption = "Table 1: Risk Factors for Mortality\\\\\\\\
+                     aOR = adjusted odds ratio; CI = confidence interval")
+}
 
 # Example 5: Auto-sized PDF (no fixed page dimensions)
-table2pdf(results, file.path(tempdir(), "autosize.pdf"),
-         paper = "auto")
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "autosize.pdf"),
+           paper = "auto")
+}
 
 # Example 6: A4 paper with custom margins
-table2pdf(results, file.path(tempdir(), "a4_custom.pdf"),
-         paper = "a4",
-         margins = c(0.75, 0.75, 0.75, 0.75))
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "a4_custom.pdf"),
+           paper = "a4",
+           margins = c(0.75, 0.75, 0.75, 0.75))
+}
 
 # Example 7: Larger font for readability
-table2pdf(results, file.path(tempdir(), "large_font.pdf"),
-         font_size = 11)
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "large_font.pdf"),
+           font_size = 11)
+}
 
 # Example 8: Indented hierarchical display
-table2pdf(results, file.path(tempdir(), "indented.pdf"),
-         indent_groups = TRUE)
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "indented.pdf"),
+           indent_groups = TRUE)
+}
 
 # Example 9: Condensed table (reduced height)
-table2pdf(results, file.path(tempdir(), "condensed.pdf"),
-         condense_table = TRUE)
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "condensed.pdf"),
+           condense_table = TRUE)
+}
 
 # Example 10: With zebra stripes
-table2pdf(results, file.path(tempdir(), "striped.pdf"),
-         zebra_stripes = TRUE,
-         stripe_color = "gray!15")
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "striped.pdf"),
+           zebra_stripes = TRUE,
+           stripe_color = "gray!15")
+}
 
 # Example 11: Dark header style
-table2pdf(results, file.path(tempdir(), "dark_header.pdf"),
-         dark_header = TRUE)
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "dark_header.pdf"),
+           dark_header = TRUE)
+}
 
 # Example 12: Combination of formatting options
-table2pdf(results, file.path(tempdir(), "publication_ready.pdf"),
-         orientation = "portrait",
-         paper = "letter",
-         font_size = 9,
-         caption = "Table 2: Multivariable Analysis\\\\\\\\
-                   Model adjusted for age, sex, and clinical factors",
-         indent_groups = TRUE,
-         zebra_stripes = TRUE,
-         bold_significant = TRUE,
-         p_threshold = 0.05)
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "publication_ready.pdf"),
+           orientation = "portrait",
+           paper = "letter",
+           font_size = 9,
+           caption = "Table 2: Multivariable Analysis\\\\\\\\
+                     Model adjusted for age, sex, and clinical factors",
+           indent_groups = TRUE,
+           zebra_stripes = TRUE,
+           bold_significant = TRUE,
+           p_threshold = 0.05)
+}
 
 # Example 13: Adjust cell padding
-table2pdf(results, file.path(tempdir(), "relaxed_padding.pdf"),
-         cell_padding = "relaxed")  # More spacious
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "relaxed_padding.pdf"),
+           cell_padding = "relaxed")  # More spacious
+}
 
 # Example 14: No scaling (natural table width)
-table2pdf(results, file.path(tempdir(), "no_scale.pdf"),
-         fit_to_page = FALSE,
-         font_size = 10)
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "no_scale.pdf"),
+           fit_to_page = FALSE,
+           font_size = 10)
+}
 
 # Example 15: Hide significance bolding
-table2pdf(results, file.path(tempdir(), "no_bold.pdf"),
-         bold_significant = FALSE)
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "no_bold.pdf"),
+           bold_significant = FALSE)
+}
 
 # Example 16: Custom column alignment
-table2pdf(results, file.path(tempdir(), "custom_align.pdf"),
-         align = c("c", "c", "c", "c", "c", "c", "c"))
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "custom_align.pdf"),
+           align = c("c", "c", "c", "c", "c", "c", "c"))
+}
 
 # Example 17: Descriptive statistics table
-desc_table <- desctable(clintrial, by = "treatment",
-     variables = c("age", "sex", "bmi", "stage"), labels = clintrial_labels)
-
-table2pdf(desc_table, file.path(tempdir(), "descriptive.pdf"),
-         caption = "Table 1: Baseline Characteristics by Treatment Group",
-         orientation = "landscape")
+if (has_latex) {
+  desc_table <- desctable(clintrial, by = "treatment",
+       variables = c("age", "sex", "bmi", "stage"), labels = clintrial_labels)
+  
+  table2pdf(desc_table, file.path(tempdir(), "descriptive.pdf"),
+           caption = "Table 1: Baseline Characteristics by Treatment Group",
+           orientation = "landscape")
+}
 
 # Example 18: Model comparison table
-models <- list(
-     base = c("age", "sex"),
-     full = c("age", "sex", "bmi", "treatment")
-)
-
-comparison <- compfit(
-     data = clintrial,
-     outcome = "os_status",
-     model_list = models
-)
-
-table2pdf(comparison, file.path(tempdir(), "model_comparison.pdf"),
-         caption = "Table 3: Model Comparison Statistics")
+if (has_latex) {
+  models <- list(
+       base = c("age", "sex"),
+       full = c("age", "sex", "bmi", "treatment")
+  )
+  
+  # Information criteria assume a common sample, so the candidate
+  # predictors are restricted to complete cases before comparison
+  comparison_data <- na.omit(clintrial[, c("os_status", "age", "sex", "bmi", "treatment")])
+  
+  comparison <- compfit(
+       data = comparison_data,
+       outcome = "os_status",
+       model_list = models,
+       verbose = FALSE
+  )
+  
+  table2pdf(comparison, file.path(tempdir(), "model_comparison.pdf"),
+           caption = "Table 3: Model Comparison Statistics")
+}
 
 # Example 19: Very wide table with aggressive fitting
-wide_model <- fit(
-     data = clintrial,
-     outcome = "os_status",
-     predictors = c("age", "sex", "race", "bmi", "smoking", 
-                   "hypertension", "diabetes", "treatment", "stage")
-)
-
-table2pdf(wide_model, file.path(tempdir(), "very_wide.pdf"),
-         orientation = "landscape",
-         font_size = 7,
-         fit_to_page = TRUE,
-         condense_table = TRUE)
+if (has_latex) {
+  wide_model <- fit(
+       data = clintrial,
+       outcome = "os_status",
+       predictors = c("age", "sex", "race", "bmi", "smoking", 
+                     "hypertension", "diabetes", "treatment", "stage")
+  )
+  
+  table2pdf(wide_model, file.path(tempdir(), "very_wide.pdf"),
+           orientation = "landscape",
+           font_size = 7,
+           fit_to_page = TRUE,
+           condense_table = TRUE)
+}
 
 # Example 20: With caption size control
-table2pdf(results, file.path(tempdir(), "caption_size.pdf"),
-         font_size = 8,
-         caption_size = 6,
-         caption = "Table 4: Results with Compact Caption\\\\\\\\
-                   Smaller caption fits better on constrained pages")
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "caption_size.pdf"),
+           font_size = 8,
+           caption_size = 6,
+           caption = "Table 4: Results with Compact Caption\\\\\\\\
+                     Smaller caption fits better on constrained pages")
+}
 
 # Example 21: Troubleshooting - keep logs
-table2pdf(results, file.path(tempdir(), "debug.pdf"),
-         show_logs = TRUE)
-# If it fails, check debug.log for error messages
-
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "debug.pdf"),
+           show_logs = TRUE)
+  # If it fails, check debug.log for error messages
 }
 }
 
 }
 \seealso{
-\code{\link{autotable}} for automatic format detection,
+\code{\link{tablesave}} for saving in the format given by the file extension,
 \code{\link{table2tex}} for LaTeX source files,
 \code{\link{table2html}} for HTML output,
 \code{\link{table2docx}} for Microsoft Word,
@@ -410,12 +457,12 @@ table2pdf(results, file.path(tempdir(), "debug.pdf"),
 \code{\link{desctable}} for descriptive tables,
 \code{\link{fit}} for regression tables
 
-Other export functions: 
-\code{\link{autotable}()},
-\code{\link{table2docx}()},
-\code{\link{table2html}()},
-\code{\link{table2pptx}()},
-\code{\link{table2rtf}()},
-\code{\link{table2tex}()}
+Other export functions:
+\code{\link[=table2docx]{table2docx()}},
+\code{\link[=table2html]{table2html()}},
+\code{\link[=table2pptx]{table2pptx()}},
+\code{\link[=table2rtf]{table2rtf()}},
+\code{\link[=table2tex]{table2tex()}},
+\code{\link[=tablesave]{tablesave()}}
 }
 \concept{export functions}

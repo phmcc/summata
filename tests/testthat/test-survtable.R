@@ -5,17 +5,12 @@
 #' 
 #' @details Run with testthat::test_file("tests/testthat/test-survtable.R")
 
-library(testthat)
 library(data.table)
-library(summata)
 
 ## ============================================================================
 ## Setup: Create test data and helper functions
 ## ============================================================================
 
-## Use package's built-in clinical trial data
-data(clintrial)
-data(clintrial_labels)
 
 ## Create a complete-case subset for tests requiring no missing data
 clintrial_complete <- na.omit(clintrial)
@@ -34,10 +29,6 @@ expect_survtable_result <- function(result) {
     expect_true(!is.null(attr(result, "type")))
 }
 
-## Helper to check for p-value column
-expect_pvalue_column <- function(result) {
-    expect_true("p-value" %in% names(result))
-}
 
 ## Helper to check for specific time column
 expect_time_column <- function(result, time, unit = NULL) {

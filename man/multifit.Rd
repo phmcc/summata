@@ -269,7 +269,10 @@ A data.table with S3 class \code{"multifit_result"} containing formatted
       value (Yes, 1, True, Present, Positive, +), shows just "Variable".
       For continuous predictors: the variable name. For interactions: the
       formatted interaction term (\emph{e.g.,} "Treatment (Drug A) × Sex (Male)")}
-    \item{n}{Integer. Sample size used in the model (if \code{show_n = TRUE})}
+    \item{n}{Integer. Sample size used in fitting (if \code{show_n = TRUE}).
+      When both unadjusted and adjusted estimates are shown, this is the
+      adjusted model's sample, which is the one behind the adjusted
+      estimate on the same row}
     \item{Events}{Integer. Number of events (if \code{show_events = TRUE})}
     \item{OR/HR/RR/Coefficient (95\% CI)}{Character. Unadjusted effect 
       estimate with CI (if \code{columns = "unadjusted"} or \code{"both"})}
@@ -299,6 +302,14 @@ A data.table with S3 class \code{"multifit_result"} containing formatted
     \item{analysis_type}{Character. \code{"multi_outcome"} to identify analysis type}
     \item{significant}{Character vector. Names of outcomes with \emph{p} < 0.05
       for the predictor (uses adjusted \emph{p}-values when available)}
+    \item{analysis_counts}{List. How much of the supplied data reached the
+      models, with elements \code{n_supplied}, \code{n_analyzed},
+      \code{n_missing_outcome} and \code{n_missing_predictor}. One model is
+      fitted per outcome, so \code{n_analyzed} holds one value per outcome
+      and the reported sample may be a range. Event counts are not
+      included: each outcome has its own event total, so a single reported
+      figure could not describe them all. The \code{print()} method always
+      reports the analyzed sample}
   }
 }
 \description{
@@ -326,7 +337,7 @@ inverts the typical regression paradigm:
 }
 
 This is conceptually opposite to \code{uniscreen()}, which tests multiple 
-predictors against a single outcome. Use \code{multifit()} when you have one 
+predictors against a single outcome. \code{multifit()} applies where there is one 
 exposure of interest and want to screen across multiple endpoints.
 
 \strong{When to Use Multivariate Regression Analysis:}
@@ -453,7 +464,7 @@ continuous_results <- multifit(data, outcomes = c("los_days", "cost"),
   \item \code{parallel = TRUE} (default) uses multiple cores for faster fitting
   \item \code{keep_models = FALSE} (default) discards model objects to save memory
   \item For many outcomes, parallel processing provides substantial speedup
-  \item Set \code{keep_models = TRUE} only when you need model diagnostics
+  \item Set \code{keep_models = TRUE} only when model diagnostics are required
 }
 }
 \examples{
@@ -462,7 +473,6 @@ data(clintrial)
 data(clintrial_labels)
 
 # Example 1: Basic multivariate analysis (unadjusted)
-# Test treatment effect on multiple binary outcomes
 result1 <- multifit(
     data = clintrial,
     outcomes = c("surgery", "pfs_status", "os_status"),
@@ -471,12 +481,10 @@ result1 <- multifit(
     parallel = FALSE
 )
 print(result1)
-# Shows odds ratios comparing Drug A and Drug B to Control
 
 \donttest{
 
 # Example 2: Adjusted analysis with covariates
-# Adjust for age, sex, and disease stage
 result2 <- multifit(
     data = clintrial,
     outcomes = c("surgery", "pfs_status", "os_status"),
@@ -486,7 +494,6 @@ result2 <- multifit(
     parallel = FALSE
 )
 print(result2)
-# Shows adjusted odds ratios (aOR)
 
 # Example 3: Compare unadjusted and adjusted results
 result3 <- multifit(
@@ -499,10 +506,8 @@ result3 <- multifit(
     parallel = FALSE
 )
 print(result3)
-# Useful for identifying confounding effects
 
 # Example 4: Continuous predictor across outcomes
-# Test age effect on multiple outcomes
 result4 <- multifit(
     data = clintrial,
     outcomes = c("surgery", "pfs_status", "os_status"),
@@ -512,7 +517,6 @@ result4 <- multifit(
     parallel = FALSE
 )
 print(result4)
-# One row per outcome for continuous predictor
 
 # Example 5: Cox regression for survival outcomes
 library(survival)
@@ -527,7 +531,6 @@ cox_result <- multifit(
     parallel = FALSE
 )
 print(cox_result)
-# Returns hazard ratios (HR/aHR)
 
 # Example 6: Cox with stratification by site
 cox_strat <- multifit(
@@ -556,7 +559,6 @@ cox_cluster <- multifit(
 print(cox_cluster)
 
 # Example 8: Interaction between predictor and covariate
-# Test if treatment effect differs by sex
 result_int <- multifit(
     data = clintrial,
     outcomes = c("surgery", "os_status"),
@@ -567,7 +569,6 @@ result_int <- multifit(
     parallel = FALSE
 )
 print(result_int)
-# Shows main effects and interaction terms with × notation
 
 # Example 9: Linear model for continuous outcomes
 linear_result <- multifit(
@@ -580,7 +581,6 @@ linear_result <- multifit(
     parallel = FALSE
 )
 print(linear_result)
-# Returns coefficient estimates, not ratios
 
 # Example 10: Poisson regression for equidispersed count outcomes
 # fu_count has variance ~= mean, appropriate for standard Poisson
@@ -595,8 +595,6 @@ poisson_result <- multifit(
     parallel = FALSE
 )
 print(poisson_result)
-# Returns rate ratios (RR)
-# For overdispersed counts (ae_count), use model_type = "negbin" instead
 
 # Example 11: Filter to significant results only
 sig_results <- multifit(
@@ -608,7 +606,6 @@ sig_results <- multifit(
     parallel = FALSE
 )
 print(sig_results)
-# Only outcomes with significant associations shown
 
 # Example 12: Custom outcome labels
 result_labeled <- multifit(
@@ -654,7 +651,6 @@ result <- multifit(
 # Get unformatted results for custom analysis
 raw_data <- attr(result, "raw_data")
 print(raw_data)
-# Contains exp_coef, ci_lower, ci_upper, p_value, \emph{etc.}
 
 # Example 15: Hide sample size and event columns
 result_minimal <- multifit(
@@ -663,6 +659,7 @@ result_minimal <- multifit(
     predictor = "treatment",
     show_n = FALSE,
     show_events = FALSE,
+    labels = clintrial_labels,
     parallel = FALSE
 )
 print(result_minimal)
@@ -674,6 +671,7 @@ result_digits <- multifit(
     predictor = "age",
     digits = 3,
     p_digits = 4,
+    labels = clintrial_labels,
     parallel = FALSE
 )
 print(result_digits)
@@ -684,6 +682,7 @@ result_coef <- multifit(
     outcomes = c("surgery"),
     predictor = "age",
     exponentiate = FALSE,
+    labels = clintrial_labels,
     parallel = FALSE
 )
 print(result_coef)
@@ -714,7 +713,6 @@ gamma_result <- multifit(
     parallel = FALSE
 )
 print(gamma_result)
-# Returns multiplicative effects on positive continuous data
 
 # Example 20: Quasipoisson for overdispersed counts
 quasi_result <- multifit(
@@ -728,7 +726,6 @@ quasi_result <- multifit(
     parallel = FALSE
 )
 print(quasi_result)
-# Adjusts standard errors for overdispersion
 
 # Example 21: Generalized linear mixed effects (GLMER)
 # Test treatment across outcomes with site clustering
@@ -774,7 +771,6 @@ multi_int <- multifit(
     parallel = FALSE
 )
 print(multi_int)
-# Shows how treatment effects vary by stage and sex across outcomes
 
 }
 
@@ -783,17 +779,19 @@ print(multi_int)
 \code{\link{uniscreen}} for screening multiple predictors against one outcome,
 \code{\link{multiforest}} for creating forest plots from multifit results,
 \code{\link{fit}} for single-outcome regression with full coefficient output,
-\code{\link{fullfit}} for complete univariable-to-multivariable workflow
+\code{\link{fullfit}} for complete univariable-to-multivariable workflow,
+\code{\link{forestsave}} for saving the forest plot,
+\code{\link{tablesave}} for exporting tables
 
-Other regression functions: 
-\code{\link{compfit}()},
-\code{\link{fit}()},
-\code{\link{fullfit}()},
-\code{\link{print.compfit_result}()},
-\code{\link{print.fit_result}()},
-\code{\link{print.fullfit_result}()},
-\code{\link{print.multifit_result}()},
-\code{\link{print.uniscreen_result}()},
-\code{\link{uniscreen}()}
+Other regression functions:
+\code{\link[=compfit]{compfit()}},
+\code{\link[=fit]{fit()}},
+\code{\link[=fullfit]{fullfit()}},
+\code{\link[=print.compfit_result]{print.compfit_result()}},
+\code{\link[=print.fit_result]{print.fit_result()}},
+\code{\link[=print.fullfit_result]{print.fullfit_result()}},
+\code{\link[=print.multifit_result]{print.multifit_result()}},
+\code{\link[=print.uniscreen_result]{print.uniscreen_result()}},
+\code{\link[=uniscreen]{uniscreen()}}
 }
 \concept{regression functions}

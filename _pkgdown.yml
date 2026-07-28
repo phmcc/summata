@@ -118,13 +118,13 @@ reference:
   
 - title: Export Functions
   contents:
-  - autotable
   - table2pdf
   - table2docx
   - table2html
   - table2pptx
   - table2tex
   - table2rtf
+  - tablesave
   
 - title: Visualization Functions
   contents:
@@ -134,6 +134,7 @@ reference:
   - coxforest
   - uniforest
   - multiforest
+  - forestsave
   
 - title: Utility Functions
   contents:

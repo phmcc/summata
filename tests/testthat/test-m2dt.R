@@ -6,17 +6,12 @@
 #' 
 #' @details Run with testthat::test_file("tests/testthat/test-m2dt.R")
 
-library(testthat)
 library(data.table)
-library(summata)
 
 ## ============================================================================
 ## Setup: Create test data and helper functions
 ## ============================================================================
 
-## Use package's built-in clinical trial data
-data(clintrial)
-data(clintrial_labels)
 
 ## Create a complete-case subset for tests requiring no missing data
 clintrial_complete <- na.omit(clintrial)
@@ -42,8 +37,9 @@ expect_m2dt_result <- function(result) {
     expect_true(!is.null(attr(result, "formula_str")))
 }
 
-## Helper to check for effect column
-expect_effect_column <- function(result, effect_type) {
+## Helper to check for a raw effect column. m2dt() returns unformatted
+## columns (OR, HR, coef), unlike the display columns tested elsewhere.
+expect_raw_effect_column <- function(result, effect_type) {
     expect_true(effect_type %in% names(result),
                 info = paste("Expected", effect_type, "column, found:", 
                              paste(names(result), collapse = ", ")))
@@ -69,7 +65,7 @@ test_that("m2dt works with logistic regression", {
     result <- m2dt(data = clintrial, model = model)
     
     expect_m2dt_result(result)
-    expect_effect_column(result, "OR")
+    expect_raw_effect_column(result, "OR")
     expect_equal(attr(result, "model_class"), "glm")
 })
 
@@ -120,7 +116,7 @@ test_that("m2dt works with linear model", {
     result <- m2dt(data = clintrial, model = model)
     
     expect_m2dt_result(result)
-    expect_effect_column(result, "Coefficient")
+    expect_raw_effect_column(result, "Coefficient")
     expect_equal(attr(result, "model_class"), "lm")
 })
 
@@ -163,7 +159,7 @@ test_that("m2dt works with Poisson regression", {
     result <- m2dt(data = test_data, model = model)
     
     expect_m2dt_result(result)
-    expect_effect_column(result, "RR")
+    expect_raw_effect_column(result, "RR")
 })
 
 
@@ -188,8 +184,6 @@ test_that("m2dt Poisson shows correct model type", {
 
 test_that("m2dt works with Cox regression", {
     
-    skip_if_not_installed("survival")
-    
     model <- survival::coxph(
                            survival::Surv(os_months, os_status) ~ age + sex + stage,
                            data = clintrial
@@ -198,14 +192,12 @@ test_that("m2dt works with Cox regression", {
     result <- m2dt(data = clintrial, model = model)
     
     expect_m2dt_result(result)
-    expect_effect_column(result, "HR")
+    expect_raw_effect_column(result, "HR")
     expect_equal(attr(result, "model_class"), "coxph")
 })
 
 
 test_that("m2dt Cox shows correct model type", {
-    
-    skip_if_not_installed("survival")
     
     model <- survival::coxph(
                            survival::Surv(os_months, os_status) ~ age,
@@ -219,8 +211,6 @@ test_that("m2dt Cox shows correct model type", {
 
 
 test_that("m2dt Cox includes events count", {
-    
-    skip_if_not_installed("survival")
     
     model <- survival::coxph(
                            survival::Surv(os_months, os_status) ~ age + sex,
@@ -240,8 +230,6 @@ test_that("m2dt Cox includes events count", {
 
 test_that("m2dt works with conditional logistic regression", {
     
-    skip_if_not_installed("survival")
-    
     ## Create strata variable
     test_data <- data.table::as.data.table(clintrial)
     test_data[, strata_var := rep(1:100, length.out = .N)]
@@ -254,7 +242,7 @@ test_that("m2dt works with conditional logistic regression", {
     result <- m2dt(data = test_data, model = model)
     
     expect_m2dt_result(result)
-    expect_effect_column(result, "HR")  # clogit uses HR
+    expect_raw_effect_column(result, "HR")  # clogit uses HR
     expect_equal(attr(result, "model_class"), "clogit")
 })
 
@@ -272,7 +260,7 @@ test_that("m2dt works with lmer", {
     result <- m2dt(data = clintrial, model = model)
     
     expect_m2dt_result(result)
-    expect_effect_column(result, "Coefficient")
+    expect_raw_effect_column(result, "Coefficient")
     expect_true(attr(result, "model_class") %in% c("lmerMod", "lmer"))
 })
 
@@ -305,7 +293,7 @@ test_that("m2dt works with glmer (binomial)", {
     result <- m2dt(data = clintrial, model = model)
     
     expect_m2dt_result(result)
-    expect_effect_column(result, "OR")
+    expect_raw_effect_column(result, "OR")
     expect_true(attr(result, "model_class") %in% c("glmerMod", "glmer"))
 })
 
@@ -317,8 +305,6 @@ test_that("m2dt works with glmer (binomial)", {
 test_that("m2dt works with coxme", {
     
     skip_if_not_installed("coxme")
-    skip_if_not_installed("survival")
-    
     model <- coxme::coxme(
                         survival::Surv(os_months, os_status) ~ age + sex + (1|site),
                         data = clintrial
@@ -327,7 +313,7 @@ test_that("m2dt works with coxme", {
     result <- m2dt(data = clintrial, model = model)
     
     expect_m2dt_result(result)
-    expect_effect_column(result, "HR")
+    expect_raw_effect_column(result, "HR")
     expect_equal(attr(result, "model_class"), "coxme")
 })
 
@@ -368,8 +354,6 @@ test_that("m2dt includes QC stats for linear model", {
 
 
 test_that("m2dt includes QC stats for Cox model", {
-    
-    skip_if_not_installed("survival")
     
     model <- survival::coxph(
                            survival::Surv(os_months, os_status) ~ age + sex,
@@ -632,8 +616,6 @@ test_that("m2dt includes n_group for factor variables", {
 
 test_that("m2dt events_group for factor variables in survival model", {
     
-    skip_if_not_installed("survival")
-    
     model <- survival::coxph(
                            survival::Surv(os_months, os_status) ~ stage,
                            data = clintrial
@@ -787,8 +769,6 @@ test_that("m2dt OR equals exp(coefficient) for logistic", {
 
 
 test_that("m2dt HR equals exp(coefficient) for Cox", {
-    
-    skip_if_not_installed("survival")
     
     model <- survival::coxph(
                            survival::Surv(os_months, os_status) ~ age,

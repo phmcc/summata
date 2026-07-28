@@ -6,17 +6,12 @@
 #' 
 #' @details Run with testthat::test_file("tests/testthat/test-desctable.R")
 
-library(testthat)
 library(data.table)
-library(summata)
 
 ## ============================================================================
 ## Setup: Create test data and helper functions
 ## ============================================================================
 
-## Use package's built-in clinical trial data
-data(clintrial)
-data(clintrial_labels)
 
 ## Create a complete-case subset for tests requiring no missing data
 clintrial_complete <- na.omit(clintrial)
@@ -42,10 +37,6 @@ expect_total_column <- function(result, label = "Total") {
     expect_true(label %in% names(result))
 }
 
-## Helper to check for p-value column
-expect_pvalue_column <- function(result) {
-    expect_true("p-value" %in% names(result))
-}
 
 
 ## ============================================================================
@@ -298,8 +289,6 @@ test_that("desctable stats_categorical='percent' shows percent only", {
 
 test_that("desctable handles survival variables", {
     
-    skip_if_not_installed("survival")
-    
     result <- desctable(
         data = clintrial,
         variables = c("Surv(os_months, os_status)")
@@ -313,8 +302,6 @@ test_that("desctable handles survival variables", {
 
 
 test_that("desctable survival with grouping shows log-rank test", {
-    
-    skip_if_not_installed("survival")
     
     result <- desctable(
         data = clintrial,
@@ -1059,8 +1046,6 @@ test_that("desctable output is suitable for export", {
 ## ============================================================================
 
 test_that("desctable creates complete Table 1", {
-    
-    skip_if_not_installed("survival")
     
     result <- desctable(
         data = clintrial,

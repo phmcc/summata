@@ -314,6 +314,15 @@ Depends on \code{return_type} parameter:
     \item{significant}{Character vector. Names of variables with p < 0.05
       in the multivariable model (or univariable if multivariable was not
       fitted)}
+    \item{analysis_counts}{List. How much of the supplied data reached the
+      models, with elements \code{n_supplied}, \code{n_analyzed},
+      \code{n_missing_outcome} and \code{n_missing_predictor}, plus
+      \code{events_supplied} and \code{events_analyzed} where the model
+      type carries an event count. The screening models and the
+      multivariable model rest on different samples whenever a predictor
+      carries missing values, so \code{n_analyzed} holds one value per
+      model and the reported sample may be a range. The \code{print()}
+      method always reports the analyzed sample}
   }
 }
 \description{
@@ -360,7 +369,7 @@ The function implements a complete regression analysis pipeline:
 
 \emph{"All" Method} (\code{method = "all"}):
 \itemize{
-  \item No variable selection - includes all predictors
+  \item No variable selection; includes all predictors
   \item Appropriate when all variables are theoretically important
   \item Risk of overfitting with many predictors relative to sample size
   \item Useful for confirmatory analyses with pre-specified models
@@ -424,8 +433,6 @@ result1 <- fullfit(
     labels = clintrial_labels
 )
 print(result1)
-# Shows both univariable and multivariable results
-# Only significant univariable predictors in multivariable model
 
 \donttest{
 
@@ -449,7 +456,6 @@ result3 <- fullfit(
     labels = clintrial_labels
 )
 print(result3)
-# Univariable for all, multivariable for selected only
 
 # Example 4: Cox regression with screening
 library(survival)
@@ -504,7 +510,8 @@ both <- fullfit(
     outcome = "os_status",
     predictors = c("age", "sex", "treatment", "stage"),
     method = "all",
-    return_type = "both"
+    return_type = "both",
+    labels = clintrial_labels
 )
 print(both$table)
 summary(both$model)
@@ -541,17 +548,20 @@ if (requireNamespace("lme4", quietly = TRUE)) {
 \code{\link{uniscreen}} for univariable screening only,
 \code{\link{fit}} for fitting a single multivariable model,
 \code{\link{compfit}} for comparing multiple models,
-\code{\link{desctable}} for descriptive statistics
+\code{\link{desctable}} for descriptive statistics,
+\code{\link{autoforest}} for forest plots of the multivariable models,
+\code{\link{forestsave}} for exporting forest plots,
+\code{\link{tablesave}} for exporting tables
 
-Other regression functions: 
-\code{\link{compfit}()},
-\code{\link{fit}()},
-\code{\link{multifit}()},
-\code{\link{print.compfit_result}()},
-\code{\link{print.fit_result}()},
-\code{\link{print.fullfit_result}()},
-\code{\link{print.multifit_result}()},
-\code{\link{print.uniscreen_result}()},
-\code{\link{uniscreen}()}
+Other regression functions:
+\code{\link[=compfit]{compfit()}},
+\code{\link[=fit]{fit()}},
+\code{\link[=multifit]{multifit()}},
+\code{\link[=print.compfit_result]{print.compfit_result()}},
+\code{\link[=print.fit_result]{print.fit_result()}},
+\code{\link[=print.fullfit_result]{print.fullfit_result()}},
+\code{\link[=print.multifit_result]{print.multifit_result()}},
+\code{\link[=print.uniscreen_result]{print.uniscreen_result()}},
+\code{\link[=uniscreen]{uniscreen()}}
 }
 \concept{regression functions}

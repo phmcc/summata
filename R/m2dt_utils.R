@@ -72,6 +72,131 @@ get_model_data <- function(model) {
     return(NULL)
 }
 
+#' Identify the variables required by a fitted model
+#'
+#' Returns the names of every variable referenced by a model formula, including
+#' the response, stratification factors, offsets and random-effect grouping
+#' factors. Terms are expanded where possible, so a model specified with a dot
+#' on the right-hand side (\emph{e.g.,} \code{y ~ .}) returns the complete set
+#' of variables rather than the literal dot.
+#'
+#' @param model Fitted model object.
+#' @param model_class Character string of the model class.
+#' @return Character vector of variable names, or \code{character(0)} when the
+#'   formula cannot be recovered.
+#' @keywords internal
+get_model_variables <- function(model, model_class) {
+
+    ## Mixed-effects and coxme formulas carry the grouping factors, which must
+    ## also be non-missing for an observation to enter the fit. The formula is
+    ## therefore preferred over the terms object for these classes, because the
+    ## terms object describes the fixed effects only.
+    if (identical(model_class, "coxme") || inherits(model, "merMod")) {
+        return(unique(tryCatch(all.vars(stats::formula(model)),
+                               error = function(e) character(0))))
+    }
+
+    ## The terms object holds the expanded formula, which matters when the
+    ## model was specified with a dot on the right-hand side.
+    vars <- tryCatch(all.vars(stats::terms(model)),
+                     error = function(e) NULL)
+
+    if (is.null(vars)) {
+        vars <- tryCatch(all.vars(stats::formula(model)),
+                         error = function(e) character(0))
+    }
+
+    return(unique(vars))
+}
+
+#' Number of observations used to fit a model
+#'
+#' Provides a single accessor for the fitted sample size across the model
+#' classes supported by \pkg{summata}. Survival models record this quantity in
+#' class-specific components rather than through \code{stats::nobs()}.
+#'
+#' @param model Fitted model object.
+#' @param model_class Character string of the model class.
+#' @return Numeric scalar giving the number of observations used in fitting, or
+#'   \code{NA_real_} when it cannot be determined.
+#' @keywords internal
+get_model_nobs <- function(model, model_class) {
+
+    n_used <- NA_real_
+
+    if (identical(model_class, "coxme")) {
+        ## coxme stores c(events, observations)
+        if (!is.null(model$n) && length(model$n) >= 2L) {
+            n_used <- as.numeric(model$n[2])
+        }
+    } else if (model_class %in% c("coxph", "clogit")) {
+        if (!is.null(model$n)) {
+            n_used <- as.numeric(model$n[1])
+        }
+    }
+
+    if (is.na(n_used)) {
+        n_used <- tryCatch(as.numeric(stats::nobs(model)),
+                           error = function(e) NA_real_)
+    }
+
+    return(n_used)
+}
+
+#' Restrict data to the observations used in model fitting
+#'
+#' Group-level sample sizes must be counted over the observations that entered
+#' the model, not over every row supplied by the user. Several fitted objects
+#' carry no model frame from which those observations can be read directly:
+#' \code{survival::coxph()} does not store one by default, \pkg{coxme} models
+#' never store one, and the memory-conserving fits performed internally by
+#' \code{uniscreen()} and \code{multifit()} pass \code{model = FALSE}. In these
+#' cases the supplied data still contains the observations dropped during
+#' fitting, and counting them inflates group sizes whenever the response or a
+#' covariate is missing.
+#'
+#' Complete cases are determined from the variables named in the model formula,
+#' reproducing the default \code{na.omit} behavior of the modeling functions.
+#' A complete-case restriction can only remove observations that the model
+#' itself could not have used, so the subset is retained even when it does not
+#' reproduce the fitted sample size exactly, as may happen when a fit used
+#' \code{subset} or case weights.
+#'
+#' @param model Fitted model object.
+#' @param model_class Character string of the model class.
+#' @param data Data frame or data.table supplied to the model call.
+#' @return Data.table restricted to the observations used in fitting. The input
+#'   is returned unchanged when the analysis rows cannot be determined.
+#' @keywords internal
+get_analysis_data <- function(model, model_class, data) {
+
+    if (is.null(data) || !inherits(data, "data.frame")) {
+        return(data)
+    }
+
+    if (!data.table::is.data.table(data)) {
+        data <- data.table::as.data.table(data)
+    }
+
+    n_used <- get_model_nobs(model, model_class)
+
+    ## No observations were dropped, so no restriction is required
+    if (!is.na(n_used) && nrow(data) == n_used) {
+        return(data)
+    }
+
+    model_vars <- get_model_variables(model, model_class)
+    model_vars <- model_vars[model_vars %in% names(data)]
+
+    if (length(model_vars) == 0L) {
+        return(data)
+    }
+
+    keep <- stats::complete.cases(data[, model_vars, with = FALSE])
+
+    return(data[keep])
+}
+
 #' Detect if model is univariable or multivariable
 #' 
 #' Determines whether a model contains one predictor (univariable) or multiple
@@ -158,7 +283,7 @@ detect_model_type <- function(model) {
         ## Count main effect terms
         n_terms <- length(main_terms)
         
-        ## If we have interactions, extract unique base variables from them too
+        ## Where interactions are present, extract their base variables as well
         if (length(interaction_terms) > 0) {
             ## Extract variables from interactions (split on ":")
             interaction_vars <- unique(unlist(strsplit(interaction_terms, ":", fixed = TRUE)))
@@ -171,19 +296,26 @@ detect_model_type <- function(model) {
     }
     
     ## For models with factor variables, count unique base variables
-    factor_pattern <- paste0("^(", paste(names(xlevels), collapse = "|"), ")")
-    is_factor_term <- grepl(factor_pattern, main_terms)
-    factor_vars_present <- unique(sapply(main_terms[is_factor_term], function(term) {
-        for (var in names(xlevels)) {
-            if (startsWith(term, var)) return(var)
-        }
-        return(NA_character_)
-    }))
-    factor_vars_present <- factor_vars_present[!is.na(factor_vars_present)]
+    ##
+    ## Each coefficient is assigned to the longest factor name it begins with.
+    ## Returning the first name in the list would collapse "sexualityHetero"
+    ## onto "sex" whenever both variables appear in the model, understating the
+    ## variable count and misreporting a multivariable model as univariable.
+    ## Names are compared literally, so a variable carrying an inline
+    ## transformation is matched on its own characters.
+    xlevel_names <- names(xlevels)
+    xlevel_names <- xlevel_names[order(nchar(xlevel_names), decreasing = TRUE)]
+    
+    matched_var <- vapply(main_terms, function(term) {
+        hits <- xlevel_names[startsWith(term, xlevel_names)]
+        if (length(hits) == 0L) NA_character_ else hits[1]
+    }, character(1), USE.NAMES = FALSE)
+    
+    factor_vars_present <- unique(matched_var[!is.na(matched_var)])
     n_vars <- length(factor_vars_present)
     
     ## Count unique continuous variables IN MAIN EFFECTS
-    continuous_terms <- main_terms[!is_factor_term]
+    continuous_terms <- main_terms[is.na(matched_var)]
     n_continuous <- length(unique(continuous_terms))
     
     ## Total unique variables (from main effects only)
@@ -292,19 +424,29 @@ parse_term <- function(terms, xlevels = NULL, model = NULL) {
     }
     
     if (!is.null(xlevels) && length(xlevels) > 0) {
-        ## Batch processing
+        ## Match each coefficient to the factor name it begins with.
+        ##
+        ## Names are compared literally rather than as regular expressions, so
+        ## that variables carrying an inline transformation (\emph{e.g.,}
+        ## \code{factor(stage)}) are matched on their own characters rather than
+        ## on the grouping and alternation those characters would denote.
+        ##
+        ## Names are processed from shortest to longest so that the longest
+        ## match is the one retained. Processing in formula order would assign
+        ## the coefficient "sexualityHetero" to "sex" whenever both variables
+        ## appear in the model and "sex" is written second.
         xlevel_names <- names(xlevels)
+        xlevel_names <- xlevel_names[order(nchar(xlevel_names))]
         
         ## For each factor variable, find all matching terms at once, skip interaction terms
         for (var in xlevel_names) {
             ## Find which terms start with this variable name
-            pattern <- paste0("^", var)
-            matches <- grepl(pattern, terms) & !is_interaction  # Skip interactions
+            matches <- startsWith(terms, var) & !is_interaction  # Skip interactions
             
             if (any(matches)) {
                 ## Extract levels for all matching terms at once
                 variable[matches] <- var
-                group[matches] <- sub(pattern, "", terms[matches])
+                group[matches] <- substring(terms[matches], nchar(var) + 1L)
             }
         }
         
@@ -371,4 +513,319 @@ get_event_variable <- function(model, model_class) {
     }
     
     return(event_var)
+}
+
+
+#' Identify the response variables of a fitted model
+#'
+#' Returns the variables appearing on the left-hand side of a model formula. A
+#' survival response contributes both the time and status variables.
+#'
+#' @param model Fitted model object.
+#' @return Character vector of response variable names, or \code{character(0)}
+#'   when the formula cannot be recovered.
+#' @keywords internal
+get_outcome_variables <- function(model) {
+
+    fml <- tryCatch(stats::formula(model), error = function(e) NULL)
+
+    if (is.null(fml) || length(fml) < 3L) {
+        return(character(0))
+    }
+
+    return(tryCatch(all.vars(fml[[2]]), error = function(e) character(0)))
+}
+
+#' Count the observations available to an analysis
+#'
+#' Summarizes how many of the supplied observations could enter a model, and
+#' separates those excluded for a missing response from those excluded for a
+#' missing covariate. The distinction matters: a missing response and a missing
+#' covariate raise different questions about whether a complete-case analysis is
+#' appropriate.
+#'
+#' Several models may be described at once by passing a list of predictor sets,
+#' as when a univariable screen fits one model per predictor. The analyzed count
+#' is then returned as one element per set.
+#'
+#' @param data Data frame or data.table supplied to the analysis.
+#' @param outcome_vars Character vector of response variable names.
+#' @param predictor_vars Character vector of predictor variable names, or a list
+#'   of such vectors when several models are described.
+#' @param event_var Character name of the event indicator, or \code{NULL} for
+#'   models that carry no event count. Factors are coded as the modeling
+#'   functions code them, with any level beyond the first counting as an event.
+#' @return Named list with \code{n_supplied}, \code{n_analyzed},
+#'   \code{n_missing_outcome} and \code{n_missing_predictor}, and, where an
+#'   event indicator was supplied, \code{events_supplied} and
+#'   \code{events_analyzed}. \code{NULL} when the counts cannot be determined.
+#' @keywords internal
+get_analysis_counts <- function(data, outcome_vars, predictor_vars = NULL,
+                                event_var = NULL) {
+
+    if (is.null(data) || !inherits(data, "data.frame") || nrow(data) == 0) {
+        return(NULL)
+    }
+
+    if (!data.table::is.data.table(data)) {
+        data <- data.table::as.data.table(data)
+    }
+
+    outcome_vars <- unique(outcome_vars[outcome_vars %in% names(data)])
+
+    if (length(outcome_vars) == 0) {
+        return(NULL)
+    }
+
+    if (!is.list(predictor_vars)) {
+        predictor_vars <- list(predictor_vars)
+    }
+
+    n_supplied <- nrow(data)
+    outcome_ok <- stats::complete.cases(data[, outcome_vars, with = FALSE])
+
+    ## Event indicator, coded as the modeling functions code it. A count
+    ## response contributes its counts rather than a binary flag, which
+    ## mirrors the total that m2dt() reports for Poisson and negative
+    ## binomial models.
+    event_indicator <- NULL
+    if (!is.null(event_var) && length(event_var) == 1 &&
+        event_var %in% names(data)) {
+        y <- data[[event_var]]
+        event_indicator <- if (is.factor(y)) {
+                               as.integer(y) > 1L
+                           } else if (is.numeric(y) || is.logical(y)) {
+                               y
+                           } else {
+                               NULL
+                           }
+    }
+
+    counts <- lapply(predictor_vars, function(vars) {
+        vars <- unique(vars[vars %in% names(data) & !vars %in% outcome_vars])
+
+        predictor_ok <- if (length(vars) > 0) {
+                            stats::complete.cases(data[, vars, with = FALSE])
+                        } else {
+                            rep(TRUE, n_supplied)
+                        }
+
+        analyzed <- outcome_ok & predictor_ok
+
+        c(n_analyzed = sum(analyzed),
+          n_missing_predictor = sum(outcome_ok & !predictor_ok),
+          events_analyzed = if (is.null(event_indicator)) {
+                                NA_real_
+                            } else {
+                                sum(event_indicator[analyzed], na.rm = TRUE)
+                            })
+    })
+
+    result <- list(
+        n_supplied = n_supplied,
+        n_analyzed = vapply(counts, function(x) x[["n_analyzed"]], numeric(1)),
+        n_missing_outcome = sum(!outcome_ok),
+        n_missing_predictor = vapply(counts, function(x) x[["n_missing_predictor"]], numeric(1))
+    )
+
+    if (!is.null(event_indicator)) {
+        result$events_supplied <- sum(event_indicator, na.rm = TRUE)
+        result$events_analyzed <- vapply(counts, function(x) x[["events_analyzed"]],
+                                         numeric(1))
+    }
+
+    return(result)
+}
+
+#' Count the observations available to a fitted model
+#'
+#' Convenience wrapper around \code{get_analysis_counts()} that derives the
+#' response and predictor variables from the model itself.
+#'
+#' @param model Fitted model object.
+#' @param model_class Character string of the model class.
+#' @param data Data frame or data.table supplied to the model call.
+#' @return See \code{get_analysis_counts()}.
+#' @keywords internal
+get_model_analysis_counts <- function(model, model_class, data) {
+
+    outcome_vars <- get_outcome_variables(model)
+
+    if (length(outcome_vars) == 0) {
+        return(NULL)
+    }
+
+    predictor_vars <- setdiff(get_model_variables(model, model_class), outcome_vars)
+
+    ## stats::family() resolves for glm, lm and merMod objects and errors for
+    ## survival fits, which are identified by their class instead
+    family_name <- tryCatch(stats::family(model)$family, error = function(e) NULL)
+    event_var <- get_event_variable_for_counts(outcome_vars, model_class, family_name)
+
+    return(get_analysis_counts(data, outcome_vars, predictor_vars, event_var))
+}
+
+#' Describe the analyzed sample for console output
+#'
+#' Renders the counts produced by \code{get_analysis_counts()} as a single line
+#' for the \code{print()} methods. The line is produced whenever the counts are
+#' available, including when every supplied observation entered the analysis:
+#' a complete sample is itself worth stating, and reporting it only on loss
+#' would leave the reader to infer the difference between no exclusions and no
+#' disclosure.
+#'
+#' @param counts List as returned by \code{get_analysis_counts()}.
+#' @param label Character label preceding the counts.
+#' @param marks List of number marks as returned by
+#'   \code{resolve_number_marks()}. Counts and percentages are separated as
+#'   the accompanying table separates them, so that a locale setting applies
+#'   to the whole of the output rather than to the table alone. Resolved from
+#'   the global option when not supplied.
+#' @return Character string, or \code{NULL} when the counts are unavailable.
+#' @keywords internal
+format_analysis_counts <- function(counts, label = "Observations analyzed",
+                                   marks = NULL) {
+
+    if (is.null(counts) || length(counts$n_analyzed) == 0) {
+        return(NULL)
+    }
+
+    n_supplied <- counts$n_supplied
+    lo <- min(counts$n_analyzed)
+    hi <- max(counts$n_analyzed)
+
+    ## The denominator may be absent, as when a total is unavailable for the
+    ## quantity being described. Nothing is reported rather than a bare
+    ## numerator dressed as a proportion.
+    if (length(n_supplied) == 0 || !is.finite(n_supplied) || n_supplied == 0) {
+        return(NULL)
+    }
+
+    if (!is.finite(lo) || !is.finite(hi)) {
+        return(NULL)
+    }
+
+    if (is.null(marks)) {
+        marks <- tryCatch(resolve_number_marks(NULL),
+                          error = function(e) list(big.mark = "",
+                                                   decimal.mark = "."))
+    }
+
+    ## Counts and percentages are rendered by the same helpers the tables use,
+    ## so that a figure in this line and the same figure in the n column below
+    ## cannot be formatted differently
+    count_str <- function(x) format_count(x, marks)
+
+    pct_str <- function(x) apply_decimal_mark(sprintf("%.1f", x), marks)
+
+    if (lo == hi) {
+        return(sprintf("%s: %s of %s (%s%%)",
+                       label, count_str(lo), count_str(n_supplied),
+                       pct_str(100 * lo / n_supplied)))
+    }
+
+    return(sprintf("%s: %s-%s of %s (%s-%s%%)",
+                   label, count_str(lo), count_str(hi), count_str(n_supplied),
+                   pct_str(100 * lo / n_supplied),
+                   pct_str(100 * hi / n_supplied)))
+}
+
+
+#' Identify the event indicator among a model's response variables
+#'
+#' Determines which response variable carries the event count, and whether the
+#' model has one at all. Linear and Gaussian models do not; the families that
+#' count events are those for which \code{m2dt()} reports an events figure, so
+#' that a denominator is only offered where a numerator exists.
+#'
+#' @param outcome_vars Character vector of response variable names.
+#' @param model_type Character string of the model type or class.
+#' @param family Model family, where applicable. Accepted as a name, a family
+#'   object, or a generator function, since callers resolve the family at
+#'   different points: \code{fit()} passes the name it was given, while
+#'   \code{uniscreen()} may already have resolved \code{"Gamma"} to
+#'   \code{Gamma(link = "log")}.
+#' @return Character name of the event indicator, or \code{NULL} when the model
+#'   carries no event count.
+#' @keywords internal
+get_event_variable_for_counts <- function(outcome_vars, model_type = NULL,
+                                          family = NULL) {
+
+    if (length(outcome_vars) == 0) {
+        return(NULL)
+    }
+
+    ## The family may arrive as a name, a family object, or the generator
+    ## function itself. Comparing an unresolved family object against a
+    ## character vector yields one value per list element rather than one
+    ## logical, so it is reduced to its name first.
+    family_name <- if (inherits(family, "family")) {
+                       family$family
+                   } else if (is.function(family)) {
+                       tryCatch(family()$family, error = function(e) NULL)
+                   } else if (is.character(family)) {
+                       family[1]
+                   } else {
+                       NULL
+                   }
+
+    survival_types <- c("coxph", "clogit", "coxme")
+    count_types <- c("negbin", "glm.nb")
+    glm_types <- c("glm", "glmer", "glmerMod")
+    event_families <- c("binomial", "quasibinomial", "poisson", "quasipoisson")
+
+    survival_response <- if (length(outcome_vars) >= 2) {
+                             outcome_vars[2]
+                         } else {
+                             outcome_vars[1]
+                         }
+
+    ## Without a usable model type, a two-variable response is survival
+    if (length(model_type) != 1 || is.na(model_type)) {
+        return(survival_response)
+    }
+
+    ## A survival response carries the time variable first and the status
+    ## variable second; the event indicator is the status variable
+    if (model_type %in% survival_types) {
+        return(survival_response)
+    }
+
+    if (model_type %in% count_types) {
+        return(outcome_vars[1])
+    }
+
+    if (model_type %in% glm_types &&
+        length(family_name) == 1 && family_name %in% event_families) {
+        return(outcome_vars[1])
+    }
+
+    return(NULL)
+}
+
+#' Describe the analyzed events for console output
+#'
+#' Renders the event counts held in \code{get_analysis_counts()} using the same
+#' formatter as the observation counts, so that the two lines cannot drift apart
+#' in rounding, separators or range handling.
+#'
+#' @param counts List as returned by \code{get_analysis_counts()}.
+#' @param label Character label preceding the counts.
+#' @param marks List of number marks as returned by
+#'   \code{resolve_number_marks()}.
+#' @return Character string, or \code{NULL} when the model carries no events.
+#' @keywords internal
+format_event_counts <- function(counts, label = "Events analyzed",
+                                marks = NULL) {
+
+    if (is.null(counts) || is.null(counts$events_analyzed)) {
+        return(NULL)
+    }
+
+    return(format_analysis_counts(
+        list(n_supplied = counts$events_supplied,
+             n_analyzed = counts$events_analyzed),
+        label = label,
+        marks = marks
+    ))
 }

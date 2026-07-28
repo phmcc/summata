@@ -56,7 +56,7 @@ A \code{ggplot} object containing the complete forest plot. The plot
   can be:
   \itemize{
     \item Displayed directly: \code{print(plot)}
-    \item Saved to file: \code{ggsave("forest.pdf", plot, width = 12, height = 8)}
+    \item Saved to file: \code{forestsave(plot, "forest.pdf")}
     \item Further customized with \pkg{ggplot2} functions
   }
   
@@ -151,12 +151,9 @@ fit_result <- fit(
 )
 
 plot5 <- autoforest(fit_result)
-# No need to pass data or labels - extracted from fit_result
 
 # Save with recommended dimensions
-dims <- attr(plot5, "rec_dims")
-ggplot2::ggsave(file.path(tempdir(), "forest.pdf"),
-                plot5, width = dims$width, height = dims$height)
+forestsave(plot5, file.path(tempdir(), "forest.pdf"))
 
 }
 }
@@ -169,13 +166,15 @@ ggplot2::ggsave(file.path(tempdir(), "forest.pdf"),
 \code{\link{fit}} for single-model regression,
 \code{\link{fullfit}} for combined univariable/multivariable regression,
 \code{\link{uniscreen}} for univariable screening,
-\code{\link{multifit}} for multi-outcome analysis
+\code{\link{multifit}} for multi-outcome analysis,
+  \code{\link{forestsave}} for saving with recommended dimensions
 
-Other visualization functions: 
-\code{\link{coxforest}()},
-\code{\link{glmforest}()},
-\code{\link{lmforest}()},
-\code{\link{multiforest}()},
-\code{\link{uniforest}()}
+Other visualization functions:
+\code{\link[=coxforest]{coxforest()}},
+\code{\link[=forestsave]{forestsave()}},
+\code{\link[=glmforest]{glmforest()}},
+\code{\link[=lmforest]{lmforest()}},
+\code{\link[=multiforest]{multiforest()}},
+\code{\link[=uniforest]{uniforest()}}
 }
 \concept{visualization functions}

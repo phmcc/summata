@@ -239,7 +239,10 @@
 #'       value (Yes, 1, True, Present, Positive, +), shows just "Variable".
 #'       For continuous predictors: the variable name. For interactions: the
 #'       formatted interaction term (\emph{e.g.,} "Treatment (Drug A) × Sex (Male)")}
-#'     \item{n}{Integer. Sample size used in the model (if \code{show_n = TRUE})}
+#'     \item{n}{Integer. Sample size used in fitting (if \code{show_n = TRUE}).
+#'       When both unadjusted and adjusted estimates are shown, this is the
+#'       adjusted model's sample, which is the one behind the adjusted
+#'       estimate on the same row}
 #'     \item{Events}{Integer. Number of events (if \code{show_events = TRUE})}
 #'     \item{OR/HR/RR/Coefficient (95\% CI)}{Character. Unadjusted effect 
 #'       estimate with CI (if \code{columns = "unadjusted"} or \code{"both"})}
@@ -269,6 +272,14 @@
 #'     \item{analysis_type}{Character. \code{"multi_outcome"} to identify analysis type}
 #'     \item{significant}{Character vector. Names of outcomes with \emph{p} < 0.05
 #'       for the predictor (uses adjusted \emph{p}-values when available)}
+#'     \item{analysis_counts}{List. How much of the supplied data reached the
+#'       models, with elements \code{n_supplied}, \code{n_analyzed},
+#'       \code{n_missing_outcome} and \code{n_missing_predictor}. One model is
+#'       fitted per outcome, so \code{n_analyzed} holds one value per outcome
+#'       and the reported sample may be a range. Event counts are not
+#'       included: each outcome has its own event total, so a single reported
+#'       figure could not describe them all. The \code{print()} method always
+#'       reports the analyzed sample}
 #'   }
 #'
 #' @details
@@ -288,7 +299,7 @@
 #' }
 #' 
 #' This is conceptually opposite to \code{uniscreen()}, which tests multiple 
-#' predictors against a single outcome. Use \code{multifit()} when you have one 
+#' predictors against a single outcome. \code{multifit()} applies where there is one 
 #' exposure of interest and want to screen across multiple endpoints.
 #' 
 #' \strong{When to Use Multivariate Regression Analysis:}
@@ -415,14 +426,16 @@
 #'   \item \code{parallel = TRUE} (default) uses multiple cores for faster fitting
 #'   \item \code{keep_models = FALSE} (default) discards model objects to save memory
 #'   \item For many outcomes, parallel processing provides substantial speedup
-#'   \item Set \code{keep_models = TRUE} only when you need model diagnostics
+#'   \item Set \code{keep_models = TRUE} only when model diagnostics are required
 #' }
 #'
 #' @seealso 
 #' \code{\link{uniscreen}} for screening multiple predictors against one outcome,
 #' \code{\link{multiforest}} for creating forest plots from multifit results,
 #' \code{\link{fit}} for single-outcome regression with full coefficient output,
-#' \code{\link{fullfit}} for complete univariable-to-multivariable workflow
+#' \code{\link{fullfit}} for complete univariable-to-multivariable workflow,
+#' \code{\link{forestsave}} for saving the forest plot,
+#' \code{\link{tablesave}} for exporting tables
 #'
 #' @examples
 #' # Load example data
@@ -430,7 +443,6 @@
 #' data(clintrial_labels)
 #' 
 #' # Example 1: Basic multivariate analysis (unadjusted)
-#' # Test treatment effect on multiple binary outcomes
 #' result1 <- multifit(
 #'     data = clintrial,
 #'     outcomes = c("surgery", "pfs_status", "os_status"),
@@ -439,12 +451,10 @@
 #'     parallel = FALSE
 #' )
 #' print(result1)
-#' # Shows odds ratios comparing Drug A and Drug B to Control
 #'
 #' \donttest{
 #' 
 #' # Example 2: Adjusted analysis with covariates
-#' # Adjust for age, sex, and disease stage
 #' result2 <- multifit(
 #'     data = clintrial,
 #'     outcomes = c("surgery", "pfs_status", "os_status"),
@@ -454,7 +464,6 @@
 #'     parallel = FALSE
 #' )
 #' print(result2)
-#' # Shows adjusted odds ratios (aOR)
 #' 
 #' # Example 3: Compare unadjusted and adjusted results
 #' result3 <- multifit(
@@ -467,10 +476,8 @@
 #'     parallel = FALSE
 #' )
 #' print(result3)
-#' # Useful for identifying confounding effects
 #' 
 #' # Example 4: Continuous predictor across outcomes
-#' # Test age effect on multiple outcomes
 #' result4 <- multifit(
 #'     data = clintrial,
 #'     outcomes = c("surgery", "pfs_status", "os_status"),
@@ -480,7 +487,6 @@
 #'     parallel = FALSE
 #' )
 #' print(result4)
-#' # One row per outcome for continuous predictor
 #' 
 #' # Example 5: Cox regression for survival outcomes
 #' library(survival)
@@ -495,7 +501,6 @@
 #'     parallel = FALSE
 #' )
 #' print(cox_result)
-#' # Returns hazard ratios (HR/aHR)
 #' 
 #' # Example 6: Cox with stratification by site
 #' cox_strat <- multifit(
@@ -524,7 +529,6 @@
 #' print(cox_cluster)
 #' 
 #' # Example 8: Interaction between predictor and covariate
-#' # Test if treatment effect differs by sex
 #' result_int <- multifit(
 #'     data = clintrial,
 #'     outcomes = c("surgery", "os_status"),
@@ -535,7 +539,6 @@
 #'     parallel = FALSE
 #' )
 #' print(result_int)
-#' # Shows main effects and interaction terms with × notation
 #' 
 #' # Example 9: Linear model for continuous outcomes
 #' linear_result <- multifit(
@@ -548,7 +551,6 @@
 #'     parallel = FALSE
 #' )
 #' print(linear_result)
-#' # Returns coefficient estimates, not ratios
 #' 
 #' # Example 10: Poisson regression for equidispersed count outcomes
 #' # fu_count has variance ~= mean, appropriate for standard Poisson
@@ -563,8 +565,6 @@
 #'     parallel = FALSE
 #' )
 #' print(poisson_result)
-#' # Returns rate ratios (RR)
-#' # For overdispersed counts (ae_count), use model_type = "negbin" instead
 #' 
 #' # Example 11: Filter to significant results only
 #' sig_results <- multifit(
@@ -576,7 +576,6 @@
 #'     parallel = FALSE
 #' )
 #' print(sig_results)
-#' # Only outcomes with significant associations shown
 #' 
 #' # Example 12: Custom outcome labels
 #' result_labeled <- multifit(
@@ -622,7 +621,6 @@
 #' # Get unformatted results for custom analysis
 #' raw_data <- attr(result, "raw_data")
 #' print(raw_data)
-#' # Contains exp_coef, ci_lower, ci_upper, p_value, \emph{etc.}
 #' 
 #' # Example 15: Hide sample size and event columns
 #' result_minimal <- multifit(
@@ -631,6 +629,7 @@
 #'     predictor = "treatment",
 #'     show_n = FALSE,
 #'     show_events = FALSE,
+#'     labels = clintrial_labels,
 #'     parallel = FALSE
 #' )
 #' print(result_minimal)
@@ -642,6 +641,7 @@
 #'     predictor = "age",
 #'     digits = 3,
 #'     p_digits = 4,
+#'     labels = clintrial_labels,
 #'     parallel = FALSE
 #' )
 #' print(result_digits)
@@ -652,6 +652,7 @@
 #'     outcomes = c("surgery"),
 #'     predictor = "age",
 #'     exponentiate = FALSE,
+#'     labels = clintrial_labels,
 #'     parallel = FALSE
 #' )
 #' print(result_coef)
@@ -682,7 +683,6 @@
 #'     parallel = FALSE
 #' )
 #' print(gamma_result)
-#' # Returns multiplicative effects on positive continuous data
 #' 
 #' # Example 20: Quasipoisson for overdispersed counts
 #' quasi_result <- multifit(
@@ -696,7 +696,6 @@
 #'     parallel = FALSE
 #' )
 #' print(quasi_result)
-#' # Adjusts standard errors for overdispersion
 #' 
 #' # Example 21: Generalized linear mixed effects (GLMER)
 #' # Test treatment across outcomes with site clustering
@@ -742,7 +741,6 @@
 #'     parallel = FALSE
 #' )
 #' print(multi_int)
-#' # Shows how treatment effects vary by stage and sex across outcomes
 #'
 #' }
 #' 
@@ -862,7 +860,7 @@ multifit <- function(data,
         is.character(.data[[predictor]])
     
     ## Build the terms to extract from models
-    ## For interactions involving the predictor, we need to extract those too
+    ## Interactions involving the predictor are extracted as well
     terms_to_extract <- predictor
     if (!is.null(interactions)) {
         ## Find interactions that involve the predictor
@@ -1183,6 +1181,33 @@ multifit <- function(data,
     
     ## Attach attributes
     data.table::setattr(formatted, "raw_data", combined_raw)
+
+    ## One adjusted model is fitted per outcome, so the analyzed sample is
+    ## recorded per outcome and reported as a range where it varies.
+    mf_adjusted_vars <- unique(c(predictor, covariates, random, strata, cluster))
+    mf_adjusted_vars <- mf_adjusted_vars[!is.na(mf_adjusted_vars)]
+    mf_counts <- lapply(outcomes, function(out) {
+        get_analysis_counts(
+            data,
+            all.vars(stats::as.formula(paste("~", out))),
+            all.vars(stats::as.formula(paste("~", paste(mf_adjusted_vars,
+                                                        collapse = "+"))))
+        )
+    })
+    mf_counts <- mf_counts[!vapply(mf_counts, is.null, logical(1))]
+    if (length(mf_counts) > 0) {
+        data.table::setattr(formatted, "analysis_counts", list(
+            n_supplied = mf_counts[[1]]$n_supplied,
+            n_analyzed = unlist(lapply(mf_counts, function(z) z$n_analyzed)),
+            n_missing_outcome = unlist(lapply(mf_counts, function(z) z$n_missing_outcome)),
+            n_missing_predictor = unlist(lapply(mf_counts, function(z) z$n_missing_predictor))
+        ))
+    }
+    data.table::setattr(formatted, "number_marks", marks)
+    ## Variable labels travel with the result so that the forest plot
+    ## functions can apply the same labels without being given them again.
+    ## An explicit labels argument to those functions still takes precedence.
+    data.table::setattr(formatted, "labels", labels)
     
     if (keep_models) {
         data.table::setattr(formatted, "models", models)
@@ -1241,9 +1266,9 @@ format_interaction_term <- function(term, labels = NULL) {
         ## Look for transition from lowercase to uppercase, or number after letter
         
         ## Strategy: find the longest matching variable name prefix
-        ## For "treatmentDrug A", we want "treatment" and "Drug A"
-        ## For "stageII", we want "stage" and "II"
-        ## For "age" (continuous in interaction), we want just "age"
+        ## "treatmentDrug A" yields "treatment" and "Drug A"
+        ## "stageII" yields "stage" and "II"
+        ## "age" (continuous in an interaction) yields "age" alone
         
         ## Check for common variable name patterns
         ## Match: lowercase letters, possibly followed by underscore/lowercase
@@ -1339,7 +1364,7 @@ extract_predictor_effects <- function(model, predictor, outcome,
         coef_names <- rownames(coef_summary)
     }
     
-    ## Find which coefficients belong to the terms we want to extract
+    ## Find which coefficients belong to the terms being extracted
     ## Build pattern to match predictor and any interaction terms
     predictor_rows <- integer(0)
     for (term in terms_to_extract) {
@@ -1357,7 +1382,7 @@ extract_predictor_effects <- function(model, predictor, outcome,
             pattern <- paste0("^", term)
             matches <- grep(pattern, coef_names)
             ## Exclude matches that are actually interaction terms (contain ":")
-            ## unless we're specifically looking for interactions
+            ## unless interactions are specifically sought
             matches <- matches[!grepl(":", coef_names[matches], fixed = TRUE)]
         }
         predictor_rows <- c(predictor_rows, matches)
@@ -1448,18 +1473,25 @@ extract_predictor_effects <- function(model, predictor, outcome,
             ## First column is the outcome
             outcome_col <- model_data[[1]]
         } else if (is_coxme) {
-            ## For coxme, use the model's y component for events
-            if (!is.null(model$data) && predictor %in% names(model$data)) {
-                ## Need to get the subset of data used in model
-                model_data <- model$data[!is.na(model$data[[predictor]]), ]
+            ## For coxme, use the model's y component for events. Restricting on
+            ## the predictor alone leaves observations with a missing response in
+            ## place, which both inflates group sizes and misaligns model_data
+            ## with outcome_col; complete cases across all model variables are
+            ## required.
+            if (!is.null(model$data)) {
+                model_data <- get_analysis_data(model, "coxme", model$data)
             }
             if (!is.null(model$y)) {
                 outcome_col <- model$y[, "status"]
             }
-        } else if (model_class == "coxph") {
-            ## For coxph, model$model contains Surv object - extract status from model$y
-            if (!is.null(model$model)) {
-                model_data <- model$model
+        } else if (model_class %in% c("coxph", "clogit")) {
+            ## For coxph, model$model contains Surv object - extract status from model$y.
+            ## survival::coxph() does not retain a model frame by default, so it
+            ## is rebuilt to recover the complete cases used in fitting.
+            model_data <- model$model
+            if (is.null(model_data)) {
+                model_data <- tryCatch(stats::model.frame(model),
+                                       error = function(e) NULL)
             }
             if (!is.null(model$y)) {
                 ## model$y is a Surv object - extract status column
@@ -1471,11 +1503,24 @@ extract_predictor_effects <- function(model, predictor, outcome,
             ## First column is the outcome
             outcome_col <- model_data[[1]]
         } else {
-            ## Fallback: try to get model frame
-            tryCatch({
-                model_data <- stats::model.frame(model)
+            ## Fallback: rebuild the model frame, which contains only the
+            ## complete cases used in fitting. Counting group sizes on the
+            ## unrestricted data would inflate them whenever the response or a
+            ## covariate is missing.
+            model_data <- tryCatch(stats::model.frame(model),
+                                   error = function(e) NULL)
+            if (!is.null(model_data)) {
                 outcome_col <- model_data[[1]]
-            }, error = function(e) NULL)
+            }
+        }
+
+        ## Group sizes are only meaningful when they can be counted over the
+        ## observations used in fitting; falling back to the model-level total
+        ## for every level would be misleading.
+        if (!is.null(model_data) &&
+            !is.null(outcome_col) &&
+            nrow(model_data) != length(outcome_col)) {
+            outcome_col <- NULL
         }
         
         if (!is.null(model_data) && predictor %in% names(model_data)) {
@@ -1748,12 +1793,43 @@ combine_multifit_results <- function(all_results, columns) {
             merge_cols <- c("outcome", "predictor", "group")
             keep_from_unadj <- c(merge_cols, "n", "events", "effect_type",
                                  "exp_coef_unadj", "ci_lower_unadj", "ci_upper_unadj", "p_unadj")
-            keep_from_adj <- c(merge_cols, "exp_coef_adj", "ci_lower_adj", "ci_upper_adj", "p_adj")
+            keep_from_adj <- c(merge_cols, "n", "events",
+                               "exp_coef_adj", "ci_lower_adj", "ci_upper_adj", "p_adj")
             
             unadj_subset <- unadj_combined[, intersect(keep_from_unadj, names(unadj_combined)), with = FALSE]
             adj_subset <- adj_combined[, intersect(keep_from_adj, names(adj_combined)), with = FALSE]
             
+            ## Carry the adjusted counts under separate names so that they can
+            ## replace the unadjusted ones after the merge
+            data.table::setnames(adj_subset,
+                                 c("n", "events"),
+                                 c(".n_adj", ".events_adj"),
+                                 skip_absent = TRUE)
+            
             combined <- merge(unadj_subset, adj_subset, by = merge_cols, all = TRUE)
+            
+            ## A row carrying an adjusted estimate is described by the adjusted
+            ## model's complete cases. The unadjusted sample is larger whenever a
+            ## covariate carries missing values, and reporting it alongside the
+            ## adjusted estimate would overstate the observations behind that
+            ## estimate. Rows with no adjusted estimate keep their unadjusted
+            ## counts. This matches the treatment in fullfit() (STROBE item 12).
+            if (all(c(".n_adj", "n") %in% names(combined))) {
+                rows <- which(!is.na(combined[[".n_adj"]]))
+                if (length(rows) > 0) {
+                    data.table::set(combined, i = rows, j = "n",
+                                    value = combined[[".n_adj"]][rows])
+                }
+                data.table::set(combined, j = ".n_adj", value = NULL)
+            }
+            if (all(c(".events_adj", "events") %in% names(combined))) {
+                rows <- which(!is.na(combined[[".events_adj"]]))
+                if (length(rows) > 0) {
+                    data.table::set(combined, i = rows, j = "events",
+                                    value = combined[[".events_adj"]][rows])
+                }
+                data.table::set(combined, j = ".events_adj", value = NULL)
+            }
         } else if (nrow(unadj_combined) > 0) {
             combined <- unadj_combined
         } else {
@@ -1980,33 +2056,15 @@ format_multifit_table <- function(data,
         }
     }
     
-    ## Format n and events
+    ## Format n and events. format_count() is vectorized, applies the grouping
+    ## mark only from four digits, and resolves the locale itself when marks are
+    ## absent, so no threshold or fallback is needed here.
     if ("n" %in% names(result)) {
-        n_str <- as.character(result$n)
-        big_n <- which(!is.na(result$n) & result$n >= 1000)
-        if (length(big_n) > 0) {
-            if (!is.null(marks)) {
-                n_str[big_n] <- vapply(result$n[big_n], format_count, character(1), marks = marks)
-            } else {
-                n_str[big_n] <- format(result$n[big_n], big.mark = ",")
-            }
-        }
-        n_str[is.na(result$n)] <- "-"
-        result[, n := n_str]
+        result[, n := format_count(result$n, marks, na = "-")]
     }
     
     if ("events" %in% names(result)) {
-        evt_str <- as.character(result$events)
-        big_e <- which(!is.na(result$events) & result$events >= 1000)
-        if (length(big_e) > 0) {
-            if (!is.null(marks)) {
-                evt_str[big_e] <- vapply(result$events[big_e], format_count, character(1), marks = marks)
-            } else {
-                evt_str[big_e] <- format(result$events[big_e], big.mark = ",")
-            }
-        }
-        evt_str[is.na(result$events)] <- "-"
-        result[, events := evt_str]
+        result[, events := format_count(result$events, marks, na = "-")]
         data.table::setnames(result, "events", "Events")
     }
     
@@ -2076,7 +2134,7 @@ format_pvalues_multifit <- function(p, digits = 3, marks = NULL) {
 #' @family regression functions
 #' @export
 print.multifit_result <- function(x, ...) {
-    cat("\nMultivariate Analysis Results\n")
+    cat("\nMultivariate Regression Results\n\n")
     cat("Predictor: ", attr(x, "predictor"), "\n", sep = "")
     cat("Outcomes: ", length(attr(x, "outcomes")), "\n", sep = "")
     cat("Model Type: ", attr(x, "model_type"), "\n", sep = "")
@@ -2107,6 +2165,15 @@ print.multifit_result <- function(x, ...) {
     }
     
     cat("Display: ", attr(x, "columns"), "\n", sep = "")
+    
+    ## Always reported, so that a complete sample is stated rather than left
+    ## to be distinguished from an absent disclosure. One model is fitted per
+    ## outcome, so the analyzed sample may be a range.
+    analyzed <- format_analysis_counts(attr(x, "analysis_counts"),
+                                       marks = attr(x, "number_marks"))
+    if (!is.null(analyzed)) {
+        cat(analyzed, "\n", sep = "")
+    }
     
     if (!is.null(attr(x, "models"))) {
         cat("Models stored: Yes\n")

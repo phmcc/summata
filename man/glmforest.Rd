@@ -103,8 +103,9 @@ occupies \code{1 - table_width}. Default is 0.6 (60\% table, 40\% forest).
 Increase for longer variable names, decrease to emphasize the forest plot.}
 
 \item{show_n}{Logical. If \code{TRUE}, includes a column showing group-specific 
-sample sizes for categorical variables and total sample size for continuous 
-variables. Default is \code{TRUE}.}
+sample sizes for categorical variables and the fitted sample size for
+continuous variables. Counts describe the observations used in fitting
+rather than every row supplied. Default is \code{TRUE}.}
 
 \item{show_events}{Logical. If \code{TRUE}, includes a column showing the 
 number of events for each group. Relevant for logistic regression (number 
@@ -138,8 +139,10 @@ Default is \code{"reference"}. Common alternatives: "ref", "1.00 (ref)".}
 \item{labels}{Named character vector or list providing custom display 
 labels for variables. Names should match variable names in the model, 
 values are the labels to display. Example: 
-\code{c(age = "Age (years)", bmi = "Body Mass Index")}. Default is \code{NULL} 
-(use original variable names).}
+\code{c(age = "Age (years)", bmi = "Body Mass Index")}. Default is
+\code{NULL}, in which case the labels attached by the function that produced
+\code{x} are used, where \code{x} is a \pkg{summata} result rather than a
+model object. Original variable names are used where neither is available.}
 
 \item{color}{Character string specifying the color for effect estimate point 
   markers in the forest plot. Use hex codes or R color names. Default is 
@@ -191,7 +194,7 @@ A \code{ggplot} object containing the complete forest plot. The plot
   can be:
   \itemize{
     \item Displayed directly: \code{print(plot)}
-    \item Saved to file: \code{ggsave("forest.pdf", plot, width = 12, height = 8)}
+    \item Saved to file: \code{forestsave(plot, "forest.pdf")}
     \item Further customized with \pkg{ggplot2} functions
   }
   
@@ -205,7 +208,18 @@ A \code{ggplot} object containing the complete forest plot. The plot
   
   These recommendations are automatically calculated based on the number of 
   variables, text sizes, and layout parameters, and are printed to console 
-  if \code{plot_width} or \code{plot_height} are not specified.
+  if \code{plot_width} or \code{plot_height} are not specified. The list also 
+  carries a \code{units} element recording the units the dimensions are 
+  expressed in, matching the \code{units} argument. \code{forestsave()} reads 
+  all three and requires no further handling.
+
+  The returned object also includes an attribute \code{"table_data"}
+  accessible via \code{attr(plot, "table_data")}, a data.table holding the
+  values drawn in the plot: one row per term in model order, with the
+  variable, factor level, sample size, event count, estimate, confidence
+  bounds and p-value. Sample sizes and event counts describe the
+  observations used in fitting rather than every row supplied, so they sum
+  to the model sample size within each variable.
 }
 \description{
 Generates a publication-ready forest plot that combines a formatted data table 
@@ -239,7 +253,7 @@ The forest plot consists of several integrated components:
     }
   \item \strong{Model Statistics} (footer): Summary of:
     \itemize{
-      \item Observations analyzed (with percentage of total data)
+      \item Observations analyzed (with total observations and percentage)
       \item Model family (Binomial, Poisson, \emph{etc.})
       \item Deviance statistics
       \item Pseudo-\emph{R}\eqn{^2} (McFadden)
@@ -308,8 +322,9 @@ many multi-level factors.
 
 The footer shows key diagnostic information:
 \itemize{
-  \item \strong{Observations analyzed}: Total N and percentage of original 
-    data (accounting for missing values)
+  \item \strong{Observations analyzed}: Observations used in fitting, the 
+    total supplied, and the percentage retained (accounting for missing 
+    values)
   \item \strong{Null/Residual Deviance}: Model fit improvement
   \item \strong{Pseudo-\emph{R}\eqn{^2}}: McFadden \emph{R}\eqn{^2} = 1 - (log L_1 / log L_2)
   \item \strong{AIC}: For model comparison (lower is better)
@@ -320,16 +335,16 @@ if available.
 
 \strong{Saving Plots:}
 
-Use \code{ggplot2::ggsave()} with recommended dimensions:
+Use \code{forestsave()}, which applies the recommended dimensions and
+selects a graphics device suited to the format:
 \preformatted{
   p <- glmforest(model, data)
-  dims <- attr(p, "rec_dims")
-  ggplot2::ggsave("forest.pdf", p, width = dims$width, height = dims$height)
+  forestsave(p, "forest.pdf")
 }
 
 Or specify custom dimensions:
 \preformatted{
-ggplot2::ggsave("forest.png", p, width = 12, height = 8, dpi = 300)
+forestsave(p, "forest.png", width = 12, height = 8, dpi = 300)
 }
 }
 \examples{
@@ -392,9 +407,7 @@ plot5 <- glmforest(
 )
 
 # Example 6: Save with recommended dimensions
-dims <- attr(plot5, "rec_dims")
-ggplot2::ggsave(file.path(tempdir(), "forest.pdf"),
-                plot5, width = dims$width, height = dims$height)
+forestsave(plot5, file.path(tempdir(), "forest.pdf"))
 
 options(old_width)
 
@@ -407,13 +420,15 @@ options(old_width)
 \code{\link{uniforest}} for univariable screening forest plots,
 \code{\link{multiforest}} for multi-outcome forest plots,
 \code{\link[stats]{glm}} for fitting GLMs,
-\code{\link{fit}} for regression modeling
+\code{\link{fit}} for regression modeling,
+  \code{\link{forestsave}} for saving with recommended dimensions
 
-Other visualization functions: 
-\code{\link{autoforest}()},
-\code{\link{coxforest}()},
-\code{\link{lmforest}()},
-\code{\link{multiforest}()},
-\code{\link{uniforest}()}
+Other visualization functions:
+\code{\link[=autoforest]{autoforest()}},
+\code{\link[=coxforest]{coxforest()}},
+\code{\link[=forestsave]{forestsave()}},
+\code{\link[=lmforest]{lmforest()}},
+\code{\link[=multiforest]{multiforest()}},
+\code{\link[=uniforest]{uniforest()}}
 }
 \concept{visualization functions}

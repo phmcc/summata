@@ -90,6 +90,10 @@
 #' @param ... Additional arguments passed to \code{\link[officer]{read_docx}} 
 #'   for document initialization.
 #'
+#' @param quiet Logical. Suppress progress and confirmation messages, such
+#'   as the notice reporting the file written. Errors and warnings are
+#'   unaffected. Default is \code{FALSE}.
+#'
 #' @return Behavior depends on \code{return_ft}:
 #'   \describe{
 #'     \item{\code{return_ft = FALSE}}{Invisibly returns a list with components:
@@ -263,7 +267,7 @@
 #' }
 #' 
 #' @seealso
-#' \code{\link{autotable}} for automatic format detection,
+#' \code{\link{tablesave}} for saving in the format given by the file extension,
 #' \code{\link{table2pptx}} for PowerPoint slides,
 #' \code{\link{table2pdf}} for PDF output,
 #' \code{\link{table2html}} for HTML tables,
@@ -382,6 +386,7 @@ table2docx <- function(table,
                      width = NULL,
                      align = NULL,
                      return_ft = FALSE,
+                     quiet = FALSE,
                      ...) {
     
     if (!requireNamespace("flextable", quietly = TRUE)) {
@@ -459,7 +464,7 @@ table2docx <- function(table,
     ## Save document
     print(doc, target = file)
     
-    message(sprintf("Table exported to %s", file))
+    if (!quiet) message(sprintf("Table saved to %s", file))
     
     ## Return based on user preference
     if (return_ft) {
@@ -486,7 +491,7 @@ table2docx <- function(table,
 #' @keywords internal
 #' @export
 print.table2docx_result <- function(x, ...) {
-    cat("Table exported to:", x$file, "\n")
+    cat("Table saved to:", x$file, "\n")
     if (!is.null(x$caption)) {
         cat("Caption:", x$caption, "\n")
     }

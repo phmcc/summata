@@ -221,7 +221,8 @@
 #'     \item{Variable}{Character. Predictor name or custom label}
 #'     \item{Group}{Character. For factor variables: category level. For 
 #'       interactions: interaction term. For continuous: typically empty}
-#'     \item{n}{Integer. Total sample size (if \code{show_n = TRUE})}
+#'     \item{n}{Integer. Sample size used in fitting, that is complete cases
+#'       across the model variables (if \code{show_n = TRUE})}
 #'     \item{n_group}{Integer. Sample size for this factor level}
 #'     \item{events}{Integer. Total number of events (if \code{show_events = TRUE})}
 #'     \item{events_group}{Integer. Events for this factor level}
@@ -238,6 +239,13 @@
 #'       diagnostics, predictions, or further analysis}
 #'     \item{raw_data}{data.table. Unformatted numeric results with columns for 
 #'       coefficients, standard errors, confidence bounds, quality statistics, \emph{etc.}}
+#'     \item{analysis_counts}{List. How much of the supplied data reached the
+#'       model, with elements \code{n_supplied}, \code{n_analyzed},
+#'       \code{n_missing_outcome} and \code{n_missing_predictor}, plus
+#'       \code{events_supplied} and \code{events_analyzed} where the model
+#'       type carries an event count. The counts describe the single
+#'       fitted model, and the \code{print()} method always reports the
+#'       analyzed sample}
 #'     \item{outcome}{Character. The outcome variable name}
 #'     \item{predictors}{Character vector. The predictor variable names}
 #'     \item{formula_str}{Character. The complete model formula as a string}
@@ -369,7 +377,10 @@
 #' \code{\link{uniscreen}} for univariable screening of multiple predictors,
 #' \code{\link{fullfit}} for complete univariable-to-multivariable workflow,
 #' \code{\link{compfit}} for comparing multiple models,
-#' \code{\link{m2dt}} for model-to-table conversion
+#' \code{\link{m2dt}} for model-to-table conversion,
+#' \code{\link{autoforest}} for forest plots of fitted models,
+#' \code{\link{forestsave}} for exporting forest plots,
+#' \code{\link{tablesave}} for exporting tables
 #'
 #' @examples
 #' # Load example data
@@ -381,10 +392,10 @@
 #' uni_model <- fit(
 #'     data = clintrial,
 #'     outcome = "os_status",
-#'     predictors = "age"
+#'     predictors = "age",
+#'     labels = clintrial_labels
 #' )
 #' print(uni_model)
-#' # Labeled as "Univariable OR"
 #'
 #' \donttest{
 #' 
@@ -525,7 +536,8 @@
 #'     predictors = c("age", "sex", "treatment"),
 #'     show_n = FALSE,
 #'     show_events = FALSE,
-#'     reference_rows = FALSE
+#'     reference_rows = FALSE,
+#'     labels = clintrial_labels
 #' )
 #' print(minimal)
 #' 
@@ -534,7 +546,8 @@
 #'     data = clintrial,
 #'     outcome = "os_status",
 #'     predictors = c("age", "treatment"),
-#'     conf_level = 0.90  # 90% confidence intervals
+#'     conf_level = 0.90,  # 90% confidence intervals
+#'     labels = clintrial_labels
 #' )
 #' print(ci90)
 #' 
@@ -543,7 +556,8 @@
 #'     data = clintrial,
 #'     outcome = "os_status",
 #'     predictors = c("age", "bmi"),
-#'     exponentiate = FALSE  # Show log odds instead of OR
+#'     exponentiate = FALSE,  # Show log odds instead of OR
+#'     labels = clintrial_labels
 #' )
 #' print(coef_model)
 #' 
@@ -554,7 +568,8 @@
 #'     outcome = "os_status",
 #'     predictors = c("age", "treatment"),
 #'     p_digits = 4,
-#'     conf_method = "profile"
+#'     conf_method = "profile",
+#'     labels = clintrial_labels
 #' )
 #' print(profile_result)
 #'
@@ -564,7 +579,8 @@
 #'     outcome = "os_status",
 #'     predictors = c("age", "treatment"),
 #'     p_digits = 4,
-#'     conf_method = "wald"
+#'     conf_method = "wald",
+#'     labels = clintrial_labels
 #' )
 #' print(wald_result)
 #' 
@@ -738,7 +754,7 @@ fit <- function(data = NULL,
                 verbose = NULL,
                 ...) {
     
-    ## Check if we're using model-based workflow
+    ## Determine whether the model-based workflow applies
     
     ## Resolve verbose setting
     verbose <- if (is.null(verbose)) getOption("summata.verbose", FALSE) else verbose
@@ -804,6 +820,13 @@ fit <- function(data = NULL,
         ## Attach metadata
         data.table::setattr(formatted, "model", model)
         data.table::setattr(formatted, "raw_data", raw_data)
+        data.table::setattr(formatted, "analysis_counts",
+                            get_model_analysis_counts(model, class(model)[1], data))
+        data.table::setattr(formatted, "number_marks", marks)
+        ## Variable labels travel with the result so that the forest plot
+        ## functions can apply the same labels without being given them again.
+        ## An explicit labels argument to those functions still takes precedence.
+        data.table::setattr(formatted, "labels", labels)
         data.table::setattr(formatted, "formula_str", formula_str)
         data.table::setattr(formatted, "model_scope", raw_data$model_scope[1])
         data.table::setattr(formatted, "model_type", raw_data$model_type[1])
@@ -1050,6 +1073,13 @@ fit <- function(data = NULL,
     ## Attach metadata
     data.table::setattr(formatted, "model", model)
     data.table::setattr(formatted, "raw_data", raw_data)
+    data.table::setattr(formatted, "analysis_counts",
+                        get_model_analysis_counts(model, class(model)[1], data))
+    data.table::setattr(formatted, "number_marks", marks)
+    ## Variable labels travel with the result so that the forest plot
+    ## functions can apply the same labels without being given them again.
+    ## An explicit labels argument to those functions still takes precedence.
+    data.table::setattr(formatted, "labels", labels)
     data.table::setattr(formatted, "outcome", outcome)
     data.table::setattr(formatted, "predictors", predictors)
     data.table::setattr(formatted, "formula_str", formula_str)
@@ -1100,16 +1130,43 @@ fit <- function(data = NULL,
 #' @family regression functions
 #' @export
 print.fit_result <- function(x, ...) {
-    cat("\n", attr(x, "model_scope"), " ", attr(x, "model_type"), " Model\n", sep = "")
+    cat("\n", attr(x, "model_scope"), " ", attr(x, "model_type"), " Model\n\n", sep = "")
     cat("Formula: ", attr(x, "formula_str"), "\n", sep = "")
     
-    ## Get sample size from raw results
     raw <- attr(x, "raw_data")
-    if (!is.null(raw)) {
-        cat("n = ", raw$n[1], sep = "")
-        if (!is.na(raw$events[1])) cat(", Events = ", raw$events[1], sep = "")
-        cat("\n")
+    
+    ## The analyzed count is the model's n, so a separate "n = " line would
+    ## state the same figure twice. Always reported, so that a complete
+    ## sample is stated rather than left to be distinguished from an absent
+    ## disclosure.
+    marks <- attr(x, "number_marks")
+    if (is.null(marks)) {
+        marks <- resolve_number_marks(NULL)
     }
+    
+    ## Used by the fallback branches below, which state a count without a
+    ## denominator and so cannot go through the counts formatter
+    bare_count <- function(value) format_count(value, marks)
+    
+    analyzed <- format_analysis_counts(attr(x, "analysis_counts"), marks = marks)
+    if (!is.null(analyzed)) {
+        cat(analyzed, "\n", sep = "")
+    } else if (!is.null(raw)) {
+        ## Counts unavailable, as when a model is supplied without its data
+        cat("Observations analyzed: ", bare_count(raw$n[1]), "\n", sep = "")
+    }
+    
+    ## Events are reported on the same footing, against the events present in
+    ## the supplied data rather than against the observations. The same
+    ## formatter is used so that the two lines cannot drift apart.
+    events_line <- format_event_counts(attr(x, "analysis_counts"), marks = marks)
+    if (!is.null(events_line)) {
+        cat(events_line, "\n", sep = "")
+    } else if (!is.null(raw) && !is.na(raw$events[1])) {
+        ## Counts unavailable, as when a model is supplied without its data
+        cat("Events analyzed: ", bare_count(raw$events[1]), "\n", sep = "")
+    }
+    
     cat("\n")
     
     NextMethod("print", x)

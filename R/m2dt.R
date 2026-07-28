@@ -8,6 +8,11 @@
 #'
 #' @param data Data frame or data.table containing the dataset used to fit the
 #'   model. Required for computing group-level sample sizes and event counts.
+#'   Where the fitted object retains no model frame, the supplied data is
+#'   restricted to complete cases across the model variables so that group-level
+#'   sample sizes describe the observations actually used in fitting. Group
+#'   sample sizes therefore sum to the model-level \code{n}, and both exclude
+#'   observations with a missing response.
 #'
 #' @param model Fitted model object. Supported classes include:
 #'   \itemize{
@@ -74,13 +79,16 @@
 #'       variable name without the level)}
 #'     \item{group}{Character. Group/level name for factor variables; empty string 
 #'       for continuous variables}
-#'     \item{n}{Integer. Total sample size used in the model}
-#'     \item{n_group}{Integer. Sample size for this specific variable level 
-#'       (factor variables only)}
-#'     \item{events}{Integer. Total number of events in the model (for survival 
-#'       and logistic models)}
-#'     \item{events_group}{Integer. Number of events for this specific variable 
-#'       level (for survival and logistic models with factor variables)}
+#'     \item{n}{Integer. Number of observations used in fitting the model, that
+#'       is complete cases across the model variables}
+#'     \item{n_group}{Integer. Number of those observations at this variable
+#'       level (factor variables only). Group sizes sum to \code{n} within
+#'       each variable}
+#'     \item{events}{Integer. Number of events among the observations used in
+#'       fitting (for survival and logistic models)}
+#'     \item{events_group}{Integer. Number of events at this variable level
+#'       (for survival and logistic models with factor variables). Group counts
+#'       sum to \code{events} within each variable}
 #'     \item{coefficient}{Numeric. Raw regression coefficient (log odds, log hazard, 
 #'       \emph{etc.})}
 #'     \item{se}{Numeric. Standard error of the coefficient}
@@ -456,20 +464,50 @@ m2dt <- function(data,
                 if (is_logistic && keep_qc_stats) {
                     ## C-statistic (if pROC available)
                     if (requireNamespace("pROC", quietly = TRUE)) {
-                        if (!isS4(model)) {
+                        if (!isS4(model) && !is.null(model$y)) {
                             roc_obj <- pROC::roc(model$y, stats::fitted(model), quiet = TRUE)
                             dt[, c_statistic := as.numeric(pROC::auc(roc_obj))]
                         }
                     }
                     
                     ## Hosmer-Lemeshow test (if ResourceSelection available)
+                    ##
+                    ## The test partitions the fitted values into bins of equal
+                    ## size. A model whose predictors are all categorical yields
+                    ## few distinct covariate patterns, and the requested bins
+                    ## cannot be formed. The test is not applicable in that
+                    ## case, so it is omitted rather than reported against an
+                    ## unstated number of bins; reporting it would also emit a
+                    ## warning on every call for an entirely ordinary model.
                     if (requireNamespace("ResourceSelection", quietly = TRUE)) {
-                        if (!isS4(model)) {
-                            hl <- ResourceSelection::hoslem.test(model$y, stats::fitted(model), g = 10)
-                            dt[, `:=`(
-                                hoslem_chi2 = hl$statistic,
-                                hoslem_p = hl$p.value
-                            )]
+                        if (!isS4(model) && !is.null(model$y)) {
+                            
+                            hl_bins <- 10L
+                            fitted_vals <- stats::fitted(model)
+                            
+                            ## Mirrors the binning performed by hoslem.test()
+                            hl_breaks <- unique(stats::quantile(
+                                fitted_vals,
+                                probs = seq(0, 1, 1 / hl_bins),
+                                na.rm = TRUE
+                            ))
+                            
+                            if (length(hl_breaks) > hl_bins) {
+                                hl <- tryCatch(
+                                    ResourceSelection::hoslem.test(
+                                        model$y, fitted_vals, g = hl_bins
+                                    ),
+                                    warning = function(w) NULL,
+                                    error = function(e) NULL
+                                )
+                                
+                                if (!is.null(hl)) {
+                                    dt[, `:=`(
+                                        hoslem_chi2 = hl$statistic,
+                                        hoslem_p = hl$p.value
+                                    )]
+                                }
+                            }
                         }
                     }
                 }
@@ -819,6 +857,7 @@ m2dt <- function(data,
     data_dt <- NULL
     event_var <- NULL
     outcome_var <- NULL
+    factor_vars <- character(0)
 
     if (!skip_counts) {
         
@@ -836,19 +875,36 @@ m2dt <- function(data,
             } else if (inherits(model, "merMod")) {
                 ## For lme4 models, use the frame
                 data_source <- model@frame
-            } else if (model_class == "coxph") {
-                ## For coxph, try model$model first
-                if (!is.null(model$model)) {
-                    data_source <- model$model
-                }
             }
             
-            ## Fallback to model_data if model's internal data not available
-            if (is.null(data_source)) {
+            ## Survival models are handled through the supplied data below. A
+            ## coxph model frame stores the response as a Surv object under a
+            ## deparsed name (for example, "Surv(os_months, os_status)"), from
+            ## which the event variable cannot be resolved, so event counts are
+            ## taken from the supplied columns instead.
+            
+            ## Fallback to the supplied data when the model retains no model
+            ## frame. This occurs for fits created with model = FALSE (the
+            ## memory-conserving default used internally by uniscreen() and
+            ## multifit()), for survival::coxph(), which does not store a model
+            ## frame by default, and for coxme and clogit models.
+            ##
+            ## The supplied data still contains the observations dropped during
+            ## fitting, so it must be restricted to the analysis rows before
+            ## group counts are taken. Without this restriction, categorical
+            ## variables report totals over every supplied row while the
+            ## model-level n reports complete cases only, and the two disagree
+            ## whenever the response or a covariate is missing.
+            reconstruct_rows <- is.null(data_source)
+            if (reconstruct_rows) {
                 data_source <- model_data
             }
             
             data_dt <- if (data.table::is.data.table(data_source)) data_source else data.table::as.data.table(data_source)
+            
+            if (reconstruct_rows) {
+                data_dt <- get_analysis_data(model, model_class, data_dt)
+            }
             
             ## For coxme, reconstruct xlevels from the data if needed
             if (is.null(xlevels) && model_class == "coxme") {
@@ -917,7 +973,7 @@ m2dt <- function(data,
                 if (length(factor_vars) > 0) {
                     
                     ## Use melt for efficient long-format conversion (faster than lapply+rbindlist)
-                    ## Only select the columns we need to minimize memory usage
+                    ## Select only the required columns, to minimize memory usage
                     cols_needed <- factor_vars
                     if (!is.null(event_var) && event_var %in% names(data_dt)) {
                         cols_needed <- c(cols_needed, event_var)
@@ -977,6 +1033,41 @@ m2dt <- function(data,
                         ## Single join to update counts
                         dt[all_counts, n_group := i.n_group, on = .(variable, group)]
                     }
+                    
+                    ## A factor level with no observations among the analysis
+                    ## rows never appears in all_counts, so its count is left
+                    ## missing and the row would otherwise inherit the
+                    ## model-level total. Such a level is empty by definition
+                    ## and reports zero, which preserves the identity between
+                    ## the group sizes and the fitted sample size.
+                    ##
+                    ## The fill is keyed on the declared levels of the counted
+                    ## variables, so that it applies only where zero is known to
+                    ## be the correct answer. Continuous and interaction terms
+                    ## never form such a key; terms carrying an inline
+                    ## transformation (\emph{e.g.,} factor(stage)) are absent
+                    ## from the counting data; and coefficients produced by
+                    ## non-treatment contrasts (\emph{e.g.,} "stage.L" from an
+                    ## ordered factor) carry a suffix that is not a level. All
+                    ## of these retain the model-level total, their group counts
+                    ## being unknown rather than zero.
+                    known_levels <- unlist(
+                        lapply(factor_vars, function(var) {
+                            paste(var, xlevels[[var]], sep = "\r")
+                        }),
+                        use.names = FALSE
+                    )
+                    
+                    empty_levels <- is.na(dt$n_group) &
+                        paste(dt$variable, dt$group, sep = "\r") %in% known_levels
+                    
+                    if (any(empty_levels)) {
+                        dt[empty_levels, n_group := 0]
+                        
+                        if ("events_group" %in% names(all_counts)) {
+                            dt[empty_levels, events_group := 0]
+                        }
+                    }
                 }
             }
         }
@@ -986,7 +1077,16 @@ m2dt <- function(data,
         interaction_rows <- grep(":", dt$variable, fixed = TRUE)
         
         if (length(interaction_rows) > 0 && !is.null(model_data)) {
-            data_dt <- if (data.table::is.data.table(data_source)) data_dt else data.table::as.data.table(data_dt)
+            ## data_dt is populated above whenever the model contains factor
+            ## terms. A model whose only non-continuous structure is an
+            ## interaction reaches this block with data_dt unset, so it is
+            ## derived here from the supplied data and restricted to the
+            ## analysis rows in the same way.
+            if (is.null(data_dt)) {
+                data_dt <- get_analysis_data(model, model_class, model_data)
+            } else if (!data.table::is.data.table(data_dt)) {
+                data_dt <- data.table::as.data.table(data_dt)
+            }
             
             ## Get xlevels if not already available
             if (is.null(xlevels)) {
@@ -1159,6 +1259,20 @@ m2dt <- function(data,
                                           group = ref_levels
                                       )
             ref_lookup <- all_counts[ref_lookup, on = .(variable, group)]
+            
+            ## A reference level absent from all_counts has no observations
+            ## among the analysis rows and reports zero rather than inheriting
+            ## the model-level total. Variables that were not counted at all are
+            ## left missing, as their counts are unknown rather than zero.
+            ref_counted <- ref_lookup$variable %in% factor_vars
+            
+            if (any(ref_counted) && "n_group" %in% names(ref_lookup)) {
+                ref_lookup[ref_counted & is.na(n_group), n_group := 0]
+                
+                if ("events_group" %in% names(ref_lookup)) {
+                    ref_lookup[ref_counted & is.na(events_group), events_group := 0]
+                }
+            }
         } else if (!skip_counts && !is.null(data_dt) && inherits(data_dt, "data.table")) {
             ## Fallback: calculate reference counts directly
             ref_counts_list <- lapply(seq_along(ref_vars), function(i) {
@@ -1260,7 +1374,7 @@ m2dt <- function(data,
             meta_cols_to_add <- meta_cols[meta_cols %in% dt_cols & !meta_cols %in% names(ref_rows_dt)]
             
             if (length(meta_cols_to_add) > 0) {
-                ## Select only the columns we need from template
+                ## Select only the required columns from the template
                 template_subset <- template_dt[, c("variable", meta_cols_to_add), with = FALSE]
                 ## Ensure no duplicates in template
                 template_subset <- unique(template_subset, by = "variable")

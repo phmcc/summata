@@ -2,21 +2,33 @@
 % Please edit documentation in R/number_utils.R
 \name{format_count}
 \alias{format_count}
-\title{Format an integer count with locale-aware thousands separator}
+\title{Format integer counts with locale-aware thousands separator}
 \usage{
-format_count(n, marks)
+format_count(n, marks = NULL, na = NA_character_)
 }
 \arguments{
-\item{n}{Integer count value.}
+\item{n}{Numeric vector of counts.}
 
 \item{marks}{List with \code{big.mark} and \code{decimal.mark} as returned
-by \code{\link{resolve_number_marks}}.}
+by \code{\link{resolve_number_marks}}. Resolved from the global option
+when not supplied, so that callers without a locale of their own still
+produce output consistent with the rest of the package.}
+
+\item{na}{Character string substituted for missing values. Contexts differ in
+what reads correctly: tables conventionally show a dash, plot annotations
+are better left blank, and the default preserves the missing value for
+callers doing their own substitution.}
 }
 \value{
-Character string with the formatted count.
+Character vector of formatted counts, the same length as \code{n}.
 }
 \description{
 Formats integer values with a thousands separator for display in tables.
-Values below 1000 are returned as plain character strings.
+Values below 1000 are returned as plain character strings, since a grouping
+mark only applies from four digits.
+}
+\details{
+Vectorized over \code{n}. Each element is formatted independently, so counts
+of differing magnitude are not padded to a common width.
 }
 \keyword{internal}

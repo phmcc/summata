@@ -57,15 +57,15 @@ packageVersion("summata")
 
 ## Required Dependencies
 
-The following packages are installed automatically as dependencies:
+The following packages are required. Those distributed through CRAN are installed automatically with `summata`; others are included in base R.
 
-| Package | Purpose |
-|:--------|:--------|
-| `data.table` | High-performance data manipulation and core data operations |
-| `survival` | Survival and time-to-event analysis |
-| `ggplot2` | Visualization system for forest plots and graphics |
-| `stats` | Statistical functions and model fitting |
-| `grDevices` | Graphics devices and color palettes |
+| Package | Purpose | Source |
+|:--------|:--------|:-------|
+| `data.table` | High-performance data manipulation and core data operations | CRAN |
+| `ggplot2` | Visualization system for forest plots and graphics | CRAN |
+| `survival` | Survival and time-to-event analysis | Base R |
+| `stats` | Statistical functions and model fitting | Base R |
+| `grDevices` | Graphics devices and color palettes | Base R |
 
 ## Optional Dependencies
 
@@ -92,7 +92,8 @@ Additional packages extend functionality for specific use-cases:
 | `withr` | Temporary state changes | Testing and safe state modifications |
 
 Install optional dependencies as needed:
-```r
+
+```{r}
 # For mixed-effects models
 install.packages(c("lme4", "coxme"))
 
@@ -107,7 +108,8 @@ install.packages(c("MASS", "MuMIn", "pROC", "ResourceSelection"))
 ```
 
 Or install all suggested packages at once:
-```r
+
+```{r}
 install.packages("summata", dependencies = TRUE)
 ```
 
@@ -198,15 +200,15 @@ test_data <- data.frame(
 )
 
 # Test Word export (requires flextable, officer)
-table2docx(test_data, file = file.path(tempdir(), "verification_test.docx"))
+table2docx(test_data, file = "verification_test.docx")
 
 # Test PDF export (requires xtable, LaTeX)
-table2pdf(test_data, file = file.path(tempdir(), "verification_test.pdf"))
+table2pdf(test_data, file = "verification_test.pdf")
 
 # Clean up
 file.remove(
-  file.path(tempdir(), "verification_test.docx"),
-  file.path(tempdir(), "verification_test.pdf")
+  "verification_test.docx",
+  "verification_test.pdf"
 )
 ```
 
@@ -241,7 +243,7 @@ tinytex::tlmgr_install("package_name")
 For compilation errors, examine the log file:
 
 ```{r}
-table2pdf(test_data, file = file.path(tempdir(), "debug.pdf"), show_logs = TRUE)
+table2pdf(test_data, file = "debug.pdf", show_logs = TRUE)
 ```
 
 ## Package Installation Failures

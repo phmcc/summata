@@ -98,7 +98,7 @@ Survival quantiles report the time at which a specified proportion of subjects h
 
 ## **Example 3:** Survival Quartiles
 
-Report multiple survival quantiles by specifying the `probs` parameter:
+Report multiple survival quantiles by specifying the `probs` parameter. Note that `labels` names levels of the `by` variable here, rather than variable names as in `desctable()` and the regression functions:
 
 ```{r}
 example3 <- survtable(
@@ -107,7 +107,12 @@ example3 <- survtable(
   by = "stage",
   times = NULL,
   probs = c(0.25, 0.5, 0.75),
-  labels = clintrial_labels
+  labels = c(
+    "I" = "Stage I",
+    "II" = "Stage II",
+    "III" = "Stage III",
+    "IV" = "Stage IV"
+  )
 )
 
 example3
@@ -221,8 +226,8 @@ surv_table <- survtable(
 )
 
 # Export both for publication
-ggsave(file.path(tempdir(), "km_curve.pdf"), width = 8, height = 6)
-table2pdf(surv_table, file.path(tempdir(), "survival_table.pdf"), 
+ggsave("km_curve.pdf", width = 8, height = 6)
+table2pdf(surv_table, "survival_table.pdf", 
           caption = "Table 2. Survival Estimates by Treatment Group")
 ```
 
@@ -238,14 +243,14 @@ Survival tables can be exported to various formats using the standard `summata` 
 # Microsoft Word
 table2docx(
   table = example1,
-  file = file.path(tempdir(), "SurvivalTable.docx"),
+  file = "survival_table.docx",
   caption = "Table 2. Survival Estimates by Treatment Group"
 )
 
 # PDF (requires LaTeX)
 table2pdf(
   table = example1,
-  file = file.path(tempdir(), "SurvivalTable.pdf"),
+  file = "survival_table.pdf",
   caption = "Table 2. Survival Estimates by Treatment Group"
 )
 ```
@@ -279,7 +284,7 @@ options(old_opts)
 # Further Reading
 
 - [Descriptive Tables](descriptive_tables.html): `desctable()` for baseline characteristics
-- [Regression Modeling](regression_modeling.html): `fit()`, `uniscreen()`, and `fullfit()`
+- [Regression Modeling](regression_modeling.html): `uniscreen()`, `fit()`, and `fullfit()`
 - [Model Comparison](model_comparison.html): `compfit()` for comparing models
 - [Table Export](table_export.html): Export to PDF, Word, and other formats
 - [Forest Plots](forest_plots.html): Visualization of regression results

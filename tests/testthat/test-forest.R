@@ -6,23 +6,13 @@
 #' 
 #' @details Run with testthat::test_file("tests/testthat/test_forest.R")
 
-library(testthat)
 library(data.table)
 library(ggplot2)
-library(summata)
-
-## Load survival for Surv() function
-if (requireNamespace("survival", quietly = TRUE)) {
-    library(survival)
-}
 
 ## ============================================================================
 ## Setup: Create test data and helper functions
 ## ============================================================================
 
-## Use package's built-in clinical trial data
-data(clintrial)
-data(clintrial_labels)
 
 ## Create complete-case subset for mixed-effects tests
 clintrial_complete <- na.omit(clintrial)
@@ -244,6 +234,7 @@ test_that("glmforest respects bold_variables parameter", {
 test_that("glmforest handles Poisson regression", {
     
     ## Create count outcome
+    set.seed(2024)
     clintrial$event_count <- rpois(nrow(clintrial), lambda = 3)
     
     model <- glm(event_count ~ age + sex + smoking, 
@@ -337,9 +328,7 @@ test_that("lmforest handles interaction terms", {
 
 test_that("coxforest works with basic coxph", {
     
-    skip_if_not_installed("survival")
-    
-    model <- survival::coxph(Surv(os_months, os_status) ~ age + sex + smoking,
+    model <- survival::coxph(survival::Surv(os_months, os_status) ~ age + sex + smoking,
                              data = clintrial)
     
     p <- suppressMessages(coxforest(model, data = clintrial,
@@ -351,8 +340,6 @@ test_that("coxforest works with basic coxph", {
 
 
 test_that("coxforest works with fit_result input", {
-    
-    skip_if_not_installed("survival")
     
     result <- fit(
         data = clintrial,
@@ -369,9 +356,7 @@ test_that("coxforest works with fit_result input", {
 
 test_that("coxforest respects key parameters", {
     
-    skip_if_not_installed("survival")
-    
-    model <- survival::coxph(Surv(os_months, os_status) ~ age + sex + stage,
+    model <- survival::coxph(survival::Surv(os_months, os_status) ~ age + sex + stage,
                              data = clintrial)
     
     p <- suppressMessages(coxforest(model, data = clintrial,
@@ -389,9 +374,7 @@ test_that("coxforest respects key parameters", {
 
 test_that("coxforest handles interaction terms", {
     
-    skip_if_not_installed("survival")
-    
-    model <- survival::coxph(Surv(os_months, os_status) ~ age + sex + treatment + 
+    model <- survival::coxph(survival::Surv(os_months, os_status) ~ age + sex + treatment + 
                                  treatment:stage,
                              data = clintrial)
     
@@ -428,9 +411,7 @@ test_that("autoforest correctly routes LM", {
 
 test_that("autoforest correctly routes coxph", {
     
-    skip_if_not_installed("survival")
-    
-    model <- survival::coxph(Surv(os_months, os_status) ~ age + sex,
+    model <- survival::coxph(survival::Surv(os_months, os_status) ~ age + sex,
                              data = clintrial)
     
     p <- suppressMessages(autoforest(model, data = clintrial))
@@ -517,8 +498,6 @@ test_that("uniforest respects key parameters", {
 
 
 test_that("uniforest works with Cox uniscreen", {
-    
-    skip_if_not_installed("survival")
     
     uni_result <- uniscreen(
         data = clintrial,
@@ -653,14 +632,13 @@ test_that("lmforest works with lmer models", {
 test_that("coxforest works with coxme models", {
     
     skip_if_not_installed("coxme")
-    skip_if_not_installed("survival")
     skip_on_cran()
     
     gc()
     
     test_data <- clintrial_complete[1:200, ]
     
-    model <- coxme::coxme(Surv(os_months, os_status) ~ age + sex + (1|site),
+    model <- coxme::coxme(survival::Surv(os_months, os_status) ~ age + sex + (1|site),
                           data = test_data)
     
     p <- suppressMessages(coxforest(model, data = test_data,
@@ -852,8 +830,6 @@ test_that("complete fit() to forest workflow works for GLM", {
 
 
 test_that("complete fit() to forest workflow works for Cox", {
-    
-    skip_if_not_installed("survival")
     
     result <- fit(
         data = clintrial,

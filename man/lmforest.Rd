@@ -86,7 +86,9 @@ specified \code{units}. Default is \code{NULL} (automatic).}
 total plot width allocated to the data table. Default is 0.6.}
 
 \item{show_n}{Logical. If \code{TRUE}, includes a column showing group-specific 
-sample sizes. Default is \code{TRUE}.}
+sample sizes.
+Counts describe the observations used in fitting rather than every row
+supplied. Default is \code{TRUE}.}
 
 \item{indent_groups}{Logical. If \code{TRUE}, indents factor levels under 
 their parent variable name, creating hierarchical structure. The "Group" 
@@ -111,7 +113,10 @@ factor variables. Default is \code{"reference"}.}
 
 \item{labels}{Named character vector providing custom display labels for 
 variables. Example: \code{c(age = "Age (years)", height = "Height (cm)")}. 
-Default is \code{NULL}.}
+Default is \code{NULL}, in which case the labels attached by the function
+that produced \code{x} are used, where \code{x} is a \pkg{summata} result
+rather than a model object. Original variable names are used where neither
+is available.}
 
 \item{units}{Character string specifying units for plot dimensions: 
 \code{"in"} (inches), \code{"cm"}, or \code{"mm"}. Default is \code{"in"}.}
@@ -149,7 +154,7 @@ A \code{ggplot} object containing the complete forest plot. The plot
   can be:
   \itemize{
     \item Displayed directly: \code{print(plot)}
-    \item Saved to file: \code{ggsave("forest.pdf", plot, width = 12, height = 8)}
+    \item Saved to file: \code{forestsave(plot, "forest.pdf")}
     \item Further customized with \pkg{ggplot2} functions
   }
   
@@ -163,7 +168,18 @@ A \code{ggplot} object containing the complete forest plot. The plot
   
   These recommendations are automatically calculated based on the number of 
   variables, text sizes, and layout parameters, and are printed to console 
-  if \code{plot_width} or \code{plot_height} are not specified.
+  if \code{plot_width} or \code{plot_height} are not specified. The list also 
+  carries a \code{units} element recording the units the dimensions are 
+  expressed in, matching the \code{units} argument. \code{forestsave()} reads 
+  all three and requires no further handling.
+
+  The returned object also includes an attribute \code{"table_data"}
+  accessible via \code{attr(plot, "table_data")}, a data.table holding the
+  values drawn in the plot: one row per term in model order, with the
+  variable, factor level, sample size, estimate, confidence bounds and
+  p-value. Sample sizes describe the observations used in fitting rather
+  than every row supplied, so they sum to the model sample size within each
+  variable.
 }
 \description{
 Generates a publication-ready forest plot that combines a formatted data table 
@@ -206,7 +222,7 @@ The linear model forest plot differs from logistic and Cox plots in several ways
     }
   \item \strong{Model Statistics} (footer):
     \itemize{
-      \item Observations analyzed (with percentage of total data)
+      \item Observations analyzed (with total observations and percentage)
       \item \emph{R}\eqn{^2} and adjusted \emph{R}\eqn{^2}
       \item \emph{F}-statistic with degrees of freedom and \emph{p}-value
       \item AIC
@@ -290,8 +306,8 @@ The "\emph{n}" column shows:
 \itemize{
   \item For continuous variables: Total observations with non-missing data
   \item For factor variables: Number of observations in each category
-  \item Footer shows total observations analyzed and percentage of original 
-    data (accounting for missing values)
+  \item Footer shows observations used in fitting, the total supplied, and 
+    the percentage retained (accounting for missing values)
 }
 }
 \examples{
@@ -354,9 +370,7 @@ plot5 <- lmforest(
 )
 
 # Example 6: Save with recommended dimensions
-dims <- attr(plot5, "rec_dims")
-ggplot2::ggsave(file.path(tempdir(), "linear_forest.pdf"),
-                plot5, width = dims$width, height = dims$height)
+forestsave(plot5, file.path(tempdir(), "linear_forest.pdf"))
 
 options(old_width)
 
@@ -369,13 +383,15 @@ options(old_width)
 \code{\link{uniforest}} for univariable screening forest plots,
 \code{\link{multiforest}} for multi-outcome forest plots,
 \code{\link[stats]{lm}} for fitting linear models,
-\code{\link{fit}} for regression modeling
+\code{\link{fit}} for regression modeling,
+  \code{\link{forestsave}} for saving with recommended dimensions
 
-Other visualization functions: 
-\code{\link{autoforest}()},
-\code{\link{coxforest}()},
-\code{\link{glmforest}()},
-\code{\link{multiforest}()},
-\code{\link{uniforest}()}
+Other visualization functions:
+\code{\link[=autoforest]{autoforest()}},
+\code{\link[=coxforest]{coxforest()}},
+\code{\link[=forestsave]{forestsave()}},
+\code{\link[=glmforest]{glmforest()}},
+\code{\link[=multiforest]{multiforest()}},
+\code{\link[=uniforest]{uniforest()}}
 }
 \concept{visualization functions}

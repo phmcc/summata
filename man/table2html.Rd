@@ -20,6 +20,7 @@ table2html(
   stripe_color = "#EEEEEE",
   dark_header = FALSE,
   include_css = TRUE,
+  quiet = FALSE,
   ...
 )
 }
@@ -83,11 +84,17 @@ Default is \code{FALSE}.}
 the output file for standalone HTML. Set to \code{FALSE} when embedding 
 in existing HTML with its own stylesheet. Default is \code{TRUE}.}
 
+\item{quiet}{Logical. Suppress progress and confirmation messages, such
+as the notice reporting the file written. Errors and warnings are
+unaffected. Default is \code{FALSE}.}
+
 \item{...}{Additional arguments passed to \code{\link[xtable]{xtable}}.}
 }
 \value{
-Invisibly returns \code{NULL}. Creates an HTML file at the specified 
-  location that can be opened in web browsers or embedded in HTML documents.
+Invisibly returns the file path, matching \code{tablesave()} and
+  \code{forestsave()}. Called for its side effect of creating an HTML file at
+  the specified location, which can be opened in web browsers or embedded in
+  HTML documents.
 }
 \description{
 Converts a data frame, data.table, or matrix to HTML format with optional CSS 
@@ -171,7 +178,7 @@ For R Markdown or Quarto documents:
 table2html(results, "table.html", include_css = FALSE)
 }
 
-Then include in your document chunk with \code{results='asis'}:
+Then include in the document chunk with \code{results='asis'}:
 \preformatted{
 cat(readLines("table.html"), sep = "\n")
 }
@@ -238,7 +245,7 @@ table2html(results, file.path(tempdir(), "captioned.html"),
 # Example 3: For embedding (no CSS)
 table2html(results, file.path(tempdir(), "embed.html"),
           include_css = FALSE)
-# Include in your HTML document
+# Include in the HTML document
 
 # Example 4: Hierarchical display
 table2html(results, file.path(tempdir(), "indented.html"),
@@ -322,7 +329,7 @@ table2html(results, file.path(tempdir(), "minimal.html"),
           include_css = FALSE,
           format_headers = FALSE,
           bold_significant = FALSE)
-# Apply your own CSS classes and styling
+# Apply personal CSS classes and styling
 
 # Example 19: Model comparison table
 models <- list(
@@ -330,8 +337,12 @@ models <- list(
      full = c("age", "sex", "treatment", "stage")
 )
 
+# Information criteria assume a common sample, so the candidate
+# predictors are restricted to complete cases before comparison
+comparison_data <- na.omit(clintrial[, c("os_status", "age", "sex", "treatment", "stage")])
+
 comparison <- compfit(
-     data = clintrial,
+     data = comparison_data,
      outcome = "os_status",
      model_list = models
 )
@@ -342,7 +353,7 @@ table2html(comparison, file.path(tempdir(), "comparison.html"),
 }
 }
 \seealso{
-\code{\link{autotable}} for automatic format detection,
+\code{\link{tablesave}} for saving in the format given by the file extension,
 \code{\link{table2pdf}} for PDF output,
 \code{\link{table2tex}} for LaTeX output,
 \code{\link{table2docx}} for Word documents,
@@ -351,12 +362,12 @@ table2html(comparison, file.path(tempdir(), "comparison.html"),
 \code{\link{fit}} for regression tables,
 \code{\link{desctable}} for descriptive tables
 
-Other export functions: 
-\code{\link{autotable}()},
-\code{\link{table2docx}()},
-\code{\link{table2pdf}()},
-\code{\link{table2pptx}()},
-\code{\link{table2rtf}()},
-\code{\link{table2tex}()}
+Other export functions:
+\code{\link[=table2docx]{table2docx()}},
+\code{\link[=table2pdf]{table2pdf()}},
+\code{\link[=table2pptx]{table2pptx()}},
+\code{\link[=table2rtf]{table2rtf()}},
+\code{\link[=table2tex]{table2tex()}},
+\code{\link[=tablesave]{tablesave()}}
 }
 \concept{export functions}

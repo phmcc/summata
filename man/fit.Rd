@@ -248,7 +248,8 @@ A data.table with S3 class \code{"fit_result"} containing formatted
     \item{Variable}{Character. Predictor name or custom label}
     \item{Group}{Character. For factor variables: category level. For 
       interactions: interaction term. For continuous: typically empty}
-    \item{n}{Integer. Total sample size (if \code{show_n = TRUE})}
+    \item{n}{Integer. Sample size used in fitting, that is complete cases
+      across the model variables (if \code{show_n = TRUE})}
     \item{n_group}{Integer. Sample size for this factor level}
     \item{events}{Integer. Total number of events (if \code{show_events = TRUE})}
     \item{events_group}{Integer. Events for this factor level}
@@ -265,6 +266,13 @@ A data.table with S3 class \code{"fit_result"} containing formatted
       diagnostics, predictions, or further analysis}
     \item{raw_data}{data.table. Unformatted numeric results with columns for 
       coefficients, standard errors, confidence bounds, quality statistics, \emph{etc.}}
+    \item{analysis_counts}{List. How much of the supplied data reached the
+      model, with elements \code{n_supplied}, \code{n_analyzed},
+      \code{n_missing_outcome} and \code{n_missing_predictor}, plus
+      \code{events_supplied} and \code{events_analyzed} where the model
+      type carries an event count. The counts describe the single
+      fitted model, and the \code{print()} method always reports the
+      analyzed sample}
     \item{outcome}{Character. The outcome variable name}
     \item{predictors}{Character vector. The predictor variable names}
     \item{formula_str}{Character. The complete model formula as a string}
@@ -409,10 +417,10 @@ library(survival)
 uni_model <- fit(
     data = clintrial,
     outcome = "os_status",
-    predictors = "age"
+    predictors = "age",
+    labels = clintrial_labels
 )
 print(uni_model)
-# Labeled as "Univariable OR"
 
 \donttest{
 
@@ -553,7 +561,8 @@ minimal <- fit(
     predictors = c("age", "sex", "treatment"),
     show_n = FALSE,
     show_events = FALSE,
-    reference_rows = FALSE
+    reference_rows = FALSE,
+    labels = clintrial_labels
 )
 print(minimal)
 
@@ -562,7 +571,8 @@ ci90 <- fit(
     data = clintrial,
     outcome = "os_status",
     predictors = c("age", "treatment"),
-    conf_level = 0.90  # 90\% confidence intervals
+    conf_level = 0.90,  # 90\% confidence intervals
+    labels = clintrial_labels
 )
 print(ci90)
 
@@ -571,7 +581,8 @@ coef_model <- fit(
     data = clintrial,
     outcome = "os_status",
     predictors = c("age", "bmi"),
-    exponentiate = FALSE  # Show log odds instead of OR
+    exponentiate = FALSE,  # Show log odds instead of OR
+    labels = clintrial_labels
 )
 print(coef_model)
 
@@ -582,7 +593,8 @@ profile_result <- fit(
     outcome = "os_status",
     predictors = c("age", "treatment"),
     p_digits = 4,
-    conf_method = "profile"
+    conf_method = "profile",
+    labels = clintrial_labels
 )
 print(profile_result)
 
@@ -592,7 +604,8 @@ wald_result <- fit(
     outcome = "os_status",
     predictors = c("age", "treatment"),
     p_digits = 4,
-    conf_method = "wald"
+    conf_method = "wald",
+    labels = clintrial_labels
 )
 print(wald_result)
 
@@ -744,17 +757,20 @@ print(result)
 \code{\link{uniscreen}} for univariable screening of multiple predictors,
 \code{\link{fullfit}} for complete univariable-to-multivariable workflow,
 \code{\link{compfit}} for comparing multiple models,
-\code{\link{m2dt}} for model-to-table conversion
+\code{\link{m2dt}} for model-to-table conversion,
+\code{\link{autoforest}} for forest plots of fitted models,
+\code{\link{forestsave}} for exporting forest plots,
+\code{\link{tablesave}} for exporting tables
 
-Other regression functions: 
-\code{\link{compfit}()},
-\code{\link{fullfit}()},
-\code{\link{multifit}()},
-\code{\link{print.compfit_result}()},
-\code{\link{print.fit_result}()},
-\code{\link{print.fullfit_result}()},
-\code{\link{print.multifit_result}()},
-\code{\link{print.uniscreen_result}()},
-\code{\link{uniscreen}()}
+Other regression functions:
+\code{\link[=compfit]{compfit()}},
+\code{\link[=fullfit]{fullfit()}},
+\code{\link[=multifit]{multifit()}},
+\code{\link[=print.compfit_result]{print.compfit_result()}},
+\code{\link[=print.fit_result]{print.fit_result()}},
+\code{\link[=print.fullfit_result]{print.fullfit_result()}},
+\code{\link[=print.multifit_result]{print.multifit_result()}},
+\code{\link[=print.uniscreen_result]{print.uniscreen_result()}},
+\code{\link[=uniscreen]{uniscreen()}}
 }
 \concept{regression functions}

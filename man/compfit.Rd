@@ -196,6 +196,14 @@ criteria rather than as a definitive model selection method.
 data(clintrial)
 data(clintrial_labels)
 
+# Information criteria assume a common sample, so the candidate predictors
+# are restricted to complete cases before any comparison
+comparison_data <- na.omit(
+    clintrial[, c("readmission_30d", "os_months", "os_status", "age", "sex",
+                  "smoking", "diabetes", "stage", "ecog", "grade",
+                  "treatment")]
+)
+
 # Example 1: Compare nested logistic regression models
 models <- list(
     base = c("age", "sex"),
@@ -204,8 +212,8 @@ models <- list(
 )
 
 comparison <- compfit(
-    data = clintrial,
-    outcome = "os_status",
+    data = comparison_data,
+    outcome = "readmission_30d",
     model_list = models,
     model_names = c("Base", "Clinical", "Full")
 )
@@ -214,42 +222,44 @@ comparison
 \donttest{
 
 # Example 2: Compare Cox survival models
-library(survival)
 surv_models <- list(
     simple = c("age", "sex"),
     clinical = c("age", "sex", "stage", "grade")
 )
 
 surv_comparison <- compfit(
-    data = clintrial,
+    data = comparison_data,
     outcome = "Surv(os_months, os_status)",
     model_list = surv_models,
     model_type = "coxph"
 )
 surv_comparison
 
-# Example 3: Test effect of adding interaction terms
+# Example 3: Test the effect of adding an interaction term.
+# Treatment efficacy differs by disease stage in these data, so the
+# interaction is expected to improve the fit.
 interaction_models <- list(
-    main = c("age", "treatment", "sex"),
-    interact = c("age", "treatment", "sex")
+    main = c("age", "treatment", "stage"),
+    interact = c("age", "treatment", "stage")
 )
 
 interaction_comp <- compfit(
-    data = clintrial,
-    outcome = "os_status",
+    data = comparison_data,
+    outcome = "Surv(os_months, os_status)",
     model_list = interaction_models,
+    model_type = "coxph",
     model_names = c("Main Effects", "With Interaction"),
     interactions_list = list(
         NULL,
-        c("treatment:sex")
+        c("treatment:stage")
     )
 )
 interaction_comp
 
 # Example 4: Include coefficient comparison table
 detailed <- compfit(
-    data = clintrial,
-    outcome = "os_status",
+    data = comparison_data,
+    outcome = "readmission_30d",
     model_list = models,
     include_coefficients = TRUE,
     labels = clintrial_labels
@@ -273,17 +283,17 @@ cat("Recommended model:", best, "\n")
 \seealso{
 \code{\link{fit}} for individual model fitting,
 \code{\link{fullfit}} for automated variable selection,
-\code{\link{table2pdf}} for exporting results
+\code{\link{tablesave}} for exporting tables
 
-Other regression functions: 
-\code{\link{fit}()},
-\code{\link{fullfit}()},
-\code{\link{multifit}()},
-\code{\link{print.compfit_result}()},
-\code{\link{print.fit_result}()},
-\code{\link{print.fullfit_result}()},
-\code{\link{print.multifit_result}()},
-\code{\link{print.uniscreen_result}()},
-\code{\link{uniscreen}()}
+Other regression functions:
+\code{\link[=fit]{fit()}},
+\code{\link[=fullfit]{fullfit()}},
+\code{\link[=multifit]{multifit()}},
+\code{\link[=print.compfit_result]{print.compfit_result()}},
+\code{\link[=print.fit_result]{print.fit_result()}},
+\code{\link[=print.fullfit_result]{print.fullfit_result()}},
+\code{\link[=print.multifit_result]{print.multifit_result()}},
+\code{\link[=print.uniscreen_result]{print.uniscreen_result()}},
+\code{\link[=uniscreen]{uniscreen()}}
 }
 \concept{regression functions}

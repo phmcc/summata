@@ -231,6 +231,7 @@
 #' @seealso
 #' \code{\link{desctable}} for baseline characteristics tables,
 #' \code{\link{fit}} for regression analysis,
+#' \code{\link{tablesave}} for export in any supported format,
 #' \code{\link{table2pdf}} for PDF export,
 #' \code{\link{table2docx}} for Word export,
 #' \code{\link[survival]{survfit}} for underlying survival estimation,
@@ -246,7 +247,8 @@
 #'     outcome = "Surv(os_months, os_status)",
 #'     by = "treatment",
 #'     times = c(12, 24, 36),
-#'     time_unit = "months"
+#'     time_unit = "months",
+#'     labels = clintrial_labels
 #' )
 #'
 #' \donttest{
@@ -257,7 +259,8 @@
 #'     outcome = "Surv(os_months, os_status)",
 #'     by = "treatment",
 #'     times = NULL,
-#'     probs = 0.5
+#'     probs = 0.5,
+#'     labels = clintrial_labels
 #' )
 #'
 #' # Example 3: Multiple quantiles (quartiles)
@@ -266,7 +269,8 @@
 #'     outcome = "Surv(os_months, os_status)",
 #'     by = "stage",
 #'     times = NULL,
-#'     probs = c(0.25, 0.5, 0.75)
+#'     probs = c(0.25, 0.5, 0.75),
+#'     labels = clintrial_labels
 #' )
 #'
 #' # Example 4: Both time points and median
@@ -276,7 +280,8 @@
 #'     by = "treatment",
 #'     times = c(12, 24),
 #'     probs = 0.5,
-#'     time_unit = "months"
+#'     time_unit = "months",
+#'     labels = clintrial_labels
 #' )
 #'
 #' # Example 5: Cumulative incidence (1 - survival)
@@ -285,7 +290,8 @@
 #'     outcome = "Surv(os_months, os_status)",
 #'     by = "treatment",
 #'     times = c(12, 24),
-#'     type = "risk"
+#'     type = "risk",
+#'     labels = clintrial_labels
 #' )
 #'
 #' # Example 6: Include number at risk
@@ -294,14 +300,16 @@
 #'     outcome = "Surv(os_months, os_status)",
 #'     by = "treatment",
 #'     times = c(12, 24),
-#'     stats = c("survival", "ci", "n_risk")
+#'     stats = c("survival", "ci", "n_risk"),
+#'     labels = clintrial_labels
 #' )
 #'
 #' # Example 7: Overall survival without stratification
 #' survtable(
 #'     data = clintrial,
 #'     outcome = "Surv(os_months, os_status)",
-#'     times = c(12, 24, 36, 48)
+#'     times = c(12, 24, 36, 48),
+#'     labels = clintrial_labels
 #' )
 #'
 #' # Example 8: Without total row
@@ -310,7 +318,8 @@
 #'     outcome = "Surv(os_months, os_status)",
 #'     by = "treatment",
 #'     times = c(12, 24),
-#'     total = FALSE
+#'     total = FALSE,
+#'     labels = clintrial_labels
 #' )
 #'
 #' # Example 9: Custom labels
@@ -329,7 +338,8 @@
 #'     outcome = "Surv(os_months, os_status)",
 #'     by = "treatment",
 #'     times = c(12, 24),
-#'     conf_type = "log-log"
+#'     conf_type = "log-log",
+#'     labels = clintrial_labels
 #' )
 #'
 #' # Example 11: Wilcoxon test instead of log-rank
@@ -338,7 +348,8 @@
 #'     outcome = "Surv(os_months, os_status)",
 #'     by = "treatment",
 #'     times = c(12, 24),
-#'     test_type = "wilcoxon"
+#'     test_type = "wilcoxon",
+#'     labels = clintrial_labels
 #' )
 #'
 #' # Example 12: Access raw data for custom analysis
@@ -376,7 +387,8 @@
 #'     outcome = "Surv(os_months, os_status)",
 #'     by = "treatment",
 #'     times = c(12, 24),
-#'     number_format = "eu"
+#'     number_format = "eu",
+#'     labels = clintrial_labels
 #' )
 #'
 #' }

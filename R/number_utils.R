@@ -106,23 +106,49 @@ format_num <- function(x, fmt_str, marks) {
 }
 
 
-#' Format an integer count with locale-aware thousands separator
+#' Format integer counts with locale-aware thousands separator
 #'
 #' Formats integer values with a thousands separator for display in tables.
-#' Values below 1000 are returned as plain character strings.
+#' Values below 1000 are returned as plain character strings, since a grouping
+#' mark only applies from four digits.
 #'
-#' @param n Integer count value.
+#' Vectorized over \code{n}. Each element is formatted independently, so counts
+#' of differing magnitude are not padded to a common width.
+#'
+#' @param n Numeric vector of counts.
 #' @param marks List with \code{big.mark} and \code{decimal.mark} as returned
-#'   by \code{\link{resolve_number_marks}}.
-#' @return Character string with the formatted count.
+#'   by \code{\link{resolve_number_marks}}. Resolved from the global option
+#'   when not supplied, so that callers without a locale of their own still
+#'   produce output consistent with the rest of the package.
+#' @param na Character string substituted for missing values. Contexts differ in
+#'   what reads correctly: tables conventionally show a dash, plot annotations
+#'   are better left blank, and the default preserves the missing value for
+#'   callers doing their own substitution.
+#' @return Character vector of formatted counts, the same length as \code{n}.
 #' @keywords internal
-format_count <- function(n, marks) {
-    if (n >= 1000) {
-        trimws(format(n, big.mark = marks$big.mark,
-                      decimal.mark = marks$decimal.mark))
-    } else {
-        as.character(n)
+format_count <- function(n, marks = NULL, na = NA_character_) {
+
+    if (is.null(marks)) {
+        marks <- resolve_number_marks(NULL)
     }
+
+    out <- as.character(n)
+    out[is.na(n)] <- na
+
+    big <- which(!is.na(n) & abs(n) >= 1000)
+
+    if (length(big) > 0) {
+        ## trim = TRUE prevents format() padding the elements to a common
+        ## width, and scientific = FALSE prevents it choosing exponential
+        ## notation, which it otherwise does from six digits upward
+        out[big] <- trimws(format(n[big],
+                                  big.mark = marks$big.mark,
+                                  decimal.mark = marks$decimal.mark,
+                                  scientific = FALSE,
+                                  trim = TRUE))
+    }
+
+    return(out)
 }
 
 

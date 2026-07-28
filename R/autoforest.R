@@ -53,7 +53,7 @@
 #'   can be:
 #'   \itemize{
 #'     \item Displayed directly: \code{print(plot)}
-#'     \item Saved to file: \code{ggsave("forest.pdf", plot, width = 12, height = 8)}
+#'     \item Saved to file: \code{forestsave(plot, "forest.pdf")}
 #'     \item Further customized with \pkg{ggplot2} functions
 #'   }
 #'   
@@ -105,7 +105,8 @@
 #' \code{\link{fit}} for single-model regression,
 #' \code{\link{fullfit}} for combined univariable/multivariable regression,
 #' \code{\link{uniscreen}} for univariable screening,
-#' \code{\link{multifit}} for multi-outcome analysis
+#' \code{\link{multifit}} for multi-outcome analysis,
+#'   \code{\link{forestsave}} for saving with recommended dimensions
 #'
 #' @examples
 #' data(clintrial)
@@ -154,12 +155,9 @@
 #' )
 #' 
 #' plot5 <- autoforest(fit_result)
-#' # No need to pass data or labels - extracted from fit_result
 #' 
 #' # Save with recommended dimensions
-#' dims <- attr(plot5, "rec_dims")
-#' ggplot2::ggsave(file.path(tempdir(), "forest.pdf"),
-#'                 plot5, width = dims$width, height = dims$height)
+#' forestsave(plot5, file.path(tempdir(), "forest.pdf"))
 #'
 #' }
 #' @family visualization functions

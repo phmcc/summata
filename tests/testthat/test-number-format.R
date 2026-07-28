@@ -8,16 +8,12 @@
 #'
 #' @details Run with testthat::test_file("tests/testthat/test_number_format.R")
 
-library(testthat)
 library(data.table)
-library(summata)
 
 ## ============================================================================
 ## Setup: Create test data
 ## ============================================================================
 
-data(clintrial)
-data(clintrial_labels)
 
 ## Small dataset for fast regression tests
 set.seed(42)
@@ -51,7 +47,6 @@ test_that("fit rejects invalid number_format", {
 })
 
 test_that("survtable rejects invalid number_format", {
-    skip_if_not_installed("survival")
     expect_error(survtable(clintrial,
                            outcome = "Surv(surv_time, surv_status)",
                            times = 12, number_format = "invalid"))
@@ -142,9 +137,7 @@ test_that("desctable custom format runs without error", {
 })
 
 test_that("desctable global option summata.number_format works", {
-    old <- getOption("summata.number_format")
-    options(summata.number_format = "eu")
-    on.exit(options(summata.number_format = old), add = TRUE)
+    withr::local_options(summata.number_format = "eu")
 
     result <- desctable(clintrial, variables = "age")
     all_cells <- unlist(result[, -c("Variable", "Group"), with = FALSE])
@@ -202,6 +195,7 @@ test_that("desctable eu positive range uses en-dash", {
 })
 
 test_that("desctable median_iqr with negatives avoids ambiguous output", {
+    set.seed(2024)
     dt_neg <- data.table(x = rnorm(100, -5, 3))
 
     result <- desctable(dt_neg, variables = "x",
@@ -221,7 +215,6 @@ test_that("desctable median_iqr with negatives avoids ambiguous output", {
 ## ============================================================================
 
 test_that("survtable works with eu number_format", {
-    skip_if_not_installed("survival")
     result <- survtable(clintrial,
                         outcome = "Surv(os_months, os_status)",
                         times = c(12, 24), number_format = "eu")
@@ -229,7 +222,6 @@ test_that("survtable works with eu number_format", {
 })
 
 test_that("survtable works with space number_format", {
-    skip_if_not_installed("survival")
     result <- survtable(clintrial,
                         outcome = "Surv(os_months, os_status)",
                         times = c(12, 24), number_format = "space")
@@ -439,7 +431,6 @@ test_that("lmforest eu runs without error", {
 
 test_that("coxforest eu runs without error", {
     skip_if_not_installed("ggplot2")
-    skip_if_not_installed("survival")
     mod <- survival::coxph(
         survival::Surv(surv_time, surv_status) ~ age + sex,
         data = test_dt)
@@ -564,14 +555,12 @@ test_that("forest_ci_separator: NULL marks defaults to US", {
 test_that("global option fallback works when number_format is NULL", {
     resolve <- summata:::resolve_number_marks
 
-    old <- getOption("summata.number_format")
-    options(summata.number_format = "eu")
-    on.exit(options(summata.number_format = old), add = TRUE)
+    withr::local_options(summata.number_format = "eu")
 
     m <- resolve(NULL)
     expect_equal(m$decimal.mark, ",")
 
-    options(summata.number_format = NULL)
+    withr::local_options(summata.number_format = NULL)
     m <- resolve(NULL)
     expect_equal(m$decimal.mark, ".")
 })

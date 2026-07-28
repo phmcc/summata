@@ -1,7 +1,7 @@
 Package: summata
 Type: Package
 Title: Publication-Ready Summary Tables and Forest Plots
-Version: 0.11.5
+Version: 0.12.0
 Authors@R: c(
     person(
         given = c("Paul", "Hsin-ti"), 
@@ -23,7 +23,6 @@ Encoding: UTF-8
 LazyData: true
 URL: https://phmcc.codeberg.page/summata/, https://codeberg.org/phmcc/summata, https://github.com/phmcc/summata
 BugReports: https://github.com/phmcc/summata/issues
-RoxygenNote: 7.3.3
 Depends: 
     R (>= 4.2.0)
 Imports:
@@ -31,11 +30,15 @@ Imports:
     survival,
     ggplot2,
     stats,
-    grDevices
+    grDevices,
+    parallel,
+    tools,
+    utils
 Suggests: 
     MASS,
     coxme,
     flextable,
+    grid,
     knitr,
     lme4,
     MuMIn,
@@ -43,10 +46,18 @@ Suggests:
     pROC,
     ragg,
     ResourceSelection,
+    reformulas,
     rmarkdown,
     stringr,
     systemfonts,
+    testthat,
     tinytex,
     withr,
     xtable
+SystemRequirements: All optional. A 'LaTeX' distribution providing pdflatex or
+    xelatex, and kpsewhich, for PDF output from table2pdf(); pdfcrop for
+    auto-sized PDF output; Ghostscript for the optional font embedding in
+    forestsave(). Each feature reports the absence of its tool and the remainder
+    of the package is unaffected.
 VignetteBuilder: knitr
+Config/roxygen2/version: 8.0.0

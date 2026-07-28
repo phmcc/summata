@@ -411,27 +411,27 @@ scenario3
 
 # Exporting Results
 
-Comparison tables can be exported to various formats:
+Comparison tables can be exported to various formats using the `tablesave()` dispatcher or the various per-format export functions:
 
 ```{r, eval = FALSE}
 # Main comparison table
 table2docx(
   table = example1,
-  file = file.path(tempdir(), "Model_Comparison.docx"),
+  file = "model_comparison.docx",
   caption = "Table 3. Model Comparison Results"
 )
 
 # Coefficient table
 table2docx(
   table = attr(example6, "coefficients"),
-  file = file.path(tempdir(), "Coefficient_Comparison.docx"),
+  file = "coefficient_comparison.docx",
   caption = "Table S1. Coefficient Estimates Across Models"
 )
 
 # PDF with landscape orientation for wide tables
 table2pdf(
   table = example1,
-  file = file.path(tempdir(), "Model_Comparison.pdf"),
+  file = "model_comparison.pdf",
   caption = "Model Comparison",
   orientation = "landscape"
 )
@@ -515,7 +515,7 @@ options(old_opts)
 # Further Reading
 
 - [Descriptive Tables](descriptive_tables.html): `desctable()` for baseline characteristics
-- [Regression Modeling](regression_modeling.html): `fit()`, `uniscreen()`, and `fullfit()`
+- [Regression Modeling](regression_modeling.html): `uniscreen()`, `fit()`, and `fullfit()`
 - [Table Export](table_export.html): Export to PDF, Word, and other formats
 - [Forest Plots](forest_plots.html): Visualization of regression results
 - [Multivariate Regression](multivariate_regression.html): `multifit()` for multi-outcome analysis

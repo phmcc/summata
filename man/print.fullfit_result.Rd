@@ -20,16 +20,16 @@ Displays a summary header with outcome, model type, method, and number of
 multivariable predictors before printing the results table.
 }
 \seealso{
-Other regression functions: 
-\code{\link{compfit}()},
-\code{\link{fit}()},
-\code{\link{fullfit}()},
-\code{\link{multifit}()},
-\code{\link{print.compfit_result}()},
-\code{\link{print.fit_result}()},
-\code{\link{print.multifit_result}()},
-\code{\link{print.uniscreen_result}()},
-\code{\link{uniscreen}()}
+Other regression functions:
+\code{\link[=compfit]{compfit()}},
+\code{\link[=fit]{fit()}},
+\code{\link[=fullfit]{fullfit()}},
+\code{\link[=multifit]{multifit()}},
+\code{\link[=print.compfit_result]{print.compfit_result()}},
+\code{\link[=print.fit_result]{print.fit_result()}},
+\code{\link[=print.multifit_result]{print.multifit_result()}},
+\code{\link[=print.uniscreen_result]{print.uniscreen_result()}},
+\code{\link[=uniscreen]{uniscreen()}}
 }
 \concept{regression functions}
 \keyword{internal}

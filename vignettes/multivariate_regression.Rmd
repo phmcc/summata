@@ -35,33 +35,30 @@ if (requireNamespace("ragg", quietly = TRUE)) {
   )
 }
 
-## Dynamic figure sizing: queue_plot() stashes rec_dims from a plot object,
-## and the opts_hook on the NEXT chunk (with use_rec_dims = TRUE) applies them
-## before knitr opens the graphics device. Plots render via ragg (dev = "ragg_png"
-## set above) and knitr captures them natively. No files written to disk.
-.plot_dims <- new.env(parent = emptyenv())
-.plot_dims$width <- NULL
-.plot_dims$height <- NULL
+## Dynamic figure sizing. A chunk that renders a forest plot names the object it
+## is about to print, by giving the chunk option rec_dims_from = "example1".
+##
+## Chunk options are resolved before knitr opens the graphics device, so this
+## hook reads the plot's recommended dimensions from its "rec_dims" attribute
+## and sets fig.width and fig.height from them. The object was created in an
+## earlier chunk and so already exists in the knit environment. Plots render via
+## ragg (dev = "ragg_png" set above) and knitr captures them natively; no files
+## are written to disk.
+##
+## A plot without recommended dimensions, or a name that does not resolve,
+## falls through to the default figure size rather than failing the build.
+knitr::opts_hooks$set(rec_dims_from = function(options) {
+  plot <- get0(options$rec_dims_from, envir = knitr::knit_global(),
+               ifnotfound = NULL)
+  dims <- attr(plot, "rec_dims")
 
-knitr::opts_hooks$set(use_rec_dims = function(options) {
-  if (isTRUE(options$use_rec_dims)) {
-    if (!is.null(.plot_dims$width))  options$fig.width  <- .plot_dims$width
-    if (!is.null(.plot_dims$height)) options$fig.height <- .plot_dims$height
-    .plot_dims$width <- NULL
-    .plot_dims$height <- NULL
+  if (!is.null(dims)) {
+    options$fig.width  <- dims$width
+    options$fig.height <- dims$height
   }
+
   options
 })
-
-## Call at the end of a plot-creation chunk to stash dimensions for the next chunk.
-queue_plot <- function(plot) {
-  dims <- attr(plot, "rec_dims")
-  if (!is.null(dims)) {
-    .plot_dims$width  <- dims$width
-    .plot_dims$height <- dims$height
-  }
-  invisible(plot)
-}
 ```
 
 Multivariate regression refers to the simultaneous examination of a single independent predictor across multiple dependent variables. This approach inverts the typical regression paradigm: rather than testing multiple predictors against one outcome (as in `uniscreen()`, `fit()`, and `fullfit()`), multivariate regression tests the predictive value of a individual factor against multiple outcomes, with or without multivariable adjustment for other independent factors. This design is particularly useful when a key exposure or intervention must be evaluated against several endpoints simultaneously.
@@ -101,17 +98,14 @@ The `clintrial` dataset includes multiple outcome types suitable for multivariat
 | Count (overdispersed) | `ae_count` | `negbin` or `quasipoisson` |
 | Time-to-event | `Surv(pfs_months, pfs_status)`, `Surv(os_months, os_status)` | `coxph` |
 
-> *n.b.:* To ensure correct font rendering and figure sizing, the forest plots below are displayed using a helper function (`queue_plot()`) that applies each plot's recommended dimensions (stored in the `"rec_dims"` attribute) via the [`ragg`](https://ragg.r-lib.org/) graphics device. In practice, replace `queue_plot()` with `ggplot2::ggsave()` using recommended plot dimensions for equivalent results:
+> *n.b.:* The forest plots below are sized by this vignette from each plot's recommended dimensions, stored in its `"rec_dims"` attribute, and rendered via the [`ragg`](https://ragg.r-lib.org/) graphics device for correct font metrics. That sizing is applied behind the scenes and is not shown in the code. Writing a plot to file elsewhere is performed with `forestsave()`, which applies the same dimensions and selects a suitable graphics device:
 > 
 > ```{r, eval = FALSE}
 > p <- glmforest(model, data = mydata)
-> dims <- attr(p, "rec_dims")
-> ggplot2::ggsave("forest_plot.png", p,
->                 width = dims$width, 
->                 height = dims$height)
+> forestsave(p, "forest_plot.png")
 > ```
 > 
-> This ensures that the figure size is always large enough to accommodate the constituent plot text and graphics, and it is generally the preferred method for saving forest plot outputs in `summata`.
+> This ensures that the figure size is always large enough to accommodate the constituent plot text and graphics, and it is the preferred method for saving forest plot outputs in `summata`.
 
 ---
 
@@ -257,6 +251,18 @@ example7 <- multifit(
 example7
 ```
 
+The three outcomes are not fitted to the same observations. Length of stay is
+unrecorded for a proportion of patients who did not undergo surgical resection,
+whereas pain score and days to recovery are complete. Each model is therefore
+fitted to its own complete cases, and the analyzed sample is reported as a range
+spanning the three models rather than as a single figure. Sample sizes in the
+`n` column vary correspondingly.
+
+Missingness of this kind is related to a variable in the model rather than
+occurring at random, and the estimates for length of stay describe the subset of
+patients for whom it was recorded. The range in the header is the signal that
+this subset differs from the others.
+
 ## **Example 8:** Mixed-Effects Models
 
 Account for clustering using random effects:
@@ -367,10 +373,9 @@ example12 <- multiforest(
   indent_predictor = TRUE,
   zebra_stripes = TRUE
 )
-queue_plot(example12)
 ```
 
-```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+```{r, echo = FALSE, out.width = "100%", rec_dims_from = "example12"}
 print(example12)
 ```
 
@@ -388,10 +393,9 @@ example13 <- multiforest(
   table_width = 0.65,
   color = "#4BA6B6"
 )
-queue_plot(example13)
 ```
 
-```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+```{r, echo = FALSE, out.width = "100%", rec_dims_from = "example13"}
 print(example13)
 ```
 
@@ -416,10 +420,9 @@ example14 <- multiforest(
   covariates_footer = TRUE,
   labels = clintrial_labels
 )
-queue_plot(example14)
 ```
 
-```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+```{r, echo = FALSE, out.width = "100%", rec_dims_from = "example14"}
 print(example14)
 ```
 
@@ -445,10 +448,9 @@ example15 <- multiforest(
   zebra_stripes = TRUE,
   labels = clintrial_labels
 )
-queue_plot(example15)
 ```
 
-```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+```{r, echo = FALSE, out.width = "100%", rec_dims_from = "example15"}
 print(example15)
 ```
 
@@ -458,34 +460,30 @@ print(example15)
 
 ## Tables
 
-Export tables using standard export functions:
+Export tables using standard export functions, or `tablesave()`:
 
 ```{r, eval = FALSE}
 table2docx(
   table = result,
-  file = file.path(tempdir(), "multioutcome_analysis.docx"),
+  file = "multioutcome_analysis.docx",
   caption = "Treatment Effects Across Outcomes"
 )
 
 table2pdf(
   table = result,
-  file = file.path(tempdir(), "multioutcome_analysis.pdf"),
+  file = "multioutcome_analysis.pdf",
   caption = "Treatment Effects Across Outcomes"
 )
 ```
 
 ## Forest Plots
 
-Save forest plots using `ggsave()`:
+Save forest plots using the dedicated `multiforest()` function, then `forestsave()`:
 
 ```{r, eval = FALSE}
 p <- multiforest(result, title = "Effect Estimates")
-dims <- attr(p, "rec_dims")
 
-ggsave(file.path(tempdir(), "multioutcome_forest.pdf"), p,
-       width = attr(result, "rec_dims")$width,
-       height = attr(result, "rec_dims")$height, 
-       units = "in")
+forestsave(p, "multioutcome_forest.pdf")
 ```
 
 ---
@@ -535,10 +533,9 @@ forest_plot <- multiforest(
   table_width = 0.65,
   labels = clintrial_labels
 )
-queue_plot(forest_plot)
 ```
 
-```{r, echo = FALSE, out.width = "100%", use_rec_dims = TRUE}
+```{r, echo = FALSE, out.width = "100%", rec_dims_from = "forest_plot"}
 print(forest_plot)
 ```
 
@@ -607,6 +604,24 @@ multifit(data, outcomes, predictor,
          model_type = "glmer")
 ```
 
+## Varying Sample Sizes
+
+Each outcome is modeled separately and fitted to its own complete cases, so
+outcomes that differ in missingness are fitted to different numbers of
+observations. The analyzed sample is reported as a range whenever this occurs,
+as in Example 7. Estimates remain valid for the observations each model used,
+but comparisons across outcomes are made on partially different samples.
+
+Restricting the data to complete cases across all outcomes and covariates places
+every model on the same observations, at the cost of discarding data:
+
+```{r, eval = FALSE}
+complete_data <- na.omit(
+  clintrial[, c("los_days", "pain_score", "recovery_days",
+                "treatment", "age", "sex", "surgery")]
+)
+```
+
 ## Many Factor Levels
 
 For predictors with many levels, consider collapsing categories:
@@ -656,7 +671,7 @@ options(old_opts)
 ## Further Reading
 
 - [Descriptive Tables](descriptive_tables.html): `desctable()` for baseline characteristics
-- [Regression Modeling](regression_modeling.html): `fit()`, `uniscreen()`, and `fullfit()`
+- [Regression Modeling](regression_modeling.html): `uniscreen()`, `fit()`, and `fullfit()`
 - [Model Comparison](model_comparison.html): `compfit()` for comparing models
 - [Table Export](table_export.html): Export to PDF, Word, and other formats
 - [Forest Plots](forest_plots.html): Visualization of regression results

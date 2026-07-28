@@ -83,8 +83,9 @@ of rows).}
 total plot width allocated to the data table. Default is 0.6 (60\% table, 
 40\% forest plot).}
 
-\item{show_n}{Logical. If \code{TRUE}, includes a column showing sample sizes. 
-Default is \code{TRUE}.}
+\item{show_n}{Logical. If \code{TRUE}, includes a column showing sample sizes.
+Counts describe the observations used in fitting rather than every row
+supplied. Default is \code{TRUE}.}
 
 \item{show_events}{Logical. If \code{TRUE}, includes a column showing the 
 number of events for each row. Default is \code{NULL}, which auto-detects
@@ -128,7 +129,11 @@ coefficients).}
 
 \item{labels}{Named character vector providing custom display labels for 
 variables. Applied to predictor names in the plot.
-Default is \code{NULL} (uses original variable names).}
+Default is \code{NULL}, in which case the labels attached by the function
+that produced \code{x} are used where \code{x} is a \pkg{summata} result
+rather than a model object, so that labels supplied once are carried
+through the workflow. Original variable names are used where neither is
+available.}
 
 \item{show_footer}{Logical. If \code{TRUE}, displays a footer with the
 outcome variable name. Default is \code{TRUE}.}
@@ -161,7 +166,7 @@ A \code{ggplot} object containing the complete forest plot. The plot
   can be:
   \itemize{
     \item Displayed directly: \code{print(plot)}
-    \item Saved to file: \code{ggsave("forest.pdf", plot, width = 12, height = 8)}
+    \item Saved to file: \code{forestsave(plot, "forest.pdf")}
     \item Further customized with \pkg{ggplot2} functions
   }
   
@@ -171,11 +176,20 @@ A \code{ggplot} object containing the complete forest plot. The plot
   \describe{
     \item{width}{Numeric. Recommended plot width in specified units}
     \item{height}{Numeric. Recommended plot height in specified units}
+    \item{units}{Character. The units the dimensions are expressed in,
+      matching the \code{units} argument}
   }
   
   These recommendations are automatically calculated based on the number of 
   variables, text sizes, and layout parameters, and are printed to console 
   if \code{plot_width} or \code{plot_height} are not specified.
+  \code{forestsave()} reads all three and requires no further handling.
+
+  The returned object also includes an attribute \code{"table_data"}
+  accessible via \code{attr(plot, "table_data")}, a data.table holding the
+  values drawn in the plot, in the order of the model terms. Sample sizes
+  and event counts describe the observations used in fitting rather than
+  every row supplied.
 }
 \description{
 Generates a publication-ready forest plot from a \code{uniscreen()} output
@@ -233,6 +247,7 @@ surv_results <- uniscreen(
     parallel = FALSE
 )
 
+# Labels attached by uniscreen() are applied automatically
 p2 <- uniforest(surv_results, title = "Univariable Survival Analysis")
 
 # Example 3: Linear regression
@@ -258,9 +273,7 @@ p4 <- uniforest(
 )
 
 # Example 5: Save with recommended dimensions
-dims <- attr(p4, "rec_dims")
-ggplot2::ggsave(file.path(tempdir(), "univariable_forest.pdf"),
-                p4, width = dims$width, height = dims$height)
+forestsave(p4, file.path(tempdir(), "univariable_forest.pdf"))
 
 options(old_width)
 
@@ -271,13 +284,15 @@ options(old_width)
 \code{\link{uniscreen}} for generating univariable screening results,
 \code{\link{multiforest}} for multi-outcome forest plots,
 \code{\link{coxforest}}, \code{\link{glmforest}}, \code{\link{lmforest}} for
-single-model forest plots
+single-model forest plots,
+  \code{\link{forestsave}} for saving with recommended dimensions
 
-Other visualization functions: 
-\code{\link{autoforest}()},
-\code{\link{coxforest}()},
-\code{\link{glmforest}()},
-\code{\link{lmforest}()},
-\code{\link{multiforest}()}
+Other visualization functions:
+\code{\link[=autoforest]{autoforest()}},
+\code{\link[=coxforest]{coxforest()}},
+\code{\link[=forestsave]{forestsave()}},
+\code{\link[=glmforest]{glmforest()}},
+\code{\link[=lmforest]{lmforest()}},
+\code{\link[=multiforest]{multiforest()}}
 }
 \concept{visualization functions}

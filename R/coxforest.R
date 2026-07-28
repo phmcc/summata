@@ -64,7 +64,9 @@
 #'   of rows).
 #'   
 #' @param show_n Logical. If \code{TRUE}, includes a column showing group-specific 
-#'   sample sizes. Default is \code{TRUE}.
+#'   sample sizes.
+#'   Counts describe the observations used in fitting rather than every row
+#'   supplied. Default is \code{TRUE}.
 #'   
 #' @param show_events Logical. If \code{TRUE}, includes a column showing the 
 #'   number of events (deaths, failures) for each group. Critical for survival 
@@ -95,8 +97,10 @@
 #'   
 #' @param labels Named character vector providing custom display labels for 
 #'   variables. Example: \code{c(age = "Age (years)", stage = "Disease Stage")}. 
-#'   Default is \code{NULL}.
-#'   
+#'   Default is \code{NULL}, in which case the labels attached by the function
+#'   that produced \code{x} are used, where \code{x} is a \pkg{summata} result
+#'   rather than a model object. Original variable names are used where neither
+#'   is available.
 #' @param color Character string specifying the color for hazard ratio point 
 #'   estimates in the forest plot. Default is \code{"#8A61D8"} (purple). Use 
 #'   hex codes or R color names.
@@ -132,7 +136,7 @@
 #'   can be:
 #'   \itemize{
 #'     \item Displayed directly: \code{print(plot)}
-#'     \item Saved to file: \code{ggsave("forest.pdf", plot, width = 12, height = 8)}
+#'     \item Saved to file: \code{forestsave(plot, "forest.pdf")}
 #'     \item Further customized with \pkg{ggplot2} functions
 #'   }
 #'   
@@ -146,7 +150,18 @@
 #'   
 #'   These recommendations are automatically calculated based on the number of 
 #'   variables, text sizes, and layout parameters, and are printed to console 
-#'   if \code{plot_width} or \code{plot_height} are not specified.
+#'   if \code{plot_width} or \code{plot_height} are not specified. The list also 
+#'   carries a \code{units} element recording the units the dimensions are 
+#'   expressed in, matching the \code{units} argument. \code{forestsave()} reads 
+#'   all three and requires no further handling.
+#'
+#'   The returned object also includes an attribute \code{"table_data"}
+#'   accessible via \code{attr(plot, "table_data")}, a data.table holding the
+#'   values drawn in the plot: one row per term in model order, with the
+#'   variable, factor level, sample size, event count, estimate, confidence
+#'   bounds and p-value. Sample sizes and event counts describe the
+#'   observations used in fitting rather than every row supplied, so they sum
+#'   to the model sample size within each variable.
 #'
 #' @details
 #' \strong{Survival-Specific Features:}
@@ -182,7 +197,7 @@
 #'     }
 #'   \item \strong{Model Statistics} (footer):
 #'     \itemize{
-#'       \item Events analyzed (with percentage of total)
+#'       \item Events analyzed (with total events and percentage)
 #'       \item Global log-rank test \emph{p}-value
 #'       \item Concordance (C-index) with standard error
 #'       \item AIC
@@ -206,7 +221,7 @@
 #'     in each group
 #'   \item Essential for assessing statistical power
 #'   \item Categories with very few events may have unreliable HR estimates
-#'   \item The footer shows total events analyzed and percentage of all events 
+#'   \item The footer shows events analyzed, total events, and percentage 
 #'     in the original data
 #' }
 #' 
@@ -259,7 +274,8 @@
 #' \code{\link{uniforest}} for univariable screening forest plots,
 #' \code{\link{multiforest}} for multi-outcome forest plots,
 #' \code{\link[survival]{coxph}} for fitting Cox models,
-#' \code{\link{fit}} for regression modeling
+#' \code{\link{fit}} for regression modeling,
+#'   \code{\link{forestsave}} for saving with recommended dimensions
 #'
 #' @examples
 #' data(clintrial)
@@ -329,9 +345,7 @@
 #' )
 #' 
 #' # Example 6: Save with recommended dimensions
-#' dims <- attr(plot5, "rec_dims")
-#' ggplot2::ggsave(file.path(tempdir(), "survival_forest.pdf"),
-#'                 plot5, width = dims$width, height = dims$height)
+#' forestsave(plot5, file.path(tempdir(), "survival_forest.pdf"))
 #'
 #' options(old_width)
 #' 
@@ -463,12 +477,24 @@ Received class: ", paste(class(x), collapse = ", "))
         data <- data.table::as.data.table(data)
     }
     
+    ## Counting frame: the observations that entered the model.
+    ##
+    ## survival::coxph() does not retain a model frame by default and coxme
+    ## models never do, so the supplied data is restricted to complete cases
+    ## across the model variables. Counting the unrestricted data would report
+    ## group sizes over every supplied row while the model-level statistics
+    ## describe complete cases only.
+    ##
+    ## The restriction is deliberately not applied to 'data', which remains the
+    ## denominator for the "percentage analyzed" figures reported below.
+    model_data <- get_analysis_data(model, class(model)[1], data)
+    
     terms <- attr(model$terms, "dataClasses")[-1]
 
     ## Filter out strata() and cluster() terms - these are not predictors to plot
     terms <- terms[!grepl("strata|cluster", names(terms))]
     
-    ## Filter out interaction terms (contain ":") - we handle these separately via coefficients
+    ## Filter out interaction terms (contain ":"), which are handled separately via coefficients
     terms <- terms[!grepl(":", names(terms), fixed = TRUE)]
 
     ## Extract coefficients based on model type
@@ -547,7 +573,7 @@ Received class: ", paste(class(x), collapse = ", "))
         ## Filter out interaction terms (contain ":")
         terms <- terms[!grepl(":", names(terms), fixed = TRUE)]
 
-        ## Create xlevels (keep your existing code)
+        ## Construct xlevels for the model
         if (is.null(model$xlevels)) {
             model$xlevels <- list()
             for (var in predictor_vars) {
@@ -612,6 +638,11 @@ Received class: ", paste(class(x), collapse = ", "))
         )
     }
 
+    ## Observations are reported alongside events. The two answer different
+    ## questions, attrition from the cohort and loss of statistical
+    ## information, and a figure is read without the console output beside it.
+    gmodel$nobs <- get_model_nobs(model, class(model)[1])
+
     ## Calculate total events in original data and percentage analyzed
     formula_terms <- all.vars(model$formula)
     if (length(formula_terms) >= 2) {
@@ -626,21 +657,23 @@ Received class: ", paste(class(x), collapse = ", "))
         }
         
         total_events <- sum(event_binary, na.rm = TRUE)
-        gmodel$pct_events_analyzed <- (gmodel$nevent / total_events) * 100
     } else {
         total_events <- NA
-        gmodel$pct_events_analyzed <- NA
     }
     
-    ## Format events and AIC with locale-aware separators
-    gmodel$nevent_formatted <- format_count_forest(gmodel$nevent, marks)
-    gmodel$nevent_with_pct <- if(!is.na(gmodel$pct_events_analyzed)) {
-                                  pct_str <- sprintf("%.1f%%", gmodel$pct_events_analyzed)
-                                  if (marks$decimal.mark != ".") pct_str <- sub(".", marks$decimal.mark, pct_str, fixed = TRUE)
-                                  paste0(gmodel$nevent_formatted, " (", pct_str, ")")
-                              } else {
-                                  gmodel$nevent_formatted
-                              }
+    ## Both lines are rendered by the formatter the print methods use, so that
+    ## a figure and the table it accompanies disclose in identical terms
+    gmodel$obs_line <- format_analysis_counts(
+        list(n_supplied = nrow(data), n_analyzed = gmodel$nobs),
+        label = "Observations analyzed", marks = marks)
+
+    gmodel$events_line <- format_analysis_counts(
+        list(n_supplied = total_events, n_analyzed = gmodel$nevent),
+        label = "Events analyzed", marks = marks)
+
+    ## Either line is dropped rather than shown without its denominator
+    gmodel$counts_block <- paste(
+        c(gmodel$obs_line, gmodel$events_line), collapse = "\n")
     aic_val <- format(round(gmodel$AIC, 2), big.mark = marks$big.mark, decimal.mark = marks$decimal.mark, scientific = FALSE, nsmall = 2)
     gmodel$AIC_formatted <- trimws(aic_val)
 
@@ -695,7 +728,7 @@ Received class: ", paste(class(x), collapse = ", "))
                 factor_levels <- model$xlevels[[var]]
                 
                 ## Create data table with proper levels
-                level_counts <- data[!is.na(get(var)), .N, by = var]
+                level_counts <- model_data[!is.na(get(var)), .N, by = var]
                 data.table::setnames(level_counts, c("level", "Freq"))
                 
                 ## Ensure all levels are present
@@ -712,7 +745,7 @@ Received class: ", paste(class(x), collapse = ", "))
                 all_levels_dt[, .(var, level, Freq, pos, var_order)]
             } else {
                 ## Fallback for variables not in xlevels
-                adf <- data[!is.na(get(var)), .N, by = var]
+                adf <- model_data[!is.na(get(var)), .N, by = var]
                 data.table::setnames(adf, old = c(var, "N"), new = c("level", "Freq"))
                 adf[, var := var]
                 adf[, pos := .I]
@@ -721,11 +754,11 @@ Received class: ", paste(class(x), collapse = ", "))
             }
         }
         else if (terms[i] == "numeric") {
-            data.table::data.table(var = var, level = "-", Freq = nrow(data), pos = 1, var_order = i)
+            data.table::data.table(var = var, level = "-", Freq = nrow(model_data), pos = 1, var_order = i)
         }
         else {
             vars = grep(paste0("^", var, "*."), coef$term, value=TRUE)
-            data.table::data.table(var = vars, level = "-", Freq = nrow(data),
+            data.table::data.table(var = vars, level = "-", Freq = nrow(model_data),
                                    pos = seq_along(vars), var_order = i)
         }
     })
@@ -744,7 +777,7 @@ Received class: ", paste(class(x), collapse = ", "))
     if (length(formula_terms) >= 2) {
         ## Assuming standard Surv(time, status) format
         event_var <- formula_terms[2]
-        event_data <- data[[event_var]]
+        event_data <- model_data[[event_var]]
         
         ## Handle factor event indicators (rare but possible)
         if (is.factor(event_data)) {
@@ -762,8 +795,8 @@ Received class: ", paste(class(x), collapse = ", "))
                 sum(event_binary, na.rm = TRUE)
             } else {
                 ## Factor level - events in that group
-                if (var %in% names(data)) {
-                    sum(event_binary[data[[var]] == level], na.rm = TRUE)
+                if (var %in% names(model_data)) {
+                    sum(event_binary[model_data[[var]] == level], na.rm = TRUE)
                 } else {
                     NA_integer_
                 }
@@ -847,18 +880,18 @@ Received class: ", paste(class(x), collapse = ", "))
                     }
                 }
                 
-                ## If we found conditions, count matching rows and events
+                ## Where conditions were found, count matching rows and events
                 if (length(conditions) > 0) {
                     ## Build subset indices
-                    subset_indices <- rep(TRUE, nrow(data))
+                    subset_indices <- rep(TRUE, nrow(model_data))
                     for (cond_var in names(conditions)) {
-                        subset_indices <- subset_indices & (data[[cond_var]] == conditions[[cond_var]])
+                        subset_indices <- subset_indices & (model_data[[cond_var]] == conditions[[cond_var]])
                     }
                     int_n <- sum(subset_indices, na.rm = TRUE)
                     
                     ## Calculate events if event variable is available
-                    if (!is.null(event_var) && event_var %in% names(data)) {
-                        event_data <- data[[event_var]]
+                    if (!is.null(event_var) && event_var %in% names(model_data)) {
+                        event_data <- model_data[[event_var]]
                         if (is.factor(event_data)) {
                             event_binary <- as.numeric(event_data) == 2
                         } else {
@@ -1146,9 +1179,9 @@ Received class: ", paste(class(x), collapse = ", "))
 
     ## Format N and events with locale-aware thousands separator
     to_show_exp_clean[, n_formatted := data.table::fifelse(is.na(N), "",
-        vapply(N, format_count_forest, character(1), marks = marks))]
+        format_count(N, marks, na = ""))]
     to_show_exp_clean[, events_formatted := data.table::fifelse(is.na(Events), "",
-        vapply(Events, format_count_forest, character(1), marks = marks))]
+        format_count(Events, marks, na = ""))]
     
     ## Clean up variable names for display
     to_show_exp_clean[, var_display := as.character(var)]
@@ -1213,6 +1246,11 @@ Received class: ", paste(class(x), collapse = ", "))
     to_show_exp_clean[is.na(estimate), estimate := 0]
     
     ## Reorder (flip) - but maintain the variable grouping
+    ## Retain the assembled table for return as an attribute. The copy is taken
+    ## before the row order is reversed for plotting, so that the returned table
+    ## follows the order of the model terms rather than the drawing order.
+    table_data <- data.table::copy(to_show_exp_clean)
+    
     to_show_exp_clean <- to_show_exp_clean[order(rev(seq_len(nrow(to_show_exp_clean))))]
     to_show_exp_clean[, x_pos := .I]
     
@@ -1470,11 +1508,11 @@ Received class: ", paste(class(x), collapse = ", "))
     ## Model statistics footer (conditional)
     {if (qc_footer) {
          ggplot2::annotate(geom = "text", x = 0.5, y = exp(y_variable),
-                           label = paste0("Events analyzed: ", gmodel$nevent_with_pct,
+                           label = paste0(gmodel$counts_block,
                                           "\nGlobal log-rank p: ", global_p_formatted,
                                           "\n", concordance_string,
                                           "\nAIC: ", gmodel$AIC_formatted),
-                           size = annot_font, hjust = 0, vjust = 1.2, fontface = "italic")
+                           size = annot_font * 0.65, hjust = 0, vjust = 1.2, fontface = "italic")
     }}
     
     ## Convert units back for output if needed
@@ -1490,7 +1528,14 @@ Received class: ", paste(class(x), collapse = ", "))
     }
     
     ## Add recommended dimensions as an attribute
-    attr(p, "rec_dims") <- list(width = rec_width, height = rec_height)
+    ## The units are recorded alongside the dimensions. Both are converted to
+    ## the requested units above, so a consumer that assumed inches would
+    ## otherwise mis-size the output by the conversion factor.
+    attr(p, "rec_dims") <- list(width = rec_width, height = rec_height,
+                                units = units)
+
+    ## Add the assembled table as an attribute
+    attr(p, "table_data") <- table_data
 
     ## Return the plot
     return(p)

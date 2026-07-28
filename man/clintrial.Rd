@@ -103,7 +103,7 @@ fullfit(clintrial,
         
 }
 \seealso{
-Other sample data: 
+Other sample data:
 \code{\link{clintrial_labels}}
 }
 \concept{sample data}

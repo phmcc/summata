@@ -168,80 +168,90 @@
 #' @seealso
 #' \code{\link{fit}} for individual model fitting,
 #' \code{\link{fullfit}} for automated variable selection,
-#' \code{\link{table2pdf}} for exporting results
+#' \code{\link{tablesave}} for exporting tables
 #'
 #' @examples
 #' # Load example data
 #' data(clintrial)
 #' data(clintrial_labels)
-#' 
+#'
+#' # Information criteria assume a common sample, so the candidate predictors
+#' # are restricted to complete cases before any comparison
+#' comparison_data <- na.omit(
+#'     clintrial[, c("readmission_30d", "os_months", "os_status", "age", "sex",
+#'                   "smoking", "diabetes", "stage", "ecog", "grade",
+#'                   "treatment")]
+#' )
+#'
 #' # Example 1: Compare nested logistic regression models
 #' models <- list(
 #'     base = c("age", "sex"),
 #'     clinical = c("age", "sex", "smoking", "diabetes"),
 #'     full = c("age", "sex", "smoking", "diabetes", "stage", "ecog")
 #' )
-#' 
+#'
 #' comparison <- compfit(
-#'     data = clintrial,
-#'     outcome = "os_status",
+#'     data = comparison_data,
+#'     outcome = "readmission_30d",
 #'     model_list = models,
 #'     model_names = c("Base", "Clinical", "Full")
 #' )
 #' comparison
 #'
 #' \donttest{
-#' 
+#'
 #' # Example 2: Compare Cox survival models
-#' library(survival)
 #' surv_models <- list(
 #'     simple = c("age", "sex"),
 #'     clinical = c("age", "sex", "stage", "grade")
 #' )
-#' 
+#'
 #' surv_comparison <- compfit(
-#'     data = clintrial,
+#'     data = comparison_data,
 #'     outcome = "Surv(os_months, os_status)",
 #'     model_list = surv_models,
 #'     model_type = "coxph"
 #' )
 #' surv_comparison
-#' 
-#' # Example 3: Test effect of adding interaction terms
+#'
+#' # Example 3: Test the effect of adding an interaction term.
+#' # Treatment efficacy differs by disease stage in these data, so the
+#' # interaction is expected to improve the fit.
 #' interaction_models <- list(
-#'     main = c("age", "treatment", "sex"),
-#'     interact = c("age", "treatment", "sex")
+#'     main = c("age", "treatment", "stage"),
+#'     interact = c("age", "treatment", "stage")
 #' )
-#' 
+#'
 #' interaction_comp <- compfit(
-#'     data = clintrial,
-#'     outcome = "os_status",
+#'     data = comparison_data,
+#'     outcome = "Surv(os_months, os_status)",
 #'     model_list = interaction_models,
+#'     model_type = "coxph",
 #'     model_names = c("Main Effects", "With Interaction"),
 #'     interactions_list = list(
 #'         NULL,
-#'         c("treatment:sex")
+#'         c("treatment:stage")
 #'     )
 #' )
 #' interaction_comp
-#' 
+#'
 #' # Example 4: Include coefficient comparison table
 #' detailed <- compfit(
-#'     data = clintrial,
-#'     outcome = "os_status",
+#'     data = comparison_data,
+#'     outcome = "readmission_30d",
 #'     model_list = models,
 #'     include_coefficients = TRUE,
 #'     labels = clintrial_labels
 #' )
-#' 
+#'
 #' # Access coefficient table
 #' coef_table <- attr(detailed, "coefficients")
 #' coef_table
-#' 
+#'
 #' # Example 5: Access fitted model objects
 #' fitted_models <- attr(comparison, "models")
 #' names(fitted_models)
-#' 
+#'
 #' # Example 6: Get best model recommendation
 #' best <- attr(comparison, "best_model")
 #' cat("Recommended model:", best, "\n")
@@ -486,6 +496,38 @@ compfit <- function(data,
 
     ## Combine all rows using rbindlist
     comparison <- data.table::rbindlist(comparison_list, fill = TRUE)
+
+    ## Information criteria and likelihood-based comparisons are only valid
+    ## across models fitted to the same observations. Each model is fitted to
+    ## complete cases for its own predictor set, so a predictor carrying missing
+    ## values silently reduces the sample for every model that contains it, and
+    ## the resulting AIC and BIC are not comparable with those of the models
+    ## that omit it.
+    ##
+    ## This is reported rather than corrected. Restricting all candidates to a
+    ## common complete-case sample changes the estimates themselves, and the
+    ## choice between that, imputation, or dropping the predictor belongs to the
+    ## analyst.
+    if ("N" %chin% names(comparison)) {
+        fitted_rows <- !is.na(comparison$N)
+        
+        if ("Converged" %chin% names(comparison)) {
+            fitted_rows <- fitted_rows & comparison$Converged != "Failed"
+        }
+        
+        sample_sizes <- unique(comparison$N[fitted_rows])
+        
+        if (length(sample_sizes) > 1) {
+            warning("Models were fitted to different numbers of observations (",
+                    paste(sort(sample_sizes), collapse = ", "), "). ",
+                    "AIC, BIC and other likelihood-based comparisons assume a ",
+                    "common sample and are not valid across models fitted to ",
+                    "different observations. Consider restricting the data to ",
+                    "complete cases across all candidate predictors before ",
+                    "comparing.",
+                    call. = FALSE)
+        }
+    }
 
     ## Calculate scores and sort
     comparison <- calculate_model_scores(comparison, model_type, scoring_weights)

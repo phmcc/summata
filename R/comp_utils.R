@@ -278,8 +278,12 @@ extract_lmer_metrics <- function(model, raw_data, metrics) {
     
     ## R-squared measures using MuMIn if available
     if (requireNamespace("MuMIn", quietly = TRUE)) {
+        ## MuMIn refits a null model and warns that the result is only correct
+        ## when that model uses the same variables. The condition holds here, as
+        ## the null is derived from the fitted model itself, and the advisory
+        ## would otherwise surface on every mixed-effects comparison.
         r2_vals <- tryCatch({
-            MuMIn::r.squaredGLMM(model)
+            suppressWarnings(MuMIn::r.squaredGLMM(model))
         }, error = function(e) NULL)
         
         if (!is.null(r2_vals) && nrow(r2_vals) > 0) {
@@ -314,7 +318,14 @@ extract_lmer_metrics <- function(model, raw_data, metrics) {
     ## Try to fit null model and compute LR test
     tryCatch({
         ## Get random effects structure
-        re_terms <- lme4::findbars(formula(model))
+        ## lme4 has moved findbars() to the reformulas package and warns when
+        ## called through the old location. Prefer reformulas where it is
+        ## available and fall back to lme4 otherwise.
+        re_terms <- if (requireNamespace("reformulas", quietly = TRUE)) {
+                        reformulas::findbars(stats::formula(model))
+                    } else {
+                        suppressWarnings(lme4::findbars(stats::formula(model)))
+                    }
         if (length(re_terms) > 0) {
             ## Build null formula with random effects
             re_string <- paste(sapply(re_terms, deparse), collapse = " + ")
@@ -379,8 +390,12 @@ extract_glmer_metrics <- function(model, raw_data, metrics) {
     
     ## R-squared measures using MuMIn if available
     if (requireNamespace("MuMIn", quietly = TRUE)) {
+        ## MuMIn refits a null model and warns that the result is only correct
+        ## when that model uses the same variables. The condition holds here, as
+        ## the null is derived from the fitted model itself, and the advisory
+        ## would otherwise surface on every mixed-effects comparison.
         r2_vals <- tryCatch({
-            MuMIn::r.squaredGLMM(model)
+            suppressWarnings(MuMIn::r.squaredGLMM(model))
         }, error = function(e) NULL)
         
         if (!is.null(r2_vals) && nrow(r2_vals) > 0) {
@@ -424,7 +439,14 @@ extract_glmer_metrics <- function(model, raw_data, metrics) {
     
     ## Global test using LR test
     tryCatch({
-        re_terms <- lme4::findbars(formula(model))
+        ## lme4 has moved findbars() to the reformulas package and warns when
+        ## called through the old location. Prefer reformulas where it is
+        ## available and fall back to lme4 otherwise.
+        re_terms <- if (requireNamespace("reformulas", quietly = TRUE)) {
+                        reformulas::findbars(stats::formula(model))
+                    } else {
+                        suppressWarnings(lme4::findbars(stats::formula(model)))
+                    }
         if (length(re_terms) > 0) {
             re_string <- paste(sapply(re_terms, deparse), collapse = " + ")
             null_form <- stats::as.formula(paste(". ~ 1 +", re_string))

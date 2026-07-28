@@ -19,7 +19,12 @@ m2dt(
 }
 \arguments{
 \item{data}{Data frame or data.table containing the dataset used to fit the
-model. Required for computing group-level sample sizes and event counts.}
+model. Required for computing group-level sample sizes and event counts.
+Where the fitted object retains no model frame, the supplied data is
+restricted to complete cases across the model variables so that group-level
+sample sizes describe the observations actually used in fitting. Group
+sample sizes therefore sum to the model-level \code{n}, and both exclude
+observations with a missing response.}
 
 \item{model}{Fitted model object. Supported classes include:
 \itemize{
@@ -87,13 +92,16 @@ A \code{data.table} containing extracted model information with the
       variable name without the level)}
     \item{group}{Character. Group/level name for factor variables; empty string 
       for continuous variables}
-    \item{n}{Integer. Total sample size used in the model}
-    \item{n_group}{Integer. Sample size for this specific variable level 
-      (factor variables only)}
-    \item{events}{Integer. Total number of events in the model (for survival 
-      and logistic models)}
-    \item{events_group}{Integer. Number of events for this specific variable 
-      level (for survival and logistic models with factor variables)}
+    \item{n}{Integer. Number of observations used in fitting the model, that
+      is complete cases across the model variables}
+    \item{n_group}{Integer. Number of those observations at this variable
+      level (factor variables only). Group sizes sum to \code{n} within
+      each variable}
+    \item{events}{Integer. Number of events among the observations used in
+      fitting (for survival and logistic models)}
+    \item{events_group}{Integer. Number of events at this variable level
+      (for survival and logistic models with factor variables). Group counts
+      sum to \code{events} within each variable}
     \item{coefficient}{Numeric. Raw regression coefficient (log odds, log hazard, 
       \emph{etc.})}
     \item{se}{Numeric. Standard error of the coefficient}

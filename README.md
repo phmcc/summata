@@ -18,7 +18,7 @@ The `summata` package provides a comprehensive framework for generating summary 
 
 For a more comprehensive description of this package and its features, see the [full documentation and vignettes](https://phmcc.codeberg.page/summata/).
 
-<img src="man/figures/README_coxforest.png" alt="Cox regression forest plot" width="100%">
+<img src="man/figures/README_hero.png" alt="Cox regression forest plot" width="100%">
 
 ## Installation
 
@@ -100,13 +100,13 @@ Export of finalized tables to various commonly used formats.
 
 | Function | Format | Dependencies |
 |:---------|:-------|:-----------|
-| `autotable()` | Auto-detect from file extension | Varies |
+| `tablesave()` | Format from file extension | Varies |
 | `table2pdf()` | PDF | `xtable`, LaTeX distribution |
 | `table2tex()` | LaTeX source | `xtable` |
 | `table2html()` | HTML | `xtable` |
-| `table2docx()` | Microsoft Word | `officer`, `flextable` |
-| `table2pptx()` | Microsoft PowerPoint | `officer`, `flextable` |
-| `table2rtf()` | Rich Text Format | `officer`, `flextable` |
+| `table2docx()` | Microsoft Word | `flextable`, `officer` |
+| `table2pptx()` | Microsoft PowerPoint | `flextable`, `officer` |
+| `table2rtf()` | Rich Text Format | `flextable`, `officer` |
 
 #### Data visualization
 
@@ -120,6 +120,7 @@ Generation of publication-ready forest plot graphics to summarize regression mod
 | `coxforest()` | Proportional hazards models |
 | `uniforest()` | Univariable screening results |
 | `multiforest()` | Multivariate regression analysis results |
+| `forestsave()` | Save plots with recommended dimensions |
 
 ### Supported Model Classes
 
@@ -183,7 +184,7 @@ data("clintrial_labels")
 predictors <- c("age", "sex", "race", "ethnicity", "bmi", "smoking",
                 "hypertension", "diabetes", "ecog", "creatinine",
                 "hemoglobin", "biomarker_x", "biomarker_y", "grade",
-                "treatment", "surgery", "los_days", "stage")
+                "stage", "treatment", "surgery")
 ```
 
 ### **Step 1:** Descriptive Statistics
@@ -198,7 +199,7 @@ table1 <- desctable(
     labels = clintrial_labels
 )
 
-table2pdf(table1, "table1.pdf",
+tablesave(table1, "table1.pdf",
           caption = "\\textbf{Table 1} - Baseline characteristics by 30-day readmission status",
           paper = "auto",
           condense_table = TRUE,
@@ -224,7 +225,7 @@ table2 <- fullfit(
     labels = clintrial_labels
 )
 
-table2pdf(table2, "table2.pdf",
+tablesave(table2, "table2.pdf",
           caption = "\\textbf{Table 2} - Predictors of 30-day readmission, multivariable Cox regression with univariable screen",
           paper = "auto",
           condense_table = TRUE,
@@ -246,10 +247,7 @@ forest_30d <- glmforest(table2,
                         indent_groups = TRUE
                         )
 
-ggsave("forest_30d.pdf", forest_30d,
-       width = attr(forest_30d, "rec_dims")$width,
-       height = attr(forest_30d, "rec_dims")$height, 
-       units = "in")
+forestsave(forest_30d, "forest_30d.pdf")
 ```
 
 <img src="man/figures/README_glmforest.png" alt="Forest plot" width="100%">
@@ -293,7 +291,7 @@ A BibTeX entry for LaTeX users is
     title = {summata: Publication-Ready Summary Tables and Forest Plots},
     author = {Paul Hsin-ti McClelland},
     year = {2026},
-    note = {R package version 0.11.5},
+    note = {R package version 0.12.0},
     url = {https://phmcc.codeberg.page/summata/},
   }
 ```

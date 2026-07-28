@@ -104,25 +104,6 @@ forest_ci_separator <- function(has_negatives, marks = NULL) {
 }
 
 
-#' Format an integer for forest plot annotations
-#'
-#' Applies thousands separator to an integer value. Respects locale marks
-#' when provided.
-#'
-#' @param x Integer value.
-#' @param marks Optional list with \code{big.mark} and \code{decimal.mark} as
-#'   returned by \code{\link{resolve_number_marks}}.
-#' @return Character string.
-#' @keywords internal
-format_count_forest <- function(x, marks = NULL) {
-    if (is.na(x)) return("")
-    if (!is.null(marks)) {
-        return(format_count(x, marks))
-    }
-    format(x, big.mark = ",", scientific = FALSE)
-}
-
-
 #' Format a p-value for forest plot annotations
 #'
 #' Returns a formatted p-value string suitable for forest plot display,

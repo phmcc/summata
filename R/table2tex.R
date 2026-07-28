@@ -19,7 +19,7 @@
 #' @param caption_size Numeric. Caption font size in points. If \code{NULL} (default), 
 #'   caption will use the document's default caption size (typically slightly smaller 
 #'   than body text). Set to a specific value (\emph{e.g.,} 6, 7, 8, 9) to control caption 
-#'   size explicitly. This generates a LaTeX comment that you can use when wrapping 
+#'   size explicitly. This generates a LaTeX comment for use when wrapping 
 #'   the table. Typical range: 6-10 points.
 #'   
 #' @param format_headers Logical. If \code{TRUE}, formats column headers by 
@@ -99,8 +99,13 @@
 #'   
 #' @param ... Additional arguments passed to \code{\link[xtable]{xtable}}.
 #'
-#' @return Invisibly returns \code{NULL}. Creates a \code{.tex} file at the specified 
-#'   location containing a LaTeX tabular environment.
+#' @param quiet Logical. Suppress progress and confirmation messages, such
+#'   as the notice reporting the file written. Errors and warnings are
+#'   unaffected. Default is \code{FALSE}.
+#'
+#' @return Invisibly returns the file path, matching \code{tablesave()} and
+#'   \code{forestsave()}. Called for its side effect of creating a \code{.tex}
+#'   file at the specified location containing a LaTeX tabular environment.
 #'
 #' @details
 #' \strong{Output Format:}
@@ -123,7 +128,7 @@
 #' 
 #' \strong{Required LaTeX Packages:}
 #' 
-#' Add these to your LaTeX document preamble:
+#' The following are required in the LaTeX document preamble:
 #' 
 #' \emph{Always required:}
 #' \preformatted{
@@ -168,7 +173,7 @@
 #' dark_header = TRUE  # Black background, white text
 #' }
 #' 
-#' Both require the xcolor package with table option in your document.
+#' Both require the xcolor package with the table option in the document preamble.
 #' 
 #' \strong{Integration with LaTeX Documents:}
 #' 
@@ -210,7 +215,7 @@
 #' 
 #' \strong{Special Characters:}
 #' 
-#' The function automatically escapes LaTeX special characters in your data:
+#' The function automatically escapes LaTeX special characters in the data:
 #' \itemize{
 #'   \item Ampersand, percent, dollar sign, hash, underscore
 #'   \item Left and right braces
@@ -221,7 +226,7 @@
 #' intentionally using LaTeX commands.
 #' 
 #' @seealso
-#' \code{\link{autotable}} for automatic format detection,
+#' \code{\link{tablesave}} for saving in the format given by the file extension,
 #' \code{\link{table2pdf}} for direct PDF output,
 #' \code{\link{table2html}} for HTML tables,
 #' \code{\link{table2docx}} for Word documents,
@@ -340,8 +345,12 @@
 #'    full = c("age", "sex", "treatment", "stage")
 #' )
 #' 
+#' # Information criteria assume a common sample, so the candidate
+#' # predictors are restricted to complete cases before comparison
+#' comparison_data <- na.omit(clintrial[, c("os_status", "age", "sex", "treatment", "stage")])
+#' 
 #' comparison <- compfit(
-#'    data = clintrial,
+#'    data = comparison_data,
 #'    outcome = "os_status",
 #'    model_list = models
 #' )
@@ -374,6 +383,7 @@ table2tex <- function (table,
                      caption_size = NULL,
                      label = NULL,
                      show_logs = FALSE,
+                     quiet = FALSE,
                      ...) {
     
     if (!requireNamespace("xtable", quietly = TRUE)) {
@@ -674,7 +684,7 @@ table2tex <- function (table,
         header_command <- "\\rowcolor{black}"
         
         if (!is.null(add.to.row) && length(add.to.row$pos) > 0) {
-            ## Check if we need to combine with arraystretch at position -1
+            ## Determine whether to combine with arraystretch at position -1
             if (-1 %in% unlist(add.to.row$pos)) {
                 ## Find the index and append to that command
                 idx <- which(unlist(add.to.row$pos) == -1)
@@ -703,7 +713,7 @@ table2tex <- function (table,
     
     ## Write comment about required packages if using special features
     if (dark_header || zebra_stripes) {
-        writeLines("% This table requires \\usepackage[table]{xcolor} in your LaTeX preamble", file_conn)
+        writeLines("% This table requires \\usepackage[table]{xcolor} in the LaTeX preamble", file_conn)
     }
     if (!is.null(array_stretch)) {
         writeLines(sprintf("%% Cell padding applied with \\arraystretch{%s}", array_stretch), file_conn)
@@ -729,7 +739,7 @@ table2tex <- function (table,
     if (!is.null(add.to.row) && length(add.to.row$pos) > 0) {
         print(xt,
               file = file,
-              append = TRUE,  # Append after our comments
+              append = TRUE,  # Append after the preceding comments
               include.rownames = FALSE,
               booktabs = booktabs, 
               floating = FALSE,
@@ -741,7 +751,7 @@ table2tex <- function (table,
     } else {
         print(xt,
               file = file,
-              append = TRUE,  # Append after our comments
+              append = TRUE,  # Append after the preceding comments
               include.rownames = FALSE,
               booktabs = booktabs, 
               floating = FALSE,
@@ -754,19 +764,19 @@ table2tex <- function (table,
     ## Add a note about required packages if using special features
     if (show_logs) {
         if (dark_header || zebra_stripes) {
-            message("Note: This table requires \\usepackage[table]{xcolor} in your LaTeX preamble")
+            if (!quiet) message("Note: This table requires \\usepackage[table]{xcolor} in the LaTeX preamble")
         }
         if (!is.null(array_stretch) && cell_padding != "none") {
-            message(sprintf("Note: Cell padding applied with \\arraystretch{%s}", array_stretch))
+            if (!quiet) message(sprintf("Note: Cell padding applied with \\arraystretch{%s}", array_stretch))
         }
         if (!is.null(caption_size)) {
             baseline_skip <- ceiling(caption_size * 1.2)
-            message(sprintf("Note: To use %dpt caption, wrap caption in: {\\fontsize{%d}{%d}\\selectfont ...}", 
+            if (!quiet) message(sprintf("Note: To use %dpt caption, wrap caption in: {\\fontsize{%d}{%d}\\selectfont ...}", 
                             caption_size, caption_size, baseline_skip))
         }
     }
     
-    message(sprintf("Table exported to %s", file))
+    if (!quiet) message(sprintf("Table saved to %s", file))
     
-    invisible(NULL)
+    invisible(file)
 }

@@ -5,17 +5,12 @@
 #' 
 #' @details Run with testthat::test_file("tests/testthat/test-fullfit.R")
 
-library(testthat)
 library(data.table)
-library(summata)
 
 ## ============================================================================
 ## Setup: Create test data and helper functions
 ## ============================================================================
 
-## Use package's built-in clinical trial data
-data(clintrial)
-data(clintrial_labels)
 
 ## Create a complete-case subset for tests requiring no missing data
 clintrial_complete <- na.omit(clintrial)
@@ -547,8 +542,6 @@ test_that("fullfit works with linear model", {
 
 
 test_that("fullfit works with Cox regression", {
-    
-    skip_if_not_installed("survival")
     
     result <- fullfit(
         data = clintrial,
@@ -1274,8 +1267,6 @@ test_that("fullfit produces consistent results", {
 
 test_that("fullfit Cox shows Events column", {
     
-    skip_if_not_installed("survival")
-    
     result <- fullfit(
         data = clintrial,
         outcome = "Surv(os_months, os_status)",
@@ -1290,8 +1281,6 @@ test_that("fullfit Cox shows Events column", {
 
 
 test_that("fullfit Cox screening works correctly", {
-    
-    skip_if_not_installed("survival")
     
     result <- fullfit(
         data = clintrial,
@@ -1663,8 +1652,6 @@ test_that("fullfit negbin return_type='both' works", {
 ## ============================================================================
 
 test_that("fullfit handles complex parameter combinations", {
-    
-    skip_if_not_installed("survival")
     
     result <- fullfit(
         data = clintrial,

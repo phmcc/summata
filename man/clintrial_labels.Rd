@@ -17,7 +17,7 @@ in the clinical_trial dataset. Use with labels parameter in functions.
 \seealso{
 \code{\link{clintrial}}
 
-Other sample data: 
+Other sample data:
 \code{\link{clintrial}}
 }
 \concept{sample data}

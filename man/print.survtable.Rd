@@ -19,9 +19,9 @@ Invisibly returns the input object \code{x}. Called for its
 Print method for survtable
 }
 \seealso{
-Other descriptive functions: 
-\code{\link{desctable}()},
-\code{\link{survtable}()}
+Other descriptive functions:
+\code{\link[=desctable]{desctable()}},
+\code{\link[=survtable]{survtable()}}
 }
 \concept{descriptive functions}
 \keyword{internal}

@@ -1,6 +1,24 @@
+# *summata* 0.12.0 (2026-07-28)
+
+* Fix *n*/Events counts to report complete cases across all functions, so group sizes sum to the model *n*; empty factor levels now report zero, and `multifit()` adjusted columns match `fullfit()` (STROBE item 12)
+* Report the analyzed sample and events in `print()` methods and forest plot footers, with counts available via the `analysis_counts` attribute
+* Import `Surv()`, `strata()`, `cluster()`, and `coxph()` from `survival` to fix `clogit` and `coxme` failures when the package is not attached by the user
+* Fix coefficient parsing for variable names that share a prefix or contain regular expression metacharacters
+* Fix `uniforest()` to draw factor levels in their established order rather than alphabetically when `indent_groups = TRUE`
+* Fix counts of 100,000 or greater displaying in exponential notation, and centralize count formatting in a vectorized `format_count()`
+* Carry variable labels from the regression functions through to the forest plot functions, so labels supplied once apply to both table and plot
+* Add `forestsave()` for saving forest plots at their recommended dimensions, with format-appropriate graphics devices and optional font embedding; `rec_dims` now records its units
+* Rename `autotable()` to `tablesave()`, pairing it with `forestsave()` and distinguishing it from `autoforest()`, which detects model class rather than file format; `autotable()` is retained as a deprecated alias
+* Add `quiet` argument to `tablesave()` and the `table2*()` functions, and return the file path invisibly from `table2pdf()`, `table2html()`, and `table2tex()`
+* Add `table_data` attribute to the forest plot functions for access to the values drawn in the figure
+* Add `compfit()` warning when candidate models are fitted to different numbers of observations
+* Suppress spurious diagnostics: singular-fit messages from mixed-effects screening, the deprecated `lme4::findbars()` call, the `MuMIn::r.squaredGLMM()` null model advisory, and the Hosmer-Lemeshow test where fitted values are too few to bin
+* Declare `parallel`, `tools`, and `utils` in Imports, and add `SystemRequirements` for the optional external tools
+* Documentation and testing suite revisions
+
 # *summata* 0.11.5 (2026-05-06)
 
-* Explicitly define `%||%` operator for backward compatability
+* Explicitly define `%||%` operator for backward compatibility
 * Move main documentation to Codeberg Pages
 * Minor documentation edits
 
@@ -50,7 +68,7 @@
 
 # *summata* 0.10.7 (2026-02-05)
 
-* Add R-hub compatability
+* Add R-hub compatibility
 * Documentation and vignette updates
 
 # *summata* 0.10.6 (2026-01-20)
@@ -109,7 +127,7 @@
 
 * Add `show_logs` parameter to `table2tex()`
 * Consistent Unicode formatting for files
-* Increased R version requirement to >= 4.2.0 for better Unicode compatability
+* Increased R version requirement to >= 4.2.0 for better Unicode compatibility
 * Add `survtable()` function with utilities
 * Minor optimizations and function cleanup, with notation standardization
 

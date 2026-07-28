@@ -74,8 +74,9 @@
 #'   of rows). The function provides recommendations if not specified.
 #'   
 #' @param show_n Logical. If \code{TRUE}, includes a column showing group-specific 
-#'   sample sizes for categorical variables and total sample size for continuous 
-#'   variables. Default is \code{TRUE}.
+#'   sample sizes for categorical variables and the fitted sample size for
+#'   continuous variables. Counts describe the observations used in fitting
+#'   rather than every row supplied. Default is \code{TRUE}.
 #'   
 #' @param show_events Logical. If \code{TRUE}, includes a column showing the 
 #'   number of events for each group. Relevant for logistic regression (number 
@@ -109,9 +110,10 @@
 #' @param labels Named character vector or list providing custom display 
 #'   labels for variables. Names should match variable names in the model, 
 #'   values are the labels to display. Example: 
-#'   \code{c(age = "Age (years)", bmi = "Body Mass Index")}. Default is \code{NULL} 
-#'   (use original variable names).
-#'   
+#'   \code{c(age = "Age (years)", bmi = "Body Mass Index")}. Default is
+#'   \code{NULL}, in which case the labels attached by the function that produced
+#'   \code{x} are used, where \code{x} is a \pkg{summata} result rather than a
+#'   model object. Original variable names are used where neither is available.
 #' @param color Character string specifying the color for effect estimate point 
 #'   markers in the forest plot. Use hex codes or R color names. Default is 
 #'   \code{NULL}, which auto-selects based on effect type: \code{"#4BA6B6"} 
@@ -161,7 +163,7 @@
 #'   can be:
 #'   \itemize{
 #'     \item Displayed directly: \code{print(plot)}
-#'     \item Saved to file: \code{ggsave("forest.pdf", plot, width = 12, height = 8)}
+#'     \item Saved to file: \code{forestsave(plot, "forest.pdf")}
 #'     \item Further customized with \pkg{ggplot2} functions
 #'   }
 #'   
@@ -175,7 +177,18 @@
 #'   
 #'   These recommendations are automatically calculated based on the number of 
 #'   variables, text sizes, and layout parameters, and are printed to console 
-#'   if \code{plot_width} or \code{plot_height} are not specified.
+#'   if \code{plot_width} or \code{plot_height} are not specified. The list also 
+#'   carries a \code{units} element recording the units the dimensions are 
+#'   expressed in, matching the \code{units} argument. \code{forestsave()} reads 
+#'   all three and requires no further handling.
+#'
+#'   The returned object also includes an attribute \code{"table_data"}
+#'   accessible via \code{attr(plot, "table_data")}, a data.table holding the
+#'   values drawn in the plot: one row per term in model order, with the
+#'   variable, factor level, sample size, event count, estimate, confidence
+#'   bounds and p-value. Sample sizes and event counts describe the
+#'   observations used in fitting rather than every row supplied, so they sum
+#'   to the model sample size within each variable.
 #'
 #' @details
 #' \strong{Plot Components:}
@@ -201,7 +214,7 @@
 #'     }
 #'   \item \strong{Model Statistics} (footer): Summary of:
 #'     \itemize{
-#'       \item Observations analyzed (with percentage of total data)
+#'       \item Observations analyzed (with total observations and percentage)
 #'       \item Model family (Binomial, Poisson, \emph{etc.})
 #'       \item Deviance statistics
 #'       \item Pseudo-\emph{R}\eqn{^2} (McFadden)
@@ -270,8 +283,9 @@
 #' 
 #' The footer shows key diagnostic information:
 #' \itemize{
-#'   \item \strong{Observations analyzed}: Total N and percentage of original 
-#'     data (accounting for missing values)
+#'   \item \strong{Observations analyzed}: Observations used in fitting, the 
+#'     total supplied, and the percentage retained (accounting for missing 
+#'     values)
 #'   \item \strong{Null/Residual Deviance}: Model fit improvement
 #'   \item \strong{Pseudo-\emph{R}\eqn{^2}}: McFadden \emph{R}\eqn{^2} = 1 - (log L_1 / log L_2)
 #'   \item \strong{AIC}: For model comparison (lower is better)
@@ -282,16 +296,16 @@
 #' 
 #' \strong{Saving Plots:}
 #' 
-#' Use \code{ggplot2::ggsave()} with recommended dimensions:
+#' Use \code{forestsave()}, which applies the recommended dimensions and
+#' selects a graphics device suited to the format:
 #' \preformatted{
 #'   p <- glmforest(model, data)
-#'   dims <- attr(p, "rec_dims")
-#'   ggplot2::ggsave("forest.pdf", p, width = dims$width, height = dims$height)
+#'   forestsave(p, "forest.pdf")
 #' }
 #' 
 #' Or specify custom dimensions:
 #' \preformatted{
-#' ggplot2::ggsave("forest.png", p, width = 12, height = 8, dpi = 300)
+#' forestsave(p, "forest.png", width = 12, height = 8, dpi = 300)
 #' }
 #'
 #' @seealso 
@@ -301,7 +315,8 @@
 #' \code{\link{uniforest}} for univariable screening forest plots,
 #' \code{\link{multiforest}} for multi-outcome forest plots,
 #' \code{\link[stats]{glm}} for fitting GLMs,
-#' \code{\link{fit}} for regression modeling
+#' \code{\link{fit}} for regression modeling,
+#'   \code{\link{forestsave}} for saving with recommended dimensions
 #'
 #' @examples
 #' data(clintrial)
@@ -363,9 +378,7 @@
 #' )
 #' 
 #' # Example 6: Save with recommended dimensions
-#' dims <- attr(plot5, "rec_dims")
-#' ggplot2::ggsave(file.path(tempdir(), "forest.pdf"),
-#'                 plot5, width = dims$width, height = dims$height)
+#' forestsave(plot5, file.path(tempdir(), "forest.pdf"))
 #'
 #' options(old_width)
 #' 
@@ -473,7 +486,7 @@ Received class: ", paste(class(x), collapse = ", "))
         plot_width <- convert_units(plot_width, from = units, to = "in")
     }
 
-    ## Determine if we should exponentiate based on link function
+    ## Determine whether to exponentiate, based on the link function
     if(is.null(exponentiate)) {
         if (is_lme4) {
             ## For lme4 models, extract family info differently
@@ -567,6 +580,14 @@ Received class: ", paste(class(x), collapse = ", "))
         data <- model_data  # Use the model data as the base
     }
     
+    ## A model fitted with model = FALSE retains no model frame. Group counts
+    ## must still describe the observations used in fitting, so the supplied
+    ## data is restricted to complete cases across the model variables rather
+    ## than counted in full.
+    if (is.null(model_data) && !is.null(data)) {
+        model_data <- get_analysis_data(model, class(model)[1], data)
+    }
+    
     ## Convert to data.table if not already
     if(!data.table::is.data.table(data)) {
         data <- data.table::as.data.table(data)
@@ -604,7 +625,7 @@ Received class: ", paste(class(x), collapse = ", "))
         terms <- attr(model$terms, "dataClasses")[-1]
     }
     
-    ## Filter out interaction terms (contain ":") - we handle these separately via coefficients
+    ## Filter out interaction terms (contain ":"), which are handled separately via coefficients
     terms <- terms[!grepl(":", names(terms), fixed = TRUE)]
     
     ## Extract coefficients and confidence intervals
@@ -624,7 +645,7 @@ Received class: ", paste(class(x), collapse = ", "))
         )
         rownames(conf_int) <- names(coef_vals)
         
-        ## Extract z values - for lme4, we calculate them
+        ## Extract z values; for lme4 these are calculated
         z_values <- coef_summary[, "Estimate"] / coef_summary[, "Std. Error"]
         p_values <- 2 * pnorm(abs(z_values), lower.tail = FALSE)
         
@@ -703,13 +724,57 @@ Received class: ", paste(class(x), collapse = ", "))
     
     ## Calculate total observations and percentage analyzed
     total_obs <- nrow(data)
-    gmodel$pct_analyzed <- (gmodel$nobs / total_obs) * 100
     
-    ## Format observations and AIC with locale-aware separators
-    gmodel$nobs_formatted <- format_count_forest(gmodel$nobs, marks)
-    pct_str <- sprintf("%.1f%%", gmodel$pct_analyzed)
-    if (marks$decimal.mark != ".") pct_str <- sub(".", marks$decimal.mark, pct_str, fixed = TRUE)
-    gmodel$nobs_with_pct <- paste0(gmodel$nobs_formatted, " (", pct_str, ")")
+    ## Events are reported alongside observations for the families that carry
+    ## them. Events per predictor is the constraint on a logistic or count
+    ## model, and a figure is read without the console output beside it.
+    fp_event_families <- c("binomial", "quasibinomial", "poisson",
+                           "quasipoisson", "negbin")
+    fp_family <- if (is_lme4) {
+                     model@resp$family$family
+                 } else if (inherits(model, "negbin")) {
+                     "negbin"
+                 } else {
+                     model$family$family
+                 }
+
+    gmodel$nevent <- NA_real_
+    fp_total_events <- NA_real_
+
+    if (fp_family %in% fp_event_families) {
+        ## Coded as the modeling functions code it, matching the Events
+        ## column built further below
+        code_events <- function(y) {
+            if (is.factor(y)) as.numeric(y) == 2 else y
+        }
+        fp_outcome_var <- all.vars(stats::formula(model))[1]
+
+        if (is_lme4) {
+            gmodel$nevent <- sum(code_events(model@resp$y), na.rm = TRUE)
+        } else if (fp_outcome_var %in% names(model_data)) {
+            gmodel$nevent <- sum(code_events(model_data[[fp_outcome_var]]),
+                                 na.rm = TRUE)
+        }
+
+        if (fp_outcome_var %in% names(data)) {
+            fp_total_events <- sum(code_events(data[[fp_outcome_var]]),
+                                   na.rm = TRUE)
+        }
+    }
+
+    ## Both lines are rendered by the formatter the print methods use, so that
+    ## a figure and the table it accompanies disclose in identical terms
+    gmodel$obs_line <- format_analysis_counts(
+        list(n_supplied = total_obs, n_analyzed = gmodel$nobs),
+        label = "Observations analyzed", marks = marks)
+
+    gmodel$events_line <- format_analysis_counts(
+        list(n_supplied = fp_total_events, n_analyzed = gmodel$nevent),
+        label = "Events analyzed", marks = marks)
+
+    ## Either line is dropped rather than shown without its denominator
+    gmodel$counts_block <- paste(
+        c(gmodel$obs_line, gmodel$events_line), collapse = "\n")
     aic_val <- format(round(gmodel$AIC, 2), big.mark = marks$big.mark, decimal.mark = marks$decimal.mark, scientific = FALSE, nsmall = 2)
     gmodel$AIC_formatted <- trimws(aic_val)
     
@@ -932,7 +997,7 @@ Received class: ", paste(class(x), collapse = ", "))
                     }
                 }
                 
-                ## If we found conditions, count matching rows
+                ## Where conditions were found, count matching rows
                 if (length(conditions) > 0) {
                     ## Build subset expression safely
                     subset_dt <- data.table::copy(model_data)
@@ -1259,9 +1324,9 @@ Received class: ", paste(class(x), collapse = ", "))
 
     ## Format N and events with thousands separator
     to_show_exp_clean[, n_formatted := data.table::fifelse(is.na(N), "",
-        vapply(N, format_count_forest, character(1), marks = marks))]
+        format_count(N, marks, na = ""))]
     to_show_exp_clean[, events_formatted := data.table::fifelse(is.na(Events), "",
-        vapply(Events, format_count_forest, character(1), marks = marks))]
+        format_count(Events, marks, na = ""))]
 
     ## Clean up variable names for display
     to_show_exp_clean[, var_display := as.character(var)]
@@ -1330,6 +1395,11 @@ Received class: ", paste(class(x), collapse = ", "))
     }
 
     ## Reorder (flip), but maintain the variable grouping
+    ## Retain the assembled table for return as an attribute. The copy is taken
+    ## before the row order is reversed for plotting, so that the returned table
+    ## follows the order of the model terms rather than the drawing order.
+    table_data <- data.table::copy(to_show_exp_clean)
+    
     to_show_exp_clean <- to_show_exp_clean[order(rev(seq_len(nrow(to_show_exp_clean))))]
     to_show_exp_clean[, x_pos := .I]
 
@@ -1607,12 +1677,12 @@ Received class: ", paste(class(x), collapse = ", "))
             ## Model statistics footer (conditional)
             {if (qc_footer) {
                  ggplot2::annotate(geom = "text", x = 0.5, y = exp(y_variable),
-                                   label = paste0("Observations analyzed: ", gmodel$nobs_with_pct,
+                                   label = paste0(gmodel$counts_block,
                                                   "\nModel: ", gmodel$family,
                                                   "\nNull (Residual) Deviance: ", null_dev_formatted, " (", resid_dev_formatted, ")",
                                                   "\nPseudo R\u00b2: ", pseudo_r2_formatted,
                                                   "\nAIC: ", gmodel$AIC_formatted),
-                                   size = annot_font * 0.8, hjust = 0, vjust = 1.2, fontface = "italic")
+                                   size = annot_font * 0.65, hjust = 0, vjust = 1.2, fontface = "italic")
             }}
         
     } else {
@@ -1752,12 +1822,12 @@ Received class: ", paste(class(x), collapse = ", "))
             ## Model statistics at bottom (conditional)
             {if (qc_footer) {
                  ggplot2::annotate(geom = "text", x = 0.5, y = y_variable,
-                                   label = paste0("Observations analyzed: ", gmodel$nobs_with_pct,
+                                   label = paste0(gmodel$counts_block,
                                                   "\nModel: ", gmodel$family,
                                                   "\nNull (Residual) Deviance: ", null_dev_formatted, " (", resid_dev_formatted, ")",
                                                   "\nPseudo R\u00b2: ", pseudo_r2_formatted,
                                                   "\nAIC: ", gmodel$AIC_formatted),
-                                   size = annot_font * 0.8, hjust = 0, vjust = 1.2, fontface = "italic")
+                                   size = annot_font * 0.65, hjust = 0, vjust = 1.2, fontface = "italic")
             }}
     }
 
@@ -1774,7 +1844,14 @@ Received class: ", paste(class(x), collapse = ", "))
     }
 
     ## Add recommended dimensions as an attribute
-    attr(p, "rec_dims") <- list(width = rec_width, height = rec_height)
+    ## The units are recorded alongside the dimensions. Both are converted to
+    ## the requested units above, so a consumer that assumed inches would
+    ## otherwise mis-size the output by the conversion factor.
+    attr(p, "rec_dims") <- list(width = rec_width, height = rec_height,
+                                units = units)
+
+    ## Add the assembled table as an attribute
+    attr(p, "table_data") <- table_data
 
     ## Return the plot
     return(p)

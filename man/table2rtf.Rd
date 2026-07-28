@@ -24,6 +24,7 @@ table2rtf(
   width = NULL,
   align = NULL,
   return_ft = FALSE,
+  quiet = FALSE,
   ...
 )
 }
@@ -108,6 +109,10 @@ Example: \code{c("left", "left", "center", "right", "right")}.}
 directly for further customization. If \code{FALSE} (default), returns 
 invisibly with flextable as attribute. See Details for usage. 
 Default is \code{FALSE}.}
+
+\item{quiet}{Logical. Suppress progress and confirmation messages, such
+as the notice reporting the file written. Errors and warnings are
+unaffected. Default is \code{FALSE}.}
 
 \item{...}{Additional arguments (currently unused, reserved for future extensions).}
 }
@@ -373,7 +378,7 @@ options(old_width)
 }
 }
 \seealso{
-\code{\link{autotable}} for automatic format detection,
+\code{\link{tablesave}} for saving in the format given by the file extension,
 \code{\link{table2docx}} for Word documents,
 \code{\link{table2pptx}} for PowerPoint slides,
 \code{\link{table2pdf}} for PDF output,
@@ -382,12 +387,12 @@ options(old_width)
 \code{\link[flextable]{flextable}} for the underlying table object,
 \code{\link[flextable]{save_as_rtf}} for direct RTF export
 
-Other export functions: 
-\code{\link{autotable}()},
-\code{\link{table2docx}()},
-\code{\link{table2html}()},
-\code{\link{table2pdf}()},
-\code{\link{table2pptx}()},
-\code{\link{table2tex}()}
+Other export functions:
+\code{\link[=table2docx]{table2docx()}},
+\code{\link[=table2html]{table2html()}},
+\code{\link[=table2pdf]{table2pdf()}},
+\code{\link[=table2pptx]{table2pptx()}},
+\code{\link[=table2tex]{table2tex()}},
+\code{\link[=tablesave]{tablesave()}}
 }
 \concept{export functions}
