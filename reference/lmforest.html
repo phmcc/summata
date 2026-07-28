@@ -23,7 +23,7 @@ manuscripts and presentations."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -196,7 +196,9 @@ total plot width allocated to the data table. Default is 0.6.</p></dd>
 
 <dt id="arg-show-n">show_n<a class="anchor" aria-label="anchor" href="#arg-show-n"></a></dt>
 <dd><p>Logical. If <code>TRUE</code>, includes a column showing group-specific
-sample sizes. Default is <code>TRUE</code>.</p></dd>
+sample sizes.
+Counts describe the observations used in fitting rather than every row
+supplied. Default is <code>TRUE</code>.</p></dd>
 
 
 <dt id="arg-indent-groups">indent_groups<a class="anchor" aria-label="anchor" href="#arg-indent-groups"></a></dt>
@@ -235,7 +237,10 @@ factor variables. Default is <code>"reference"</code>.</p></dd>
 <dt id="arg-labels">labels<a class="anchor" aria-label="anchor" href="#arg-labels"></a></dt>
 <dd><p>Named character vector providing custom display labels for
 variables. Example: <code>c(age = "Age (years)", height = "Height (cm)")</code>.
-Default is <code>NULL</code>.</p></dd>
+Default is <code>NULL</code>, in which case the labels attached by the function
+that produced <code>x</code> are used, where <code>x</code> is a <span class="pkg">summata</span> result
+rather than a model object. Original variable names are used where neither
+is available.</p></dd>
 
 
 <dt id="arg-units">units<a class="anchor" aria-label="anchor" href="#arg-units"></a></dt>
@@ -276,7 +281,7 @@ statistics in the footer (observations analyzed, <em>R</em>\(^2\), adjusted
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A <code>ggplot</code> object containing the complete forest plot. The plot
   can be:</p><ul><li><p>Displayed directly: <code>print(plot)</code></p></li>
-<li><p>Saved to file: <code>ggsave("forest.pdf", plot, width = 12, height = 8)</code></p></li>
+<li><p>Saved to file: <code>forestsave(plot, "forest.pdf")</code></p></li>
 <li><p>Further customized with <span class="pkg">ggplot2</span> functions</p></li>
 </ul><p>The returned object includes an attribute <code>"rec_dims"</code>
   accessible via <code>attr(plot, "rec_dims")</code>, which is a list
@@ -289,7 +294,17 @@ statistics in the footer (observations analyzed, <em>R</em>\(^2\), adjusted
 
 </dl><p>These recommendations are automatically calculated based on the number of
   variables, text sizes, and layout parameters, and are printed to console
-  if <code>plot_width</code> or <code>plot_height</code> are not specified.</p>
+  if <code>plot_width</code> or <code>plot_height</code> are not specified. The list also
+  carries a <code>units</code> element recording the units the dimensions are
+  expressed in, matching the <code>units</code> argument. <code><a href="forestsave.html">forestsave()</a></code> reads
+  all three and requires no further handling.</p>
+<p>The returned object also includes an attribute <code>"table_data"</code>
+  accessible via <code>attr(plot, "table_data")</code>, a data.table holding the
+  values drawn in the plot: one row per term in model order, with the
+  variable, factor level, sample size, estimate, confidence bounds and
+  p-value. Sample sizes describe the observations used in fitting rather
+  than every row supplied, so they sum to the model sample size within each
+  variable.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -312,7 +327,7 @@ statistics in the footer (observations analyzed, <em>R</em>\(^2\), adjusted
 <li><p>Reference line at coefficient = 0</p></li>
 <li><p>Linear scale</p></li>
 </ul></li>
-<li><p><strong>Model Statistics</strong> (footer):</p><ul><li><p>Observations analyzed (with percentage of total data)</p></li>
+<li><p><strong>Model Statistics</strong> (footer):</p><ul><li><p>Observations analyzed (with total observations and percentage)</p></li>
 <li><p><em>R</em>\(^2\) and adjusted <em>R</em>\(^2\)</p></li>
 <li><p><em>F</em>-statistic with degrees of freedom and <em>p</em>-value</p></li>
 <li><p>AIC</p></li>
@@ -360,8 +375,8 @@ BMI increases by 0.50 kg/m\(^2\) for each additional year of age.</p>
 </ul><p><strong>Sample Size Reporting:</strong></p>
 <p>The "<em>n</em>" column shows:</p><ul><li><p>For continuous variables: Total observations with non-missing data</p></li>
 <li><p>For factor variables: Number of observations in each category</p></li>
-<li><p>Footer shows total observations analyzed and percentage of original
-    data (accounting for missing values)</p></li>
+<li><p>Footer shows observations used in fitting, the total supplied, and
+    the percentage retained (accounting for missing values)</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -371,10 +386,12 @@ BMI increases by 0.50 kg/m\(^2\) for each additional year of age.</p>
 <code><a href="uniforest.html">uniforest</a></code> for univariable screening forest plots,
 <code><a href="multiforest.html">multiforest</a></code> for multi-outcome forest plots,
 <code><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></code> for fitting linear models,
-<code><a href="fit.html">fit</a></code> for regression modeling</p>
+<code><a href="fit.html">fit</a></code> for regression modeling,
+  <code><a href="forestsave.html">forestsave</a></code> for saving with recommended dimensions</p>
 <p>Other visualization functions:
 <code><a href="autoforest.html">autoforest()</a></code>,
 <code><a href="coxforest.html">coxforest()</a></code>,
+<code><a href="forestsave.html">forestsave()</a></code>,
 <code><a href="glmforest.html">glmforest()</a></code>,
 <code><a href="multiforest.html">multiforest()</a></code>,
 <code><a href="uniforest.html">uniforest()</a></code></p></div>
@@ -446,9 +463,8 @@ BMI increases by 0.50 kg/m\(^2\) for each additional year of age.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Recommended plot dimensions: width = 16.0 in, height = 5.0 in</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 6: Save with recommended dimensions</span></span></span>
-<span class="r-in"><span><span class="va">dims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">plot5</span>, <span class="st">"rec_dims"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"linear_forest.pdf"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                <span class="va">plot5</span>, width <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">width</span>, height <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">height</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="forestsave.html">forestsave</a></span><span class="op">(</span><span class="va">plot5</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"linear_forest.pdf"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/RtmptN10wa/linear_forest.pdf (width = 16.0 in, height = 5.0 in)</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="va">old_width</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
@@ -464,7 +480,7 @@ BMI increases by 0.50 kg/m\(^2\) for each additional year of age.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
 </div>
 
     </footer></div>

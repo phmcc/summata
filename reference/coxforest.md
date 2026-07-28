@@ -131,7 +131,8 @@ coxforest(
 - show_n:
 
   Logical. If `TRUE`, includes a column showing group-specific sample
-  sizes. Default is `TRUE`.
+  sizes. Counts describe the observations used in fitting rather than
+  every row supplied. Default is `TRUE`.
 
 - show_events:
 
@@ -177,7 +178,10 @@ coxforest(
 
   Named character vector providing custom display labels for variables.
   Example: `c(age = "Age (years)", stage = "Disease Stage")`. Default is
-  `NULL`.
+  `NULL`, in which case the labels attached by the function that
+  produced `x` are used, where `x` is a summata result rather than a
+  model object. Original variable names are used where neither is
+  available.
 
 - color:
 
@@ -226,7 +230,7 @@ A `ggplot` object containing the complete forest plot. The plot can be:
 
 - Displayed directly: `print(plot)`
 
-- Saved to file: `ggsave("forest.pdf", plot, width = 12, height = 8)`
+- Saved to file: `forestsave(plot, "forest.pdf")`
 
 - Further customized with ggplot2 functions
 
@@ -243,7 +247,19 @@ The returned object includes an attribute `"rec_dims"` accessible via
 
 These recommendations are automatically calculated based on the number
 of variables, text sizes, and layout parameters, and are printed to
-console if `plot_width` or `plot_height` are not specified.
+console if `plot_width` or `plot_height` are not specified. The list
+also carries a `units` element recording the units the dimensions are
+expressed in, matching the `units` argument.
+[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+reads all three and requires no further handling.
+
+The returned object also includes an attribute `"table_data"` accessible
+via `attr(plot, "table_data")`, a data.table holding the values drawn in
+the plot: one row per term in model order, with the variable, factor
+level, sample size, event count, estimate, confidence bounds and
+p-value. Sample sizes and event counts describe the observations used in
+fitting rather than every row supplied, so they sum to the model sample
+size within each variable.
 
 ## Details
 
@@ -290,7 +306,7 @@ components:
 
 4.  **Model Statistics** (footer):
 
-    - Events analyzed (with percentage of total)
+    - Events analyzed (with total events and percentage)
 
     - Global log-rank test *p*-value
 
@@ -319,8 +335,8 @@ The "Events" column is particularly important in survival analysis:
 
 - Categories with very few events may have unreliable HR estimates
 
-- The footer shows total events analyzed and percentage of all events in
-  the original data
+- The footer shows events analyzed, total events, and percentage in the
+  original data
 
 **Concordance (C-index):**
 
@@ -389,10 +405,13 @@ for univariable screening forest plots,
 for multi-outcome forest plots,
 [`coxph`](https://rdrr.io/pkg/survival/man/coxph.html) for fitting Cox
 models, [`fit`](https://phmcc.codeberg.page/summata/reference/fit.md)
-for regression modeling
+for regression modeling,
+[`forestsave`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+for saving with recommended dimensions
 
 Other visualization functions:
 [`autoforest()`](https://phmcc.codeberg.page/summata/reference/autoforest.md),
+[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md),
 [`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md),
 [`lmforest()`](https://phmcc.codeberg.page/summata/reference/lmforest.md),
 [`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md),
@@ -473,9 +492,8 @@ plot5 <- coxforest(
 #> Recommended plot dimensions: width = 13.7 in, height = 5.0 in
 
 # Example 6: Save with recommended dimensions
-dims <- attr(plot5, "rec_dims")
-ggplot2::ggsave(file.path(tempdir(), "survival_forest.pdf"),
-                plot5, width = dims$width, height = dims$height)
+forestsave(plot5, file.path(tempdir(), "survival_forest.pdf"))
+#> Forest plot saved to /tmp/RtmptN10wa/survival_forest.pdf (width = 13.7 in, height = 5.0 in)
 
 options(old_width)
 

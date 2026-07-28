@@ -61,10 +61,11 @@ hypothesis tests based on variable type:
 | Categorical                | *n* (%)           | χ² or Fisher | χ² or Fisher   |
 | Time-to-event              | Median (95% CI)   | Log-rank     | Log-rank       |
 
-For categorical variables, Fisher exact test is used when any expected
-cell count falls below 5. For continuous variables, the test selection
-follows the displayed statistic: parametric tests are used with
-mean-based statistics, nonparametric tests with median-based statistics.
+By default, Fisher exact test is used when any expected cell count falls
+below 5 for categorical variables. Similarly, the test selection for
+continuous variables will follow the displayed statistic unless
+otherwise specified: parametric tests are used with mean-based
+statistics, nonparametric tests with median-based statistics.
 
 ------------------------------------------------------------------------
 
@@ -621,21 +622,21 @@ vignette for comprehensive documentation.
 # Microsoft Word
 table2docx(
   table = table1,
-  file = file.path(tempdir(), "Table1.docx"),
+  file = "Table1.docx",
   caption = "Table 1. Baseline Characteristics by Group"
 )
 
 # PDF (requires LaTeX)
 table2pdf(
   table = table1,
-  file = file.path(tempdir(), "Table1.pdf"),
+  file = "Table1.pdf",
   caption = "Table 1. Baseline Characteristics by Group"
 )
 
 # HTML
 table2html(
   table = table1,
-  file = file.path(tempdir(), "Table1.html"),
+  file = "Table1.html",
   caption = "Table 1. Baseline Characteristics by Group"
 )
 ```
@@ -695,7 +696,7 @@ For tables with many variables, consider splitting by category or using
 landscape orientation for export:
 
 ``` r
-table2pdf(table, file.path(tempdir(), "table1.pdf"), orientation = "landscape", font_size = 8)
+table2pdf(table, "table1.pdf", orientation = "landscape", font_size = 8)
 ```
 
 ------------------------------------------------------------------------
@@ -708,9 +709,8 @@ table2pdf(table, file.path(tempdir(), "table1.pdf"), orientation = "landscape", 
   for time-to-event summaries
 - [Regression
   Modeling](https://phmcc.codeberg.page/summata/articles/regression_modeling.md):
-  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
   [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
-  and
+  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md), and
   [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
 - [Model
   Comparison](https://phmcc.codeberg.page/summata/articles/model_comparison.md):

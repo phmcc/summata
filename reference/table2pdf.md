@@ -34,6 +34,7 @@ table2pdf(
   stripe_color = "gray!20",
   dark_header = FALSE,
   show_logs = FALSE,
+  quiet = FALSE,
   ...
 )
 ```
@@ -216,6 +217,12 @@ table2pdf(
   compilation for troubleshooting. If `FALSE`, deletes these files.
   Default is `FALSE`.
 
+- quiet:
+
+  Logical. Suppress progress and confirmation messages, such as the
+  notice reporting the file written. Errors and warnings are unaffected.
+  Default is `FALSE`.
+
 - ...:
 
   Additional arguments passed to
@@ -224,9 +231,13 @@ table2pdf(
 
 ## Value
 
-Invisibly returns `NULL`. Creates a PDF file at the specified location.
-If compilation fails, check the `.log` file (if `show_logs = TRUE`) for
-error details.
+Invisibly returns the file path, matching
+[`tablesave()`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+and
+[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md).
+Called for its side effect of creating a PDF file at the specified
+location. If compilation fails, check the `.log` file (if
+`show_logs = TRUE`) for error details.
 
 ## Details
 
@@ -325,8 +336,8 @@ If PDF compilation fails:
 
 ## See also
 
-[`autotable`](https://phmcc.codeberg.page/summata/reference/autotable.md)
-for automatic format detection,
+[`tablesave`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+for saving in the format given by the file extension,
 [`table2tex`](https://phmcc.codeberg.page/summata/reference/table2tex.md)
 for LaTeX source files,
 [`table2html`](https://phmcc.codeberg.page/summata/reference/table2html.md)
@@ -343,12 +354,12 @@ for descriptive tables,
 regression tables
 
 Other export functions:
-[`autotable()`](https://phmcc.codeberg.page/summata/reference/autotable.md),
 [`table2docx()`](https://phmcc.codeberg.page/summata/reference/table2docx.md),
 [`table2html()`](https://phmcc.codeberg.page/summata/reference/table2html.md),
 [`table2pptx()`](https://phmcc.codeberg.page/summata/reference/table2pptx.md),
 [`table2rtf()`](https://phmcc.codeberg.page/summata/reference/table2rtf.md),
-[`table2tex()`](https://phmcc.codeberg.page/summata/reference/table2tex.md)
+[`table2tex()`](https://phmcc.codeberg.page/summata/reference/table2tex.md),
+[`tablesave()`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
 
 ## Examples
 
@@ -359,7 +370,7 @@ data(clintrial_labels)
 # Create example table
 results <- fit(
     data = clintrial,
-    outcome = "os_status",
+    outcome = "readmission_30d",
     predictors = c("age", "sex", "treatment", "stage"),
     labels = clintrial_labels
 )
@@ -382,177 +393,218 @@ if(has_latex){
   table2pdf(results, file.path(tempdir(), "basic_results.pdf"))
 }
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmpn8SzwZ/basic_results.pdf
+#> Table saved to /tmp/RtmptN10wa/basic_results.pdf
 
 # \donttest{
 
-if(has_latex){
-
 # Example 2: Landscape orientation for wide tables
-table2pdf(results, file.path(tempdir(), "wide_results.pdf"),
-         orientation = "landscape")
-
-# Example 3: With caption
-table2pdf(results, file.path(tempdir(), "captioned.pdf"),
-         caption = "Table 1: Multivariable logistic regression results")
-
-# Example 4: Multi-line caption with formatting
-table2pdf(results, file.path(tempdir(), "formatted_caption.pdf"),
-         caption = "Table 1: Risk Factors for Mortality\\\\
-                   aOR = adjusted odds ratio; CI = confidence interval")
-
-# Example 5: Auto-sized PDF (no fixed page dimensions)
-table2pdf(results, file.path(tempdir(), "autosize.pdf"),
-         paper = "auto")
-
-# Example 6: A4 paper with custom margins
-table2pdf(results, file.path(tempdir(), "a4_custom.pdf"),
-         paper = "a4",
-         margins = c(0.75, 0.75, 0.75, 0.75))
-
-# Example 7: Larger font for readability
-table2pdf(results, file.path(tempdir(), "large_font.pdf"),
-         font_size = 11)
-
-# Example 8: Indented hierarchical display
-table2pdf(results, file.path(tempdir(), "indented.pdf"),
-         indent_groups = TRUE)
-
-# Example 9: Condensed table (reduced height)
-table2pdf(results, file.path(tempdir(), "condensed.pdf"),
-         condense_table = TRUE)
-
-# Example 10: With zebra stripes
-table2pdf(results, file.path(tempdir(), "striped.pdf"),
-         zebra_stripes = TRUE,
-         stripe_color = "gray!15")
-
-# Example 11: Dark header style
-table2pdf(results, file.path(tempdir(), "dark_header.pdf"),
-         dark_header = TRUE)
-
-# Example 12: Combination of formatting options
-table2pdf(results, file.path(tempdir(), "publication_ready.pdf"),
-         orientation = "portrait",
-         paper = "letter",
-         font_size = 9,
-         caption = "Table 2: Multivariable Analysis\\\\
-                   Model adjusted for age, sex, and clinical factors",
-         indent_groups = TRUE,
-         zebra_stripes = TRUE,
-         bold_significant = TRUE,
-         p_threshold = 0.05)
-
-# Example 13: Adjust cell padding
-table2pdf(results, file.path(tempdir(), "relaxed_padding.pdf"),
-         cell_padding = "relaxed")  # More spacious
-
-# Example 14: No scaling (natural table width)
-table2pdf(results, file.path(tempdir(), "no_scale.pdf"),
-         fit_to_page = FALSE,
-         font_size = 10)
-
-# Example 15: Hide significance bolding
-table2pdf(results, file.path(tempdir(), "no_bold.pdf"),
-         bold_significant = FALSE)
-
-# Example 16: Custom column alignment
-table2pdf(results, file.path(tempdir(), "custom_align.pdf"),
-         align = c("c", "c", "c", "c", "c", "c", "c"))
-
-# Example 17: Descriptive statistics table
-desc_table <- desctable(clintrial, by = "treatment",
-     variables = c("age", "sex", "bmi", "stage"), labels = clintrial_labels)
-
-table2pdf(desc_table, file.path(tempdir(), "descriptive.pdf"),
-         caption = "Table 1: Baseline Characteristics by Treatment Group",
-         orientation = "landscape")
-
-# Example 18: Model comparison table
-models <- list(
-     base = c("age", "sex"),
-     full = c("age", "sex", "bmi", "treatment")
-)
-
-comparison <- compfit(
-     data = clintrial,
-     outcome = "os_status",
-     model_list = models
-)
-
-table2pdf(comparison, file.path(tempdir(), "model_comparison.pdf"),
-         caption = "Table 3: Model Comparison Statistics")
-
-# Example 19: Very wide table with aggressive fitting
-wide_model <- fit(
-     data = clintrial,
-     outcome = "os_status",
-     predictors = c("age", "sex", "race", "bmi", "smoking", 
-                   "hypertension", "diabetes", "treatment", "stage")
-)
-
-table2pdf(wide_model, file.path(tempdir(), "very_wide.pdf"),
-         orientation = "landscape",
-         font_size = 7,
-         fit_to_page = TRUE,
-         condense_table = TRUE)
-
-# Example 20: With caption size control
-table2pdf(results, file.path(tempdir(), "caption_size.pdf"),
-         font_size = 8,
-         caption_size = 6,
-         caption = "Table 4: Results with Compact Caption\\\\
-                   Smaller caption fits better on constrained pages")
-
-# Example 21: Troubleshooting - keep logs
-table2pdf(results, file.path(tempdir(), "debug.pdf"),
-         show_logs = TRUE)
-# If it fails, check debug.log for error messages
-
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "wide_results.pdf"),
+           orientation = "landscape")
 }
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmpn8SzwZ/wide_results.pdf
+#> Table saved to /tmp/RtmptN10wa/wide_results.pdf
+
+# Example 3: With caption
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "captioned.pdf"),
+           caption = "Table 1: Multivariable logistic regression results")
+}
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmpn8SzwZ/captioned.pdf
+#> Table saved to /tmp/RtmptN10wa/captioned.pdf
+
+# Example 4: Multi-line caption with formatting
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "formatted_caption.pdf"),
+           caption = "Table 1: Risk Factors for Mortality\\\\
+                     aOR = adjusted odds ratio; CI = confidence interval")
+}
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmpn8SzwZ/formatted_caption.pdf
+#> Table saved to /tmp/RtmptN10wa/formatted_caption.pdf
+
+# Example 5: Auto-sized PDF (no fixed page dimensions)
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "autosize.pdf"),
+           paper = "auto")
+}
 #> Using standalone class for auto-sized output
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmpn8SzwZ/autosize.pdf
+#> Table saved to /tmp/RtmptN10wa/autosize.pdf
+
+# Example 6: A4 paper with custom margins
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "a4_custom.pdf"),
+           paper = "a4",
+           margins = c(0.75, 0.75, 0.75, 0.75))
+}
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmpn8SzwZ/a4_custom.pdf
+#> Table saved to /tmp/RtmptN10wa/a4_custom.pdf
+
+# Example 7: Larger font for readability
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "large_font.pdf"),
+           font_size = 11)
+}
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmpn8SzwZ/large_font.pdf
+#> Table saved to /tmp/RtmptN10wa/large_font.pdf
+
+# Example 8: Indented hierarchical display
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "indented.pdf"),
+           indent_groups = TRUE)
+}
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmpn8SzwZ/indented.pdf
+#> Table saved to /tmp/RtmptN10wa/indented.pdf
+
+# Example 9: Condensed table (reduced height)
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "condensed.pdf"),
+           condense_table = TRUE)
+}
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmpn8SzwZ/condensed.pdf
+#> Table saved to /tmp/RtmptN10wa/condensed.pdf
+
+# Example 10: With zebra stripes
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "striped.pdf"),
+           zebra_stripes = TRUE,
+           stripe_color = "gray!15")
+}
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmpn8SzwZ/striped.pdf
+#> Table saved to /tmp/RtmptN10wa/striped.pdf
+
+# Example 11: Dark header style
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "dark_header.pdf"),
+           dark_header = TRUE)
+}
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmpn8SzwZ/dark_header.pdf
+#> Table saved to /tmp/RtmptN10wa/dark_header.pdf
+
+# Example 12: Combination of formatting options
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "publication_ready.pdf"),
+           orientation = "portrait",
+           paper = "letter",
+           font_size = 9,
+           caption = "Table 2: Multivariable Analysis\\\\
+                     Model adjusted for age, sex, and clinical factors",
+           indent_groups = TRUE,
+           zebra_stripes = TRUE,
+           bold_significant = TRUE,
+           p_threshold = 0.05)
+}
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmpn8SzwZ/publication_ready.pdf
+#> Table saved to /tmp/RtmptN10wa/publication_ready.pdf
+
+# Example 13: Adjust cell padding
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "relaxed_padding.pdf"),
+           cell_padding = "relaxed")  # More spacious
+}
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmpn8SzwZ/relaxed_padding.pdf
+#> Table saved to /tmp/RtmptN10wa/relaxed_padding.pdf
+
+# Example 14: No scaling (natural table width)
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "no_scale.pdf"),
+           fit_to_page = FALSE,
+           font_size = 10)
+}
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmpn8SzwZ/no_scale.pdf
+#> Table saved to /tmp/RtmptN10wa/no_scale.pdf
+
+# Example 15: Hide significance bolding
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "no_bold.pdf"),
+           bold_significant = FALSE)
+}
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmpn8SzwZ/no_bold.pdf
+#> Table saved to /tmp/RtmptN10wa/no_bold.pdf
+
+# Example 16: Custom column alignment
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "custom_align.pdf"),
+           align = c("c", "c", "c", "c", "c", "c", "c"))
+}
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmpn8SzwZ/custom_align.pdf
+#> Table saved to /tmp/RtmptN10wa/custom_align.pdf
+
+# Example 17: Descriptive statistics table
+if (has_latex) {
+  desc_table <- desctable(clintrial, by = "treatment",
+       variables = c("age", "sex", "bmi", "stage"), labels = clintrial_labels)
+  
+  table2pdf(desc_table, file.path(tempdir(), "descriptive.pdf"),
+           caption = "Table 1: Baseline Characteristics by Treatment Group",
+           orientation = "landscape")
+}
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmpn8SzwZ/descriptive.pdf
+#> Table saved to /tmp/RtmptN10wa/descriptive.pdf
+
+# Example 18: Model comparison table
+if (has_latex) {
+  models <- list(
+       base = c("age", "sex"),
+       full = c("age", "sex", "bmi", "treatment")
+  )
+  
+  # Information criteria assume a common sample, so the candidate
+  # predictors are restricted to complete cases before comparison
+  comparison_data <- na.omit(clintrial[, c("os_status", "age", "sex", "bmi", "treatment")])
+  
+  comparison <- compfit(
+       data = comparison_data,
+       outcome = "os_status",
+       model_list = models,
+       verbose = FALSE
+  )
+  
+  table2pdf(comparison, file.path(tempdir(), "model_comparison.pdf"),
+           caption = "Table 3: Model Comparison Statistics")
+}
 #> Auto-detected binary outcome, using logistic regression
 #> Fitting base with 2 predictors...
 #> Fitting full with 4 predictors...
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmpn8SzwZ/model_comparison.pdf
+#> Table saved to /tmp/RtmptN10wa/model_comparison.pdf
+
+# Example 19: Very wide table with aggressive fitting
+if (has_latex) {
+  wide_model <- fit(
+       data = clintrial,
+       outcome = "os_status",
+       predictors = c("age", "sex", "race", "bmi", "smoking", 
+                     "hypertension", "diabetes", "treatment", "stage")
+  )
+  
+  table2pdf(wide_model, file.path(tempdir(), "very_wide.pdf"),
+           orientation = "landscape",
+           font_size = 7,
+           fit_to_page = TRUE,
+           condense_table = TRUE)
+}
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmpn8SzwZ/very_wide.pdf
+#> Table saved to /tmp/RtmptN10wa/very_wide.pdf
+
+# Example 20: With caption size control
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "caption_size.pdf"),
+           font_size = 8,
+           caption_size = 6,
+           caption = "Table 4: Results with Compact Caption\\\\
+                     Smaller caption fits better on constrained pages")
+}
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmpn8SzwZ/caption_size.pdf
+#> Table saved to /tmp/RtmptN10wa/caption_size.pdf
+
+# Example 21: Troubleshooting - keep logs
+if (has_latex) {
+  table2pdf(results, file.path(tempdir(), "debug.pdf"),
+           show_logs = TRUE)
+  # If it fails, check debug.log for error messages
+}
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmpn8SzwZ/debug.pdf
+#> Table saved to /tmp/RtmptN10wa/debug.pdf
 # }
 ```

@@ -30,6 +30,11 @@ m2dt(
 
   Data frame or data.table containing the dataset used to fit the model.
   Required for computing group-level sample sizes and event counts.
+  Where the fitted object retains no model frame, the supplied data is
+  restricted to complete cases across the model variables so that
+  group-level sample sizes describe the observations actually used in
+  fitting. Group sample sizes therefore sum to the model-level `n`, and
+  both exclude observations with a missing response.
 
 - model:
 
@@ -139,22 +144,24 @@ standard columns:
 
 - n:
 
-  Integer. Total sample size used in the model
+  Integer. Number of observations used in fitting the model, that is
+  complete cases across the model variables
 
 - n_group:
 
-  Integer. Sample size for this specific variable level (factor
-  variables only)
+  Integer. Number of those observations at this variable level (factor
+  variables only). Group sizes sum to `n` within each variable
 
 - events:
 
-  Integer. Total number of events in the model (for survival and
-  logistic models)
+  Integer. Number of events among the observations used in fitting (for
+  survival and logistic models)
 
 - events_group:
 
-  Integer. Number of events for this specific variable level (for
-  survival and logistic models with factor variables)
+  Integer. Number of events at this variable level (for survival and
+  logistic models with factor variables). Group counts sum to `events`
+  within each variable
 
 - coefficient:
 
@@ -319,8 +326,8 @@ cox_result
 #>      model_scope model_type      term     n events coefficient          se       coef coef_lower coef_upper exp_coef exp_lower exp_upper       HR  ci_lower ci_upper statistic      p_value concordance concordance_se       rsq   rsq_max
 #>           <char>     <char>    <char> <int>  <num>       <num>       <num>      <num>      <num>      <num>    <num>     <num>     <num>    <num>     <num>    <num>     <num>        <num>       <num>          <num>     <num>     <num>
 #> 1: Multivariable     Cox PH       age   847    606  0.03461725 0.003728664 0.03461725  0.0273092  0.0419253 1.035223 1.0276855  1.042817 1.035223 1.0276855 1.042817  9.284090 1.630945e-20   0.6691193     0.01092972 0.2039982 0.9998581
-#> 2: Multivariable     Cox PH sexFemale   450    298  0.00000000          NA 0.00000000         NA         NA 1.000000        NA        NA 1.000000        NA       NA        NA           NA          NA             NA 0.2039982        NA
-#> 3: Multivariable     Cox PH   sexMale   400    311  0.30621038 0.081605529 0.30621038  0.1462665  0.4661543 1.358268 1.1575046  1.593853 1.358268 1.1575046 1.593853  3.752324 1.752029e-04   0.6691193     0.01092972 0.2039982 0.9998581
+#> 2: Multivariable     Cox PH sexFemale   449    297  0.00000000          NA 0.00000000         NA         NA 1.000000        NA        NA 1.000000        NA       NA        NA           NA          NA             NA 0.2039982        NA
+#> 3: Multivariable     Cox PH   sexMale   398    309  0.30621038 0.081605529 0.30621038  0.1462665  0.4661543 1.358268 1.1575046  1.593853 1.358268 1.1575046 1.593853  3.752324 1.752029e-04   0.6691193     0.01092972 0.2039982 0.9998581
 #> 4: Multivariable     Cox PH    stageI   211    127  0.00000000          NA 0.00000000         NA         NA 1.000000        NA        NA 1.000000        NA       NA        NA           NA          NA             NA 0.2039982        NA
 #> 5: Multivariable     Cox PH   stageII   263    172  0.12276723 0.117008958 0.12276723 -0.1065661  0.3521006 1.130621 0.8989156  1.422052 1.130621 0.8989156 1.422052  1.049212 2.940804e-01   0.6691193     0.01092972 0.2039982 0.9998581
 #> 6: Multivariable     Cox PH  stageIII   241    186  0.59770106 0.115604112 0.59770106  0.3711212  0.8242810 1.817935 1.4493587  2.280241 1.817935 1.4493587 2.280241  5.170241 2.337929e-07   0.6691193     0.01092972 0.2039982 0.9998581
@@ -328,8 +335,8 @@ cox_result
 #>    likelihood_ratio_test likelihood_ratio_df likelihood_ratio_p wald_test wald_df       wald_p score_test score_df      score_p variable  group n_group events_group reference    sig sig_binary
 #>                    <num>               <num>              <num>     <num>   <num>        <num>      <num>    <num>        <num>   <char> <char>   <num>        <num>    <char> <char>     <lgcl>
 #> 1:              193.2463                   5       7.903413e-40    198.43       5 6.155672e-41   207.1364        5 8.440913e-43      age             NA           NA              ***       TRUE
-#> 2:                    NA                  NA                 NA        NA      NA           NA         NA       NA           NA      sex Female     450          298 reference             FALSE
-#> 3:              193.2463                   5       7.903413e-40    198.43       5 6.155672e-41   207.1364        5 8.440913e-43      sex   Male     400          311              ***       TRUE
+#> 2:                    NA                  NA                 NA        NA      NA           NA         NA       NA           NA      sex Female     449          297 reference             FALSE
+#> 3:              193.2463                   5       7.903413e-40    198.43       5 6.155672e-41   207.1364        5 8.440913e-43      sex   Male     398          309              ***       TRUE
 #> 4:                    NA                  NA                 NA        NA      NA           NA         NA       NA           NA    stage      I     211          127 reference             FALSE
 #> 5:              193.2463                   5       7.903413e-40    198.43       5 6.155672e-41   207.1364        5 8.440913e-43    stage     II     263          172                       FALSE
 #> 6:              193.2463                   5       7.903413e-40    198.43       5 6.155672e-41   207.1364        5 8.440913e-43    stage    III     241          186              ***       TRUE

@@ -353,6 +353,8 @@ within confidence intervals adapt automatically to avoid ambiguity:
 for baseline characteristics tables,
 [`fit`](https://phmcc.codeberg.page/summata/reference/fit.md) for
 regression analysis,
+[`tablesave`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+for export in any supported format,
 [`table2pdf`](https://phmcc.codeberg.page/summata/reference/table2pdf.md)
 for PDF export,
 [`table2docx`](https://phmcc.codeberg.page/summata/reference/table2docx.md)
@@ -378,7 +380,8 @@ survtable(
     outcome = "Surv(os_months, os_status)",
     by = "treatment",
     times = c(12, 24, 36),
-    time_unit = "months"
+    time_unit = "months",
+    labels = clintrial_labels
 )
 #> 
 #> Survival Summary Table
@@ -404,7 +407,8 @@ survtable(
     outcome = "Surv(os_months, os_status)",
     by = "treatment",
     times = NULL,
-    probs = 0.5
+    probs = 0.5,
+    labels = clintrial_labels
 )
 #> 
 #> Survival Summary Table
@@ -427,7 +431,8 @@ survtable(
     outcome = "Surv(os_months, os_status)",
     by = "stage",
     times = NULL,
-    probs = c(0.25, 0.5, 0.75)
+    probs = c(0.25, 0.5, 0.75),
+    labels = clintrial_labels
 )
 #> 
 #> Survival Summary Table
@@ -452,7 +457,8 @@ survtable(
     by = "treatment",
     times = c(12, 24),
     probs = 0.5,
-    time_unit = "months"
+    time_unit = "months",
+    labels = clintrial_labels
 )
 #> 
 #> Survival Summary Table
@@ -476,7 +482,8 @@ survtable(
     outcome = "Surv(os_months, os_status)",
     by = "treatment",
     times = c(12, 24),
-    type = "risk"
+    type = "risk",
+    labels = clintrial_labels
 )
 #> 
 #> Survival Summary Table
@@ -500,7 +507,8 @@ survtable(
     outcome = "Surv(os_months, os_status)",
     by = "treatment",
     times = c(12, 24),
-    stats = c("survival", "ci", "n_risk")
+    stats = c("survival", "ci", "n_risk"),
+    labels = clintrial_labels
 )
 #> 
 #> Survival Summary Table
@@ -522,7 +530,8 @@ survtable(
 survtable(
     data = clintrial,
     outcome = "Surv(os_months, os_status)",
-    times = c(12, 24, 36, 48)
+    times = c(12, 24, 36, 48),
+    labels = clintrial_labels
 )
 #> 
 #> Survival Summary Table
@@ -541,7 +550,8 @@ survtable(
     outcome = "Surv(os_months, os_status)",
     by = "treatment",
     times = c(12, 24),
-    total = FALSE
+    total = FALSE,
+    labels = clintrial_labels
 )
 #> 
 #> Survival Summary Table
@@ -589,7 +599,8 @@ survtable(
     outcome = "Surv(os_months, os_status)",
     by = "treatment",
     times = c(12, 24),
-    conf_type = "log-log"
+    conf_type = "log-log",
+    labels = clintrial_labels
 )
 #> 
 #> Survival Summary Table
@@ -613,7 +624,8 @@ survtable(
     outcome = "Surv(os_months, os_status)",
     by = "treatment",
     times = c(12, 24),
-    test_type = "wilcoxon"
+    test_type = "wilcoxon",
+    labels = clintrial_labels
 )
 #> 
 #> Survival Summary Table
@@ -690,7 +702,8 @@ survtable(
     outcome = "Surv(os_months, os_status)",
     by = "treatment",
     times = c(12, 24),
-    number_format = "eu"
+    number_format = "eu",
+    labels = clintrial_labels
 )
 #> 
 #> Survival Summary Table

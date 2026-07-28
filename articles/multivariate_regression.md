@@ -62,26 +62,24 @@ multivariate analysis:
 | Count (overdispersed) | `ae_count` | `negbin` or `quasipoisson` |
 | Time-to-event | `Surv(pfs_months, pfs_status)`, `Surv(os_months, os_status)` | `coxph` |
 
-> *n.b.:* To ensure correct font rendering and figure sizing, the forest
-> plots below are displayed using a helper function (`queue_plot()`)
-> that applies each plot’s recommended dimensions (stored in the
-> `"rec_dims"` attribute) via the [`ragg`](https://ragg.r-lib.org/)
-> graphics device. In practice, replace `queue_plot()` with
-> [`ggplot2::ggsave()`](https://ggplot2.tidyverse.org/reference/ggsave.html)
-> using recommended plot dimensions for equivalent results:
+> *n.b.:* The forest plots below are sized by this vignette from each
+> plot’s recommended dimensions, stored in its `"rec_dims"` attribute,
+> and rendered via the [`ragg`](https://ragg.r-lib.org/) graphics device
+> for correct font metrics. That sizing is applied behind the scenes and
+> is not shown in the code. Writing a plot to file elsewhere is
+> performed with
+> [`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md),
+> which applies the same dimensions and selects a suitable graphics
+> device:
 >
 > ``` r
 > p <- glmforest(model, data = mydata)
-> dims <- attr(p, "rec_dims")
-> ggplot2::ggsave("forest_plot.png", p,
->                 width = dims$width, 
->                 height = dims$height)
+> forestsave(p, "forest_plot.png")
 > ```
 >
 > This ensures that the figure size is always large enough to
-> accommodate the constituent plot text and graphics, and it is
-> generally the preferred method for saving forest plot outputs in
-> `summata`.
+> accommodate the constituent plot text and graphics, and it is the
+> preferred method for saving forest plot outputs in `summata`.
 
 ------------------------------------------------------------------------
 
@@ -103,11 +101,13 @@ example1 <- multifit(
 
 example1
 ##> 
-##> Multivariate Analysis Results
+##> Multivariate Regression Results
+##> 
 ##> Predictor: surgery
 ##> Outcomes: 4
 ##> Model Type: glm
 ##> Display: unadjusted
+##> Observations analyzed: 850 of 850 (100.0%)
 ##> 
 ##>                   Outcome          Predictor      n Events      OR (95% CI) p-value
 ##>                    <char>             <char> <char> <char>           <char>  <char>
@@ -137,12 +137,14 @@ example2 <- multifit(
 
 example2
 ##> 
-##> Multivariate Analysis Results
+##> Multivariate Regression Results
+##> 
 ##> Predictor: surgery
 ##> Outcomes: 4
 ##> Model Type: glm
 ##> Covariates: age, sex, smoking, diabetes
 ##> Display: adjusted
+##> Observations analyzed: 833 of 850 (98.0%)
 ##> 
 ##>                   Outcome          Predictor      n Events     aOR (95% CI) p-value
 ##>                    <char>             <char> <char> <char>           <char>  <char>
@@ -171,19 +173,21 @@ example3 <- multifit(
 
 example3
 ##> 
-##> Multivariate Analysis Results
+##> Multivariate Regression Results
+##> 
 ##> Predictor: surgery
 ##> Outcomes: 4
 ##> Model Type: glm
 ##> Covariates: age, sex, diabetes, surgery
 ##> Display: both
+##> Observations analyzed: 834 of 850 (98.1%)
 ##> 
 ##>                   Outcome          Predictor      n Events      OR (95% CI)   Uni p     aOR (95% CI) Multi p
 ##>                    <char>             <char> <char> <char>           <char>  <char>           <char>  <char>
-##> 1:       Any Complication Surgical Resection    370    236 1.70 (1.29-2.25) < 0.001 1.82 (1.36-2.44) < 0.001
-##> 2: ICU Admission Required Surgical Resection    370    179 2.25 (1.70-2.99) < 0.001 2.57 (1.91-3.48) < 0.001
-##> 3:     30-Day Readmission Surgical Resection    370    181 0.91 (0.69-1.19)   0.500 1.05 (0.79-1.40)   0.720
-##> 4:   Wound/Site Infection Surgical Resection    370    121 4.58 (3.18-6.72) < 0.001 4.98 (3.37-7.46) < 0.001
+##> 1:       Any Complication Surgical Resection    362    229 1.70 (1.29-2.25) < 0.001 1.82 (1.36-2.44) < 0.001
+##> 2: ICU Admission Required Surgical Resection    362    173 2.25 (1.70-2.99) < 0.001 2.57 (1.91-3.48) < 0.001
+##> 3:     30-Day Readmission Surgical Resection    362    176 0.91 (0.69-1.19)   0.500 1.05 (0.79-1.40)   0.720
+##> 4:   Wound/Site Infection Surgical Resection    362    117 4.58 (3.18-6.72) < 0.001 4.98 (3.37-7.46) < 0.001
 ```
 
 Comparing columns reveals confounding (large differences) or robust
@@ -209,12 +213,14 @@ example4 <- multifit(
 
 example4
 ##> 
-##> Multivariate Analysis Results
+##> Multivariate Regression Results
+##> 
 ##> Predictor: age
 ##> Outcomes: 3
 ##> Model Type: glm
 ##> Covariates: sex, treatment, surgery
 ##> Display: adjusted
+##> Observations analyzed: 850 of 850 (100.0%)
 ##> 
 ##>                   Outcome      n Events     aOR (95% CI) p-value
 ##>                    <char> <char> <char>           <char>  <char>
@@ -244,12 +250,14 @@ example5 <- multifit(
 
 example5
 ##> 
-##> Multivariate Analysis Results
+##> Multivariate Regression Results
+##> 
 ##> Predictor: treatment
 ##> Outcomes: 4
 ##> Model Type: glm
 ##> Covariates: age, sex, surgery
 ##> Display: adjusted
+##> Observations analyzed: 850 of 850 (100.0%)
 ##> 
 ##>                   Outcome                Predictor      n Events     aOR (95% CI) p-value
 ##>                    <char>                   <char> <char> <char>           <char>  <char>
@@ -285,19 +293,21 @@ example6 <- multifit(
 
 example6
 ##> 
-##> Multivariate Analysis Results
+##> Multivariate Regression Results
+##> 
 ##> Predictor: treatment
 ##> Outcomes: 2
 ##> Model Type: coxph
 ##> Covariates: age, sex, stage
 ##> Display: adjusted
+##> Observations analyzed: 847 of 850 (99.6%)
 ##> 
 ##>                               Outcome                Predictor      n Events     aHR (95% CI) p-value
 ##>                                <char>                   <char> <char> <char>           <char>  <char>
-##> 1: Progression-Free Survival (months) Treatment Group (Drug A)    721    721 0.54 (0.44-0.66) < 0.001
-##> 2: Progression-Free Survival (months) Treatment Group (Drug B)    721    721 0.82 (0.68-0.98)   0.033
-##> 3:          Overall Survival (months) Treatment Group (Drug A)    606    606 0.56 (0.45-0.70) < 0.001
-##> 4:          Overall Survival (months) Treatment Group (Drug B)    606    606 0.83 (0.67-1.01)   0.062
+##> 1: Progression-Free Survival (months) Treatment Group (Drug A)    292    227 0.54 (0.44-0.66) < 0.001
+##> 2: Progression-Free Survival (months) Treatment Group (Drug B)    361    321 0.82 (0.68-0.98)   0.033
+##> 3:          Overall Survival (months) Treatment Group (Drug A)    292    184 0.56 (0.45-0.70) < 0.001
+##> 4:          Overall Survival (months) Treatment Group (Drug B)    361    273 0.83 (0.67-1.01)   0.062
 ```
 
 ### **Example 7:** Linear Regression
@@ -317,12 +327,14 @@ example7 <- multifit(
 
 example7
 ##> 
-##> Multivariate Analysis Results
+##> Multivariate Regression Results
+##> 
 ##> Predictor: treatment
 ##> Outcomes: 3
 ##> Model Type: lm
 ##> Covariates: age, sex, surgery
 ##> Display: adjusted
+##> Observations analyzed: 830-840 of 850 (97.6-98.8%)
 ##> 
 ##>                            Outcome                Predictor      n Adj. Coefficient (95% CI) p-value
 ##>                             <char>                   <char> <char>                    <char>  <char>
@@ -333,6 +345,19 @@ example7
 ##> 5:     Days to Functional Recovery Treatment Group (Drug A)    288    -1.73 (-2.96 to -0.50)   0.006
 ##> 6:     Days to Functional Recovery Treatment Group (Drug B)    352       2.79 (1.59 to 3.98) < 0.001
 ```
+
+The three outcomes are not fitted to the same observations. Length of
+stay is unrecorded for a proportion of patients who did not undergo
+surgical resection, whereas pain score and days to recovery are
+complete. Each model is therefore fitted to its own complete cases, and
+the analyzed sample is reported as a range spanning the three models
+rather than as a single figure. Sample sizes in the `n` column vary
+correspondingly.
+
+Missingness of this kind is related to a variable in the model rather
+than occurring at random, and the estimates for length of stay describe
+the subset of patients for whom it was recorded. The range in the header
+is the signal that this subset differs from the others.
 
 ### **Example 8:** Mixed-Effects Models
 
@@ -352,13 +377,15 @@ example8 <- multifit(
 
 example8
 ##> 
-##> Multivariate Analysis Results
+##> Multivariate Regression Results
+##> 
 ##> Predictor: treatment
 ##> Outcomes: 2
 ##> Model Type: glmer
 ##> Covariates: age, sex
 ##> Random Effects: (1|site)
 ##> Display: adjusted
+##> Observations analyzed: 850 of 850 (100.0%)
 ##> 
 ##>                 Outcome                Predictor      n Events     aOR (95% CI) p-value
 ##>                  <char>                   <char> <char> <char>           <char>  <char>
@@ -389,13 +416,15 @@ example9 <- multifit(
 
 example9
 ##> 
-##> Multivariate Analysis Results
+##> Multivariate Regression Results
+##> 
 ##> Predictor: treatment
 ##> Outcomes: 2
 ##> Model Type: glm
 ##> Covariates: age, sex
 ##> Interactions: treatment:sex
 ##> Display: adjusted
+##> Observations analyzed: 850 of 850 (100.0%)
 ##> 
 ##>                 Outcome                             Predictor      n Events     aOR (95% CI) p-value
 ##>                  <char>                                <char> <char> <char>           <char>  <char>
@@ -427,12 +456,14 @@ example10 <- multifit(
 
 example10
 ##> 
-##> Multivariate Analysis Results
+##> Multivariate Regression Results
+##> 
 ##> Predictor: treatment
 ##> Outcomes: 4
 ##> Model Type: glm
 ##> Covariates: age, sex, surgery
 ##> Display: adjusted
+##> Observations analyzed: 850 of 850 (100.0%)
 ##> 
 ##>                   Outcome                Predictor      n Events     aOR (95% CI) p-value
 ##>                    <char>                   <char> <char> <char>           <char>  <char>
@@ -503,7 +534,6 @@ example12 <- multiforest(
   indent_predictor = TRUE,
   zebra_stripes = TRUE
 )
-queue_plot(example12)
 ```
 
 ![](multivariate_regression_files/figure-html/unnamed-chunk-16-1.png)
@@ -523,7 +553,6 @@ example13 <- multiforest(
   table_width = 0.65,
   color = "#4BA6B6"
 )
-queue_plot(example13)
 ```
 
 ![](multivariate_regression_files/figure-html/unnamed-chunk-18-1.png)
@@ -549,7 +578,6 @@ example14 <- multiforest(
   covariates_footer = TRUE,
   labels = clintrial_labels
 )
-queue_plot(example14)
 ```
 
 ![](multivariate_regression_files/figure-html/unnamed-chunk-20-1.png)
@@ -582,7 +610,6 @@ example15 <- multiforest(
   zebra_stripes = TRUE,
   labels = clintrial_labels
 )
-queue_plot(example15)
 ```
 
 ![](multivariate_regression_files/figure-html/unnamed-chunk-22-1.png)
@@ -593,35 +620,34 @@ queue_plot(example15)
 
 ### Tables
 
-Export tables using standard export functions:
+Export tables using standard export functions, or
+[`tablesave()`](https://phmcc.codeberg.page/summata/reference/tablesave.md):
 
 ``` r
 table2docx(
   table = result,
-  file = file.path(tempdir(), "multioutcome_analysis.docx"),
+  file = "multioutcome_analysis.docx",
   caption = "Treatment Effects Across Outcomes"
 )
 
 table2pdf(
   table = result,
-  file = file.path(tempdir(), "multioutcome_analysis.pdf"),
+  file = "multioutcome_analysis.pdf",
   caption = "Treatment Effects Across Outcomes"
 )
 ```
 
 ### Forest Plots
 
-Save forest plots using
-[`ggsave()`](https://ggplot2.tidyverse.org/reference/ggsave.html):
+Save forest plots using the dedicated
+[`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md)
+function, then
+[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md):
 
 ``` r
 p <- multiforest(result, title = "Effect Estimates")
-dims <- attr(p, "rec_dims")
 
-ggsave(file.path(tempdir(), "multioutcome_forest.pdf"), p,
-       width = attr(result, "rec_dims")$width,
-       height = attr(result, "rec_dims")$height, 
-       units = "in")
+forestsave(p, "multioutcome_forest.pdf")
 ```
 
 ------------------------------------------------------------------------
@@ -648,11 +674,13 @@ unadjusted <- multifit(
 
 unadjusted
 ##> 
-##> Multivariate Analysis Results
+##> Multivariate Regression Results
+##> 
 ##> Predictor: treatment
 ##> Outcomes: 4
 ##> Model Type: glm
 ##> Display: unadjusted
+##> Observations analyzed: 850 of 850 (100.0%)
 ##> 
 ##>                   Outcome                Predictor      n Events      OR (95% CI) p-value
 ##>                    <char>                   <char> <char> <char>           <char>  <char>
@@ -678,23 +706,25 @@ adjusted <- multifit(
 
 adjusted
 ##> 
-##> Multivariate Analysis Results
+##> Multivariate Regression Results
+##> 
 ##> Predictor: treatment
 ##> Outcomes: 4
 ##> Model Type: glm
 ##> Covariates: age, sex, diabetes, surgery
 ##> Display: both
+##> Observations analyzed: 834 of 850 (98.1%)
 ##> 
 ##>                   Outcome                Predictor      n Events      OR (95% CI)  Uni p     aOR (95% CI) Multi p
 ##>                    <char>                   <char> <char> <char>           <char> <char>           <char>  <char>
-##> 1:       Any Complication Treatment Group (Drug A)    292    143 0.73 (0.51-1.06)  0.097 0.62 (0.42-0.91)   0.016
-##> 2:       Any Complication Treatment Group (Drug B)    362    226 1.27 (0.89-1.81)  0.182 1.44 (0.99-2.09)   0.057
-##> 3: ICU Admission Required Treatment Group (Drug A)    292    111 1.26 (0.87-1.86)  0.226 1.11 (0.75-1.67)   0.599
-##> 4: ICU Admission Required Treatment Group (Drug B)    362    145 1.38 (0.96-1.99)  0.085 1.75 (1.19-2.61)   0.005
-##> 5:     30-Day Readmission Treatment Group (Drug A)    292    127 0.89 (0.62-1.28)  0.523 0.86 (0.59-1.25)   0.427
-##> 6:     30-Day Readmission Treatment Group (Drug B)    362    209 1.58 (1.11-2.24)  0.011 1.56 (1.08-2.25)   0.018
-##> 7:   Wound/Site Infection Treatment Group (Drug A)    292     72 2.14 (1.32-3.55)  0.002 1.86 (1.11-3.19)   0.021
-##> 8:   Wound/Site Infection Treatment Group (Drug B)    362     69 1.54 (0.95-2.55)  0.084 2.22 (1.31-3.87)   0.004
+##> 1:       Any Complication Treatment Group (Drug A)    288    139 0.73 (0.51-1.06)  0.097 0.62 (0.42-0.91)   0.016
+##> 2:       Any Complication Treatment Group (Drug B)    355    221 1.27 (0.89-1.81)  0.182 1.44 (0.99-2.09)   0.057
+##> 3: ICU Admission Required Treatment Group (Drug A)    288    108 1.26 (0.87-1.86)  0.226 1.11 (0.75-1.67)   0.599
+##> 4: ICU Admission Required Treatment Group (Drug B)    355    143 1.38 (0.96-1.99)  0.085 1.75 (1.19-2.61)   0.005
+##> 5:     30-Day Readmission Treatment Group (Drug A)    288    126 0.89 (0.62-1.28)  0.523 0.86 (0.59-1.25)   0.427
+##> 6:     30-Day Readmission Treatment Group (Drug B)    355    203 1.58 (1.11-2.24)  0.011 1.56 (1.08-2.25)   0.018
+##> 7:   Wound/Site Infection Treatment Group (Drug A)    288     70 2.14 (1.32-3.55)  0.002 1.86 (1.11-3.19)   0.021
+##> 8:   Wound/Site Infection Treatment Group (Drug B)    355     66 1.54 (0.95-2.55)  0.084 2.22 (1.31-3.87)   0.004
 
 ## Forest plot visualization
 forest_plot <- multiforest(
@@ -706,7 +736,6 @@ forest_plot <- multiforest(
   table_width = 0.65,
   labels = clintrial_labels
 )
-queue_plot(forest_plot)
 ```
 
 ![](multivariate_regression_files/figure-html/unnamed-chunk-26-1.png)
@@ -778,6 +807,26 @@ multifit(data, outcomes, predictor,
          model_type = "glmer")
 ```
 
+### Varying Sample Sizes
+
+Each outcome is modeled separately and fitted to its own complete cases,
+so outcomes that differ in missingness are fitted to different numbers
+of observations. The analyzed sample is reported as a range whenever
+this occurs, as in Example 7. Estimates remain valid for the
+observations each model used, but comparisons across outcomes are made
+on partially different samples.
+
+Restricting the data to complete cases across all outcomes and
+covariates places every model on the same observations, at the cost of
+discarding data:
+
+``` r
+complete_data <- na.omit(
+  clintrial[, c("los_days", "pain_score", "recovery_days",
+                "treatment", "age", "sex", "surgery")]
+)
+```
+
 ### Many Factor Levels
 
 For predictors with many levels, consider collapsing categories:
@@ -843,9 +892,8 @@ model <- polr(grade ~ age + sex + stage, data = clintrial, Hess = TRUE)
   for baseline characteristics
 - [Regression
   Modeling](https://phmcc.codeberg.page/summata/articles/regression_modeling.md):
-  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
   [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
-  and
+  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md), and
   [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
 - [Model
   Comparison](https://phmcc.codeberg.page/summata/articles/model_comparison.md):

@@ -363,6 +363,17 @@ The returned object includes the following attributes accessible via
   coefficients, standard errors, confidence interval bounds, *etc.*
   Suitable for further statistical analysis or custom formatting
 
+- analysis_counts:
+
+  List. How much of the supplied data reached the model, with elements
+  `n_supplied`, `n_analyzed`, `n_missing_outcome` and
+  `n_missing_predictor`, plus `events_supplied` and `events_analyzed`
+  where the model type carries an event count. Each predictor is
+  screened in its own model, so `n_analyzed` holds one value per
+  predictor and the reported sample may be a range. The
+  [`print()`](https://rdrr.io/r/base/print.html) method always reports
+  the analyzed sample
+
 - models:
 
   List (if `keep_models = TRUE`). Named list of fitted model objects,
@@ -479,7 +490,13 @@ for complete univariable-to-multivariable workflow,
 [`compfit`](https://phmcc.codeberg.page/summata/reference/compfit.md)
 for comparing multiple models,
 [`m2dt`](https://phmcc.codeberg.page/summata/reference/m2dt.md) for
-converting individual models to tables
+converting individual models to tables,
+[`uniforest`](https://phmcc.codeberg.page/summata/reference/uniforest.md)
+for forest plots of screening results,
+[`forestsave`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+for exporting forest plots,
+[`tablesave`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+for exporting tables
 
 Other regression functions:
 [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md),
@@ -506,27 +523,31 @@ screen1 <- uniscreen(
     predictors = c("age", "sex", "bmi", "smoking", "hypertension"),
     model_type = "glm",
     family = "binomial",
+    labels = clintrial_labels,
     parallel = FALSE
 )
 print(screen1)
 #> 
 #> Univariable Screening Results
+#> 
 #> Outcome: os_status
 #> Model Type: Logistic
 #> Predictors Screened: 5
 #> Significant (p < 0.05): 3
+#> Observations analyzed: 833-850 of 850 (98.0-100.0%)
+#> Events analyzed: 594-609 of 609 (97.5-100.0%)
 #> 
-#>        Variable   Group      n Events      OR (95% CI) p-value
-#>          <char>  <char> <char> <char>           <char>  <char>
-#> 1:          age       -    850    609 1.05 (1.03-1.06) < 0.001
-#> 2:          sex  Female    450    298        reference       -
-#> 3:                 Male    400    311 1.78 (1.31-2.43) < 0.001
-#> 4:          bmi       -    838    599 1.01 (0.98-1.05)   0.347
-#> 5:      smoking   Never    337    248        reference       -
-#> 6:               Former    311    203 0.67 (0.48-0.94)   0.022
-#> 7:              Current    185    143 1.22 (0.81-1.87)   0.351
-#> 8: hypertension      No    504    354        reference       -
-#> 9:                  Yes    331    242 1.15 (0.85-1.57)   0.369
+#>                   Variable   Group      n Events      OR (95% CI) p-value
+#>                     <char>  <char> <char> <char>           <char>  <char>
+#> 1:             Age (years)       -    850    609 1.05 (1.03-1.06) < 0.001
+#> 2:                     Sex  Female    450    298        reference       -
+#> 3:                            Male    400    311 1.78 (1.31-2.43) < 0.001
+#> 4: Body Mass Index (kg/m²)       -    838    599 1.01 (0.98-1.05)   0.347
+#> 5:          Smoking Status   Never    337    248        reference       -
+#> 6:                          Former    311    203 0.67 (0.48-0.94)   0.022
+#> 7:                         Current    185    143 1.22 (0.81-1.87)   0.351
+#> 8:            Hypertension      No    504    354        reference       -
+#> 9:                             Yes    331    242 1.15 (0.85-1.57)   0.369
 
 # \donttest{
 
@@ -541,10 +562,13 @@ screen2 <- uniscreen(
 print(screen2)
 #> 
 #> Univariable Screening Results
+#> 
 #> Outcome: os_status
 #> Model Type: Logistic
 #> Predictors Screened: 4
 #> Significant (p < 0.05): 3
+#> Observations analyzed: 838-850 of 850 (98.6-100.0%)
+#> Events analyzed: 599-609 of 609 (98.4-100.0%)
 #> 
 #>                   Variable   Group      n Events      OR (95% CI) p-value
 #>                     <char>  <char> <char> <char>           <char>  <char>
@@ -570,10 +594,13 @@ screen3 <- uniscreen(
 print(screen3)
 #> 
 #> Univariable Screening Results
+#> 
 #> Outcome: os_status
 #> Model Type: Logistic
 #> Predictors Screened: 7
 #> Significant (p < 0.2): 4
+#> Observations analyzed: 833-850 of 850 (98.0-100.0%)
+#> Events analyzed: 594-609 of 609 (97.5-100.0%)
 #> 
 #>                    Variable   Group      n Events       OR (95% CI) p-value
 #>                      <char>  <char> <char> <char>            <char>  <char>
@@ -607,10 +634,13 @@ cox_screen <- uniscreen(
 print(cox_screen)
 #> 
 #> Univariable Screening Results
+#> 
 #> Outcome: Surv(os_months, os_status)
 #> Model Type: Cox PH
 #> Predictors Screened: 5
 #> Significant (p < 0.05): 5
+#> Observations analyzed: 840-850 of 850 (98.8-100.0%)
+#> Events analyzed: 600-609 of 609 (98.5-100.0%)
 #> 
 #>            Variable                     Group      n Events      HR (95% CI) p-value
 #>              <char>                    <char> <char> <char>           <char>  <char>
@@ -679,16 +709,18 @@ linear_screen <- uniscreen(
 print(linear_screen)
 #> 
 #> Univariable Screening Results
+#> 
 #> Outcome: bmi
 #> Model Type: Linear
 #> Predictors Screened: 5
 #> Significant (p < 0.05): 0
+#> Observations analyzed: 833-838 of 850 (98.0-98.6%)
 #> 
 #>                       Variable   Group      n  Coefficient (95% CI) p-value
 #>                         <char>  <char> <char>                <char>  <char>
 #> 1:                 Age (years)       -    838 -0.02 (-0.05 to 0.01)   0.140
-#> 2:                         Sex  Female    450             reference       -
-#> 3:                                Male    400 -0.36 (-1.03 to 0.31)   0.296
+#> 2:                         Sex  Female    445             reference       -
+#> 3:                                Male    393 -0.36 (-1.03 to 0.31)   0.296
 #> 4:              Smoking Status   Never    337             reference       -
 #> 5:                              Former    311  0.22 (-0.55 to 0.98)   0.578
 #> 6:                             Current    185  0.31 (-0.57 to 1.20)   0.490
@@ -709,23 +741,26 @@ poisson_screen <- uniscreen(
 print(poisson_screen)
 #> 
 #> Univariable Screening Results
+#> 
 #> Outcome: fu_count
 #> Model Type: Poisson
 #> Predictors Screened: 4
 #> Significant (p < 0.05): 3
+#> Observations analyzed: 839-842 of 850 (98.7-99.1%)
+#> Events analyzed: 5,517-5,533 of 5,533 (99.7-100.0%)
 #> 
 #>               Variable   Group      n Events      RR (95% CI) p-value
 #>                 <char>  <char> <char> <char>           <char>  <char>
 #>  1:        Age (years)       -    842  5,533 1.00 (0.99-1.00)   0.005
-#>  2:      Disease Stage       I    211  1,238        reference       -
-#>  3:                         II    263  1,638 1.05 (0.97-1.13)   0.201
-#>  4:                        III    241  1,638 1.14 (1.06-1.23) < 0.001
-#>  5:                         IV    132  1,003 1.28 (1.18-1.39) < 0.001
-#>  6:    Treatment Group Control    196  1,180        reference       -
-#>  7:                     Drug A    292  1,910 1.08 (1.00-1.16)   0.045
-#>  8:                     Drug B    362  2,443 1.11 (1.04-1.19)   0.003
-#>  9: Surgical Resection      No    480  3,098        reference       -
-#> 10:                        Yes    370  2,435 1.03 (0.97-1.08)   0.322
+#>  2:      Disease Stage       I    207  1,238        reference       -
+#>  3:                         II    261  1,638 1.05 (0.97-1.13)   0.201
+#>  4:                        III    240  1,638 1.14 (1.06-1.23) < 0.001
+#>  5:                         IV    131  1,003 1.28 (1.18-1.39) < 0.001
+#>  6:    Treatment Group Control    193  1,180        reference       -
+#>  7:                     Drug A    290  1,910 1.08 (1.00-1.16)   0.045
+#>  8:                     Drug B    359  2,443 1.11 (1.04-1.19)   0.003
+#>  9: Surgical Resection      No    477  3,098        reference       -
+#> 10:                        Yes    365  2,435 1.03 (0.97-1.08)   0.322
 # Returns rate ratios (RR)
 
 # Example 8: Negative binomial for overdispersed counts
@@ -743,21 +778,24 @@ if (requireNamespace("MASS", quietly = TRUE)) {
 }
 #> 
 #> Univariable Screening Results
+#> 
 #> Outcome: ae_count
 #> Model Type: Negative Binomial
 #> Predictors Screened: 4
 #> Significant (p < 0.05): 3
+#> Observations analyzed: 824-840 of 850 (96.9-98.8%)
+#> Events analyzed: 4,506-4,599 of 4,599 (98.0-100.0%)
 #> 
 #>              Variable   Group      n Events      RR (95% CI) p-value
 #>                <char>  <char> <char> <char>           <char>  <char>
 #> 1:        Age (years)       -    840  4,599 1.01 (1.01-1.02) < 0.001
-#> 2:    Treatment Group Control    196    851        reference       -
-#> 3:                     Drug A    292  1,240 0.97 (0.83-1.13)   0.712
-#> 4:                     Drug B    362  2,508 1.61 (1.39-1.86) < 0.001
-#> 5:           Diabetes      No    637  2,998        reference       -
-#> 6:                        Yes    197  1,508 1.63 (1.43-1.86) < 0.001
-#> 7: Surgical Resection      No    480  2,627        reference       -
-#> 8:                        Yes    370  1,972 0.97 (0.86-1.09)   0.580
+#> 2:    Treatment Group Control    194    851        reference       -
+#> 3:                     Drug A    291  1,240 0.97 (0.83-1.13)   0.712
+#> 4:                     Drug B    355  2,508 1.61 (1.39-1.86) < 0.001
+#> 5:           Diabetes      No    630  2,998        reference       -
+#> 6:                        Yes    194  1,508 1.63 (1.43-1.86) < 0.001
+#> 7: Surgical Resection      No    473  2,627        reference       -
+#> 8:                        Yes    367  1,972 0.97 (0.86-1.09)   0.580
 
 # Example 9: Gamma regression for positive continuous outcomes (\emph{e.g.,} costs)
 gamma_screen <- uniscreen(
@@ -772,20 +810,22 @@ gamma_screen <- uniscreen(
 print(gamma_screen)
 #> 
 #> Univariable Screening Results
+#> 
 #> Outcome: los_days
 #> Model Type: Gamma
 #> Predictors Screened: 4
 #> Significant (p < 0.05): 3
+#> Observations analyzed: 830 of 850 (97.6%)
 #> 
 #>              Variable   Group      n Coefficient (95% CI) p-value
 #>                <char>  <char> <char>               <char>  <char>
 #> 1:        Age (years)       -    830     1.01 (1.01-1.01) < 0.001
-#> 2:                Sex  Female    450            reference       -
-#> 3:                       Male    400     1.04 (1.01-1.08)   0.011
-#> 4:    Treatment Group Control    196            reference       -
-#> 5:                     Drug A    292     0.96 (0.92-1.00)   0.067
-#> 6:                     Drug B    362     1.15 (1.10-1.19) < 0.001
-#> 7: Surgical Resection      No    480            reference       -
+#> 2:                Sex  Female    442            reference       -
+#> 3:                       Male    388     1.04 (1.01-1.08)   0.011
+#> 4:    Treatment Group Control    192            reference       -
+#> 5:                     Drug A    288     0.96 (0.92-1.00)   0.067
+#> 6:                     Drug B    350     1.15 (1.10-1.19) < 0.001
+#> 7: Surgical Resection      No    460            reference       -
 #> 8:                        Yes    370     1.03 (1.00-1.06)   0.091
 
 # Example 10: Hide reference rows for factor variables
@@ -794,26 +834,29 @@ screen10 <- uniscreen(
     outcome = "os_status",
     predictors = c("treatment", "stage", "grade"),
     reference_rows = FALSE,
+    labels = clintrial_labels,
     parallel = FALSE
 )
 print(screen10)
 #> 
 #> Univariable Screening Results
+#> 
 #> Outcome: os_status
 #> Model Type: Logistic
 #> Predictors Screened: 3
 #> Significant (p < 0.05): 3
+#> Observations analyzed: 840-850 of 850 (98.8-100.0%)
+#> Events analyzed: 600-609 of 609 (98.5-100.0%)
 #> 
-#>     Variable                     Group      n Events       OR (95% CI) p-value
-#>       <char>                    <char> <char> <char>            <char>  <char>
-#> 1: treatment                    Drug A    292    184  0.51 (0.34-0.76)   0.001
-#> 2:                              Drug B    362    274  0.93 (0.61-1.39)   0.721
-#> 3:     stage                        II    263    172  1.25 (0.86-1.82)   0.243
-#> 4:                                 III    241    186  2.24 (1.49-3.38) < 0.001
-#> 5:                                  IV    132    121 7.28 (3.85-15.04) < 0.001
-#> 6:     grade Moderately differentiated    412    297  1.58 (1.06-2.33)   0.023
-#> 7:               Poorly differentiated    275    208  1.90 (1.24-2.91)   0.003
-# Reference categories not shown
+#>           Variable                     Group      n Events       OR (95% CI) p-value
+#>             <char>                    <char> <char> <char>            <char>  <char>
+#> 1: Treatment Group                    Drug A    292    184  0.51 (0.34-0.76)   0.001
+#> 2:                                    Drug B    362    274  0.93 (0.61-1.39)   0.721
+#> 3:   Disease Stage                        II    263    172  1.25 (0.86-1.82)   0.243
+#> 4:                                       III    241    186  2.24 (1.49-3.38) < 0.001
+#> 5:                                        IV    132    121 7.28 (3.85-15.04) < 0.001
+#> 6:     Tumor Grade Moderately differentiated    412    297  1.58 (1.06-2.33)   0.023
+#> 7:                     Poorly differentiated    275    208  1.90 (1.24-2.91)   0.003
 
 # Example 11: Customize decimal places
 screen11 <- uniscreen(
@@ -821,21 +864,25 @@ screen11 <- uniscreen(
     outcome = "os_status",
     predictors = c("age", "bmi", "creatinine"),
     digits = 3,      # 3 decimal places for OR
-    p_digits = 4     # 4 decimal places for p-values
+    p_digits = 4,    # 4 decimal places for p-values
+    labels = clintrial_labels
 )
 print(screen11)
 #> 
 #> Univariable Screening Results
+#> 
 #> Outcome: os_status
 #> Model Type: Logistic
 #> Predictors Screened: 3
 #> Significant (p < 0.05): 1
+#> Observations analyzed: 838-850 of 850 (98.6-100.0%)
+#> Events analyzed: 599-609 of 609 (98.4-100.0%)
 #> 
-#>      Variable  Group      n Events         OR (95% CI)  p-value
-#>        <char> <char> <char> <char>              <char>   <char>
-#> 1:        age      -    850    609 1.048 (1.034-1.063) < 0.0001
-#> 2:        bmi      -    838    599 1.015 (0.984-1.046)   0.3466
-#> 3: creatinine      -    840    600 0.901 (0.547-1.494)   0.6848
+#>                       Variable  Group      n Events         OR (95% CI)  p-value
+#>                         <char> <char> <char> <char>              <char>   <char>
+#> 1:                 Age (years)      -    850    609 1.048 (1.034-1.063) < 0.0001
+#> 2:     Body Mass Index (kg/m²)      -    838    599 1.015 (0.984-1.046)   0.3466
+#> 3: Baseline Creatinine (mg/dL)      -    840    600 0.901 (0.547-1.494)   0.6848
 
 # Example 12: Hide sample size and event columns
 screen12 <- uniscreen(
@@ -844,22 +891,26 @@ screen12 <- uniscreen(
     predictors = c("age", "sex", "bmi"),
     show_n = FALSE,
     show_events = FALSE,
+    labels = clintrial_labels,
     parallel = FALSE
 )
 print(screen12)
 #> 
 #> Univariable Screening Results
+#> 
 #> Outcome: os_status
 #> Model Type: Logistic
 #> Predictors Screened: 3
 #> Significant (p < 0.05): 2
+#> Observations analyzed: 838-850 of 850 (98.6-100.0%)
+#> Events analyzed: 599-609 of 609 (98.4-100.0%)
 #> 
-#>    Variable  Group      OR (95% CI) p-value
-#>      <char> <char>           <char>  <char>
-#> 1:      age      - 1.05 (1.03-1.06) < 0.001
-#> 2:      sex Female        reference       -
-#> 3:            Male 1.78 (1.31-2.43) < 0.001
-#> 4:      bmi      - 1.01 (0.98-1.05)   0.347
+#>                   Variable  Group      OR (95% CI) p-value
+#>                     <char> <char>           <char>  <char>
+#> 1:             Age (years)      - 1.05 (1.03-1.06) < 0.001
+#> 2:                     Sex Female        reference       -
+#> 3:                           Male 1.78 (1.31-2.43) < 0.001
+#> 4: Body Mass Index (kg/m²)      - 1.01 (0.98-1.05)   0.347
 
 # Example 13: Access raw numeric data
 screen13 <- uniscreen(
@@ -886,7 +937,6 @@ print(raw_data)
 #> 4:             FALSE treatment reference
 #> 5:     **       TRUE treatment          
 #> 6:             FALSE treatment          
-# Contains unformatted coefficients, SEs, CIs, etc.
 
 # Example 14: Force coefficient display instead of OR
 screen14 <- uniscreen(
@@ -895,21 +945,25 @@ screen14 <- uniscreen(
     predictors = c("age", "bmi"),
     model_type = "glm",
     family = "binomial",
+    labels = clintrial_labels,
     parallel = FALSE,
     exponentiate = FALSE  # Show log odds instead of OR
 )
 print(screen14)
 #> 
 #> Univariable Screening Results
+#> 
 #> Outcome: os_status
 #> Model Type: Logistic
 #> Predictors Screened: 2
 #> Significant (p < 0.05): 1
+#> Observations analyzed: 838-850 of 850 (98.6-100.0%)
+#> Events analyzed: 599-609 of 609 (98.4-100.0%)
 #> 
-#>    Variable  Group      n Events Coefficient (95% CI) p-value
-#>      <char> <char> <char> <char>               <char>  <char>
-#> 1:      age      -    850    609  0.05 (0.03 to 0.06) < 0.001
-#> 2:      bmi      -    838    599 0.01 (-0.02 to 0.05)   0.347
+#>                   Variable  Group      n Events Coefficient (95% CI) p-value
+#>                     <char> <char> <char> <char>               <char>  <char>
+#> 1:             Age (years)      -    850    609  0.05 (0.03 to 0.06) < 0.001
+#> 2: Body Mass Index (kg/m²)      -    838    599 0.01 (-0.02 to 0.05)   0.347
 
 # Example 15: Screening with weights
 screen15 <- uniscreen(
@@ -918,6 +972,7 @@ screen15 <- uniscreen(
     predictors = c("age", "sex", "bmi"),
     model_type = "coxph",
     weights = runif(nrow(clintrial), min = 0.5, max = 2),  # Random numbers for example
+    labels = clintrial_labels,
     parallel = FALSE
 )
 
@@ -961,8 +1016,10 @@ multi_model <- fit(
 print(multi_model)
 #> 
 #> Multivariable Logistic Model
+#> 
 #> Formula: os_status ~ age + sex + smoking + treatment + stage + grade
-#> n = 833, Events = 594
+#> Observations analyzed: 833 of 850 (98.0%)
+#> Events analyzed: 594 of 609 (97.5%)
 #> 
 #>            Variable                     Group      n Events      aOR (95% CI) p-value
 #>              <char>                    <char> <char> <char>            <char>  <char>
@@ -1000,10 +1057,13 @@ if (requireNamespace("lme4", quietly = TRUE)) {
 }
 #> 
 #> Univariable Screening Results
+#> 
 #> Outcome: os_status
 #> Model Type: glmerMod
 #> Predictors Screened: 4
 #> Significant (p < 0.05): 4
+#> Observations analyzed: 847-850 of 850 (99.6-100.0%)
+#> Events analyzed: 606-609 of 609 (99.5-100.0%)
 #> 
 #>            Variable   Group      n Events       OR (95% CI) p-value
 #>              <char>  <char> <char> <char>            <char>  <char>
@@ -1031,16 +1091,14 @@ if (requireNamespace("lme4", quietly = TRUE)) {
     )
     print(lmer_screen)
 }
-#> boundary (singular) fit: see help('isSingular')
-#> boundary (singular) fit: see help('isSingular')
-#> boundary (singular) fit: see help('isSingular')
-#> boundary (singular) fit: see help('isSingular')
 #> 
 #> Univariable Screening Results
+#> 
 #> Outcome: biomarker_x
 #> Model Type: Linear Mixed
 #> Predictors Screened: 4
 #> Significant (p < 0.05): 1
+#> Observations analyzed: 833-842 of 850 (98.0-99.1%)
 #> 
 #>           Variable   Group      n  Coefficient (95% CI) p-value
 #>             <char>  <char> <char>                <char>  <char>
@@ -1069,10 +1127,13 @@ if (requireNamespace("coxme", quietly = TRUE)) {
 }
 #> 
 #> Univariable Screening Results
+#> 
 #> Outcome: Surv(os_months, os_status)
 #> Model Type: Mixed Effects Cox
 #> Predictors Screened: 4
 #> Significant (p < 0.05): 4
+#> Observations analyzed: 847-850 of 850 (99.6-100.0%)
+#> Events analyzed: 606-609 of 609 (99.5-100.0%)
 #> 
 #>            Variable   Group      n Events      HR (95% CI) p-value
 #>              <char>  <char> <char> <char>           <char>  <char>
@@ -1097,10 +1158,10 @@ if (requireNamespace("lme4", quietly = TRUE)) {
         model_type = "glmer",
         random = "(1|site/patient_id)",
         family = "binomial",
+        labels = clintrial_labels,
         parallel = FALSE
     )
 }
-#> boundary (singular) fit: see help('isSingular')
 
 # Example 22: Quasipoisson for overdispersed count data
 # Alternative to negative binomial when MASS not available
@@ -1116,25 +1177,28 @@ quasi_screen <- uniscreen(
 print(quasi_screen)
 #> 
 #> Univariable Screening Results
+#> 
 #> Outcome: ae_count
 #> Model Type: Quasi-Poisson
 #> Predictors Screened: 5
 #> Significant (p < 0.05): 4
+#> Observations analyzed: 824-840 of 850 (96.9-98.8%)
+#> Events analyzed: 4,506-4,599 of 4,599 (98.0-100.0%)
 #> 
 #>               Variable   Group      n Events      RR (95% CI) p-value
 #>                 <char>  <char> <char> <char>           <char>  <char>
 #>  1:        Age (years)       -    840  4,599 1.01 (1.01-1.02) < 0.001
-#>  2:    Treatment Group Control    196    851        reference       -
-#>  3:                     Drug A    292  1,240 0.97 (0.82-1.15)   0.741
-#>  4:                     Drug B    362  2,508 1.61 (1.38-1.88) < 0.001
-#>  5:           Diabetes      No    637  2,998        reference       -
-#>  6:                        Yes    197  1,508 1.63 (1.44-1.85) < 0.001
-#>  7: Surgical Resection      No    480  2,627        reference       -
-#>  8:                        Yes    370  1,972 0.97 (0.85-1.10)   0.602
-#>  9:      Disease Stage       I    211  1,103        reference       -
-#> 10:                         II    263  1,291 0.94 (0.80-1.12)   0.508
-#> 11:                        III    241  1,494 1.18 (1.01-1.40)   0.043
-#> 12:                         IV    132    689 1.00 (0.82-1.23)   0.967
+#>  2:    Treatment Group Control    194    851        reference       -
+#>  3:                     Drug A    291  1,240 0.97 (0.82-1.15)   0.741
+#>  4:                     Drug B    355  2,508 1.61 (1.38-1.88) < 0.001
+#>  5:           Diabetes      No    630  2,998        reference       -
+#>  6:                        Yes    194  1,508 1.63 (1.44-1.85) < 0.001
+#>  7: Surgical Resection      No    473  2,627        reference       -
+#>  8:                        Yes    367  1,972 0.97 (0.85-1.10)   0.602
+#>  9:      Disease Stage       I    209  1,103        reference       -
+#> 10:                         II    259  1,291 0.94 (0.80-1.12)   0.508
+#> 11:                        III    239  1,494 1.18 (1.01-1.40)   0.043
+#> 12:                         IV    130    689 1.00 (0.82-1.23)   0.967
 # Adjusts standard errors for overdispersion
 
 # Example 23: Quasibinomial for overdispersed binary data
@@ -1150,10 +1214,13 @@ quasibin_screen <- uniscreen(
 print(quasibin_screen)
 #> 
 #> Univariable Screening Results
+#> 
 #> Outcome: any_complication
 #> Model Type: Quasi-Binomial
 #> Predictors Screened: 5
 #> Significant (p < 0.05): 3
+#> Observations analyzed: 834-850 of 850 (98.1-100.0%)
+#> Events analyzed: 468-480 of 480 (97.5-100.0%)
 #> 
 #>                    Variable  Group      n Events      OR (95% CI) p-value
 #>                      <char> <char> <char> <char>           <char>  <char>
@@ -1181,16 +1248,18 @@ invgauss_screen <- uniscreen(
 print(invgauss_screen)
 #> 
 #> Univariable Screening Results
+#> 
 #> Outcome: recovery_days
 #> Model Type: Inverse.gaussian GLM
 #> Predictors Screened: 4
 #> Significant (p < 0.05): 4
+#> Observations analyzed: 815-835 of 850 (95.9-98.2%)
 #> 
 #>                           Variable  Group      n Coefficient (95% CI) p-value
 #>                             <char> <char> <char>               <char>  <char>
 #> 1:                     Age (years)      -    835     1.01 (1.01-1.01) < 0.001
-#> 2:              Surgical Resection     No    480            reference       -
-#> 3:                                    Yes    370     1.26 (1.19-1.34) < 0.001
+#> 2:              Surgical Resection     No    472            reference       -
+#> 3:                                    Yes    363     1.26 (1.19-1.34) < 0.001
 #> 4: Postoperative Pain Score (0-10)      -    825     1.04 (1.03-1.06) < 0.001
 #> 5:  Length of Hospital Stay (days)      -    815     1.05 (1.04-1.06) < 0.001
 

@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -192,22 +192,19 @@ suitable for multivariate analysis:</p>
 </tbody>
 </table>
 <blockquote>
-<p><em>n.b.:</em> To ensure correct font rendering and figure sizing,
-the forest plots below are displayed using a helper function
-(<code>queue_plot()</code>) that applies each plot’s recommended
-dimensions (stored in the <code>"rec_dims"</code> attribute) via the <a href="https://ragg.r-lib.org/" class="external-link"><code>ragg</code></a> graphics device. In
-practice, replace <code>queue_plot()</code> with
-<code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggplot2::ggsave()</a></code> using recommended plot dimensions for
-equivalent results:</p>
+<p><em>n.b.:</em> The forest plots below are sized by this vignette from
+each plot’s recommended dimensions, stored in its
+<code>"rec_dims"</code> attribute, and rendered via the <a href="https://ragg.r-lib.org/" class="external-link"><code>ragg</code></a> graphics device for
+correct font metrics. That sizing is applied behind the scenes and is
+not shown in the code. Writing a plot to file elsewhere is performed
+with <code><a href="../reference/forestsave.html">forestsave()</a></code>, which applies the same dimensions and
+selects a suitable graphics device:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glmforest.html">glmforest</a></span><span class="op">(</span><span class="va">model</span>, data <span class="op">=</span> <span class="va">mydata</span><span class="op">)</span></span>
-<span><span class="va">dims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">p</span>, <span class="st">"rec_dims"</span><span class="op">)</span></span>
-<span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"forest_plot.png"</span>, <span class="va">p</span>,</span>
-<span>                width <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">width</span>, </span>
-<span>                height <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">height</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/forestsave.html">forestsave</a></span><span class="op">(</span><span class="va">p</span>, <span class="st">"forest_plot.png"</span><span class="op">)</span></span></code></pre></div>
 <p>This ensures that the figure size is always large enough to
-accommodate the constituent plot text and graphics, and it is generally
-the preferred method for saving forest plot outputs in
+accommodate the constituent plot text and graphics, and it is the
+preferred method for saving forest plot outputs in
 <code>summata</code>.</p>
 </blockquote>
 <hr>
@@ -232,11 +229,13 @@ the preferred method for saving forest plot outputs in
 <span></span>
 <span><span class="va">example1</span></span>
 <span><span class="co">##&gt; </span></span>
-<span><span class="co">##&gt; Multivariate Analysis Results</span></span>
+<span><span class="co">##&gt; Multivariate Regression Results</span></span>
+<span><span class="co">##&gt; </span></span>
 <span><span class="co">##&gt; Predictor: surgery</span></span>
 <span><span class="co">##&gt; Outcomes: 4</span></span>
 <span><span class="co">##&gt; Model Type: glm</span></span>
 <span><span class="co">##&gt; Display: unadjusted</span></span>
+<span><span class="co">##&gt; Observations analyzed: 850 of 850 (100.0%)</span></span>
 <span><span class="co">##&gt; </span></span>
 <span><span class="co">##&gt;                   Outcome          Predictor      n Events      OR (95% CI) p-value</span></span>
 <span><span class="co">##&gt;                    &lt;char&gt;             &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
@@ -265,12 +264,14 @@ categorical predictors, each non-reference level appears separately.</p>
 <span></span>
 <span><span class="va">example2</span></span>
 <span><span class="co">##&gt; </span></span>
-<span><span class="co">##&gt; Multivariate Analysis Results</span></span>
+<span><span class="co">##&gt; Multivariate Regression Results</span></span>
+<span><span class="co">##&gt; </span></span>
 <span><span class="co">##&gt; Predictor: surgery</span></span>
 <span><span class="co">##&gt; Outcomes: 4</span></span>
 <span><span class="co">##&gt; Model Type: glm</span></span>
 <span><span class="co">##&gt; Covariates: age, sex, smoking, diabetes</span></span>
 <span><span class="co">##&gt; Display: adjusted</span></span>
+<span><span class="co">##&gt; Observations analyzed: 833 of 850 (98.0%)</span></span>
 <span><span class="co">##&gt; </span></span>
 <span><span class="co">##&gt;                   Outcome          Predictor      n Events     aOR (95% CI) p-value</span></span>
 <span><span class="co">##&gt;                    &lt;char&gt;             &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
@@ -299,19 +300,21 @@ results side-by-side:</p>
 <span></span>
 <span><span class="va">example3</span></span>
 <span><span class="co">##&gt; </span></span>
-<span><span class="co">##&gt; Multivariate Analysis Results</span></span>
+<span><span class="co">##&gt; Multivariate Regression Results</span></span>
+<span><span class="co">##&gt; </span></span>
 <span><span class="co">##&gt; Predictor: surgery</span></span>
 <span><span class="co">##&gt; Outcomes: 4</span></span>
 <span><span class="co">##&gt; Model Type: glm</span></span>
 <span><span class="co">##&gt; Covariates: age, sex, diabetes, surgery</span></span>
 <span><span class="co">##&gt; Display: both</span></span>
+<span><span class="co">##&gt; Observations analyzed: 834 of 850 (98.1%)</span></span>
 <span><span class="co">##&gt; </span></span>
 <span><span class="co">##&gt;                   Outcome          Predictor      n Events      OR (95% CI)   Uni p     aOR (95% CI) Multi p</span></span>
 <span><span class="co">##&gt;                    &lt;char&gt;             &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
-<span><span class="co">##&gt; 1:       Any Complication Surgical Resection    370    236 1.70 (1.29-2.25) &lt; 0.001 1.82 (1.36-2.44) &lt; 0.001</span></span>
-<span><span class="co">##&gt; 2: ICU Admission Required Surgical Resection    370    179 2.25 (1.70-2.99) &lt; 0.001 2.57 (1.91-3.48) &lt; 0.001</span></span>
-<span><span class="co">##&gt; 3:     30-Day Readmission Surgical Resection    370    181 0.91 (0.69-1.19)   0.500 1.05 (0.79-1.40)   0.720</span></span>
-<span><span class="co">##&gt; 4:   Wound/Site Infection Surgical Resection    370    121 4.58 (3.18-6.72) &lt; 0.001 4.98 (3.37-7.46) &lt; 0.001</span></span></code></pre></div>
+<span><span class="co">##&gt; 1:       Any Complication Surgical Resection    362    229 1.70 (1.29-2.25) &lt; 0.001 1.82 (1.36-2.44) &lt; 0.001</span></span>
+<span><span class="co">##&gt; 2: ICU Admission Required Surgical Resection    362    173 2.25 (1.70-2.99) &lt; 0.001 2.57 (1.91-3.48) &lt; 0.001</span></span>
+<span><span class="co">##&gt; 3:     30-Day Readmission Surgical Resection    362    176 0.91 (0.69-1.19)   0.500 1.05 (0.79-1.40)   0.720</span></span>
+<span><span class="co">##&gt; 4:   Wound/Site Infection Surgical Resection    362    117 4.58 (3.18-6.72) &lt; 0.001 4.98 (3.37-7.46) &lt; 0.001</span></span></code></pre></div>
 <p>Comparing columns reveals confounding (large differences) or robust
 associations (similar estimates).</p>
 <hr>
@@ -337,12 +340,14 @@ associations (similar estimates).</p>
 <span></span>
 <span><span class="va">example4</span></span>
 <span><span class="co">##&gt; </span></span>
-<span><span class="co">##&gt; Multivariate Analysis Results</span></span>
+<span><span class="co">##&gt; Multivariate Regression Results</span></span>
+<span><span class="co">##&gt; </span></span>
 <span><span class="co">##&gt; Predictor: age</span></span>
 <span><span class="co">##&gt; Outcomes: 3</span></span>
 <span><span class="co">##&gt; Model Type: glm</span></span>
 <span><span class="co">##&gt; Covariates: sex, treatment, surgery</span></span>
 <span><span class="co">##&gt; Display: adjusted</span></span>
+<span><span class="co">##&gt; Observations analyzed: 850 of 850 (100.0%)</span></span>
 <span><span class="co">##&gt; </span></span>
 <span><span class="co">##&gt;                   Outcome      n Events     aOR (95% CI) p-value</span></span>
 <span><span class="co">##&gt;                    &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
@@ -371,12 +376,14 @@ expanded:</p>
 <span></span>
 <span><span class="va">example5</span></span>
 <span><span class="co">##&gt; </span></span>
-<span><span class="co">##&gt; Multivariate Analysis Results</span></span>
+<span><span class="co">##&gt; Multivariate Regression Results</span></span>
+<span><span class="co">##&gt; </span></span>
 <span><span class="co">##&gt; Predictor: treatment</span></span>
 <span><span class="co">##&gt; Outcomes: 4</span></span>
 <span><span class="co">##&gt; Model Type: glm</span></span>
 <span><span class="co">##&gt; Covariates: age, sex, surgery</span></span>
 <span><span class="co">##&gt; Display: adjusted</span></span>
+<span><span class="co">##&gt; Observations analyzed: 850 of 850 (100.0%)</span></span>
 <span><span class="co">##&gt; </span></span>
 <span><span class="co">##&gt;                   Outcome                Predictor      n Events     aOR (95% CI) p-value</span></span>
 <span><span class="co">##&gt;                    &lt;char&gt;                   &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
@@ -414,19 +421,21 @@ expanded:</p>
 <span></span>
 <span><span class="va">example6</span></span>
 <span><span class="co">##&gt; </span></span>
-<span><span class="co">##&gt; Multivariate Analysis Results</span></span>
+<span><span class="co">##&gt; Multivariate Regression Results</span></span>
+<span><span class="co">##&gt; </span></span>
 <span><span class="co">##&gt; Predictor: treatment</span></span>
 <span><span class="co">##&gt; Outcomes: 2</span></span>
 <span><span class="co">##&gt; Model Type: coxph</span></span>
 <span><span class="co">##&gt; Covariates: age, sex, stage</span></span>
 <span><span class="co">##&gt; Display: adjusted</span></span>
+<span><span class="co">##&gt; Observations analyzed: 847 of 850 (99.6%)</span></span>
 <span><span class="co">##&gt; </span></span>
 <span><span class="co">##&gt;                               Outcome                Predictor      n Events     aHR (95% CI) p-value</span></span>
 <span><span class="co">##&gt;                                &lt;char&gt;                   &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
-<span><span class="co">##&gt; 1: Progression-Free Survival (months) Treatment Group (Drug A)    721    721 0.54 (0.44-0.66) &lt; 0.001</span></span>
-<span><span class="co">##&gt; 2: Progression-Free Survival (months) Treatment Group (Drug B)    721    721 0.82 (0.68-0.98)   0.033</span></span>
-<span><span class="co">##&gt; 3:          Overall Survival (months) Treatment Group (Drug A)    606    606 0.56 (0.45-0.70) &lt; 0.001</span></span>
-<span><span class="co">##&gt; 4:          Overall Survival (months) Treatment Group (Drug B)    606    606 0.83 (0.67-1.01)   0.062</span></span></code></pre></div>
+<span><span class="co">##&gt; 1: Progression-Free Survival (months) Treatment Group (Drug A)    292    227 0.54 (0.44-0.66) &lt; 0.001</span></span>
+<span><span class="co">##&gt; 2: Progression-Free Survival (months) Treatment Group (Drug B)    361    321 0.82 (0.68-0.98)   0.033</span></span>
+<span><span class="co">##&gt; 3:          Overall Survival (months) Treatment Group (Drug A)    292    184 0.56 (0.45-0.70) &lt; 0.001</span></span>
+<span><span class="co">##&gt; 4:          Overall Survival (months) Treatment Group (Drug B)    361    273 0.83 (0.67-1.01)   0.062</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="example-7-linear-regression">
@@ -446,12 +455,14 @@ expanded:</p>
 <span></span>
 <span><span class="va">example7</span></span>
 <span><span class="co">##&gt; </span></span>
-<span><span class="co">##&gt; Multivariate Analysis Results</span></span>
+<span><span class="co">##&gt; Multivariate Regression Results</span></span>
+<span><span class="co">##&gt; </span></span>
 <span><span class="co">##&gt; Predictor: treatment</span></span>
 <span><span class="co">##&gt; Outcomes: 3</span></span>
 <span><span class="co">##&gt; Model Type: lm</span></span>
 <span><span class="co">##&gt; Covariates: age, sex, surgery</span></span>
 <span><span class="co">##&gt; Display: adjusted</span></span>
+<span><span class="co">##&gt; Observations analyzed: 830-840 of 850 (97.6-98.8%)</span></span>
 <span><span class="co">##&gt; </span></span>
 <span><span class="co">##&gt;                            Outcome                Predictor      n Adj. Coefficient (95% CI) p-value</span></span>
 <span><span class="co">##&gt;                             &lt;char&gt;                   &lt;char&gt; &lt;char&gt;                    &lt;char&gt;  &lt;char&gt;</span></span>
@@ -461,6 +472,17 @@ expanded:</p>
 <span><span class="co">##&gt; 4: Postoperative Pain Score (0-10) Treatment Group (Drug B)    359       0.86 (0.59 to 1.13) &lt; 0.001</span></span>
 <span><span class="co">##&gt; 5:     Days to Functional Recovery Treatment Group (Drug A)    288    -1.73 (-2.96 to -0.50)   0.006</span></span>
 <span><span class="co">##&gt; 6:     Days to Functional Recovery Treatment Group (Drug B)    352       2.79 (1.59 to 3.98) &lt; 0.001</span></span></code></pre></div>
+<p>The three outcomes are not fitted to the same observations. Length of
+stay is unrecorded for a proportion of patients who did not undergo
+surgical resection, whereas pain score and days to recovery are
+complete. Each model is therefore fitted to its own complete cases, and
+the analyzed sample is reported as a range spanning the three models
+rather than as a single figure. Sample sizes in the <code>n</code>
+column vary correspondingly.</p>
+<p>Missingness of this kind is related to a variable in the model rather
+than occurring at random, and the estimates for length of stay describe
+the subset of patients for whom it was recorded. The range in the header
+is the signal that this subset differs from the others.</p>
 </div>
 <div class="section level3">
 <h3 id="example-8-mixed-effects-models">
@@ -481,13 +503,15 @@ expanded:</p>
 <span></span>
 <span><span class="va">example8</span></span>
 <span><span class="co">##&gt; </span></span>
-<span><span class="co">##&gt; Multivariate Analysis Results</span></span>
+<span><span class="co">##&gt; Multivariate Regression Results</span></span>
+<span><span class="co">##&gt; </span></span>
 <span><span class="co">##&gt; Predictor: treatment</span></span>
 <span><span class="co">##&gt; Outcomes: 2</span></span>
 <span><span class="co">##&gt; Model Type: glmer</span></span>
 <span><span class="co">##&gt; Covariates: age, sex</span></span>
 <span><span class="co">##&gt; Random Effects: (1|site)</span></span>
 <span><span class="co">##&gt; Display: adjusted</span></span>
+<span><span class="co">##&gt; Observations analyzed: 850 of 850 (100.0%)</span></span>
 <span><span class="co">##&gt; </span></span>
 <span><span class="co">##&gt;                 Outcome                Predictor      n Events     aOR (95% CI) p-value</span></span>
 <span><span class="co">##&gt;                  &lt;char&gt;                   &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
@@ -519,13 +543,15 @@ expanded:</p>
 <span></span>
 <span><span class="va">example9</span></span>
 <span><span class="co">##&gt; </span></span>
-<span><span class="co">##&gt; Multivariate Analysis Results</span></span>
+<span><span class="co">##&gt; Multivariate Regression Results</span></span>
+<span><span class="co">##&gt; </span></span>
 <span><span class="co">##&gt; Predictor: treatment</span></span>
 <span><span class="co">##&gt; Outcomes: 2</span></span>
 <span><span class="co">##&gt; Model Type: glm</span></span>
 <span><span class="co">##&gt; Covariates: age, sex</span></span>
 <span><span class="co">##&gt; Interactions: treatment:sex</span></span>
 <span><span class="co">##&gt; Display: adjusted</span></span>
+<span><span class="co">##&gt; Observations analyzed: 850 of 850 (100.0%)</span></span>
 <span><span class="co">##&gt; </span></span>
 <span><span class="co">##&gt;                 Outcome                             Predictor      n Events     aOR (95% CI) p-value</span></span>
 <span><span class="co">##&gt;                  &lt;char&gt;                                &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
@@ -557,12 +583,14 @@ expanded:</p>
 <span></span>
 <span><span class="va">example10</span></span>
 <span><span class="co">##&gt; </span></span>
-<span><span class="co">##&gt; Multivariate Analysis Results</span></span>
+<span><span class="co">##&gt; Multivariate Regression Results</span></span>
+<span><span class="co">##&gt; </span></span>
 <span><span class="co">##&gt; Predictor: treatment</span></span>
 <span><span class="co">##&gt; Outcomes: 4</span></span>
 <span><span class="co">##&gt; Model Type: glm</span></span>
 <span><span class="co">##&gt; Covariates: age, sex, surgery</span></span>
 <span><span class="co">##&gt; Display: adjusted</span></span>
+<span><span class="co">##&gt; Observations analyzed: 850 of 850 (100.0%)</span></span>
 <span><span class="co">##&gt; </span></span>
 <span><span class="co">##&gt;                   Outcome                Predictor      n Events     aOR (95% CI) p-value</span></span>
 <span><span class="co">##&gt;                    &lt;char&gt;                   &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
@@ -627,8 +655,7 @@ the <code><a href="../reference/multiforest.html">multiforest()</a></code> funct
 <span>  title <span class="op">=</span> <span class="st">"Treatment Effects Across Outcomes"</span>,</span>
 <span>  indent_predictor <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span>
-<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example12</span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="multivariate_regression_files/figure-html/unnamed-chunk-16-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
@@ -646,8 +673,7 @@ parameters:</p>
 <span>  covariates_footer <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  table_width <span class="op">=</span> <span class="fl">0.65</span>,</span>
 <span>  color <span class="op">=</span> <span class="st">"#4BA6B6"</span></span>
-<span><span class="op">)</span></span>
-<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example13</span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="multivariate_regression_files/figure-html/unnamed-chunk-18-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
@@ -672,8 +698,7 @@ Outcomes<a class="anchor" aria-label="anchor" href="#example-14-forest-plot-for-
 <span>  show_predictor <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  covariates_footer <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span></span>
-<span><span class="op">)</span></span>
-<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example14</span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="multivariate_regression_files/figure-html/unnamed-chunk-20-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
@@ -701,8 +726,7 @@ outputs similarly to other forest plot functions:</p>
 <span>  indent_predictor <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span></span>
-<span><span class="op">)</span></span>
-<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">example15</span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="multivariate_regression_files/figure-html/unnamed-chunk-22-1.png" class="r-plt" alt="" width="100%"></p>
 <hr>
 </div>
@@ -713,32 +737,30 @@ outputs similarly to other forest plot functions:</p>
 <div class="section level3">
 <h3 id="tables">Tables<a class="anchor" aria-label="anchor" href="#tables"></a>
 </h3>
-<p>Export tables using standard export functions:</p>
+<p>Export tables using standard export functions, or
+<code><a href="../reference/tablesave.html">tablesave()</a></code>:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/table2docx.html">table2docx</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">result</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"multioutcome_analysis.docx"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"multioutcome_analysis.docx"</span>,</span>
 <span>  caption <span class="op">=</span> <span class="st">"Treatment Effects Across Outcomes"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">result</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"multioutcome_analysis.pdf"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"multioutcome_analysis.pdf"</span>,</span>
 <span>  caption <span class="op">=</span> <span class="st">"Treatment Effects Across Outcomes"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="forest-plots">Forest Plots<a class="anchor" aria-label="anchor" href="#forest-plots"></a>
 </h3>
-<p>Save forest plots using <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave()</a></code>:</p>
+<p>Save forest plots using the dedicated <code><a href="../reference/multiforest.html">multiforest()</a></code>
+function, then <code><a href="../reference/forestsave.html">forestsave()</a></code>:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/multiforest.html">multiforest</a></span><span class="op">(</span><span class="va">result</span>, title <span class="op">=</span> <span class="st">"Effect Estimates"</span><span class="op">)</span></span>
-<span><span class="va">dims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">p</span>, <span class="st">"rec_dims"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"multioutcome_forest.pdf"</span><span class="op">)</span>, <span class="va">p</span>,</span>
-<span>       width <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">result</span>, <span class="st">"rec_dims"</span><span class="op">)</span><span class="op">$</span><span class="va">width</span>,</span>
-<span>       height <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">result</span>, <span class="st">"rec_dims"</span><span class="op">)</span><span class="op">$</span><span class="va">height</span>, </span>
-<span>       units <span class="op">=</span> <span class="st">"in"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/forestsave.html">forestsave</a></span><span class="op">(</span><span class="va">p</span>, <span class="st">"multioutcome_forest.pdf"</span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
 <div class="section level3">
@@ -764,11 +786,13 @@ workflow:</p>
 <span></span>
 <span><span class="va">unadjusted</span></span>
 <span><span class="co">##&gt; </span></span>
-<span><span class="co">##&gt; Multivariate Analysis Results</span></span>
+<span><span class="co">##&gt; Multivariate Regression Results</span></span>
+<span><span class="co">##&gt; </span></span>
 <span><span class="co">##&gt; Predictor: treatment</span></span>
 <span><span class="co">##&gt; Outcomes: 4</span></span>
 <span><span class="co">##&gt; Model Type: glm</span></span>
 <span><span class="co">##&gt; Display: unadjusted</span></span>
+<span><span class="co">##&gt; Observations analyzed: 850 of 850 (100.0%)</span></span>
 <span><span class="co">##&gt; </span></span>
 <span><span class="co">##&gt;                   Outcome                Predictor      n Events      OR (95% CI) p-value</span></span>
 <span><span class="co">##&gt;                    &lt;char&gt;                   &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
@@ -794,23 +818,25 @@ workflow:</p>
 <span></span>
 <span><span class="va">adjusted</span></span>
 <span><span class="co">##&gt; </span></span>
-<span><span class="co">##&gt; Multivariate Analysis Results</span></span>
+<span><span class="co">##&gt; Multivariate Regression Results</span></span>
+<span><span class="co">##&gt; </span></span>
 <span><span class="co">##&gt; Predictor: treatment</span></span>
 <span><span class="co">##&gt; Outcomes: 4</span></span>
 <span><span class="co">##&gt; Model Type: glm</span></span>
 <span><span class="co">##&gt; Covariates: age, sex, diabetes, surgery</span></span>
 <span><span class="co">##&gt; Display: both</span></span>
+<span><span class="co">##&gt; Observations analyzed: 834 of 850 (98.1%)</span></span>
 <span><span class="co">##&gt; </span></span>
 <span><span class="co">##&gt;                   Outcome                Predictor      n Events      OR (95% CI)  Uni p     aOR (95% CI) Multi p</span></span>
 <span><span class="co">##&gt;                    &lt;char&gt;                   &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
-<span><span class="co">##&gt; 1:       Any Complication Treatment Group (Drug A)    292    143 0.73 (0.51-1.06)  0.097 0.62 (0.42-0.91)   0.016</span></span>
-<span><span class="co">##&gt; 2:       Any Complication Treatment Group (Drug B)    362    226 1.27 (0.89-1.81)  0.182 1.44 (0.99-2.09)   0.057</span></span>
-<span><span class="co">##&gt; 3: ICU Admission Required Treatment Group (Drug A)    292    111 1.26 (0.87-1.86)  0.226 1.11 (0.75-1.67)   0.599</span></span>
-<span><span class="co">##&gt; 4: ICU Admission Required Treatment Group (Drug B)    362    145 1.38 (0.96-1.99)  0.085 1.75 (1.19-2.61)   0.005</span></span>
-<span><span class="co">##&gt; 5:     30-Day Readmission Treatment Group (Drug A)    292    127 0.89 (0.62-1.28)  0.523 0.86 (0.59-1.25)   0.427</span></span>
-<span><span class="co">##&gt; 6:     30-Day Readmission Treatment Group (Drug B)    362    209 1.58 (1.11-2.24)  0.011 1.56 (1.08-2.25)   0.018</span></span>
-<span><span class="co">##&gt; 7:   Wound/Site Infection Treatment Group (Drug A)    292     72 2.14 (1.32-3.55)  0.002 1.86 (1.11-3.19)   0.021</span></span>
-<span><span class="co">##&gt; 8:   Wound/Site Infection Treatment Group (Drug B)    362     69 1.54 (0.95-2.55)  0.084 2.22 (1.31-3.87)   0.004</span></span>
+<span><span class="co">##&gt; 1:       Any Complication Treatment Group (Drug A)    288    139 0.73 (0.51-1.06)  0.097 0.62 (0.42-0.91)   0.016</span></span>
+<span><span class="co">##&gt; 2:       Any Complication Treatment Group (Drug B)    355    221 1.27 (0.89-1.81)  0.182 1.44 (0.99-2.09)   0.057</span></span>
+<span><span class="co">##&gt; 3: ICU Admission Required Treatment Group (Drug A)    288    108 1.26 (0.87-1.86)  0.226 1.11 (0.75-1.67)   0.599</span></span>
+<span><span class="co">##&gt; 4: ICU Admission Required Treatment Group (Drug B)    355    143 1.38 (0.96-1.99)  0.085 1.75 (1.19-2.61)   0.005</span></span>
+<span><span class="co">##&gt; 5:     30-Day Readmission Treatment Group (Drug A)    288    126 0.89 (0.62-1.28)  0.523 0.86 (0.59-1.25)   0.427</span></span>
+<span><span class="co">##&gt; 6:     30-Day Readmission Treatment Group (Drug B)    355    203 1.58 (1.11-2.24)  0.011 1.56 (1.08-2.25)   0.018</span></span>
+<span><span class="co">##&gt; 7:   Wound/Site Infection Treatment Group (Drug A)    288     70 2.14 (1.32-3.55)  0.002 1.86 (1.11-3.19)   0.021</span></span>
+<span><span class="co">##&gt; 8:   Wound/Site Infection Treatment Group (Drug B)    355     66 1.54 (0.95-2.55)  0.084 2.22 (1.31-3.87)   0.004</span></span>
 <span></span>
 <span><span class="co">## Forest plot visualization</span></span>
 <span><span class="va">forest_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/multiforest.html">multiforest</a></span><span class="op">(</span></span>
@@ -821,8 +847,7 @@ workflow:</p>
 <span>  zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  table_width <span class="op">=</span> <span class="fl">0.65</span>,</span>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span></span>
-<span><span class="op">)</span></span>
-<span><span class="fu">queue_plot</span><span class="op">(</span><span class="va">forest_plot</span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="multivariate_regression_files/figure-html/unnamed-chunk-26-1.png" class="r-plt" alt="" width="100%"></p>
 <hr>
 </div>
@@ -963,10 +988,28 @@ survival)</li>
 <span>         model_type <span class="op">=</span> <span class="st">"glmer"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
+<h3 id="varying-sample-sizes">Varying Sample Sizes<a class="anchor" aria-label="anchor" href="#varying-sample-sizes"></a>
+</h3>
+<p>Each outcome is modeled separately and fitted to its own complete
+cases, so outcomes that differ in missingness are fitted to different
+numbers of observations. The analyzed sample is reported as a range
+whenever this occurs, as in Example 7. Estimates remain valid for the
+observations each model used, but comparisons across outcomes are made
+on partially different samples.</p>
+<p>Restricting the data to complete cases across all outcomes and
+covariates places every model on the same observations, at the cost of
+discarding data:</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">complete_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span></span>
+<span>  <span class="va">clintrial</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"los_days"</span>, <span class="st">"pain_score"</span>, <span class="st">"recovery_days"</span>,</span>
+<span>                <span class="st">"treatment"</span>, <span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"surgery"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
 <h3 id="many-factor-levels">Many Factor Levels<a class="anchor" aria-label="anchor" href="#many-factor-levels"></a>
 </h3>
 <p>For predictors with many levels, consider collapsing categories:</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">clintrial</span><span class="op">$</span><span class="va">treatment_binary</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">clintrial</span><span class="op">$</span><span class="va">treatment</span> <span class="op">==</span> <span class="st">"Control"</span>, </span>
 <span>                                      <span class="st">"Control"</span>, <span class="st">"Active"</span><span class="op">)</span></span></code></pre></div>
 <hr>
@@ -1021,7 +1064,7 @@ because binomial GLM coerces such variables to binary (first level
 <em>vs.</em> all others).</p>
 <p>For multilevel categorical outcomes, use dedicated packages outside
 of <code>summata</code>:</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Multinomial regression (unordered categories)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.stats.ox.ac.uk/pub/MASS4/" class="external-link">nnet</a></span><span class="op">)</span></span>
 <span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nnet/man/multinom.html" class="external-link">multinom</a></span><span class="op">(</span><span class="va">treatment</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">stage</span>, data <span class="op">=</span> <span class="va">clintrial</span><span class="op">)</span></span>
@@ -1040,7 +1083,7 @@ of <code>summata</code>:</p>
 <code><a href="../reference/desctable.html">desctable()</a></code> for baseline characteristics</li>
 <li>
 <a href="regression_modeling.html">Regression Modeling</a>:
-<code><a href="../reference/fit.html">fit()</a></code>, <code><a href="../reference/uniscreen.html">uniscreen()</a></code>, and
+<code><a href="../reference/uniscreen.html">uniscreen()</a></code>, <code><a href="../reference/fit.html">fit()</a></code>, and
 <code><a href="../reference/fullfit.html">fullfit()</a></code>
 </li>
 <li>
@@ -1069,7 +1112,7 @@ Interactions and mixed-effects models</li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
 </div>
 
     </footer>

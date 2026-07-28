@@ -203,8 +203,10 @@ fit(clintrial,
     labels = clintrial_labels)
 #> 
 #> Multivariable Poisson Model
+#> 
 #> Formula: fu_count ~ age + stage + treatment
-#> n = 839, Events = 5517
+#> Observations analyzed: 839 of 850 (98.7%)
+#> Events analyzed: 5,517 of 5,533 (99.7%)
 #> 
 #>           Variable   Group      n Events     aRR (95% CI) p-value
 #>             <char>  <char> <char> <char>           <char>  <char>
@@ -225,8 +227,10 @@ fit(clintrial,
     labels = clintrial_labels)
 #> 
 #> Multivariable Negative Binomial Model
+#> 
 #> Formula: ae_count ~ age + treatment + diabetes
-#> n = 824, Events = 4506
+#> Observations analyzed: 824 of 850 (96.9%)
+#> Events analyzed: 4,506 of 4,599 (98.0%)
 #> 
 #>           Variable   Group      n Events     aRR (95% CI) p-value
 #>             <char>  <char> <char> <char>           <char>  <char>
@@ -250,36 +254,39 @@ fullfit(clintrial,
 #> Fitting multivariable model with 8 predictors...
 #> 
 #> Fullfit Analysis Results
+#> 
 #> Outcome: Surv(os_months, os_status)
 #> Model Type: coxph
 #> Method: screen (p < 0.2)
 #> Predictors Screened: 9
 #> Multivariable Predictors: 8
+#> Observations analyzed: 833-850 of 850 (98.0-100.0%)
+#> Events analyzed: 594-609 of 609 (97.5-100.0%)
 #> 
 #>                    Variable                     Group      n Events      HR (95% CI)   Uni p     aHR (95% CI) Multi p
 #>                      <char>                    <char> <char> <char>           <char>  <char>           <char>  <char>
 #>  1:             Age (years)                         -    833    594 1.03 (1.03-1.04) < 0.001 1.03 (1.03-1.04) < 0.001
-#>  2:                     Sex                    Female    450    298        reference       -        reference       -
-#>  3:                                              Male    400    311 1.30 (1.11-1.53)   0.001 1.33 (1.13-1.57) < 0.001
-#>  4:           Disease Stage                         I    211    127        reference       -        reference       -
-#>  5:                                                II    263    172 1.12 (0.89-1.41)   0.337 1.10 (0.87-1.39)   0.413
-#>  6:                                               III    241    186 1.69 (1.35-2.11) < 0.001 1.81 (1.43-2.28) < 0.001
-#>  7:                                                IV    132    121 3.18 (2.47-4.09) < 0.001 3.76 (2.89-4.89) < 0.001
-#>  8:             Tumor Grade       Well-differentiated    153     95        reference       -        reference       -
-#>  9:                         Moderately differentiated    412    297 1.36 (1.08-1.71)   0.010 1.52 (1.20-1.93) < 0.001
-#> 10:                             Poorly differentiated    275    208 1.62 (1.27-2.06) < 0.001 1.92 (1.49-2.46) < 0.001
-#> 11: ECOG Performance Status                         0    265    159        reference       -        reference       -
-#> 12:                                                 1    302    212 1.36 (1.11-1.67)   0.003 1.52 (1.23-1.87) < 0.001
-#> 13:                                                 2    238    194 1.86 (1.51-2.29) < 0.001 2.06 (1.66-2.55) < 0.001
+#>  2:                     Sex                    Female    443    292        reference       -        reference       -
+#>  3:                                              Male    390    302 1.30 (1.11-1.53)   0.001 1.33 (1.13-1.57) < 0.001
+#>  4:           Disease Stage                         I    207    125        reference       -        reference       -
+#>  5:                                                II    261    170 1.12 (0.89-1.41)   0.337 1.10 (0.87-1.39)   0.413
+#>  6:                                               III    237    182 1.69 (1.35-2.11) < 0.001 1.81 (1.43-2.28) < 0.001
+#>  7:                                                IV    128    117 3.18 (2.47-4.09) < 0.001 3.76 (2.89-4.89) < 0.001
+#>  8:             Tumor Grade       Well-differentiated    151     93        reference       -        reference       -
+#>  9:                         Moderately differentiated    410    296 1.36 (1.08-1.71)   0.010 1.52 (1.20-1.93) < 0.001
+#> 10:                             Poorly differentiated    272    205 1.62 (1.27-2.06) < 0.001 1.92 (1.49-2.46) < 0.001
+#> 11: ECOG Performance Status                         0    263    158        reference       -        reference       -
+#> 12:                                                 1    298    208 1.36 (1.11-1.67)   0.003 1.52 (1.23-1.87) < 0.001
+#> 13:                                                 2    235    191 1.86 (1.51-2.29) < 0.001 2.06 (1.66-2.55) < 0.001
 #> 14:                                                 3     37     37 3.06 (2.13-4.38) < 0.001 3.43 (2.37-4.97) < 0.001
 #> 15:          Smoking Status                     Never    337    248        reference       -        reference       -
 #> 16:                                            Former    311    203 0.84 (0.70-1.02)   0.074 0.94 (0.78-1.14)   0.546
 #> 17:                                           Current    185    143 1.19 (0.97-1.46)   0.103 1.29 (1.05-1.60)   0.017
 #> 18:     Biomarker X (ng/mL)                         -    833    594 1.11 (1.08-1.13) < 0.001 1.08 (1.05-1.11) < 0.001
 #> 19:       Biomarker Y (U/L)                         -    842    601 1.00 (1.00-1.00)   0.934                -       -
-#> 20:         Treatment Group                   Control    196    151        reference       -        reference       -
-#> 21:                                            Drug A    292    184 0.64 (0.52-0.80) < 0.001 0.53 (0.42-0.66) < 0.001
-#> 22:                                            Drug B    362    274 0.94 (0.77-1.15)   0.567 0.77 (0.63-0.95)   0.014
+#> 20:         Treatment Group                   Control    191    146        reference       -        reference       -
+#> 21:                                            Drug A    288    181 0.64 (0.52-0.80) < 0.001 0.53 (0.42-0.66) < 0.001
+#> 22:                                            Drug B    354    267 0.94 (0.77-1.15)   0.567 0.77 (0.63-0.95)   0.014
 #>                    Variable                     Group      n Events      HR (95% CI)   Uni p     aHR (95% CI) Multi p
 #>                      <char>                    <char> <char> <char>           <char>  <char>           <char>  <char>
 # }

@@ -17,7 +17,7 @@ the full capabilities of descriptive and regression analysis functions."></head>
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -235,8 +235,10 @@ the full capabilities of descriptive and regression analysis functions.</p>
 <span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Poisson Model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formula: fu_count ~ age + stage + treatment</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n = 839, Events = 5517</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 839 of 850 (98.7%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Events analyzed: 5,517 of 5,533 (99.7%)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           Variable   Group      n Events     aRR (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
@@ -257,8 +259,10 @@ the full capabilities of descriptive and regression analysis functions.</p>
 <span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Negative Binomial Model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formula: ae_count ~ age + treatment + diabetes</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n = 824, Events = 4506</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 824 of 850 (96.9%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Events analyzed: 4,506 of 4,599 (98.0%)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           Variable   Group      n Events     aRR (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
@@ -282,36 +286,39 @@ the full capabilities of descriptive and regression analysis functions.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting multivariable model with 8 predictors...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Fullfit Analysis Results</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Outcome: Surv(os_months, os_status)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model Type: coxph</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Method: screen (p &lt; 0.2)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Predictors Screened: 9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Predictors: 8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 833-850 of 850 (98.0-100.0%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Events analyzed: 594-609 of 609 (97.5-100.0%)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                    Variable                     Group      n Events      HR (95% CI)   Uni p     aHR (95% CI) Multi p</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                      &lt;char&gt;                    &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  1:             Age (years)                         -    833    594 1.03 (1.03-1.04) &lt; 0.001 1.03 (1.03-1.04) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2:                     Sex                    Female    450    298        reference       -        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3:                                              Male    400    311 1.30 (1.11-1.53)   0.001 1.33 (1.13-1.57) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  4:           Disease Stage                         I    211    127        reference       -        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  5:                                                II    263    172 1.12 (0.89-1.41)   0.337 1.10 (0.87-1.39)   0.413</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6:                                               III    241    186 1.69 (1.35-2.11) &lt; 0.001 1.81 (1.43-2.28) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  7:                                                IV    132    121 3.18 (2.47-4.09) &lt; 0.001 3.76 (2.89-4.89) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  8:             Tumor Grade       Well-differentiated    153     95        reference       -        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  9:                         Moderately differentiated    412    297 1.36 (1.08-1.71)   0.010 1.52 (1.20-1.93) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10:                             Poorly differentiated    275    208 1.62 (1.27-2.06) &lt; 0.001 1.92 (1.49-2.46) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11: ECOG Performance Status                         0    265    159        reference       -        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12:                                                 1    302    212 1.36 (1.11-1.67)   0.003 1.52 (1.23-1.87) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13:                                                 2    238    194 1.86 (1.51-2.29) &lt; 0.001 2.06 (1.66-2.55) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:                     Sex                    Female    443    292        reference       -        reference       -</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:                                              Male    390    302 1.30 (1.11-1.53)   0.001 1.33 (1.13-1.57) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:           Disease Stage                         I    207    125        reference       -        reference       -</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:                                                II    261    170 1.12 (0.89-1.41)   0.337 1.10 (0.87-1.39)   0.413</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:                                               III    237    182 1.69 (1.35-2.11) &lt; 0.001 1.81 (1.43-2.28) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:                                                IV    128    117 3.18 (2.47-4.09) &lt; 0.001 3.76 (2.89-4.89) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:             Tumor Grade       Well-differentiated    151     93        reference       -        reference       -</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:                         Moderately differentiated    410    296 1.36 (1.08-1.71)   0.010 1.52 (1.20-1.93) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:                             Poorly differentiated    272    205 1.62 (1.27-2.06) &lt; 0.001 1.92 (1.49-2.46) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11: ECOG Performance Status                         0    263    158        reference       -        reference       -</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12:                                                 1    298    208 1.36 (1.11-1.67)   0.003 1.52 (1.23-1.87) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13:                                                 2    235    191 1.86 (1.51-2.29) &lt; 0.001 2.06 (1.66-2.55) &lt; 0.001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 14:                                                 3     37     37 3.06 (2.13-4.38) &lt; 0.001 3.43 (2.37-4.97) &lt; 0.001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 15:          Smoking Status                     Never    337    248        reference       -        reference       -</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 16:                                            Former    311    203 0.84 (0.70-1.02)   0.074 0.94 (0.78-1.14)   0.546</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 17:                                           Current    185    143 1.19 (0.97-1.46)   0.103 1.29 (1.05-1.60)   0.017</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 18:     Biomarker X (ng/mL)                         -    833    594 1.11 (1.08-1.13) &lt; 0.001 1.08 (1.05-1.11) &lt; 0.001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 19:       Biomarker Y (U/L)                         -    842    601 1.00 (1.00-1.00)   0.934                -       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20:         Treatment Group                   Control    196    151        reference       -        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21:                                            Drug A    292    184 0.64 (0.52-0.80) &lt; 0.001 0.53 (0.42-0.66) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 22:                                            Drug B    362    274 0.94 (0.77-1.15)   0.567 0.77 (0.63-0.95)   0.014</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20:         Treatment Group                   Control    191    146        reference       -        reference       -</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21:                                            Drug A    288    181 0.64 (0.52-0.80) &lt; 0.001 0.53 (0.42-0.66) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22:                                            Drug B    354    267 0.94 (0.77-1.15)   0.567 0.77 (0.63-0.95)   0.014</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                    Variable                     Group      n Events      HR (95% CI)   Uni p     aHR (95% CI) Multi p</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                      &lt;char&gt;                    &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
@@ -327,7 +334,7 @@ the full capabilities of descriptive and regression analysis functions.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
 </div>
 
     </footer></div>

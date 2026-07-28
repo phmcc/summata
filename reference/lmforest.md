@@ -126,7 +126,8 @@ lmforest(
 - show_n:
 
   Logical. If `TRUE`, includes a column showing group-specific sample
-  sizes. Default is `TRUE`.
+  sizes. Counts describe the observations used in fitting rather than
+  every row supplied. Default is `TRUE`.
 
 - indent_groups:
 
@@ -163,7 +164,10 @@ lmforest(
 
   Named character vector providing custom display labels for variables.
   Example: `c(age = "Age (years)", height = "Height (cm)")`. Default is
-  `NULL`.
+  `NULL`, in which case the labels attached by the function that
+  produced `x` are used, where `x` is a summata result rather than a
+  model object. Original variable names are used where neither is
+  available.
 
 - units:
 
@@ -212,7 +216,7 @@ A `ggplot` object containing the complete forest plot. The plot can be:
 
 - Displayed directly: `print(plot)`
 
-- Saved to file: `ggsave("forest.pdf", plot, width = 12, height = 8)`
+- Saved to file: `forestsave(plot, "forest.pdf")`
 
 - Further customized with ggplot2 functions
 
@@ -229,7 +233,18 @@ The returned object includes an attribute `"rec_dims"` accessible via
 
 These recommendations are automatically calculated based on the number
 of variables, text sizes, and layout parameters, and are printed to
-console if `plot_width` or `plot_height` are not specified.
+console if `plot_width` or `plot_height` are not specified. The list
+also carries a `units` element recording the units the dimensions are
+expressed in, matching the `units` argument.
+[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+reads all three and requires no further handling.
+
+The returned object also includes an attribute `"table_data"` accessible
+via `attr(plot, "table_data")`, a data.table holding the values drawn in
+the plot: one row per term in model order, with the variable, factor
+level, sample size, estimate, confidence bounds and p-value. Sample
+sizes describe the observations used in fitting rather than every row
+supplied, so they sum to the model sample size within each variable.
 
 ## Details
 
@@ -279,7 +294,7 @@ several ways:
 
 4.  **Model Statistics** (footer):
 
-    - Observations analyzed (with percentage of total data)
+    - Observations analyzed (with total observations and percentage)
 
     - *R*\\^2\\ and adjusted *R*\\^2\\
 
@@ -383,8 +398,8 @@ The "*n*" column shows:
 
 - For factor variables: Number of observations in each category
 
-- Footer shows total observations analyzed and percentage of original
-  data (accounting for missing values)
+- Footer shows observations used in fitting, the total supplied, and the
+  percentage retained (accounting for missing values)
 
 ## See also
 
@@ -400,11 +415,14 @@ for univariable screening forest plots,
 for multi-outcome forest plots, [`lm`](https://rdrr.io/r/stats/lm.html)
 for fitting linear models,
 [`fit`](https://phmcc.codeberg.page/summata/reference/fit.md) for
-regression modeling
+regression modeling,
+[`forestsave`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+for saving with recommended dimensions
 
 Other visualization functions:
 [`autoforest()`](https://phmcc.codeberg.page/summata/reference/autoforest.md),
 [`coxforest()`](https://phmcc.codeberg.page/summata/reference/coxforest.md),
+[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md),
 [`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md),
 [`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md),
 [`uniforest()`](https://phmcc.codeberg.page/summata/reference/uniforest.md)
@@ -476,9 +494,8 @@ plot5 <- lmforest(
 #> Recommended plot dimensions: width = 16.0 in, height = 5.0 in
 
 # Example 6: Save with recommended dimensions
-dims <- attr(plot5, "rec_dims")
-ggplot2::ggsave(file.path(tempdir(), "linear_forest.pdf"),
-                plot5, width = dims$width, height = dims$height)
+forestsave(plot5, file.path(tempdir(), "linear_forest.pdf"))
+#> Forest plot saved to /tmp/RtmptN10wa/linear_forest.pdf (width = 16.0 in, height = 5.0 in)
 
 options(old_width)
 

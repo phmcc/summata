@@ -18,7 +18,7 @@ For a more comprehensive description of this package and its features,
 see the [full documentation and
 vignettes](https://phmcc.codeberg.page/summata/).
 
-![Cox regression forest plot](reference/figures/README_coxforest.png)
+![Cox regression forest plot](reference/figures/README_hero.png)
 
 ## Installation
 
@@ -118,13 +118,13 @@ Export of finalized tables to various commonly used formats.
 
 | Function | Format | Dependencies |
 |:---|:---|:---|
-| [`autotable()`](https://phmcc.codeberg.page/summata/reference/autotable.md) | Auto-detect from file extension | Varies |
+| [`tablesave()`](https://phmcc.codeberg.page/summata/reference/tablesave.md) | Format from file extension | Varies |
 | [`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md) | PDF | `xtable`, LaTeX distribution |
 | [`table2tex()`](https://phmcc.codeberg.page/summata/reference/table2tex.md) | LaTeX source | `xtable` |
 | [`table2html()`](https://phmcc.codeberg.page/summata/reference/table2html.md) | HTML | `xtable` |
-| [`table2docx()`](https://phmcc.codeberg.page/summata/reference/table2docx.md) | Microsoft Word | `officer`, `flextable` |
-| [`table2pptx()`](https://phmcc.codeberg.page/summata/reference/table2pptx.md) | Microsoft PowerPoint | `officer`, `flextable` |
-| [`table2rtf()`](https://phmcc.codeberg.page/summata/reference/table2rtf.md) | Rich Text Format | `officer`, `flextable` |
+| [`table2docx()`](https://phmcc.codeberg.page/summata/reference/table2docx.md) | Microsoft Word | `flextable`, `officer` |
+| [`table2pptx()`](https://phmcc.codeberg.page/summata/reference/table2pptx.md) | Microsoft PowerPoint | `flextable`, `officer` |
+| [`table2rtf()`](https://phmcc.codeberg.page/summata/reference/table2rtf.md) | Rich Text Format | `flextable`, `officer` |
 
 #### Data visualization
 
@@ -139,6 +139,7 @@ regression models.
 | [`coxforest()`](https://phmcc.codeberg.page/summata/reference/coxforest.md) | Proportional hazards models |
 | [`uniforest()`](https://phmcc.codeberg.page/summata/reference/uniforest.md) | Univariable screening results |
 | [`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md) | Multivariate regression analysis results |
+| [`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md) | Save plots with recommended dimensions |
 
 ### Supported Model Classes
 
@@ -219,7 +220,7 @@ data("clintrial_labels")
 predictors <- c("age", "sex", "race", "ethnicity", "bmi", "smoking",
                 "hypertension", "diabetes", "ecog", "creatinine",
                 "hemoglobin", "biomarker_x", "biomarker_y", "grade",
-                "treatment", "surgery", "los_days", "stage")
+                "stage", "treatment", "surgery")
 ```
 
 ### **Step 1:** Descriptive Statistics
@@ -237,7 +238,7 @@ table1 <- desctable(
     labels = clintrial_labels
 )
 
-table2pdf(table1, "table1.pdf",
+tablesave(table1, "table1.pdf",
           caption = "\\textbf{Table 1} - Baseline characteristics by 30-day readmission status",
           paper = "auto",
           condense_table = TRUE,
@@ -266,7 +267,7 @@ table2 <- fullfit(
     labels = clintrial_labels
 )
 
-table2pdf(table2, "table2.pdf",
+tablesave(table2, "table2.pdf",
           caption = "\\textbf{Table 2} - Predictors of 30-day readmission, multivariable Cox regression with univariable screen",
           paper = "auto",
           condense_table = TRUE,
@@ -291,10 +292,7 @@ forest_30d <- glmforest(table2,
                         indent_groups = TRUE
                         )
 
-ggsave("forest_30d.pdf", forest_30d,
-       width = attr(forest_30d, "rec_dims")$width,
-       height = attr(forest_30d, "rec_dims")$height, 
-       units = "in")
+forestsave(forest_30d, "forest_30d.pdf")
 ```
 
 ![Forest plot](reference/figures/README_glmforest.png)
@@ -345,7 +343,7 @@ A BibTeX entry for LaTeX users is
     title = {summata: Publication-Ready Summary Tables and Forest Plots},
     author = {Paul Hsin-ti McClelland},
     year = {2026},
-    note = {R package version 0.11.5},
+    note = {R package version 0.12.0},
     url = {https://phmcc.codeberg.page/summata/},
   }
 ```
@@ -388,8 +386,6 @@ _(The `summata` package is under active development. Any breaking changes to the
 
 ## Export Functions
 
-- [`autotable()`](https://phmcc.codeberg.page/summata/reference/autotable.md)
-  : Export Table with Automatic Format Detection
 - [`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md)
   : Export Table to PDF Format
 - [`table2docx()`](https://phmcc.codeberg.page/summata/reference/table2docx.md)
@@ -402,6 +398,9 @@ _(The `summata` package is under active development. Any breaking changes to the
   : Export Table to LaTeX Format
 - [`table2rtf()`](https://phmcc.codeberg.page/summata/reference/table2rtf.md)
   : Export Table to Rich Text Format (RTF)
+- [`tablesave()`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+  [`autotable()`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+  : Save a Table to File
 
 ## Visualization Functions
 
@@ -417,6 +416,8 @@ _(The `summata` package is under active development. Any breaking changes to the
   : Create Forest Plot for Univariable Screening
 - [`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md)
   : Create Forest Plot for Multivariate Regression
+- [`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+  : Save a Forest Plot at Its Recommended Dimensions
 
 ## Utility Functions
 

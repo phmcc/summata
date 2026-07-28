@@ -55,26 +55,24 @@ data(clintrial)
 data(clintrial_labels)
 ```
 
-> *n.b.:* To ensure correct font rendering and figure sizing, the forest
-> plots below are displayed using a helper function (`queue_plot()`)
-> that applies each plot’s recommended dimensions (stored in the
-> `"rec_dims"` attribute) via the [`ragg`](https://ragg.r-lib.org/)
-> graphics device. In practice, replace `queue_plot()` with
-> [`ggplot2::ggsave()`](https://ggplot2.tidyverse.org/reference/ggsave.html)
-> using recommended plot dimensions for equivalent results:
+> *n.b.:* The forest plots below are sized by this vignette from each
+> plot’s recommended dimensions, stored in its `"rec_dims"` attribute,
+> and rendered via the [`ragg`](https://ragg.r-lib.org/) graphics device
+> for correct font metrics. That sizing is applied behind the scenes and
+> is not shown in the code. Writing a plot to file elsewhere is
+> performed with
+> [`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md),
+> which applies the same dimensions and selects a suitable graphics
+> device:
 >
 > ``` r
 > p <- glmforest(model, data = mydata)
-> dims <- attr(p, "rec_dims")
-> ggplot2::ggsave("forest_plot.png", p,
->                 width = dims$width, 
->                 height = dims$height)
+> forestsave(p, "forest_plot.png")
 > ```
 >
 > This ensures that the figure size is always large enough to
-> accommodate the constituent plot text and graphics, and it is
-> generally the preferred method for saving forest plot outputs in
-> `summata`.
+> accommodate the constituent plot text and graphics, and it is the
+> preferred method for saving forest plot outputs in `summata`.
 
 ------------------------------------------------------------------------
 
@@ -100,7 +98,6 @@ example1 <- glmforest(
   title = "Logistic Regression: Predictors of Outcome",
   labels = clintrial_labels
 )
-queue_plot(example1)
 ```
 
 ![](forest_plots_files/figure-html/unnamed-chunk-4-1.png)
@@ -122,7 +119,6 @@ example2 <- lmforest(
   title = "Linear Regression: Length of Stay",
   labels = clintrial_labels
 )
-queue_plot(example2)
 ```
 
 ![](forest_plots_files/figure-html/unnamed-chunk-6-1.png)
@@ -144,7 +140,6 @@ example3 <- coxforest(
   title = "Cox Regression: Survival Analysis",
   labels = clintrial_labels
 )
-queue_plot(example3)
 ```
 
 ![](forest_plots_files/figure-html/unnamed-chunk-8-1.png)
@@ -161,7 +156,6 @@ example4 <- autoforest(
   data = clintrial,
   labels = clintrial_labels
 )
-queue_plot(example4)
 ```
 
 ![](forest_plots_files/figure-html/unnamed-chunk-10-1.png)
@@ -177,7 +171,10 @@ output by extracting the attached model object.
 
 ### **Example 5:** Direct Extraction from Fit Output
 
-The same approach works for logistic models:
+Input a `summata` regression object (*i.e.*, from
+[`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md) or
+[`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md))
+directly into a forest plot function:
 
 ``` r
 table_logistic <- fit(
@@ -194,14 +191,14 @@ example5 <- glmforest(
   labels = clintrial_labels,
   zebra_stripes = TRUE
 )
-queue_plot(example5)
 ```
 
 ![](forest_plots_files/figure-html/unnamed-chunk-12-1.png)
 
 ### **Example 6:** Model Attribute from Fit Output
 
-And for Cox models:
+Alternatively, input the attached model attribute from a `summata`
+regression object:
 
 ``` r
 table_cox <- fit(
@@ -218,7 +215,6 @@ example6 <- coxforest(
   labels = clintrial_labels,
   zebra_stripes = TRUE
 )
-queue_plot(example6)
 ```
 
 ![](forest_plots_files/figure-html/unnamed-chunk-14-1.png)
@@ -239,7 +235,6 @@ example7 <- glmforest(
   labels = clintrial_labels,
   indent_groups = TRUE
 )
-queue_plot(example7)
 ```
 
 ![](forest_plots_files/figure-html/unnamed-chunk-16-1.png)
@@ -256,7 +251,6 @@ example8 <- glmforest(
   labels = clintrial_labels,
   condense_table = TRUE
 )
-queue_plot(example8)
 ```
 
 ![](forest_plots_files/figure-html/unnamed-chunk-18-1.png)
@@ -274,7 +268,6 @@ example9 <- glmforest(
   indent_groups = TRUE,
   zebra_stripes = FALSE
 )
-queue_plot(example9)
 ```
 
 ![](forest_plots_files/figure-html/unnamed-chunk-20-1.png)
@@ -294,7 +287,6 @@ example10a <- coxforest(
   indent_groups = TRUE,
   zebra_stripes = TRUE
 )
-queue_plot(example10a)
 ```
 
 ![](forest_plots_files/figure-html/unnamed-chunk-22-1.png)
@@ -309,7 +301,6 @@ example10b <- coxforest(
   show_events = FALSE,
   indent_groups = TRUE
 )
-queue_plot(example10b)
 ```
 
 ![](forest_plots_files/figure-html/unnamed-chunk-24-1.png)
@@ -331,7 +322,6 @@ example11 <- glmforest(
   digits = 3,
   indent_groups = TRUE
 )
-queue_plot(example11)
 ```
 
 ![](forest_plots_files/figure-html/unnamed-chunk-26-1.png)
@@ -348,7 +338,6 @@ example12 <- glmforest(
   ref_label = "ref",
   indent_groups = TRUE
 )
-queue_plot(example12)
 ```
 
 ![](forest_plots_files/figure-html/unnamed-chunk-28-1.png)
@@ -365,7 +354,6 @@ example13 <- coxforest(
   effect_label = "Effect (95% CI)",
   indent_groups = TRUE
 )
-queue_plot(example13)
 ```
 
 ![](forest_plots_files/figure-html/unnamed-chunk-30-1.png)
@@ -382,7 +370,6 @@ example14 <- glmforest(
   color = "#E41A1C",
   indent_groups = TRUE
 )
-queue_plot(example14)
 ```
 
 ![](forest_plots_files/figure-html/unnamed-chunk-32-1.png)
@@ -397,9 +384,9 @@ example15 <- glmforest(
   title = "Larger Font (1.5×)",
   labels = clintrial_labels,
   font_size = 1.5,
-  indent_groups = TRUE
+  indent_groups = TRUE,
+  qc_footer = FALSE
 )
-queue_plot(example15)
 ```
 
 ![](forest_plots_files/figure-html/unnamed-chunk-34-1.png)
@@ -417,7 +404,6 @@ example16a <- glmforest(
   labels = clintrial_labels,
   table_width = 0.75
 )
-queue_plot(example16a)
 ```
 
 ![](forest_plots_files/figure-html/unnamed-chunk-36-1.png)
@@ -430,7 +416,6 @@ example16b <- glmforest(
   labels = clintrial_labels,
   table_width = 0.50
 )
-queue_plot(example16b)
 ```
 
 ![](forest_plots_files/figure-html/unnamed-chunk-38-1.png)
@@ -439,12 +424,15 @@ queue_plot(example16b)
 
 ## Saving Forest Plots
 
-Forest plots include a `rec_dims` attribute for optimal sizing when
-saving to files.
+Forest plots include a `rec_dims` attribute recording the dimensions
+best suited to their content.
+[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+reads it, so no manual sizing is required.
 
 ### **Example 17:** Recommended Dimensions
 
-Use the recommended dimensions for optimal output:
+[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+applies the recommended dimensions and reports the size it used:
 
 ``` r
 p <- glmforest(
@@ -455,19 +443,13 @@ p <- glmforest(
   zebra_stripes = TRUE
 )
 
-# Get recommended dimensions
+# Inspect the recommendation, which also records its units
 dims <- attr(p, "rec_dims")
-cat("Width:", dims$width, "inches\n")
-cat("Height:", dims$height, "inches\n")
+cat("Width:", dims$width, dims$units, "\n")
+cat("Height:", dims$height, dims$units, "\n")
 
-# Save with recommended dimensions
-ggsave(
-  filename = file.path(tempdir(), "forest_plot.pdf"),
-  plot = p,
-  width = dims$width,
-  height = dims$height,
-  units = "in"
-)
+# Or simply let forestsave() apply them
+forestsave(p, "forest_plot.pdf")
 ```
 
 ### **Example 18:** Multiple Formats
@@ -481,19 +463,20 @@ p <- glmforest(
   labels = clintrial_labels
 )
 
-dims <- attr(p, "rec_dims")
+# The format follows the file extension, and the dimensions are applied
+# automatically in every case
 
 # PDF (vector, best for publications)
-ggsave("forest.pdf", p, width = dims$width, height = dims$height)
+forestsave(p, "forest.pdf")
 
 # PNG (raster, good for presentations)
-ggsave("forest.png", p, width = dims$width, height = dims$height, dpi = 300)
+forestsave(p, "forest.png", dpi = 300)
 
 # TIFF (high-quality raster, often required by journals)
-ggsave("forest.tiff", p, width = dims$width, height = dims$height, dpi = 300)
+forestsave(p, "forest.tiff", dpi = 300)
 
 # SVG (vector, good for web)
-ggsave("forest.svg", p, width = dims$width, height = dims$height)
+forestsave(p, "forest.svg")
 ```
 
 ------------------------------------------------------------------------
@@ -522,9 +505,8 @@ example19 <- coxforest(
   ref_label = "reference",
   font_size = 1.0,
   table_width = 0.62,
-  color = "#8A61D8"
+  color = "#B5394C"
 )
-queue_plot(example19)
 ```
 
 ![](forest_plots_files/figure-html/unnamed-chunk-42-1.png)
@@ -546,7 +528,6 @@ example20_modified <- example20 +
     plot.title = element_text(face = "italic", color = "#A72727"),
     plot.background = element_rect(fill = "white", color = NA)
   )
-queue_plot(example20_modified)
 ```
 
 ![](forest_plots_files/figure-html/unnamed-chunk-44-1.png)
@@ -580,7 +561,6 @@ example21 <- glmforest(
   title = "Poisson Regression: Follow-Up Visits",
   labels = clintrial_labels
 )
-queue_plot(example21)
 ```
 
 ![](forest_plots_files/figure-html/unnamed-chunk-46-1.png)
@@ -605,7 +585,6 @@ example22 <- glmforest(
   x = nb_result,
   title = "Negative Binomial: Adverse Events"
 )
-queue_plot(example22)
 ```
 
 ![](forest_plots_files/figure-html/unnamed-chunk-48-1.png)
@@ -677,7 +656,7 @@ Reduce font size or increase figure dimensions:
 
 ``` r
 p <- glmforest(model, font_size = 0.9)
-ggsave(file.path(tempdir(), "plot.pdf"), p, width = 14, height = 8)
+forestsave(p, "plot.pdf", width = 14, height = 8)
 ```
 
 ### Missing Labels
@@ -707,9 +686,8 @@ p <- glmforest(model, labels = labels)
   for time-to-event summaries
 - [Regression
   Modeling](https://phmcc.codeberg.page/summata/articles/regression_modeling.md):
-  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
   [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
-  and
+  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md), and
   [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
 - [Model
   Comparison](https://phmcc.codeberg.page/summata/articles/model_comparison.md):

@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -110,59 +110,58 @@ formats and format-specific options where needed.</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
+<td align="left"><code><a href="../reference/tablesave.html">tablesave()</a></code></td>
+<td align="left">Any of the below, based on file extension</td>
+<td align="left">Varies</td>
+</tr>
+<tr class="even">
 <td align="left"><code><a href="https://rdrr.io/pkg/data.table/man/fwrite.html" class="external-link">data.table::fwrite()</a></code></td>
 <td align="left">CSV / TSV</td>
 <td align="left"><code>data.table</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code><a href="../reference/table2pdf.html">table2pdf()</a></code></td>
 <td align="left">PDF</td>
 <td align="left">
 <code>xtable</code>, LaTeX distribution</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><code><a href="../reference/table2docx.html">table2docx()</a></code></td>
 <td align="left">Microsoft Word (.docx)</td>
 <td align="left">
 <code>flextable</code>, <code>officer</code>
 </td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code><a href="../reference/table2html.html">table2html()</a></code></td>
 <td align="left">HTML</td>
 <td align="left"><code>xtable</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><code><a href="../reference/table2pptx.html">table2pptx()</a></code></td>
 <td align="left">PowerPoint (.pptx)</td>
 <td align="left">
 <code>flextable</code>, <code>officer</code>
 </td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code><a href="../reference/table2tex.html">table2tex()</a></code></td>
 <td align="left">LaTeX source (.tex)</td>
 <td align="left"><code>xtable</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><code><a href="../reference/table2rtf.html">table2rtf()</a></code></td>
 <td align="left">Rich Text Format (.rtf)</td>
 <td align="left"><code>flextable</code></td>
 </tr>
-<tr class="even">
-<td align="left"><code><a href="../reference/autotable.html">autotable()</a></code></td>
-<td align="left">Auto-detect from extension</td>
-<td align="left">Varies</td>
-</tr>
 </tbody>
 </table>
-<p>For delimited text formats (CSV, TSV), tables can be written directly
-with <code><a href="https://rdrr.io/pkg/data.table/man/fwrite.html" class="external-link">data.table::fwrite()</a></code> since all <code>summata</code>
-output tables are <code>data.table</code> objects. For formatted
-document output, these functions follow a standard syntax when
-called:</p>
+<p><code><a href="../reference/tablesave.html">tablesave()</a></code> writes any of these formats, choosing one
+from the file extension. The format-specific functions may also be
+called directly if preferred. The syntax for all functions follows the
+same paradigm:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/autotable.html">autotable</a></span><span class="op">(</span><span class="va">data</span>, <span class="st">"output.pdf"</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tablesave.html">tablesave</a></span><span class="op">(</span><span class="va">data</span>, <span class="st">"output.pdf"</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
 <p>where <code>data</code> is the dataset, and <code>"output.pdf"</code>
 is the name of the destination file. This vignette demonstrates the
 various capabilities of these functions using the included sample
@@ -218,35 +217,38 @@ dataset.</p>
 <div class="section level2">
 <h2 id="csv-tsv-export">CSV / TSV Export<a class="anchor" aria-label="anchor" href="#csv-tsv-export"></a>
 </h2>
-<p>All <code>summata</code> output tables are <code>data.table</code>
-objects, so they can be written to delimited text files directly with
-<code><a href="https://rdrr.io/pkg/data.table/man/fwrite.html" class="external-link">data.table::fwrite()</a></code>. This is the simplest export path and
-requires no additional dependencies beyond <code>data.table</code>,
-which <code>summata</code> already imports.</p>
+<p>Delimited text is the simplest export path and requires no
+dependencies beyond <code>data.table</code>, which <code>summata</code>
+already imports. Since all <code>summata</code> output tables are
+<code>data.table</code> objects, <code><a href="https://rdrr.io/pkg/data.table/man/fwrite.html" class="external-link">data.table::fwrite()</a></code> may
+be used directly.</p>
 <div class="section level3">
 <h3 id="example-1-csv-export">
 <strong>Example 1:</strong> CSV Export<a class="anchor" aria-label="anchor" href="#example-1-csv-export"></a>
 </h3>
+<p>Standard CSV export can be performed using
+<code><a href="https://rdrr.io/pkg/data.table/man/fwrite.html" class="external-link">data.table::fwrite()</a></code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/fwrite.html" class="external-link">fwrite</a></span><span class="op">(</span><span class="va">table1</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1.csv"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/fwrite.html" class="external-link">fwrite</a></span><span class="op">(</span><span class="va">table1</span>, <span class="st">"table1.csv"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="example-2-tsv-export">
 <strong>Example 2:</strong> TSV Export<a class="anchor" aria-label="anchor" href="#example-2-tsv-export"></a>
 </h3>
-<p>Specify a tab delimiter for TSV output:</p>
+<p>TSV export can be performed by using
+<code><a href="https://rdrr.io/pkg/data.table/man/fwrite.html" class="external-link">data.table::fwrite()</a></code> with a specified tab delimiter:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/fwrite.html" class="external-link">fwrite</a></span><span class="op">(</span><span class="va">table1</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1.tsv"</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"\t"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/fwrite.html" class="external-link">fwrite</a></span><span class="op">(</span><span class="va">table1</span>, <span class="st">"table1.tsv"</span>, sep <span class="op">=</span> <span class="st">"\t"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="example-3-semicolon-delimited-european-locale">
 <strong>Example 3:</strong> Semicolon-Delimited (European
 Locale)<a class="anchor" aria-label="anchor" href="#example-3-semicolon-delimited-european-locale"></a>
 </h3>
-<p>Use a semicolon delimiter for compatibility with locales where the
-comma is the decimal separator:</p>
+<p>Like <code><a href="https://rdrr.io/pkg/data.table/man/fwrite.html" class="external-link">data.table::fwrite()</a></code>, <code><a href="../reference/tablesave.html">tablesave()</a></code> also
+accepts a custom delimiter:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/fwrite.html" class="external-link">fwrite</a></span><span class="op">(</span><span class="va">table1</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1.csv"</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">";"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/fwrite.html" class="external-link">fwrite</a></span><span class="op">(</span><span class="va">table1</span>, <span class="st">"table1_semicolon.csv"</span>, sep <span class="op">=</span> <span class="st">";"</span><span class="op">)</span></span></code></pre></div>
 <p>CSV and TSV files are useful for archiving raw table output,
 importing into spreadsheet software, or downstream processing in other
 statistical environments. For formatted, publication-ready output, use
@@ -268,7 +270,7 @@ distribution (TinyTeX, TeX Live, MiKTeX, or MacTeX) is required.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table1</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1.pdf"</span><span class="op">)</span></span>
+<span>  file <span class="op">=</span> <span class="st">"table1.pdf"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -279,7 +281,7 @@ distribution (TinyTeX, TeX Live, MiKTeX, or MacTeX) is required.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table1</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1.pdf"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"table1_caption.pdf"</span>,</span>
 <span>  caption <span class="op">=</span> <span class="st">"Table 1. Baseline Characteristics by Group"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -291,7 +293,7 @@ distribution (TinyTeX, TeX Live, MiKTeX, or MacTeX) is required.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table2</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table2.pdf"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"table2.pdf"</span>,</span>
 <span>  caption <span class="op">=</span> <span class="st">"Table 2. Regression Analysis"</span>,</span>
 <span>  font_size <span class="op">=</span> <span class="fl">8</span>,</span>
 <span>  bold_significant <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -309,7 +311,7 @@ distribution (TinyTeX, TeX Live, MiKTeX, or MacTeX) is required.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table2</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table2_Landscape.pdf"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"table2_landscape.pdf"</span>,</span>
 <span>  caption <span class="op">=</span> <span class="st">"Table 2. Regression Results"</span>,</span>
 <span>  paper <span class="op">=</span> <span class="st">"letter"</span>,</span>
 <span>  orientation <span class="op">=</span> <span class="st">"landscape"</span></span>
@@ -323,7 +325,7 @@ distribution (TinyTeX, TeX Live, MiKTeX, or MacTeX) is required.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table2</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table2_Margins.pdf"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"table2_margins.pdf"</span>,</span>
 <span>  margins <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span>  <span class="co"># top, right, bottom, left</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -335,7 +337,7 @@ distribution (TinyTeX, TeX Live, MiKTeX, or MacTeX) is required.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table2</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table2_Fitted.pdf"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"table2_fitted.pdf"</span>,</span>
 <span>  fit_to_page <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -348,7 +350,7 @@ documents:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table2</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table2_Auto.pdf"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"table2_auto.pdf"</span>,</span>
 <span>  paper <span class="op">=</span> <span class="st">"auto"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <hr>
@@ -368,7 +370,7 @@ packages.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/table2docx.html">table2docx</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table1</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1.docx"</span><span class="op">)</span></span>
+<span>  file <span class="op">=</span> <span class="st">"table1.docx"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -379,7 +381,7 @@ packages.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/table2docx.html">table2docx</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table1</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1.docx"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"table1_caption.docx"</span>,</span>
 <span>  caption <span class="op">=</span> <span class="st">"Table 1. Baseline Characteristics by Group"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -391,7 +393,7 @@ packages.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/table2docx.html">table2docx</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table2</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table2.docx"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"table2.docx"</span>,</span>
 <span>  caption <span class="op">=</span> <span class="st">"Table 2. Regression Analysis"</span>,</span>
 <span>  font_size <span class="op">=</span> <span class="fl">9</span>,</span>
 <span>  font_family <span class="op">=</span> <span class="st">"Times New Roman"</span>,</span>
@@ -409,7 +411,7 @@ packages.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/table2docx.html">table2docx</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table2</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table2_Landscape.docx"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"table2_landscape.docx"</span>,</span>
 <span>  caption <span class="op">=</span> <span class="st">"Table 2. Regression Results"</span>,</span>
 <span>  paper <span class="op">=</span> <span class="st">"letter"</span>,</span>
 <span>  orientation <span class="op">=</span> <span class="st">"landscape"</span></span>
@@ -423,7 +425,7 @@ packages.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/table2docx.html">table2docx</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table1</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1_DarkHeader.docx"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"table1_darkheader.docx"</span>,</span>
 <span>  caption <span class="op">=</span> <span class="st">"Table 1. Baseline Characteristics"</span>,</span>
 <span>  dark_header <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -444,7 +446,7 @@ output for web use via the <code>xtable</code> package.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/table2html.html">table2html</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table1</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1.html"</span><span class="op">)</span></span>
+<span>  file <span class="op">=</span> <span class="st">"table1.html"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -455,7 +457,7 @@ output for web use via the <code>xtable</code> package.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/table2html.html">table2html</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table1</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1.html"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"table1_caption.html"</span>,</span>
 <span>  caption <span class="op">=</span> <span class="st">"Table 1. Baseline Characteristics"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -467,7 +469,7 @@ output for web use via the <code>xtable</code> package.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/table2html.html">table2html</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table2</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table2.html"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"table2.html"</span>,</span>
 <span>  caption <span class="op">=</span> <span class="st">"Table 2. Regression Analysis"</span>,</span>
 <span>  bold_significant <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  indent_groups <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -491,7 +493,7 @@ presentations with tables using the <code>flextable</code> and
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/table2pptx.html">table2pptx</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table1</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1.pptx"</span><span class="op">)</span></span>
+<span>  file <span class="op">=</span> <span class="st">"table1.pptx"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -502,7 +504,7 @@ presentations with tables using the <code>flextable</code> and
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/table2pptx.html">table2pptx</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table1</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1.pptx"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"table1_slidetitle.pptx"</span>,</span>
 <span>  slide_title <span class="op">=</span> <span class="st">"Baseline Characteristics"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -514,7 +516,7 @@ presentations with tables using the <code>flextable</code> and
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/table2pptx.html">table2pptx</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table2</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table2.pptx"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"table2.pptx"</span>,</span>
 <span>  slide_title <span class="op">=</span> <span class="st">"Regression Analysis"</span>,</span>
 <span>  font_size <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  font_family <span class="op">=</span> <span class="st">"Arial"</span>,</span>
@@ -531,7 +533,7 @@ presentations with tables using the <code>flextable</code> and
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/table2pptx.html">table2pptx</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table1</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1_Custom.pptx"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"table1_custom.pptx"</span>,</span>
 <span>  template <span class="op">=</span> <span class="st">"my_template.pptx"</span>,</span>
 <span>  layout <span class="op">=</span> <span class="st">"Title and Content"</span>,</span>
 <span>  master <span class="op">=</span> <span class="st">"Office Theme"</span></span>
@@ -552,7 +554,7 @@ inclusion in manuscripts via the <code>xtable</code> package.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/table2tex.html">table2tex</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table1</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1.tex"</span><span class="op">)</span></span>
+<span>  file <span class="op">=</span> <span class="st">"table1.tex"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -563,7 +565,7 @@ inclusion in manuscripts via the <code>xtable</code> package.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/table2tex.html">table2tex</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table1</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1.tex"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"table1_caption.tex"</span>,</span>
 <span>  caption <span class="op">=</span> <span class="st">"Baseline Characteristics by Group"</span>,</span>
 <span>  label <span class="op">=</span> <span class="st">"tab:demographics"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -576,7 +578,7 @@ inclusion in manuscripts via the <code>xtable</code> package.</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/table2tex.html">table2tex</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table2</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table2.tex"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"table2.tex"</span>,</span>
 <span>  caption <span class="op">=</span> <span class="st">"Regression Analysis"</span>,</span>
 <span>  label <span class="op">=</span> <span class="st">"tab:regression"</span>,</span>
 <span>  booktabs <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -599,7 +601,7 @@ using the <code>flextable</code> and <code>officer</code> packages.</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/table2rtf.html">table2rtf</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table1</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1.rtf"</span><span class="op">)</span></span>
+<span>  file <span class="op">=</span> <span class="st">"table1.rtf"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -610,7 +612,7 @@ using the <code>flextable</code> and <code>officer</code> packages.</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/table2rtf.html">table2rtf</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table2</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table2.rtf"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"table2.rtf"</span>,</span>
 <span>  caption <span class="op">=</span> <span class="st">"Table 2. Regression Analysis"</span>,</span>
 <span>  font_size <span class="op">=</span> <span class="fl">9</span>,</span>
 <span>  font_family <span class="op">=</span> <span class="st">"Times New Roman"</span>,</span>
@@ -627,7 +629,7 @@ using the <code>flextable</code> and <code>officer</code> packages.</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/table2rtf.html">table2rtf</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table2</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table2_Landscape.rtf"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"table2_landscape.rtf"</span>,</span>
 <span>  paper <span class="op">=</span> <span class="st">"letter"</span>,</span>
 <span>  orientation <span class="op">=</span> <span class="st">"landscape"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -635,25 +637,26 @@ using the <code>flextable</code> and <code>officer</code> packages.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="automatic-format-detection">Automatic Format Detection<a class="anchor" aria-label="anchor" href="#automatic-format-detection"></a>
+<h2 id="saving-to-any-format">Saving to Any Format<a class="anchor" aria-label="anchor" href="#saving-to-any-format"></a>
 </h2>
-<p>The <code><a href="../reference/autotable.html">autotable()</a></code> function detects the output format from
-the file extension, simplifying the export workflow:</p>
+<p>The <code><a href="../reference/tablesave.html">tablesave()</a></code> function writes a table in the format
+indicated by the file extension, simplifying the export workflow:</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/autotable.html">autotable</a></span><span class="op">(</span><span class="va">table1</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1.csv"</span><span class="op">)</span><span class="op">)</span>   <span class="co"># CSV output</span></span>
-<span><span class="fu"><a href="../reference/autotable.html">autotable</a></span><span class="op">(</span><span class="va">table1</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1.tsv"</span><span class="op">)</span><span class="op">)</span>   <span class="co"># TSV output</span></span>
-<span><span class="fu"><a href="../reference/autotable.html">autotable</a></span><span class="op">(</span><span class="va">table1</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1.pdf"</span><span class="op">)</span><span class="op">)</span>   <span class="co"># PDF output</span></span>
-<span><span class="fu"><a href="../reference/autotable.html">autotable</a></span><span class="op">(</span><span class="va">table1</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1.docx"</span><span class="op">)</span><span class="op">)</span>  <span class="co"># DOCX output</span></span>
-<span><span class="fu"><a href="../reference/autotable.html">autotable</a></span><span class="op">(</span><span class="va">table1</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1.html"</span><span class="op">)</span><span class="op">)</span>  <span class="co"># HTML output</span></span>
-<span><span class="fu"><a href="../reference/autotable.html">autotable</a></span><span class="op">(</span><span class="va">table1</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1.pptx"</span><span class="op">)</span><span class="op">)</span>  <span class="co"># PPTX output</span></span>
-<span><span class="fu"><a href="../reference/autotable.html">autotable</a></span><span class="op">(</span><span class="va">table1</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1.tex"</span><span class="op">)</span><span class="op">)</span>   <span class="co"># TeX output</span></span>
-<span><span class="fu"><a href="../reference/autotable.html">autotable</a></span><span class="op">(</span><span class="va">table1</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1.rtf"</span><span class="op">)</span><span class="op">)</span>   <span class="co"># RTF output</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/tablesave.html">tablesave</a></span><span class="op">(</span><span class="va">table1</span>, <span class="st">"table1.csv"</span><span class="op">)</span>             <span class="co"># CSV output</span></span>
+<span><span class="fu"><a href="../reference/tablesave.html">tablesave</a></span><span class="op">(</span><span class="va">table1</span>, <span class="st">"table1.tsv"</span><span class="op">)</span>             <span class="co"># TSV output</span></span>
+<span><span class="fu"><a href="../reference/tablesave.html">tablesave</a></span><span class="op">(</span><span class="va">table1</span>, <span class="st">"table1.ssv"</span>, sep <span class="op">=</span> <span class="st">" "</span><span class="op">)</span>  <span class="co"># SSV output</span></span>
+<span><span class="fu"><a href="../reference/tablesave.html">tablesave</a></span><span class="op">(</span><span class="va">table1</span>, <span class="st">"table1.pdf"</span><span class="op">)</span>             <span class="co"># PDF output</span></span>
+<span><span class="fu"><a href="../reference/tablesave.html">tablesave</a></span><span class="op">(</span><span class="va">table1</span>, <span class="st">"table1.docx"</span><span class="op">)</span>            <span class="co"># DOCX output</span></span>
+<span><span class="fu"><a href="../reference/tablesave.html">tablesave</a></span><span class="op">(</span><span class="va">table1</span>, <span class="st">"table1.html"</span><span class="op">)</span>            <span class="co"># HTML output</span></span>
+<span><span class="fu"><a href="../reference/tablesave.html">tablesave</a></span><span class="op">(</span><span class="va">table1</span>, <span class="st">"table1.pptx"</span><span class="op">)</span>            <span class="co"># PPTX output</span></span>
+<span><span class="fu"><a href="../reference/tablesave.html">tablesave</a></span><span class="op">(</span><span class="va">table1</span>, <span class="st">"table1.tex"</span><span class="op">)</span>             <span class="co"># TeX output</span></span>
+<span><span class="fu"><a href="../reference/tablesave.html">tablesave</a></span><span class="op">(</span><span class="va">table1</span>, <span class="st">"table1.rtf"</span><span class="op">)</span>             <span class="co"># RTF output</span></span></code></pre></div>
 <p>Format-specific parameters pass through to the underlying
 function:</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/autotable.html">autotable</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/tablesave.html">tablesave</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table2</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table2.pdf"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"table2.pdf"</span>,</span>
 <span>  caption <span class="op">=</span> <span class="st">"Table 2. Regression Analysis"</span>,</span>
 <span>  orientation <span class="op">=</span> <span class="st">"landscape"</span>,</span>
 <span>  font_size <span class="op">=</span> <span class="fl">8</span>,</span>
@@ -748,12 +751,12 @@ and survival variables (<code><a href="../reference/desctable.html">desctable()<
 </ul>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Full display</span></span>
-<span><span class="fu"><a href="../reference/table2docx.html">table2docx</a></span><span class="op">(</span><span class="va">table1</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1_Full.docx"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/table2docx.html">table2docx</a></span><span class="op">(</span><span class="va">table1</span>, <span class="st">"table1_full.docx"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Condense all variable types</span></span>
 <span><span class="fu"><a href="../reference/table2docx.html">table2docx</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table1</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1_Condensed.docx"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"table1_condensed.docx"</span>,</span>
 <span>  condense_table <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
@@ -761,7 +764,7 @@ and survival variables (<code><a href="../reference/desctable.html">desctable()<
 <span><span class="co"># Condense only continuous/survival (descriptive tables only)</span></span>
 <span><span class="fu"><a href="../reference/table2docx.html">table2docx</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table1</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1_CondenseQuant.docx"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"table1_condensequant.docx"</span>,</span>
 <span>  condense_quantitative <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -954,27 +957,28 @@ and survival variables (<code><a href="../reference/desctable.html">desctable()<
 <tbody>
 <tr class="odd">
 <td align="left">Data archival, further processing</td>
-<td align="left">CSV (.csv) or TSV (.tsv)</td>
+<td align="left">CSV (<code>.csv</code>) or TSV (<code>.tsv</code>)</td>
 </tr>
 <tr class="even">
 <td align="left">Journal submission</td>
-<td align="left">PDF (.pdf) or LaTeX (.tex)</td>
+<td align="left">PDF (<code>.pdf</code>) or LaTeX
+(<code>.tex</code>)</td>
 </tr>
 <tr class="odd">
 <td align="left">Manuscript drafts, collaboration</td>
-<td align="left">Word (.docx)</td>
+<td align="left">Word (<code>.docx</code>)</td>
 </tr>
 <tr class="even">
 <td align="left">Web/R Markdown</td>
-<td align="left">HTML (.html)</td>
+<td align="left">HTML (<code>.html</code>)</td>
 </tr>
 <tr class="odd">
 <td align="left">Presentations</td>
-<td align="left">PowerPoint (.pptx)</td>
+<td align="left">PowerPoint (<code>.pptx</code>)</td>
 </tr>
 <tr class="even">
 <td align="left">Maximum compatibility</td>
-<td align="left">RTF (.rtf)</td>
+<td align="left">RTF (<code>.rtf</code>)</td>
 </tr>
 </tbody>
 </table>
@@ -1007,9 +1011,9 @@ embedding</li>
 <span><span class="va">formats</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"csv"</span>, <span class="st">"pdf"</span>, <span class="st">"docx"</span>, <span class="st">"html"</span>, <span class="st">"pptx"</span>, <span class="st">"rtf"</span>, <span class="st">"tex"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">fmt</span> <span class="kw">in</span> <span class="va">formats</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="../reference/autotable.html">autotable</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="../reference/tablesave.html">tablesave</a></span><span class="op">(</span></span>
 <span>    table <span class="op">=</span> <span class="va">table2</span>,</span>
-<span>    file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Table2."</span>, <span class="va">fmt</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Table2."</span>, <span class="va">fmt</span><span class="op">)</span>,</span>
 <span>    caption <span class="op">=</span> <span class="va">common_opts</span><span class="op">$</span><span class="va">caption</span>,</span>
 <span>    bold_significant <span class="op">=</span> <span class="va">common_opts</span><span class="op">$</span><span class="va">bold_significant</span>,</span>
 <span>    indent_groups <span class="op">=</span> <span class="va">common_opts</span><span class="op">$</span><span class="va">indent_groups</span>,</span>
@@ -1035,7 +1039,7 @@ debugging:</p>
 <span><span class="co"># tinytex::install_tinytex()</span></span>
 <span></span>
 <span><span class="co"># Keep log files for debugging</span></span>
-<span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span><span class="va">table</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"debug.pdf"</span><span class="op">)</span>, show_logs <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span><span class="va">table</span>, <span class="st">"debug.pdf"</span>, show_logs <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>See <a href="installation_setup.html">Installation and Setup</a> for
 LaTeX configuration details.</p>
 </div>
@@ -1045,27 +1049,27 @@ LaTeX configuration details.</p>
 <p>Several options address wide tables:</p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Use landscape orientation</span></span>
-<span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span><span class="va">table</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"wide.pdf"</span><span class="op">)</span>, orientation <span class="op">=</span> <span class="st">"landscape"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span><span class="va">table</span>, <span class="st">"wide.pdf"</span>, orientation <span class="op">=</span> <span class="st">"landscape"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Enable fit-to-page scaling</span></span>
-<span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span><span class="va">table</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"wide.pdf"</span><span class="op">)</span>, fit_to_page <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span><span class="va">table</span>, <span class="st">"wide.pdf"</span>, fit_to_page <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Reduce font size</span></span>
-<span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span><span class="va">table</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"wide.pdf"</span><span class="op">)</span>, font_size <span class="op">=</span> <span class="fl">7</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span><span class="va">table</span>, <span class="st">"wide.pdf"</span>, font_size <span class="op">=</span> <span class="fl">7</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="customizing-flextable-output">Customizing flextable Output<a class="anchor" aria-label="anchor" href="#customizing-flextable-output"></a>
 </h3>
 <p>Get the flextable object for further customization:</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ft</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/table2docx.html">table2docx</a></span><span class="op">(</span><span class="va">table1</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1.docx"</span><span class="op">)</span>, return_ft <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">ft</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/table2docx.html">table2docx</a></span><span class="op">(</span><span class="va">table1</span>, <span class="st">"table1.docx"</span>, return_ft <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ardata-fr.github.io/flextable-book/" class="external-link">flextable</a></span><span class="op">)</span></span>
 <span><span class="va">ft</span> <span class="op">&lt;-</span> <span class="va">ft</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://davidgohel.github.io/flextable/reference/bold.html" class="external-link">bold</a></span><span class="op">(</span>i <span class="op">=</span> <span class="fl">1</span>, part <span class="op">=</span> <span class="st">"header"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://davidgohel.github.io/flextable/reference/color.html" class="external-link">color</a></span><span class="op">(</span>i <span class="op">=</span> <span class="fl">1</span>, color <span class="op">=</span> <span class="st">"navy"</span>, part <span class="op">=</span> <span class="st">"header"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/save_as_docx.html" class="external-link">save_as_docx</a></span><span class="op">(</span><span class="va">ft</span>, path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1_Custom.docx"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/save_as_docx.html" class="external-link">save_as_docx</a></span><span class="op">(</span><span class="va">ft</span>, path <span class="op">=</span> <span class="st">"table1_custom.docx"</span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
 </div>
@@ -1078,7 +1082,7 @@ LaTeX configuration details.</p>
 <code><a href="../reference/desctable.html">desctable()</a></code> for baseline characteristics</li>
 <li>
 <a href="regression_modeling.html">Regression Modeling</a>:
-<code><a href="../reference/fit.html">fit()</a></code>, <code><a href="../reference/uniscreen.html">uniscreen()</a></code>, and
+<code><a href="../reference/uniscreen.html">uniscreen()</a></code>, <code><a href="../reference/fit.html">fit()</a></code>, and
 <code><a href="../reference/fullfit.html">fullfit()</a></code>
 </li>
 <li>
@@ -1106,7 +1110,7 @@ Interactions and mixed-effects models</li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
 </div>
 
     </footer>

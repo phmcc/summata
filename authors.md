@@ -11,13 +11,13 @@ Source:
 [`inst/CITATION`](https://codeberg.org/phmcc/summata/tree/main/inst/CITATION)
 
 McClelland PH (2026). *summata: Publication-Ready Summary Tables and
-Forest Plots*. R package version 0.11.5,
+Forest Plots*. R package version 0.12.0,
 <https://phmcc.codeberg.page/summata/>.
 
     @Manual{,
       title = {summata: Publication-Ready Summary Tables and Forest Plots},
       author = {Paul Hsin-ti McClelland},
       year = {2026},
-      note = {R package version 0.11.5},
+      note = {R package version 0.12.0},
       url = {https://phmcc.codeberg.page/summata/},
     }

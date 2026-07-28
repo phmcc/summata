@@ -19,7 +19,7 @@ predictor levels shown for each."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -193,7 +193,8 @@ total plot width allocated to the data table. Default is 0.6 (60% table,
 
 <dt id="arg-show-n">show_n<a class="anchor" aria-label="anchor" href="#arg-show-n"></a></dt>
 <dd><p>Logical. If <code>TRUE</code>, includes a column showing sample sizes.
-Default is <code>TRUE</code>.</p></dd>
+Counts describe the observations used in fitting rather than every row
+supplied. Default is <code>TRUE</code>.</p></dd>
 
 
 <dt id="arg-show-events">show_events<a class="anchor" aria-label="anchor" href="#arg-show-events"></a></dt>
@@ -265,8 +266,9 @@ coefficients).</p></dd>
 <dt id="arg-labels">labels<a class="anchor" aria-label="anchor" href="#arg-labels"></a></dt>
 <dd><p>Named character vector providing custom display labels for
 outcomes and variables. Applied to outcome names in the plot.
-Default is <code>NULL</code> (uses labels already applied in multifit, or
-original names).</p></dd>
+Default is <code>NULL</code>, in which case the labels attached by
+<code><a href="multifit.html">multifit()</a></code> are used. Original names are used where neither is
+available.</p></dd>
 
 
 <dt id="arg-units">units<a class="anchor" aria-label="anchor" href="#arg-units"></a></dt>
@@ -295,7 +297,7 @@ original names).</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A <code>ggplot</code> object containing the complete forest plot. The plot
   can be:</p><ul><li><p>Displayed directly: <code>print(plot)</code></p></li>
-<li><p>Saved to file: <code>ggsave("forest.pdf", plot, width = 12, height = 8)</code></p></li>
+<li><p>Saved to file: <code>forestsave(plot, "forest.pdf")</code></p></li>
 <li><p>Further customized with <span class="pkg">ggplot2</span> functions</p></li>
 </ul><p>The returned object includes an attribute <code>"rec_dims"</code>
   accessible via <code>attr(plot, "rec_dims")</code>, which is a list
@@ -305,10 +307,20 @@ original names).</p></dd>
     <dt>height</dt>
 <dd><p>Numeric. Recommended plot height in specified units</p></dd>
 
+    <dt>units</dt>
+<dd><p>Character. The units the dimensions are expressed in,
+      matching the <code>units</code> argument</p></dd>
+
 
 </dl><p>These recommendations are automatically calculated based on the number of
   variables, text sizes, and layout parameters, and are printed to console
-  if <code>plot_width</code> or <code>plot_height</code> are not specified.</p>
+  if <code>plot_width</code> or <code>plot_height</code> are not specified.
+  <code><a href="forestsave.html">forestsave()</a></code> reads all three and requires no further handling.</p>
+<p>The returned object also includes an attribute <code>"table_data"</code>
+  accessible via <code>attr(plot, "table_data")</code>, a data.table holding the
+  values drawn in the plot, in the order of the model terms. Sample sizes
+  and event counts describe the observations used in fitting rather than
+  every row supplied.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -341,10 +353,12 @@ with the formatted table output.</p>
 <code><a href="glmforest.html">glmforest</a></code> for single GLM forest plots,
 <code><a href="coxforest.html">coxforest</a></code> for single Cox model forest plots,
 <code><a href="lmforest.html">lmforest</a></code> for single linear model forest plots,
-<code><a href="uniforest.html">uniforest</a></code> for univariable screening forest plots</p>
+<code><a href="uniforest.html">uniforest</a></code> for univariable screening forest plots,
+  <code><a href="forestsave.html">forestsave</a></code> for saving with recommended dimensions</p>
 <p>Other visualization functions:
 <code><a href="autoforest.html">autoforest()</a></code>,
 <code><a href="coxforest.html">coxforest()</a></code>,
+<code><a href="forestsave.html">forestsave()</a></code>,
 <code><a href="glmforest.html">glmforest()</a></code>,
 <code><a href="lmforest.html">lmforest()</a></code>,
 <code><a href="uniforest.html">uniforest()</a></code></p></div>
@@ -391,9 +405,8 @@ with the formatted table output.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Recommended plot dimensions: width = 16.7 in, height = 5.0 in</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 4: Save with recommended dimensions</span></span></span>
-<span class="r-in"><span><span class="va">dims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">plot3</span>, <span class="st">"rec_dims"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"multioutcome_forest.pdf"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                <span class="va">plot3</span>, width <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">width</span>, height <span class="op">=</span> <span class="va">dims</span><span class="op">$</span><span class="va">height</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="forestsave.html">forestsave</a></span><span class="op">(</span><span class="va">plot3</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"multioutcome_forest.pdf"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/RtmptN10wa/multioutcome_forest.pdf (width = 16.7 in, height = 5.0 in)</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="va">old_width</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
@@ -409,7 +422,7 @@ with the formatted table output.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
 </div>
 
     </footer></div>

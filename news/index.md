@@ -1,10 +1,78 @@
 # Changelog
 
+## *summata* 0.12.0 (2026-07-28)
+
+- Fix *n*/Events counts to report complete cases across all functions,
+  so group sizes sum to the model *n*; empty factor levels now report
+  zero, and
+  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
+  adjusted columns match
+  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
+  (STROBE item 12)
+- Report the analyzed sample and events in
+  [`print()`](https://rdrr.io/r/base/print.html) methods and forest plot
+  footers, with counts available via the `analysis_counts` attribute
+- Import [`Surv()`](https://rdrr.io/pkg/survival/man/Surv.html),
+  [`strata()`](https://rdrr.io/pkg/survival/man/strata.html),
+  [`cluster()`](https://rdrr.io/pkg/survival/man/cluster.html), and
+  [`coxph()`](https://rdrr.io/pkg/survival/man/coxph.html) from
+  `survival` to fix `clogit` and `coxme` failures when the package is
+  not attached by the user
+- Fix coefficient parsing for variable names that share a prefix or
+  contain regular expression metacharacters
+- Fix
+  [`uniforest()`](https://phmcc.codeberg.page/summata/reference/uniforest.md)
+  to draw factor levels in their established order rather than
+  alphabetically when `indent_groups = TRUE`
+- Fix counts of 100,000 or greater displaying in exponential notation,
+  and centralize count formatting in a vectorized
+  [`format_count()`](https://phmcc.codeberg.page/summata/reference/format_count.md)
+- Carry variable labels from the regression functions through to the
+  forest plot functions, so labels supplied once apply to both table and
+  plot
+- Add
+  [`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+  for saving forest plots at their recommended dimensions, with
+  format-appropriate graphics devices and optional font embedding;
+  `rec_dims` now records its units
+- Rename
+  [`autotable()`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+  to
+  [`tablesave()`](https://phmcc.codeberg.page/summata/reference/tablesave.md),
+  pairing it with
+  [`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+  and distinguishing it from
+  [`autoforest()`](https://phmcc.codeberg.page/summata/reference/autoforest.md),
+  which detects model class rather than file format;
+  [`autotable()`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+  is retained as a deprecated alias
+- Add `quiet` argument to
+  [`tablesave()`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+  and the `table2*()` functions, and return the file path invisibly from
+  [`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md),
+  [`table2html()`](https://phmcc.codeberg.page/summata/reference/table2html.md),
+  and
+  [`table2tex()`](https://phmcc.codeberg.page/summata/reference/table2tex.md)
+- Add `table_data` attribute to the forest plot functions for access to
+  the values drawn in the figure
+- Add
+  [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
+  warning when candidate models are fitted to different numbers of
+  observations
+- Suppress spurious diagnostics: singular-fit messages from
+  mixed-effects screening, the deprecated `lme4::findbars()` call, the
+  [`MuMIn::r.squaredGLMM()`](https://rdrr.io/pkg/MuMIn/man/r.squaredGLMM.html)
+  null model advisory, and the Hosmer-Lemeshow test where fitted values
+  are too few to bin
+- Declare `parallel`, `tools`, and `utils` in Imports, and add
+  `SystemRequirements` for the optional external tools
+- Documentation and testing suite revisions
+
 ## *summata* 0.11.5 (2026-05-06)
 
 CRAN release: 2026-05-07
 
-- Explicitly define `%||%` operator for backward compatability
+- Explicitly define `%||%` operator for backward compatibility
 - Move main documentation to Codeberg Pages
 - Minor documentation edits
 
@@ -77,7 +145,7 @@ CRAN release: 2026-03-08
 
 ## *summata* 0.10.7 (2026-02-05)
 
-- Add R-hub compatability
+- Add R-hub compatibility
 - Documentation and vignette updates
 
 ## *summata* 0.10.6 (2026-01-20)
@@ -157,7 +225,7 @@ CRAN release: 2026-03-08
   [`table2tex()`](https://phmcc.codeberg.page/summata/reference/table2tex.md)
 - Consistent Unicode formatting for files
 - Increased R version requirement to \>= 4.2.0 for better Unicode
-  compatability
+  compatibility
 - Add
   [`survtable()`](https://phmcc.codeberg.page/summata/reference/survtable.md)
   function with utilities
@@ -241,7 +309,7 @@ CRAN release: 2026-03-08
 ## *summata* 0.7.14 (2025-12-20)
 
 - Add
-  [`autotable()`](https://phmcc.codeberg.page/summata/reference/autotable.md)
+  [`autotable()`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
   function
 
 ## *summata* 0.7.13 (2025-12-19)

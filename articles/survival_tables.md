@@ -126,7 +126,11 @@ context.
 
 ### **Example 3:** Survival Quartiles
 
-Report multiple survival quantiles by specifying the `probs` parameter:
+Report multiple survival quantiles by specifying the `probs` parameter.
+Note that `labels` names levels of the `by` variable here, rather than
+variable names as in
+[`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
+and the regression functions:
 
 ``` r
 example3 <- survtable(
@@ -135,7 +139,12 @@ example3 <- survtable(
   by = "stage",
   times = NULL,
   probs = c(0.25, 0.5, 0.75),
-  labels = clintrial_labels
+  labels = c(
+    "I" = "Stage I",
+    "II" = "Stage II",
+    "III" = "Stage III",
+    "IV" = "Stage IV"
+  )
 )
 
 example3
@@ -147,13 +156,13 @@ example3
 #> Statistic: Survival probability
 #> Test: Log-rank (p = < 0.001)
 #> 
-#>    Variable 75% Survival Time (95% CI)  Median (95% CI) 25% Survival Time (95% CI) p-value
-#>      <char>                     <char>           <char>                     <char>  <char>
-#> 1:    Total              5.1 (4.3-6.1) 19.5 (16.1-23.5)                         NR < 0.001
-#> 2:        I             9.0 (7.4-12.5) 33.7 (22.4-45.2)                         NR        
-#> 3:       II             7.7 (6.1-12.3) 32.2 (24.8-42.0)                         NR        
-#> 4:      III              3.9 (3.0-5.2) 13.7 (10.4-22.3)             44.7 (35.8-NR)        
-#> 5:       IV              2.0 (1.4-2.8)    5.9 (4.3-8.2)           15.6 (10.8-26.7)
+#>     Variable 75% Survival Time (95% CI)  Median (95% CI) 25% Survival Time (95% CI) p-value
+#>       <char>                     <char>           <char>                     <char>  <char>
+#> 1:     Total              5.1 (4.3-6.1) 19.5 (16.1-23.5)                         NR < 0.001
+#> 2:   Stage I             9.0 (7.4-12.5) 33.7 (22.4-45.2)                         NR        
+#> 3:  Stage II             7.7 (6.1-12.3) 32.2 (24.8-42.0)                         NR        
+#> 4: Stage III              3.9 (3.0-5.2) 13.7 (10.4-22.3)             44.7 (35.8-NR)        
+#> 5:  Stage IV              2.0 (1.4-2.8)    5.9 (4.3-8.2)           15.6 (10.8-26.7)
 ```
 
 ------------------------------------------------------------------------
@@ -319,8 +328,8 @@ surv_table <- survtable(
 )
 
 # Export both for publication
-ggsave(file.path(tempdir(), "km_curve.pdf"), width = 8, height = 6)
-table2pdf(surv_table, file.path(tempdir(), "survival_table.pdf"), 
+ggsave("km_curve.pdf", width = 8, height = 6)
+table2pdf(surv_table, "survival_table.pdf", 
           caption = "Table 2. Survival Estimates by Treatment Group")
 ```
 
@@ -340,14 +349,14 @@ vignette for comprehensive documentation.
 # Microsoft Word
 table2docx(
   table = example1,
-  file = file.path(tempdir(), "SurvivalTable.docx"),
+  file = "survival_table.docx",
   caption = "Table 2. Survival Estimates by Treatment Group"
 )
 
 # PDF (requires LaTeX)
 table2pdf(
   table = example1,
-  file = file.path(tempdir(), "SurvivalTable.pdf"),
+  file = "survival_table.pdf",
   caption = "Table 2. Survival Estimates by Treatment Group"
 )
 ```
@@ -383,9 +392,8 @@ When selecting landmark time points, consider the following:
   for baseline characteristics
 - [Regression
   Modeling](https://phmcc.codeberg.page/summata/articles/regression_modeling.md):
-  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
   [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
-  and
+  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md), and
   [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
 - [Model
   Comparison](https://phmcc.codeberg.page/summata/articles/model_comparison.md):

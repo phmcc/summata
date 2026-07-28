@@ -26,10 +26,10 @@
 <url><loc>https://phmcc.codeberg.page/summata/reference/apply_decimal_mark.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/apply_zebra_stripes_ft.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/autoforest.html</loc></url>
-<url><loc>https://phmcc.codeberg.page/summata/reference/autotable.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/bold_pvalues_ft.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/build_failed_model_row.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/build_model_row.html</loc></url>
+<url><loc>https://phmcc.codeberg.page/summata/reference/cairo_device.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/calculate_coxme_scores.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/calculate_forest_layout.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/calculate_glmer_scores.html</loc></url>
@@ -57,6 +57,7 @@
 <url><loc>https://phmcc.codeberg.page/summata/reference/detect_plot_font.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/determine_alignment.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/determine_effect_type.html</loc></url>
+<url><loc>https://phmcc.codeberg.page/summata/reference/embed_plot_fonts.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/extract_coxme_metrics.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/extract_glmer_metrics.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/extract_lmer_metrics.html</loc></url>
@@ -67,6 +68,8 @@
 <url><loc>https://phmcc.codeberg.page/summata/reference/fit.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/fix_negative_zero.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/forest_ci_separator.html</loc></url>
+<url><loc>https://phmcc.codeberg.page/summata/reference/forestsave.html</loc></url>
+<url><loc>https://phmcc.codeberg.page/summata/reference/format_analysis_counts.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/format_categorical_stat.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/format_column_headers.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/format_column_headers_html.html</loc></url>
@@ -74,7 +77,7 @@
 <url><loc>https://phmcc.codeberg.page/summata/reference/format_column_headers_with_n_tex.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/format_continuous_stat.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/format_count.html</loc></url>
-<url><loc>https://phmcc.codeberg.page/summata/reference/format_count_forest.html</loc></url>
+<url><loc>https://phmcc.codeberg.page/summata/reference/format_event_counts.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/format_fullfit_combined.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/format_headers_ft.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/format_indented_groups.html</loc></url>
@@ -96,11 +99,18 @@
 <url><loc>https://phmcc.codeberg.page/summata/reference/format_survival_cells.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/format_survival_ci.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/fullfit.html</loc></url>
+<url><loc>https://phmcc.codeberg.page/summata/reference/get_analysis_counts.html</loc></url>
+<url><loc>https://phmcc.codeberg.page/summata/reference/get_analysis_data.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/get_cached_confint.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/get_event_variable.html</loc></url>
+<url><loc>https://phmcc.codeberg.page/summata/reference/get_event_variable_for_counts.html</loc></url>
+<url><loc>https://phmcc.codeberg.page/summata/reference/get_model_analysis_counts.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/get_model_data.html</loc></url>
+<url><loc>https://phmcc.codeberg.page/summata/reference/get_model_nobs.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/get_model_type_name.html</loc></url>
+<url><loc>https://phmcc.codeberg.page/summata/reference/get_model_variables.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/get_model_xlevels.html</loc></url>
+<url><loc>https://phmcc.codeberg.page/summata/reference/get_outcome_variables.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/get_paper_settings.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/get_stat_label.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/glmforest.html</loc></url>
@@ -146,6 +156,7 @@
 <url><loc>https://phmcc.codeberg.page/summata/reference/resolve_separator.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/safe_round.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/sanitize_for_latex.html</loc></url>
+<url><loc>https://phmcc.codeberg.page/summata/reference/select_forest_device.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/should_condense_binary.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/summata-imports.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/survtable.html</loc></url>
@@ -155,6 +166,7 @@
 <url><loc>https://phmcc.codeberg.page/summata/reference/table2pptx.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/table2rtf.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/table2tex.html</loc></url>
+<url><loc>https://phmcc.codeberg.page/summata/reference/tablesave.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/uniforest.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/uniscreen.html</loc></url>
 <url><loc>https://phmcc.codeberg.page/summata/reference/validate_fit_inputs.html</loc></url>

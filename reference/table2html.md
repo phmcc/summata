@@ -25,6 +25,7 @@ table2html(
   stripe_color = "#EEEEEE",
   dark_header = FALSE,
   include_css = TRUE,
+  quiet = FALSE,
   ...
 )
 ```
@@ -125,6 +126,12 @@ table2html(
   for standalone HTML. Set to `FALSE` when embedding in existing HTML
   with its own stylesheet. Default is `TRUE`.
 
+- quiet:
+
+  Logical. Suppress progress and confirmation messages, such as the
+  notice reporting the file written. Errors and warnings are unaffected.
+  Default is `FALSE`.
+
 - ...:
 
   Additional arguments passed to
@@ -132,8 +139,13 @@ table2html(
 
 ## Value
 
-Invisibly returns `NULL`. Creates an HTML file at the specified location
-that can be opened in web browsers or embedded in HTML documents.
+Invisibly returns the file path, matching
+[`tablesave()`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+and
+[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md).
+Called for its side effect of creating an HTML file at the specified
+location, which can be opened in web browsers or embedded in HTML
+documents.
 
 ## Details
 
@@ -223,7 +235,7 @@ For R Markdown or Quarto documents:
     # Generate HTML fragment (no CSS)
     table2html(results, "table.html", include_css = FALSE)
 
-Then include in your document chunk with `results='asis'`:
+Then include in the document chunk with `results='asis'`:
 
     cat(readLines("table.html"), sep = "\n")
 
@@ -267,8 +279,8 @@ The generated HTML follows accessibility best practices:
 
 ## See also
 
-[`autotable`](https://phmcc.codeberg.page/summata/reference/autotable.md)
-for automatic format detection,
+[`tablesave`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+for saving in the format given by the file extension,
 [`table2pdf`](https://phmcc.codeberg.page/summata/reference/table2pdf.md)
 for PDF output,
 [`table2tex`](https://phmcc.codeberg.page/summata/reference/table2tex.md)
@@ -285,12 +297,12 @@ regression tables,
 for descriptive tables
 
 Other export functions:
-[`autotable()`](https://phmcc.codeberg.page/summata/reference/autotable.md),
 [`table2docx()`](https://phmcc.codeberg.page/summata/reference/table2docx.md),
 [`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md),
 [`table2pptx()`](https://phmcc.codeberg.page/summata/reference/table2pptx.md),
 [`table2rtf()`](https://phmcc.codeberg.page/summata/reference/table2rtf.md),
-[`table2tex()`](https://phmcc.codeberg.page/summata/reference/table2tex.md)
+[`table2tex()`](https://phmcc.codeberg.page/summata/reference/table2tex.md),
+[`tablesave()`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
 
 ## Examples
 
@@ -310,69 +322,69 @@ results <- fit(
 if (requireNamespace("xtable", quietly = TRUE)) {
   table2html(results, file.path(tempdir(), "results.html"))
 }
-#> Table exported to /tmp/Rtmpn8SzwZ/results.html
+#> Table saved to /tmp/RtmptN10wa/results.html
 
 # \donttest{
 # Example 2: With caption
 table2html(results, file.path(tempdir(), "captioned.html"),
           caption = "Table 1: Multivariable Logistic Regression Results")
-#> Table exported to /tmp/Rtmpn8SzwZ/captioned.html
+#> Table saved to /tmp/RtmptN10wa/captioned.html
 
 # Example 3: For embedding (no CSS)
 table2html(results, file.path(tempdir(), "embed.html"),
           include_css = FALSE)
-#> Table exported to /tmp/Rtmpn8SzwZ/embed.html
-# Include in your HTML document
+#> Table saved to /tmp/RtmptN10wa/embed.html
+# Include in the HTML document
 
 # Example 4: Hierarchical display
 table2html(results, file.path(tempdir(), "indented.html"),
           indent_groups = TRUE)
-#> Table exported to /tmp/Rtmpn8SzwZ/indented.html
+#> Table saved to /tmp/RtmptN10wa/indented.html
 
 # Example 5: Condensed table
 table2html(results, file.path(tempdir(), "condensed.html"),
           condense_table = TRUE)
-#> Table exported to /tmp/Rtmpn8SzwZ/condensed.html
+#> Table saved to /tmp/RtmptN10wa/condensed.html
 
 # Example 6: With zebra stripes
 table2html(results, file.path(tempdir(), "striped.html"),
           zebra_stripes = TRUE,
           stripe_color = "#F0F0F0")
-#> Table exported to /tmp/Rtmpn8SzwZ/striped.html
+#> Table saved to /tmp/RtmptN10wa/striped.html
 
 # Example 7: Dark header style
 table2html(results, file.path(tempdir(), "dark.html"),
           dark_header = TRUE)
-#> Table exported to /tmp/Rtmpn8SzwZ/dark.html
+#> Table saved to /tmp/RtmptN10wa/dark.html
 
 # Example 8: Combination styling
 table2html(results, file.path(tempdir(), "styled.html"),
           zebra_stripes = TRUE,
           dark_header = TRUE,
           bold_significant = TRUE)
-#> Table exported to /tmp/Rtmpn8SzwZ/styled.html
+#> Table saved to /tmp/RtmptN10wa/styled.html
 
 # Example 9: Custom stripe color
 table2html(results, file.path(tempdir(), "blue_stripes.html"),
           zebra_stripes = TRUE,
           stripe_color = "#E3F2FD")  # Light blue
-#> Table exported to /tmp/Rtmpn8SzwZ/blue_stripes.html
+#> Table saved to /tmp/RtmptN10wa/blue_stripes.html
 
 # Example 10: Disable significance bolding
 table2html(results, file.path(tempdir(), "no_bold.html"),
           bold_significant = FALSE)
-#> Table exported to /tmp/Rtmpn8SzwZ/no_bold.html
+#> Table saved to /tmp/RtmptN10wa/no_bold.html
 
 # Example 11: Stricter significance threshold
 table2html(results, file.path(tempdir(), "strict.html"),
           bold_significant = TRUE,
           p_threshold = 0.01)
-#> Table exported to /tmp/Rtmpn8SzwZ/strict.html
+#> Table saved to /tmp/RtmptN10wa/strict.html
 
 # Example 12: No header formatting
 table2html(results, file.path(tempdir(), "raw_headers.html"),
           format_headers = FALSE)
-#> Table exported to /tmp/Rtmpn8SzwZ/raw_headers.html
+#> Table saved to /tmp/RtmptN10wa/raw_headers.html
 
 # Example 13: Descriptive statistics table
 desc_table <- desctable(clintrial, by = "treatment",
@@ -380,18 +392,18 @@ desc_table <- desctable(clintrial, by = "treatment",
 
 table2html(desc_table, file.path(tempdir(), "baseline.html"),
           caption = "Table 1: Baseline Characteristics by Treatment Group")
-#> Table exported to /tmp/Rtmpn8SzwZ/baseline.html
+#> Table saved to /tmp/RtmptN10wa/baseline.html
 
 # Example 14: For R Markdown (no CSS, for inline display)
 table2html(results, file.path(tempdir(), "rmd_table.html"),
           include_css = FALSE,
           indent_groups = TRUE)
-#> Table exported to /tmp/Rtmpn8SzwZ/rmd_table.html
+#> Table saved to /tmp/RtmptN10wa/rmd_table.html
 
 # Then in R Markdown, use a chunk with results='asis' to display inline:
 cat(readLines(file.path(tempdir(), "rmd_table.html")), sep = "\n")
-#> <!-- html table generated in R 4.5.2 by xtable 1.8-8 package -->
-#> <!-- Tue May 26 14:49:07 2026 -->
+#> <!-- html table generated in R 4.6.0 by xtable 1.8-8 package -->
+#> <!-- Tue Jul 28 17:02:00 2026 -->
 #> <table border=1>
 #> <tr> <th> Variable </th> <th> <i>n</i> </th> <th> Events </th> <th> aOR (95% CI) </th> <th> <i>p</i>-value </th>  </tr>
 #>   <tr> <td> Age (years) </td> <td> 847 </td> <td> 606 </td> <td> 1.05 (1.04-1.07) </td> <td> <b>< 0.001</b> </td> </tr>
@@ -414,7 +426,7 @@ table2html(results, file.path(tempdir(), "email.html"),
           include_css = TRUE,  # Self-contained
           zebra_stripes = TRUE,
           caption = "Regression Results - See Attached")
-#> Table exported to /tmp/Rtmpn8SzwZ/email.html
+#> Table saved to /tmp/RtmptN10wa/email.html
 # Can be directly included in HTML emails
 
 # Example 16: Publication-ready web version
@@ -424,22 +436,22 @@ table2html(results, file.path(tempdir(), "publication.html"),
           zebra_stripes = FALSE,  # Clean look
           bold_significant = TRUE,
           dark_header = FALSE)
-#> Table exported to /tmp/Rtmpn8SzwZ/publication.html
+#> Table saved to /tmp/RtmptN10wa/publication.html
 
 # Example 17: Modern dark theme
 table2html(results, file.path(tempdir(), "dark_theme.html"),
           dark_header = TRUE,
           stripe_color = "#2A2A2A",  # Dark gray stripes
           zebra_stripes = TRUE)
-#> Table exported to /tmp/Rtmpn8SzwZ/dark_theme.html
+#> Table saved to /tmp/RtmptN10wa/dark_theme.html
 
 # Example 18: Minimal styling for custom CSS
 table2html(results, file.path(tempdir(), "minimal.html"),
           include_css = FALSE,
           format_headers = FALSE,
           bold_significant = FALSE)
-#> Table exported to /tmp/Rtmpn8SzwZ/minimal.html
-# Apply your own CSS classes and styling
+#> Table saved to /tmp/RtmptN10wa/minimal.html
+# Apply personal CSS classes and styling
 
 # Example 19: Model comparison table
 models <- list(
@@ -447,8 +459,12 @@ models <- list(
      full = c("age", "sex", "treatment", "stage")
 )
 
+# Information criteria assume a common sample, so the candidate
+# predictors are restricted to complete cases before comparison
+comparison_data <- na.omit(clintrial[, c("os_status", "age", "sex", "treatment", "stage")])
+
 comparison <- compfit(
-     data = clintrial,
+     data = comparison_data,
      outcome = "os_status",
      model_list = models
 )
@@ -458,7 +474,7 @@ comparison <- compfit(
 
 table2html(comparison, file.path(tempdir(), "comparison.html"),
           caption = "Model Comparison Statistics")
-#> Table exported to /tmp/Rtmpn8SzwZ/comparison.html
+#> Table saved to /tmp/RtmptN10wa/comparison.html
 
 # }
 ```

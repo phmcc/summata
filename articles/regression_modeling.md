@@ -20,8 +20,8 @@ analysis:
 
 All functions support a wide range of model types including linear
 models, generalized linear models (logistic, Poisson, Gaussian, Gamma,
-negative binomial), Cox proportional hazards models, and mixed-effects
-models, with consistent syntax and formatted output.
+negative binomial, *etc.*), Cox proportional hazards models, and
+mixed-effects models, with consistent syntax and formatted output.
 
 As with other `summata` functions, these functions adhere to the
 standard calling convention:
@@ -108,8 +108,8 @@ predictors for multivariable modeling.
 ### **Example 1:** Binary Outcome Screen (Logistic Regression)
 
 For binary outcomes, use `model_type = "glm"` (logistic regression is
-the default family). Here we examine predictors of 30-day hospital
-readmission:
+the default family). The following example examines predictors of 30-day
+hospital readmission:
 
 ``` r
 screening_vars <- c("age", "sex", "race", "bmi", "smoking", 
@@ -126,10 +126,13 @@ example1 <- uniscreen(
 example1
 #> 
 #> Univariable Screening Results
+#> 
 #> Outcome: readmission_30d
 #> Model Type: Logistic
 #> Predictors Screened: 9
 #> Significant (p < 0.05): 7
+#> Observations analyzed: 833-850 of 850 (98.0-100.0%)
+#> Events analyzed: 416-427 of 427 (97.4-100.0%)
 #> 
 #>                    Variable   Group      n Events       OR (95% CI) p-value
 #>                      <char>  <char> <char> <char>            <char>  <char>
@@ -182,10 +185,13 @@ example2 <- uniscreen(
 example2
 #> 
 #> Univariable Screening Results
+#> 
 #> Outcome: readmission_30d
 #> Model Type: Logistic
 #> Predictors Screened: 9
 #> Significant (p < 0.01): 5
+#> Observations analyzed: 833-850 of 850 (98.0-100.0%)
+#> Events analyzed: 416-427 of 427 (97.4-100.0%)
 #> 
 #>                    Variable   Group      n Events       OR (95% CI) p-value
 #>                      <char>  <char> <char> <char>            <char>  <char>
@@ -233,25 +239,27 @@ example4 <- uniscreen(
 example4
 #> 
 #> Univariable Screening Results
+#> 
 #> Outcome: los_days
 #> Model Type: Linear
 #> Predictors Screened: 5
 #> Significant (p < 0.05): 5
+#> Observations analyzed: 814-830 of 850 (95.8-97.6%)
 #> 
 #>                    Variable  Group      n Coefficient (95% CI) p-value
 #>                      <char> <char> <char>               <char>  <char>
 #>  1:             Age (years)      -    830     0.14 (0.11-0.16) < 0.001
-#>  2:                     Sex Female    450            reference       -
-#>  3:                           Male    400     0.86 (0.20-1.52)   0.010
-#>  4:           Disease Stage      I    211            reference       -
-#>  5:                             II    263     1.16 (0.29-2.02)   0.009
-#>  6:                            III    241     2.72 (1.84-3.60) < 0.001
-#>  7:                             IV    132     2.96 (1.92-4.01) < 0.001
-#>  8:                Diabetes     No    637            reference       -
-#>  9:                            Yes    197     2.59 (1.83-3.35) < 0.001
-#> 10: ECOG Performance Status      0    265            reference       -
-#> 11:                              1    302     2.12 (1.35-2.88) < 0.001
-#> 12:                              2    238     3.78 (2.96-4.59) < 0.001
+#>  2:                     Sex Female    442            reference       -
+#>  3:                           Male    388     0.86 (0.20-1.52)   0.010
+#>  4:           Disease Stage      I    207            reference       -
+#>  5:                             II    259     1.16 (0.29-2.02)   0.009
+#>  6:                            III    235     2.72 (1.84-3.60) < 0.001
+#>  7:                             IV    126     2.96 (1.92-4.01) < 0.001
+#>  8:                Diabetes     No    618            reference       -
+#>  9:                            Yes    196     2.59 (1.83-3.35) < 0.001
+#> 10: ECOG Performance Status      0    261            reference       -
+#> 11:                              1    295     2.12 (1.35-2.88) < 0.001
+#> 12:                              2    229     3.78 (2.96-4.59) < 0.001
 #> 13:                              3     37     4.90 (3.32-6.48) < 0.001
 ```
 
@@ -273,10 +281,13 @@ example3 <- uniscreen(
 example3
 #> 
 #> Univariable Screening Results
+#> 
 #> Outcome: Surv(os_months, os_status)
 #> Model Type: Cox PH
 #> Predictors Screened: 5
 #> Significant (p < 0.05): 5
+#> Observations analyzed: 842-850 of 850 (99.1-100.0%)
+#> Events analyzed: 602-609 of 609 (98.9-100.0%)
 #> 
 #>                    Variable   Group      n Events      HR (95% CI) p-value
 #>                      <char>  <char> <char> <char>           <char>  <char>
@@ -306,6 +317,7 @@ example5 <- uniscreen(
   data = clintrial,
   outcome = "readmission_30d",
   predictors = c("age", "sex", "stage"),
+  labels = clintrial_labels,
   model_type = "glm",
   keep_models = TRUE
 )
@@ -364,8 +376,10 @@ example6 <- fit(
 example6
 #> 
 #> Multivariable Logistic Model
+#> 
 #> Formula: readmission_30d ~ age + sex + treatment + stage + diabetes
-#> n = 834, Events = 417
+#> Observations analyzed: 834 of 850 (98.1%)
+#> Events analyzed: 417 of 427 (97.7%)
 #> 
 #>            Variable   Group      n Events     aOR (95% CI) p-value
 #>              <char>  <char> <char> <char>           <char>  <char>
@@ -399,8 +413,9 @@ example8 <- fit(
 example8
 #> 
 #> Multivariable Linear Model
+#> 
 #> Formula: los_days ~ age + sex + stage + ecog
-#> n = 822
+#> Observations analyzed: 822 of 850 (96.7%)
 #> 
 #>                    Variable  Group      n Adj. Coefficient (95% CI) p-value
 #>                      <char> <char> <char>                    <char>  <char>
@@ -433,17 +448,19 @@ example7 <- fit(
 example7
 #> 
 #> Multivariable Cox PH Model
+#> 
 #> Formula: Surv(os_months, os_status) ~ age + sex + treatment + stage
-#> n = 847, Events = 606
+#> Observations analyzed: 847 of 850 (99.6%)
+#> Events analyzed: 606 of 609 (99.5%)
 #> 
 #>            Variable   Group      n Events     aHR (95% CI) p-value
 #>              <char>  <char> <char> <char>           <char>  <char>
 #>  1:     Age (years)       -    847    606 1.04 (1.03-1.04) < 0.001
-#>  2:             Sex  Female    450    298        reference       -
-#>  3:                    Male    400    311 1.33 (1.13-1.56) < 0.001
-#>  4: Treatment Group Control    196    151        reference       -
+#>  2:             Sex  Female    449    297        reference       -
+#>  3:                    Male    398    309 1.33 (1.13-1.56) < 0.001
+#>  4: Treatment Group Control    194    149        reference       -
 #>  5:                  Drug A    292    184 0.56 (0.45-0.70) < 0.001
-#>  6:                  Drug B    362    274 0.83 (0.67-1.01)   0.062
+#>  6:                  Drug B    361    273 0.83 (0.67-1.01)   0.062
 #>  7:   Disease Stage       I    211    127        reference       -
 #>  8:                      II    263    172 1.16 (0.92-1.46)   0.214
 #>  9:                     III    241    186 1.90 (1.51-2.38) < 0.001
@@ -470,8 +487,10 @@ example9 <- fit(
 example9
 #> 
 #> Multivariable Poisson Model
+#> 
 #> Formula: fu_count ~ age + stage + treatment + surgery
-#> n = 839, Events = 5517
+#> Observations analyzed: 839 of 850 (98.7%)
+#> Events analyzed: 5,517 of 5,533 (99.7%)
 #> 
 #>               Variable   Group      n Events     aRR (95% CI) p-value
 #>                 <char>  <char> <char> <char>           <char>  <char>
@@ -511,8 +530,10 @@ example10 <- fit(
 example10
 #> 
 #> Multivariable Logistic Model
+#> 
 #> Formula: readmission_30d ~ sex + stage + treatment
-#> n = 398, Events = 216
+#> Observations analyzed: 847 of 850 (99.6%)
+#> Events analyzed: 425 of 427 (99.5%)
 #> 
 #>           Variable  Group      n Events     aOR (95% CI) p-value
 #>             <char> <char> <char> <char>           <char>  <char>
@@ -533,6 +554,7 @@ example11 <- fit(
   data = clintrial,
   outcome = "readmission_30d",
   predictors = c("age", "sex", "stage"),
+  labels = clintrial_labels,
   model_type = "glm",
   conf_level = 0.90
 )
@@ -540,18 +562,20 @@ example11 <- fit(
 example11
 #> 
 #> Multivariable Logistic Model
-#> Formula: readmission_30d ~ age + sex + stage
-#> n = 847, Events = 425
 #> 
-#>    Variable  Group      n Events     aOR (90% CI) p-value
-#>      <char> <char> <char> <char>           <char>  <char>
-#> 1:      age      -    847    425 1.03 (1.02-1.04) < 0.001
-#> 2:      sex Female    449    209        reference       -
-#> 3:            Male    398    216 1.41 (1.12-1.79)   0.014
-#> 4:    stage      I    211     89        reference       -
-#> 5:              II    263    126 1.28 (0.94-1.75)   0.196
-#> 6:             III    241    133 1.83 (1.33-2.52)   0.002
-#> 7:              IV    132     77 2.03 (1.39-2.96)   0.002
+#> Formula: readmission_30d ~ age + sex + stage
+#> Observations analyzed: 847 of 850 (99.6%)
+#> Events analyzed: 425 of 427 (99.5%)
+#> 
+#>         Variable  Group      n Events     aOR (90% CI) p-value
+#>           <char> <char> <char> <char>           <char>  <char>
+#> 1:   Age (years)      -    847    425 1.03 (1.02-1.04) < 0.001
+#> 2:           Sex Female    449    209        reference       -
+#> 3:                 Male    398    216 1.41 (1.12-1.79)   0.014
+#> 4: Disease Stage      I    211     89        reference       -
+#> 5:                   II    263    126 1.28 (0.94-1.75)   0.196
+#> 6:                  III    241    133 1.83 (1.33-2.52)   0.002
+#> 7:                   IV    132     77 2.03 (1.39-2.96)   0.002
 ```
 
 ### **Example 12:** Confidence Interval Method
@@ -580,6 +604,7 @@ example12a <- fit(
   data = clintrial,
   outcome = "readmission_30d",
   predictors = c("age", "sex", "stage"),
+  labels = clintrial_labels,
   model_type = "glm",
   conf_method = "profile"
 )
@@ -587,24 +612,27 @@ example12a <- fit(
 example12a
 #> 
 #> Multivariable Logistic Model
-#> Formula: readmission_30d ~ age + sex + stage
-#> n = 847, Events = 425
 #> 
-#>    Variable  Group      n Events     aOR (95% CI) p-value
-#>      <char> <char> <char> <char>           <char>  <char>
-#> 1:      age      -    847    425 1.03 (1.02-1.04) < 0.001
-#> 2:      sex Female    449    209        reference       -
-#> 3:            Male    398    216 1.41 (1.07-1.87)   0.014
-#> 4:    stage      I    211     89        reference       -
-#> 5:              II    263    126 1.28 (0.88-1.86)   0.196
-#> 6:             III    241    133 1.83 (1.25-2.68)   0.002
-#> 7:              IV    132     77 2.03 (1.30-3.19)   0.002
+#> Formula: readmission_30d ~ age + sex + stage
+#> Observations analyzed: 847 of 850 (99.6%)
+#> Events analyzed: 425 of 427 (99.5%)
+#> 
+#>         Variable  Group      n Events     aOR (95% CI) p-value
+#>           <char> <char> <char> <char>           <char>  <char>
+#> 1:   Age (years)      -    847    425 1.03 (1.02-1.04) < 0.001
+#> 2:           Sex Female    449    209        reference       -
+#> 3:                 Male    398    216 1.41 (1.07-1.87)   0.014
+#> 4: Disease Stage      I    211     89        reference       -
+#> 5:                   II    263    126 1.28 (0.88-1.86)   0.196
+#> 6:                  III    241    133 1.83 (1.25-2.68)   0.002
+#> 7:                   IV    132     77 2.03 (1.30-3.19)   0.002
 
 # Wald CIs (faster, suitable for simulation studies or exploratory work)
 example12b <- fit(
   data = clintrial,
   outcome = "readmission_30d",
   predictors = c("age", "sex", "stage"),
+  labels = clintrial_labels,
   model_type = "glm",
   conf_method = "wald"
 )
@@ -612,18 +640,20 @@ example12b <- fit(
 example12b
 #> 
 #> Multivariable Logistic Model
-#> Formula: readmission_30d ~ age + sex + stage
-#> n = 847, Events = 425
 #> 
-#>    Variable  Group      n Events     aOR (95% CI) p-value
-#>      <char> <char> <char> <char>           <char>  <char>
-#> 1:      age      -    847    425 1.03 (1.02-1.04) < 0.001
-#> 2:      sex Female    449    209        reference       -
-#> 3:            Male    398    216 1.41 (1.07-1.87)   0.014
-#> 4:    stage      I    211     89        reference       -
-#> 5:              II    263    126 1.28 (0.88-1.86)   0.196
-#> 6:             III    241    133 1.83 (1.25-2.67)   0.002
-#> 7:              IV    132     77 2.03 (1.29-3.18)   0.002
+#> Formula: readmission_30d ~ age + sex + stage
+#> Observations analyzed: 847 of 850 (99.6%)
+#> Events analyzed: 425 of 427 (99.5%)
+#> 
+#>         Variable  Group      n Events     aOR (95% CI) p-value
+#>           <char> <char> <char> <char>           <char>  <char>
+#> 1:   Age (years)      -    847    425 1.03 (1.02-1.04) < 0.001
+#> 2:           Sex Female    449    209        reference       -
+#> 3:                 Male    398    216 1.41 (1.07-1.87)   0.014
+#> 4: Disease Stage      I    211     89        reference       -
+#> 5:                   II    263    126 1.28 (0.88-1.86)   0.196
+#> 6:                  III    241    133 1.83 (1.25-2.67)   0.002
+#> 7:                   IV    132     77 2.03 (1.29-3.18)   0.002
 ```
 
 ### **Example 13:** Raw Coefficients
@@ -643,8 +673,10 @@ example13 <- fit(
 example13
 #> 
 #> Multivariable Logistic Model
+#> 
 #> Formula: readmission_30d ~ age + sex + stage
-#> n = 847, Events = 425
+#> Observations analyzed: 847 of 850 (99.6%)
+#> Events analyzed: 425 of 427 (99.5%)
 #> 
 #>    Variable  Group      n Events Adj. Coefficient (95% CI) p-value
 #>      <char> <char> <char> <char>                    <char>  <char>
@@ -706,11 +738,14 @@ example14 <- fullfit(
 example14
 #> 
 #> Fullfit Analysis Results
+#> 
 #> Outcome: readmission_30d
 #> Model Type: glm
 #> Method: screen (p < 0.05)
 #> Predictors Screened: 7
 #> Multivariable Predictors: 6
+#> Observations analyzed: 833-850 of 850 (98.0-100.0%)
+#> Events analyzed: 416-427 of 427 (97.4-100.0%)
 #> 
 #>                    Variable   Group      n Events      OR (95% CI)   Uni p     aOR (95% CI) Multi p
 #>                      <char>  <char> <char> <char>           <char>  <char>           <char>  <char>
@@ -750,11 +785,14 @@ example15 <- fullfit(
 example15
 #> 
 #> Fullfit Analysis Results
+#> 
 #> Outcome: any_complication
 #> Model Type: glm
 #> Method: all
 #> Predictors Screened: 4
 #> Multivariable Predictors: 4
+#> Observations analyzed: 847-850 of 850 (99.6-100.0%)
+#> Events analyzed: 477-480 of 480 (99.4-100.0%)
 #> 
 #>            Variable   Group      n Events      OR (95% CI)  Uni p     aOR (95% CI) Multi p
 #>              <char>  <char> <char> <char>           <char> <char>           <char>  <char>
@@ -789,11 +827,14 @@ example16 <- fullfit(
 example16
 #> 
 #> Fullfit Analysis Results
+#> 
 #> Outcome: icu_admission
 #> Model Type: glm
 #> Method: custom
 #> Predictors Screened: 6
 #> Multivariable Predictors: 4
+#> Observations analyzed: 833-850 of 850 (98.0-100.0%)
+#> Events analyzed: 312-320 of 320 (97.5-100.0%)
 #> 
 #>                    Variable   Group      n Events      OR (95% CI)   Uni p     aOR (95% CI) Multi p
 #>                      <char>  <char> <char> <char>           <char>  <char>           <char>  <char>
@@ -823,6 +864,7 @@ example17a <- fullfit(
   data = clintrial,
   outcome = "wound_infection",
   predictors = c("age", "sex", "stage"),
+  labels = clintrial_labels,
   model_type = "glm",
   columns = "uni"
 )
@@ -830,26 +872,30 @@ example17a <- fullfit(
 example17a
 #> 
 #> Fullfit Analysis Results
+#> 
 #> Outcome: wound_infection
 #> Model Type: glm
 #> Method: screen (p < 0.05)
 #> Predictors Screened: 3
+#> Observations analyzed: 847-850 of 850 (99.6-100.0%)
+#> Events analyzed: 166-167 of 167 (99.4-100.0%)
 #> 
-#>    Variable  Group      n Events      OR (95% CI) p-value
-#>      <char> <char> <char> <char>           <char>  <char>
-#> 1:      age      -    850    167 0.99 (0.98-1.01)   0.447
-#> 2:      sex Female    450     89        reference       -
-#> 3:            Male    400     78 0.98 (0.70-1.38)   0.919
-#> 4:    stage      I    211     51        reference       -
-#> 5:              II    263     52 0.77 (0.50-1.20)   0.249
-#> 6:             III    241     40 0.62 (0.39-0.99)   0.046
-#> 7:              IV    132     23 0.66 (0.38-1.14)   0.141
+#>         Variable  Group      n Events      OR (95% CI) p-value
+#>           <char> <char> <char> <char>           <char>  <char>
+#> 1:   Age (years)      -    850    167 0.99 (0.98-1.01)   0.447
+#> 2:           Sex Female    450     89        reference       -
+#> 3:                 Male    400     78 0.98 (0.70-1.38)   0.919
+#> 4: Disease Stage      I    211     51        reference       -
+#> 5:                   II    263     52 0.77 (0.50-1.20)   0.249
+#> 6:                  III    241     40 0.62 (0.39-0.99)   0.046
+#> 7:                   IV    132     23 0.66 (0.38-1.14)   0.141
 
 # Multivariable only
 example17b <- fullfit(
   data = clintrial,
   outcome = "wound_infection",
   predictors = c("age", "sex", "stage"),
+  labels = clintrial_labels,
   model_type = "glm",
   columns = "multi"
 )
@@ -857,18 +903,21 @@ example17b <- fullfit(
 example17b
 #> 
 #> Fullfit Analysis Results
+#> 
 #> Outcome: wound_infection
 #> Model Type: glm
 #> Method: screen (p < 0.05)
 #> Predictors Screened: 3
 #> Multivariable Predictors: 1
+#> Observations analyzed: 847-850 of 850 (99.6-100.0%)
+#> Events analyzed: 166-167 of 167 (99.4-100.0%)
 #> 
-#>    Variable  Group      n Events      OR (95% CI) p-value
-#>      <char> <char> <char> <char>           <char>  <char>
-#> 1:    stage      I    211     51        reference       -
-#> 2:              II    263     52 0.77 (0.50-1.20)   0.249
-#> 3:             III    241     40 0.62 (0.39-0.99)   0.046
-#> 4:              IV    132     23 0.66 (0.38-1.14)   0.141
+#>         Variable  Group      n Events      OR (95% CI) p-value
+#>           <char> <char> <char> <char>           <char>  <char>
+#> 1: Disease Stage      I    211     51        reference       -
+#> 2:                   II    263     52 0.77 (0.50-1.20)   0.249
+#> 3:                  III    241     40 0.62 (0.39-0.99)   0.046
+#> 4:                   IV    132     23 0.66 (0.38-1.14)   0.141
 ```
 
 ### **Example 18:** Survival Analysis
@@ -891,24 +940,27 @@ example18 <- fullfit(
 example18
 #> 
 #> Fullfit Analysis Results
+#> 
 #> Outcome: Surv(os_months, os_status)
 #> Model Type: coxph
 #> Method: screen (p < 0.1)
 #> Predictors Screened: 5
 #> Multivariable Predictors: 5
+#> Observations analyzed: 842-850 of 850 (99.1-100.0%)
+#> Events analyzed: 602-609 of 609 (98.9-100.0%)
 #> 
 #>                    Variable   Group      n Events      HR (95% CI)   Uni p     aHR (95% CI) Multi p
 #>                      <char>  <char> <char> <char>           <char>  <char>           <char>  <char>
 #>  1:             Age (years)       -    842    602 1.03 (1.03-1.04) < 0.001 1.04 (1.03-1.04) < 0.001
-#>  2:                     Sex  Female    450    298        reference       -        reference       -
-#>  3:                            Male    400    311 1.30 (1.11-1.53)   0.001 1.29 (1.10-1.52)   0.002
-#>  4:         Treatment Group Control    196    151        reference       -        reference       -
-#>  5:                          Drug A    292    184 0.64 (0.52-0.80) < 0.001 0.54 (0.44-0.68) < 0.001
-#>  6:                          Drug B    362    274 0.94 (0.77-1.15)   0.567 0.84 (0.69-1.03)   0.095
-#>  7:           Disease Stage       I    211    127        reference       -        reference       -
-#>  8:                              II    263    172 1.12 (0.89-1.41)   0.337 1.13 (0.90-1.43)   0.288
+#>  2:                     Sex  Female    448    296        reference       -        reference       -
+#>  3:                            Male    394    306 1.30 (1.11-1.53)   0.001 1.29 (1.10-1.52)   0.002
+#>  4:         Treatment Group Control    194    149        reference       -        reference       -
+#>  5:                          Drug A    291    183 0.64 (0.52-0.80) < 0.001 0.54 (0.44-0.68) < 0.001
+#>  6:                          Drug B    357    270 0.94 (0.77-1.15)   0.567 0.84 (0.69-1.03)   0.095
+#>  7:           Disease Stage       I    210    127        reference       -        reference       -
+#>  8:                              II    261    170 1.12 (0.89-1.41)   0.337 1.13 (0.90-1.43)   0.288
 #>  9:                             III    241    186 1.69 (1.35-2.11) < 0.001 1.93 (1.53-2.43) < 0.001
-#> 10:                              IV    132    121 3.18 (2.47-4.09) < 0.001 3.87 (2.98-5.01) < 0.001
+#> 10:                              IV    130    119 3.18 (2.47-4.09) < 0.001 3.87 (2.98-5.01) < 0.001
 #> 11: ECOG Performance Status       0    265    159        reference       -        reference       -
 #> 12:                               1    302    212 1.36 (1.11-1.67)   0.003 1.51 (1.22-1.85) < 0.001
 #> 13:                               2    238    194 1.86 (1.51-2.29) < 0.001 1.93 (1.56-2.39) < 0.001
@@ -943,8 +995,10 @@ example19 <- fit(
 example19
 #> 
 #> Multivariable Negative Binomial Model
+#> 
 #> Formula: ae_count ~ age + sex + diabetes + treatment
-#> n = 824, Events = 4506
+#> Observations analyzed: 824 of 850 (96.9%)
+#> Events analyzed: 4,506 of 4,599 (98.0%)
 #> 
 #>           Variable   Group      n Events     aRR (95% CI) p-value
 #>             <char>  <char> <char> <char>           <char>  <char>
@@ -983,8 +1037,9 @@ example20 <- fit(
 example20
 #> 
 #> Multivariable Gamma Model
+#> 
 #> Formula: los_days ~ age + ecog + stage + treatment
-#> n = 822
+#> Observations analyzed: 822 of 850 (96.7%)
 #> 
 #>                    Variable   Group      n Adj. Coefficient (95% CI) p-value
 #>                      <char>  <char> <char>                    <char>  <char>
@@ -1024,8 +1079,9 @@ example21 <- fit(
 example21
 #> 
 #> Multivariable Linear Mixed Model
+#> 
 #> Formula: los_days ~ age + sex + treatment + stage + (1|site)
-#> n = 827
+#> Observations analyzed: 827 of 850 (97.3%)
 #> 
 #>            Variable   Group      n Adj. Coefficient (95% CI) p-value
 #>              <char>  <char> <char>                    <char>  <char>
@@ -1062,8 +1118,10 @@ example22 <- fit(
 example22
 #> 
 #> Multivariable glmerMod Model
+#> 
 #> Formula: readmission_30d ~ age + sex + diabetes + treatment + (1|site)
-#> n = 834, Events = 417
+#> Observations analyzed: 834 of 850 (98.1%)
+#> Events analyzed: 417 of 427 (97.7%)
 #> 
 #>           Variable   Group      n Events     aOR (95% CI) p-value
 #>             <char>  <char> <char> <char>           <char>  <char>
@@ -1095,8 +1153,10 @@ example23 <- fit(
 example23
 #> 
 #> Multivariable glmerMod Model
+#> 
 #> Formula: fu_count ~ age + stage + treatment + (1|site)
-#> n = 839
+#> Observations analyzed: 839 of 850 (98.7%)
+#> Events analyzed: 5,517 of 5,533 (99.7%)
 #> 
 #>           Variable   Group      n Events     aRR (95% CI) p-value
 #>             <char>  <char> <char> <char>           <char>  <char>
@@ -1130,17 +1190,19 @@ example24 <- fit(
 example24
 #> 
 #> Multivariable Mixed Effects Cox Model
+#> 
 #> Formula: Surv(os_months, os_status) ~ age + sex + treatment + stage + (1|site)
-#> n = 847, Events = 606
+#> Observations analyzed: 847 of 850 (99.6%)
+#> Events analyzed: 606 of 609 (99.5%)
 #> 
 #>            Variable   Group      n Events     aHR (95% CI) p-value
 #>              <char>  <char> <char> <char>           <char>  <char>
 #>  1:     Age (years)       -    847    606 1.04 (1.03-1.05) < 0.001
-#>  2:             Sex  Female    450    298        reference       -
-#>  3:                    Male    400    311 1.36 (1.16-1.60) < 0.001
-#>  4: Treatment Group Control    196    151        reference       -
+#>  2:             Sex  Female    449    297        reference       -
+#>  3:                    Male    398    309 1.36 (1.16-1.60) < 0.001
+#>  4: Treatment Group Control    194    149        reference       -
 #>  5:                  Drug A    292    184 0.57 (0.46-0.72) < 0.001
-#>  6:                  Drug B    362    274 0.93 (0.76-1.14)   0.492
+#>  6:                  Drug B    361    273 0.93 (0.76-1.14)   0.492
 #>  7:   Disease Stage       I    211    127        reference       -
 #>  8:                      II    263    172 1.17 (0.93-1.48)   0.178
 #>  9:                     III    241    186 2.04 (1.62-2.58) < 0.001
@@ -1166,8 +1228,10 @@ example25 <- fit(
 example25
 #> 
 #> Multivariable Quasi-Binomial Model
+#> 
 #> Formula: any_complication ~ age + sex + diabetes + stage
-#> n = 834, Events = 468
+#> Observations analyzed: 834 of 850 (98.1%)
+#> Events analyzed: 468 of 480 (97.5%)
 #> 
 #>         Variable  Group      n Events     aOR (95% CI) p-value
 #>           <char> <char> <char> <char>           <char>  <char>
@@ -1217,15 +1281,17 @@ example26 <- fit(
 example26
 #> 
 #> Multivariable Conditional Logistic Model
+#> 
 #> Formula: case ~ smoking + diabetes + bmi + strata( match_id )
-#> n = 124, Events = 100
+#> Observations analyzed: 200 of 200 (100.0%)
+#> Events analyzed: 100 of 100 (100.0%)
 #> 
 #>    Variable  Group      n Events     aHR (95% CI) p-value
 #>      <char> <char> <char> <char>           <char>  <char>
-#> 1:  smoking     No    124    100        reference       -
-#> 2:             Yes     76    100 3.46 (1.48-8.12)   0.004
-#> 3: diabetes     No    140    100        reference       -
-#> 4:             Yes     60    100 0.90 (0.40-2.03)   0.795
+#> 1:  smoking     No    124     49        reference       -
+#> 2:             Yes     76     51 3.46 (1.48-8.12)   0.004
+#> 3: diabetes     No    140     70        reference       -
+#> 4:             Yes     60     30 0.90 (0.40-2.03)   0.795
 #> 5:      bmi      -    200    100 1.61 (1.30-2.00) < 0.001
 ```
 
@@ -1235,20 +1301,22 @@ The output shows odds ratios conditional on the matching strata.
 
 ## Exporting Results
 
-Regression tables can be exported to various formats:
+Regression tables can be exported to various formats using the
+[`tablesave()`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+dispatcher or the various per-format export functions:
 
 ``` r
 # Microsoft Word
 table2docx(
   table = example13,
-  file = file.path(tempdir(), "Table2_Regression.docx"),
+  file = "table2_regression.docx",
   caption = "Table 2. Univariable and Multivariable Analysis"
 )
 
 # PDF
 table2pdf(
   table = example13,
-  file = file.path(tempdir(), "Table2_Regression.pdf"),
+  file = "table2_regression.pdf",
   caption = "Table 2. Regression Results"
 )
 ```
@@ -1307,9 +1375,9 @@ confounding:
 
 Adequate events per predictor are required for stable estimation:
 
-- Logistic/Cox models: ≥10 events per predictor (rule of thumb)
-- Linear models: ≥10–20 observations per predictor
-- Mixed-effects models: ≥5–10 clusters recommended
+- Logistic/Cox models: ≥ 10 events per predictor (rule of thumb)
+- Linear models: ≥ 10–20 observations per predictor
+- Mixed-effects models: ≥ 5–10 clusters recommended
 - Use `method = "screen"` to reduce predictors when sample size is
   limited
 
@@ -1328,6 +1396,20 @@ sapply(clintrial[, c("age", "sex", "stage")], function(x) sum(is.na(x)))
 # Create complete-case dataset explicitly
 complete_data <- na.omit(clintrial[, c("readmission_30d", "age", "sex", "stage")])
 ```
+
+Printed output reports the analyzed sample against the data supplied,
+and, for model types that carry an event count, the analyzed events on
+the same basis:
+
+    Observations analyzed: 750 of 850 (88.2%)
+    Events analyzed: 382 of 382 (100.0%)
+
+The event denominator counts only events among observations with an
+observed outcome, since an observation whose outcome is missing cannot
+be classified as an event or a non-event. Where missingness is confined
+to the outcome, every identifiable event is therefore analyzed and that
+line reads 100%; a figure below 100% indicates events lost to missing
+covariates.
 
 ### Factor Reference Levels
 

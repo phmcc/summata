@@ -126,7 +126,7 @@ A `ggplot` object containing the complete forest plot. The plot can be:
 
 - Displayed directly: `print(plot)`
 
-- Saved to file: `ggsave("forest.pdf", plot, width = 12, height = 8)`
+- Saved to file: `forestsave(plot, "forest.pdf")`
 
 - Further customized with ggplot2 functions
 
@@ -197,10 +197,13 @@ for combined univariable/multivariable regression,
 [`uniscreen`](https://phmcc.codeberg.page/summata/reference/uniscreen.md)
 for univariable screening,
 [`multifit`](https://phmcc.codeberg.page/summata/reference/multifit.md)
-for multi-outcome analysis
+for multi-outcome analysis,
+[`forestsave`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+for saving with recommended dimensions
 
 Other visualization functions:
 [`coxforest()`](https://phmcc.codeberg.page/summata/reference/coxforest.md),
+[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md),
 [`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md),
 [`lmforest()`](https://phmcc.codeberg.page/summata/reference/lmforest.md),
 [`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md),
@@ -259,13 +262,11 @@ fit_result <- fit(
 )
 
 plot5 <- autoforest(fit_result)
-#> Recommended plot dimensions: width = 13.5 in, height = 5.0 in
-# No need to pass data or labels - extracted from fit_result
+#> Recommended plot dimensions: width = 15.3 in, height = 5.0 in
 
 # Save with recommended dimensions
-dims <- attr(plot5, "rec_dims")
-ggplot2::ggsave(file.path(tempdir(), "forest.pdf"),
-                plot5, width = dims$width, height = dims$height)
+forestsave(plot5, file.path(tempdir(), "forest.pdf"))
+#> Forest plot saved to /tmp/RtmptN10wa/forest.pdf (width = 15.3 in, height = 5.0 in)
 
 # }
 ```

@@ -1,4 +1,6 @@
 # Package Imports
 
-This file declares imports from base R and stats packages to avoid "no
-visible global function definition" warnings in R CMD check.
+Declares the imports that are called without a namespace prefix, so that
+R CMD check does not report them as undefined globals. Functions called
+as `package::function()` elsewhere in the package need no entry here,
+but their package must still appear under Imports in DESCRIPTION.

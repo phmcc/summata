@@ -21,7 +21,7 @@ although it can be used as a standalone function as well."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -98,7 +98,12 @@ although it can be used as a standalone function as well.</p>
 
 <dl><dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
 <dd><p>Data frame or data.table containing the dataset used to fit the
-model. Required for computing group-level sample sizes and event counts.</p></dd>
+model. Required for computing group-level sample sizes and event counts.
+Where the fitted object retains no model frame, the supplied data is
+restricted to complete cases across the model variables so that group-level
+sample sizes describe the observations actually used in fitting. Group
+sample sizes therefore sum to the model-level <code>n</code>, and both exclude
+observations with a missing response.</p></dd>
 
 
 <dt id="arg-model">model<a class="anchor" aria-label="anchor" href="#arg-model"></a></dt>
@@ -188,19 +193,22 @@ throughout a session.</p></dd>
       for continuous variables</p></dd>
 
     <dt>n</dt>
-<dd><p>Integer. Total sample size used in the model</p></dd>
+<dd><p>Integer. Number of observations used in fitting the model, that
+      is complete cases across the model variables</p></dd>
 
     <dt>n_group</dt>
-<dd><p>Integer. Sample size for this specific variable level
-      (factor variables only)</p></dd>
+<dd><p>Integer. Number of those observations at this variable
+      level (factor variables only). Group sizes sum to <code>n</code> within
+      each variable</p></dd>
 
     <dt>events</dt>
-<dd><p>Integer. Total number of events in the model (for survival
-      and logistic models)</p></dd>
+<dd><p>Integer. Number of events among the observations used in
+      fitting (for survival and logistic models)</p></dd>
 
     <dt>events_group</dt>
-<dd><p>Integer. Number of events for this specific variable
-      level (for survival and logistic models with factor variables)</p></dd>
+<dd><p>Integer. Number of events at this variable level
+      (for survival and logistic models with factor variables). Group counts
+      sum to <code>events</code> within each variable</p></dd>
 
     <dt>coefficient</dt>
 <dd><p>Numeric. Raw regression coefficient (log odds, log hazard,
@@ -338,8 +346,8 @@ forest plot visualization</p></div>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      model_scope model_type      term     n events coefficient          se       coef coef_lower coef_upper exp_coef exp_lower exp_upper       HR  ci_lower ci_upper statistic      p_value concordance concordance_se       rsq   rsq_max</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           &lt;char&gt;     &lt;char&gt;    &lt;char&gt; &lt;int&gt;  &lt;num&gt;       &lt;num&gt;       &lt;num&gt;      &lt;num&gt;      &lt;num&gt;      &lt;num&gt;    &lt;num&gt;     &lt;num&gt;     &lt;num&gt;    &lt;num&gt;     &lt;num&gt;    &lt;num&gt;     &lt;num&gt;        &lt;num&gt;       &lt;num&gt;          &lt;num&gt;     &lt;num&gt;     &lt;num&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1: Multivariable     Cox PH       age   847    606  0.03461725 0.003728664 0.03461725  0.0273092  0.0419253 1.035223 1.0276855  1.042817 1.035223 1.0276855 1.042817  9.284090 1.630945e-20   0.6691193     0.01092972 0.2039982 0.9998581</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2: Multivariable     Cox PH sexFemale   450    298  0.00000000          NA 0.00000000         NA         NA 1.000000        NA        NA 1.000000        NA       NA        NA           NA          NA             NA 0.2039982        NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3: Multivariable     Cox PH   sexMale   400    311  0.30621038 0.081605529 0.30621038  0.1462665  0.4661543 1.358268 1.1575046  1.593853 1.358268 1.1575046 1.593853  3.752324 1.752029e-04   0.6691193     0.01092972 0.2039982 0.9998581</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: Multivariable     Cox PH sexFemale   449    297  0.00000000          NA 0.00000000         NA         NA 1.000000        NA        NA 1.000000        NA       NA        NA           NA          NA             NA 0.2039982        NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3: Multivariable     Cox PH   sexMale   398    309  0.30621038 0.081605529 0.30621038  0.1462665  0.4661543 1.358268 1.1575046  1.593853 1.358268 1.1575046 1.593853  3.752324 1.752029e-04   0.6691193     0.01092972 0.2039982 0.9998581</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4: Multivariable     Cox PH    stageI   211    127  0.00000000          NA 0.00000000         NA         NA 1.000000        NA        NA 1.000000        NA       NA        NA           NA          NA             NA 0.2039982        NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5: Multivariable     Cox PH   stageII   263    172  0.12276723 0.117008958 0.12276723 -0.1065661  0.3521006 1.130621 0.8989156  1.422052 1.130621 0.8989156 1.422052  1.049212 2.940804e-01   0.6691193     0.01092972 0.2039982 0.9998581</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6: Multivariable     Cox PH  stageIII   241    186  0.59770106 0.115604112 0.59770106  0.3711212  0.8242810 1.817935 1.4493587  2.280241 1.817935 1.4493587 2.280241  5.170241 2.337929e-07   0.6691193     0.01092972 0.2039982 0.9998581</span>
@@ -347,8 +355,8 @@ forest plot visualization</p></div>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    likelihood_ratio_test likelihood_ratio_df likelihood_ratio_p wald_test wald_df       wald_p score_test score_df      score_p variable  group n_group events_group reference    sig sig_binary</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                    &lt;num&gt;               &lt;num&gt;              &lt;num&gt;     &lt;num&gt;   &lt;num&gt;        &lt;num&gt;      &lt;num&gt;    &lt;num&gt;        &lt;num&gt;   &lt;char&gt; &lt;char&gt;   &lt;num&gt;        &lt;num&gt;    &lt;char&gt; &lt;char&gt;     &lt;lgcl&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1:              193.2463                   5       7.903413e-40    198.43       5 6.155672e-41   207.1364        5 8.440913e-43      age             NA           NA              ***       TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:                    NA                  NA                 NA        NA      NA           NA         NA       NA           NA      sex Female     450          298 reference             FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:              193.2463                   5       7.903413e-40    198.43       5 6.155672e-41   207.1364        5 8.440913e-43      sex   Male     400          311              ***       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:                    NA                  NA                 NA        NA      NA           NA         NA       NA           NA      sex Female     449          297 reference             FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:              193.2463                   5       7.903413e-40    198.43       5 6.155672e-41   207.1364        5 8.440913e-43      sex   Male     398          309              ***       TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4:                    NA                  NA                 NA        NA      NA           NA         NA       NA           NA    stage      I     211          127 reference             FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5:              193.2463                   5       7.903413e-40    198.43       5 6.155672e-41   207.1364        5 8.440913e-43    stage     II     263          172                       FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6:              193.2463                   5       7.903413e-40    198.43       5 6.155672e-41   207.1364        5 8.440913e-43    stage    III     241          186              ***       TRUE</span>
@@ -409,7 +417,7 @@ forest plot visualization</p></div>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
 </div>
 
     </footer></div>

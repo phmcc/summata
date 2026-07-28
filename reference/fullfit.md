@@ -458,6 +458,18 @@ The table includes the following attributes:
   Character vector. Names of variables with p \< 0.05 in the
   multivariable model (or univariable if multivariable was not fitted)
 
+- analysis_counts:
+
+  List. How much of the supplied data reached the models, with elements
+  `n_supplied`, `n_analyzed`, `n_missing_outcome` and
+  `n_missing_predictor`, plus `events_supplied` and `events_analyzed`
+  where the model type carries an event count. The screening models and
+  the multivariable model rest on different samples whenever a predictor
+  carries missing values, so `n_analyzed` holds one value per model and
+  the reported sample may be a range. The
+  [`print()`](https://rdrr.io/r/base/print.html) method always reports
+  the analyzed sample
+
 ## Details
 
 **Analysis Workflow:**
@@ -502,7 +514,7 @@ The function implements a complete regression analysis pipeline:
 
 *"All" Method* (`method = "all"`):
 
-- No variable selection - includes all predictors
+- No variable selection; includes all predictors
 
 - Appropriate when all variables are theoretically important
 
@@ -569,7 +581,13 @@ fitting a single multivariable model,
 [`compfit`](https://phmcc.codeberg.page/summata/reference/compfit.md)
 for comparing multiple models,
 [`desctable`](https://phmcc.codeberg.page/summata/reference/desctable.md)
-for descriptive statistics
+for descriptive statistics,
+[`autoforest`](https://phmcc.codeberg.page/summata/reference/autoforest.md)
+for forest plots of the multivariable models,
+[`forestsave`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+for exporting forest plots,
+[`tablesave`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+for exporting tables
 
 Other regression functions:
 [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md),
@@ -605,11 +623,14 @@ result1 <- fullfit(
 print(result1)
 #> 
 #> Fullfit Analysis Results
+#> 
 #> Outcome: os_status
 #> Model Type: glm
 #> Method: screen (p < 0.05)
 #> Predictors Screened: 8
 #> Multivariable Predictors: 5
+#> Observations analyzed: 833-850 of 850 (98.0-100.0%)
+#> Events analyzed: 594-609 of 609 (97.5-100.0%)
 #> 
 #>                    Variable   Group      n Events       OR (95% CI)   Uni p      aOR (95% CI) Multi p
 #>                      <char>  <char> <char> <char>            <char>  <char>            <char>  <char>
@@ -631,8 +652,6 @@ print(result1)
 #> 16:                              II    261    170  1.25 (0.86-1.82)   0.243  1.26 (0.84-1.90)   0.263
 #> 17:                             III    237    182  2.24 (1.49-3.38) < 0.001  2.54 (1.64-3.99) < 0.001
 #> 18:                              IV    128    117 7.28 (3.85-15.04) < 0.001 8.61 (4.40-18.33) < 0.001
-# Shows both univariable and multivariable results
-# Only significant univariable predictors in multivariable model
 
 # \donttest{
 
@@ -649,11 +668,14 @@ result2 <- fullfit(
 print(result2)
 #> 
 #> Fullfit Analysis Results
+#> 
 #> Outcome: os_status
 #> Model Type: glm
 #> Method: all
 #> Predictors Screened: 4
 #> Multivariable Predictors: 4
+#> Observations analyzed: 847-850 of 850 (99.6-100.0%)
+#> Events analyzed: 606-609 of 609 (99.5-100.0%)
 #> 
 #>            Variable   Group      n Events       OR (95% CI)   Uni p      aOR (95% CI) Multi p
 #>              <char>  <char> <char> <char>            <char>  <char>            <char>  <char>
@@ -682,11 +704,14 @@ result3 <- fullfit(
 print(result3)
 #> 
 #> Fullfit Analysis Results
+#> 
 #> Outcome: os_status
 #> Model Type: glm
 #> Method: custom
 #> Predictors Screened: 6
 #> Multivariable Predictors: 3
+#> Observations analyzed: 833-850 of 850 (98.0-100.0%)
+#> Events analyzed: 594-609 of 609 (97.5-100.0%)
 #> 
 #>                    Variable   Group      n Events       OR (95% CI)   Uni p      aOR (95% CI) Multi p
 #>                      <char>  <char> <char> <char>            <char>  <char>            <char>  <char>
@@ -704,7 +729,6 @@ print(result3)
 #> 12:                              II    263    172  1.25 (0.86-1.82)   0.243  1.31 (0.88-1.95)   0.181
 #> 13:                             III    241    186  2.24 (1.49-3.38) < 0.001  2.56 (1.66-3.96) < 0.001
 #> 14:                              IV    132    121 7.28 (3.85-15.04) < 0.001 8.43 (4.36-17.76) < 0.001
-# Univariable for all, multivariable for selected only
 
 # Example 4: Cox regression with screening
 library(survival)
@@ -722,20 +746,23 @@ cox_result <- fullfit(
 print(cox_result)
 #> 
 #> Fullfit Analysis Results
+#> 
 #> Outcome: Surv(os_months, os_status)
 #> Model Type: coxph
 #> Method: screen (p < 0.1)
 #> Predictors Screened: 4
 #> Multivariable Predictors: 4
+#> Observations analyzed: 847-850 of 850 (99.6-100.0%)
+#> Events analyzed: 606-609 of 609 (99.5-100.0%)
 #> 
 #>            Variable   Group      n Events      HR (95% CI)   Uni p     aHR (95% CI) Multi p
 #>              <char>  <char> <char> <char>           <char>  <char>           <char>  <char>
 #>  1:     Age (years)       -    847    606 1.03 (1.03-1.04) < 0.001 1.04 (1.03-1.04) < 0.001
-#>  2:             Sex  Female    450    298        reference       -        reference       -
-#>  3:                    Male    400    311 1.30 (1.11-1.53)   0.001 1.33 (1.13-1.56) < 0.001
-#>  4: Treatment Group Control    196    151        reference       -        reference       -
+#>  2:             Sex  Female    449    297        reference       -        reference       -
+#>  3:                    Male    398    309 1.30 (1.11-1.53)   0.001 1.33 (1.13-1.56) < 0.001
+#>  4: Treatment Group Control    194    149        reference       -        reference       -
 #>  5:                  Drug A    292    184 0.64 (0.52-0.80) < 0.001 0.56 (0.45-0.70) < 0.001
-#>  6:                  Drug B    362    274 0.94 (0.77-1.15)   0.567 0.83 (0.67-1.01)   0.062
+#>  6:                  Drug B    361    273 0.94 (0.77-1.15)   0.567 0.83 (0.67-1.01)   0.062
 #>  7:   Disease Stage       I    211    127        reference       -        reference       -
 #>  8:                      II    263    172 1.12 (0.89-1.41)   0.337 1.16 (0.92-1.46)   0.214
 #>  9:                     III    241    186 1.69 (1.35-2.11) < 0.001 1.90 (1.51-2.38) < 0.001
@@ -755,11 +782,13 @@ linear_result <- fullfit(
 print(linear_result)
 #> 
 #> Fullfit Analysis Results
+#> 
 #> Outcome: bmi
 #> Model Type: lm
 #> Method: all
 #> Predictors Screened: 4
 #> Multivariable Predictors: 4
+#> Observations analyzed: 833-838 of 850 (98.0-98.6%)
 #> 
 #>                       Variable   Group      n  Coefficient (95% CI)  Uni p Adj. Coefficient (95% CI) Multi p
 #>                         <char>  <char> <char>                <char> <char>                    <char>  <char>
@@ -786,11 +815,14 @@ poisson_result <- fullfit(
 print(poisson_result)
 #> 
 #> Fullfit Analysis Results
+#> 
 #> Outcome: fu_count
 #> Model Type: glm
 #> Method: all
 #> Predictors Screened: 4
 #> Multivariable Predictors: 4
+#> Observations analyzed: 839-842 of 850 (98.7-99.1%)
+#> Events analyzed: 5,517-5,533 of 5,533 (99.7-100.0%)
 #> 
 #>               Variable   Group      n Events      RR (95% CI)   Uni p     aRR (95% CI) Multi p
 #>                 <char>  <char> <char> <char>           <char>  <char>           <char>  <char>
@@ -818,11 +850,14 @@ multi_only <- fullfit(
 print(multi_only)
 #> 
 #> Fullfit Analysis Results
+#> 
 #> Outcome: os_status
 #> Model Type: glm
 #> Method: all
 #> Predictors Screened: 4
 #> Multivariable Predictors: 4
+#> Observations analyzed: 847-850 of 850 (99.6-100.0%)
+#> Events analyzed: 606-609 of 609 (99.5-100.0%)
 #> 
 #>            Variable   Group      n Events      aOR (95% CI) p-value
 #>              <char>  <char> <char> <char>            <char>  <char>
@@ -843,31 +878,35 @@ both <- fullfit(
     outcome = "os_status",
     predictors = c("age", "sex", "treatment", "stage"),
     method = "all",
-    return_type = "both"
+    return_type = "both",
+    labels = clintrial_labels
 )
 #> Running univariable analysis...
 #> Fitting multivariable model with 4 predictors...
 print(both$table)
 #> 
 #> Fullfit Analysis Results
+#> 
 #> Outcome: os_status
 #> Model Type: glm
 #> Method: all
 #> Predictors Screened: 4
 #> Multivariable Predictors: 4
+#> Observations analyzed: 847-850 of 850 (99.6-100.0%)
+#> Events analyzed: 606-609 of 609 (99.5-100.0%)
 #> 
-#>      Variable   Group      n Events       OR (95% CI)   Uni p      aOR (95% CI) Multi p
-#>        <char>  <char> <char> <char>            <char>  <char>            <char>  <char>
-#>  1:       age       -    847    606  1.05 (1.03-1.06) < 0.001  1.05 (1.04-1.07) < 0.001
-#>  2:       sex  Female    449    297         reference       -         reference       -
-#>  3:              Male    398    309  1.78 (1.31-2.43) < 0.001  2.02 (1.45-2.83) < 0.001
-#>  4: treatment Control    194    149         reference       -         reference       -
-#>  5:            Drug A    292    184  0.51 (0.34-0.76)   0.001  0.44 (0.28-0.68) < 0.001
-#>  6:            Drug B    361    273  0.93 (0.61-1.39)   0.721  0.74 (0.47-1.16)   0.192
-#>  7:     stage       I    211    127         reference       -         reference       -
-#>  8:                II    263    172  1.25 (0.86-1.82)   0.243  1.32 (0.88-1.97)   0.181
-#>  9:               III    241    186  2.24 (1.49-3.38) < 0.001  2.70 (1.74-4.21) < 0.001
-#> 10:                IV    132    121 7.28 (3.85-15.04) < 0.001 9.08 (4.66-19.28) < 0.001
+#>            Variable   Group      n Events       OR (95% CI)   Uni p      aOR (95% CI) Multi p
+#>              <char>  <char> <char> <char>            <char>  <char>            <char>  <char>
+#>  1:     Age (years)       -    847    606  1.05 (1.03-1.06) < 0.001  1.05 (1.04-1.07) < 0.001
+#>  2:             Sex  Female    449    297         reference       -         reference       -
+#>  3:                    Male    398    309  1.78 (1.31-2.43) < 0.001  2.02 (1.45-2.83) < 0.001
+#>  4: Treatment Group Control    194    149         reference       -         reference       -
+#>  5:                  Drug A    292    184  0.51 (0.34-0.76)   0.001  0.44 (0.28-0.68) < 0.001
+#>  6:                  Drug B    361    273  0.93 (0.61-1.39)   0.721  0.74 (0.47-1.16)   0.192
+#>  7:   Disease Stage       I    211    127         reference       -         reference       -
+#>  8:                      II    263    172  1.25 (0.86-1.82)   0.243  1.32 (0.88-1.97)   0.181
+#>  9:                     III    241    186  2.24 (1.49-3.38) < 0.001  2.70 (1.74-4.21) < 0.001
+#> 10:                      IV    132    121 7.28 (3.85-15.04) < 0.001 9.08 (4.66-19.28) < 0.001
 summary(both$model)
 #> 
 #> Call:
@@ -946,11 +985,13 @@ if (requireNamespace("lme4", quietly = TRUE)) {
 #> Fitting multivariable model with 4 predictors...
 #> 
 #> Fullfit Analysis Results
+#> 
 #> Outcome: los_days
 #> Model Type: lmer
 #> Method: all
 #> Predictors Screened: 4
 #> Multivariable Predictors: 4
+#> Observations analyzed: 827-830 of 850 (97.3-97.6%)
 #> 
 #>               Variable   Group      n  Coefficient (95% CI)   Uni p Adj. Coefficient (95% CI) Multi p
 #>                 <char>  <char> <char>                <char>  <char>                    <char>  <char>

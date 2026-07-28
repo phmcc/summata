@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -129,8 +129,8 @@ for regression analysis:</p>
 </table>
 <p>All functions support a wide range of model types including linear
 models, generalized linear models (logistic, Poisson, Gaussian, Gamma,
-negative binomial), Cox proportional hazards models, and mixed-effects
-models, with consistent syntax and formatted output.</p>
+negative binomial, <em>etc.</em>), Cox proportional hazards models, and
+mixed-effects models, with consistent syntax and formatted output.</p>
 <p>As with other <code>summata</code> functions, these functions adhere
 to the standard calling convention:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
@@ -384,8 +384,8 @@ identifies candidate predictors for multivariable modeling.</p>
 Regression)<a class="anchor" aria-label="anchor" href="#example-1-binary-outcome-screen-logistic-regression"></a>
 </h3>
 <p>For binary outcomes, use <code>model_type = "glm"</code> (logistic
-regression is the default family). Here we examine predictors of 30-day
-hospital readmission:</p>
+regression is the default family). The following example examines
+predictors of 30-day hospital readmission:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">screening_vars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"race"</span>, <span class="st">"bmi"</span>, <span class="st">"smoking"</span>, </span>
 <span>                    <span class="st">"diabetes"</span>, <span class="st">"stage"</span>, <span class="st">"ecog"</span>, <span class="st">"treatment"</span><span class="op">)</span></span>
@@ -401,10 +401,13 @@ hospital readmission:</p>
 <span><span class="va">example1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Univariable Screening Results</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Outcome: readmission_30d</span></span>
 <span><span class="co">#&gt; Model Type: Logistic</span></span>
 <span><span class="co">#&gt; Predictors Screened: 9</span></span>
 <span><span class="co">#&gt; Significant (p &lt; 0.05): 7</span></span>
+<span><span class="co">#&gt; Observations analyzed: 833-850 of 850 (98.0-100.0%)</span></span>
+<span><span class="co">#&gt; Events analyzed: 416-427 of 427 (97.4-100.0%)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                    Variable   Group      n Events       OR (95% CI) p-value</span></span>
 <span><span class="co">#&gt;                      &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;            &lt;char&gt;  &lt;char&gt;</span></span>
@@ -457,10 +460,13 @@ meeting a significance criterion:</p>
 <span><span class="va">example2</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Univariable Screening Results</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Outcome: readmission_30d</span></span>
 <span><span class="co">#&gt; Model Type: Logistic</span></span>
 <span><span class="co">#&gt; Predictors Screened: 9</span></span>
 <span><span class="co">#&gt; Significant (p &lt; 0.01): 5</span></span>
+<span><span class="co">#&gt; Observations analyzed: 833-850 of 850 (98.0-100.0%)</span></span>
+<span><span class="co">#&gt; Events analyzed: 416-427 of 427 (97.4-100.0%)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                    Variable   Group      n Events       OR (95% CI) p-value</span></span>
 <span><span class="co">#&gt;                      &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;            &lt;char&gt;  &lt;char&gt;</span></span>
@@ -509,25 +515,27 @@ Regression)<a class="anchor" aria-label="anchor" href="#example-3-continuous-out
 <span><span class="va">example4</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Univariable Screening Results</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Outcome: los_days</span></span>
 <span><span class="co">#&gt; Model Type: Linear</span></span>
 <span><span class="co">#&gt; Predictors Screened: 5</span></span>
 <span><span class="co">#&gt; Significant (p &lt; 0.05): 5</span></span>
+<span><span class="co">#&gt; Observations analyzed: 814-830 of 850 (95.8-97.6%)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                    Variable  Group      n Coefficient (95% CI) p-value</span></span>
 <span><span class="co">#&gt;                      &lt;char&gt; &lt;char&gt; &lt;char&gt;               &lt;char&gt;  &lt;char&gt;</span></span>
 <span><span class="co">#&gt;  1:             Age (years)      -    830     0.14 (0.11-0.16) &lt; 0.001</span></span>
-<span><span class="co">#&gt;  2:                     Sex Female    450            reference       -</span></span>
-<span><span class="co">#&gt;  3:                           Male    400     0.86 (0.20-1.52)   0.010</span></span>
-<span><span class="co">#&gt;  4:           Disease Stage      I    211            reference       -</span></span>
-<span><span class="co">#&gt;  5:                             II    263     1.16 (0.29-2.02)   0.009</span></span>
-<span><span class="co">#&gt;  6:                            III    241     2.72 (1.84-3.60) &lt; 0.001</span></span>
-<span><span class="co">#&gt;  7:                             IV    132     2.96 (1.92-4.01) &lt; 0.001</span></span>
-<span><span class="co">#&gt;  8:                Diabetes     No    637            reference       -</span></span>
-<span><span class="co">#&gt;  9:                            Yes    197     2.59 (1.83-3.35) &lt; 0.001</span></span>
-<span><span class="co">#&gt; 10: ECOG Performance Status      0    265            reference       -</span></span>
-<span><span class="co">#&gt; 11:                              1    302     2.12 (1.35-2.88) &lt; 0.001</span></span>
-<span><span class="co">#&gt; 12:                              2    238     3.78 (2.96-4.59) &lt; 0.001</span></span>
+<span><span class="co">#&gt;  2:                     Sex Female    442            reference       -</span></span>
+<span><span class="co">#&gt;  3:                           Male    388     0.86 (0.20-1.52)   0.010</span></span>
+<span><span class="co">#&gt;  4:           Disease Stage      I    207            reference       -</span></span>
+<span><span class="co">#&gt;  5:                             II    259     1.16 (0.29-2.02)   0.009</span></span>
+<span><span class="co">#&gt;  6:                            III    235     2.72 (1.84-3.60) &lt; 0.001</span></span>
+<span><span class="co">#&gt;  7:                             IV    126     2.96 (1.92-4.01) &lt; 0.001</span></span>
+<span><span class="co">#&gt;  8:                Diabetes     No    618            reference       -</span></span>
+<span><span class="co">#&gt;  9:                            Yes    196     2.59 (1.83-3.35) &lt; 0.001</span></span>
+<span><span class="co">#&gt; 10: ECOG Performance Status      0    261            reference       -</span></span>
+<span><span class="co">#&gt; 11:                              1    295     2.12 (1.35-2.88) &lt; 0.001</span></span>
+<span><span class="co">#&gt; 12:                              2    229     3.78 (2.96-4.59) &lt; 0.001</span></span>
 <span><span class="co">#&gt; 13:                              3     37     4.90 (3.32-6.48) &lt; 0.001</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -549,10 +557,13 @@ notation and set <code>model_type = "coxph"</code>:</p>
 <span><span class="va">example3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Univariable Screening Results</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Outcome: Surv(os_months, os_status)</span></span>
 <span><span class="co">#&gt; Model Type: Cox PH</span></span>
 <span><span class="co">#&gt; Predictors Screened: 5</span></span>
 <span><span class="co">#&gt; Significant (p &lt; 0.05): 5</span></span>
+<span><span class="co">#&gt; Observations analyzed: 842-850 of 850 (99.1-100.0%)</span></span>
+<span><span class="co">#&gt; Events analyzed: 602-609 of 609 (98.9-100.0%)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                    Variable   Group      n Events      HR (95% CI) p-value</span></span>
 <span><span class="co">#&gt;                      &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
@@ -582,6 +593,7 @@ objects for diagnostics:</p>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcome <span class="op">=</span> <span class="st">"readmission_30d"</span>,</span>
 <span>  predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"stage"</span><span class="op">)</span>,</span>
+<span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span>
 <span>  model_type <span class="op">=</span> <span class="st">"glm"</span>,</span>
 <span>  keep_models <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
@@ -640,8 +652,10 @@ consistent function calling.</p>
 <span><span class="va">example6</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Multivariable Logistic Model</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Formula: readmission_30d ~ age + sex + treatment + stage + diabetes</span></span>
-<span><span class="co">#&gt; n = 834, Events = 417</span></span>
+<span><span class="co">#&gt; Observations analyzed: 834 of 850 (98.1%)</span></span>
+<span><span class="co">#&gt; Events analyzed: 417 of 427 (97.7%)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;            Variable   Group      n Events     aOR (95% CI) p-value</span></span>
 <span><span class="co">#&gt;              &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
@@ -675,8 +689,9 @@ consistent function calling.</p>
 <span><span class="va">example8</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Multivariable Linear Model</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Formula: los_days ~ age + sex + stage + ecog</span></span>
-<span><span class="co">#&gt; n = 822</span></span>
+<span><span class="co">#&gt; Observations analyzed: 822 of 850 (96.7%)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                    Variable  Group      n Adj. Coefficient (95% CI) p-value</span></span>
 <span><span class="co">#&gt;                      &lt;char&gt; &lt;char&gt; &lt;char&gt;                    &lt;char&gt;  &lt;char&gt;</span></span>
@@ -709,17 +724,19 @@ consistent function calling.</p>
 <span><span class="va">example7</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Multivariable Cox PH Model</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Formula: Surv(os_months, os_status) ~ age + sex + treatment + stage</span></span>
-<span><span class="co">#&gt; n = 847, Events = 606</span></span>
+<span><span class="co">#&gt; Observations analyzed: 847 of 850 (99.6%)</span></span>
+<span><span class="co">#&gt; Events analyzed: 606 of 609 (99.5%)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;            Variable   Group      n Events     aHR (95% CI) p-value</span></span>
 <span><span class="co">#&gt;              &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
 <span><span class="co">#&gt;  1:     Age (years)       -    847    606 1.04 (1.03-1.04) &lt; 0.001</span></span>
-<span><span class="co">#&gt;  2:             Sex  Female    450    298        reference       -</span></span>
-<span><span class="co">#&gt;  3:                    Male    400    311 1.33 (1.13-1.56) &lt; 0.001</span></span>
-<span><span class="co">#&gt;  4: Treatment Group Control    196    151        reference       -</span></span>
+<span><span class="co">#&gt;  2:             Sex  Female    449    297        reference       -</span></span>
+<span><span class="co">#&gt;  3:                    Male    398    309 1.33 (1.13-1.56) &lt; 0.001</span></span>
+<span><span class="co">#&gt;  4: Treatment Group Control    194    149        reference       -</span></span>
 <span><span class="co">#&gt;  5:                  Drug A    292    184 0.56 (0.45-0.70) &lt; 0.001</span></span>
-<span><span class="co">#&gt;  6:                  Drug B    362    274 0.83 (0.67-1.01)   0.062</span></span>
+<span><span class="co">#&gt;  6:                  Drug B    361    273 0.83 (0.67-1.01)   0.062</span></span>
 <span><span class="co">#&gt;  7:   Disease Stage       I    211    127        reference       -</span></span>
 <span><span class="co">#&gt;  8:                      II    263    172 1.16 (0.92-1.46)   0.214</span></span>
 <span><span class="co">#&gt;  9:                     III    241    186 1.90 (1.51-2.38) &lt; 0.001</span></span>
@@ -747,8 +764,10 @@ Poisson):</p>
 <span><span class="va">example9</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Multivariable Poisson Model</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Formula: fu_count ~ age + stage + treatment + surgery</span></span>
-<span><span class="co">#&gt; n = 839, Events = 5517</span></span>
+<span><span class="co">#&gt; Observations analyzed: 839 of 850 (98.7%)</span></span>
+<span><span class="co">#&gt; Events analyzed: 5,517 of 5,533 (99.7%)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;               Variable   Group      n Events     aRR (95% CI) p-value</span></span>
 <span><span class="co">#&gt;                 &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
@@ -788,8 +807,10 @@ Factors<a class="anchor" aria-label="anchor" href="#example-10-toggling-referenc
 <span><span class="va">example10</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Multivariable Logistic Model</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Formula: readmission_30d ~ sex + stage + treatment</span></span>
-<span><span class="co">#&gt; n = 398, Events = 216</span></span>
+<span><span class="co">#&gt; Observations analyzed: 847 of 850 (99.6%)</span></span>
+<span><span class="co">#&gt; Events analyzed: 425 of 427 (99.5%)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;           Variable  Group      n Events     aOR (95% CI) p-value</span></span>
 <span><span class="co">#&gt;             &lt;char&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
@@ -811,6 +832,7 @@ width:</p>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcome <span class="op">=</span> <span class="st">"readmission_30d"</span>,</span>
 <span>  predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"stage"</span><span class="op">)</span>,</span>
+<span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span>
 <span>  model_type <span class="op">=</span> <span class="st">"glm"</span>,</span>
 <span>  conf_level <span class="op">=</span> <span class="fl">0.90</span></span>
 <span><span class="op">)</span></span>
@@ -818,18 +840,20 @@ width:</p>
 <span><span class="va">example11</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Multivariable Logistic Model</span></span>
-<span><span class="co">#&gt; Formula: readmission_30d ~ age + sex + stage</span></span>
-<span><span class="co">#&gt; n = 847, Events = 425</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;    Variable  Group      n Events     aOR (90% CI) p-value</span></span>
-<span><span class="co">#&gt;      &lt;char&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
-<span><span class="co">#&gt; 1:      age      -    847    425 1.03 (1.02-1.04) &lt; 0.001</span></span>
-<span><span class="co">#&gt; 2:      sex Female    449    209        reference       -</span></span>
-<span><span class="co">#&gt; 3:            Male    398    216 1.41 (1.12-1.79)   0.014</span></span>
-<span><span class="co">#&gt; 4:    stage      I    211     89        reference       -</span></span>
-<span><span class="co">#&gt; 5:              II    263    126 1.28 (0.94-1.75)   0.196</span></span>
-<span><span class="co">#&gt; 6:             III    241    133 1.83 (1.33-2.52)   0.002</span></span>
-<span><span class="co">#&gt; 7:              IV    132     77 2.03 (1.39-2.96)   0.002</span></span></code></pre></div>
+<span><span class="co">#&gt; Formula: readmission_30d ~ age + sex + stage</span></span>
+<span><span class="co">#&gt; Observations analyzed: 847 of 850 (99.6%)</span></span>
+<span><span class="co">#&gt; Events analyzed: 425 of 427 (99.5%)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;         Variable  Group      n Events     aOR (90% CI) p-value</span></span>
+<span><span class="co">#&gt;           &lt;char&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
+<span><span class="co">#&gt; 1:   Age (years)      -    847    425 1.03 (1.02-1.04) &lt; 0.001</span></span>
+<span><span class="co">#&gt; 2:           Sex Female    449    209        reference       -</span></span>
+<span><span class="co">#&gt; 3:                 Male    398    216 1.41 (1.12-1.79)   0.014</span></span>
+<span><span class="co">#&gt; 4: Disease Stage      I    211     89        reference       -</span></span>
+<span><span class="co">#&gt; 5:                   II    263    126 1.28 (0.94-1.75)   0.196</span></span>
+<span><span class="co">#&gt; 6:                  III    241    133 1.83 (1.33-2.52)   0.002</span></span>
+<span><span class="co">#&gt; 7:                   IV    132     77 2.03 (1.39-2.96)   0.002</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="example-12-confidence-interval-method">
@@ -896,6 +920,7 @@ edge cases. To set Wald intervals as the default method globally, use
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcome <span class="op">=</span> <span class="st">"readmission_30d"</span>,</span>
 <span>  predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"stage"</span><span class="op">)</span>,</span>
+<span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span>
 <span>  model_type <span class="op">=</span> <span class="st">"glm"</span>,</span>
 <span>  conf_method <span class="op">=</span> <span class="st">"profile"</span></span>
 <span><span class="op">)</span></span>
@@ -903,24 +928,27 @@ edge cases. To set Wald intervals as the default method globally, use
 <span><span class="va">example12a</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Multivariable Logistic Model</span></span>
-<span><span class="co">#&gt; Formula: readmission_30d ~ age + sex + stage</span></span>
-<span><span class="co">#&gt; n = 847, Events = 425</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;    Variable  Group      n Events     aOR (95% CI) p-value</span></span>
-<span><span class="co">#&gt;      &lt;char&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
-<span><span class="co">#&gt; 1:      age      -    847    425 1.03 (1.02-1.04) &lt; 0.001</span></span>
-<span><span class="co">#&gt; 2:      sex Female    449    209        reference       -</span></span>
-<span><span class="co">#&gt; 3:            Male    398    216 1.41 (1.07-1.87)   0.014</span></span>
-<span><span class="co">#&gt; 4:    stage      I    211     89        reference       -</span></span>
-<span><span class="co">#&gt; 5:              II    263    126 1.28 (0.88-1.86)   0.196</span></span>
-<span><span class="co">#&gt; 6:             III    241    133 1.83 (1.25-2.68)   0.002</span></span>
-<span><span class="co">#&gt; 7:              IV    132     77 2.03 (1.30-3.19)   0.002</span></span>
+<span><span class="co">#&gt; Formula: readmission_30d ~ age + sex + stage</span></span>
+<span><span class="co">#&gt; Observations analyzed: 847 of 850 (99.6%)</span></span>
+<span><span class="co">#&gt; Events analyzed: 425 of 427 (99.5%)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;         Variable  Group      n Events     aOR (95% CI) p-value</span></span>
+<span><span class="co">#&gt;           &lt;char&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
+<span><span class="co">#&gt; 1:   Age (years)      -    847    425 1.03 (1.02-1.04) &lt; 0.001</span></span>
+<span><span class="co">#&gt; 2:           Sex Female    449    209        reference       -</span></span>
+<span><span class="co">#&gt; 3:                 Male    398    216 1.41 (1.07-1.87)   0.014</span></span>
+<span><span class="co">#&gt; 4: Disease Stage      I    211     89        reference       -</span></span>
+<span><span class="co">#&gt; 5:                   II    263    126 1.28 (0.88-1.86)   0.196</span></span>
+<span><span class="co">#&gt; 6:                  III    241    133 1.83 (1.25-2.68)   0.002</span></span>
+<span><span class="co">#&gt; 7:                   IV    132     77 2.03 (1.30-3.19)   0.002</span></span>
 <span></span>
 <span><span class="co"># Wald CIs (faster, suitable for simulation studies or exploratory work)</span></span>
 <span><span class="va">example12b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcome <span class="op">=</span> <span class="st">"readmission_30d"</span>,</span>
 <span>  predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"stage"</span><span class="op">)</span>,</span>
+<span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span>
 <span>  model_type <span class="op">=</span> <span class="st">"glm"</span>,</span>
 <span>  conf_method <span class="op">=</span> <span class="st">"wald"</span></span>
 <span><span class="op">)</span></span>
@@ -928,18 +956,20 @@ edge cases. To set Wald intervals as the default method globally, use
 <span><span class="va">example12b</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Multivariable Logistic Model</span></span>
-<span><span class="co">#&gt; Formula: readmission_30d ~ age + sex + stage</span></span>
-<span><span class="co">#&gt; n = 847, Events = 425</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;    Variable  Group      n Events     aOR (95% CI) p-value</span></span>
-<span><span class="co">#&gt;      &lt;char&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
-<span><span class="co">#&gt; 1:      age      -    847    425 1.03 (1.02-1.04) &lt; 0.001</span></span>
-<span><span class="co">#&gt; 2:      sex Female    449    209        reference       -</span></span>
-<span><span class="co">#&gt; 3:            Male    398    216 1.41 (1.07-1.87)   0.014</span></span>
-<span><span class="co">#&gt; 4:    stage      I    211     89        reference       -</span></span>
-<span><span class="co">#&gt; 5:              II    263    126 1.28 (0.88-1.86)   0.196</span></span>
-<span><span class="co">#&gt; 6:             III    241    133 1.83 (1.25-2.67)   0.002</span></span>
-<span><span class="co">#&gt; 7:              IV    132     77 2.03 (1.29-3.18)   0.002</span></span></code></pre></div>
+<span><span class="co">#&gt; Formula: readmission_30d ~ age + sex + stage</span></span>
+<span><span class="co">#&gt; Observations analyzed: 847 of 850 (99.6%)</span></span>
+<span><span class="co">#&gt; Events analyzed: 425 of 427 (99.5%)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;         Variable  Group      n Events     aOR (95% CI) p-value</span></span>
+<span><span class="co">#&gt;           &lt;char&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
+<span><span class="co">#&gt; 1:   Age (years)      -    847    425 1.03 (1.02-1.04) &lt; 0.001</span></span>
+<span><span class="co">#&gt; 2:           Sex Female    449    209        reference       -</span></span>
+<span><span class="co">#&gt; 3:                 Male    398    216 1.41 (1.07-1.87)   0.014</span></span>
+<span><span class="co">#&gt; 4: Disease Stage      I    211     89        reference       -</span></span>
+<span><span class="co">#&gt; 5:                   II    263    126 1.28 (0.88-1.86)   0.196</span></span>
+<span><span class="co">#&gt; 6:                  III    241    133 1.83 (1.25-2.67)   0.002</span></span>
+<span><span class="co">#&gt; 7:                   IV    132     77 2.03 (1.29-3.18)   0.002</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="example-13-raw-coefficients">
@@ -960,8 +990,10 @@ display log-scale coefficients (<em>β</em> rather than
 <span><span class="va">example13</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Multivariable Logistic Model</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Formula: readmission_30d ~ age + sex + stage</span></span>
-<span><span class="co">#&gt; n = 847, Events = 425</span></span>
+<span><span class="co">#&gt; Observations analyzed: 847 of 850 (99.6%)</span></span>
+<span><span class="co">#&gt; Events analyzed: 425 of 427 (99.5%)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;    Variable  Group      n Events Adj. Coefficient (95% CI) p-value</span></span>
 <span><span class="co">#&gt;      &lt;char&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;                    &lt;char&gt;  &lt;char&gt;</span></span>
@@ -1037,11 +1069,14 @@ analysis:</p>
 <span><span class="va">example14</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Fullfit Analysis Results</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Outcome: readmission_30d</span></span>
 <span><span class="co">#&gt; Model Type: glm</span></span>
 <span><span class="co">#&gt; Method: screen (p &lt; 0.05)</span></span>
 <span><span class="co">#&gt; Predictors Screened: 7</span></span>
 <span><span class="co">#&gt; Multivariable Predictors: 6</span></span>
+<span><span class="co">#&gt; Observations analyzed: 833-850 of 850 (98.0-100.0%)</span></span>
+<span><span class="co">#&gt; Events analyzed: 416-427 of 427 (97.4-100.0%)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                    Variable   Group      n Events      OR (95% CI)   Uni p     aOR (95% CI) Multi p</span></span>
 <span><span class="co">#&gt;                      &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
@@ -1081,11 +1116,14 @@ in both univariable and multivariable analysis:</p>
 <span><span class="va">example15</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Fullfit Analysis Results</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Outcome: any_complication</span></span>
 <span><span class="co">#&gt; Model Type: glm</span></span>
 <span><span class="co">#&gt; Method: all</span></span>
 <span><span class="co">#&gt; Predictors Screened: 4</span></span>
 <span><span class="co">#&gt; Multivariable Predictors: 4</span></span>
+<span><span class="co">#&gt; Observations analyzed: 847-850 of 850 (99.6-100.0%)</span></span>
+<span><span class="co">#&gt; Events analyzed: 477-480 of 480 (99.4-100.0%)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;            Variable   Group      n Events      OR (95% CI)  Uni p     aOR (95% CI) Multi p</span></span>
 <span><span class="co">#&gt;              &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
@@ -1121,11 +1159,14 @@ specification of multivariable predictors via the
 <span><span class="va">example16</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Fullfit Analysis Results</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Outcome: icu_admission</span></span>
 <span><span class="co">#&gt; Model Type: glm</span></span>
 <span><span class="co">#&gt; Method: custom</span></span>
 <span><span class="co">#&gt; Predictors Screened: 6</span></span>
 <span><span class="co">#&gt; Multivariable Predictors: 4</span></span>
+<span><span class="co">#&gt; Observations analyzed: 833-850 of 850 (98.0-100.0%)</span></span>
+<span><span class="co">#&gt; Events analyzed: 312-320 of 320 (97.5-100.0%)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                    Variable   Group      n Events      OR (95% CI)   Uni p     aOR (95% CI) Multi p</span></span>
 <span><span class="co">#&gt;                      &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
@@ -1156,6 +1197,7 @@ displayed:</p>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcome <span class="op">=</span> <span class="st">"wound_infection"</span>,</span>
 <span>  predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"stage"</span><span class="op">)</span>,</span>
+<span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span>
 <span>  model_type <span class="op">=</span> <span class="st">"glm"</span>,</span>
 <span>  columns <span class="op">=</span> <span class="st">"uni"</span></span>
 <span><span class="op">)</span></span>
@@ -1163,26 +1205,30 @@ displayed:</p>
 <span><span class="va">example17a</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Fullfit Analysis Results</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Outcome: wound_infection</span></span>
 <span><span class="co">#&gt; Model Type: glm</span></span>
 <span><span class="co">#&gt; Method: screen (p &lt; 0.05)</span></span>
 <span><span class="co">#&gt; Predictors Screened: 3</span></span>
+<span><span class="co">#&gt; Observations analyzed: 847-850 of 850 (99.6-100.0%)</span></span>
+<span><span class="co">#&gt; Events analyzed: 166-167 of 167 (99.4-100.0%)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;    Variable  Group      n Events      OR (95% CI) p-value</span></span>
-<span><span class="co">#&gt;      &lt;char&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
-<span><span class="co">#&gt; 1:      age      -    850    167 0.99 (0.98-1.01)   0.447</span></span>
-<span><span class="co">#&gt; 2:      sex Female    450     89        reference       -</span></span>
-<span><span class="co">#&gt; 3:            Male    400     78 0.98 (0.70-1.38)   0.919</span></span>
-<span><span class="co">#&gt; 4:    stage      I    211     51        reference       -</span></span>
-<span><span class="co">#&gt; 5:              II    263     52 0.77 (0.50-1.20)   0.249</span></span>
-<span><span class="co">#&gt; 6:             III    241     40 0.62 (0.39-0.99)   0.046</span></span>
-<span><span class="co">#&gt; 7:              IV    132     23 0.66 (0.38-1.14)   0.141</span></span>
+<span><span class="co">#&gt;         Variable  Group      n Events      OR (95% CI) p-value</span></span>
+<span><span class="co">#&gt;           &lt;char&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
+<span><span class="co">#&gt; 1:   Age (years)      -    850    167 0.99 (0.98-1.01)   0.447</span></span>
+<span><span class="co">#&gt; 2:           Sex Female    450     89        reference       -</span></span>
+<span><span class="co">#&gt; 3:                 Male    400     78 0.98 (0.70-1.38)   0.919</span></span>
+<span><span class="co">#&gt; 4: Disease Stage      I    211     51        reference       -</span></span>
+<span><span class="co">#&gt; 5:                   II    263     52 0.77 (0.50-1.20)   0.249</span></span>
+<span><span class="co">#&gt; 6:                  III    241     40 0.62 (0.39-0.99)   0.046</span></span>
+<span><span class="co">#&gt; 7:                   IV    132     23 0.66 (0.38-1.14)   0.141</span></span>
 <span></span>
 <span><span class="co"># Multivariable only</span></span>
 <span><span class="va">example17b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fullfit.html">fullfit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcome <span class="op">=</span> <span class="st">"wound_infection"</span>,</span>
 <span>  predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"stage"</span><span class="op">)</span>,</span>
+<span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span>
 <span>  model_type <span class="op">=</span> <span class="st">"glm"</span>,</span>
 <span>  columns <span class="op">=</span> <span class="st">"multi"</span></span>
 <span><span class="op">)</span></span>
@@ -1190,18 +1236,21 @@ displayed:</p>
 <span><span class="va">example17b</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Fullfit Analysis Results</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Outcome: wound_infection</span></span>
 <span><span class="co">#&gt; Model Type: glm</span></span>
 <span><span class="co">#&gt; Method: screen (p &lt; 0.05)</span></span>
 <span><span class="co">#&gt; Predictors Screened: 3</span></span>
 <span><span class="co">#&gt; Multivariable Predictors: 1</span></span>
+<span><span class="co">#&gt; Observations analyzed: 847-850 of 850 (99.6-100.0%)</span></span>
+<span><span class="co">#&gt; Events analyzed: 166-167 of 167 (99.4-100.0%)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;    Variable  Group      n Events      OR (95% CI) p-value</span></span>
-<span><span class="co">#&gt;      &lt;char&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
-<span><span class="co">#&gt; 1:    stage      I    211     51        reference       -</span></span>
-<span><span class="co">#&gt; 2:              II    263     52 0.77 (0.50-1.20)   0.249</span></span>
-<span><span class="co">#&gt; 3:             III    241     40 0.62 (0.39-0.99)   0.046</span></span>
-<span><span class="co">#&gt; 4:              IV    132     23 0.66 (0.38-1.14)   0.141</span></span></code></pre></div>
+<span><span class="co">#&gt;         Variable  Group      n Events      OR (95% CI) p-value</span></span>
+<span><span class="co">#&gt;           &lt;char&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
+<span><span class="co">#&gt; 1: Disease Stage      I    211     51        reference       -</span></span>
+<span><span class="co">#&gt; 2:                   II    263     52 0.77 (0.50-1.20)   0.249</span></span>
+<span><span class="co">#&gt; 3:                  III    241     40 0.62 (0.39-0.99)   0.046</span></span>
+<span><span class="co">#&gt; 4:                   IV    132     23 0.66 (0.38-1.14)   0.141</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="example-18-survival-analysis">
@@ -1224,24 +1273,27 @@ specifying <code><a href="https://rdrr.io/pkg/survival/man/Surv.html" class="ext
 <span><span class="va">example18</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Fullfit Analysis Results</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Outcome: Surv(os_months, os_status)</span></span>
 <span><span class="co">#&gt; Model Type: coxph</span></span>
 <span><span class="co">#&gt; Method: screen (p &lt; 0.1)</span></span>
 <span><span class="co">#&gt; Predictors Screened: 5</span></span>
 <span><span class="co">#&gt; Multivariable Predictors: 5</span></span>
+<span><span class="co">#&gt; Observations analyzed: 842-850 of 850 (99.1-100.0%)</span></span>
+<span><span class="co">#&gt; Events analyzed: 602-609 of 609 (98.9-100.0%)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                    Variable   Group      n Events      HR (95% CI)   Uni p     aHR (95% CI) Multi p</span></span>
 <span><span class="co">#&gt;                      &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
 <span><span class="co">#&gt;  1:             Age (years)       -    842    602 1.03 (1.03-1.04) &lt; 0.001 1.04 (1.03-1.04) &lt; 0.001</span></span>
-<span><span class="co">#&gt;  2:                     Sex  Female    450    298        reference       -        reference       -</span></span>
-<span><span class="co">#&gt;  3:                            Male    400    311 1.30 (1.11-1.53)   0.001 1.29 (1.10-1.52)   0.002</span></span>
-<span><span class="co">#&gt;  4:         Treatment Group Control    196    151        reference       -        reference       -</span></span>
-<span><span class="co">#&gt;  5:                          Drug A    292    184 0.64 (0.52-0.80) &lt; 0.001 0.54 (0.44-0.68) &lt; 0.001</span></span>
-<span><span class="co">#&gt;  6:                          Drug B    362    274 0.94 (0.77-1.15)   0.567 0.84 (0.69-1.03)   0.095</span></span>
-<span><span class="co">#&gt;  7:           Disease Stage       I    211    127        reference       -        reference       -</span></span>
-<span><span class="co">#&gt;  8:                              II    263    172 1.12 (0.89-1.41)   0.337 1.13 (0.90-1.43)   0.288</span></span>
+<span><span class="co">#&gt;  2:                     Sex  Female    448    296        reference       -        reference       -</span></span>
+<span><span class="co">#&gt;  3:                            Male    394    306 1.30 (1.11-1.53)   0.001 1.29 (1.10-1.52)   0.002</span></span>
+<span><span class="co">#&gt;  4:         Treatment Group Control    194    149        reference       -        reference       -</span></span>
+<span><span class="co">#&gt;  5:                          Drug A    291    183 0.64 (0.52-0.80) &lt; 0.001 0.54 (0.44-0.68) &lt; 0.001</span></span>
+<span><span class="co">#&gt;  6:                          Drug B    357    270 0.94 (0.77-1.15)   0.567 0.84 (0.69-1.03)   0.095</span></span>
+<span><span class="co">#&gt;  7:           Disease Stage       I    210    127        reference       -        reference       -</span></span>
+<span><span class="co">#&gt;  8:                              II    261    170 1.12 (0.89-1.41)   0.337 1.13 (0.90-1.43)   0.288</span></span>
 <span><span class="co">#&gt;  9:                             III    241    186 1.69 (1.35-2.11) &lt; 0.001 1.93 (1.53-2.43) &lt; 0.001</span></span>
-<span><span class="co">#&gt; 10:                              IV    132    121 3.18 (2.47-4.09) &lt; 0.001 3.87 (2.98-5.01) &lt; 0.001</span></span>
+<span><span class="co">#&gt; 10:                              IV    130    119 3.18 (2.47-4.09) &lt; 0.001 3.87 (2.98-5.01) &lt; 0.001</span></span>
 <span><span class="co">#&gt; 11: ECOG Performance Status       0    265    159        reference       -        reference       -</span></span>
 <span><span class="co">#&gt; 12:                               1    302    212 1.36 (1.11-1.67)   0.003 1.51 (1.22-1.85) &lt; 0.001</span></span>
 <span><span class="co">#&gt; 13:                               2    238    194 1.86 (1.51-2.29) &lt; 0.001 1.93 (1.56-2.39) &lt; 0.001</span></span>
@@ -1276,8 +1328,10 @@ with overdispersion, making it ideal for this demonstration.</p>
 <span><span class="va">example19</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Multivariable Negative Binomial Model</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Formula: ae_count ~ age + sex + diabetes + treatment</span></span>
-<span><span class="co">#&gt; n = 824, Events = 4506</span></span>
+<span><span class="co">#&gt; Observations analyzed: 824 of 850 (96.9%)</span></span>
+<span><span class="co">#&gt; Events analyzed: 4,506 of 4,599 (98.0%)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;           Variable   Group      n Events     aRR (95% CI) p-value</span></span>
 <span><span class="co">#&gt;             &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
@@ -1317,8 +1371,9 @@ coefficients then represent multiplicative effects on the mean. When
 <span><span class="va">example20</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Multivariable Gamma Model</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Formula: los_days ~ age + ecog + stage + treatment</span></span>
-<span><span class="co">#&gt; n = 822</span></span>
+<span><span class="co">#&gt; Observations analyzed: 822 of 850 (96.7%)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;                    Variable   Group      n Adj. Coefficient (95% CI) p-value</span></span>
 <span><span class="co">#&gt;                      &lt;char&gt;  &lt;char&gt; &lt;char&gt;                    &lt;char&gt;  &lt;char&gt;</span></span>
@@ -1358,8 +1413,9 @@ notation in the predictors:</p>
 <span><span class="va">example21</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Multivariable Linear Mixed Model</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Formula: los_days ~ age + sex + treatment + stage + (1|site)</span></span>
-<span><span class="co">#&gt; n = 827</span></span>
+<span><span class="co">#&gt; Observations analyzed: 827 of 850 (97.3%)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;            Variable   Group      n Adj. Coefficient (95% CI) p-value</span></span>
 <span><span class="co">#&gt;              &lt;char&gt;  &lt;char&gt; &lt;char&gt;                    &lt;char&gt;  &lt;char&gt;</span></span>
@@ -1395,8 +1451,10 @@ requires the <code>lme4</code> package.</p>
 <span><span class="va">example22</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Multivariable glmerMod Model</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Formula: readmission_30d ~ age + sex + diabetes + treatment + (1|site)</span></span>
-<span><span class="co">#&gt; n = 834, Events = 417</span></span>
+<span><span class="co">#&gt; Observations analyzed: 834 of 850 (98.1%)</span></span>
+<span><span class="co">#&gt; Events analyzed: 417 of 427 (97.7%)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;           Variable   Group      n Events     aOR (95% CI) p-value</span></span>
 <span><span class="co">#&gt;             &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
@@ -1429,8 +1487,10 @@ assume equidispersion:</p>
 <span><span class="va">example23</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Multivariable glmerMod Model</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Formula: fu_count ~ age + stage + treatment + (1|site)</span></span>
-<span><span class="co">#&gt; n = 839</span></span>
+<span><span class="co">#&gt; Observations analyzed: 839 of 850 (98.7%)</span></span>
+<span><span class="co">#&gt; Events analyzed: 5,517 of 5,533 (99.7%)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;           Variable   Group      n Events     aRR (95% CI) p-value</span></span>
 <span><span class="co">#&gt;             &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
@@ -1464,17 +1524,19 @@ with site-level random effects:</p>
 <span><span class="va">example24</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Multivariable Mixed Effects Cox Model</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Formula: Surv(os_months, os_status) ~ age + sex + treatment + stage + (1|site)</span></span>
-<span><span class="co">#&gt; n = 847, Events = 606</span></span>
+<span><span class="co">#&gt; Observations analyzed: 847 of 850 (99.6%)</span></span>
+<span><span class="co">#&gt; Events analyzed: 606 of 609 (99.5%)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;            Variable   Group      n Events     aHR (95% CI) p-value</span></span>
 <span><span class="co">#&gt;              &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
 <span><span class="co">#&gt;  1:     Age (years)       -    847    606 1.04 (1.03-1.05) &lt; 0.001</span></span>
-<span><span class="co">#&gt;  2:             Sex  Female    450    298        reference       -</span></span>
-<span><span class="co">#&gt;  3:                    Male    400    311 1.36 (1.16-1.60) &lt; 0.001</span></span>
-<span><span class="co">#&gt;  4: Treatment Group Control    196    151        reference       -</span></span>
+<span><span class="co">#&gt;  2:             Sex  Female    449    297        reference       -</span></span>
+<span><span class="co">#&gt;  3:                    Male    398    309 1.36 (1.16-1.60) &lt; 0.001</span></span>
+<span><span class="co">#&gt;  4: Treatment Group Control    194    149        reference       -</span></span>
 <span><span class="co">#&gt;  5:                  Drug A    292    184 0.57 (0.46-0.72) &lt; 0.001</span></span>
-<span><span class="co">#&gt;  6:                  Drug B    362    274 0.93 (0.76-1.14)   0.492</span></span>
+<span><span class="co">#&gt;  6:                  Drug B    361    273 0.93 (0.76-1.14)   0.492</span></span>
 <span><span class="co">#&gt;  7:   Disease Stage       I    211    127        reference       -</span></span>
 <span><span class="co">#&gt;  8:                      II    263    172 1.17 (0.93-1.48)   0.178</span></span>
 <span><span class="co">#&gt;  9:                     III    241    186 2.04 (1.62-2.58) &lt; 0.001</span></span>
@@ -1501,8 +1563,10 @@ more appropriate standard errors.</p>
 <span><span class="va">example25</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Multivariable Quasi-Binomial Model</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Formula: any_complication ~ age + sex + diabetes + stage</span></span>
-<span><span class="co">#&gt; n = 834, Events = 468</span></span>
+<span><span class="co">#&gt; Observations analyzed: 834 of 850 (98.1%)</span></span>
+<span><span class="co">#&gt; Events analyzed: 468 of 480 (97.5%)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;         Variable  Group      n Events     aOR (95% CI) p-value</span></span>
 <span><span class="co">#&gt;           &lt;char&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
@@ -1554,15 +1618,17 @@ stratification variable should be specified using the
 <span><span class="va">example26</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Multivariable Conditional Logistic Model</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Formula: case ~ smoking + diabetes + bmi + strata( match_id )</span></span>
-<span><span class="co">#&gt; n = 124, Events = 100</span></span>
+<span><span class="co">#&gt; Observations analyzed: 200 of 200 (100.0%)</span></span>
+<span><span class="co">#&gt; Events analyzed: 100 of 100 (100.0%)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;    Variable  Group      n Events     aHR (95% CI) p-value</span></span>
 <span><span class="co">#&gt;      &lt;char&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span></span>
-<span><span class="co">#&gt; 1:  smoking     No    124    100        reference       -</span></span>
-<span><span class="co">#&gt; 2:             Yes     76    100 3.46 (1.48-8.12)   0.004</span></span>
-<span><span class="co">#&gt; 3: diabetes     No    140    100        reference       -</span></span>
-<span><span class="co">#&gt; 4:             Yes     60    100 0.90 (0.40-2.03)   0.795</span></span>
+<span><span class="co">#&gt; 1:  smoking     No    124     49        reference       -</span></span>
+<span><span class="co">#&gt; 2:             Yes     76     51 3.46 (1.48-8.12)   0.004</span></span>
+<span><span class="co">#&gt; 3: diabetes     No    140     70        reference       -</span></span>
+<span><span class="co">#&gt; 4:             Yes     60     30 0.90 (0.40-2.03)   0.795</span></span>
 <span><span class="co">#&gt; 5:      bmi      -    200    100 1.61 (1.30-2.00) &lt; 0.001</span></span></code></pre></div>
 <p>The output shows odds ratios conditional on the matching strata.</p>
 <hr>
@@ -1571,19 +1637,21 @@ stratification variable should be specified using the
 <div class="section level2">
 <h2 id="exporting-results">Exporting Results<a class="anchor" aria-label="anchor" href="#exporting-results"></a>
 </h2>
-<p>Regression tables can be exported to various formats:</p>
+<p>Regression tables can be exported to various formats using the
+<code><a href="../reference/tablesave.html">tablesave()</a></code> dispatcher or the various per-format export
+functions:</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Microsoft Word</span></span>
 <span><span class="fu"><a href="../reference/table2docx.html">table2docx</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">example13</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table2_Regression.docx"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"table2_regression.docx"</span>,</span>
 <span>  caption <span class="op">=</span> <span class="st">"Table 2. Univariable and Multivariable Analysis"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># PDF</span></span>
 <span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">example13</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table2_Regression.pdf"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"table2_regression.pdf"</span>,</span>
 <span>  caption <span class="op">=</span> <span class="st">"Table 2. Regression Results"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>See the <a href="table_export.html">Table Export</a> vignette for
@@ -1721,9 +1789,9 @@ carefully</li>
 </h3>
 <p>Adequate events per predictor are required for stable estimation:</p>
 <ul>
-<li>Logistic/Cox models: ≥10 events per predictor (rule of thumb)</li>
-<li>Linear models: ≥10–20 observations per predictor</li>
-<li>Mixed-effects models: ≥5–10 clusters recommended</li>
+<li>Logistic/Cox models: ≥ 10 events per predictor (rule of thumb)</li>
+<li>Linear models: ≥ 10–20 observations per predictor</li>
+<li>Mixed-effects models: ≥ 5–10 clusters recommended</li>
 <li>Use <code>method = "screen"</code> to reduce predictors when sample
 size is limited</li>
 </ul>
@@ -1743,12 +1811,23 @@ size is limited</li>
 <span></span>
 <span><span class="co"># Create complete-case dataset explicitly</span></span>
 <span><span class="va">complete_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="va">clintrial</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"readmission_30d"</span>, <span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"stage"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<p>Printed output reports the analyzed sample against the data supplied,
+and, for model types that carry an event count, the analyzed events on
+the same basis:</p>
+<pre><code>Observations analyzed: 750 of 850 (88.2%)
+Events analyzed: 382 of 382 (100.0%)</code></pre>
+<p>The event denominator counts only events among observations with an
+observed outcome, since an observation whose outcome is missing cannot
+be classified as an event or a non-event. Where missingness is confined
+to the outcome, every identifiable event is therefore analyzed and that
+line reads 100%; a figure below 100% indicates events lost to missing
+covariates.</p>
 </div>
 <div class="section level3">
 <h3 id="factor-reference-levels">Factor Reference Levels<a class="anchor" aria-label="anchor" href="#factor-reference-levels"></a>
 </h3>
 <p>Ensure reference categories are set appropriately:</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Set specific reference level</span></span>
 <span><span class="va">clintrial</span><span class="op">$</span><span class="va">stage</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/relevel.html" class="external-link">relevel</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">clintrial</span><span class="op">$</span><span class="va">stage</span><span class="op">)</span>, ref <span class="op">=</span> <span class="st">"I"</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -1756,7 +1835,7 @@ size is limited</li>
 <h3 id="convergence-issues">Convergence Issues<a class="anchor" aria-label="anchor" href="#convergence-issues"></a>
 </h3>
 <p>For models that fail to converge:</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Access model for diagnostics</span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span><span class="va">data</span>, <span class="va">outcome</span>, <span class="va">predictors</span>, model_type <span class="op">=</span> <span class="st">"glm"</span><span class="op">)</span></span>
 <span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">result</span>, <span class="st">"model"</span><span class="op">)</span></span>
@@ -1771,7 +1850,7 @@ size is limited</li>
 <h3 id="overdispersion-diagnostics">Overdispersion Diagnostics<a class="anchor" aria-label="anchor" href="#overdispersion-diagnostics"></a>
 </h3>
 <p>To check for overdispersion in Poisson or binomial models:</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Fit Poisson model</span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span><span class="va">data</span>, <span class="va">outcome</span>, <span class="va">predictors</span>, model_type <span class="op">=</span> <span class="st">"glm"</span>, family <span class="op">=</span> <span class="st">"poisson"</span><span class="op">)</span></span>
 <span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">result</span>, <span class="st">"model"</span><span class="op">)</span></span>
@@ -1787,7 +1866,7 @@ size is limited</li>
 </h3>
 <p>Mixed-effects models can be sensitive to starting values and
 optimization:</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Increase iterations</span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
@@ -1845,7 +1924,7 @@ Interactions and mixed-effects models</li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
 </div>
 
     </footer>

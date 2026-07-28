@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,9 +60,31 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.12.0" id="summata-0120-2026-07-28">
+<em>summata</em> 0.12.0 (2026-07-28)<a class="anchor" aria-label="anchor" href="#summata-0120-2026-07-28"></a></h2>
+<ul><li>Fix <em>n</em>/Events counts to report complete cases across all functions, so group sizes sum to the model <em>n</em>; empty factor levels now report zero, and <code><a href="../reference/multifit.html">multifit()</a></code> adjusted columns match <code><a href="../reference/fullfit.html">fullfit()</a></code> (STROBE item 12)</li>
+<li>Report the analyzed sample and events in <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> methods and forest plot footers, with counts available via the <code>analysis_counts</code> attribute</li>
+<li>Import <code><a href="https://rdrr.io/pkg/survival/man/Surv.html" class="external-link">Surv()</a></code>, <code><a href="https://rdrr.io/pkg/survival/man/strata.html" class="external-link">strata()</a></code>, <code><a href="https://rdrr.io/pkg/survival/man/cluster.html" class="external-link">cluster()</a></code>, and <code><a href="https://rdrr.io/pkg/survival/man/coxph.html" class="external-link">coxph()</a></code> from <code>survival</code> to fix <code>clogit</code> and <code>coxme</code> failures when the package is not attached by the user</li>
+<li>Fix coefficient parsing for variable names that share a prefix or contain regular expression metacharacters</li>
+<li>Fix <code><a href="../reference/uniforest.html">uniforest()</a></code> to draw factor levels in their established order rather than alphabetically when <code>indent_groups = TRUE</code>
+</li>
+<li>Fix counts of 100,000 or greater displaying in exponential notation, and centralize count formatting in a vectorized <code><a href="../reference/format_count.html">format_count()</a></code>
+</li>
+<li>Carry variable labels from the regression functions through to the forest plot functions, so labels supplied once apply to both table and plot</li>
+<li>Add <code><a href="../reference/forestsave.html">forestsave()</a></code> for saving forest plots at their recommended dimensions, with format-appropriate graphics devices and optional font embedding; <code>rec_dims</code> now records its units</li>
+<li>Rename <code><a href="../reference/tablesave.html">autotable()</a></code> to <code><a href="../reference/tablesave.html">tablesave()</a></code>, pairing it with <code><a href="../reference/forestsave.html">forestsave()</a></code> and distinguishing it from <code><a href="../reference/autoforest.html">autoforest()</a></code>, which detects model class rather than file format; <code><a href="../reference/tablesave.html">autotable()</a></code> is retained as a deprecated alias</li>
+<li>Add <code>quiet</code> argument to <code><a href="../reference/tablesave.html">tablesave()</a></code> and the <code>table2*()</code> functions, and return the file path invisibly from <code><a href="../reference/table2pdf.html">table2pdf()</a></code>, <code><a href="../reference/table2html.html">table2html()</a></code>, and <code><a href="../reference/table2tex.html">table2tex()</a></code>
+</li>
+<li>Add <code>table_data</code> attribute to the forest plot functions for access to the values drawn in the figure</li>
+<li>Add <code><a href="../reference/compfit.html">compfit()</a></code> warning when candidate models are fitted to different numbers of observations</li>
+<li>Suppress spurious diagnostics: singular-fit messages from mixed-effects screening, the deprecated <code>lme4::findbars()</code> call, the <code><a href="https://rdrr.io/pkg/MuMIn/man/r.squaredGLMM.html" class="external-link">MuMIn::r.squaredGLMM()</a></code> null model advisory, and the Hosmer-Lemeshow test where fitted values are too few to bin</li>
+<li>Declare <code>parallel</code>, <code>tools</code>, and <code>utils</code> in Imports, and add <code>SystemRequirements</code> for the optional external tools</li>
+<li>Documentation and testing suite revisions</li>
+</ul></div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.11.5" id="summata-0115-2026-05-06">
 <em>summata</em> 0.11.5 (2026-05-06)<a class="anchor" aria-label="anchor" href="#summata-0115-2026-05-06"></a></h2><p class="text-muted">CRAN release: 2026-05-07</p>
-<ul><li>Explicitly define <code>%||%</code> operator for backward compatability</li>
+<ul><li>Explicitly define <code>%||%</code> operator for backward compatibility</li>
 <li>Move main documentation to Codeberg Pages</li>
 <li>Minor documentation edits</li>
 </ul></div>
@@ -123,7 +145,7 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.10.7" id="summata-0107-2026-02-05">
 <em>summata</em> 0.10.7 (2026-02-05)<a class="anchor" aria-label="anchor" href="#summata-0107-2026-02-05"></a></h2>
-<ul><li>Add R-hub compatability</li>
+<ul><li>Add R-hub compatibility</li>
 <li>Documentation and vignette updates</li>
 </ul></div>
     <div class="section level2">
@@ -195,7 +217,7 @@
 <ul><li>Add <code>show_logs</code> parameter to <code><a href="../reference/table2tex.html">table2tex()</a></code>
 </li>
 <li>Consistent Unicode formatting for files</li>
-<li>Increased R version requirement to &gt;= 4.2.0 for better Unicode compatability</li>
+<li>Increased R version requirement to &gt;= 4.2.0 for better Unicode compatibility</li>
 <li>Add <code><a href="../reference/survtable.html">survtable()</a></code> function with utilities</li>
 <li>Minor optimizations and function cleanup, with notation standardization</li>
 </ul></div>
@@ -262,7 +284,7 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.7.14" id="summata-0714-2025-12-20">
 <em>summata</em> 0.7.14 (2025-12-20)<a class="anchor" aria-label="anchor" href="#summata-0714-2025-12-20"></a></h2>
-<ul><li>Add <code><a href="../reference/autotable.html">autotable()</a></code> function</li>
+<ul><li>Add <code><a href="../reference/tablesave.html">autotable()</a></code> function</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.7.13" id="summata-0713-2025-12-19">
@@ -503,7 +525,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
 </div>
 
     </footer></div>

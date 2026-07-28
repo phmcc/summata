@@ -371,7 +371,10 @@ multivariate regression results. The table structure includes:
 
 - n:
 
-  Integer. Sample size used in the model (if `show_n = TRUE`)
+  Integer. Sample size used in fitting (if `show_n = TRUE`). When both
+  unadjusted and adjusted estimates are shown, this is the adjusted
+  model's sample, which is the one behind the adjusted estimate on the
+  same row
 
 - Events:
 
@@ -452,6 +455,17 @@ The returned object includes the following attributes accessible via
   Character vector. Names of outcomes with *p* \< 0.05 for the predictor
   (uses adjusted *p*-values when available)
 
+- analysis_counts:
+
+  List. How much of the supplied data reached the models, with elements
+  `n_supplied`, `n_analyzed`, `n_missing_outcome` and
+  `n_missing_predictor`. One model is fitted per outcome, so
+  `n_analyzed` holds one value per outcome and the reported sample may
+  be a range. Event counts are not included: each outcome has its own
+  event total, so a single reported figure could not describe them all.
+  The [`print()`](https://rdrr.io/r/base/print.html) method always
+  reports the analyzed sample
+
 ## Details
 
 **Analysis Approach:**
@@ -474,8 +488,8 @@ workflow that inverts the typical regression paradigm:
 
 This is conceptually opposite to
 [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
-which tests multiple predictors against a single outcome. Use
-`multifit()` when you have one exposure of interest and want to screen
+which tests multiple predictors against a single outcome. `multifit()`
+applies where there is one exposure of interest and want to screen
 across multiple endpoints.
 
 **When to Use Multivariate Regression Analysis:**
@@ -622,7 +636,7 @@ calls for each type:
 
 - For many outcomes, parallel processing provides substantial speedup
 
-- Set `keep_models = TRUE` only when you need model diagnostics
+- Set `keep_models = TRUE` only when model diagnostics are required
 
 ## See also
 
@@ -633,7 +647,11 @@ for creating forest plots from multifit results,
 [`fit`](https://phmcc.codeberg.page/summata/reference/fit.md) for
 single-outcome regression with full coefficient output,
 [`fullfit`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
-for complete univariable-to-multivariable workflow
+for complete univariable-to-multivariable workflow,
+[`forestsave`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+for saving the forest plot,
+[`tablesave`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+for exporting tables
 
 Other regression functions:
 [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md),
@@ -654,7 +672,6 @@ data(clintrial)
 data(clintrial_labels)
 
 # Example 1: Basic multivariate analysis (unadjusted)
-# Test treatment effect on multiple binary outcomes
 result1 <- multifit(
     data = clintrial,
     outcomes = c("surgery", "pfs_status", "os_status"),
@@ -664,11 +681,13 @@ result1 <- multifit(
 )
 print(result1)
 #> 
-#> Multivariate Analysis Results
+#> Multivariate Regression Results
+#> 
 #> Predictor: treatment
 #> Outcomes: 3
 #> Model Type: glm
 #> Display: unadjusted
+#> Observations analyzed: 850 of 850 (100.0%)
 #> 
 #>                       Outcome                Predictor      n Events      OR (95% CI) p-value
 #>                        <char>                   <char> <char> <char>           <char>  <char>
@@ -678,12 +697,10 @@ print(result1)
 #> 4: Progression or Death Event Treatment Group (Drug B)    362    322 1.02 (0.58-1.75)   0.950
 #> 5:                Death Event Treatment Group (Drug A)    292    184 0.51 (0.34-0.76)   0.001
 #> 6:                Death Event Treatment Group (Drug B)    362    274 0.93 (0.61-1.39)   0.721
-# Shows odds ratios comparing Drug A and Drug B to Control
 
 # \donttest{
 
 # Example 2: Adjusted analysis with covariates
-# Adjust for age, sex, and disease stage
 result2 <- multifit(
     data = clintrial,
     outcomes = c("surgery", "pfs_status", "os_status"),
@@ -694,12 +711,14 @@ result2 <- multifit(
 )
 print(result2)
 #> 
-#> Multivariate Analysis Results
+#> Multivariate Regression Results
+#> 
 #> Predictor: treatment
 #> Outcomes: 3
 #> Model Type: glm
 #> Covariates: age, sex, stage
 #> Display: adjusted
+#> Observations analyzed: 847 of 850 (99.6%)
 #> 
 #>                       Outcome                Predictor      n Events     aOR (95% CI) p-value
 #>                        <char>                   <char> <char> <char>           <char>  <char>
@@ -709,7 +728,6 @@ print(result2)
 #> 4: Progression or Death Event Treatment Group (Drug B)    361    321 0.77 (0.42-1.36)   0.374
 #> 5:                Death Event Treatment Group (Drug A)    292    184 0.44 (0.28-0.68) < 0.001
 #> 6:                Death Event Treatment Group (Drug B)    361    273 0.74 (0.47-1.16)   0.192
-# Shows adjusted odds ratios (aOR)
 
 # Example 3: Compare unadjusted and adjusted results
 result3 <- multifit(
@@ -723,25 +741,25 @@ result3 <- multifit(
 )
 print(result3)
 #> 
-#> Multivariate Analysis Results
+#> Multivariate Regression Results
+#> 
 #> Predictor: treatment
 #> Outcomes: 3
 #> Model Type: glm
 #> Covariates: age, sex, stage
 #> Display: both
+#> Observations analyzed: 847 of 850 (99.6%)
 #> 
 #>                       Outcome                Predictor      n Events      OR (95% CI)   Uni p     aOR (95% CI) Multi p
 #>                        <char>                   <char> <char> <char>           <char>  <char>           <char>  <char>
 #> 1:                Death Event Treatment Group (Drug A)    292    184 0.51 (0.34-0.76)   0.001 0.44 (0.28-0.68) < 0.001
-#> 2:                Death Event Treatment Group (Drug B)    362    274 0.93 (0.61-1.39)   0.721 0.74 (0.47-1.16)   0.192
+#> 2:                Death Event Treatment Group (Drug B)    361    273 0.93 (0.61-1.39)   0.721 0.74 (0.47-1.16)   0.192
 #> 3: Progression or Death Event Treatment Group (Drug A)    292    227 0.44 (0.26-0.73)   0.002 0.36 (0.20-0.62) < 0.001
-#> 4: Progression or Death Event Treatment Group (Drug B)    362    322 1.02 (0.58-1.75)   0.950 0.77 (0.42-1.36)   0.374
+#> 4: Progression or Death Event Treatment Group (Drug B)    361    321 1.02 (0.58-1.75)   0.950 0.77 (0.42-1.36)   0.374
 #> 5:         Surgical Resection Treatment Group (Drug A)    292    173 1.58 (1.10-2.27)   0.014 1.84 (1.23-2.76)   0.003
-#> 6:         Surgical Resection Treatment Group (Drug B)    362    103 0.43 (0.30-0.62) < 0.001 0.45 (0.30-0.66) < 0.001
-# Useful for identifying confounding effects
+#> 6:         Surgical Resection Treatment Group (Drug B)    361    102 0.43 (0.30-0.62) < 0.001 0.45 (0.30-0.66) < 0.001
 
 # Example 4: Continuous predictor across outcomes
-# Test age effect on multiple outcomes
 result4 <- multifit(
     data = clintrial,
     outcomes = c("surgery", "pfs_status", "os_status"),
@@ -752,19 +770,20 @@ result4 <- multifit(
 )
 print(result4)
 #> 
-#> Multivariate Analysis Results
+#> Multivariate Regression Results
+#> 
 #> Predictor: age
 #> Outcomes: 3
 #> Model Type: glm
 #> Covariates: sex, treatment, stage
 #> Display: adjusted
+#> Observations analyzed: 847 of 850 (99.6%)
 #> 
 #>                       Outcome      n Events     aOR (95% CI) p-value
 #>                        <char> <char> <char>           <char>  <char>
 #> 1:         Surgical Resection    847    368 0.96 (0.94-0.97) < 0.001
 #> 2: Progression or Death Event    847    721 1.02 (1.01-1.04)   0.006
 #> 3:                Death Event    847    606 1.05 (1.04-1.07) < 0.001
-# One row per outcome for continuous predictor
 
 # Example 5: Cox regression for survival outcomes
 library(survival)
@@ -780,20 +799,21 @@ cox_result <- multifit(
 )
 print(cox_result)
 #> 
-#> Multivariate Analysis Results
+#> Multivariate Regression Results
+#> 
 #> Predictor: treatment
 #> Outcomes: 2
 #> Model Type: coxph
 #> Covariates: age, sex, stage
 #> Display: adjusted
+#> Observations analyzed: 847 of 850 (99.6%)
 #> 
 #>                               Outcome                Predictor      n Events     aHR (95% CI) p-value
 #>                                <char>                   <char> <char> <char>           <char>  <char>
-#> 1: Progression-Free Survival (months) Treatment Group (Drug A)    721    721 0.54 (0.44-0.66) < 0.001
-#> 2: Progression-Free Survival (months) Treatment Group (Drug B)    721    721 0.82 (0.68-0.98)   0.033
-#> 3:          Overall Survival (months) Treatment Group (Drug A)    606    606 0.56 (0.45-0.70) < 0.001
-#> 4:          Overall Survival (months) Treatment Group (Drug B)    606    606 0.83 (0.67-1.01)   0.062
-# Returns hazard ratios (HR/aHR)
+#> 1: Progression-Free Survival (months) Treatment Group (Drug A)    292    227 0.54 (0.44-0.66) < 0.001
+#> 2: Progression-Free Survival (months) Treatment Group (Drug B)    361    321 0.82 (0.68-0.98)   0.033
+#> 3:          Overall Survival (months) Treatment Group (Drug A)    292    184 0.56 (0.45-0.70) < 0.001
+#> 4:          Overall Survival (months) Treatment Group (Drug B)    361    273 0.83 (0.67-1.01)   0.062
 
 # Example 6: Cox with stratification by site
 cox_strat <- multifit(
@@ -808,18 +828,20 @@ cox_strat <- multifit(
 )
 print(cox_strat)
 #> 
-#> Multivariate Analysis Results
+#> Multivariate Regression Results
+#> 
 #> Predictor: treatment
 #> Outcomes: 1
 #> Model Type: coxph
 #> Covariates: age, sex
 #> Strata: site
 #> Display: adjusted
+#> Observations analyzed: 850 of 850 (100.0%)
 #> 
 #>                      Outcome                Predictor      n Events     aHR (95% CI) p-value
 #>                       <char>                   <char> <char> <char>           <char>  <char>
-#> 1: Overall Survival (months) Treatment Group (Drug A)    609    609 0.62 (0.50-0.77) < 0.001
-#> 2: Overall Survival (months) Treatment Group (Drug B)    609    609 1.00 (0.81-1.22)   0.976
+#> 1: Overall Survival (months) Treatment Group (Drug A)    292    184 0.62 (0.50-0.77) < 0.001
+#> 2: Overall Survival (months) Treatment Group (Drug B)    362    274 1.00 (0.81-1.22)   0.976
 
 # Example 7: Cox with clustered standard errors
 cox_cluster <- multifit(
@@ -834,21 +856,22 @@ cox_cluster <- multifit(
 )
 print(cox_cluster)
 #> 
-#> Multivariate Analysis Results
+#> Multivariate Regression Results
+#> 
 #> Predictor: treatment
 #> Outcomes: 1
 #> Model Type: coxph
 #> Covariates: age, sex, stage
 #> Cluster: site
 #> Display: adjusted
+#> Observations analyzed: 847 of 850 (99.6%)
 #> 
 #>                      Outcome                Predictor      n Events     aHR (95% CI) p-value
 #>                       <char>                   <char> <char> <char>           <char>  <char>
-#> 1: Overall Survival (months) Treatment Group (Drug A)    606    606 0.56 (0.45-0.70) < 0.001
-#> 2: Overall Survival (months) Treatment Group (Drug B)    606    606 0.83 (0.67-1.01)   0.167
+#> 1: Overall Survival (months) Treatment Group (Drug A)    292    184 0.56 (0.45-0.70) < 0.001
+#> 2: Overall Survival (months) Treatment Group (Drug B)    361    273 0.83 (0.67-1.01)   0.167
 
 # Example 8: Interaction between predictor and covariate
-# Test if treatment effect differs by sex
 result_int <- multifit(
     data = clintrial,
     outcomes = c("surgery", "os_status"),
@@ -860,13 +883,15 @@ result_int <- multifit(
 )
 print(result_int)
 #> 
-#> Multivariate Analysis Results
+#> Multivariate Regression Results
+#> 
 #> Predictor: treatment
 #> Outcomes: 2
 #> Model Type: glm
 #> Covariates: age, sex, stage
 #> Interactions: treatment:sex
 #> Display: adjusted
+#> Observations analyzed: 847 of 850 (99.6%)
 #> 
 #>               Outcome                             Predictor      n Events     aOR (95% CI) p-value
 #>                <char>                                <char> <char> <char>           <char>  <char>
@@ -878,7 +903,6 @@ print(result_int)
 #> 6:        Death Event              Treatment Group (Drug B)    361    273 0.61 (0.34-1.09)   0.099
 #> 7:        Death Event Treatment Group (Drug A) × Sex (Male)      -      - 1.29 (0.52-3.17)   0.575
 #> 8:        Death Event Treatment Group (Drug B) × Sex (Male)      -      - 1.59 (0.65-3.90)   0.308
-# Shows main effects and interaction terms with × notation
 
 # Example 9: Linear model for continuous outcomes
 linear_result <- multifit(
@@ -892,12 +916,14 @@ linear_result <- multifit(
 )
 print(linear_result)
 #> 
-#> Multivariate Analysis Results
+#> Multivariate Regression Results
+#> 
 #> Predictor: treatment
 #> Outcomes: 2
 #> Model Type: lm
 #> Covariates: age, sex
 #> Display: adjusted
+#> Observations analyzed: 830-842 of 850 (97.6-99.1%)
 #> 
 #>                           Outcome                Predictor      n Adj. Coefficient (95% CI) p-value
 #>                            <char>                   <char> <char>                    <char>  <char>
@@ -905,7 +931,6 @@ print(linear_result)
 #> 2: Length of Hospital Stay (days) Treatment Group (Drug B)    350       2.66 (1.91 to 3.41) < 0.001
 #> 3:            Biomarker X (ng/mL) Treatment Group (Drug A)    290     -0.39 (-0.94 to 0.16)   0.164
 #> 4:            Biomarker X (ng/mL) Treatment Group (Drug B)    358     -0.01 (-0.53 to 0.52)   0.983
-# Returns coefficient estimates, not ratios
 
 # Example 10: Poisson regression for equidispersed count outcomes
 # fu_count has variance ~= mean, appropriate for standard Poisson
@@ -921,19 +946,19 @@ poisson_result <- multifit(
 )
 print(poisson_result)
 #> 
-#> Multivariate Analysis Results
+#> Multivariate Regression Results
+#> 
 #> Predictor: treatment
 #> Outcomes: 1
 #> Model Type: glm
 #> Covariates: age, stage
 #> Display: adjusted
+#> Observations analyzed: 839 of 850 (98.7%)
 #> 
 #>                  Outcome                Predictor      n Events     aRR (95% CI) p-value
 #>                   <char>                   <char> <char> <char>           <char>  <char>
 #> 1: Follow-Up Visit Count Treatment Group (Drug A)    290  1,910 1.08 (1.00-1.16)   0.052
 #> 2: Follow-Up Visit Count Treatment Group (Drug B)    358  2,438 1.11 (1.03-1.19)   0.005
-# Returns rate ratios (RR)
-# For overdispersed counts (ae_count), use model_type = "negbin" instead
 
 # Example 11: Filter to significant results only
 sig_results <- multifit(
@@ -946,11 +971,13 @@ sig_results <- multifit(
 )
 print(sig_results)
 #> 
-#> Multivariate Analysis Results
+#> Multivariate Regression Results
+#> 
 #> Predictor: stage
 #> Outcomes: 3
 #> Model Type: glm
 #> Display: unadjusted
+#> Observations analyzed: 847 of 850 (99.6%)
 #> 
 #>                       Outcome           Predictor      n Events        OR (95% CI) p-value
 #>                        <char>              <char> <char> <char>             <char>  <char>
@@ -961,7 +988,6 @@ print(sig_results)
 #> 5: Progression or Death Event  Disease Stage (IV)    132    128 13.62 (5.43-45.73) < 0.001
 #> 6:                Death Event Disease Stage (III)    241    186   2.24 (1.49-3.38) < 0.001
 #> 7:                Death Event  Disease Stage (IV)    132    121  7.28 (3.85-15.04) < 0.001
-# Only outcomes with significant associations shown
 
 # Example 12: Custom outcome labels
 result_labeled <- multifit(
@@ -978,11 +1004,13 @@ result_labeled <- multifit(
 )
 print(result_labeled)
 #> 
-#> Multivariate Analysis Results
+#> Multivariate Regression Results
+#> 
 #> Predictor: treatment
 #> Outcomes: 3
 #> Model Type: glm
 #> Display: unadjusted
+#> Observations analyzed: 850 of 850 (100.0%)
 #> 
 #>                Outcome                Predictor      n Events      OR (95% CI) p-value
 #>                 <char>                   <char> <char> <char>           <char>  <char>
@@ -1050,7 +1078,6 @@ print(raw_data)
 #>       <char>    <char> <char> <int>  <num>       <num>       <num>    <num>     <num>     <num>     <num>        <num>      <char>   <lgcl>
 #> 1:   surgery       age      -   850    370 -0.03608738 0.006211760 0.964556 0.9527194 0.9762269 -5.809525 6.265023e-09          OR    FALSE
 #> 2: os_status       age      -   850    609  0.04695122 0.006987363 1.048071 1.0340279 1.0627756  6.719447 1.824154e-11          OR    FALSE
-# Contains exp_coef, ci_lower, ci_upper, p_value, \emph{etc.}
 
 # Example 15: Hide sample size and event columns
 result_minimal <- multifit(
@@ -1059,22 +1086,25 @@ result_minimal <- multifit(
     predictor = "treatment",
     show_n = FALSE,
     show_events = FALSE,
+    labels = clintrial_labels,
     parallel = FALSE
 )
 print(result_minimal)
 #> 
-#> Multivariate Analysis Results
+#> Multivariate Regression Results
+#> 
 #> Predictor: treatment
 #> Outcomes: 2
 #> Model Type: glm
 #> Display: unadjusted
+#> Observations analyzed: 850 of 850 (100.0%)
 #> 
-#>      Outcome          Predictor      OR (95% CI) p-value
-#>       <char>             <char>           <char>  <char>
-#> 1:   surgery treatment (Drug A) 1.58 (1.10-2.27)   0.014
-#> 2:   surgery treatment (Drug B) 0.43 (0.30-0.62) < 0.001
-#> 3: os_status treatment (Drug A) 0.51 (0.34-0.76)   0.001
-#> 4: os_status treatment (Drug B) 0.93 (0.61-1.39)   0.721
+#>               Outcome                Predictor      OR (95% CI) p-value
+#>                <char>                   <char>           <char>  <char>
+#> 1: Surgical Resection Treatment Group (Drug A) 1.58 (1.10-2.27)   0.014
+#> 2: Surgical Resection Treatment Group (Drug B) 0.43 (0.30-0.62) < 0.001
+#> 3:        Death Event Treatment Group (Drug A) 0.51 (0.34-0.76)   0.001
+#> 4:        Death Event Treatment Group (Drug B) 0.93 (0.61-1.39)   0.721
 
 # Example 16: Customize decimal places
 result_digits <- multifit(
@@ -1083,20 +1113,23 @@ result_digits <- multifit(
     predictor = "age",
     digits = 3,
     p_digits = 4,
+    labels = clintrial_labels,
     parallel = FALSE
 )
 print(result_digits)
 #> 
-#> Multivariate Analysis Results
+#> Multivariate Regression Results
+#> 
 #> Predictor: age
 #> Outcomes: 2
 #> Model Type: glm
 #> Display: unadjusted
+#> Observations analyzed: 850 of 850 (100.0%)
 #> 
-#>      Outcome      n Events         OR (95% CI)  p-value
-#>       <char> <char> <char>              <char>   <char>
-#> 1:   surgery    850    370 0.965 (0.953-0.976) < 0.0001
-#> 2: os_status    850    609 1.048 (1.034-1.063) < 0.0001
+#>               Outcome      n Events         OR (95% CI)  p-value
+#>                <char> <char> <char>              <char>   <char>
+#> 1: Surgical Resection    850    370 0.965 (0.953-0.976) < 0.0001
+#> 2:        Death Event    850    609 1.048 (1.034-1.063) < 0.0001
 
 # Example 17: Force coefficient display (no exponentiation)
 result_coef <- multifit(
@@ -1104,19 +1137,22 @@ result_coef <- multifit(
     outcomes = c("surgery"),
     predictor = "age",
     exponentiate = FALSE,
+    labels = clintrial_labels,
     parallel = FALSE
 )
 print(result_coef)
 #> 
-#> Multivariate Analysis Results
+#> Multivariate Regression Results
+#> 
 #> Predictor: age
 #> Outcomes: 1
 #> Model Type: glm
 #> Display: unadjusted
+#> Observations analyzed: 850 of 850 (100.0%)
 #> 
-#>    Outcome      n Events      OR (95% CI) p-value
-#>     <char> <char> <char>           <char>  <char>
-#> 1: surgery    850    370 0.96 (0.95-0.98) < 0.001
+#>               Outcome      n Events      OR (95% CI) p-value
+#>                <char> <char> <char>           <char>  <char>
+#> 1: Surgical Resection    850    370 0.96 (0.95-0.98) < 0.001
 
 # Example 18: Complete publication workflow
 final_table <- multifit(
@@ -1132,21 +1168,23 @@ final_table <- multifit(
 )
 print(final_table)
 #> 
-#> Multivariate Analysis Results
+#> Multivariate Regression Results
+#> 
 #> Predictor: treatment
 #> Outcomes: 3
 #> Model Type: glm
 #> Covariates: age, sex, stage, grade
 #> Display: both
+#> Observations analyzed: 838 of 850 (98.6%)
 #> 
 #>                       Outcome                Predictor      n Events      OR (95% CI)   Uni p     aOR (95% CI) Multi p
 #>                        <char>                   <char> <char> <char>           <char>  <char>           <char>  <char>
-#> 1:                Death Event Treatment Group (Drug A)    292    184 0.51 (0.34-0.76)   0.001 0.41 (0.26-0.65) < 0.001
-#> 2:                Death Event Treatment Group (Drug B)    362    274 0.93 (0.61-1.39)   0.721 0.69 (0.43-1.08)   0.105
-#> 3: Progression or Death Event Treatment Group (Drug A)    292    227 0.44 (0.26-0.73)   0.002 0.34 (0.19-0.59) < 0.001
-#> 4: Progression or Death Event Treatment Group (Drug B)    362    322 1.02 (0.58-1.75)   0.950 0.73 (0.40-1.30)   0.291
-#> 5:         Surgical Resection Treatment Group (Drug A)    292    173 1.58 (1.10-2.27)   0.014 1.78 (1.19-2.67)   0.005
-#> 6:         Surgical Resection Treatment Group (Drug B)    362    103 0.43 (0.30-0.62) < 0.001 0.43 (0.29-0.64) < 0.001
+#> 1:                Death Event Treatment Group (Drug A)    289    182 0.51 (0.34-0.76)   0.001 0.41 (0.26-0.65) < 0.001
+#> 2:                Death Event Treatment Group (Drug B)    357    269 0.93 (0.61-1.39)   0.721 0.69 (0.43-1.08)   0.105
+#> 3: Progression or Death Event Treatment Group (Drug A)    289    224 0.44 (0.26-0.73)   0.002 0.34 (0.19-0.59) < 0.001
+#> 4: Progression or Death Event Treatment Group (Drug B)    357    317 1.02 (0.58-1.75)   0.950 0.73 (0.40-1.30)   0.291
+#> 5:         Surgical Resection Treatment Group (Drug A)    289    170 1.58 (1.10-2.27)   0.014 1.78 (1.19-2.67)   0.005
+#> 6:         Surgical Resection Treatment Group (Drug B)    357    100 0.43 (0.30-0.62) < 0.001 0.43 (0.29-0.64) < 0.001
 
 # Example 19: Gamma regression for positive continuous outcomes
 gamma_result <- multifit(
@@ -1161,12 +1199,14 @@ gamma_result <- multifit(
 )
 print(gamma_result)
 #> 
-#> Multivariate Analysis Results
+#> Multivariate Regression Results
+#> 
 #> Predictor: treatment
 #> Outcomes: 2
 #> Model Type: glm
 #> Covariates: age, surgery
 #> Display: adjusted
+#> Observations analyzed: 830-835 of 850 (97.6-98.2%)
 #> 
 #>                           Outcome                Predictor      n Adj. Coefficient (95% CI) p-value
 #>                            <char>                   <char> <char>                    <char>  <char>
@@ -1174,7 +1214,6 @@ print(gamma_result)
 #> 2: Length of Hospital Stay (days) Treatment Group (Drug B)    350       0.15 (0.11 to 0.19)       -
 #> 3:    Days to Functional Recovery Treatment Group (Drug A)    288    -0.10 (-0.17 to -0.03)       -
 #> 4:    Days to Functional Recovery Treatment Group (Drug B)    352       0.17 (0.10 to 0.23)       -
-# Returns multiplicative effects on positive continuous data
 
 # Example 20: Quasipoisson for overdispersed counts
 quasi_result <- multifit(
@@ -1189,18 +1228,19 @@ quasi_result <- multifit(
 )
 print(quasi_result)
 #> 
-#> Multivariate Analysis Results
+#> Multivariate Regression Results
+#> 
 #> Predictor: treatment
 #> Outcomes: 1
 #> Model Type: glm
 #> Covariates: age, diabetes
 #> Display: adjusted
+#> Observations analyzed: 824 of 850 (96.9%)
 #> 
 #>                Outcome                Predictor      n Events     aRR (95% CI) p-value
 #>                 <char>                   <char> <char> <char>           <char>  <char>
 #> 1: Adverse Event Count Treatment Group (Drug A)    287  1,221 0.95 (0.81-1.12)       -
 #> 2: Adverse Event Count Treatment Group (Drug B)    348  2,459 1.55 (1.34-1.80)       -
-# Adjusts standard errors for overdispersion
 
 # Example 21: Generalized linear mixed effects (GLMER)
 # Test treatment across outcomes with site clustering
@@ -1219,13 +1259,15 @@ if (requireNamespace("lme4", quietly = TRUE)) {
     print(glmer_result)
 }
 #> 
-#> Multivariate Analysis Results
+#> Multivariate Regression Results
+#> 
 #> Predictor: treatment
 #> Outcomes: 3
 #> Model Type: glmer
 #> Covariates: age, sex
 #> Random Effects: (1|site)
 #> Display: adjusted
+#> Observations analyzed: 850 of 850 (100.0%)
 #> 
 #>                       Outcome                Predictor      n Events     aOR (95% CI) p-value
 #>                        <char>                   <char> <char> <char>           <char>  <char>
@@ -1252,13 +1294,15 @@ if (requireNamespace("coxme", quietly = TRUE)) {
     print(coxme_result)
 }
 #> 
-#> Multivariate Analysis Results
+#> Multivariate Regression Results
+#> 
 #> Predictor: treatment
 #> Outcomes: 2
 #> Model Type: coxme
 #> Covariates: age, sex, stage
 #> Random Effects: (1|site)
 #> Display: adjusted
+#> Observations analyzed: 847 of 850 (99.6%)
 #> 
 #>                               Outcome                Predictor      n Events     aHR (95% CI) p-value
 #>                                <char>                   <char> <char> <char>           <char>  <char>
@@ -1279,13 +1323,15 @@ multi_int <- multifit(
 )
 print(multi_int)
 #> 
-#> Multivariate Analysis Results
+#> Multivariate Regression Results
+#> 
 #> Predictor: treatment
 #> Outcomes: 3
 #> Model Type: glm
 #> Covariates: age, sex, stage
 #> Interactions: treatment:stage, treatment:sex
 #> Display: adjusted
+#> Observations analyzed: 847 of 850 (99.6%)
 #> 
 #>                        Outcome                                      Predictor      n Events                                                                                           aOR (95% CI) p-value
 #>                         <char>                                         <char> <char> <char>                                                                                                 <char>  <char>
@@ -1321,7 +1367,6 @@ print(multi_int)
 #> 30:                Death Event          Treatment Group (Drug B) × Sex (Male)      -      -                                                                                       1.78 (0.71-4.45)   0.218
 #>                        Outcome                                      Predictor      n Events                                                                                           aOR (95% CI) p-value
 #>                         <char>                                         <char> <char> <char>                                                                                                 <char>  <char>
-# Shows how treatment effects vary by stage and sex across outcomes
 
 # }
 ```

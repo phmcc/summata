@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -181,11 +181,11 @@ type:</p>
 </tr>
 </tbody>
 </table>
-<p>For categorical variables, Fisher exact test is used when any
-expected cell count falls below 5. For continuous variables, the test
-selection follows the displayed statistic: parametric tests are used
-with mean-based statistics, nonparametric tests with median-based
-statistics.</p>
+<p>By default, Fisher exact test is used when any expected cell count
+falls below 5 for categorical variables. Similarly, the test selection
+for continuous variables will follow the displayed statistic unless
+otherwise specified: parametric tests are used with mean-based
+statistics, nonparametric tests with median-based statistics.</p>
 <hr>
 </div>
 <div class="section level2">
@@ -789,21 +789,21 @@ documentation.</p>
 <code class="sourceCode R"><span><span class="co"># Microsoft Word</span></span>
 <span><span class="fu"><a href="../reference/table2docx.html">table2docx</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table1</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1.docx"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"Table1.docx"</span>,</span>
 <span>  caption <span class="op">=</span> <span class="st">"Table 1. Baseline Characteristics by Group"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># PDF (requires LaTeX)</span></span>
 <span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table1</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1.pdf"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"Table1.pdf"</span>,</span>
 <span>  caption <span class="op">=</span> <span class="st">"Table 1. Baseline Characteristics by Group"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># HTML</span></span>
 <span><span class="fu"><a href="../reference/table2html.html">table2html</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">table1</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"Table1.html"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"Table1.html"</span>,</span>
 <span>  caption <span class="op">=</span> <span class="st">"Table 1. Baseline Characteristics by Group"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <hr>
@@ -872,7 +872,7 @@ levels are explicitly defined:</p>
 <p>For tables with many variables, consider splitting by category or
 using landscape orientation for export:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span><span class="va">table</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"table1.pdf"</span><span class="op">)</span>, orientation <span class="op">=</span> <span class="st">"landscape"</span>, font_size <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span><span class="va">table</span>, <span class="st">"table1.pdf"</span>, orientation <span class="op">=</span> <span class="st">"landscape"</span>, font_size <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
 </div>
@@ -885,7 +885,7 @@ using landscape orientation for export:</p>
 <code><a href="../reference/survtable.html">survtable()</a></code> for time-to-event summaries</li>
 <li>
 <a href="regression_modeling.html">Regression Modeling</a>:
-<code><a href="../reference/fit.html">fit()</a></code>, <code><a href="../reference/uniscreen.html">uniscreen()</a></code>, and
+<code><a href="../reference/uniscreen.html">uniscreen()</a></code>, <code><a href="../reference/fit.html">fit()</a></code>, and
 <code><a href="../reference/fullfit.html">fullfit()</a></code>
 </li>
 <li>
@@ -916,7 +916,7 @@ Interactions and mixed-effects models</li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
 </div>
 
     </footer>

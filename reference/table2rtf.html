@@ -23,7 +23,7 @@ compatibility, and when maximum editability is required."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -101,6 +101,7 @@ compatibility, and when maximum editability is required.</p>
 <span>  width <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  align <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  return_ft <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  quiet <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -224,6 +225,12 @@ invisibly with flextable as attribute. See Details for usage.
 Default is <code>FALSE</code>.</p></dd>
 
 
+<dt id="arg-quiet">quiet<a class="anchor" aria-label="anchor" href="#arg-quiet"></a></dt>
+<dd><p>Logical. Suppress progress and confirmation messages, such
+as the notice reporting the file written. Errors and warnings are
+unaffected. Default is <code>FALSE</code>.</p></dd>
+
+
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional arguments (currently unused, reserved for future extensions).</p></dd>
 
@@ -325,7 +332,7 @@ Default is <code>FALSE</code>.</p></dd>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="autotable.html">autotable</a></code> for automatic format detection,
+    <div class="dont-index"><p><code><a href="tablesave.html">tablesave</a></code> for saving in the format given by the file extension,
 <code><a href="table2docx.html">table2docx</a></code> for Word documents,
 <code><a href="table2pptx.html">table2pptx</a></code> for PowerPoint slides,
 <code><a href="table2pdf.html">table2pdf</a></code> for PDF output,
@@ -334,12 +341,12 @@ Default is <code>FALSE</code>.</p></dd>
 <code><a href="https://davidgohel.github.io/flextable/reference/flextable.html" class="external-link">flextable</a></code> for the underlying table object,
 <code><a href="https://davidgohel.github.io/flextable/reference/save_as_rtf.html" class="external-link">save_as_rtf</a></code> for direct RTF export</p>
 <p>Other export functions:
-<code><a href="autotable.html">autotable()</a></code>,
 <code><a href="table2docx.html">table2docx()</a></code>,
 <code><a href="table2html.html">table2html()</a></code>,
 <code><a href="table2pdf.html">table2pdf()</a></code>,
 <code><a href="table2pptx.html">table2pptx()</a></code>,
-<code><a href="table2tex.html">table2tex()</a></code></p></div>
+<code><a href="table2tex.html">table2tex()</a></code>,
+<code><a href="tablesave.html">tablesave()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -359,54 +366,54 @@ Default is <code>FALSE</code>.</p></dd>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"flextable"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu">table2rtf</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"results.rtf"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/results.rtf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/results.rtf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="va">old_width</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">180</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Example 2: With caption</span></span></span>
 <span class="r-in"><span><span class="fu">table2rtf</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"captioned.rtf"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>       caption <span class="op">=</span> <span class="st">"Table 1: Multivariable Logistic Regression Results"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/captioned.rtf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/captioned.rtf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 3: Landscape orientation for wide tables</span></span></span>
 <span class="r-in"><span><span class="fu">table2rtf</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"wide.rtf"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>       orientation <span class="op">=</span> <span class="st">"landscape"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/wide.rtf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/wide.rtf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 4: Custom font and size</span></span></span>
 <span class="r-in"><span><span class="fu">table2rtf</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"custom_font.rtf"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>       font_family <span class="op">=</span> <span class="st">"Times New Roman"</span>,</span></span>
 <span class="r-in"><span>       font_size <span class="op">=</span> <span class="fl">11</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/custom_font.rtf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/custom_font.rtf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 5: Hierarchical display</span></span></span>
 <span class="r-in"><span><span class="fu">table2rtf</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"indented.rtf"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>       indent_groups <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/indented.rtf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/indented.rtf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 6: Condensed table</span></span></span>
 <span class="r-in"><span><span class="fu">table2rtf</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"condensed.rtf"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>       condense_table <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/condensed.rtf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/condensed.rtf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 7: With zebra stripes</span></span></span>
 <span class="r-in"><span><span class="fu">table2rtf</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"striped.rtf"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>       zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/striped.rtf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/striped.rtf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 8: Dark header style</span></span></span>
 <span class="r-in"><span><span class="fu">table2rtf</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"dark.rtf"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>       dark_header <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/dark.rtf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/dark.rtf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 9: A4 paper for international submissions</span></span></span>
 <span class="r-in"><span><span class="fu">table2rtf</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"a4.rtf"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>       paper <span class="op">=</span> <span class="st">"a4"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/a4.rtf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/a4.rtf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 10: Get flextable for customization</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">table2rtf</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"base.rtf"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/base.rtf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/base.rtf</span>
 <span class="r-in"><span><span class="va">ft</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">result</span>, <span class="st">"flextable"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Customize the flextable</span></span></span>
@@ -418,7 +425,7 @@ Default is <code>FALSE</code>.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 11: Direct flextable return</span></span></span>
 <span class="r-in"><span><span class="va">ft</span> <span class="op">&lt;-</span> <span class="fu">table2rtf</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"direct.rtf"</span><span class="op">)</span>, return_ft <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/direct.rtf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/direct.rtf</span>
 <span class="r-in"><span><span class="va">ft</span> <span class="op">&lt;-</span> <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/bg.html" class="external-link">bg</a></span><span class="op">(</span><span class="va">ft</span>, bg <span class="op">=</span> <span class="st">"yellow"</span>, part <span class="op">=</span> <span class="st">"header"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 12: Regulatory submission table</span></span></span>
@@ -429,23 +436,23 @@ Default is <code>FALSE</code>.</p></dd>
 <span class="r-in"><span>       indent_groups <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>       zebra_stripes <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
 <span class="r-in"><span>       bold_significant <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/submission.rtf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/submission.rtf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 13: Custom column alignment</span></span></span>
 <span class="r-in"><span><span class="fu">table2rtf</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"aligned.rtf"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>       align <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"left"</span>, <span class="st">"left"</span>, <span class="st">"center"</span>, <span class="st">"right"</span>, <span class="st">"right"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/aligned.rtf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/aligned.rtf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 14: Disable significance bolding</span></span></span>
 <span class="r-in"><span><span class="fu">table2rtf</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"no_bold.rtf"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>       bold_significant <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/no_bold.rtf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/no_bold.rtf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 15: Stricter significance threshold</span></span></span>
 <span class="r-in"><span><span class="fu">table2rtf</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"strict.rtf"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>       bold_significant <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>       p_threshold <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/strict.rtf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/strict.rtf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 16: Descriptive statistics for baseline characteristics</span></span></span>
 <span class="r-in"><span><span class="va">desc</span> <span class="op">&lt;-</span> <span class="fu"><a href="desctable.html">desctable</a></span><span class="op">(</span><span class="va">clintrial</span>, by <span class="op">=</span> <span class="st">"treatment"</span>,</span></span>
@@ -454,7 +461,7 @@ Default is <code>FALSE</code>.</p></dd>
 <span class="r-in"><span><span class="fu">table2rtf</span><span class="op">(</span><span class="va">desc</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"baseline.rtf"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>       caption <span class="op">=</span> <span class="st">"Table 1: Baseline Patient Characteristics"</span>,</span></span>
 <span class="r-in"><span>       zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/baseline.rtf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/baseline.rtf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 17: Clinical trial efficacy table</span></span></span>
 <span class="r-in"><span><span class="fu">table2rtf</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"efficacy.rtf"</span><span class="op">)</span>,</span></span>
@@ -463,7 +470,7 @@ Default is <code>FALSE</code>.</p></dd>
 <span class="r-in"><span>       paper <span class="op">=</span> <span class="st">"letter"</span>,</span></span>
 <span class="r-in"><span>       orientation <span class="op">=</span> <span class="st">"landscape"</span>,</span></span>
 <span class="r-in"><span>       condense_table <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/efficacy.rtf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/efficacy.rtf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="va">old_width</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
@@ -478,7 +485,7 @@ Default is <code>FALSE</code>.</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
 </div>
 
     </footer></div>

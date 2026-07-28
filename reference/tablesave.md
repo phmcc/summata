@@ -1,33 +1,45 @@
-# Export Table with Automatic Format Detection
+# Save a Table to File
 
-Automatically detects the output format based on file extension and
-exports the table using the appropriate specialized function. Provides a
-unified interface for table export across all supported formats.
+Writes a table to file in the format indicated by the file extension,
+dispatching to the appropriate specialized export function. Provides a
+unified interface for table export across all supported formats, and is
+the counterpart to
+[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+for forest plots.
 
 ## Usage
 
 ``` r
-autotable(table, file, ...)
+tablesave(table, file, quiet = FALSE, ...)
+
+autotable(table, file, quiet = FALSE, ...)
 ```
 
 ## Arguments
 
 - table:
 
-  Data frame, data.table, or matrix to export. Can be output from
+  A table produced by
   [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md),
   [`survtable()`](https://phmcc.codeberg.page/summata/reference/survtable.md),
   [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
   [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
   [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md),
   [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md),
-  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md),
-  or any tabular data structure.
+  or
+  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md).
+  Any data frame, data.table, or matrix is accepted.
 
 - file:
 
   Character string specifying the output filename. The file extension
   determines the export format:
+
+  - `.csv` - Comma-separated values (uses
+    [`data.table::fwrite()`](https://rdrr.io/pkg/data.table/man/fwrite.html))
+
+  - `.tsv` - Tab-separated values (uses
+    [`data.table::fwrite()`](https://rdrr.io/pkg/data.table/man/fwrite.html))
 
   - `.pdf` - PDF via LaTeX (uses
     [`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md))
@@ -46,6 +58,14 @@ autotable(table, file, ...)
 
   - `.rtf` - Rich Text Format (uses
     [`table2rtf()`](https://phmcc.codeberg.page/summata/reference/table2rtf.md))
+
+- quiet:
+
+  Logical. Suppress progress and confirmation messages. The setting is
+  forwarded to the format-specific export function, so the LaTeX
+  compilation notices from
+  [`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md)
+  are suppressed with it. Default is `FALSE`.
 
 - ...:
 
@@ -81,6 +101,11 @@ autotable(table, file, ...)
 
   :   [`table2rtf()`](https://phmcc.codeberg.page/summata/reference/table2rtf.md) -
       `font_size`, `font_family`, `caption`, *etc.*
+
+  CSV, TSV
+
+  :   [`data.table::fwrite()`](https://rdrr.io/pkg/data.table/man/fwrite.html) -
+      `sep`, `quote`, `na`, *etc.*
 
   Common parameters across formats include:
 
@@ -118,8 +143,7 @@ autotable(table, file, ...)
 
 ## Value
 
-Invisibly returns the file path. Called primarily for its side effect of
-creating the output file.
+Invisibly returns `file`.
 
 ## Details
 
@@ -129,8 +153,8 @@ based on the file extension. All parameters are passed through to the
 underlying function, so the full range of format-specific options
 remains available.
 
-For format-specific advanced features, you may prefer to use the
-individual export functions directly:
+For format-specific advanced features, individual export functions may
+be called directly:
 
 - PDF exports support orientation, paper size, margins, and auto-sizing
 
@@ -166,11 +190,18 @@ data(clintrial_labels)
 tbl <- desctable(clintrial, by = "treatment",
     variables = c("age", "sex"), labels = clintrial_labels)
 
-# Auto-detect format from extension
+# Example 1: The format follows the file extension
 if (requireNamespace("xtable", quietly = TRUE)) {
-  autotable(tbl, file.path(tempdir(), "example.html"))
+  tablesave(tbl, file.path(tempdir(), "example.html"))
 }
-#> Table exported to /tmp/Rtmpn8SzwZ/example.html
+#> Table saved to /tmp/RtmptN10wa/example.html
+
+# Example 2: Delimited output needs no additional packages
+tablesave(tbl, file.path(tempdir(), "example.csv"))
+#> Table saved to /tmp/RtmptN10wa/example.csv
+
+# Example 3: Suppress the message reporting the file written
+tablesave(tbl, file.path(tempdir(), "example.tsv"), quiet = TRUE)
 
 # \donttest{
 # Load example data
@@ -201,57 +232,63 @@ has_latex <- local({
   result == 0L
 })
 
-# Export automatically detects format from extension
-autotable(results, file.path(tempdir(), "results.html"))  # Creates HTML file
-#> Table exported to /tmp/Rtmpn8SzwZ/results.html
-autotable(results, file.path(tempdir(), "results.docx"))  # Creates Word document
-#> Table exported to /tmp/Rtmpn8SzwZ/results.docx
-autotable(results, file.path(tempdir(), "results.pptx"))  # Creates PowerPoint slide
-#> Table exported to /tmp/Rtmpn8SzwZ/results.pptx
-autotable(results, file.path(tempdir(), "results.tex"))   # Creates LaTeX source
-#> Table exported to /tmp/Rtmpn8SzwZ/results.tex
-autotable(results, file.path(tempdir(), "results.rtf"))   # Creates RTF document
-#> Table exported to /tmp/Rtmpn8SzwZ/results.rtf
+# Example 4: The format is taken from the file extension
+tablesave(results, file.path(tempdir(), "results.html"))  # Creates HTML file
+#> Table saved to /tmp/RtmptN10wa/results.html
+tablesave(results, file.path(tempdir(), "results.docx"))  # Creates Word document
+#> Table saved to /tmp/RtmptN10wa/results.docx
+tablesave(results, file.path(tempdir(), "results.pptx"))  # Creates PowerPoint slide
+#> Table saved to /tmp/RtmptN10wa/results.pptx
+tablesave(results, file.path(tempdir(), "results.tex"))   # Creates LaTeX source
+#> Table saved to /tmp/RtmptN10wa/results.tex
+tablesave(results, file.path(tempdir(), "results.rtf"))   # Creates RTF document
+#> Table saved to /tmp/RtmptN10wa/results.rtf
 if (has_latex) {
-  autotable(results, file.path(tempdir(), "results.pdf")) # Creates PDF
+  tablesave(results, file.path(tempdir(), "results.pdf")) # Creates PDF
 }
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmpn8SzwZ/results.pdf
+#> Table saved to /tmp/RtmptN10wa/results.pdf
 
-# Pass format-specific parameters
+# Example 5: Format-specific parameters are passed through
 if (has_latex) {
-  autotable(results, file.path(tempdir(), "results.pdf"), 
+  tablesave(results, file.path(tempdir(), "results.pdf"), 
              orientation = "landscape",
              paper = "a4",
              font_size = 10)
 }
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmpn8SzwZ/results.pdf
+#> Table saved to /tmp/RtmptN10wa/results.pdf
 
-autotable(results, file.path(tempdir(), "results.docx"),
+tablesave(results, file.path(tempdir(), "results.docx"),
            caption = "Table 1: Logistic Regression Results",
            font_family = "Times New Roman",
            condense_table = TRUE)
-#> Table exported to /tmp/Rtmpn8SzwZ/results.docx
+#> Table saved to /tmp/RtmptN10wa/results.docx
 
-autotable(results, file.path(tempdir(), "results.html"),
+tablesave(results, file.path(tempdir(), "results.html"),
            zebra_stripes = TRUE,
            dark_header = TRUE,
            bold_significant = TRUE)
-#> Table exported to /tmp/Rtmpn8SzwZ/results.html
+#> Table saved to /tmp/RtmptN10wa/results.html
 
-# Works with any summata table output
+# Example 6: Any summata table may be saved
 desc <- desctable(clintrial,
                   by = "treatment",
                   variables = c("age", "sex", "bmi"))
 if (has_latex) {
-  autotable(desc, file.path(tempdir(), "demographics.pdf"))
+  tablesave(desc, file.path(tempdir(), "demographics.pdf"))
 }
 #> Compiling PDF...
-#> Table exported to /tmp/Rtmpn8SzwZ/demographics.pdf
+#> Table saved to /tmp/RtmptN10wa/demographics.pdf
 
+# Example 7: Model comparison table
+# Information criteria assume a common sample, so the candidate
+# predictors are restricted to complete cases before comparison
+comparison_data <- na.omit(
+    clintrial[, c("os_status", "age", "sex", "treatment", "stage")]
+)
 comparison <- compfit(
-    data = clintrial,
+    data = comparison_data,
     outcome = "os_status",
     model_list = list(
         base = c("age", "sex"),
@@ -261,8 +298,8 @@ comparison <- compfit(
 #> Auto-detected binary outcome, using logistic regression
 #> Fitting base with 2 predictors...
 #> Fitting full with 4 predictors...
-autotable(comparison, file.path(tempdir(), "model_comparison.docx"))
-#> Table exported to /tmp/Rtmpn8SzwZ/model_comparison.docx
+tablesave(comparison, file.path(tempdir(), "model_comparison.docx"))
+#> Table saved to /tmp/RtmptN10wa/model_comparison.docx
 
 # }
 ```

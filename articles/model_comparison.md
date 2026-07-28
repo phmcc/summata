@@ -211,7 +211,7 @@ example3
 #> Models ranked by selection score:
 #>           Model   CMS     N Events Predictors Converged    AIC    BIC Pseudo-R² Concordance Global p
 #>          <char> <num> <int>  <num>      <int>    <char>  <num>  <num>     <num>       <num>   <char>
-#> 1:         Full  75.8   196    151          5       Yes 7188.4 7232.4     0.283       0.699  < 0.001
+#> 1:         Full  75.8   194    149          5       Yes 7188.4 7232.4     0.283       0.699  < 0.001
 #> 2: Demographics  48.0   196    151          3       Yes 7438.4 7456.0     0.126       0.629  < 0.001
 #> 3:   Unadjusted  33.8   196    151          1       Yes 7527.1 7535.9     0.026       0.549  < 0.001
 #> 
@@ -592,7 +592,7 @@ scenario1
 #> Models ranked by selection score:
 #>               Model   CMS     N Events Predictors Converged    AIC    BIC Pseudo-R² Concordance Global p
 #>              <char> <num> <int>  <num>      <int>    <char>  <num>  <num>     <num>       <num>   <char>
-#> 1:   Fully Adjusted  75.8   196    151          5       Yes 7188.4 7232.4     0.283       0.699  < 0.001
+#> 1:   Fully Adjusted  75.8   194    149          5       Yes 7188.4 7232.4     0.283       0.699  < 0.001
 #> 2: Age-Sex Adjusted  48.0   196    151          3       Yes 7438.4 7456.0     0.126       0.629  < 0.001
 #> 3:            Crude  33.8   196    151          1       Yes 7527.1 7535.9     0.026       0.549  < 0.001
 #> 
@@ -613,16 +613,16 @@ attr(scenario1, "coefficients")
 #>  7: Age-Sex Adjusted             Age (years)       -    850    609             <NA> < 0.001 1.03 (1.03-1.04)
 #>  8: Age-Sex Adjusted                     Sex  Female    450    298             <NA>       -        reference
 #>  9: Age-Sex Adjusted                            Male    400    311             <NA>   0.004 1.26 (1.08-1.48)
-#> 10:   Fully Adjusted         Treatment Group Control    196    151             <NA>       -        reference
-#> 11:   Fully Adjusted                          Drug A    292    184             <NA> < 0.001 0.54 (0.44-0.68)
-#> 12:   Fully Adjusted                          Drug B    362    274             <NA>   0.095 0.84 (0.69-1.03)
+#> 10:   Fully Adjusted         Treatment Group Control    194    149             <NA>       -        reference
+#> 11:   Fully Adjusted                          Drug A    291    183             <NA> < 0.001 0.54 (0.44-0.68)
+#> 12:   Fully Adjusted                          Drug B    357    270             <NA>   0.095 0.84 (0.69-1.03)
 #> 13:   Fully Adjusted             Age (years)       -    842    602             <NA> < 0.001 1.04 (1.03-1.04)
-#> 14:   Fully Adjusted                     Sex  Female    450    298             <NA>       -        reference
-#> 15:   Fully Adjusted                            Male    400    311             <NA>   0.002 1.29 (1.10-1.52)
-#> 16:   Fully Adjusted           Disease Stage       I    211    127             <NA>       -        reference
-#> 17:   Fully Adjusted                              II    263    172             <NA>   0.288 1.13 (0.90-1.43)
+#> 14:   Fully Adjusted                     Sex  Female    448    296             <NA>       -        reference
+#> 15:   Fully Adjusted                            Male    394    306             <NA>   0.002 1.29 (1.10-1.52)
+#> 16:   Fully Adjusted           Disease Stage       I    210    127             <NA>       -        reference
+#> 17:   Fully Adjusted                              II    261    170             <NA>   0.288 1.13 (0.90-1.43)
 #> 18:   Fully Adjusted                             III    241    186             <NA> < 0.001 1.93 (1.53-2.43)
-#> 19:   Fully Adjusted                              IV    132    121             <NA> < 0.001 3.87 (2.98-5.01)
+#> 19:   Fully Adjusted                              IV    130    119             <NA> < 0.001 3.87 (2.98-5.01)
 #> 20:   Fully Adjusted ECOG Performance Status       0    265    159             <NA>       -        reference
 #> 21:   Fully Adjusted                               1    302    212             <NA> < 0.001 1.51 (1.22-1.85)
 #> 22:   Fully Adjusted                               2    238    194             <NA> < 0.001 1.93 (1.56-2.39)
@@ -731,27 +731,29 @@ scenario3
 
 ## Exporting Results
 
-Comparison tables can be exported to various formats:
+Comparison tables can be exported to various formats using the
+[`tablesave()`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+dispatcher or the various per-format export functions:
 
 ``` r
 # Main comparison table
 table2docx(
   table = example1,
-  file = file.path(tempdir(), "Model_Comparison.docx"),
+  file = "model_comparison.docx",
   caption = "Table 3. Model Comparison Results"
 )
 
 # Coefficient table
 table2docx(
   table = attr(example6, "coefficients"),
-  file = file.path(tempdir(), "Coefficient_Comparison.docx"),
+  file = "coefficient_comparison.docx",
   caption = "Table S1. Coefficient Estimates Across Models"
 )
 
 # PDF with landscape orientation for wide tables
 table2pdf(
   table = example1,
-  file = file.path(tempdir(), "Model_Comparison.pdf"),
+  file = "model_comparison.pdf",
   caption = "Model Comparison",
   orientation = "landscape"
 )
@@ -843,9 +845,8 @@ comparison[, .(Model, `Composite Model Score (CMS)`, AIC, Concordance)]
   for baseline characteristics
 - [Regression
   Modeling](https://phmcc.codeberg.page/summata/articles/regression_modeling.md):
-  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
   [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
-  and
+  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md), and
   [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
 - [Table
   Export](https://phmcc.codeberg.page/summata/articles/table_export.md):

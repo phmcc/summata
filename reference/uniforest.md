@@ -117,8 +117,9 @@ uniforest(
 
 - show_n:
 
-  Logical. If `TRUE`, includes a column showing sample sizes. Default is
-  `TRUE`.
+  Logical. If `TRUE`, includes a column showing sample sizes. Counts
+  describe the observations used in fitting rather than every row
+  supplied. Default is `TRUE`.
 
 - show_events:
 
@@ -176,8 +177,11 @@ uniforest(
 - labels:
 
   Named character vector providing custom display labels for variables.
-  Applied to predictor names in the plot. Default is `NULL` (uses
-  original variable names).
+  Applied to predictor names in the plot. Default is `NULL`, in which
+  case the labels attached by the function that produced `x` are used
+  where `x` is a summata result rather than a model object, so that
+  labels supplied once are carried through the workflow. Original
+  variable names are used where neither is available.
 
 - show_footer:
 
@@ -219,7 +223,7 @@ A `ggplot` object containing the complete forest plot. The plot can be:
 
 - Displayed directly: `print(plot)`
 
-- Saved to file: `ggsave("forest.pdf", plot, width = 12, height = 8)`
+- Saved to file: `forestsave(plot, "forest.pdf")`
 
 - Further customized with ggplot2 functions
 
@@ -234,9 +238,22 @@ The returned object includes an attribute `"rec_dims"` accessible via
 
   Numeric. Recommended plot height in specified units
 
+- units:
+
+  Character. The units the dimensions are expressed in, matching the
+  `units` argument
+
 These recommendations are automatically calculated based on the number
 of variables, text sizes, and layout parameters, and are printed to
 console if `plot_width` or `plot_height` are not specified.
+[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+reads all three and requires no further handling.
+
+The returned object also includes an attribute `"table_data"` accessible
+via `attr(plot, "table_data")`, a data.table holding the values drawn in
+the plot, in the order of the model terms. Sample sizes and event counts
+describe the observations used in fitting rather than every row
+supplied.
 
 ## Details
 
@@ -273,11 +290,14 @@ for multi-outcome forest plots,
 [`coxforest`](https://phmcc.codeberg.page/summata/reference/coxforest.md),
 [`glmforest`](https://phmcc.codeberg.page/summata/reference/glmforest.md),
 [`lmforest`](https://phmcc.codeberg.page/summata/reference/lmforest.md)
-for single-model forest plots
+for single-model forest plots,
+[`forestsave`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+for saving with recommended dimensions
 
 Other visualization functions:
 [`autoforest()`](https://phmcc.codeberg.page/summata/reference/autoforest.md),
 [`coxforest()`](https://phmcc.codeberg.page/summata/reference/coxforest.md),
+[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md),
 [`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md),
 [`lmforest()`](https://phmcc.codeberg.page/summata/reference/lmforest.md),
 [`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md)
@@ -299,7 +319,7 @@ uni_results <- uniscreen(
 
 # Example 1: Basic univariable forest plot
 p <- uniforest(uni_results, title = "Univariable Associations with Mortality")
-#> Recommended plot dimensions: width = 11.4 in, height = 6.2 in
+#> Recommended plot dimensions: width = 12.2 in, height = 6.2 in
 
 # \donttest{
 
@@ -316,8 +336,9 @@ surv_results <- uniscreen(
     parallel = FALSE
 )
 
+# Labels attached by uniscreen() are applied automatically
 p2 <- uniforest(surv_results, title = "Univariable Survival Analysis")
-#> Recommended plot dimensions: width = 11.2 in, height = 5.5 in
+#> Recommended plot dimensions: width = 12.0 in, height = 5.5 in
 
 # Example 3: Linear regression
 lm_results <- uniscreen(
@@ -330,7 +351,7 @@ lm_results <- uniscreen(
 )
 
 p3 <- uniforest(lm_results, title = "Predictors of Length of Stay")
-#> Recommended plot dimensions: width = 10.0 in, height = 5.0 in
+#> Recommended plot dimensions: width = 11.0 in, height = 5.0 in
 
 # Example 4: Customize appearance
 p4 <- uniforest(
@@ -341,12 +362,11 @@ p4 <- uniforest(
     zebra_stripes = TRUE,
     bold_variables = TRUE
 )
-#> Recommended plot dimensions: width = 10.2 in, height = 7.2 in
+#> Recommended plot dimensions: width = 10.7 in, height = 7.2 in
 
 # Example 5: Save with recommended dimensions
-dims <- attr(p4, "rec_dims")
-ggplot2::ggsave(file.path(tempdir(), "univariable_forest.pdf"),
-                p4, width = dims$width, height = dims$height)
+forestsave(p4, file.path(tempdir(), "univariable_forest.pdf"))
+#> Forest plot saved to /tmp/RtmptN10wa/univariable_forest.pdf (width = 10.7 in, height = 7.2 in)
 
 options(old_width)
 

@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -215,7 +215,9 @@ context.</p>
 <strong>Example 3:</strong> Survival Quartiles<a class="anchor" aria-label="anchor" href="#example-3-survival-quartiles"></a>
 </h3>
 <p>Report multiple survival quantiles by specifying the
-<code>probs</code> parameter:</p>
+<code>probs</code> parameter. Note that <code>labels</code> names levels
+of the <code>by</code> variable here, rather than variable names as in
+<code><a href="../reference/desctable.html">desctable()</a></code> and the regression functions:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/survtable.html">survtable</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
@@ -223,7 +225,12 @@ context.</p>
 <span>  by <span class="op">=</span> <span class="st">"stage"</span>,</span>
 <span>  times <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  probs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span><span class="op">)</span>,</span>
-<span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span></span>
+<span>  labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="st">"I"</span> <span class="op">=</span> <span class="st">"Stage I"</span>,</span>
+<span>    <span class="st">"II"</span> <span class="op">=</span> <span class="st">"Stage II"</span>,</span>
+<span>    <span class="st">"III"</span> <span class="op">=</span> <span class="st">"Stage III"</span>,</span>
+<span>    <span class="st">"IV"</span> <span class="op">=</span> <span class="st">"Stage IV"</span></span>
+<span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">example3</span></span>
@@ -235,13 +242,13 @@ context.</p>
 <span><span class="co">#&gt; Statistic: Survival probability</span></span>
 <span><span class="co">#&gt; Test: Log-rank (p = &lt; 0.001)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;    Variable 75% Survival Time (95% CI)  Median (95% CI) 25% Survival Time (95% CI) p-value</span></span>
-<span><span class="co">#&gt;      &lt;char&gt;                     &lt;char&gt;           &lt;char&gt;                     &lt;char&gt;  &lt;char&gt;</span></span>
-<span><span class="co">#&gt; 1:    Total              5.1 (4.3-6.1) 19.5 (16.1-23.5)                         NR &lt; 0.001</span></span>
-<span><span class="co">#&gt; 2:        I             9.0 (7.4-12.5) 33.7 (22.4-45.2)                         NR        </span></span>
-<span><span class="co">#&gt; 3:       II             7.7 (6.1-12.3) 32.2 (24.8-42.0)                         NR        </span></span>
-<span><span class="co">#&gt; 4:      III              3.9 (3.0-5.2) 13.7 (10.4-22.3)             44.7 (35.8-NR)        </span></span>
-<span><span class="co">#&gt; 5:       IV              2.0 (1.4-2.8)    5.9 (4.3-8.2)           15.6 (10.8-26.7)</span></span></code></pre></div>
+<span><span class="co">#&gt;     Variable 75% Survival Time (95% CI)  Median (95% CI) 25% Survival Time (95% CI) p-value</span></span>
+<span><span class="co">#&gt;       &lt;char&gt;                     &lt;char&gt;           &lt;char&gt;                     &lt;char&gt;  &lt;char&gt;</span></span>
+<span><span class="co">#&gt; 1:     Total              5.1 (4.3-6.1) 19.5 (16.1-23.5)                         NR &lt; 0.001</span></span>
+<span><span class="co">#&gt; 2:   Stage I             9.0 (7.4-12.5) 33.7 (22.4-45.2)                         NR        </span></span>
+<span><span class="co">#&gt; 3:  Stage II             7.7 (6.1-12.3) 32.2 (24.8-42.0)                         NR        </span></span>
+<span><span class="co">#&gt; 4: Stage III              3.9 (3.0-5.2) 13.7 (10.4-22.3)             44.7 (35.8-NR)        </span></span>
+<span><span class="co">#&gt; 5:  Stage IV              2.0 (1.4-2.8)    5.9 (4.3-8.2)           15.6 (10.8-26.7)</span></span></code></pre></div>
 <hr>
 </div>
 </div>
@@ -409,8 +416,8 @@ for publication:</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Export both for publication</span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"km_curve.pdf"</span><span class="op">)</span>, width <span class="op">=</span> <span class="fl">8</span>, height <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span><span class="va">surv_table</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"survival_table.pdf"</span><span class="op">)</span>, </span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"km_curve.pdf"</span>, width <span class="op">=</span> <span class="fl">8</span>, height <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span><span class="va">surv_table</span>, <span class="st">"survival_table.pdf"</span>, </span>
 <span>          caption <span class="op">=</span> <span class="st">"Table 2. Survival Estimates by Treatment Group"</span><span class="op">)</span></span></code></pre></div>
 <p>This workflow ensures that the Kaplan-Meier curve and survival table
 report consistent time points and groupings.</p>
@@ -427,14 +434,14 @@ documentation.</p>
 <code class="sourceCode R"><span><span class="co"># Microsoft Word</span></span>
 <span><span class="fu"><a href="../reference/table2docx.html">table2docx</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">example1</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"SurvivalTable.docx"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"survival_table.docx"</span>,</span>
 <span>  caption <span class="op">=</span> <span class="st">"Table 2. Survival Estimates by Treatment Group"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># PDF (requires LaTeX)</span></span>
 <span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span></span>
 <span>  table <span class="op">=</span> <span class="va">example1</span>,</span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"SurvivalTable.pdf"</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"survival_table.pdf"</span>,</span>
 <span>  caption <span class="op">=</span> <span class="st">"Table 2. Survival Estimates by Treatment Group"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <hr>
@@ -476,7 +483,7 @@ point</li>
 <code><a href="../reference/desctable.html">desctable()</a></code> for baseline characteristics</li>
 <li>
 <a href="regression_modeling.html">Regression Modeling</a>:
-<code><a href="../reference/fit.html">fit()</a></code>, <code><a href="../reference/uniscreen.html">uniscreen()</a></code>, and
+<code><a href="../reference/uniscreen.html">uniscreen()</a></code>, <code><a href="../reference/fit.html">fit()</a></code>, and
 <code><a href="../reference/fullfit.html">fullfit()</a></code>
 </li>
 <li>
@@ -507,7 +514,7 @@ Interactions and mixed-effects models</li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
 </div>
 
     </footer>

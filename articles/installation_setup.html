@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -135,38 +135,46 @@ Codeberg:</p>
 <div class="section level3">
 <h3 id="required-dependencies">Required Dependencies<a class="anchor" aria-label="anchor" href="#required-dependencies"></a>
 </h3>
-<p>The following packages are installed automatically as
-dependencies:</p>
+<p>The following packages are required. Those distributed through CRAN
+are installed automatically with <code>summata</code>; others are
+included in base R.</p>
 <table class="table">
 <colgroup>
-<col width="50%">
-<col width="50%">
+<col width="34%">
+<col width="34%">
+<col width="30%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">Package</th>
 <th align="left">Purpose</th>
+<th align="left">Source</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td align="left"><code>data.table</code></td>
 <td align="left">High-performance data manipulation and core data
 operations</td>
+<td align="left">CRAN</td>
 </tr>
 <tr class="even">
-<td align="left"><code>survival</code></td>
-<td align="left">Survival and time-to-event analysis</td>
-</tr>
-<tr class="odd">
 <td align="left"><code>ggplot2</code></td>
 <td align="left">Visualization system for forest plots and graphics</td>
+<td align="left">CRAN</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>survival</code></td>
+<td align="left">Survival and time-to-event analysis</td>
+<td align="left">Base R</td>
 </tr>
 <tr class="even">
 <td align="left"><code>stats</code></td>
 <td align="left">Statistical functions and model fitting</td>
+<td align="left">Base R</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>grDevices</code></td>
 <td align="left">Graphics devices and color palettes</td>
+<td align="left">Base R</td>
 </tr>
 </tbody>
 </table>
@@ -420,15 +428,15 @@ edited in Microsoft Office or compatible applications.</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Test Word export (requires flextable, officer)</span></span>
-<span><span class="fu"><a href="../reference/table2docx.html">table2docx</a></span><span class="op">(</span><span class="va">test_data</span>, file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"verification_test.docx"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/table2docx.html">table2docx</a></span><span class="op">(</span><span class="va">test_data</span>, file <span class="op">=</span> <span class="st">"verification_test.docx"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Test PDF export (requires xtable, LaTeX)</span></span>
-<span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span><span class="va">test_data</span>, file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"verification_test.pdf"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span><span class="va">test_data</span>, file <span class="op">=</span> <span class="st">"verification_test.pdf"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Clean up</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.remove</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"verification_test.docx"</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"verification_test.pdf"</span><span class="op">)</span></span>
+<span>  <span class="st">"verification_test.docx"</span>,</span>
+<span>  <span class="st">"verification_test.pdf"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Successful execution confirms proper configuration of all
 export-related dependencies.</p>
@@ -460,7 +468,7 @@ Solutions include:</p>
 <code class="sourceCode R"><span><span class="fu">tinytex</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/tinytex/man/tlmgr.html" class="external-link">tlmgr_install</a></span><span class="op">(</span><span class="st">"package_name"</span><span class="op">)</span></span></code></pre></div>
 <p>For compilation errors, examine the log file:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span><span class="va">test_data</span>, file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"debug.pdf"</span><span class="op">)</span>, show_logs <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/table2pdf.html">table2pdf</a></span><span class="op">(</span><span class="va">test_data</span>, file <span class="op">=</span> <span class="st">"debug.pdf"</span>, show_logs <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="package-installation-failures">Package Installation Failures<a class="anchor" aria-label="anchor" href="#package-installation-failures"></a>
@@ -525,7 +533,7 @@ LaTeX distribution (2–6 GB)</td>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
 </div>
 
     </footer>

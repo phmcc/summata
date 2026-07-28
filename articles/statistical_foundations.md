@@ -13,7 +13,7 @@ vignette.
 
 ## Notation and Conventions
 
-Throughout this article, we adopt the following notation:
+The following notation is used throughout this article:
 
 | Symbol        | Description                           |
 |:--------------|:--------------------------------------|

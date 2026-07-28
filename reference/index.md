@@ -22,8 +22,6 @@
 
 ## Export Functions
 
-- [`autotable()`](https://phmcc.codeberg.page/summata/reference/autotable.md)
-  : Export Table with Automatic Format Detection
 - [`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md)
   : Export Table to PDF Format
 - [`table2docx()`](https://phmcc.codeberg.page/summata/reference/table2docx.md)
@@ -36,6 +34,9 @@
   : Export Table to LaTeX Format
 - [`table2rtf()`](https://phmcc.codeberg.page/summata/reference/table2rtf.md)
   : Export Table to Rich Text Format (RTF)
+- [`tablesave()`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+  [`autotable()`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+  : Save a Table to File
 
 ## Visualization Functions
 
@@ -51,6 +52,8 @@
   : Create Forest Plot for Univariable Screening
 - [`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md)
   : Create Forest Plot for Multivariate Regression
+- [`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+  : Save a Forest Plot at Its Recommended Dimensions
 
 ## Utility Functions
 

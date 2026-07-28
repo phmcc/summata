@@ -231,9 +231,9 @@ descriptive statistics. The table structure includes:
 
 - Group:
 
-  For continuous variables: statistic type (*e.g.*, "Mean \\\pm\\ SD",
-  "Median \[IQR\]"). For categorical variables: category level. Empty
-  for variable name rows.
+  For continuous variables: statistic type (*e.g.*, "Mean ± SD", "Median
+  \[IQR\]"). For categorical variables: category level. Empty for
+  variable name rows.
 
 - Total:
 
@@ -321,8 +321,7 @@ All numeric output respects the `number_format` parameter. Separators
 within ranges and confidence intervals adapt automatically to avoid
 ambiguity:
 
-- Mean \\\pm\\ SD: `"45.2 \eqn{\pm} 12.3"` (US) or
-  `"45,2 \eqn{\pm} 12,3"` (EU)
+- Mean ± SD: `"45.2 ± 12.3"` (US) or `"45,2 ± 12,3"` (EU)
 
 - Median \[IQR\]: `"38.0 [28.0-52.0]"` (US) or `"38,0 [28,0-52,0]"` (EU,
   en-dash separator)
@@ -342,6 +341,8 @@ ambiguity:
 for detailed survival summary tables,
 [`fit`](https://phmcc.codeberg.page/summata/reference/fit.md) for
 regression modeling,
+[`tablesave`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+for export in any supported format,
 [`table2pdf`](https://phmcc.codeberg.page/summata/reference/table2pdf.md)
 for PDF export,
 [`table2docx`](https://phmcc.codeberg.page/summata/reference/table2docx.md)
@@ -361,121 +362,129 @@ data(clintrial)
 
 # Example 1: Basic descriptive table without grouping
 desctable(clintrial,
-        variables = c("age", "sex", "bmi"))
-#>    Variable        Group            Total
-#>      <char>       <char>           <char>
-#> 1:        N                           850
-#> 2:      age Median [IQR] 60.0 [52.0-67.0]
-#> 3:      sex       Female      450 (52.9%)
-#> 4:                  Male      400 (47.1%)
-#> 5:      bmi Median [IQR] 28.0 [24.7-31.5]
+        variables = c("age", "sex", "bmi"),
+        labels = clintrial_labels)
+#>                   Variable        Group            Total
+#>                     <char>       <char>           <char>
+#> 1:                       N                           850
+#> 2:             Age (years) Median [IQR] 60.0 [52.0-67.0]
+#> 3:                     Sex       Female      450 (52.9%)
+#> 4:                                 Male      400 (47.1%)
+#> 5: Body Mass Index (kg/m²) Median [IQR] 28.0 [24.7-31.5]
 
 # \donttest{
 
 # Example 2: Grouped comparison with default tests
 desctable(clintrial,
         by = "treatment",
-        variables = c("age", "sex", "race", "bmi"))
-#>    Variable        Group            Total          Control           Drug A           Drug B p-value
-#>      <char>       <char>           <char>           <char>           <char>           <char>  <char>
-#> 1:        N                           850              196              292              362        
-#> 2:      age Median [IQR] 60.0 [52.0-67.0] 59.0 [52.0-66.5] 60.0 [51.0-68.0] 61.0 [53.0-68.0]   0.465
-#> 3:      sex       Female      450 (52.9%)      100 (51.0%)      164 (56.2%)      186 (51.4%)   0.394
-#> 4:                  Male      400 (47.1%)       96 (49.0%)      128 (43.8%)      176 (48.6%)        
-#> 5:     race        White      598 (70.4%)      147 (75.0%)      198 (67.8%)      253 (69.9%)   0.794
-#> 6:                 Black      126 (14.8%)       25 (12.8%)       47 (16.1%)       54 (14.9%)        
-#> 7:                 Asian       93 (10.9%)        17 (8.7%)       35 (12.0%)       41 (11.3%)        
-#> 8:                 Other        33 (3.9%)         7 (3.6%)        12 (4.1%)        14 (3.9%)        
-#> 9:      bmi Median [IQR] 28.0 [24.7-31.5] 28.0 [24.4-31.9] 28.2 [24.9-31.3] 27.8 [24.7-31.5]   0.831
+        variables = c("age", "sex", "race", "bmi"),
+        labels = clintrial_labels)
+#>                   Variable        Group            Total          Control           Drug A           Drug B p-value
+#>                     <char>       <char>           <char>           <char>           <char>           <char>  <char>
+#> 1:                       N                           850              196              292              362        
+#> 2:             Age (years) Median [IQR] 60.0 [52.0-67.0] 59.0 [52.0-66.5] 60.0 [51.0-68.0] 61.0 [53.0-68.0]   0.465
+#> 3:                     Sex       Female      450 (52.9%)      100 (51.0%)      164 (56.2%)      186 (51.4%)   0.394
+#> 4:                                 Male      400 (47.1%)       96 (49.0%)      128 (43.8%)      176 (48.6%)        
+#> 5:                    Race        White      598 (70.4%)      147 (75.0%)      198 (67.8%)      253 (69.9%)   0.794
+#> 6:                                Black      126 (14.8%)       25 (12.8%)       47 (16.1%)       54 (14.9%)        
+#> 7:                                Asian       93 (10.9%)        17 (8.7%)       35 (12.0%)       41 (11.3%)        
+#> 8:                                Other        33 (3.9%)         7 (3.6%)        12 (4.1%)        14 (3.9%)        
+#> 9: Body Mass Index (kg/m²) Median [IQR] 28.0 [24.7-31.5] 28.0 [24.4-31.9] 28.2 [24.9-31.3] 27.8 [24.7-31.5]   0.831
 
 # Example 3: Customize continuous statistics
 desctable(clintrial,
         by = "treatment",
         variables = c("age", "bmi", "creatinine"),
-        stats_continuous = c("median_iqr", "range"))
-#>      Variable        Group            Total          Control           Drug A           Drug B p-value
-#>        <char>       <char>           <char>           <char>           <char>           <char>  <char>
-#> 1:          N                           850              196              292              362        
-#> 2:        age Median [IQR] 60.0 [52.0-67.0] 59.0 [52.0-66.5] 60.0 [51.0-68.0] 61.0 [53.0-68.0]   0.465
-#> 3:                   Range        18.0-90.0        26.0-90.0        18.0-90.0        24.0-90.0        
-#> 4:        bmi Median [IQR] 28.0 [24.7-31.5] 28.0 [24.4-31.9] 28.2 [24.9-31.3] 27.8 [24.7-31.5]   0.831
-#> 5:                   Range        15.0-42.6        17.4-40.8        15.5-40.9        15.0-42.6        
-#> 6: creatinine Median [IQR]    1.0 [0.8-1.2]    1.0 [0.8-1.2]    1.0 [0.8-1.2]    1.0 [0.8-1.2]   0.483
-#> 7:                   Range          0.3-2.2          0.5-1.8          0.3-2.2          0.4-2.1        
+        stats_continuous = c("median_iqr", "range"),
+        labels = clintrial_labels)
+#>                       Variable        Group            Total          Control           Drug A           Drug B p-value
+#>                         <char>       <char>           <char>           <char>           <char>           <char>  <char>
+#> 1:                           N                           850              196              292              362        
+#> 2:                 Age (years) Median [IQR] 60.0 [52.0-67.0] 59.0 [52.0-66.5] 60.0 [51.0-68.0] 61.0 [53.0-68.0]   0.465
+#> 3:                                    Range        18.0-90.0        26.0-90.0        18.0-90.0        24.0-90.0        
+#> 4:     Body Mass Index (kg/m²) Median [IQR] 28.0 [24.7-31.5] 28.0 [24.4-31.9] 28.2 [24.9-31.3] 27.8 [24.7-31.5]   0.831
+#> 5:                                    Range        15.0-42.6        17.4-40.8        15.5-40.9        15.0-42.6        
+#> 6: Baseline Creatinine (mg/dL) Median [IQR]    1.0 [0.8-1.2]    1.0 [0.8-1.2]    1.0 [0.8-1.2]    1.0 [0.8-1.2]   0.483
+#> 7:                                    Range          0.3-2.2          0.5-1.8          0.3-2.2          0.4-2.1        
 
 # Example 4: Change categorical display format
 desctable(clintrial,
         by = "treatment",
         variables = c("sex", "race", "smoking"),
-        stats_categorical = "n")  # Show counts only
-#>     Variable   Group  Total Control Drug A Drug B p-value
-#>       <char>  <char> <char>  <char> <char> <char>  <char>
-#>  1:        N            850     196    292    362        
-#>  2:      sex  Female    450     100    164    186   0.394
-#>  3:             Male    400      96    128    176        
-#>  4:     race   White    598     147    198    253   0.794
-#>  5:            Black    126      25     47     54        
-#>  6:            Asian     93      17     35     41        
-#>  7:            Other     33       7     12     14        
-#>  8:  smoking   Never    337      83    123    131   0.450
-#>  9:           Former    311      66    101    144        
-#> 10:          Current    185      42     64     79        
+        stats_categorical = "n",  # Show counts only
+        labels = clintrial_labels)
+#>           Variable   Group  Total Control Drug A Drug B p-value
+#>             <char>  <char> <char>  <char> <char> <char>  <char>
+#>  1:              N            850     196    292    362        
+#>  2:            Sex  Female    450     100    164    186   0.394
+#>  3:                   Male    400      96    128    176        
+#>  4:           Race   White    598     147    198    253   0.794
+#>  5:                  Black    126      25     47     54        
+#>  6:                  Asian     93      17     35     41        
+#>  7:                  Other     33       7     12     14        
+#>  8: Smoking Status   Never    337      83    123    131   0.450
+#>  9:                 Former    311      66    101    144        
+#> 10:                Current    185      42     64     79        
 
 # Example 5: Include missing values
 desctable(clintrial,
         by = "treatment",
         variables = c("age", "smoking", "hypertension"),
         na_include = TRUE,
-        na_label = "Missing")
-#>        Variable        Group            Total          Control           Drug A           Drug B p-value
-#>          <char>       <char>           <char>           <char>           <char>           <char>  <char>
-#> 1:            N                           850              196              292              362        
-#> 2:          age Median [IQR] 60.0 [52.0-67.0] 59.0 [52.0-66.5] 60.0 [51.0-68.0] 61.0 [53.0-68.0]   0.465
-#> 3:      smoking        Never      337 (40.5%)       83 (43.5%)      123 (42.7%)      131 (37.0%)   0.450
-#> 4:                    Former      311 (37.3%)       66 (34.6%)      101 (35.1%)      144 (40.7%)        
-#> 5:                   Current      185 (22.2%)       42 (22.0%)       64 (22.2%)       79 (22.3%)        
-#> 6:                   Missing               17                5                4                8        
-#> 7: hypertension           No      504 (60.4%)      108 (56.2%)      179 (62.2%)      217 (61.1%)   0.401
-#> 8:                       Yes      331 (39.6%)       84 (43.8%)      109 (37.8%)      138 (38.9%)        
-#> 9:                   Missing               15                4                4                7        
+        na_label = "Missing",
+        labels = clintrial_labels)
+#>          Variable        Group            Total          Control           Drug A           Drug B p-value
+#>            <char>       <char>           <char>           <char>           <char>           <char>  <char>
+#> 1:              N                           850              196              292              362        
+#> 2:    Age (years) Median [IQR] 60.0 [52.0-67.0] 59.0 [52.0-66.5] 60.0 [51.0-68.0] 61.0 [53.0-68.0]   0.465
+#> 3: Smoking Status        Never      337 (40.5%)       83 (43.5%)      123 (42.7%)      131 (37.0%)   0.450
+#> 4:                      Former      311 (37.3%)       66 (34.6%)      101 (35.1%)      144 (40.7%)        
+#> 5:                     Current      185 (22.2%)       42 (22.0%)       64 (22.2%)       79 (22.3%)        
+#> 6:                     Missing               17                5                4                8        
+#> 7:   Hypertension           No      504 (60.4%)      108 (56.2%)      179 (62.2%)      217 (61.1%)   0.401
+#> 8:                         Yes      331 (39.6%)       84 (43.8%)      109 (37.8%)      138 (38.9%)        
+#> 9:                     Missing               15                4                4                7        
 
 # Example 6: Disable statistical testing
 desctable(clintrial,
         by = "treatment",
         variables = c("age", "sex", "bmi"),
-        test = FALSE)
-#>    Variable        Group            Total          Control           Drug A           Drug B
-#>      <char>       <char>           <char>           <char>           <char>           <char>
-#> 1:        N                           850              196              292              362
-#> 2:      age Median [IQR] 60.0 [52.0-67.0] 59.0 [52.0-66.5] 60.0 [51.0-68.0] 61.0 [53.0-68.0]
-#> 3:      sex       Female      450 (52.9%)      100 (51.0%)      164 (56.2%)      186 (51.4%)
-#> 4:                  Male      400 (47.1%)       96 (49.0%)      128 (43.8%)      176 (48.6%)
-#> 5:      bmi Median [IQR] 28.0 [24.7-31.5] 28.0 [24.4-31.9] 28.2 [24.9-31.3] 27.8 [24.7-31.5]
+        test = FALSE,
+        labels = clintrial_labels)
+#>                   Variable        Group            Total          Control           Drug A           Drug B
+#>                     <char>       <char>           <char>           <char>           <char>           <char>
+#> 1:                       N                           850              196              292              362
+#> 2:             Age (years) Median [IQR] 60.0 [52.0-67.0] 59.0 [52.0-66.5] 60.0 [51.0-68.0] 61.0 [53.0-68.0]
+#> 3:                     Sex       Female      450 (52.9%)      100 (51.0%)      164 (56.2%)      186 (51.4%)
+#> 4:                                 Male      400 (47.1%)       96 (49.0%)      128 (43.8%)      176 (48.6%)
+#> 5: Body Mass Index (kg/m²) Median [IQR] 28.0 [24.7-31.5] 28.0 [24.4-31.9] 28.2 [24.9-31.3] 27.8 [24.7-31.5]
 
 # Example 7: Force specific tests
 desctable(clintrial,
         by = "surgery",
         variables = c("age", "sex"),
-        test_continuous = "t",      # t-test instead of auto
-        test_categorical = "fisher") # Fisher test instead of auto
-#>    Variable        Group            Total               No              Yes p-value
-#>      <char>       <char>           <char>           <char>           <char>  <char>
-#> 1:        N                           850              480              370        
-#> 2:      age Median [IQR] 60.0 [52.0-67.0] 62.0 [54.0-70.0] 57.0 [49.0-66.0] < 0.001
-#> 3:      sex       Female      450 (52.9%)      246 (51.2%)      204 (55.1%)   0.268
-#> 4:                  Male      400 (47.1%)      234 (48.8%)      166 (44.9%)        
+        test_continuous = "t",        # t-test instead of auto
+        test_categorical = "fisher",  # Fisher test instead of auto
+        labels = clintrial_labels)
+#>       Variable        Group            Total               No              Yes p-value
+#>         <char>       <char>           <char>           <char>           <char>  <char>
+#> 1:           N                           850              480              370        
+#> 2: Age (years) Median [IQR] 60.0 [52.0-67.0] 62.0 [54.0-70.0] 57.0 [49.0-66.0] < 0.001
+#> 3:         Sex       Female      450 (52.9%)      246 (51.2%)      204 (55.1%)   0.268
+#> 4:                     Male      400 (47.1%)      234 (48.8%)      166 (44.9%)        
 
 # Example 8: Adjust decimal places
 desctable(clintrial,
         by = "treatment",
         variables = c("age", "bmi"),
         digits = 2,    # 2 decimals for continuous
-        p_digits = 4)  # 4 decimals for p-values
-#>    Variable        Group               Total             Control              Drug A              Drug B p-value
-#>      <char>       <char>              <char>              <char>              <char>              <char>  <char>
-#> 1:        N                              850                 196                 292                 362        
-#> 2:      age Median [IQR] 60.00 [52.00-67.00] 59.00 [52.00-66.50] 60.00 [51.00-68.00] 61.00 [53.00-68.00]  0.4654
-#> 3:      bmi Median [IQR] 28.00 [24.70-31.50] 28.00 [24.40-31.90] 28.25 [24.90-31.30] 27.80 [24.70-31.50]  0.8314
+        p_digits = 4,  # 4 decimals for p-values
+        labels = clintrial_labels)
+#>                   Variable        Group               Total             Control              Drug A              Drug B p-value
+#>                     <char>       <char>              <char>              <char>              <char>              <char>  <char>
+#> 1:                       N                              850                 196                 292                 362        
+#> 2:             Age (years) Median [IQR] 60.00 [52.00-67.00] 59.00 [52.00-66.50] 60.00 [51.00-68.00] 61.00 [53.00-68.00]  0.4654
+#> 3: Body Mass Index (kg/m²) Median [IQR] 28.00 [24.70-31.50] 28.00 [24.40-31.90] 28.25 [24.90-31.30] 27.80 [24.70-31.50]  0.8314
 
 # Example 9: Custom variable labels
 labels <- c(
@@ -501,34 +510,37 @@ desctable(clintrial,
 desctable(clintrial,
         by = "treatment",
         variables = c("age", "sex"),
-        total = "last")
-#>    Variable        Group          Control           Drug A           Drug B            Total p-value
-#>      <char>       <char>           <char>           <char>           <char>           <char>  <char>
-#> 1:        N                           196              292              362              850        
-#> 2:      age Median [IQR] 59.0 [52.0-66.5] 60.0 [51.0-68.0] 61.0 [53.0-68.0] 60.0 [52.0-67.0]   0.465
-#> 3:      sex       Female      100 (51.0%)      164 (56.2%)      186 (51.4%)      450 (52.9%)   0.394
-#> 4:                  Male       96 (49.0%)      128 (43.8%)      176 (48.6%)      400 (47.1%)        
+        total = "last",
+        labels = clintrial_labels)
+#>       Variable        Group          Control           Drug A           Drug B            Total p-value
+#>         <char>       <char>           <char>           <char>           <char>           <char>  <char>
+#> 1:           N                           196              292              362              850        
+#> 2: Age (years) Median [IQR] 59.0 [52.0-66.5] 60.0 [51.0-68.0] 61.0 [53.0-68.0] 60.0 [52.0-67.0]   0.465
+#> 3:         Sex       Female      100 (51.0%)      164 (56.2%)      186 (51.4%)      450 (52.9%)   0.394
+#> 4:                     Male       96 (49.0%)      128 (43.8%)      176 (48.6%)      400 (47.1%)        
 
 # Example 11: Exclude total column
 desctable(clintrial,
         by = "treatment",
         variables = c("age", "sex"),
-        total = FALSE)
-#>    Variable        Group          Control           Drug A           Drug B p-value
-#>      <char>       <char>           <char>           <char>           <char>  <char>
-#> 1:        N                           196              292              362        
-#> 2:      age Median [IQR] 59.0 [52.0-66.5] 60.0 [51.0-68.0] 61.0 [53.0-68.0]   0.465
-#> 3:      sex       Female      100 (51.0%)      164 (56.2%)      186 (51.4%)   0.394
-#> 4:                  Male       96 (49.0%)      128 (43.8%)      176 (48.6%)        
+        total = FALSE,
+        labels = clintrial_labels)
+#>       Variable        Group          Control           Drug A           Drug B p-value
+#>         <char>       <char>           <char>           <char>           <char>  <char>
+#> 1:           N                           196              292              362        
+#> 2: Age (years) Median [IQR] 59.0 [52.0-66.5] 60.0 [51.0-68.0] 61.0 [53.0-68.0]   0.465
+#> 3:         Sex       Female      100 (51.0%)      164 (56.2%)      186 (51.4%)   0.394
+#> 4:                     Male       96 (49.0%)      128 (43.8%)      176 (48.6%)        
 
 # Example 12: Survival analysis
 desctable(clintrial,
         by = "treatment",
-        variables = "Surv(os_months, os_status)")
-#>                      Variable           Group            Total          Control           Drug A           Drug B p-value
-#>                        <char>          <char>           <char>           <char>           <char>           <char>  <char>
-#> 1:                          N                              850              196              292              362        
-#> 2: Surv(os_months, os_status) Median (95% CI) 19.4 (16.2-23.4) 14.7 (10.5-19.2) 33.6 (24.5-42.2) 14.7 (11.0-21.8) < 0.001
+        variables = "Surv(os_months, os_status)",
+        labels = clintrial_labels)
+#>                     Variable           Group            Total          Control           Drug A           Drug B p-value
+#>                       <char>          <char>           <char>           <char>           <char>           <char>  <char>
+#> 1:                         N                              850              196              292              362        
+#> 2: Overall Survival (months) Median (95% CI) 19.4 (16.2-23.4) 14.7 (10.5-19.2) 33.6 (24.5-42.2) 14.7 (11.0-21.8) < 0.001
 
 # Example 13: Multiple survival endpoints
 desctable(clintrial,
@@ -555,37 +567,39 @@ desctable(clintrial,
             "bmi", "creatinine",            # Labs
             "smoking", "hypertension",      # Risk factors
             "Surv(os_months, os_status)"    # Survival
-        ))
-#>                       Variable           Group            Total          Control           Drug A           Drug B p-value
-#>                         <char>          <char>           <char>           <char>           <char>           <char>  <char>
-#>  1:                          N                              850              196              292              362        
-#>  2:                        age    Median [IQR] 60.0 [52.0-67.0] 59.0 [52.0-66.5] 60.0 [51.0-68.0] 61.0 [53.0-68.0]   0.465
-#>  3:                        sex          Female      450 (52.9%)      100 (51.0%)      164 (56.2%)      186 (51.4%)   0.394
-#>  4:                                       Male      400 (47.1%)       96 (49.0%)      128 (43.8%)      176 (48.6%)        
-#>  5:                       race           White      598 (70.4%)      147 (75.0%)      198 (67.8%)      253 (69.9%)   0.794
-#>  6:                                      Black      126 (14.8%)       25 (12.8%)       47 (16.1%)       54 (14.9%)        
-#>  7:                                      Asian       93 (10.9%)        17 (8.7%)       35 (12.0%)       41 (11.3%)        
-#>  8:                                      Other        33 (3.9%)         7 (3.6%)        12 (4.1%)        14 (3.9%)        
-#>  9:                        bmi    Median [IQR] 28.0 [24.7-31.5] 28.0 [24.4-31.9] 28.2 [24.9-31.3] 27.8 [24.7-31.5]   0.831
-#> 10:                 creatinine    Median [IQR]    1.0 [0.8-1.2]    1.0 [0.8-1.2]    1.0 [0.8-1.2]    1.0 [0.8-1.2]   0.483
-#> 11:                    smoking           Never      337 (40.5%)       83 (43.5%)      123 (42.7%)      131 (37.0%)   0.450
-#> 12:                                     Former      311 (37.3%)       66 (34.6%)      101 (35.1%)      144 (40.7%)        
-#> 13:                                    Current      185 (22.2%)       42 (22.0%)       64 (22.2%)       79 (22.3%)        
-#> 14:               hypertension              No      504 (60.4%)      108 (56.2%)      179 (62.2%)      217 (61.1%)   0.401
-#> 15:                                        Yes      331 (39.6%)       84 (43.8%)      109 (37.8%)      138 (38.9%)        
-#> 16: Surv(os_months, os_status) Median (95% CI) 19.4 (16.2-23.4) 14.7 (10.5-19.2) 33.6 (24.5-42.2) 14.7 (11.0-21.8) < 0.001
+        ),
+        labels = clintrial_labels)
+#>                        Variable           Group            Total          Control           Drug A           Drug B p-value
+#>                          <char>          <char>           <char>           <char>           <char>           <char>  <char>
+#>  1:                           N                              850              196              292              362        
+#>  2:                 Age (years)    Median [IQR] 60.0 [52.0-67.0] 59.0 [52.0-66.5] 60.0 [51.0-68.0] 61.0 [53.0-68.0]   0.465
+#>  3:                         Sex          Female      450 (52.9%)      100 (51.0%)      164 (56.2%)      186 (51.4%)   0.394
+#>  4:                                        Male      400 (47.1%)       96 (49.0%)      128 (43.8%)      176 (48.6%)        
+#>  5:                        Race           White      598 (70.4%)      147 (75.0%)      198 (67.8%)      253 (69.9%)   0.794
+#>  6:                                       Black      126 (14.8%)       25 (12.8%)       47 (16.1%)       54 (14.9%)        
+#>  7:                                       Asian       93 (10.9%)        17 (8.7%)       35 (12.0%)       41 (11.3%)        
+#>  8:                                       Other        33 (3.9%)         7 (3.6%)        12 (4.1%)        14 (3.9%)        
+#>  9:     Body Mass Index (kg/m²)    Median [IQR] 28.0 [24.7-31.5] 28.0 [24.4-31.9] 28.2 [24.9-31.3] 27.8 [24.7-31.5]   0.831
+#> 10: Baseline Creatinine (mg/dL)    Median [IQR]    1.0 [0.8-1.2]    1.0 [0.8-1.2]    1.0 [0.8-1.2]    1.0 [0.8-1.2]   0.483
+#> 11:              Smoking Status           Never      337 (40.5%)       83 (43.5%)      123 (42.7%)      131 (37.0%)   0.450
+#> 12:                                      Former      311 (37.3%)       66 (34.6%)      101 (35.1%)      144 (40.7%)        
+#> 13:                                     Current      185 (22.2%)       42 (22.0%)       64 (22.2%)       79 (22.3%)        
+#> 14:                Hypertension              No      504 (60.4%)      108 (56.2%)      179 (62.2%)      217 (61.1%)   0.401
+#> 15:                                         Yes      331 (39.6%)       84 (43.8%)      109 (37.8%)      138 (38.9%)        
+#> 16:   Overall Survival (months) Median (95% CI) 19.4 (16.2-23.4) 14.7 (10.5-19.2) 33.6 (24.5-42.2) 14.7 (11.0-21.8) < 0.001
 
 # Example 15: Three or more groups
 desctable(clintrial,
         by = "stage",  # Assuming stage has 3+ levels
-        variables = c("age", "sex", "bmi"))
-#>    Variable        Group            Total                I               II              III               IV p-value
-#>      <char>       <char>           <char>           <char>           <char>           <char>           <char>  <char>
-#> 1:        N                           850              211              263              241              132        
-#> 2:      age Median [IQR] 60.0 [52.0-67.0] 61.0 [53.0-67.0] 61.0 [51.0-70.0] 58.0 [51.0-67.0] 60.0 [53.0-66.0]   0.481
-#> 3:      sex       Female      449 (53.0%)      110 (52.1%)      131 (49.8%)      134 (55.6%)       74 (56.1%)   0.515
-#> 4:                  Male      398 (47.0%)      101 (47.9%)      132 (50.2%)      107 (44.4%)       58 (43.9%)        
-#> 5:      bmi Median [IQR] 28.0 [24.7-31.5] 27.9 [24.8-30.9] 28.1 [24.2-31.5] 27.8 [24.7-31.5] 28.5 [25.1-32.1]   0.595
+        variables = c("age", "sex", "bmi"),
+        labels = clintrial_labels)
+#>                   Variable        Group            Total                I               II              III               IV p-value
+#>                     <char>       <char>           <char>           <char>           <char>           <char>           <char>  <char>
+#> 1:                       N                           850              211              263              241              132        
+#> 2:             Age (years) Median [IQR] 60.0 [52.0-67.0] 61.0 [53.0-67.0] 61.0 [51.0-70.0] 58.0 [51.0-67.0] 60.0 [53.0-66.0]   0.481
+#> 3:                     Sex       Female      449 (53.0%)      110 (52.1%)      131 (49.8%)      134 (55.6%)       74 (56.1%)   0.515
+#> 4:                                 Male      398 (47.0%)      101 (47.9%)      132 (50.2%)      107 (44.4%)       58 (43.9%)        
+#> 5: Body Mass Index (kg/m²) Median [IQR] 28.0 [24.7-31.5] 27.9 [24.8-30.9] 28.1 [24.2-31.5] 27.8 [24.7-31.5] 28.5 [25.1-32.1]   0.595
 # Automatically uses ANOVA/Kruskal-Wallis and chi-squared
 
 # Example 16: Access raw unformatted data
@@ -613,28 +627,30 @@ desctable(clintrial,
         by = "treatment",
         variables = "smoking",
         na_include = TRUE,
-        na_percent = TRUE)
-#>    Variable   Group       Total    Control      Drug A      Drug B p-value
-#>      <char>  <char>      <char>     <char>      <char>      <char>  <char>
-#> 1:        N                 850        196         292         362        
-#> 2:  smoking   Never 337 (39.6%) 83 (42.3%) 123 (42.1%) 131 (36.2%)   0.450
-#> 3:           Former 311 (36.6%) 66 (33.7%) 101 (34.6%) 144 (39.8%)        
-#> 4:          Current 185 (21.8%) 42 (21.4%)  64 (21.9%)  79 (21.8%)        
-#> 5:          Unknown   17 (2.0%)   5 (2.6%)    4 (1.4%)    8 (2.2%)        
+        na_percent = TRUE,
+        labels = clintrial_labels)
+#>          Variable   Group       Total    Control      Drug A      Drug B p-value
+#>            <char>  <char>      <char>     <char>      <char>      <char>  <char>
+#> 1:              N                 850        196         292         362        
+#> 2: Smoking Status   Never 337 (39.6%) 83 (42.3%) 123 (42.1%) 131 (36.2%)   0.450
+#> 3:                 Former 311 (36.6%) 66 (33.7%) 101 (34.6%) 144 (39.8%)        
+#> 4:                Current 185 (21.8%) 42 (21.4%)  64 (21.9%)  79 (21.8%)        
+#> 5:                Unknown   17 (2.0%)   5 (2.6%)    4 (1.4%)    8 (2.2%)        
 
 # Exclude NAs from denominator (non-missing sum to 100%)
 desctable(clintrial,
         by = "treatment",
         variables = "smoking",
         na_include = TRUE,
-        na_percent = FALSE)
-#>    Variable   Group       Total    Control      Drug A      Drug B p-value
-#>      <char>  <char>      <char>     <char>      <char>      <char>  <char>
-#> 1:        N                 850        196         292         362        
-#> 2:  smoking   Never 337 (40.5%) 83 (43.5%) 123 (42.7%) 131 (37.0%)   0.450
-#> 3:           Former 311 (37.3%) 66 (34.6%) 101 (35.1%) 144 (40.7%)        
-#> 4:          Current 185 (22.2%) 42 (22.0%)  64 (22.2%)  79 (22.3%)        
-#> 5:          Unknown          17          5           4           8        
+        na_percent = FALSE,
+        labels = clintrial_labels)
+#>          Variable   Group       Total    Control      Drug A      Drug B p-value
+#>            <char>  <char>      <char>     <char>      <char>      <char>  <char>
+#> 1:              N                 850        196         292         362        
+#> 2: Smoking Status   Never 337 (40.5%) 83 (43.5%) 123 (42.7%) 131 (37.0%)   0.450
+#> 3:                 Former 311 (37.3%) 66 (34.6%) 101 (35.1%) 144 (40.7%)        
+#> 4:                Current 185 (22.2%) 42 (22.0%)  64 (22.2%)  79 (22.3%)        
+#> 5:                Unknown          17          5           4           8        
 
 # Example 19: Passing additional test arguments
 # Equal variance t-test
@@ -642,24 +658,26 @@ desctable(clintrial,
         by = "sex",
         variables = "age",
         test_continuous = "t",
-        var.equal = TRUE)
-#>    Variable        Group            Total           Female             Male p-value
-#>      <char>       <char>           <char>           <char>           <char>  <char>
-#> 1:        N                           850              450              400        
-#> 2:      age Median [IQR] 60.0 [52.0-67.0] 60.0 [52.0-67.0] 60.0 [51.5-69.0]   0.951
+        var.equal = TRUE,
+        labels = clintrial_labels)
+#>       Variable        Group            Total           Female             Male p-value
+#>         <char>       <char>           <char>           <char>           <char>  <char>
+#> 1:           N                           850              450              400        
+#> 2: Age (years) Median [IQR] 60.0 [52.0-67.0] 60.0 [52.0-67.0] 60.0 [51.5-69.0]   0.951
 
 # Example 20: European number formatting
 desctable(clintrial,
         by = "treatment",
         variables = c("age", "sex", "bmi"),
-        number_format = "eu")
-#>    Variable        Group            Total          Control           Drug A           Drug B p-value
-#>      <char>       <char>           <char>           <char>           <char>           <char>  <char>
-#> 1:        N                           850              196              292              362        
-#> 2:      age Median [IQR] 60,0 [52,0–67,0] 59,0 [52,0–66,5] 60,0 [51,0–68,0] 61,0 [53,0–68,0]   0,465
-#> 3:      sex       Female      450 (52,9%)      100 (51,0%)      164 (56,2%)      186 (51,4%)   0,394
-#> 4:                  Male      400 (47,1%)       96 (49,0%)      128 (43,8%)      176 (48,6%)        
-#> 5:      bmi Median [IQR] 28,0 [24,7–31,5] 28,0 [24,4–31,9] 28,2 [24,9–31,3] 27,8 [24,7–31,5]   0,831
+        number_format = "eu",
+        labels = clintrial_labels)
+#>                   Variable        Group            Total          Control           Drug A           Drug B p-value
+#>                     <char>       <char>           <char>           <char>           <char>           <char>  <char>
+#> 1:                       N                           850              196              292              362        
+#> 2:             Age (years) Median [IQR] 60,0 [52,0–67,0] 59,0 [52,0–66,5] 60,0 [51,0–68,0] 61,0 [53,0–68,0]   0,465
+#> 3:                     Sex       Female      450 (52,9%)      100 (51,0%)      164 (56,2%)      186 (51,4%)   0,394
+#> 4:                                 Male      400 (47,1%)       96 (49,0%)      128 (43,8%)      176 (48,6%)        
+#> 5: Body Mass Index (kg/m²) Median [IQR] 28,0 [24,7–31,5] 28,0 [24,4–31,9] 28,2 [24,9–31,3] 27,8 [24,7–31,5]   0,831
 
 # Example 21: Complete Table 1 for publication
 table1 <- desctable(

@@ -21,7 +21,7 @@ multivariable models automatically."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -348,7 +348,8 @@ parameters.</p></dd>
       interactions: interaction term. For continuous: typically empty</p></dd>
 
     <dt>n</dt>
-<dd><p>Integer. Total sample size (if <code>show_n = TRUE</code>)</p></dd>
+<dd><p>Integer. Sample size used in fitting, that is complete cases
+      across the model variables (if <code>show_n = TRUE</code>)</p></dd>
 
     <dt>n_group</dt>
 <dd><p>Integer. Sample size for this factor level</p></dd>
@@ -376,6 +377,15 @@ parameters.</p></dd>
     <dt>raw_data</dt>
 <dd><p>data.table. Unformatted numeric results with columns for
       coefficients, standard errors, confidence bounds, quality statistics, <em>etc.</em></p></dd>
+
+    <dt>analysis_counts</dt>
+<dd><p>List. How much of the supplied data reached the
+      model, with elements <code>n_supplied</code>, <code>n_analyzed</code>,
+      <code>n_missing_outcome</code> and <code>n_missing_predictor</code>, plus
+      <code>events_supplied</code> and <code>events_analyzed</code> where the model
+      type carries an event count. The counts describe the single
+      fitted model, and the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method always reports the
+      analyzed sample</p></dd>
 
     <dt>outcome</dt>
 <dd><p>Character. The outcome variable name</p></dd>
@@ -489,7 +499,10 @@ intervals.</p>
     <div class="dont-index"><p><code><a href="uniscreen.html">uniscreen</a></code> for univariable screening of multiple predictors,
 <code><a href="fullfit.html">fullfit</a></code> for complete univariable-to-multivariable workflow,
 <code><a href="compfit.html">compfit</a></code> for comparing multiple models,
-<code><a href="m2dt.html">m2dt</a></code> for model-to-table conversion</p>
+<code><a href="m2dt.html">m2dt</a></code> for model-to-table conversion,
+<code><a href="autoforest.html">autoforest</a></code> for forest plots of fitted models,
+<code><a href="forestsave.html">forestsave</a></code> for exporting forest plots,
+<code><a href="tablesave.html">tablesave</a></code> for exporting tables</p>
 <p>Other regression functions:
 <code><a href="compfit.html">compfit()</a></code>,
 <code><a href="fullfit.html">fullfit()</a></code>,
@@ -513,18 +526,20 @@ intervals.</p>
 <span class="r-in"><span><span class="va">uni_model</span> <span class="op">&lt;-</span> <span class="fu">fit</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>    outcome <span class="op">=</span> <span class="st">"os_status"</span>,</span></span>
-<span class="r-in"><span>    predictors <span class="op">=</span> <span class="st">"age"</span></span></span>
+<span class="r-in"><span>    predictors <span class="op">=</span> <span class="st">"age"</span>,</span></span>
+<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">uni_model</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Univariable Logistic Model</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Formula: os_status ~ age</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n = 850, Events = 609</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Variable  Group      n Events      OR (95% CI) p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:      age      -    850    609 1.05 (1.03-1.06) &lt; 0.001</span>
-<span class="r-in"><span><span class="co"># Labeled as "Univariable OR"</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Formula: os_status ~ age</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 850 of 850 (100.0%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Events analyzed: 609 of 609 (100.0%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       Variable  Group      n Events      OR (95% CI) p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         &lt;char&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1: Age (years)      -    850    609 1.05 (1.03-1.06) &lt; 0.001</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span></span></span>
@@ -538,8 +553,10 @@ intervals.</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">multi_model</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Logistic Model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formula: os_status ~ age + sex + bmi + treatment</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n = 838, Events = 599</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 838 of 850 (98.6%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Events analyzed: 599 of 609 (98.4%)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                   Variable   Group      n Events     aOR (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                     &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
@@ -562,17 +579,19 @@ intervals.</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cox_model</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Cox PH Model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formula: Surv(os_months, os_status) ~ age + sex + treatment + stage</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n = 847, Events = 606</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 847 of 850 (99.6%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Events analyzed: 606 of 609 (99.5%)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            Variable   Group      n Events     aHR (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  1:     Age (years)       -    847    606 1.04 (1.03-1.04) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2:             Sex  Female    450    298        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3:                    Male    400    311 1.33 (1.13-1.56) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  4: Treatment Group Control    196    151        reference       -</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:             Sex  Female    449    297        reference       -</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:                    Male    398    309 1.33 (1.13-1.56) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4: Treatment Group Control    194    149        reference       -</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  5:                  Drug A    292    184 0.56 (0.45-0.70) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6:                  Drug B    362    274 0.83 (0.67-1.01)   0.062</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:                  Drug B    361    273 0.83 (0.67-1.01)   0.062</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  7:   Disease Stage       I    211    127        reference       -</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  8:                      II    263    172 1.16 (0.92-1.46)   0.214</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  9:                     III    241    186 1.90 (1.51-2.38) &lt; 0.001</span>
@@ -589,8 +608,10 @@ intervals.</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">interact_model</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Logistic Model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formula: os_status ~ age + treatment + sex + age:treatment</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n = 850, Events = 609</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 850 of 850 (100.0%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Events analyzed: 609 of 609 (100.0%)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                  Variable   Group      n Events     aOR (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                    &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
@@ -615,8 +636,10 @@ intervals.</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">strat_model</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Cox PH Model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formula: Surv(os_months, os_status) ~ age + sex + treatment + strata( site )</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n = 850, Events = 609</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 850 of 850 (100.0%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Events analyzed: 609 of 609 (100.0%)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           Variable   Group      n Events     aHR (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
@@ -639,8 +662,10 @@ intervals.</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cluster_model</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Cox PH Model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formula: Surv(os_months, os_status) ~ age + treatment</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n = 850, Events = 609</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 850 of 850 (100.0%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Events analyzed: 609 of 609 (100.0%)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           Variable   Group      n Events     aHR (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
@@ -660,8 +685,9 @@ intervals.</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">linear_model</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Linear Model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formula: bmi ~ age + sex + smoking</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n = 833</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 833 of 850 (98.0%)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          Variable   Group      n Adj. Coefficient (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            &lt;char&gt;  &lt;char&gt; &lt;char&gt;                    &lt;char&gt;  &lt;char&gt;</span>
@@ -685,8 +711,10 @@ intervals.</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">poisson_model</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Poisson Model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formula: fu_count ~ age + stage + treatment + surgery</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n = 839, Events = 5517</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 839 of 850 (98.7%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Events analyzed: 5,517 of 5,533 (99.7%)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               Variable   Group      n Events     aRR (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                 &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
@@ -716,8 +744,10 @@ intervals.</p>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Negative Binomial Model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formula: ae_count ~ age + treatment + diabetes + surgery</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n = 824, Events = 4506</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 824 of 850 (96.9%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Events analyzed: 4,506 of 4,599 (98.0%)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              Variable   Group      n Events     aRR (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
@@ -742,8 +772,9 @@ intervals.</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">gamma_model</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Gamma Model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formula: los_days ~ age + treatment + surgery</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n = 830</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 830 of 850 (97.6%)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              Variable   Group      n Adj. Coefficient (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                &lt;char&gt;  &lt;char&gt; &lt;char&gt;                    &lt;char&gt;  &lt;char&gt;</span>
@@ -825,8 +856,10 @@ intervals.</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">complex_model</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Logistic Model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formula: os_status ~ age + sex + treatment + bmi + age:treatment + sex:bmi</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n = 838, Events = 599</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 838 of 850 (98.6%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Events analyzed: 599 of 609 (98.4%)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                   Variable   Group      n Events      aOR (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                     &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;            &lt;char&gt;  &lt;char&gt;</span>
@@ -848,58 +881,67 @@ intervals.</p>
 <span class="r-in"><span>    predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"treatment"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    show_n <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
 <span class="r-in"><span>    show_events <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>    reference_rows <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span>    reference_rows <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">minimal</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Logistic Model</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Formula: os_status ~ age + sex + treatment</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n = 850, Events = 609</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Variable  Group     aOR (95% CI) p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:       age      - 1.05 (1.04-1.07) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:       sex   Male 1.83 (1.33-2.53) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3: treatment Drug A 0.48 (0.31-0.73) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:           Drug B 0.86 (0.56-1.31)   0.492</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Formula: os_status ~ age + sex + treatment</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 850 of 850 (100.0%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Events analyzed: 609 of 609 (100.0%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           Variable  Group     aOR (95% CI) p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:     Age (years)      - 1.05 (1.04-1.07) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:             Sex   Male 1.83 (1.33-2.53) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3: Treatment Group Drug A 0.48 (0.31-0.73) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                 Drug B 0.86 (0.56-1.31)   0.492</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 15: Different confidence levels</span></span></span>
 <span class="r-in"><span><span class="va">ci90</span> <span class="op">&lt;-</span> <span class="fu">fit</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>    outcome <span class="op">=</span> <span class="st">"os_status"</span>,</span></span>
 <span class="r-in"><span>    predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"treatment"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    conf_level <span class="op">=</span> <span class="fl">0.90</span>  <span class="co"># 90% confidence intervals</span></span></span>
+<span class="r-in"><span>    conf_level <span class="op">=</span> <span class="fl">0.90</span>,  <span class="co"># 90% confidence intervals</span></span></span>
+<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">ci90</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Logistic Model</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Formula: os_status ~ age + treatment</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n = 850, Events = 609</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Variable   Group      n Events     aOR (90% CI) p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:       age       -    850    609 1.05 (1.04-1.06) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2: treatment Control    196    151        reference       -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:            Drug A    292    184 0.47 (0.33-0.67) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:            Drug B    362    274 0.87 (0.61-1.24)   0.518</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Formula: os_status ~ age + treatment</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 850 of 850 (100.0%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Events analyzed: 609 of 609 (100.0%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           Variable   Group      n Events     aOR (90% CI) p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:     Age (years)       -    850    609 1.05 (1.04-1.06) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: Treatment Group Control    196    151        reference       -</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:                  Drug A    292    184 0.47 (0.33-0.67) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                  Drug B    362    274 0.87 (0.61-1.24)   0.518</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 16: Force coefficient display instead of OR</span></span></span>
 <span class="r-in"><span><span class="va">coef_model</span> <span class="op">&lt;-</span> <span class="fu">fit</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>    outcome <span class="op">=</span> <span class="st">"os_status"</span>,</span></span>
 <span class="r-in"><span>    predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"bmi"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    exponentiate <span class="op">=</span> <span class="cn">FALSE</span>  <span class="co"># Show log odds instead of OR</span></span></span>
+<span class="r-in"><span>    exponentiate <span class="op">=</span> <span class="cn">FALSE</span>,  <span class="co"># Show log odds instead of OR</span></span></span>
+<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">coef_model</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Logistic Model</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Formula: os_status ~ age + bmi</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n = 838, Events = 599</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Variable  Group      n Events Adj. Coefficient (95% CI) p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;                    &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:      age      -    838    599       0.05 (0.03 to 0.06) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:      bmi      -    838    599      0.02 (-0.01 to 0.05)   0.178</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Formula: os_status ~ age + bmi</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 838 of 850 (98.6%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Events analyzed: 599 of 609 (98.4%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                   Variable  Group      n Events Adj. Coefficient (95% CI) p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                     &lt;char&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;                    &lt;char&gt;  &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:             Age (years)      -    838    599       0.05 (0.03 to 0.06) &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: Body Mass Index (kg/m²)      -    838    599      0.02 (-0.01 to 0.05)   0.178</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 17: Confidence interval method</span></span></span>
 <span class="r-in"><span><span class="co"># Default: profile likelihood CIs for GLM (more accurate)</span></span></span>
@@ -908,20 +950,23 @@ intervals.</p>
 <span class="r-in"><span>    outcome <span class="op">=</span> <span class="st">"os_status"</span>,</span></span>
 <span class="r-in"><span>    predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"treatment"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    p_digits <span class="op">=</span> <span class="fl">4</span>,</span></span>
-<span class="r-in"><span>    conf_method <span class="op">=</span> <span class="st">"profile"</span></span></span>
+<span class="r-in"><span>    conf_method <span class="op">=</span> <span class="st">"profile"</span>,</span></span>
+<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">profile_result</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Logistic Model</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Formula: os_status ~ age + treatment</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n = 850, Events = 609</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Variable   Group      n Events     aOR (95% CI)  p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;   &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:       age       -    850    609 1.05 (1.03-1.06) &lt; 0.0001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2: treatment Control    196    151        reference        -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:            Drug A    292    184 0.47 (0.31-0.72)   0.0005</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:            Drug B    362    274 0.87 (0.57-1.32)   0.5183</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Formula: os_status ~ age + treatment</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 850 of 850 (100.0%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Events analyzed: 609 of 609 (100.0%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           Variable   Group      n Events     aOR (95% CI)  p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;   &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:     Age (years)       -    850    609 1.05 (1.03-1.06) &lt; 0.0001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: Treatment Group Control    196    151        reference        -</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:                  Drug A    292    184 0.47 (0.31-0.72)   0.0005</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                  Drug B    362    274 0.87 (0.57-1.32)   0.5183</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Wald CIs (faster, suitable for simulation or exploratory work)</span></span></span>
 <span class="r-in"><span><span class="va">wald_result</span> <span class="op">&lt;-</span> <span class="fu">fit</span><span class="op">(</span></span></span>
@@ -929,20 +974,23 @@ intervals.</p>
 <span class="r-in"><span>    outcome <span class="op">=</span> <span class="st">"os_status"</span>,</span></span>
 <span class="r-in"><span>    predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"treatment"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    p_digits <span class="op">=</span> <span class="fl">4</span>,</span></span>
-<span class="r-in"><span>    conf_method <span class="op">=</span> <span class="st">"wald"</span></span></span>
+<span class="r-in"><span>    conf_method <span class="op">=</span> <span class="st">"wald"</span>,</span></span>
+<span class="r-in"><span>    labels <span class="op">=</span> <span class="va">clintrial_labels</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">wald_result</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Logistic Model</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Formula: os_status ~ age + treatment</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n = 850, Events = 609</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Variable   Group      n Events     aOR (95% CI)  p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;   &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:       age       -    850    609 1.05 (1.03-1.06) &lt; 0.0001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2: treatment Control    196    151        reference        -</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:            Drug A    292    184 0.47 (0.31-0.72)   0.0005</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:            Drug B    362    274 0.87 (0.57-1.33)   0.5183</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Formula: os_status ~ age + treatment</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 850 of 850 (100.0%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Events analyzed: 609 of 609 (100.0%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           Variable   Group      n Events     aOR (95% CI)  p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;   &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:     Age (years)       -    850    609 1.05 (1.03-1.06) &lt; 0.0001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: Treatment Group Control    196    151        reference        -</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:                  Drug A    292    184 0.47 (0.31-0.72)   0.0005</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                  Drug B    362    274 0.87 (0.57-1.33)   0.5183</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 18: Check model quality statistics</span></span></span>
 <span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">fit</span><span class="op">(</span></span></span>
@@ -972,15 +1020,17 @@ intervals.</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">interaction_model</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Cox PH Model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formula: Surv(os_months, os_status) ~ age + treatment + stage + treatment:stage</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n = 847, Events = 606</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 847 of 850 (99.6%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Events analyzed: 606 of 609 (99.5%)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                           Variable   Group      n Events     aHR (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                             &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  1:                                    Age (years)       -    847    606 1.04 (1.03-1.05) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2:                                Treatment Group Control    196    151        reference       -</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:                                Treatment Group Control    194    149        reference       -</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  3:                                                 Drug A    292    184 0.71 (0.46-1.09)   0.120</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  4:                                                 Drug B    362    274 0.68 (0.44-1.04)   0.076</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:                                                 Drug B    361    273 0.68 (0.44-1.04)   0.076</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  5:                                  Disease Stage       I    211    127        reference       -</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  6:                                                     II    263    172 1.11 (0.73-1.70)   0.624</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  7:                                                    III    241    186 1.86 (1.17-2.96)   0.009</span>
@@ -1004,8 +1054,10 @@ intervals.</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">multi_interaction</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Logistic Model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formula: readmission_30d ~ age + sex + surgery + diabetes + surgery:diabetes + age:sex</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n = 834, Events = 417</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 834 of 850 (98.1%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Events analyzed: 417 of 427 (97.7%)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                     Variable  Group      n Events      aOR (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                       &lt;char&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;            &lt;char&gt;  &lt;char&gt;</span>
@@ -1032,8 +1084,10 @@ intervals.</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">quasi_model</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Quasi-Poisson Model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formula: ae_count ~ age + treatment + diabetes + surgery</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n = 824, Events = 4506</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 824 of 850 (96.9%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Events analyzed: 4,506 of 4,599 (98.0%)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              Variable   Group      n Events     aRR (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
@@ -1059,8 +1113,10 @@ intervals.</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">quasi_logistic</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Quasi-Binomial Model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formula: any_complication ~ age + bmi + diabetes + surgery</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n = 833, Events = 468</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 833 of 850 (98.0%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Events analyzed: 468 of 480 (97.5%)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                   Variable  Group      n Events     aOR (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                     &lt;char&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
@@ -1083,8 +1139,9 @@ intervals.</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">gamma_identity</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Gamma Model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formula: los_days ~ age + treatment + surgery + any_complication</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n = 830</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 830 of 850 (97.6%)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              Variable            Group      n Adj. Coefficient (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                &lt;char&gt;           &lt;char&gt; &lt;char&gt;                    &lt;char&gt;  &lt;char&gt;</span>
@@ -1110,8 +1167,9 @@ intervals.</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">inverse_gaussian</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Inverse.gaussian GLM Model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formula: recovery_days ~ age + surgery + pain_score</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n = 825</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 825 of 850 (97.1%)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                           Variable  Group      n Adj. Coefficient (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                             &lt;char&gt; &lt;char&gt; &lt;char&gt;                    &lt;char&gt;  &lt;char&gt;</span>
@@ -1138,8 +1196,9 @@ intervals.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   logLik.lmekin coxme</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Linear Mixed Model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formula: los_days ~ age + treatment + stage + (1|site)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n = 827</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 827 of 850 (97.3%)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           Variable   Group      n Adj. Coefficient (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             &lt;char&gt;  &lt;char&gt; &lt;char&gt;                    &lt;char&gt;  &lt;char&gt;</span>
@@ -1166,8 +1225,10 @@ intervals.</p>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable glmerMod Model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formula: readmission_30d ~ age + surgery + los_days + (1|site)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n = 830, Events = 418</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 830 of 850 (97.6%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Events analyzed: 418 of 427 (97.9%)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                          Variable  Group      n Events     aOR (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                            &lt;char&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
@@ -1189,15 +1250,17 @@ intervals.</p>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Mixed Effects Cox Model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formula: Surv(os_months, os_status) ~ age + treatment + stage + (1|site)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n = 847, Events = 606</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 847 of 850 (99.6%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Events analyzed: 606 of 609 (99.5%)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           Variable   Group      n Events     aHR (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1:     Age (years)       -    847    606 1.04 (1.03-1.05) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2: Treatment Group Control    196    151        reference       -</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: Treatment Group Control    194    149        reference       -</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3:                  Drug A    292    184 0.57 (0.46-0.71) &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                  Drug B    362    274 0.94 (0.76-1.15)   0.534</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                  Drug B    361    273 0.94 (0.76-1.15)   0.534</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5:   Disease Stage       I    211    127        reference       -</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6:                      II    263    172 1.16 (0.92-1.47)   0.210</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 7:                     III    241    186 1.98 (1.57-2.50) &lt; 0.001</span>
@@ -1214,11 +1277,11 @@ intervals.</p>
 <span class="r-in"><span>    <span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">random_slopes</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> boundary (singular) fit: see help('isSingular')</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Linear Mixed Model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formula: los_days ~ age + treatment + stage + (treatment|site)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n = 827</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 827 of 850 (97.3%)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           Variable   Group      n Adj. Coefficient (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             &lt;char&gt;  &lt;char&gt; &lt;char&gt;                    &lt;char&gt;  &lt;char&gt;</span>
@@ -1241,8 +1304,10 @@ intervals.</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Logistic Model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formula: os_status ~ age + sex + treatment</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n = 850, Events = 609</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 850 of 850 (100.0%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Events analyzed: 609 of 609 (100.0%)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           Variable   Group      n Events     aOR (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
@@ -1266,7 +1331,7 @@ intervals.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
 </div>
 
     </footer></div>

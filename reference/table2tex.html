@@ -21,7 +21,7 @@ into LaTeX manuscripts. Requires xtable for export."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -99,6 +99,7 @@ into LaTeX manuscripts. Requires <span class="pkg">xtable</span> for export.</p>
 <span>  caption_size <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  label <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  show_logs <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  quiet <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -218,7 +219,7 @@ Supports multi-line captions using double backslash. Default is <code>NULL</code
 <dd><p>Numeric. Caption font size in points. If <code>NULL</code> (default),
 caption will use the document's default caption size (typically slightly smaller
 than body text). Set to a specific value (<em>e.g.,</em> 6, 7, 8, 9) to control caption
-size explicitly. This generates a LaTeX comment that you can use when wrapping
+size explicitly. This generates a LaTeX comment for use when wrapping
 the table. Typical range: 6-10 points.</p></dd>
 
 
@@ -233,14 +234,21 @@ about required LaTeX packages and formatting options applied. If
 <code>FALSE</code>, suppresses these messages. Default is <code>FALSE</code>.</p></dd>
 
 
+<dt id="arg-quiet">quiet<a class="anchor" aria-label="anchor" href="#arg-quiet"></a></dt>
+<dd><p>Logical. Suppress progress and confirmation messages, such
+as the notice reporting the file written. Errors and warnings are
+unaffected. Default is <code>FALSE</code>.</p></dd>
+
+
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional arguments passed to <code><a href="https://rdrr.io/pkg/xtable/man/xtable.html" class="external-link">xtable</a></code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Invisibly returns <code>NULL</code>. Creates a <code>.tex</code> file at the specified
-  location containing a LaTeX tabular environment.</p>
+    <p>Invisibly returns the file path, matching <code><a href="tablesave.html">tablesave()</a></code> and
+  <code><a href="forestsave.html">forestsave()</a></code>. Called for its side effect of creating a <code>.tex</code>
+  file at the specified location containing a LaTeX tabular environment.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -254,7 +262,7 @@ about required LaTeX packages and formatting options applied. If
 <li><p>Data rows with automatic escaping of special characters</p></li>
 <li><p>Optional caption and label commands</p></li>
 </ul><p><strong>Required LaTeX Packages:</strong></p>
-<p>Add these to your LaTeX document preamble:</p>
+<p>The following are required in the LaTeX document preamble:</p>
 <p><em>Always required:</em></p><div class="sourceCode"><pre><code>
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -285,7 +293,7 @@ Creates alternating background colors for visual grouping:</p><div class="source
 Creates high-contrast header row:</p><div class="sourceCode"><pre><code><span></span>
 <span><span class="va">dark_header</span> <span class="op">=</span> <span class="cn">TRUE</span>  <span class="co"># Black background, white text</span></span></code></pre></div>
 
-<p>Both require the xcolor package with table option in your document.</p>
+<p>Both require the xcolor package with the table option in the document preamble.</p>
 <p><strong>Integration with LaTeX Documents:</strong></p>
 <p><em>Basic inclusion:</em></p><div class="sourceCode"><pre><code>
 \begin{table}[htbp]
@@ -319,7 +327,7 @@ Creates high-contrast header row:</p><div class="sourceCode"><pre><code><span></
 the output file for reference. For actual LaTeX captions, wrap the table
 in a table environment (see examples above).</p>
 <p><strong>Special Characters:</strong></p>
-<p>The function automatically escapes LaTeX special characters in your data:</p><ul><li><p>Ampersand, percent, dollar sign, hash, underscore</p></li>
+<p>The function automatically escapes LaTeX special characters in the data:</p><ul><li><p>Ampersand, percent, dollar sign, hash, underscore</p></li>
 <li><p>Left and right braces</p></li>
 <li><p>Tilde and caret (using <code>textasciitilde</code> and <code>textasciicircum</code>)</p></li>
 </ul><p>Variable names and labels should not include these characters unless
@@ -327,7 +335,7 @@ intentionally using LaTeX commands.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="autotable.html">autotable</a></code> for automatic format detection,
+    <div class="dont-index"><p><code><a href="tablesave.html">tablesave</a></code> for saving in the format given by the file extension,
 <code><a href="table2pdf.html">table2pdf</a></code> for direct PDF output,
 <code><a href="table2html.html">table2html</a></code> for HTML tables,
 <code><a href="table2docx.html">table2docx</a></code> for Word documents,
@@ -336,12 +344,12 @@ intentionally using LaTeX commands.</p>
 <code><a href="fit.html">fit</a></code> for regression tables,
 <code><a href="desctable.html">desctable</a></code> for descriptive tables</p>
 <p>Other export functions:
-<code><a href="autotable.html">autotable()</a></code>,
 <code><a href="table2docx.html">table2docx()</a></code>,
 <code><a href="table2html.html">table2html()</a></code>,
 <code><a href="table2pdf.html">table2pdf()</a></code>,
 <code><a href="table2pptx.html">table2pptx()</a></code>,
-<code><a href="table2rtf.html">table2rtf()</a></code></p></div>
+<code><a href="table2rtf.html">table2rtf()</a></code>,
+<code><a href="tablesave.html">tablesave()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -361,7 +369,7 @@ intentionally using LaTeX commands.</p>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"xtable"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu">table2tex</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"basic.tex"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/basic.tex</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/basic.tex</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Example 2: With booktabs for publication</span></span></span>
@@ -369,7 +377,7 @@ intentionally using LaTeX commands.</p>
 <span class="r-in"><span>       booktabs <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>       caption <span class="op">=</span> <span class="st">"Multivariable logistic regression results"</span>,</span></span>
 <span class="r-in"><span>       label <span class="op">=</span> <span class="st">"tab:regression"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/publication.tex</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/publication.tex</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 3: Multi-line caption with abbreviations</span></span></span>
 <span class="r-in"><span><span class="fu">table2tex</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"detailed.tex"</span><span class="op">)</span>,</span></span>
@@ -378,70 +386,70 @@ intentionally using LaTeX commands.</p>
 <span class="r-in"><span><span class="st">                 aOR = adjusted odds ratio; CI = confidence interval\\\\</span></span></span>
 <span class="r-in"><span><span class="st">                 Model adjusted for age, sex, treatment, and disease stage"</span>,</span></span>
 <span class="r-in"><span>       label <span class="op">=</span> <span class="st">"tab:mortality"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/detailed.tex</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/detailed.tex</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 4: Hierarchical display with indentation</span></span></span>
 <span class="r-in"><span><span class="fu">table2tex</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"indented.tex"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>       indent_groups <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>       booktabs <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/indented.tex</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/indented.tex</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 5: Condensed table (reduced height)</span></span></span>
 <span class="r-in"><span><span class="fu">table2tex</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"condensed.tex"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>       condense_table <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>       booktabs <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/condensed.tex</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/condensed.tex</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 6: With zebra stripes</span></span></span>
 <span class="r-in"><span><span class="fu">table2tex</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"striped.tex"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>       zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>       stripe_color <span class="op">=</span> <span class="st">"gray!15"</span>,</span></span>
 <span class="r-in"><span>       booktabs <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/striped.tex</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/striped.tex</span>
 <span class="r-in"><span><span class="co"># Remember to add \usepackage[table]{xcolor} to the LaTeX document</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 7: Dark header style</span></span></span>
 <span class="r-in"><span><span class="fu">table2tex</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"dark_header.tex"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>       dark_header <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>       booktabs <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/dark_header.tex</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/dark_header.tex</span>
 <span class="r-in"><span><span class="co"># Requires \usepackage[table]{xcolor}</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 8: Custom cell padding</span></span></span>
 <span class="r-in"><span><span class="fu">table2tex</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"relaxed.tex"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>       cell_padding <span class="op">=</span> <span class="st">"relaxed"</span>,</span></span>
 <span class="r-in"><span>       booktabs <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/relaxed.tex</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/relaxed.tex</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 9: Custom column alignment (auto-detected by default)</span></span></span>
 <span class="r-in"><span><span class="fu">table2tex</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"custom_align.tex"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>       align <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"c"</span>, <span class="st">"c"</span>, <span class="st">"c"</span>, <span class="st">"c"</span>, <span class="st">"c"</span>, <span class="st">"c"</span>, <span class="st">"c"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/custom_align.tex</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/custom_align.tex</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 10: No header formatting (keep original names)</span></span></span>
 <span class="r-in"><span><span class="fu">table2tex</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"raw_headers.tex"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>       format_headers <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/raw_headers.tex</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/raw_headers.tex</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 11: Disable significance bolding</span></span></span>
 <span class="r-in"><span><span class="fu">table2tex</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"no_bold.tex"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>       bold_significant <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
 <span class="r-in"><span>       booktabs <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/no_bold.tex</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/no_bold.tex</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 12: Stricter significance threshold</span></span></span>
 <span class="r-in"><span><span class="fu">table2tex</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"strict_sig.tex"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>       bold_significant <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>       p_threshold <span class="op">=</span> <span class="fl">0.01</span>,  <span class="co"># Bold only if p &lt; 0.01</span></span></span>
 <span class="r-in"><span>       booktabs <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/strict_sig.tex</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/strict_sig.tex</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 13: With caption size control</span></span></span>
 <span class="r-in"><span><span class="fu">table2tex</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"caption_size.tex"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>       caption_size <span class="op">=</span> <span class="fl">6</span>,</span></span>
 <span class="r-in"><span>       caption <span class="op">=</span> <span class="st">"Table 1 - Results with Compact Caption\\\\</span></span></span>
 <span class="r-in"><span><span class="st">                 Smaller caption fits better on constrained pages"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/caption_size.tex</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/caption_size.tex</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 14: Complete publication-ready table</span></span></span>
 <span class="r-in"><span><span class="fu">table2tex</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"final_table1.tex"</span><span class="op">)</span>,</span></span>
@@ -452,7 +460,7 @@ intentionally using LaTeX commands.</p>
 <span class="r-in"><span>       zebra_stripes <span class="op">=</span> <span class="cn">FALSE</span>,  <span class="co"># Many journals prefer no stripes</span></span></span>
 <span class="r-in"><span>       bold_significant <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>       cell_padding <span class="op">=</span> <span class="st">"normal"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/final_table1.tex</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/final_table1.tex</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 15: Descriptive statistics table</span></span></span>
 <span class="r-in"><span><span class="va">desc_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="desctable.html">desctable</a></span><span class="op">(</span><span class="va">clintrial</span>, by <span class="op">=</span> <span class="st">"treatment"</span>,</span></span>
@@ -462,7 +470,7 @@ intentionally using LaTeX commands.</p>
 <span class="r-in"><span>       booktabs <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>       caption <span class="op">=</span> <span class="st">"Table 1: Baseline Characteristics"</span>,</span></span>
 <span class="r-in"><span>       label <span class="op">=</span> <span class="st">"tab:baseline"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/table1_descriptive.tex</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/table1_descriptive.tex</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 16: Model comparison table</span></span></span>
 <span class="r-in"><span><span class="va">models</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
@@ -470,8 +478,12 @@ intentionally using LaTeX commands.</p>
 <span class="r-in"><span>   full <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"treatment"</span>, <span class="st">"stage"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Information criteria assume a common sample, so the candidate</span></span></span>
+<span class="r-in"><span><span class="co"># predictors are restricted to complete cases before comparison</span></span></span>
+<span class="r-in"><span><span class="va">comparison_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="va">clintrial</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"os_status"</span>, <span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"treatment"</span>, <span class="st">"stage"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="compfit.html">compfit</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>   data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
+<span class="r-in"><span>   data <span class="op">=</span> <span class="va">comparison_data</span>,</span></span>
 <span class="r-in"><span>   outcome <span class="op">=</span> <span class="st">"os_status"</span>,</span></span>
 <span class="r-in"><span>   model_list <span class="op">=</span> <span class="va">models</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
@@ -483,7 +495,7 @@ intentionally using LaTeX commands.</p>
 <span class="r-in"><span>       booktabs <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>       caption <span class="op">=</span> <span class="st">"Model Comparison Statistics"</span>,</span></span>
 <span class="r-in"><span>       label <span class="op">=</span> <span class="st">"tab:models"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table exported to /tmp/Rtmpn8SzwZ/model_comparison.tex</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmptN10wa/model_comparison.tex</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
@@ -497,7 +509,7 @@ intentionally using LaTeX commands.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
 </div>
 
     </footer></div>

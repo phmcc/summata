@@ -21,7 +21,7 @@ categorical, and time-to-event variables.'></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -270,7 +270,7 @@ functions (<em>e.g.</em>, <code>var.equal = TRUE</code> for <em>t</em>-tests,
 
     <dt>Group</dt>
 <dd><p>For continuous variables: statistic type (<em>e.g.</em>,
-      "Mean \(\pm\) SD", "Median [IQR]"). For categorical variables:
+      "Mean ± SD", "Median [IQR]"). For categorical variables:
       category level. Empty for variable name rows.</p></dd>
 
     <dt>Total</dt>
@@ -337,8 +337,8 @@ summaries:</p><ul><li><p><strong>Continuous</strong>: Numeric variables (integer
 </ul><p><strong>Formatting Conventions:</strong></p>
 <p>All numeric output respects the <code>number_format</code> parameter. Separators
 within ranges and confidence intervals adapt automatically to avoid
-ambiguity:</p><ul><li><p>Mean \(\pm\) SD: <code>"45.2 \eqn{\pm} 12.3"</code> (US) or
-    <code>"45,2 \eqn{\pm} 12,3"</code> (EU)</p></li>
+ambiguity:</p><ul><li><p>Mean ± SD: <code>"45.2 ± 12.3"</code> (US) or
+    <code>"45,2 ± 12,3"</code> (EU)</p></li>
 <li><p>Median [IQR]: <code>"38.0 [28.0-52.0]"</code> (US) or
     <code>"38,0 [28,0-52,0]"</code> (EU, en-dash separator)</p></li>
 <li><p>Range: <code>"18.0-75.0"</code> (positive, US),
@@ -352,6 +352,7 @@ ambiguity:</p><ul><li><p>Mean \(\pm\) SD: <code>"45.2 \eqn{\pm} 12.3"</code> (US
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="survtable.html">survtable</a></code> for detailed survival summary tables,
 <code><a href="fit.html">fit</a></code> for regression modeling,
+<code><a href="tablesave.html">tablesave</a></code> for export in any supported format,
 <code><a href="table2pdf.html">table2pdf</a></code> for PDF export,
 <code><a href="table2docx.html">table2docx</a></code> for Word export,
 <code><a href="table2html.html">table2html</a></code> for HTML export</p>
@@ -367,121 +368,129 @@ ambiguity:</p><ul><li><p>Mean \(\pm\) SD: <code>"45.2 \eqn{\pm} 12.3"</code> (US
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 1: Basic descriptive table without grouping</span></span></span>
 <span class="r-in"><span><span class="fu">desctable</span><span class="op">(</span><span class="va">clintrial</span>,</span></span>
-<span class="r-in"><span>        variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"bmi"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Variable        Group            Total</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;       &lt;char&gt;           &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:        N                           850</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:      age Median [IQR] 60.0 [52.0-67.0]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:      sex       Female      450 (52.9%)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                  Male      400 (47.1%)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5:      bmi Median [IQR] 28.0 [24.7-31.5]</span>
+<span class="r-in"><span>        variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"bmi"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        labels <span class="op">=</span> <span class="va">clintrial_labels</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                   Variable        Group            Total</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                     &lt;char&gt;       &lt;char&gt;           &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:                       N                           850</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:             Age (years) Median [IQR] 60.0 [52.0-67.0]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:                     Sex       Female      450 (52.9%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                                 Male      400 (47.1%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5: Body Mass Index (kg/m²) Median [IQR] 28.0 [24.7-31.5]</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 2: Grouped comparison with default tests</span></span></span>
 <span class="r-in"><span><span class="fu">desctable</span><span class="op">(</span><span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>        by <span class="op">=</span> <span class="st">"treatment"</span>,</span></span>
-<span class="r-in"><span>        variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"race"</span>, <span class="st">"bmi"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Variable        Group            Total          Control           Drug A           Drug B p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;       &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:        N                           850              196              292              362        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:      age Median [IQR] 60.0 [52.0-67.0] 59.0 [52.0-66.5] 60.0 [51.0-68.0] 61.0 [53.0-68.0]   0.465</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:      sex       Female      450 (52.9%)      100 (51.0%)      164 (56.2%)      186 (51.4%)   0.394</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                  Male      400 (47.1%)       96 (49.0%)      128 (43.8%)      176 (48.6%)        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5:     race        White      598 (70.4%)      147 (75.0%)      198 (67.8%)      253 (69.9%)   0.794</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6:                 Black      126 (14.8%)       25 (12.8%)       47 (16.1%)       54 (14.9%)        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7:                 Asian       93 (10.9%)        17 (8.7%)       35 (12.0%)       41 (11.3%)        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8:                 Other        33 (3.9%)         7 (3.6%)        12 (4.1%)        14 (3.9%)        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9:      bmi Median [IQR] 28.0 [24.7-31.5] 28.0 [24.4-31.9] 28.2 [24.9-31.3] 27.8 [24.7-31.5]   0.831</span>
+<span class="r-in"><span>        variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"race"</span>, <span class="st">"bmi"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        labels <span class="op">=</span> <span class="va">clintrial_labels</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                   Variable        Group            Total          Control           Drug A           Drug B p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                     &lt;char&gt;       &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:                       N                           850              196              292              362        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:             Age (years) Median [IQR] 60.0 [52.0-67.0] 59.0 [52.0-66.5] 60.0 [51.0-68.0] 61.0 [53.0-68.0]   0.465</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:                     Sex       Female      450 (52.9%)      100 (51.0%)      164 (56.2%)      186 (51.4%)   0.394</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                                 Male      400 (47.1%)       96 (49.0%)      128 (43.8%)      176 (48.6%)        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:                    Race        White      598 (70.4%)      147 (75.0%)      198 (67.8%)      253 (69.9%)   0.794</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6:                                Black      126 (14.8%)       25 (12.8%)       47 (16.1%)       54 (14.9%)        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7:                                Asian       93 (10.9%)        17 (8.7%)       35 (12.0%)       41 (11.3%)        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8:                                Other        33 (3.9%)         7 (3.6%)        12 (4.1%)        14 (3.9%)        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9: Body Mass Index (kg/m²) Median [IQR] 28.0 [24.7-31.5] 28.0 [24.4-31.9] 28.2 [24.9-31.3] 27.8 [24.7-31.5]   0.831</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 3: Customize continuous statistics</span></span></span>
 <span class="r-in"><span><span class="fu">desctable</span><span class="op">(</span><span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>        by <span class="op">=</span> <span class="st">"treatment"</span>,</span></span>
 <span class="r-in"><span>        variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"bmi"</span>, <span class="st">"creatinine"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>        stats_continuous <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"median_iqr"</span>, <span class="st">"range"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      Variable        Group            Total          Control           Drug A           Drug B p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;char&gt;       &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:          N                           850              196              292              362        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:        age Median [IQR] 60.0 [52.0-67.0] 59.0 [52.0-66.5] 60.0 [51.0-68.0] 61.0 [53.0-68.0]   0.465</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:                   Range        18.0-90.0        26.0-90.0        18.0-90.0        24.0-90.0        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:        bmi Median [IQR] 28.0 [24.7-31.5] 28.0 [24.4-31.9] 28.2 [24.9-31.3] 27.8 [24.7-31.5]   0.831</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5:                   Range        15.0-42.6        17.4-40.8        15.5-40.9        15.0-42.6        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6: creatinine Median [IQR]    1.0 [0.8-1.2]    1.0 [0.8-1.2]    1.0 [0.8-1.2]    1.0 [0.8-1.2]   0.483</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7:                   Range          0.3-2.2          0.5-1.8          0.3-2.2          0.4-2.1        </span>
+<span class="r-in"><span>        stats_continuous <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"median_iqr"</span>, <span class="st">"range"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        labels <span class="op">=</span> <span class="va">clintrial_labels</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                       Variable        Group            Total          Control           Drug A           Drug B p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                         &lt;char&gt;       &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:                           N                           850              196              292              362        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:                 Age (years) Median [IQR] 60.0 [52.0-67.0] 59.0 [52.0-66.5] 60.0 [51.0-68.0] 61.0 [53.0-68.0]   0.465</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:                                    Range        18.0-90.0        26.0-90.0        18.0-90.0        24.0-90.0        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:     Body Mass Index (kg/m²) Median [IQR] 28.0 [24.7-31.5] 28.0 [24.4-31.9] 28.2 [24.9-31.3] 27.8 [24.7-31.5]   0.831</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:                                    Range        15.0-42.6        17.4-40.8        15.5-40.9        15.0-42.6        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6: Baseline Creatinine (mg/dL) Median [IQR]    1.0 [0.8-1.2]    1.0 [0.8-1.2]    1.0 [0.8-1.2]    1.0 [0.8-1.2]   0.483</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7:                                    Range          0.3-2.2          0.5-1.8          0.3-2.2          0.4-2.1        </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 4: Change categorical display format</span></span></span>
 <span class="r-in"><span><span class="fu">desctable</span><span class="op">(</span><span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>        by <span class="op">=</span> <span class="st">"treatment"</span>,</span></span>
 <span class="r-in"><span>        variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sex"</span>, <span class="st">"race"</span>, <span class="st">"smoking"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>        stats_categorical <span class="op">=</span> <span class="st">"n"</span><span class="op">)</span>  <span class="co"># Show counts only</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Variable   Group  Total Control Drug A Drug B p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt;  &lt;char&gt; &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1:        N            850     196    292    362        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2:      sex  Female    450     100    164    186   0.394</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3:             Male    400      96    128    176        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  4:     race   White    598     147    198    253   0.794</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  5:            Black    126      25     47     54        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6:            Asian     93      17     35     41        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  7:            Other     33       7     12     14        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  8:  smoking   Never    337      83    123    131   0.450</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  9:           Former    311      66    101    144        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10:          Current    185      42     64     79        </span>
+<span class="r-in"><span>        stats_categorical <span class="op">=</span> <span class="st">"n"</span>,  <span class="co"># Show counts only</span></span></span>
+<span class="r-in"><span>        labels <span class="op">=</span> <span class="va">clintrial_labels</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           Variable   Group  Total Control Drug A Drug B p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             &lt;char&gt;  &lt;char&gt; &lt;char&gt;  &lt;char&gt; &lt;char&gt; &lt;char&gt;  &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1:              N            850     196    292    362        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:            Sex  Female    450     100    164    186   0.394</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:                   Male    400      96    128    176        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:           Race   White    598     147    198    253   0.794</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:                  Black    126      25     47     54        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:                  Asian     93      17     35     41        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:                  Other     33       7     12     14        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8: Smoking Status   Never    337      83    123    131   0.450</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:                 Former    311      66    101    144        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:                Current    185      42     64     79        </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 5: Include missing values</span></span></span>
 <span class="r-in"><span><span class="fu">desctable</span><span class="op">(</span><span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>        by <span class="op">=</span> <span class="st">"treatment"</span>,</span></span>
 <span class="r-in"><span>        variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"smoking"</span>, <span class="st">"hypertension"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>        na_include <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>        na_label <span class="op">=</span> <span class="st">"Missing"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        Variable        Group            Total          Control           Drug A           Drug B p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          &lt;char&gt;       &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:            N                           850              196              292              362        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:          age Median [IQR] 60.0 [52.0-67.0] 59.0 [52.0-66.5] 60.0 [51.0-68.0] 61.0 [53.0-68.0]   0.465</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:      smoking        Never      337 (40.5%)       83 (43.5%)      123 (42.7%)      131 (37.0%)   0.450</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                    Former      311 (37.3%)       66 (34.6%)      101 (35.1%)      144 (40.7%)        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5:                   Current      185 (22.2%)       42 (22.0%)       64 (22.2%)       79 (22.3%)        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6:                   Missing               17                5                4                8        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7: hypertension           No      504 (60.4%)      108 (56.2%)      179 (62.2%)      217 (61.1%)   0.401</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8:                       Yes      331 (39.6%)       84 (43.8%)      109 (37.8%)      138 (38.9%)        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9:                   Missing               15                4                4                7        </span>
+<span class="r-in"><span>        na_label <span class="op">=</span> <span class="st">"Missing"</span>,</span></span>
+<span class="r-in"><span>        labels <span class="op">=</span> <span class="va">clintrial_labels</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          Variable        Group            Total          Control           Drug A           Drug B p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            &lt;char&gt;       &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:              N                           850              196              292              362        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:    Age (years) Median [IQR] 60.0 [52.0-67.0] 59.0 [52.0-66.5] 60.0 [51.0-68.0] 61.0 [53.0-68.0]   0.465</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3: Smoking Status        Never      337 (40.5%)       83 (43.5%)      123 (42.7%)      131 (37.0%)   0.450</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                      Former      311 (37.3%)       66 (34.6%)      101 (35.1%)      144 (40.7%)        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:                     Current      185 (22.2%)       42 (22.0%)       64 (22.2%)       79 (22.3%)        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6:                     Missing               17                5                4                8        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7:   Hypertension           No      504 (60.4%)      108 (56.2%)      179 (62.2%)      217 (61.1%)   0.401</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8:                         Yes      331 (39.6%)       84 (43.8%)      109 (37.8%)      138 (38.9%)        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9:                     Missing               15                4                4                7        </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 6: Disable statistical testing</span></span></span>
 <span class="r-in"><span><span class="fu">desctable</span><span class="op">(</span><span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>        by <span class="op">=</span> <span class="st">"treatment"</span>,</span></span>
 <span class="r-in"><span>        variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"bmi"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>        test <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Variable        Group            Total          Control           Drug A           Drug B</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;       &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:        N                           850              196              292              362</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:      age Median [IQR] 60.0 [52.0-67.0] 59.0 [52.0-66.5] 60.0 [51.0-68.0] 61.0 [53.0-68.0]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:      sex       Female      450 (52.9%)      100 (51.0%)      164 (56.2%)      186 (51.4%)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                  Male      400 (47.1%)       96 (49.0%)      128 (43.8%)      176 (48.6%)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5:      bmi Median [IQR] 28.0 [24.7-31.5] 28.0 [24.4-31.9] 28.2 [24.9-31.3] 27.8 [24.7-31.5]</span>
+<span class="r-in"><span>        test <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>        labels <span class="op">=</span> <span class="va">clintrial_labels</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                   Variable        Group            Total          Control           Drug A           Drug B</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                     &lt;char&gt;       &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:                       N                           850              196              292              362</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:             Age (years) Median [IQR] 60.0 [52.0-67.0] 59.0 [52.0-66.5] 60.0 [51.0-68.0] 61.0 [53.0-68.0]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:                     Sex       Female      450 (52.9%)      100 (51.0%)      164 (56.2%)      186 (51.4%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                                 Male      400 (47.1%)       96 (49.0%)      128 (43.8%)      176 (48.6%)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5: Body Mass Index (kg/m²) Median [IQR] 28.0 [24.7-31.5] 28.0 [24.4-31.9] 28.2 [24.9-31.3] 27.8 [24.7-31.5]</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 7: Force specific tests</span></span></span>
 <span class="r-in"><span><span class="fu">desctable</span><span class="op">(</span><span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>        by <span class="op">=</span> <span class="st">"surgery"</span>,</span></span>
 <span class="r-in"><span>        variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>        test_continuous <span class="op">=</span> <span class="st">"t"</span>,      <span class="co"># t-test instead of auto</span></span></span>
-<span class="r-in"><span>        test_categorical <span class="op">=</span> <span class="st">"fisher"</span><span class="op">)</span> <span class="co"># Fisher test instead of auto</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Variable        Group            Total               No              Yes p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;       &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:        N                           850              480              370        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:      age Median [IQR] 60.0 [52.0-67.0] 62.0 [54.0-70.0] 57.0 [49.0-66.0] &lt; 0.001</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:      sex       Female      450 (52.9%)      246 (51.2%)      204 (55.1%)   0.268</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                  Male      400 (47.1%)      234 (48.8%)      166 (44.9%)        </span>
+<span class="r-in"><span>        test_continuous <span class="op">=</span> <span class="st">"t"</span>,        <span class="co"># t-test instead of auto</span></span></span>
+<span class="r-in"><span>        test_categorical <span class="op">=</span> <span class="st">"fisher"</span>,  <span class="co"># Fisher test instead of auto</span></span></span>
+<span class="r-in"><span>        labels <span class="op">=</span> <span class="va">clintrial_labels</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       Variable        Group            Total               No              Yes p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         &lt;char&gt;       &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:           N                           850              480              370        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: Age (years) Median [IQR] 60.0 [52.0-67.0] 62.0 [54.0-70.0] 57.0 [49.0-66.0] &lt; 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:         Sex       Female      450 (52.9%)      246 (51.2%)      204 (55.1%)   0.268</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                     Male      400 (47.1%)      234 (48.8%)      166 (44.9%)        </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 8: Adjust decimal places</span></span></span>
 <span class="r-in"><span><span class="fu">desctable</span><span class="op">(</span><span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>        by <span class="op">=</span> <span class="st">"treatment"</span>,</span></span>
 <span class="r-in"><span>        variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"bmi"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>        digits <span class="op">=</span> <span class="fl">2</span>,    <span class="co"># 2 decimals for continuous</span></span></span>
-<span class="r-in"><span>        p_digits <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>  <span class="co"># 4 decimals for p-values</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Variable        Group               Total             Control              Drug A              Drug B p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;       &lt;char&gt;              &lt;char&gt;              &lt;char&gt;              &lt;char&gt;              &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:        N                              850                 196                 292                 362        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:      age Median [IQR] 60.00 [52.00-67.00] 59.00 [52.00-66.50] 60.00 [51.00-68.00] 61.00 [53.00-68.00]  0.4654</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:      bmi Median [IQR] 28.00 [24.70-31.50] 28.00 [24.40-31.90] 28.25 [24.90-31.30] 27.80 [24.70-31.50]  0.8314</span>
+<span class="r-in"><span>        p_digits <span class="op">=</span> <span class="fl">4</span>,  <span class="co"># 4 decimals for p-values</span></span></span>
+<span class="r-in"><span>        labels <span class="op">=</span> <span class="va">clintrial_labels</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                   Variable        Group               Total             Control              Drug A              Drug B p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                     &lt;char&gt;       &lt;char&gt;              &lt;char&gt;              &lt;char&gt;              &lt;char&gt;              &lt;char&gt;  &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:                       N                              850                 196                 292                 362        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:             Age (years) Median [IQR] 60.00 [52.00-67.00] 59.00 [52.00-66.50] 60.00 [51.00-68.00] 61.00 [53.00-68.00]  0.4654</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3: Body Mass Index (kg/m²) Median [IQR] 28.00 [24.70-31.50] 28.00 [24.40-31.90] 28.25 [24.90-31.30] 27.80 [24.70-31.50]  0.8314</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 9: Custom variable labels</span></span></span>
 <span class="r-in"><span><span class="va">labels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
@@ -507,34 +516,37 @@ ambiguity:</p><ul><li><p>Mean \(\pm\) SD: <code>"45.2 \eqn{\pm} 12.3"</code> (US
 <span class="r-in"><span><span class="fu">desctable</span><span class="op">(</span><span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>        by <span class="op">=</span> <span class="st">"treatment"</span>,</span></span>
 <span class="r-in"><span>        variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>        total <span class="op">=</span> <span class="st">"last"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Variable        Group          Control           Drug A           Drug B            Total p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;       &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:        N                           196              292              362              850        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:      age Median [IQR] 59.0 [52.0-66.5] 60.0 [51.0-68.0] 61.0 [53.0-68.0] 60.0 [52.0-67.0]   0.465</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:      sex       Female      100 (51.0%)      164 (56.2%)      186 (51.4%)      450 (52.9%)   0.394</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                  Male       96 (49.0%)      128 (43.8%)      176 (48.6%)      400 (47.1%)        </span>
+<span class="r-in"><span>        total <span class="op">=</span> <span class="st">"last"</span>,</span></span>
+<span class="r-in"><span>        labels <span class="op">=</span> <span class="va">clintrial_labels</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       Variable        Group          Control           Drug A           Drug B            Total p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         &lt;char&gt;       &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:           N                           196              292              362              850        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: Age (years) Median [IQR] 59.0 [52.0-66.5] 60.0 [51.0-68.0] 61.0 [53.0-68.0] 60.0 [52.0-67.0]   0.465</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:         Sex       Female      100 (51.0%)      164 (56.2%)      186 (51.4%)      450 (52.9%)   0.394</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                     Male       96 (49.0%)      128 (43.8%)      176 (48.6%)      400 (47.1%)        </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 11: Exclude total column</span></span></span>
 <span class="r-in"><span><span class="fu">desctable</span><span class="op">(</span><span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>        by <span class="op">=</span> <span class="st">"treatment"</span>,</span></span>
 <span class="r-in"><span>        variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>        total <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Variable        Group          Control           Drug A           Drug B p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;       &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:        N                           196              292              362        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:      age Median [IQR] 59.0 [52.0-66.5] 60.0 [51.0-68.0] 61.0 [53.0-68.0]   0.465</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:      sex       Female      100 (51.0%)      164 (56.2%)      186 (51.4%)   0.394</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                  Male       96 (49.0%)      128 (43.8%)      176 (48.6%)        </span>
+<span class="r-in"><span>        total <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>        labels <span class="op">=</span> <span class="va">clintrial_labels</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       Variable        Group          Control           Drug A           Drug B p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         &lt;char&gt;       &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:           N                           196              292              362        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: Age (years) Median [IQR] 59.0 [52.0-66.5] 60.0 [51.0-68.0] 61.0 [53.0-68.0]   0.465</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:         Sex       Female      100 (51.0%)      164 (56.2%)      186 (51.4%)   0.394</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                     Male       96 (49.0%)      128 (43.8%)      176 (48.6%)        </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 12: Survival analysis</span></span></span>
 <span class="r-in"><span><span class="fu">desctable</span><span class="op">(</span><span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>        by <span class="op">=</span> <span class="st">"treatment"</span>,</span></span>
-<span class="r-in"><span>        variables <span class="op">=</span> <span class="st">"Surv(os_months, os_status)"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                      Variable           Group            Total          Control           Drug A           Drug B p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                        &lt;char&gt;          &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:                          N                              850              196              292              362        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2: Surv(os_months, os_status) Median (95% CI) 19.4 (16.2-23.4) 14.7 (10.5-19.2) 33.6 (24.5-42.2) 14.7 (11.0-21.8) &lt; 0.001</span>
+<span class="r-in"><span>        variables <span class="op">=</span> <span class="st">"Surv(os_months, os_status)"</span>,</span></span>
+<span class="r-in"><span>        labels <span class="op">=</span> <span class="va">clintrial_labels</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                     Variable           Group            Total          Control           Drug A           Drug B p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                       &lt;char&gt;          &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:                         N                              850              196              292              362        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: Overall Survival (months) Median (95% CI) 19.4 (16.2-23.4) 14.7 (10.5-19.2) 33.6 (24.5-42.2) 14.7 (11.0-21.8) &lt; 0.001</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 13: Multiple survival endpoints</span></span></span>
 <span class="r-in"><span><span class="fu">desctable</span><span class="op">(</span><span class="va">clintrial</span>,</span></span>
@@ -561,37 +573,39 @@ ambiguity:</p><ul><li><p>Mean \(\pm\) SD: <code>"45.2 \eqn{\pm} 12.3"</code> (US
 <span class="r-in"><span>            <span class="st">"bmi"</span>, <span class="st">"creatinine"</span>,            <span class="co"># Labs</span></span></span>
 <span class="r-in"><span>            <span class="st">"smoking"</span>, <span class="st">"hypertension"</span>,      <span class="co"># Risk factors</span></span></span>
 <span class="r-in"><span>            <span class="st">"Surv(os_months, os_status)"</span>    <span class="co"># Survival</span></span></span>
-<span class="r-in"><span>        <span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       Variable           Group            Total          Control           Drug A           Drug B p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                         &lt;char&gt;          &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1:                          N                              850              196              292              362        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2:                        age    Median [IQR] 60.0 [52.0-67.0] 59.0 [52.0-66.5] 60.0 [51.0-68.0] 61.0 [53.0-68.0]   0.465</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3:                        sex          Female      450 (52.9%)      100 (51.0%)      164 (56.2%)      186 (51.4%)   0.394</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  4:                                       Male      400 (47.1%)       96 (49.0%)      128 (43.8%)      176 (48.6%)        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  5:                       race           White      598 (70.4%)      147 (75.0%)      198 (67.8%)      253 (69.9%)   0.794</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6:                                      Black      126 (14.8%)       25 (12.8%)       47 (16.1%)       54 (14.9%)        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  7:                                      Asian       93 (10.9%)        17 (8.7%)       35 (12.0%)       41 (11.3%)        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  8:                                      Other        33 (3.9%)         7 (3.6%)        12 (4.1%)        14 (3.9%)        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  9:                        bmi    Median [IQR] 28.0 [24.7-31.5] 28.0 [24.4-31.9] 28.2 [24.9-31.3] 27.8 [24.7-31.5]   0.831</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10:                 creatinine    Median [IQR]    1.0 [0.8-1.2]    1.0 [0.8-1.2]    1.0 [0.8-1.2]    1.0 [0.8-1.2]   0.483</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11:                    smoking           Never      337 (40.5%)       83 (43.5%)      123 (42.7%)      131 (37.0%)   0.450</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12:                                     Former      311 (37.3%)       66 (34.6%)      101 (35.1%)      144 (40.7%)        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13:                                    Current      185 (22.2%)       42 (22.0%)       64 (22.2%)       79 (22.3%)        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14:               hypertension              No      504 (60.4%)      108 (56.2%)      179 (62.2%)      217 (61.1%)   0.401</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15:                                        Yes      331 (39.6%)       84 (43.8%)      109 (37.8%)      138 (38.9%)        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16: Surv(os_months, os_status) Median (95% CI) 19.4 (16.2-23.4) 14.7 (10.5-19.2) 33.6 (24.5-42.2) 14.7 (11.0-21.8) &lt; 0.001</span>
+<span class="r-in"><span>        <span class="op">)</span>,</span></span>
+<span class="r-in"><span>        labels <span class="op">=</span> <span class="va">clintrial_labels</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                        Variable           Group            Total          Control           Drug A           Drug B p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                          &lt;char&gt;          &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1:                           N                              850              196              292              362        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:                 Age (years)    Median [IQR] 60.0 [52.0-67.0] 59.0 [52.0-66.5] 60.0 [51.0-68.0] 61.0 [53.0-68.0]   0.465</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:                         Sex          Female      450 (52.9%)      100 (51.0%)      164 (56.2%)      186 (51.4%)   0.394</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:                                        Male      400 (47.1%)       96 (49.0%)      128 (43.8%)      176 (48.6%)        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:                        Race           White      598 (70.4%)      147 (75.0%)      198 (67.8%)      253 (69.9%)   0.794</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:                                       Black      126 (14.8%)       25 (12.8%)       47 (16.1%)       54 (14.9%)        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:                                       Asian       93 (10.9%)        17 (8.7%)       35 (12.0%)       41 (11.3%)        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:                                       Other        33 (3.9%)         7 (3.6%)        12 (4.1%)        14 (3.9%)        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:     Body Mass Index (kg/m²)    Median [IQR] 28.0 [24.7-31.5] 28.0 [24.4-31.9] 28.2 [24.9-31.3] 27.8 [24.7-31.5]   0.831</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10: Baseline Creatinine (mg/dL)    Median [IQR]    1.0 [0.8-1.2]    1.0 [0.8-1.2]    1.0 [0.8-1.2]    1.0 [0.8-1.2]   0.483</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11:              Smoking Status           Never      337 (40.5%)       83 (43.5%)      123 (42.7%)      131 (37.0%)   0.450</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12:                                      Former      311 (37.3%)       66 (34.6%)      101 (35.1%)      144 (40.7%)        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13:                                     Current      185 (22.2%)       42 (22.0%)       64 (22.2%)       79 (22.3%)        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14:                Hypertension              No      504 (60.4%)      108 (56.2%)      179 (62.2%)      217 (61.1%)   0.401</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15:                                         Yes      331 (39.6%)       84 (43.8%)      109 (37.8%)      138 (38.9%)        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16:   Overall Survival (months) Median (95% CI) 19.4 (16.2-23.4) 14.7 (10.5-19.2) 33.6 (24.5-42.2) 14.7 (11.0-21.8) &lt; 0.001</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 15: Three or more groups</span></span></span>
 <span class="r-in"><span><span class="fu">desctable</span><span class="op">(</span><span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>        by <span class="op">=</span> <span class="st">"stage"</span>,  <span class="co"># Assuming stage has 3+ levels</span></span></span>
-<span class="r-in"><span>        variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"bmi"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Variable        Group            Total                I               II              III               IV p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;       &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:        N                           850              211              263              241              132        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:      age Median [IQR] 60.0 [52.0-67.0] 61.0 [53.0-67.0] 61.0 [51.0-70.0] 58.0 [51.0-67.0] 60.0 [53.0-66.0]   0.481</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:      sex       Female      449 (53.0%)      110 (52.1%)      131 (49.8%)      134 (55.6%)       74 (56.1%)   0.515</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                  Male      398 (47.0%)      101 (47.9%)      132 (50.2%)      107 (44.4%)       58 (43.9%)        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5:      bmi Median [IQR] 28.0 [24.7-31.5] 27.9 [24.8-30.9] 28.1 [24.2-31.5] 27.8 [24.7-31.5] 28.5 [25.1-32.1]   0.595</span>
+<span class="r-in"><span>        variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"bmi"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        labels <span class="op">=</span> <span class="va">clintrial_labels</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                   Variable        Group            Total                I               II              III               IV p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                     &lt;char&gt;       &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:                       N                           850              211              263              241              132        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:             Age (years) Median [IQR] 60.0 [52.0-67.0] 61.0 [53.0-67.0] 61.0 [51.0-70.0] 58.0 [51.0-67.0] 60.0 [53.0-66.0]   0.481</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:                     Sex       Female      449 (53.0%)      110 (52.1%)      131 (49.8%)      134 (55.6%)       74 (56.1%)   0.515</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                                 Male      398 (47.0%)      101 (47.9%)      132 (50.2%)      107 (44.4%)       58 (43.9%)        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5: Body Mass Index (kg/m²) Median [IQR] 28.0 [24.7-31.5] 27.9 [24.8-30.9] 28.1 [24.2-31.5] 27.8 [24.7-31.5] 28.5 [25.1-32.1]   0.595</span>
 <span class="r-in"><span><span class="co"># Automatically uses ANOVA/Kruskal-Wallis and chi-squared</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 16: Access raw unformatted data</span></span></span>
@@ -619,28 +633,30 @@ ambiguity:</p><ul><li><p>Mean \(\pm\) SD: <code>"45.2 \eqn{\pm} 12.3"</code> (US
 <span class="r-in"><span>        by <span class="op">=</span> <span class="st">"treatment"</span>,</span></span>
 <span class="r-in"><span>        variables <span class="op">=</span> <span class="st">"smoking"</span>,</span></span>
 <span class="r-in"><span>        na_include <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>        na_percent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Variable   Group       Total    Control      Drug A      Drug B p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;  &lt;char&gt;      &lt;char&gt;     &lt;char&gt;      &lt;char&gt;      &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:        N                 850        196         292         362        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:  smoking   Never 337 (39.6%) 83 (42.3%) 123 (42.1%) 131 (36.2%)   0.450</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:           Former 311 (36.6%) 66 (33.7%) 101 (34.6%) 144 (39.8%)        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:          Current 185 (21.8%) 42 (21.4%)  64 (21.9%)  79 (21.8%)        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5:          Unknown   17 (2.0%)   5 (2.6%)    4 (1.4%)    8 (2.2%)        </span>
+<span class="r-in"><span>        na_percent <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>        labels <span class="op">=</span> <span class="va">clintrial_labels</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          Variable   Group       Total    Control      Drug A      Drug B p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            &lt;char&gt;  &lt;char&gt;      &lt;char&gt;     &lt;char&gt;      &lt;char&gt;      &lt;char&gt;  &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:              N                 850        196         292         362        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: Smoking Status   Never 337 (39.6%) 83 (42.3%) 123 (42.1%) 131 (36.2%)   0.450</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:                 Former 311 (36.6%) 66 (33.7%) 101 (34.6%) 144 (39.8%)        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                Current 185 (21.8%) 42 (21.4%)  64 (21.9%)  79 (21.8%)        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:                Unknown   17 (2.0%)   5 (2.6%)    4 (1.4%)    8 (2.2%)        </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Exclude NAs from denominator (non-missing sum to 100%)</span></span></span>
 <span class="r-in"><span><span class="fu">desctable</span><span class="op">(</span><span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>        by <span class="op">=</span> <span class="st">"treatment"</span>,</span></span>
 <span class="r-in"><span>        variables <span class="op">=</span> <span class="st">"smoking"</span>,</span></span>
 <span class="r-in"><span>        na_include <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>        na_percent <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Variable   Group       Total    Control      Drug A      Drug B p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;  &lt;char&gt;      &lt;char&gt;     &lt;char&gt;      &lt;char&gt;      &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:        N                 850        196         292         362        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:  smoking   Never 337 (40.5%) 83 (43.5%) 123 (42.7%) 131 (37.0%)   0.450</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:           Former 311 (37.3%) 66 (34.6%) 101 (35.1%) 144 (40.7%)        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:          Current 185 (22.2%) 42 (22.0%)  64 (22.2%)  79 (22.3%)        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5:          Unknown          17          5           4           8        </span>
+<span class="r-in"><span>        na_percent <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>        labels <span class="op">=</span> <span class="va">clintrial_labels</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          Variable   Group       Total    Control      Drug A      Drug B p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            &lt;char&gt;  &lt;char&gt;      &lt;char&gt;     &lt;char&gt;      &lt;char&gt;      &lt;char&gt;  &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:              N                 850        196         292         362        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: Smoking Status   Never 337 (40.5%) 83 (43.5%) 123 (42.7%) 131 (37.0%)   0.450</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:                 Former 311 (37.3%) 66 (34.6%) 101 (35.1%) 144 (40.7%)        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                Current 185 (22.2%) 42 (22.0%)  64 (22.2%)  79 (22.3%)        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:                Unknown          17          5           4           8        </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 19: Passing additional test arguments</span></span></span>
 <span class="r-in"><span><span class="co"># Equal variance t-test</span></span></span>
@@ -648,24 +664,26 @@ ambiguity:</p><ul><li><p>Mean \(\pm\) SD: <code>"45.2 \eqn{\pm} 12.3"</code> (US
 <span class="r-in"><span>        by <span class="op">=</span> <span class="st">"sex"</span>,</span></span>
 <span class="r-in"><span>        variables <span class="op">=</span> <span class="st">"age"</span>,</span></span>
 <span class="r-in"><span>        test_continuous <span class="op">=</span> <span class="st">"t"</span>,</span></span>
-<span class="r-in"><span>        var.equal <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Variable        Group            Total           Female             Male p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;       &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:        N                           850              450              400        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:      age Median [IQR] 60.0 [52.0-67.0] 60.0 [52.0-67.0] 60.0 [51.5-69.0]   0.951</span>
+<span class="r-in"><span>        var.equal <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>        labels <span class="op">=</span> <span class="va">clintrial_labels</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       Variable        Group            Total           Female             Male p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         &lt;char&gt;       &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:           N                           850              450              400        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: Age (years) Median [IQR] 60.0 [52.0-67.0] 60.0 [52.0-67.0] 60.0 [51.5-69.0]   0.951</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 20: European number formatting</span></span></span>
 <span class="r-in"><span><span class="fu">desctable</span><span class="op">(</span><span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>        by <span class="op">=</span> <span class="st">"treatment"</span>,</span></span>
 <span class="r-in"><span>        variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span>, <span class="st">"bmi"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>        number_format <span class="op">=</span> <span class="st">"eu"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Variable        Group            Total          Control           Drug A           Drug B p-value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;       &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:        N                           850              196              292              362        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:      age Median [IQR] 60,0 [52,0–67,0] 59,0 [52,0–66,5] 60,0 [51,0–68,0] 61,0 [53,0–68,0]   0,465</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:      sex       Female      450 (52,9%)      100 (51,0%)      164 (56,2%)      186 (51,4%)   0,394</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                  Male      400 (47,1%)       96 (49,0%)      128 (43,8%)      176 (48,6%)        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5:      bmi Median [IQR] 28,0 [24,7–31,5] 28,0 [24,4–31,9] 28,2 [24,9–31,3] 27,8 [24,7–31,5]   0,831</span>
+<span class="r-in"><span>        number_format <span class="op">=</span> <span class="st">"eu"</span>,</span></span>
+<span class="r-in"><span>        labels <span class="op">=</span> <span class="va">clintrial_labels</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                   Variable        Group            Total          Control           Drug A           Drug B p-value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                     &lt;char&gt;       &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:                       N                           850              196              292              362        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:             Age (years) Median [IQR] 60,0 [52,0–67,0] 59,0 [52,0–66,5] 60,0 [51,0–68,0] 61,0 [53,0–68,0]   0,465</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:                     Sex       Female      450 (52,9%)      100 (51,0%)      164 (56,2%)      186 (51,4%)   0,394</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                                 Male      400 (47,1%)       96 (49,0%)      128 (43,8%)      176 (48,6%)        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5: Body Mass Index (kg/m²) Median [IQR] 28,0 [24,7–31,5] 28,0 [24,4–31,9] 28,2 [24,9–31,3] 27,8 [24,7–31,5]   0,831</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 21: Complete Table 1 for publication</span></span></span>
 <span class="r-in"><span><span class="va">table1</span> <span class="op">&lt;-</span> <span class="fu">desctable</span><span class="op">(</span></span></span>
@@ -748,7 +766,7 @@ ambiguity:</p><ul><li><p>Mean \(\pm\) SD: <code>"45.2 \eqn{\pm} 12.3"</code> (US
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
 </div>
 
     </footer></div>

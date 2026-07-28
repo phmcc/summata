@@ -31,6 +31,7 @@ table2tex(
   caption_size = NULL,
   label = NULL,
   show_logs = FALSE,
+  quiet = FALSE,
   ...
 )
 ```
@@ -165,8 +166,8 @@ table2tex(
   Numeric. Caption font size in points. If `NULL` (default), caption
   will use the document's default caption size (typically slightly
   smaller than body text). Set to a specific value (*e.g.,* 6, 7, 8, 9)
-  to control caption size explicitly. This generates a LaTeX comment
-  that you can use when wrapping the table. Typical range: 6-10 points.
+  to control caption size explicitly. This generates a LaTeX comment for
+  use when wrapping the table. Typical range: 6-10 points.
 
 - label:
 
@@ -179,6 +180,12 @@ table2tex(
   LaTeX packages and formatting options applied. If `FALSE`, suppresses
   these messages. Default is `FALSE`.
 
+- quiet:
+
+  Logical. Suppress progress and confirmation messages, such as the
+  notice reporting the file written. Errors and warnings are unaffected.
+  Default is `FALSE`.
+
 - ...:
 
   Additional arguments passed to
@@ -186,7 +193,11 @@ table2tex(
 
 ## Value
 
-Invisibly returns `NULL`. Creates a `.tex` file at the specified
+Invisibly returns the file path, matching
+[`tablesave()`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+and
+[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md).
+Called for its side effect of creating a `.tex` file at the specified
 location containing a LaTeX tabular environment.
 
 ## Details
@@ -216,7 +227,7 @@ The output includes:
 
 **Required LaTeX Packages:**
 
-Add these to your LaTeX document preamble:
+The following are required in the LaTeX document preamble:
 
 *Always required:*
 
@@ -259,7 +270,8 @@ grouping:
 
     dark_header = TRUE  # Black background, white text
 
-Both require the xcolor package with table option in your document.
+Both require the xcolor package with the table option in the document
+preamble.
 
 **Integration with LaTeX Documents:**
 
@@ -298,8 +310,7 @@ a table environment (see examples above).
 
 **Special Characters:**
 
-The function automatically escapes LaTeX special characters in your
-data:
+The function automatically escapes LaTeX special characters in the data:
 
 - Ampersand, percent, dollar sign, hash, underscore
 
@@ -312,8 +323,8 @@ intentionally using LaTeX commands.
 
 ## See also
 
-[`autotable`](https://phmcc.codeberg.page/summata/reference/autotable.md)
-for automatic format detection,
+[`tablesave`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+for saving in the format given by the file extension,
 [`table2pdf`](https://phmcc.codeberg.page/summata/reference/table2pdf.md)
 for direct PDF output,
 [`table2html`](https://phmcc.codeberg.page/summata/reference/table2html.md)
@@ -330,12 +341,12 @@ regression tables,
 for descriptive tables
 
 Other export functions:
-[`autotable()`](https://phmcc.codeberg.page/summata/reference/autotable.md),
 [`table2docx()`](https://phmcc.codeberg.page/summata/reference/table2docx.md),
 [`table2html()`](https://phmcc.codeberg.page/summata/reference/table2html.md),
 [`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md),
 [`table2pptx()`](https://phmcc.codeberg.page/summata/reference/table2pptx.md),
-[`table2rtf()`](https://phmcc.codeberg.page/summata/reference/table2rtf.md)
+[`table2rtf()`](https://phmcc.codeberg.page/summata/reference/table2rtf.md),
+[`tablesave()`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
 
 ## Examples
 
@@ -355,7 +366,7 @@ results <- fit(
 if (requireNamespace("xtable", quietly = TRUE)) {
   table2tex(results, file.path(tempdir(), "basic.tex"))
 }
-#> Table exported to /tmp/Rtmpn8SzwZ/basic.tex
+#> Table saved to /tmp/RtmptN10wa/basic.tex
 
 # \donttest{
 # Example 2: With booktabs for publication
@@ -363,7 +374,7 @@ table2tex(results, file.path(tempdir(), "publication.tex"),
        booktabs = TRUE,
        caption = "Multivariable logistic regression results",
        label = "tab:regression")
-#> Table exported to /tmp/Rtmpn8SzwZ/publication.tex
+#> Table saved to /tmp/RtmptN10wa/publication.tex
 
 # Example 3: Multi-line caption with abbreviations
 table2tex(results, file.path(tempdir(), "detailed.tex"),
@@ -372,70 +383,70 @@ table2tex(results, file.path(tempdir(), "detailed.tex"),
                  aOR = adjusted odds ratio; CI = confidence interval\\\\
                  Model adjusted for age, sex, treatment, and disease stage",
        label = "tab:mortality")
-#> Table exported to /tmp/Rtmpn8SzwZ/detailed.tex
+#> Table saved to /tmp/RtmptN10wa/detailed.tex
 
 # Example 4: Hierarchical display with indentation
 table2tex(results, file.path(tempdir(), "indented.tex"),
        indent_groups = TRUE,
        booktabs = TRUE)
-#> Table exported to /tmp/Rtmpn8SzwZ/indented.tex
+#> Table saved to /tmp/RtmptN10wa/indented.tex
 
 # Example 5: Condensed table (reduced height)
 table2tex(results, file.path(tempdir(), "condensed.tex"),
        condense_table = TRUE,
        booktabs = TRUE)
-#> Table exported to /tmp/Rtmpn8SzwZ/condensed.tex
+#> Table saved to /tmp/RtmptN10wa/condensed.tex
 
 # Example 6: With zebra stripes
 table2tex(results, file.path(tempdir(), "striped.tex"),
        zebra_stripes = TRUE,
        stripe_color = "gray!15",
        booktabs = TRUE)
-#> Table exported to /tmp/Rtmpn8SzwZ/striped.tex
+#> Table saved to /tmp/RtmptN10wa/striped.tex
 # Remember to add \usepackage[table]{xcolor} to the LaTeX document
 
 # Example 7: Dark header style
 table2tex(results, file.path(tempdir(), "dark_header.tex"),
        dark_header = TRUE,
        booktabs = TRUE)
-#> Table exported to /tmp/Rtmpn8SzwZ/dark_header.tex
+#> Table saved to /tmp/RtmptN10wa/dark_header.tex
 # Requires \usepackage[table]{xcolor}
 
 # Example 8: Custom cell padding
 table2tex(results, file.path(tempdir(), "relaxed.tex"),
        cell_padding = "relaxed",
        booktabs = TRUE)
-#> Table exported to /tmp/Rtmpn8SzwZ/relaxed.tex
+#> Table saved to /tmp/RtmptN10wa/relaxed.tex
 
 # Example 9: Custom column alignment (auto-detected by default)
 table2tex(results, file.path(tempdir(), "custom_align.tex"),
        align = c("c", "c", "c", "c", "c", "c", "c"))
-#> Table exported to /tmp/Rtmpn8SzwZ/custom_align.tex
+#> Table saved to /tmp/RtmptN10wa/custom_align.tex
 
 # Example 10: No header formatting (keep original names)
 table2tex(results, file.path(tempdir(), "raw_headers.tex"),
        format_headers = FALSE)
-#> Table exported to /tmp/Rtmpn8SzwZ/raw_headers.tex
+#> Table saved to /tmp/RtmptN10wa/raw_headers.tex
 
 # Example 11: Disable significance bolding
 table2tex(results, file.path(tempdir(), "no_bold.tex"),
        bold_significant = FALSE,
        booktabs = TRUE)
-#> Table exported to /tmp/Rtmpn8SzwZ/no_bold.tex
+#> Table saved to /tmp/RtmptN10wa/no_bold.tex
 
 # Example 12: Stricter significance threshold
 table2tex(results, file.path(tempdir(), "strict_sig.tex"),
        bold_significant = TRUE,
        p_threshold = 0.01,  # Bold only if p < 0.01
        booktabs = TRUE)
-#> Table exported to /tmp/Rtmpn8SzwZ/strict_sig.tex
+#> Table saved to /tmp/RtmptN10wa/strict_sig.tex
 
 # Example 13: With caption size control
 table2tex(results, file.path(tempdir(), "caption_size.tex"),
        caption_size = 6,
        caption = "Table 1 - Results with Compact Caption\\\\
                  Smaller caption fits better on constrained pages")
-#> Table exported to /tmp/Rtmpn8SzwZ/caption_size.tex
+#> Table saved to /tmp/RtmptN10wa/caption_size.tex
 
 # Example 14: Complete publication-ready table
 table2tex(results, file.path(tempdir(), "final_table1.tex"),
@@ -446,7 +457,7 @@ table2tex(results, file.path(tempdir(), "final_table1.tex"),
        zebra_stripes = FALSE,  # Many journals prefer no stripes
        bold_significant = TRUE,
        cell_padding = "normal")
-#> Table exported to /tmp/Rtmpn8SzwZ/final_table1.tex
+#> Table saved to /tmp/RtmptN10wa/final_table1.tex
 
 # Example 15: Descriptive statistics table
 desc_table <- desctable(clintrial, by = "treatment",
@@ -456,7 +467,7 @@ table2tex(desc_table, file.path(tempdir(), "table1_descriptive.tex"),
        booktabs = TRUE,
        caption = "Table 1: Baseline Characteristics",
        label = "tab:baseline")
-#> Table exported to /tmp/Rtmpn8SzwZ/table1_descriptive.tex
+#> Table saved to /tmp/RtmptN10wa/table1_descriptive.tex
 
 # Example 16: Model comparison table
 models <- list(
@@ -464,8 +475,12 @@ models <- list(
    full = c("age", "sex", "treatment", "stage")
 )
 
+# Information criteria assume a common sample, so the candidate
+# predictors are restricted to complete cases before comparison
+comparison_data <- na.omit(clintrial[, c("os_status", "age", "sex", "treatment", "stage")])
+
 comparison <- compfit(
-   data = clintrial,
+   data = comparison_data,
    outcome = "os_status",
    model_list = models
 )
@@ -477,7 +492,7 @@ table2tex(comparison, file.path(tempdir(), "model_comparison.tex"),
        booktabs = TRUE,
        caption = "Model Comparison Statistics",
        label = "tab:models")
-#> Table exported to /tmp/Rtmpn8SzwZ/model_comparison.tex
+#> Table saved to /tmp/RtmptN10wa/model_comparison.tex
 
 # }
 ```

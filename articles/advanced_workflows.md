@@ -32,26 +32,24 @@ table(clintrial$site)
 The `clintrial` dataset includes 10 study sites, providing a natural
 clustering variable for hierarchical analysis.
 
-> *n.b.:* To ensure correct font rendering and figure sizing, the forest
-> plots below are displayed using a helper function (`queue_plot()`)
-> that applies each plot’s recommended dimensions (stored in the
-> `"rec_dims"` attribute) via the [`ragg`](https://ragg.r-lib.org/)
-> graphics device. In practice, replace `queue_plot()` with
-> [`ggplot2::ggsave()`](https://ggplot2.tidyverse.org/reference/ggsave.html)
-> using recommended plot dimensions for equivalent results:
+> *n.b.:* The forest plots below are sized by this vignette from each
+> plot’s recommended dimensions, stored in its `"rec_dims"` attribute,
+> and rendered via the [`ragg`](https://ragg.r-lib.org/) graphics device
+> for correct font metrics. That sizing is applied behind the scenes and
+> is not shown in the code. Writing a plot to file elsewhere is
+> performed with
+> [`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md),
+> which applies the same dimensions and selects a suitable graphics
+> device:
 >
 > ``` r
 > p <- glmforest(model, data = mydata)
-> dims <- attr(p, "rec_dims")
-> ggplot2::ggsave("forest_plot.png", p,
->                 width = dims$width, 
->                 height = dims$height)
+> forestsave(p, "forest_plot.png")
 > ```
 >
 > This ensures that the figure size is always large enough to
-> accommodate the constituent plot text and graphics, and it is
-> generally the preferred method for saving forest plot outputs in
-> `summata`.
+> accommodate the constituent plot text and graphics, and it is the
+> preferred method for saving forest plot outputs in `summata`.
 
 ------------------------------------------------------------------------
 
@@ -80,8 +78,10 @@ example1 <- fit(
 example1
 ##> 
 ##> Multivariable Logistic Model
+##> 
 ##> Formula: surgery ~ age + sex + treatment + stage + sex:treatment
-##> n = 847, Events = 368
+##> Observations analyzed: 847 of 850 (99.6%)
+##> Events analyzed: 368 of 370 (99.5%)
 ##> 
 ##>                                  Variable   Group      n Events     aOR (95% CI) p-value
 ##>                                    <char>  <char> <char> <char>           <char>  <char>
@@ -116,23 +116,25 @@ example2 <- fit(
 example2
 ##> 
 ##> Multivariable Cox PH Model
+##> 
 ##> Formula: Surv(os_months, os_status) ~ age + sex + treatment + stage + sex:treatment + stage:treatment
-##> n = 847, Events = 606
+##> Observations analyzed: 847 of 850 (99.6%)
+##> Events analyzed: 606 of 609 (99.5%)
 ##> 
 ##>                                           Variable   Group      n Events     aHR (95% CI) p-value
 ##>                                             <char>  <char> <char> <char>           <char>  <char>
 ##>  1:                                    Age (years)       -    847    606 1.04 (1.03-1.04) < 0.001
-##>  2:                                            Sex  Female    450    298        reference       -
-##>  3:                                                   Male    400    311 1.32 (0.95-1.83)   0.094
-##>  4:                                Treatment Group Control    196    151        reference       -
+##>  2:                                            Sex  Female    449    297        reference       -
+##>  3:                                                   Male    398    309 1.32 (0.95-1.83)   0.094
+##>  4:                                Treatment Group Control    194    149        reference       -
 ##>  5:                                                 Drug A    292    184 0.70 (0.43-1.14)   0.153
-##>  6:                                                 Drug B    362    274 0.67 (0.41-1.09)   0.106
+##>  6:                                                 Drug B    361    273 0.67 (0.41-1.09)   0.106
 ##>  7:                                  Disease Stage       I    211    127        reference       -
 ##>  8:                                                     II    263    172 1.11 (0.73-1.70)   0.624
 ##>  9:                                                    III    241    186 1.94 (1.21-3.09)   0.006
 ##> 10:                                                     IV    132    121 3.69 (2.28-5.97) < 0.001
 ##> 11:          Sex (Male) × Treatment Group (Drug A)       -    128     89 1.11 (0.72-1.72)   0.637
-##> 12:          Sex (Male) × Treatment Group (Drug B)       -    176    143 0.98 (0.65-1.46)   0.903
+##> 12:          Sex (Male) × Treatment Group (Drug B)       -    175    142 0.98 (0.65-1.46)   0.903
 ##> 13:  Treatment Group (Drug A) × Disease Stage (II)       -     93     52 0.75 (0.42-1.35)   0.339
 ##> 14: Treatment Group (Drug A) × Disease Stage (III)       -     75     50 0.65 (0.35-1.20)   0.171
 ##> 15:  Treatment Group (Drug A) × Disease Stage (IV)       -     46     37 0.70 (0.37-1.34)   0.287
@@ -158,8 +160,9 @@ example3 <- fit(
 example3
 ##> 
 ##> Multivariable Linear Model
+##> 
 ##> Formula: los_days ~ age + sex + treatment + stage + surgery + age:treatment
-##> n = 827
+##> Observations analyzed: 827 of 850 (97.3%)
 ##> 
 ##>                                   Variable   Group      n Adj. Coefficient (95% CI) p-value
 ##>                                     <char>  <char> <char>                    <char>  <char>
@@ -197,11 +200,14 @@ example4 <- fullfit(
 example4
 ##> 
 ##> Fullfit Analysis Results
+##> 
 ##> Outcome: surgery
 ##> Model Type: glm
 ##> Method: all
 ##> Predictors Screened: 5
 ##> Multivariable Predictors: 5
+##> Observations analyzed: 847-850 of 850 (99.6-100.0%)
+##> Events analyzed: 368-370 of 370 (99.5-100.0%)
 ##> 
 ##>                                     Variable   Group      n Events      OR (95% CI)   Uni p     aOR (95% CI) Multi p
 ##>                                       <char>  <char> <char> <char>           <char>  <char>           <char>  <char>
@@ -297,7 +303,6 @@ example6 <- glmforest(
   indent_groups = TRUE,
   zebra_stripes = TRUE
 )
-queue_plot(example6)
 ```
 
 ![](advanced_workflows_files/figure-html/unnamed-chunk-9-1.png)
@@ -336,8 +341,9 @@ example7 <- fit(
 example7
 ##> 
 ##> Multivariable Linear Mixed Model
+##> 
 ##> Formula: los_days ~ age + sex + treatment + stage + (1|site)
-##> n = 827
+##> Observations analyzed: 827 of 850 (97.3%)
 ##> 
 ##>            Variable   Group      n Adj. Coefficient (95% CI) p-value
 ##>              <char>  <char> <char>                    <char>  <char>
@@ -371,8 +377,10 @@ example8 <- fit(
 example8
 ##> 
 ##> Multivariable glmerMod Model
+##> 
 ##> Formula: surgery ~ age + sex + treatment + stage + (1|site)
-##> n = 847, Events = 368
+##> Observations analyzed: 847 of 850 (99.6%)
+##> Events analyzed: 368 of 370 (99.5%)
 ##> 
 ##>            Variable   Group      n Events     aOR (95% CI) p-value
 ##>              <char>  <char> <char> <char>           <char>  <char>
@@ -404,8 +412,9 @@ example9 <- fit(
 example9
 ##> 
 ##> Multivariable Linear Mixed Model
+##> 
 ##> Formula: los_days ~ age + sex + treatment + stage + (1 + treatment|site)
-##> n = 827
+##> Observations analyzed: 827 of 850 (97.3%)
 ##> 
 ##>            Variable   Group      n Adj. Coefficient (95% CI) p-value
 ##>              <char>  <char> <char>                    <char>  <char>
@@ -437,8 +446,10 @@ example10 <- fit(
 example10
 ##> 
 ##> Multivariable Mixed Effects Cox Model
+##> 
 ##> Formula: Surv(os_months, os_status) ~ age + sex + treatment + stage + (1|site)
-##> n = 847, Events = 606
+##> Observations analyzed: 847
+##> Events analyzed: 606
 ##> 
 ##>            Variable   Group      n Events     aHR (95% CI) p-value
 ##>              <char>  <char> <char> <char>           <char>  <char>
@@ -466,7 +477,6 @@ example11 <- glmforest(
   indent_groups = TRUE,
   zebra_stripes = TRUE
 )
-queue_plot(example11)
 ```
 
 ![](advanced_workflows_files/figure-html/unnamed-chunk-15-1.png)
@@ -546,8 +556,10 @@ example13 <- fit(
 example13
 ##> 
 ##> Multivariable Cox PH Model
+##> 
 ##> Formula: Surv(os_months, os_status) ~ age + sex + treatment + strata( site )
-##> n = 850, Events = 609
+##> Observations analyzed: 850 of 850 (100.0%)
+##> Events analyzed: 609 of 609 (100.0%)
 ##> 
 ##>           Variable   Group      n Events     aHR (95% CI) p-value
 ##>             <char>  <char> <char> <char>           <char>  <char>
@@ -578,17 +590,19 @@ example14 <- fit(
 example14
 ##> 
 ##> Multivariable Cox PH Model
+##> 
 ##> Formula: Surv(os_months, os_status) ~ age + sex + treatment + stage
-##> n = 847, Events = 606
+##> Observations analyzed: 847 of 850 (99.6%)
+##> Events analyzed: 606 of 609 (99.5%)
 ##> 
 ##>            Variable   Group      n Events     aHR (95% CI) p-value
 ##>              <char>  <char> <char> <char>           <char>  <char>
 ##>  1:     Age (years)       -    847    606 1.04 (1.03-1.04) < 0.001
-##>  2:             Sex  Female    450    298        reference       -
-##>  3:                    Male    400    311 1.33 (1.19-1.48) < 0.001
-##>  4: Treatment Group Control    196    151        reference       -
+##>  2:             Sex  Female    449    297        reference       -
+##>  3:                    Male    398    309 1.33 (1.19-1.48) < 0.001
+##>  4: Treatment Group Control    194    149        reference       -
 ##>  5:                  Drug A    292    184 0.56 (0.40-0.78) < 0.001
-##>  6:                  Drug B    362    274 0.83 (0.63-1.08)   0.167
+##>  6:                  Drug B    361    273 0.83 (0.63-1.08)   0.167
 ##>  7:   Disease Stage       I    211    127        reference       -
 ##>  8:                      II    263    172 1.16 (0.93-1.44)   0.189
 ##>  9:                     III    241    186 1.90 (1.61-2.23) < 0.001
@@ -621,8 +635,10 @@ example15 <- fit(
 example15
 ##> 
 ##> Multivariable Logistic Model
+##> 
 ##> Formula: surgery ~ age + sex + treatment + stage
-##> n = 847, Events = 368
+##> Observations analyzed: 847 of 850 (99.6%)
+##> Events analyzed: 368 of 370 (99.5%)
 ##> 
 ##>            Variable   Group      n Events     aOR (95% CI) p-value
 ##>              <char>  <char> <char> <char>           <char>  <char>
@@ -664,10 +680,13 @@ example16 <- uniscreen(
 example16
 ##> 
 ##> Univariable Screening Results
+##> 
 ##> Outcome: surgery
 ##> Model Type: glmerMod
 ##> Predictors Screened: 4
 ##> Significant (p < 0.05): 3
+##> Observations analyzed: 847-850 of 850 (99.6-100.0%)
+##> Events analyzed: 368-370 of 370 (99.5-100.0%)
 ##> 
 ##>            Variable   Group      n Events      OR (95% CI) p-value
 ##>              <char>  <char> <char> <char>           <char>  <char>
@@ -700,10 +719,13 @@ example17 <- uniscreen(
 example17
 ##> 
 ##> Univariable Screening Results
+##> 
 ##> Outcome: Surv(os_months, os_status)
 ##> Model Type: Mixed Effects Cox
 ##> Predictors Screened: 5
 ##> Significant (p < 0.05): 5
+##> Observations analyzed: 842-850 of 850 (99.1-100.0%)
+##> Events analyzed: 602-609 of 609 (98.9-100.0%)
 ##> 
 ##>                    Variable   Group      n Events      HR (95% CI) p-value
 ##>                      <char>  <char> <char> <char>           <char>  <char>
@@ -727,7 +749,9 @@ example17
 
 The
 [`uniforest()`](https://phmcc.codeberg.page/summata/reference/uniforest.md)
-function visualizes univariable screening results:
+function visualizes univariable screening results. Labels supplied to
+[`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md)
+are carried through automatically, and may also be given directly:
 
 ``` r
 uni_results <- uniscreen(
@@ -741,10 +765,10 @@ uni_results <- uniscreen(
 example18 <- uniforest(
   uni_results,
   title = "Univariable Screening Results",
+  labels = clintrial_labels,
   indent_groups = TRUE,
   zebra_stripes = TRUE
 )
-queue_plot(example18)
 ```
 
 ![](advanced_workflows_files/figure-html/unnamed-chunk-23-1.png)
@@ -775,13 +799,15 @@ example19 <- multifit(
 
 example19
 ##> 
-##> Multivariate Analysis Results
+##> Multivariate Regression Results
+##> 
 ##> Predictor: treatment
 ##> Outcomes: 3
 ##> Model Type: glm
 ##> Covariates: age, sex, stage
 ##> Interactions: treatment:sex
 ##> Display: adjusted
+##> Observations analyzed: 847 of 850 (99.6%)
 ##> 
 ##>                        Outcome                             Predictor      n Events     aOR (95% CI) p-value
 ##>                         <char>                                <char> <char> <char>           <char>  <char>
@@ -817,13 +843,15 @@ example20 <- multifit(
 
 example20
 ##> 
-##> Multivariate Analysis Results
+##> Multivariate Regression Results
+##> 
 ##> Predictor: treatment
 ##> Outcomes: 2
 ##> Model Type: glmer
 ##> Covariates: age, sex
 ##> Random Effects: (1|site)
 ##> Display: adjusted
+##> Observations analyzed: 850 of 850 (100.0%)
 ##> 
 ##>                       Outcome                Predictor      n Events     aOR (95% CI) p-value
 ##>                        <char>                   <char> <char> <char>           <char>  <char>
@@ -852,13 +880,15 @@ example21 <- multifit(
 
 example21
 ##> 
-##> Multivariate Analysis Results
+##> Multivariate Regression Results
+##> 
 ##> Predictor: treatment
 ##> Outcomes: 2
 ##> Model Type: coxme
 ##> Covariates: age, sex
 ##> Random Effects: (1|site)
 ##> Display: adjusted
+##> Observations analyzed: 850 of 850 (100.0%)
 ##> 
 ##>                               Outcome                Predictor      n Events     aHR (95% CI) p-value
 ##>                                <char>                   <char> <char> <char>           <char>  <char>
@@ -889,10 +919,13 @@ risk_screening <- uniscreen(
 risk_screening
 ##> 
 ##> Univariable Screening Results
+##> 
 ##> Outcome: os_status
 ##> Model Type: Logistic
 ##> Predictors Screened: 9
 ##> Significant (p < 0.2): 6
+##> Observations analyzed: 833-850 of 850 (98.0-100.0%)
+##> Events analyzed: 594-609 of 609 (97.5-100.0%)
 ##> 
 ##>                    Variable   Group      n Events                                                                         OR (95% CI) p-value
 ##>                      <char>  <char> <char> <char>                                                                              <char>  <char>
@@ -934,30 +967,32 @@ effects <- multifit(
 
 effects
 ##> 
-##> Multivariate Analysis Results
+##> Multivariate Regression Results
+##> 
 ##> Predictor: treatment
 ##> Outcomes: 3
 ##> Model Type: glm
 ##> Covariates: age, sex, stage
 ##> Display: both
+##> Observations analyzed: 847 of 850 (99.6%)
 ##> 
 ##>                       Outcome                Predictor      n Events      OR (95% CI)   Uni p     aOR (95% CI) Multi p
 ##>                        <char>                   <char> <char> <char>           <char>  <char>           <char>  <char>
 ##> 1:                Death Event Treatment Group (Drug A)    292    184 0.51 (0.34-0.76)   0.001 0.44 (0.28-0.68) < 0.001
-##> 2:                Death Event Treatment Group (Drug B)    362    274 0.93 (0.61-1.39)   0.721 0.74 (0.47-1.16)   0.192
+##> 2:                Death Event Treatment Group (Drug B)    361    273 0.93 (0.61-1.39)   0.721 0.74 (0.47-1.16)   0.192
 ##> 3: Progression or Death Event Treatment Group (Drug A)    292    227 0.44 (0.26-0.73)   0.002 0.36 (0.20-0.62) < 0.001
-##> 4: Progression or Death Event Treatment Group (Drug B)    362    322 1.02 (0.58-1.75)   0.950 0.77 (0.42-1.36)   0.374
+##> 4: Progression or Death Event Treatment Group (Drug B)    361    321 1.02 (0.58-1.75)   0.950 0.77 (0.42-1.36)   0.374
 ##> 5:         Surgical Resection Treatment Group (Drug A)    292    173 1.58 (1.10-2.27)   0.014 1.84 (1.23-2.76)   0.003
-##> 6:         Surgical Resection Treatment Group (Drug B)    362    103 0.43 (0.30-0.62) < 0.001 0.45 (0.30-0.66) < 0.001
+##> 6:         Surgical Resection Treatment Group (Drug B)    361    102 0.43 (0.30-0.62) < 0.001 0.45 (0.30-0.66) < 0.001
 
 # Step 3: Visualize effects
 forest_plot <- multiforest(
   effects,
   title = "Effects Across Outcomes",
+  labels = clintrial_labels,
   indent_predictor = TRUE,
   zebra_stripes = TRUE
 )
-queue_plot(forest_plot)
 ```
 
 ![](advanced_workflows_files/figure-html/unnamed-chunk-28-1.png)
@@ -1039,9 +1074,8 @@ interaction patterns, consider stratified analyses or effect plots.
   for baseline characteristics
 - [Regression
   Modeling](https://phmcc.codeberg.page/summata/articles/regression_modeling.md):
-  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
   [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
-  and
+  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md), and
   [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
 - [Model
   Comparison](https://phmcc.codeberg.page/summata/articles/model_comparison.md):

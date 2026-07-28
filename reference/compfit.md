@@ -299,8 +299,8 @@ selection criteria rather than as a definitive model selection method.
 individual model fitting,
 [`fullfit`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
 for automated variable selection,
-[`table2pdf`](https://phmcc.codeberg.page/summata/reference/table2pdf.md)
-for exporting results
+[`tablesave`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+for exporting tables
 
 Other regression functions:
 [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
@@ -320,6 +320,14 @@ Other regression functions:
 data(clintrial)
 data(clintrial_labels)
 
+# Information criteria assume a common sample, so the candidate predictors
+# are restricted to complete cases before any comparison
+comparison_data <- na.omit(
+    clintrial[, c("readmission_30d", "os_months", "os_status", "age", "sex",
+                  "smoking", "diabetes", "stage", "ecog", "grade",
+                  "treatment")]
+)
+
 # Example 1: Compare nested logistic regression models
 models <- list(
     base = c("age", "sex"),
@@ -328,8 +336,8 @@ models <- list(
 )
 
 comparison <- compfit(
-    data = clintrial,
-    outcome = "os_status",
+    data = comparison_data,
+    outcome = "readmission_30d",
     model_list = models,
     model_names = c("Base", "Clinical", "Full")
 )
@@ -340,7 +348,7 @@ comparison <- compfit(
 comparison
 #> 
 #> Model Comparison Results
-#> Outcome: os_status
+#> Outcome: readmission_30d
 #> Model Type: glm
 #> 
 #> CMS Weights:
@@ -350,28 +358,27 @@ comparison
 #>   Pseudo-R²: 15%
 #>   Brier score: 5%
 #> 
-#> Recommended Model: Full (CMS: 73.2)
+#> Recommended Model: Full (CMS: 66.9)
 #> 
 #> Models ranked by selection score:
-#>       Model   CMS     N Events Predictors Converged   AIC   BIC Pseudo-R² Concordance Brier Score Global p
-#>      <char> <num> <int>  <num>      <int>    <char> <num> <num>     <num>       <num>       <num>   <char>
-#> 1:     Full  73.2   833    594          6   Suspect 836.0 892.7     0.187       0.784       0.162  < 0.001
-#> 2: Clinical  43.1   833    594          4       Yes 940.4 968.7     0.070       0.680       0.187  < 0.001
-#> 3:     Base  39.4   850    609          2       Yes 955.3 969.5     0.064       0.675       0.188  < 0.001
+#>       Model   CMS     N Events Predictors Converged    AIC    BIC Pseudo-R² Concordance Brier Score Global p
+#>      <char> <num> <int>  <num>      <int>    <char>  <num>  <num>     <num>       <num>       <num>   <char>
+#> 1:     Full  66.9   833    416          6       Yes 1069.1 1125.8     0.095       0.692       0.220  < 0.001
+#> 2: Clinical  49.3   833    416          4       Yes 1102.1 1130.4     0.056       0.656       0.231  < 0.001
+#> 3:     Base  32.1   833    416          2       Yes 1131.1 1145.3     0.026       0.602       0.241  < 0.001
 #> 
 #> CMS interpretation: 85+ Excellent, 75-84 Very Good, 65-74 Good, 55-64 Fair, < 55 Poor
 
 # \donttest{
 
 # Example 2: Compare Cox survival models
-library(survival)
 surv_models <- list(
     simple = c("age", "sex"),
     clinical = c("age", "sex", "stage", "grade")
 )
 
 surv_comparison <- compfit(
-    data = clintrial,
+    data = comparison_data,
     outcome = "Surv(os_months, os_status)",
     model_list = surv_models,
     model_type = "coxph"
@@ -395,57 +402,58 @@ surv_comparison
 #> Models ranked by selection score:
 #>       Model   CMS     N Events Predictors Converged    AIC    BIC Pseudo-R² Concordance Global p
 #>      <char> <num> <int>  <num>      <int>    <char>  <num>  <num>     <num>       <num>   <char>
-#> 1: clinical  74.1   838    598          4       Yes 7201.9 7232.6     0.219       0.678  < 0.001
-#> 2:   simple  38.9   850    609          2       Yes 7458.5 7467.3     0.101       0.613  < 0.001
+#> 1: clinical  74.1   833    594          4       Yes 7147.4 7178.1     0.218       0.678  < 0.001
+#> 2:   simple  38.8   833    594          2       Yes 7257.4 7266.2     0.097       0.612  < 0.001
 #> 
 #> CMS interpretation: 85+ Excellent, 75-84 Very Good, 65-74 Good, 55-64 Fair, < 55 Poor
 
-# Example 3: Test effect of adding interaction terms
+# Example 3: Test the effect of adding an interaction term.
+# Treatment efficacy differs by disease stage in these data, so the
+# interaction is expected to improve the fit.
 interaction_models <- list(
-    main = c("age", "treatment", "sex"),
-    interact = c("age", "treatment", "sex")
+    main = c("age", "treatment", "stage"),
+    interact = c("age", "treatment", "stage")
 )
 
 interaction_comp <- compfit(
-    data = clintrial,
-    outcome = "os_status",
+    data = comparison_data,
+    outcome = "Surv(os_months, os_status)",
     model_list = interaction_models,
+    model_type = "coxph",
     model_names = c("Main Effects", "With Interaction"),
     interactions_list = list(
         NULL,
-        c("treatment:sex")
+        c("treatment:stage")
     )
 )
-#> Auto-detected binary outcome, using logistic regression
 #> Fitting Main Effects with 3 predictors...
 #> Fitting With Interaction with 3 predictors + 1 interaction...
 interaction_comp
 #> 
 #> Model Comparison Results
-#> Outcome: os_status
-#> Model Type: glm
+#> Outcome: Surv(os_months, os_status)
+#> Model Type: coxph
 #> 
 #> CMS Weights:
 #>   Convergence: 15%
-#>   AIC: 25%
+#>   AIC: 30%
 #>   Concordance: 40%
-#>   Pseudo-R²: 15%
-#>   Brier score: 5%
+#>   Global p-value: 15%
 #> 
-#> Recommended Model: Main Effects (CMS: 66.7)
+#> Recommended Model: Main Effects (CMS: 73.9)
 #> 
 #> Models ranked by selection score:
-#>               Model   CMS     N Events Predictors Converged   AIC   BIC Pseudo-R² Concordance Brier Score Global p
-#>              <char> <num> <int>  <num>      <int>    <char> <num> <num>     <num>       <num>       <num>   <char>
-#> 1:     Main Effects  66.7   850    609          3       Yes 943.4 967.2     0.079       0.697       0.185  < 0.001
-#> 2: With Interaction  41.7   850    609          3       Yes 947.2 980.4     0.079       0.697       0.184  < 0.001
+#>               Model   CMS     N Events Predictors Converged    AIC    BIC Pseudo-R² Concordance Global p
+#>              <char> <num> <int>  <num>      <int>    <char>  <num>  <num>     <num>       <num>   <char>
+#> 1:     Main Effects  73.9   833    594          3       Yes 7144.4 7170.7     0.219       0.676  < 0.001
+#> 2: With Interaction  44.3   833    594          3       Yes 7150.1 7202.7     0.225       0.680  < 0.001
 #> 
 #> CMS interpretation: 85+ Excellent, 75-84 Very Good, 65-74 Good, 55-64 Fair, < 55 Poor
 
 # Example 4: Include coefficient comparison table
 detailed <- compfit(
-    data = clintrial,
-    outcome = "os_status",
+    data = comparison_data,
+    outcome = "readmission_30d",
     model_list = models,
     include_coefficients = TRUE,
     labels = clintrial_labels
@@ -458,37 +466,37 @@ detailed <- compfit(
 # Access coefficient table
 coef_table <- attr(detailed, "coefficients")
 coef_table
-#>        Model                Variable   Group      n Events                                                                                                    aOR (95% CI) p-value
-#>       <char>                  <char>  <char> <char> <char>                                                                                                          <char>  <char>
-#>  1:     base             Age (years)       -    850    609                                                                                                1.05 (1.04-1.06) < 0.001
-#>  2:     base                     Sex  Female    450    298                                                                                                       reference       -
-#>  3:     base                            Male    400    311                                                                                                1.86 (1.36-2.56) < 0.001
-#>  4: clinical             Age (years)       -    833    594                                                                                                1.05 (1.03-1.06) < 0.001
-#>  5: clinical                     Sex  Female    443    292                                                                                                       reference       -
-#>  6: clinical                            Male    390    302                                                                                                1.83 (1.33-2.53) < 0.001
-#>  7: clinical          Smoking Status   Never    337    248                                                                                                       reference       -
-#>  8: clinical                          Former    311    203                                                                                                0.74 (0.52-1.05)   0.089
-#>  9: clinical                         Current    185    143                                                                                                1.38 (0.89-2.14)   0.151
-#> 10: clinical                Diabetes      No    636    456                                                                                                       reference       -
-#> 11: clinical                             Yes    197    138                                                                                                0.99 (0.69-1.44)   0.974
-#> 12:     full             Age (years)       -    833    594                                                                                                1.06 (1.04-1.07) < 0.001
-#> 13:     full                     Sex  Female    443    292                                                                                                       reference       -
-#> 14:     full                            Male    390    302                                                                                                2.00 (1.42-2.84) < 0.001
-#> 15:     full          Smoking Status   Never    337    248                                                                                                       reference       -
-#> 16:     full                          Former    311    203                                                                                                0.72 (0.49-1.05)   0.089
-#> 17:     full                         Current    185    143                                                                                                1.32 (0.83-2.11)   0.244
-#> 18:     full                Diabetes      No    636    456                                                                                                       reference       -
-#> 19:     full                             Yes    197    138                                                                                                0.93 (0.63-1.39)   0.719
-#> 20:     full           Disease Stage       I    207    125                                                                                                       reference       -
-#> 21:     full                              II    261    170                                                                                                1.32 (0.87-2.01)   0.197
-#> 22:     full                             III    237    182                                                                                                2.66 (1.70-4.20) < 0.001
-#> 23:     full                              IV    128    117                                                                                               9.69 (4.93-20.72) < 0.001
-#> 24:     full ECOG Performance Status       0    263    158                                                                                                       reference       -
-#> 25:     full                               1    298    208                                                                                                1.70 (1.15-2.51)   0.007
-#> 26:     full                               2    235    191                                                                                                3.35 (2.15-5.30) < 0.001
-#> 27:     full                               3     37     37 36022880.19 (0.00-23119118697429391683100875173163642152512738051347358308592830067904386018411451647000576.00)   0.977
-#>        Model                Variable   Group      n Events                                                                                                    aOR (95% CI) p-value
-#>       <char>                  <char>  <char> <char> <char>                                                                                                          <char>  <char>
+#>        Model                Variable   Group      n Events      aOR (95% CI) p-value
+#>       <char>                  <char>  <char> <char> <char>            <char>  <char>
+#>  1:     base             Age (years)       -    833    416  1.03 (1.02-1.04) < 0.001
+#>  2:     base                     Sex  Female    443    206         reference       -
+#>  3:     base                            Male    390    210  1.36 (1.03-1.79)   0.031
+#>  4: clinical             Age (years)       -    833    416  1.03 (1.02-1.05) < 0.001
+#>  5: clinical                     Sex  Female    443    206         reference       -
+#>  6: clinical                            Male    390    210  1.38 (1.04-1.83)   0.027
+#>  7: clinical          Smoking Status   Never    337    156         reference       -
+#>  8: clinical                          Former    311    141  1.03 (0.75-1.42)   0.862
+#>  9: clinical                         Current    185    119  2.44 (1.67-3.59) < 0.001
+#> 10: clinical                Diabetes      No    636    300         reference       -
+#> 11: clinical                             Yes    197    116  1.81 (1.29-2.54) < 0.001
+#> 12:     full             Age (years)       -    833    416  1.04 (1.02-1.05) < 0.001
+#> 13:     full                     Sex  Female    443    206         reference       -
+#> 14:     full                            Male    390    210  1.41 (1.05-1.89)   0.021
+#> 15:     full          Smoking Status   Never    337    156         reference       -
+#> 16:     full                          Former    311    141  1.04 (0.75-1.44)   0.833
+#> 17:     full                         Current    185    119  2.43 (1.65-3.62) < 0.001
+#> 18:     full                Diabetes      No    636    300         reference       -
+#> 19:     full                             Yes    197    116  1.82 (1.29-2.58) < 0.001
+#> 20:     full           Disease Stage       I    207     86         reference       -
+#> 21:     full                              II    261    124  1.34 (0.90-1.99)   0.149
+#> 22:     full                             III    237    131  1.95 (1.31-2.92)   0.001
+#> 23:     full                              IV    128     75  2.26 (1.41-3.65) < 0.001
+#> 24:     full ECOG Performance Status       0    263    107         reference       -
+#> 25:     full                               1    298    143  1.37 (0.97-1.95)   0.078
+#> 26:     full                               2    235    136  2.06 (1.41-3.00) < 0.001
+#> 27:     full                               3     37     30 6.80 (2.91-17.98) < 0.001
+#>        Model                Variable   Group      n Events      aOR (95% CI) p-value
+#>       <char>                  <char>  <char> <char> <char>            <char>  <char>
 
 # Example 5: Access fitted model objects
 fitted_models <- attr(comparison, "models")
