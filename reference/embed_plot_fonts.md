@@ -3,8 +3,8 @@
 Post-processes a PDF so that its fonts are embedded, through
 [`grDevices::embedFonts()`](https://rdrr.io/r/grDevices/embedFonts.html).
 This is offered as an alternative to drawing with a Cairo device, which
-embeds fonts but selects its own italic face. Embedding is performed by
-Ghostscript (external).
+embeds fonts but renders italics unreliably. If Cairo is not selected,
+embedding is performed by Ghostscript (external).
 
 ## Usage
 

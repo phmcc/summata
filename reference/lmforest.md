@@ -496,7 +496,7 @@ plot5 <- lmforest(
 
 # Example 6: Save with recommended dimensions
 forestsave(plot5, file.path(tempdir(), "linear_forest.pdf"))
-#> Forest plot saved to /tmp/Rtmp9CXk1j/linear_forest.pdf (width = 16.0 in, height = 5.0 in)
+#> Forest plot saved to /tmp/RtmpMMvyLw/linear_forest.pdf (width = 16.0 in, height = 5.0 in)
 
 options(old_width)
 

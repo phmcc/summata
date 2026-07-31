@@ -395,54 +395,54 @@ results <- fit(
 if (requireNamespace("flextable", quietly = TRUE)) {
   table2rtf(results, file.path(tempdir(), "results.rtf"))
 }
-#> Table saved to /tmp/Rtmp9CXk1j/results.rtf
+#> Table saved to /tmp/RtmpMMvyLw/results.rtf
 
 # \donttest{
 old_width <- options(width = 180)
 # Example 2: With caption
 table2rtf(results, file.path(tempdir(), "captioned.rtf"),
        caption = "Table 1: Multivariable Logistic Regression Results")
-#> Table saved to /tmp/Rtmp9CXk1j/captioned.rtf
+#> Table saved to /tmp/RtmpMMvyLw/captioned.rtf
 
 # Example 3: Landscape orientation for wide tables
 table2rtf(results, file.path(tempdir(), "wide.rtf"),
        orientation = "landscape")
-#> Table saved to /tmp/Rtmp9CXk1j/wide.rtf
+#> Table saved to /tmp/RtmpMMvyLw/wide.rtf
 
 # Example 4: Custom font and size
 table2rtf(results, file.path(tempdir(), "custom_font.rtf"),
        font_family = "Times New Roman",
        font_size = 11)
-#> Table saved to /tmp/Rtmp9CXk1j/custom_font.rtf
+#> Table saved to /tmp/RtmpMMvyLw/custom_font.rtf
 
 # Example 5: Hierarchical display
 table2rtf(results, file.path(tempdir(), "indented.rtf"),
        indent_groups = TRUE)
-#> Table saved to /tmp/Rtmp9CXk1j/indented.rtf
+#> Table saved to /tmp/RtmpMMvyLw/indented.rtf
 
 # Example 6: Condensed table
 table2rtf(results, file.path(tempdir(), "condensed.rtf"),
        condense_table = TRUE)
-#> Table saved to /tmp/Rtmp9CXk1j/condensed.rtf
+#> Table saved to /tmp/RtmpMMvyLw/condensed.rtf
 
 # Example 7: With zebra stripes
 table2rtf(results, file.path(tempdir(), "striped.rtf"),
        zebra_stripes = TRUE)
-#> Table saved to /tmp/Rtmp9CXk1j/striped.rtf
+#> Table saved to /tmp/RtmpMMvyLw/striped.rtf
 
 # Example 8: Dark header style
 table2rtf(results, file.path(tempdir(), "dark.rtf"),
        dark_header = TRUE)
-#> Table saved to /tmp/Rtmp9CXk1j/dark.rtf
+#> Table saved to /tmp/RtmpMMvyLw/dark.rtf
 
 # Example 9: A4 paper for international submissions
 table2rtf(results, file.path(tempdir(), "a4.rtf"),
        paper = "a4")
-#> Table saved to /tmp/Rtmp9CXk1j/a4.rtf
+#> Table saved to /tmp/RtmpMMvyLw/a4.rtf
 
 # Example 10: Get flextable for customization
 result <- table2rtf(results, file.path(tempdir(), "base.rtf"))
-#> Table saved to /tmp/Rtmp9CXk1j/base.rtf
+#> Table saved to /tmp/RtmpMMvyLw/base.rtf
 ft <- attr(result, "flextable")
 
 # Customize the flextable
@@ -454,7 +454,7 @@ flextable::save_as_rtf(ft, path = file.path(tempdir(), "customized.rtf"))
 
 # Example 11: Direct flextable return
 ft <- table2rtf(results, file.path(tempdir(), "direct.rtf"), return_ft = TRUE)
-#> Table saved to /tmp/Rtmp9CXk1j/direct.rtf
+#> Table saved to /tmp/RtmpMMvyLw/direct.rtf
 ft <- flextable::bg(ft, bg = "yellow", part = "header")
 
 # Example 12: Regulatory submission table
@@ -465,23 +465,23 @@ table2rtf(results, file.path(tempdir(), "submission.rtf"),
        indent_groups = TRUE,
        zebra_stripes = FALSE,
        bold_significant = TRUE)
-#> Table saved to /tmp/Rtmp9CXk1j/submission.rtf
+#> Table saved to /tmp/RtmpMMvyLw/submission.rtf
 
 # Example 13: Custom column alignment
 table2rtf(results, file.path(tempdir(), "aligned.rtf"),
        align = c("left", "left", "center", "right", "right"))
-#> Table saved to /tmp/Rtmp9CXk1j/aligned.rtf
+#> Table saved to /tmp/RtmpMMvyLw/aligned.rtf
 
 # Example 14: Disable significance bolding
 table2rtf(results, file.path(tempdir(), "no_bold.rtf"),
        bold_significant = FALSE)
-#> Table saved to /tmp/Rtmp9CXk1j/no_bold.rtf
+#> Table saved to /tmp/RtmpMMvyLw/no_bold.rtf
 
 # Example 15: Stricter significance threshold
 table2rtf(results, file.path(tempdir(), "strict.rtf"),
        bold_significant = TRUE,
        p_threshold = 0.01)
-#> Table saved to /tmp/Rtmp9CXk1j/strict.rtf
+#> Table saved to /tmp/RtmpMMvyLw/strict.rtf
 
 # Example 16: Descriptive statistics for baseline characteristics
 desc <- desctable(clintrial, by = "treatment",
@@ -490,7 +490,7 @@ desc <- desctable(clintrial, by = "treatment",
 table2rtf(desc, file.path(tempdir(), "baseline.rtf"),
        caption = "Table 1: Baseline Patient Characteristics",
        zebra_stripes = TRUE)
-#> Table saved to /tmp/Rtmp9CXk1j/baseline.rtf
+#> Table saved to /tmp/RtmpMMvyLw/baseline.rtf
 
 # Example 17: Clinical trial efficacy table
 table2rtf(results, file.path(tempdir(), "efficacy.rtf"),
@@ -499,7 +499,7 @@ table2rtf(results, file.path(tempdir(), "efficacy.rtf"),
        paper = "letter",
        orientation = "landscape",
        condense_table = TRUE)
-#> Table saved to /tmp/Rtmp9CXk1j/efficacy.rtf
+#> Table saved to /tmp/RtmpMMvyLw/efficacy.rtf
 
 options(old_width)
 # }

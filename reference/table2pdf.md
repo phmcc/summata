@@ -393,7 +393,7 @@ if(has_latex){
   table2pdf(results, file.path(tempdir(), "basic_results.pdf"))
 }
 #> Compiling PDF...
-#> Table saved to /tmp/Rtmp9CXk1j/basic_results.pdf
+#> Table saved to /tmp/RtmpMMvyLw/basic_results.pdf
 
 # \donttest{
 
@@ -403,7 +403,7 @@ if (has_latex) {
            orientation = "landscape")
 }
 #> Compiling PDF...
-#> Table saved to /tmp/Rtmp9CXk1j/wide_results.pdf
+#> Table saved to /tmp/RtmpMMvyLw/wide_results.pdf
 
 # Example 3: With caption
 if (has_latex) {
@@ -411,7 +411,7 @@ if (has_latex) {
            caption = "Table 1: Multivariable logistic regression results")
 }
 #> Compiling PDF...
-#> Table saved to /tmp/Rtmp9CXk1j/captioned.pdf
+#> Table saved to /tmp/RtmpMMvyLw/captioned.pdf
 
 # Example 4: Multi-line caption with formatting
 if (has_latex) {
@@ -420,7 +420,7 @@ if (has_latex) {
                      aOR = adjusted odds ratio; CI = confidence interval")
 }
 #> Compiling PDF...
-#> Table saved to /tmp/Rtmp9CXk1j/formatted_caption.pdf
+#> Table saved to /tmp/RtmpMMvyLw/formatted_caption.pdf
 
 # Example 5: Auto-sized PDF (no fixed page dimensions)
 if (has_latex) {
@@ -429,7 +429,7 @@ if (has_latex) {
 }
 #> Using standalone class for auto-sized output
 #> Compiling PDF...
-#> Table saved to /tmp/Rtmp9CXk1j/autosize.pdf
+#> Table saved to /tmp/RtmpMMvyLw/autosize.pdf
 
 # Example 6: A4 paper with custom margins
 if (has_latex) {
@@ -438,7 +438,7 @@ if (has_latex) {
            margins = c(0.75, 0.75, 0.75, 0.75))
 }
 #> Compiling PDF...
-#> Table saved to /tmp/Rtmp9CXk1j/a4_custom.pdf
+#> Table saved to /tmp/RtmpMMvyLw/a4_custom.pdf
 
 # Example 7: Larger font for readability
 if (has_latex) {
@@ -446,7 +446,7 @@ if (has_latex) {
            font_size = 11)
 }
 #> Compiling PDF...
-#> Table saved to /tmp/Rtmp9CXk1j/large_font.pdf
+#> Table saved to /tmp/RtmpMMvyLw/large_font.pdf
 
 # Example 8: Indented hierarchical display
 if (has_latex) {
@@ -454,7 +454,7 @@ if (has_latex) {
            indent_groups = TRUE)
 }
 #> Compiling PDF...
-#> Table saved to /tmp/Rtmp9CXk1j/indented.pdf
+#> Table saved to /tmp/RtmpMMvyLw/indented.pdf
 
 # Example 9: Condensed table (reduced height)
 if (has_latex) {
@@ -462,7 +462,7 @@ if (has_latex) {
            condense_table = TRUE)
 }
 #> Compiling PDF...
-#> Table saved to /tmp/Rtmp9CXk1j/condensed.pdf
+#> Table saved to /tmp/RtmpMMvyLw/condensed.pdf
 
 # Example 10: With zebra stripes
 if (has_latex) {
@@ -471,7 +471,7 @@ if (has_latex) {
            stripe_color = "gray!15")
 }
 #> Compiling PDF...
-#> Table saved to /tmp/Rtmp9CXk1j/striped.pdf
+#> Table saved to /tmp/RtmpMMvyLw/striped.pdf
 
 # Example 11: Dark header style
 if (has_latex) {
@@ -479,7 +479,7 @@ if (has_latex) {
            dark_header = TRUE)
 }
 #> Compiling PDF...
-#> Table saved to /tmp/Rtmp9CXk1j/dark_header.pdf
+#> Table saved to /tmp/RtmpMMvyLw/dark_header.pdf
 
 # Example 12: Combination of formatting options
 if (has_latex) {
@@ -495,7 +495,7 @@ if (has_latex) {
            p_threshold = 0.05)
 }
 #> Compiling PDF...
-#> Table saved to /tmp/Rtmp9CXk1j/publication_ready.pdf
+#> Table saved to /tmp/RtmpMMvyLw/publication_ready.pdf
 
 # Example 13: Adjust cell padding
 if (has_latex) {
@@ -503,7 +503,7 @@ if (has_latex) {
            cell_padding = "relaxed")  # More spacious
 }
 #> Compiling PDF...
-#> Table saved to /tmp/Rtmp9CXk1j/relaxed_padding.pdf
+#> Table saved to /tmp/RtmpMMvyLw/relaxed_padding.pdf
 
 # Example 14: No scaling (natural table width)
 if (has_latex) {
@@ -512,7 +512,7 @@ if (has_latex) {
            font_size = 10)
 }
 #> Compiling PDF...
-#> Table saved to /tmp/Rtmp9CXk1j/no_scale.pdf
+#> Table saved to /tmp/RtmpMMvyLw/no_scale.pdf
 
 # Example 15: Hide significance bolding
 if (has_latex) {
@@ -520,7 +520,7 @@ if (has_latex) {
            bold_significant = FALSE)
 }
 #> Compiling PDF...
-#> Table saved to /tmp/Rtmp9CXk1j/no_bold.pdf
+#> Table saved to /tmp/RtmpMMvyLw/no_bold.pdf
 
 # Example 16: Custom column alignment
 if (has_latex) {
@@ -528,7 +528,7 @@ if (has_latex) {
            align = c("c", "c", "c", "c", "c", "c", "c"))
 }
 #> Compiling PDF...
-#> Table saved to /tmp/Rtmp9CXk1j/custom_align.pdf
+#> Table saved to /tmp/RtmpMMvyLw/custom_align.pdf
 
 # Example 17: Descriptive statistics table
 if (has_latex) {
@@ -540,7 +540,7 @@ if (has_latex) {
            orientation = "landscape")
 }
 #> Compiling PDF...
-#> Table saved to /tmp/Rtmp9CXk1j/descriptive.pdf
+#> Table saved to /tmp/RtmpMMvyLw/descriptive.pdf
 
 # Example 18: Model comparison table
 if (has_latex) {
@@ -567,7 +567,7 @@ if (has_latex) {
 #> Fitting base with 2 predictors...
 #> Fitting full with 4 predictors...
 #> Compiling PDF...
-#> Table saved to /tmp/Rtmp9CXk1j/model_comparison.pdf
+#> Table saved to /tmp/RtmpMMvyLw/model_comparison.pdf
 
 # Example 19: Very wide table with aggressive fitting
 if (has_latex) {
@@ -585,7 +585,7 @@ if (has_latex) {
            condense_table = TRUE)
 }
 #> Compiling PDF...
-#> Table saved to /tmp/Rtmp9CXk1j/very_wide.pdf
+#> Table saved to /tmp/RtmpMMvyLw/very_wide.pdf
 
 # Example 20: With caption size control
 if (has_latex) {
@@ -596,7 +596,7 @@ if (has_latex) {
                      Smaller caption fits better on constrained pages")
 }
 #> Compiling PDF...
-#> Table saved to /tmp/Rtmp9CXk1j/caption_size.pdf
+#> Table saved to /tmp/RtmpMMvyLw/caption_size.pdf
 
 # Example 21: Troubleshooting - keep logs
 if (has_latex) {
@@ -605,6 +605,6 @@ if (has_latex) {
   # If it fails, check debug.log for error messages
 }
 #> Compiling PDF...
-#> Table saved to /tmp/Rtmp9CXk1j/debug.pdf
+#> Table saved to /tmp/RtmpMMvyLw/debug.pdf
 # }
 ```

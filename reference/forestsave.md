@@ -1,4 +1,4 @@
-# Save a Forest Plot at Its Recommended Dimensions
+# Save a Forest Plot to File
 
 Writes a forest plot to file, sized by default from the recommendations
 the plotting function computed from the plot's own content, and rendered
@@ -128,7 +128,7 @@ Unless `device` is supplied, `forestsave()` selects:
 
 - Other formats:
 
-  Deferred to
+  Left to
   [`ggplot2::ggsave()`](https://ggplot2.tidyverse.org/reference/ggsave.html).
 
 **Font embedding.** R's PDF device draws on the standard fonts that
@@ -145,9 +145,15 @@ selects its own italic face.
 [`grDevices::cairo_pdf()`](https://rdrr.io/r/grDevices/cairo.html),
 [`grDevices::cairo_ps()`](https://rdrr.io/r/grDevices/cairo.html), or
 [`grDevices::svg()`](https://rdrr.io/r/grDevices/cairo.html) according
-to the output format. It applies to vector formats only: raster output
-already uses the ragg devices, which supersede Cairo's raster backends.
-Any other value of `device` is passed to
+to the output format:
+
+    forestsave(p, "forest.pdf", device = "cairo")
+
+It applies to vector formats only, since raster output already uses the
+ragg devices, which supersede Cairo's raster backends. Cairo is absent
+from some installations even where `capabilities("cairo")` reports
+otherwise, so the device is opened once before use and its
+unavailability reported. Any other value of `device` is passed to
 [`ggplot2::ggsave()`](https://ggplot2.tidyverse.org/reference/ggsave.html)
 unchanged.
 
@@ -159,14 +165,14 @@ apparent at the point it is written.
 ## See also
 
 [`autoforest`](https://phmcc.codeberg.page/summata/reference/autoforest.md),
-[`lmforest`](https://phmcc.codeberg.page/summata/reference/lmforest.md),
-[`glmforest`](https://phmcc.codeberg.page/summata/reference/glmforest.md),
 [`coxforest`](https://phmcc.codeberg.page/summata/reference/coxforest.md),
+[`glmforest`](https://phmcc.codeberg.page/summata/reference/glmforest.md),
+[`lmforest`](https://phmcc.codeberg.page/summata/reference/lmforest.md),
 [`uniforest`](https://phmcc.codeberg.page/summata/reference/uniforest.md),
 [`multiforest`](https://phmcc.codeberg.page/summata/reference/multiforest.md)
-for producing the plots;
+for producing forest plots;
 [`tablesave`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
-for the equivalent operation on tables
+for exporting formatted tables
 
 Other visualization functions:
 [`autoforest()`](https://phmcc.codeberg.page/summata/reference/autoforest.md),
@@ -189,31 +195,26 @@ model <- stats::glm(readmission_30d ~ age + sex + stage,
 p <- glmforest(model, data = clintrial, labels = clintrial_labels)
 #> Recommended plot dimensions: width = 13.9 in, height = 5.0 in
 
-# \donttest{
 # Example 1: Save at the recommended dimensions
-# Written under tempdir() so the example respects CRAN's no-write policy;
-# in practice any desired path may be supplied.
 forestsave(p, file.path(tempdir(), "forest.pdf"))
-#> Forest plot saved to /tmp/Rtmp9CXk1j/forest.pdf (width = 13.9 in, height = 5.0 in)
+#> Forest plot saved to /tmp/RtmpMMvyLw/forest.pdf (width = 13.9 in, height = 5.0 in)
+
+# \donttest{
 
 # Example 2: Raster output at publication resolution
 forestsave(p, file.path(tempdir(), "forest.png"), dpi = 600)
-#> Forest plot saved to /tmp/Rtmp9CXk1j/forest.png (width = 13.9 in, height = 5.0 in)
+#> Forest plot saved to /tmp/RtmpMMvyLw/forest.png (width = 13.9 in, height = 5.0 in)
 
 # Example 3: Dimensions given explicitly, in any supported units
 forestsave(p, file.path(tempdir(), "forest_sized.pdf"),
            width = 24, height = 16, units = "cm")
-#> Forest plot saved to /tmp/Rtmp9CXk1j/forest_sized.pdf (width = 24.0 cm, height = 16.0 cm)
+#> Forest plot saved to /tmp/RtmpMMvyLw/forest_sized.pdf (width = 24.0 cm, height = 16.0 cm)
 
 # Example 4: Embed fonts after writing, where Ghostscript is available
 forestsave(p, file.path(tempdir(), "forest_embedded.pdf"),
            embed_fonts = TRUE)
-#> Forest plot saved to /tmp/Rtmp9CXk1j/forest_embedded.pdf (width = 13.9 in, height = 5.0 in)
-#> Fonts embedded in /tmp/Rtmp9CXk1j/forest_embedded.pdf
+#> Forest plot saved to /tmp/RtmpMMvyLw/forest_embedded.pdf (width = 13.9 in, height = 5.0 in)
+#> Fonts embedded in /tmp/RtmpMMvyLw/forest_embedded.pdf
 
-# Example 5: Cairo embeds fonts as it draws, at the cost of its own
-# italic face selection
-forestsave(p, file.path(tempdir(), "forest_cairo.pdf"), device = "cairo")
-#> Forest plot saved to /tmp/Rtmp9CXk1j/forest_cairo.pdf (width = 13.9 in, height = 5.0 in)
 # }
 ```

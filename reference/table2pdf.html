@@ -378,7 +378,7 @@ sized exactly to the table content:</p><ol><li><p>Using the <code>standalone</co
 <span class="r-in"><span>  <span class="fu">table2pdf</span><span class="op">(</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"basic_results.pdf"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Compiling PDF...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/Rtmp9CXk1j/basic_results.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmpMMvyLw/basic_results.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span></span></span>
@@ -388,7 +388,7 @@ sized exactly to the table content:</p><ol><li><p>Using the <code>standalone</co
 <span class="r-in"><span>           orientation <span class="op">=</span> <span class="st">"landscape"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Compiling PDF...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/Rtmp9CXk1j/wide_results.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmpMMvyLw/wide_results.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 3: With caption</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="va">has_latex</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -396,7 +396,7 @@ sized exactly to the table content:</p><ol><li><p>Using the <code>standalone</co
 <span class="r-in"><span>           caption <span class="op">=</span> <span class="st">"Table 1: Multivariable logistic regression results"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Compiling PDF...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/Rtmp9CXk1j/captioned.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmpMMvyLw/captioned.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 4: Multi-line caption with formatting</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="va">has_latex</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -405,7 +405,7 @@ sized exactly to the table content:</p><ol><li><p>Using the <code>standalone</co
 <span class="r-in"><span><span class="st">                     aOR = adjusted odds ratio; CI = confidence interval"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Compiling PDF...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/Rtmp9CXk1j/formatted_caption.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmpMMvyLw/formatted_caption.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 5: Auto-sized PDF (no fixed page dimensions)</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="va">has_latex</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -414,7 +414,7 @@ sized exactly to the table content:</p><ol><li><p>Using the <code>standalone</co
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using standalone class for auto-sized output</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Compiling PDF...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/Rtmp9CXk1j/autosize.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmpMMvyLw/autosize.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 6: A4 paper with custom margins</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="va">has_latex</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -423,7 +423,7 @@ sized exactly to the table content:</p><ol><li><p>Using the <code>standalone</co
 <span class="r-in"><span>           margins <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.75</span>, <span class="fl">0.75</span>, <span class="fl">0.75</span>, <span class="fl">0.75</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Compiling PDF...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/Rtmp9CXk1j/a4_custom.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmpMMvyLw/a4_custom.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 7: Larger font for readability</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="va">has_latex</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -431,7 +431,7 @@ sized exactly to the table content:</p><ol><li><p>Using the <code>standalone</co
 <span class="r-in"><span>           font_size <span class="op">=</span> <span class="fl">11</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Compiling PDF...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/Rtmp9CXk1j/large_font.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmpMMvyLw/large_font.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 8: Indented hierarchical display</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="va">has_latex</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -439,7 +439,7 @@ sized exactly to the table content:</p><ol><li><p>Using the <code>standalone</co
 <span class="r-in"><span>           indent_groups <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Compiling PDF...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/Rtmp9CXk1j/indented.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmpMMvyLw/indented.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 9: Condensed table (reduced height)</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="va">has_latex</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -447,7 +447,7 @@ sized exactly to the table content:</p><ol><li><p>Using the <code>standalone</co
 <span class="r-in"><span>           condense_table <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Compiling PDF...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/Rtmp9CXk1j/condensed.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmpMMvyLw/condensed.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 10: With zebra stripes</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="va">has_latex</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -456,7 +456,7 @@ sized exactly to the table content:</p><ol><li><p>Using the <code>standalone</co
 <span class="r-in"><span>           stripe_color <span class="op">=</span> <span class="st">"gray!15"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Compiling PDF...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/Rtmp9CXk1j/striped.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmpMMvyLw/striped.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 11: Dark header style</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="va">has_latex</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -464,7 +464,7 @@ sized exactly to the table content:</p><ol><li><p>Using the <code>standalone</co
 <span class="r-in"><span>           dark_header <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Compiling PDF...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/Rtmp9CXk1j/dark_header.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmpMMvyLw/dark_header.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 12: Combination of formatting options</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="va">has_latex</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -480,7 +480,7 @@ sized exactly to the table content:</p><ol><li><p>Using the <code>standalone</co
 <span class="r-in"><span>           p_threshold <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Compiling PDF...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/Rtmp9CXk1j/publication_ready.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmpMMvyLw/publication_ready.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 13: Adjust cell padding</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="va">has_latex</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -488,7 +488,7 @@ sized exactly to the table content:</p><ol><li><p>Using the <code>standalone</co
 <span class="r-in"><span>           cell_padding <span class="op">=</span> <span class="st">"relaxed"</span><span class="op">)</span>  <span class="co"># More spacious</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Compiling PDF...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/Rtmp9CXk1j/relaxed_padding.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmpMMvyLw/relaxed_padding.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 14: No scaling (natural table width)</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="va">has_latex</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -497,7 +497,7 @@ sized exactly to the table content:</p><ol><li><p>Using the <code>standalone</co
 <span class="r-in"><span>           font_size <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Compiling PDF...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/Rtmp9CXk1j/no_scale.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmpMMvyLw/no_scale.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 15: Hide significance bolding</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="va">has_latex</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -505,7 +505,7 @@ sized exactly to the table content:</p><ol><li><p>Using the <code>standalone</co
 <span class="r-in"><span>           bold_significant <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Compiling PDF...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/Rtmp9CXk1j/no_bold.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmpMMvyLw/no_bold.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 16: Custom column alignment</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="va">has_latex</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -513,7 +513,7 @@ sized exactly to the table content:</p><ol><li><p>Using the <code>standalone</co
 <span class="r-in"><span>           align <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"c"</span>, <span class="st">"c"</span>, <span class="st">"c"</span>, <span class="st">"c"</span>, <span class="st">"c"</span>, <span class="st">"c"</span>, <span class="st">"c"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Compiling PDF...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/Rtmp9CXk1j/custom_align.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmpMMvyLw/custom_align.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 17: Descriptive statistics table</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="va">has_latex</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -525,7 +525,7 @@ sized exactly to the table content:</p><ol><li><p>Using the <code>standalone</co
 <span class="r-in"><span>           orientation <span class="op">=</span> <span class="st">"landscape"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Compiling PDF...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/Rtmp9CXk1j/descriptive.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmpMMvyLw/descriptive.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 18: Model comparison table</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="va">has_latex</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -552,7 +552,7 @@ sized exactly to the table content:</p><ol><li><p>Using the <code>standalone</co
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting base with 2 predictors...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Fitting full with 4 predictors...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Compiling PDF...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/Rtmp9CXk1j/model_comparison.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmpMMvyLw/model_comparison.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 19: Very wide table with aggressive fitting</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="va">has_latex</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -570,7 +570,7 @@ sized exactly to the table content:</p><ol><li><p>Using the <code>standalone</co
 <span class="r-in"><span>           condense_table <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Compiling PDF...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/Rtmp9CXk1j/very_wide.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmpMMvyLw/very_wide.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 20: With caption size control</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="va">has_latex</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -581,7 +581,7 @@ sized exactly to the table content:</p><ol><li><p>Using the <code>standalone</co
 <span class="r-in"><span><span class="st">                     Smaller caption fits better on constrained pages"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Compiling PDF...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/Rtmp9CXk1j/caption_size.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmpMMvyLw/caption_size.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 21: Troubleshooting - keep logs</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="va">has_latex</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -590,7 +590,7 @@ sized exactly to the table content:</p><ol><li><p>Using the <code>standalone</co
 <span class="r-in"><span>  <span class="co"># If it fails, check debug.log for error messages</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Compiling PDF...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/Rtmp9CXk1j/debug.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Table saved to /tmp/RtmpMMvyLw/debug.pdf</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

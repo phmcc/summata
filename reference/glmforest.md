@@ -528,7 +528,7 @@ plot5 <- glmforest(
 
 # Example 6: Save with recommended dimensions
 forestsave(plot5, file.path(tempdir(), "forest.pdf"))
-#> Forest plot saved to /tmp/Rtmp9CXk1j/forest.pdf (width = 14.9 in, height = 5.0 in)
+#> Forest plot saved to /tmp/RtmpMMvyLw/forest.pdf (width = 14.9 in, height = 5.0 in)
 
 options(old_width)
 
