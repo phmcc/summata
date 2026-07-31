@@ -1,3 +1,5 @@
+### * Main function
+
 #' Export Table to PDF Format
 #'
 #' Converts a data frame, data.table, or matrix to a professionally formatted PDF 

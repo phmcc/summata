@@ -1,3 +1,5 @@
+### * Main function
+
 #' Create Forest Plot for Generalized Linear Models
 #'
 #' Generates a publication-ready forest plot that combines a formatted data table 

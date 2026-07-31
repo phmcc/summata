@@ -1,3 +1,5 @@
+### * Extraction functions
+
 #' Get factor levels from model (works with S3 and S4)
 #' 
 #' Extracts factor level information from fitted model objects. Handles both
@@ -37,6 +39,7 @@ get_model_xlevels <- function(model) {
     return(NULL)
 }
 
+
 #' Get data from model object (works with S3 and S4)
 #' 
 #' Retrieves the original data used to fit a model. Checks multiple locations
@@ -71,6 +74,7 @@ get_model_data <- function(model) {
     ## Default
     return(NULL)
 }
+
 
 #' Identify the variables required by a fitted model
 #'
@@ -109,6 +113,7 @@ get_model_variables <- function(model, model_class) {
     return(unique(vars))
 }
 
+
 #' Number of observations used to fit a model
 #'
 #' Provides a single accessor for the fitted sample size across the model
@@ -143,6 +148,7 @@ get_model_nobs <- function(model, model_class) {
     return(n_used)
 }
 
+
 #' Restrict data to the observations used in model fitting
 #'
 #' Group-level sample sizes must be counted over the observations that entered
@@ -154,13 +160,6 @@ get_model_nobs <- function(model, model_class) {
 #' cases the supplied data still contains the observations dropped during
 #' fitting, and counting them inflates group sizes whenever the response or a
 #' covariate is missing.
-#'
-#' Complete cases are determined from the variables named in the model formula,
-#' reproducing the default \code{na.omit} behavior of the modeling functions.
-#' A complete-case restriction can only remove observations that the model
-#' itself could not have used, so the subset is retained even when it does not
-#' reproduce the fitted sample size exactly, as may happen when a fit used
-#' \code{subset} or case weights.
 #'
 #' @param model Fitted model object.
 #' @param model_class Character string of the model class.
@@ -196,6 +195,7 @@ get_analysis_data <- function(model, model_class, data) {
 
     return(data[keep])
 }
+
 
 #' Detect if model is univariable or multivariable
 #' 
@@ -325,6 +325,7 @@ detect_model_type <- function(model) {
     return(data.table::fifelse(n_terms == 1, "Univariable", "Multivariable"))
 }
 
+
 #' Get readable model type name
 #' 
 #' Converts model class names to human-readable descriptions. For GLMs,
@@ -371,6 +372,7 @@ get_model_type_name <- function(model) {
                   model_class  # default
                   ))
 }
+
 
 #' Parse term into variable and group
 #' 
@@ -465,6 +467,7 @@ parse_term <- function(terms, xlevels = NULL, model = NULL) {
     return(data.table::data.table(variable = variable, group = group))
 }
 
+
 #' Extract event variable from survival model
 #' 
 #' Parses the Surv() expression in survival model formulas to extract
@@ -535,6 +538,7 @@ get_outcome_variables <- function(model) {
 
     return(tryCatch(all.vars(fml[[2]]), error = function(e) character(0)))
 }
+
 
 #' Count the observations available to an analysis
 #'
@@ -637,6 +641,7 @@ get_analysis_counts <- function(data, outcome_vars, predictor_vars = NULL,
     return(result)
 }
 
+
 #' Count the observations available to a fitted model
 #'
 #' Convenience wrapper around \code{get_analysis_counts()} that derives the
@@ -663,71 +668,6 @@ get_model_analysis_counts <- function(model, model_class, data) {
     event_var <- get_event_variable_for_counts(outcome_vars, model_class, family_name)
 
     return(get_analysis_counts(data, outcome_vars, predictor_vars, event_var))
-}
-
-#' Describe the analyzed sample for console output
-#'
-#' Renders the counts produced by \code{get_analysis_counts()} as a single line
-#' for the \code{print()} methods. The line is produced whenever the counts are
-#' available, including when every supplied observation entered the analysis:
-#' a complete sample is itself worth stating, and reporting it only on loss
-#' would leave the reader to infer the difference between no exclusions and no
-#' disclosure.
-#'
-#' @param counts List as returned by \code{get_analysis_counts()}.
-#' @param label Character label preceding the counts.
-#' @param marks List of number marks as returned by
-#'   \code{resolve_number_marks()}. Counts and percentages are separated as
-#'   the accompanying table separates them, so that a locale setting applies
-#'   to the whole of the output rather than to the table alone. Resolved from
-#'   the global option when not supplied.
-#' @return Character string, or \code{NULL} when the counts are unavailable.
-#' @keywords internal
-format_analysis_counts <- function(counts, label = "Observations analyzed",
-                                   marks = NULL) {
-
-    if (is.null(counts) || length(counts$n_analyzed) == 0) {
-        return(NULL)
-    }
-
-    n_supplied <- counts$n_supplied
-    lo <- min(counts$n_analyzed)
-    hi <- max(counts$n_analyzed)
-
-    ## The denominator may be absent, as when a total is unavailable for the
-    ## quantity being described. Nothing is reported rather than a bare
-    ## numerator dressed as a proportion.
-    if (length(n_supplied) == 0 || !is.finite(n_supplied) || n_supplied == 0) {
-        return(NULL)
-    }
-
-    if (!is.finite(lo) || !is.finite(hi)) {
-        return(NULL)
-    }
-
-    if (is.null(marks)) {
-        marks <- tryCatch(resolve_number_marks(NULL),
-                          error = function(e) list(big.mark = "",
-                                                   decimal.mark = "."))
-    }
-
-    ## Counts and percentages are rendered by the same helpers the tables use,
-    ## so that a figure in this line and the same figure in the n column below
-    ## cannot be formatted differently
-    count_str <- function(x) format_count(x, marks)
-
-    pct_str <- function(x) apply_decimal_mark(sprintf("%.1f", x), marks)
-
-    if (lo == hi) {
-        return(sprintf("%s: %s of %s (%s%%)",
-                       label, count_str(lo), count_str(n_supplied),
-                       pct_str(100 * lo / n_supplied)))
-    }
-
-    return(sprintf("%s: %s-%s of %s (%s-%s%%)",
-                   label, count_str(lo), count_str(hi), count_str(n_supplied),
-                   pct_str(100 * lo / n_supplied),
-                   pct_str(100 * hi / n_supplied)))
 }
 
 
@@ -802,6 +742,75 @@ get_event_variable_for_counts <- function(outcome_vars, model_type = NULL,
 
     return(NULL)
 }
+
+
+### * Formatting functions
+
+#' Describe the analyzed sample for console output
+#'
+#' Renders the counts produced by \code{get_analysis_counts()} as a single line
+#' for the \code{print()} methods. The line is produced whenever the counts are
+#' available, including when every supplied observation entered the analysis:
+#' a complete sample is itself worth stating, and reporting it only on loss
+#' would leave the reader to infer the difference between no exclusions and no
+#' disclosure.
+#'
+#' @param counts List as returned by \code{get_analysis_counts()}.
+#' @param label Character label preceding the counts.
+#' @param marks List of number marks as returned by
+#'   \code{resolve_number_marks()}. Counts and percentages are separated as
+#'   the accompanying table separates them, so that a locale setting applies
+#'   to the whole of the output rather than to the table alone. Resolved from
+#'   the global option when not supplied.
+#' @return Character string, or \code{NULL} when the counts are unavailable.
+#' @keywords internal
+format_analysis_counts <- function(counts, label = "Observations analyzed",
+                                   marks = NULL) {
+
+    if (is.null(counts) || length(counts$n_analyzed) == 0) {
+        return(NULL)
+    }
+
+    n_supplied <- counts$n_supplied
+    lo <- min(counts$n_analyzed)
+    hi <- max(counts$n_analyzed)
+
+    ## The denominator may be absent, as when a total is unavailable for the
+    ## quantity being described. Nothing is reported rather than a bare
+    ## numerator dressed as a proportion.
+    if (length(n_supplied) == 0 || !is.finite(n_supplied) || n_supplied == 0) {
+        return(NULL)
+    }
+
+    if (!is.finite(lo) || !is.finite(hi)) {
+        return(NULL)
+    }
+
+    if (is.null(marks)) {
+        marks <- tryCatch(resolve_number_marks(NULL),
+                          error = function(e) list(big.mark = "",
+                                                   decimal.mark = "."))
+    }
+
+    ## Counts and percentages are rendered by the same helpers the tables use,
+    ## so that a figure in this line and the same figure in the n column below
+    ## cannot be formatted differently
+    count_str <- function(x) format_count(x, marks)
+
+    pct_str <- function(x) apply_decimal_mark(sprintf("%.1f", x), marks)
+
+    if (lo == hi) {
+        return(sprintf("%s: %s of %s (%s%%)",
+                       label, count_str(lo), count_str(n_supplied),
+                       pct_str(100 * lo / n_supplied)))
+    }
+
+    return(sprintf("%s: %s-%s of %s (%s-%s%%)",
+                   label, count_str(lo), count_str(hi), count_str(n_supplied),
+                   pct_str(100 * lo / n_supplied),
+                   pct_str(100 * hi / n_supplied)))
+}
+
 
 #' Describe the analyzed events for console output
 #'

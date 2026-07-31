@@ -1,3 +1,5 @@
+### * Main function
+
 #' Complete Regression Analysis Workflow
 #'
 #' Executes a comprehensive regression analysis pipeline that combines univariable 
@@ -828,6 +830,71 @@ fullfit <- function(data,
     }
 }
 
+
+### * Print function
+
+#' Print method for fullfit results
+#' 
+#' Displays a summary header with outcome, model type, method, and number of
+#' multivariable predictors before printing the results table.
+#' 
+#' @param x fullfit_result object.
+#' @param ... Additional arguments passed to print methods.
+#' @return Invisibly returns the input object \code{x}. Called for its
+#'   side effect of printing a formatted summary to the console.
+#' @keywords internal
+#' @family regression functions
+#' @export
+print.fullfit_result <- function(x, ...) {
+    cat("\nFullfit Analysis Results\n\n")
+    cat("Outcome: ", attr(x, "outcome"), "\n", sep = "")
+    cat("Model Type: ", attr(x, "model_type"), "\n", sep = "")
+    
+    method <- attr(x, "method")
+    p_thresh <- attr(x, "p_threshold")
+    if (!is.null(method) && method == "screen" && !is.null(p_thresh)) {
+        cat("Method: screen (p < ", p_thresh, ")\n", sep = "")
+    } else if (!is.null(method)) {
+        cat("Method: ", method, "\n", sep = "")
+    }
+    
+    n_screened <- attr(x, "n_screened")
+    if (!is.null(n_screened)) {
+        cat("Predictors Screened: ", n_screened, "\n", sep = "")
+    }
+    
+    n_multi <- attr(x, "n_multi")
+    if (!is.null(n_multi)) {
+        cat("Multivariable Predictors: ", n_multi, "\n", sep = "")
+    }
+    
+    ## Always reported. The screening models and the multivariable model may
+    ## rest on different samples, so the analyzed sample may be a range.
+    ff_counts <- attr(x, "analysis_counts")
+    
+    ff_marks <- attr(x, "number_marks")
+    
+    analyzed <- format_analysis_counts(ff_counts, marks = ff_marks)
+    if (!is.null(analyzed)) {
+        cat(analyzed, "\n", sep = "")
+    }
+    
+    ## Events per retained variable is the constraint on a multivariable
+    ## model, so events are reported alongside the observations
+    events_line <- format_event_counts(ff_counts, marks = ff_marks)
+    if (!is.null(events_line)) {
+        cat(events_line, "\n", sep = "")
+    }
+    
+    cat("\n")
+    ## Print as data.table, skipping uniscreen_result print method
+    print(as.data.table(x))
+    invisible(x)
+}
+
+
+### * Table formatting
+
 #' Format combined fullfit output from formatted tables
 #' 
 #' Merges univariable and multivariable results into a single publication-ready
@@ -1093,63 +1160,4 @@ determine_effect_type <- function(uni_raw, multi_raw, exponentiate, adjusted = F
     
     ## Fallback: use Coefficient (not Estimate) for linear models
     return(if (adjusted) "Adj. Coefficient" else "Coefficient")
-}
-
-#' Print method for fullfit results
-#' 
-#' Displays a summary header with outcome, model type, method, and number of
-#' multivariable predictors before printing the results table.
-#' 
-#' @param x fullfit_result object.
-#' @param ... Additional arguments passed to print methods.
-#' @return Invisibly returns the input object \code{x}. Called for its
-#'   side effect of printing a formatted summary to the console.
-#' @keywords internal
-#' @family regression functions
-#' @export
-print.fullfit_result <- function(x, ...) {
-    cat("\nFullfit Analysis Results\n\n")
-    cat("Outcome: ", attr(x, "outcome"), "\n", sep = "")
-    cat("Model Type: ", attr(x, "model_type"), "\n", sep = "")
-    
-    method <- attr(x, "method")
-    p_thresh <- attr(x, "p_threshold")
-    if (!is.null(method) && method == "screen" && !is.null(p_thresh)) {
-        cat("Method: screen (p < ", p_thresh, ")\n", sep = "")
-    } else if (!is.null(method)) {
-        cat("Method: ", method, "\n", sep = "")
-    }
-    
-    n_screened <- attr(x, "n_screened")
-    if (!is.null(n_screened)) {
-        cat("Predictors Screened: ", n_screened, "\n", sep = "")
-    }
-    
-    n_multi <- attr(x, "n_multi")
-    if (!is.null(n_multi)) {
-        cat("Multivariable Predictors: ", n_multi, "\n", sep = "")
-    }
-    
-    ## Always reported. The screening models and the multivariable model may
-    ## rest on different samples, so the analyzed sample may be a range.
-    ff_counts <- attr(x, "analysis_counts")
-    
-    ff_marks <- attr(x, "number_marks")
-    
-    analyzed <- format_analysis_counts(ff_counts, marks = ff_marks)
-    if (!is.null(analyzed)) {
-        cat(analyzed, "\n", sep = "")
-    }
-    
-    ## Events per retained variable is the constraint on a multivariable
-    ## model, so events are reported alongside the observations
-    events_line <- format_event_counts(ff_counts, marks = ff_marks)
-    if (!is.null(events_line)) {
-        cat(events_line, "\n", sep = "")
-    }
-    
-    cat("\n")
-    ## Print as data.table, skipping uniscreen_result print method
-    print(as.data.table(x))
-    invisible(x)
 }

@@ -1,3 +1,5 @@
+### * Main function
+
 #' Export Table to Microsoft Word Format (DOCX)
 #'
 #' Converts a data frame, data.table, or matrix to a fully editable Microsoft Word 
@@ -481,6 +483,9 @@ table2docx <- function(table,
         return(invisible(result_obj))
     }
 }
+
+
+### * Print function
 
 #' Print method for table2docx results
 #'

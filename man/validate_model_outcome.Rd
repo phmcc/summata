@@ -32,7 +32,4 @@ and GLM family (if applicable). Detects common mismatches like using survival
 outcomes with non-survival models or binary outcomes with linear models.
 Can auto-correct fixable issues or raise informative errors.
 }
-\details{
-Checks for mismatches and auto-corrects or errors as appropriate.
-}
 \keyword{internal}

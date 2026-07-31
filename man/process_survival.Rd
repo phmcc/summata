@@ -2,7 +2,7 @@
 % Please edit documentation in R/desc_utils.R
 \name{process_survival}
 \alias{process_survival}
-\title{Process survival variable}
+\title{Process time-to-event variable}
 \usage{
 process_survival(
   data,

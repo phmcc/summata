@@ -2,7 +2,7 @@
 % Please edit documentation in R/surv_utils.R
 \name{process_survival_times}
 \alias{process_survival_times}
-\title{Process survival at specified time points (optimized)}
+\title{Process survival at specified time points}
 \usage{
 process_survival_times(
   survfit_objects,
@@ -56,6 +56,5 @@ List with formatted and raw data.tables.
 }
 \description{
 Extracts survival probabilities at specified time points from survfit objects.
-Uses vectorized operations for efficiency.
 }
 \keyword{internal}

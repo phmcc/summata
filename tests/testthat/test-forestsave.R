@@ -123,9 +123,28 @@ test_that("formats with no preferred device defer to ggsave", {
 })
 
 
+## capabilities("cairo") reports that the library was compiled in, not that the
+## device can be opened. On a headless macOS runner the two disagree: the
+## capability is TRUE while cairo_pdf() fails for want of the supporting
+## infrastructure. The device is therefore probed rather than asked.
+cairo_pdf_works <- function() {
+    if (!isTRUE(unname(capabilities("cairo")))) {
+        return(FALSE)
+    }
+    probe <- tempfile(fileext = ".pdf")
+    ok <- tryCatch({
+        grDevices::cairo_pdf(filename = probe)
+        grDevices::dev.off()
+        file.exists(probe) && file.size(probe) > 0
+    }, error = function(e) FALSE, warning = function(w) FALSE)
+    unlink(probe)
+    return(isTRUE(ok))
+}
+
+
 test_that("an explicit device overrides the automatic selection", {
 
-    skip_if(!isTRUE(unname(capabilities("cairo"))), "Cairo not compiled in")
+    skip_if_not(cairo_pdf_works(), "Cairo PDF device is not usable here")
 
     p <- forest_fixture()
 
@@ -143,6 +162,8 @@ test_that("an explicit device overrides the automatic selection", {
 
 test_that("the cairo shorthand resolves per format and rejects raster", {
 
+    ## This test only inspects the returned device function, so the capability
+    ## flag is the correct guard; the device is never opened.
     skip_if(!isTRUE(unname(capabilities("cairo"))), "Cairo not compiled in")
 
     expect_identical(summata:::cairo_device("x.pdf"), grDevices::cairo_pdf)

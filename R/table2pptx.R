@@ -1,3 +1,5 @@
+### * Main function
+
 #' Export Table to Microsoft PowerPoint Format (PPTX)
 #'
 #' Converts a data frame, data.table, or matrix to a Microsoft PowerPoint slide 
@@ -508,6 +510,9 @@ table2pptx <- function(table,
         return(invisible(result_obj))
     }
 }
+
+
+### * Print function
 
 #' Print method for table2pptx results
 #'

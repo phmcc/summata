@@ -1,3 +1,5 @@
+### * Main function
+
 #' Create Publication-Ready Descriptive Statistics Tables
 #'
 #' Generates comprehensive descriptive statistics tables with automatic variable

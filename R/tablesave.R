@@ -1,3 +1,5 @@
+### * Main function
+
 #' Save a Table to File
 #'
 #' Writes a table to file in the format indicated by the file extension,

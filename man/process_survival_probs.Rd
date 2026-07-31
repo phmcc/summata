@@ -2,7 +2,7 @@
 % Please edit documentation in R/surv_utils.R
 \name{process_survival_probs}
 \alias{process_survival_probs}
-\title{Process survival probability quantiles (optimized)}
+\title{Process survival probability quantiles}
 \usage{
 process_survival_probs(
   survfit_objects,
@@ -45,6 +45,5 @@ List with formatted and raw data.tables.
 }
 \description{
 Extracts survival time quantiles from survfit objects.
-Uses vectorized operations for efficiency.
 }
 \keyword{internal}

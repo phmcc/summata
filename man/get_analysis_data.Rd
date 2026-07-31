@@ -28,12 +28,4 @@ cases the supplied data still contains the observations dropped during
 fitting, and counting them inflates group sizes whenever the response or a
 covariate is missing.
 }
-\details{
-Complete cases are determined from the variables named in the model formula,
-reproducing the default \code{na.omit} behavior of the modeling functions.
-A complete-case restriction can only remove observations that the model
-itself could not have used, so the subset is retained even when it does not
-reproduce the fitted sample size exactly, as may happen when a fit used
-\code{subset} or case weights.
-}
 \keyword{internal}

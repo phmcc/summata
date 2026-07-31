@@ -1,3 +1,5 @@
+### * Main function
+
 #' Create Publication-Ready Survival Summary Tables
 #'
 #' Generates comprehensive survival summary tables with survival probabilities
@@ -590,7 +592,126 @@ survtable <- function(data,
 }
 
 
+### * Print function
+
+#' Print method for survtable
+#'
+#' @param x Object of class \code{survtable}.
+#' @param ... Additional arguments passed to print methods.
+#' @return Invisibly returns the input object \code{x}. Called for its
+#'   side effect of printing a formatted summary to the console.
+#' @family descriptive functions
+#' @export
+#' @keywords internal
+print.survtable <- function(x, ...) {
+    outcome <- attr(x, "outcome")
+    by_var <- attr(x, "by_variable")
+    by_label <- attr(x, "by_label")
+    times <- attr(x, "times")
+    probs <- attr(x, "probs")
+    time_unit <- attr(x, "time_unit")
+    type <- attr(x, "type")
+    test_result <- attr(x, "test_result")
+
+    cat("\nSurvival Summary Table\n")
+    
+    if (!is.null(outcome)) {
+        if (length(outcome) > 1) {
+            cat("Outcomes: ", length(outcome), "\n", sep = "")
+        } else {
+            cat("Outcome: ", outcome, "\n", sep = "")
+        }
+    }
+
+    if (!is.null(by_var)) {
+        display_by <- if (!is.null(by_label)) by_label else by_var
+        cat("Stratified by: ", display_by, "\n", sep = "")
+    }
+
+    if (!is.null(times)) {
+        times_str <- paste(times, collapse = ", ")
+        if (!is.null(time_unit)) {
+            times_str <- paste(times_str, time_unit)
+        }
+        cat("Time points: ", times_str, "\n", sep = "")
+    }
+    if (!is.null(probs)) {
+        cat("Quantiles: ", paste(probs * 100, "%", sep = "", collapse = ", "), "\n", sep = "")
+    }
+
+    type_label <- switch(type,
+                         "survival" = "Survival probability",
+                         "risk" = "Cumulative incidence",
+                         "cumhaz" = "Cumulative hazard")
+    cat("Statistic: ", type_label, "\n", sep = "")
+
+    ## Handle test result - could be single or list for multiple outcomes
+    if (!is.null(test_result)) {
+        if (is.list(test_result) && !is.null(test_result$test_type)) {
+            ## Single test result
+            test_name <- switch(test_result$test_type,
+                                "logrank" = "Log-rank",
+                                "wilcoxon" = "Wilcoxon",
+                                "tarone" = "Tarone-Ware",
+                                "petopeto" = "Peto-Peto")
+            cat("Test: ", test_name, " (p = ", format_pvalue_survtable(test_result$p_value, 3), ")\n", sep = "")
+        } else if (is.list(test_result) && length(test_result) > 0) {
+            ## Multiple test results - show first one's type
+            first_test <- test_result[[1]]
+            if (!is.null(first_test)) {
+                test_name <- switch(first_test$test_type,
+                                    "logrank" = "Log-rank",
+                                    "wilcoxon" = "Wilcoxon",
+                                    "tarone" = "Tarone-Ware",
+                                    "petopeto" = "Peto-Peto")
+                cat("Test: ", test_name, "\n", sep = "")
+            }
+        }
+    }
+
+    cat("\n")
+    NextMethod("print", x)
+    invisible(x)
+}
+
+
+### * Table assembly
+
 #' Process a single survival outcome
+#'
+#' Parses a Surv() expression, fits the survival models, performs the group
+#' comparison test where requested, and assembles the formatted and raw
+#' tables for one outcome. Called once per outcome by survtable().
+#'
+#' @param data Data.table with the source data.
+#' @param outcome Character string giving a Surv() expression.
+#' @param outcome_label Character label for the outcome, or NULL for a
+#'   single-outcome table.
+#' @param by Character name of stratifying variable.
+#' @param times Numeric vector of time points.
+#' @param probs Numeric vector of probabilities.
+#' @param stats Character vector of statistics to include.
+#' @param type Character string specifying probability type.
+#' @param conf_level Numeric confidence level for interval estimates.
+#' @param conf_type Character string specifying confidence interval type.
+#' @param digits Integer decimal places for percentages.
+#' @param time_digits Integer decimal places for time values.
+#' @param percent Logical whether to display as percentages.
+#' @param test Logical whether to perform a group comparison test.
+#' @param test_type Character string specifying test type.
+#' @param total Logical or character controlling total column.
+#' @param total_label Character label for total column.
+#' @param time_unit Character time unit for column headers.
+#' @param time_label Character template for time column headers.
+#' @param median_label Character label for median row.
+#' @param labels Named character vector of display labels for group levels.
+#' @param na_rm Logical whether to drop rows with missing time, status, or
+#'   stratifying values.
+#' @param marks List with \code{big.mark} and \code{decimal.mark} as returned
+#'   by \code{\link{resolve_number_marks}}.
+#' @param ... Additional arguments passed to \code{survival::survfit()}.
+#' @return List with the formatted table, the raw table, the survfit objects,
+#'   and the test result.
 #' @keywords internal
 process_single_outcome <- function(data,
                                    outcome,
@@ -818,85 +939,4 @@ process_single_outcome <- function(data,
         survfit_objects = survfit_objects,
         test_result = test_result
     )
-}
-
-
-#' Print method for survtable
-#'
-#' @param x Object of class \code{survtable}.
-#' @param ... Additional arguments passed to print methods.
-#' @return Invisibly returns the input object \code{x}. Called for its
-#'   side effect of printing a formatted summary to the console.
-#' @family descriptive functions
-#' @export
-#' @keywords internal
-print.survtable <- function(x, ...) {
-    outcome <- attr(x, "outcome")
-    by_var <- attr(x, "by_variable")
-    by_label <- attr(x, "by_label")
-    times <- attr(x, "times")
-    probs <- attr(x, "probs")
-    time_unit <- attr(x, "time_unit")
-    type <- attr(x, "type")
-    test_result <- attr(x, "test_result")
-
-    cat("\nSurvival Summary Table\n")
-    
-    if (!is.null(outcome)) {
-        if (length(outcome) > 1) {
-            cat("Outcomes: ", length(outcome), "\n", sep = "")
-        } else {
-            cat("Outcome: ", outcome, "\n", sep = "")
-        }
-    }
-
-    if (!is.null(by_var)) {
-        display_by <- if (!is.null(by_label)) by_label else by_var
-        cat("Stratified by: ", display_by, "\n", sep = "")
-    }
-
-    if (!is.null(times)) {
-        times_str <- paste(times, collapse = ", ")
-        if (!is.null(time_unit)) {
-            times_str <- paste(times_str, time_unit)
-        }
-        cat("Time points: ", times_str, "\n", sep = "")
-    }
-    if (!is.null(probs)) {
-        cat("Quantiles: ", paste(probs * 100, "%", sep = "", collapse = ", "), "\n", sep = "")
-    }
-
-    type_label <- switch(type,
-                         "survival" = "Survival probability",
-                         "risk" = "Cumulative incidence",
-                         "cumhaz" = "Cumulative hazard")
-    cat("Statistic: ", type_label, "\n", sep = "")
-
-    ## Handle test result - could be single or list for multiple outcomes
-    if (!is.null(test_result)) {
-        if (is.list(test_result) && !is.null(test_result$test_type)) {
-            ## Single test result
-            test_name <- switch(test_result$test_type,
-                                "logrank" = "Log-rank",
-                                "wilcoxon" = "Wilcoxon",
-                                "tarone" = "Tarone-Ware",
-                                "petopeto" = "Peto-Peto")
-            cat("Test: ", test_name, " (p = ", format_pvalue_survtable(test_result$p_value, 3), ")\n", sep = "")
-        } else if (is.list(test_result) && length(test_result) > 0) {
-            ## Multiple test results - show first one's type
-            first_test <- test_result[[1]]
-            if (!is.null(first_test)) {
-                test_name <- switch(first_test$test_type,
-                                    "logrank" = "Log-rank",
-                                    "wilcoxon" = "Wilcoxon",
-                                    "tarone" = "Tarone-Ware",
-                                    "petopeto" = "Peto-Peto")
-                cat("Test: ", test_name, "\n", sep = "")
-            }
-        }
-    }
-
-    cat("\n")
-    NextMethod("print", x)
-    invisible(x)
 }

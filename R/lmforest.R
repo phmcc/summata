@@ -1,3 +1,5 @@
+### * Main function
+
 #' Create Forest Plot for Linear Models
 #'
 #' Generates a publication-ready forest plot that combines a formatted data table 
@@ -537,23 +539,31 @@ Received class: ", paste(class(x), collapse = ", "))
         t_crit <- stats::qt((1 + conf_level) / 2, df = summary(model)$devcomp$dims["n"] - 
                                                       summary(model)$devcomp$dims["p"])
         
-        ## Use profile CI if available, else fall back to Wald
-        tryCatch({
-            conf_int <- confint(model, method = "Wald", level = conf_level)
+        ## Use profile CI if available, else fall back to Wald.
+        ##
+        ## The value is returned from both branches rather than assigned with
+        ## <<-. Where confint() raises an error the assignment in the first
+        ## branch never runs, so a cascading assignment from the handler would
+        ## find no binding in this frame and create one in the global
+        ## environment.
+        conf_int <- tryCatch({
+            ci <- confint(model, method = "Wald", level = conf_level)
             ## Remove random effect rows if present
             fixed_names <- names(coef_vals)
-            if (any(rownames(conf_int) %in% fixed_names)) {
-                conf_int <- conf_int[fixed_names, , drop = FALSE]
+            if (any(rownames(ci) %in% fixed_names)) {
+                ci <- ci[fixed_names, , drop = FALSE]
             }
+            ci
         }, error = function(e) {
             ci_pct_low <- paste0(round((1 - conf_level) / 2 * 100, 1), " %")
             ci_pct_high <- paste0(round((1 + conf_level) / 2 * 100, 1), " %")
-            conf_int <<- cbind(
+            ci <- cbind(
                 coef_vals - t_crit * se_vals,
                 coef_vals + t_crit * se_vals
             )
-            colnames(conf_int) <<- c(ci_pct_low, ci_pct_high)
-            rownames(conf_int) <<- names(coef_vals)
+            colnames(ci) <- c(ci_pct_low, ci_pct_high)
+            rownames(ci) <- names(coef_vals)
+            ci
         })
         
         ## Extract t values and p values

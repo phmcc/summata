@@ -293,6 +293,7 @@ Other visualization functions:
 \code{\link[=forestsave]{forestsave()}},
 \code{\link[=glmforest]{glmforest()}},
 \code{\link[=lmforest]{lmforest()}},
-\code{\link[=multiforest]{multiforest()}}
+\code{\link[=multiforest]{multiforest()}},
+\code{\link[=recdims]{recdims()}}
 }
 \concept{visualization functions}

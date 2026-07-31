@@ -1,3 +1,5 @@
+### * Main function
+
 #' Export Table to HTML Format
 #'
 #' Converts a data frame, data.table, or matrix to HTML format with optional CSS 

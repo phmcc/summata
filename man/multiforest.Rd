@@ -294,6 +294,7 @@ Other visualization functions:
 \code{\link[=forestsave]{forestsave()}},
 \code{\link[=glmforest]{glmforest()}},
 \code{\link[=lmforest]{lmforest()}},
+\code{\link[=recdims]{recdims()}},
 \code{\link[=uniforest]{uniforest()}}
 }
 \concept{visualization functions}

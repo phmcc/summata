@@ -1,3 +1,5 @@
+### * Main function
+
 #' Create Forest Plot with Automatic Model Detection
 #'
 #' A convenience wrapper function that automatically detects the input type and
@@ -364,6 +366,8 @@ autoforest <- function(x, data = NULL, title = NULL, ...) {
     }
 }
 
+
+### * Helper functions
 
 #' Check if object is a multifit result
 #' 

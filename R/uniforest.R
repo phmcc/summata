@@ -1,3 +1,5 @@
+### * Main function
+
 #' Create Forest Plot for Univariable Screening
 #'
 #' Generates a publication-ready forest plot from a \code{uniscreen()} output
@@ -1060,6 +1062,8 @@ uniforest <- function(x,
     return(p)
 }
 
+
+### * Layout formatting
 
 #' Calculate table layout for uniforest plots
 #' 

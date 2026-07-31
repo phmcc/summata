@@ -1,3 +1,44 @@
+### * Paper settings
+
+#' Get paper size for PDF/LaTeX export
+#' 
+#' Returns paper dimensions and margin settings for the specified paper size.
+#' 
+#' @param paper Character string: "letter", "a4", or "auto".
+#' @param margins Optional numeric vector of margins (length 1 or 4).
+#' @return List with latex_paper, width, height, and margins components.
+#' @keywords internal
+get_paper_settings <- function (paper, margins = NULL) {
+    paper <- match.arg(paper, c("letter", "a4", "auto"))
+    settings <- switch(paper,
+                       letter = list(latex_paper = "letterpaper", 
+                                     width = 8.5,
+                                     height = 11,
+                                     default_margins = c(1, 1, 1, 1)),
+                       a4 = list(latex_paper = "a4paper",
+                                 width = 8.27, 
+                                 height = 11.69,
+                                 default_margins = c(1, 1, 1, 1)),
+                       auto = list(latex_paper = "letterpaper", 
+                                   width = NULL, height = NULL, default_margins = c(0.5, 0.5, 0.5, 0.5)))
+    if (!is.null(margins)) {
+        if (length(margins) == 1) {
+            margins <- rep(margins, 4)
+        }
+        else if (length(margins) != 4) {
+            stop("margins must be length 1 or 4")
+        }
+        settings$margins <- margins
+    }
+    else {
+        settings$margins <- settings$default_margins
+    }
+    return(settings)
+}
+
+
+### * Cell padding
+
 #' Add padding to exported table headers
 #' 
 #' Adds LaTeX vertical spacing rules to column headers for proper vertical
@@ -10,6 +51,7 @@ add_header_padding <- function (col_names) {
     padded_names <- paste0("\\rule{0pt}{3ex}", col_names, "\\rule[-1.5ex]{0pt}{0pt}")
     return(as.character(padded_names))
 }
+
 
 #' Add padding to exported table variables
 #' 
@@ -61,22 +103,8 @@ add_variable_padding <- function (df) {
     return(new_df)
 }
 
-#' Check LaTeX installation
-#' 
-#' Verifies that a LaTeX distribution (pdflatex or xelatex) is available
-#' on the system for PDF compilation.
-#' 
-#' @return Logical \code{TRUE} if LaTeX is available, \code{FALSE} otherwise.
-#' @keywords internal
-check_latex <- function () {
-    pdflatex_check <- Sys.which("pdflatex")
-    if (pdflatex_check != "") 
-        return(TRUE)
-    xelatex_check <- Sys.which("xelatex")
-    if (xelatex_check != "") 
-        return(TRUE)
-    return(FALSE)
-}
+
+### * Cell alignment
 
 #' Determine alignment for exported tables
 #' 
@@ -97,6 +125,9 @@ determine_alignment <- function(df) {
     }
     return(align)
 }
+
+
+### * Table formatting
 
 #' Apply formatting to column headers in exported tables (PDF/LaTeX)
 #' 
@@ -261,264 +292,6 @@ format_indented_groups <- function (df, indent_string = "    ") {
     new_df$Group <- NULL
     rownames(new_df) <- NULL
     return(new_df)
-}
-
-#' Format \emph{p}-values for exported tables
-#' 
-#' Applies bold formatting to significant \emph{p}-values in LaTeX tables using
-#' the textbf command.
-#' 
-#' @param df Data.table containing \emph{p}-value columns.
-#' @param p_threshold Numeric threshold for significance (default 0.05).
-#' @return Data.table with significant \emph{p}-values wrapped in LaTeX bold commands.
-#' @keywords internal
-format_pvalues_export_tex <- function (df, p_threshold = 0.05) {
-    for (col in names(df)) {
-        if (col == "p-value" || col == "Uni p" || col == "Multi p" || 
-            grepl("p.value|pvalue", col, ignore.case = TRUE)) {
-            for (i in seq_len(nrow(df))) {
-                cell_value <- as.character(df[[col]][i])
-                if (is.na(cell_value) || cell_value == "" || 
-                    cell_value == "NA" || grepl("\\\\textbf", cell_value)) {
-                    next
-                }
-                is_significant <- FALSE
-                if (grepl("^<\\s*0\\.001", cell_value)) {
-                    is_significant <- TRUE
-                }
-                else if (grepl("^[0-9]\\.[0-9]", cell_value) || 
-                         grepl("^0\\.[0-9]", cell_value)) {
-                    p_numeric <- suppressWarnings(as.numeric(gsub("[^0-9.]", 
-                                                                  "", cell_value)))
-                    if (!is.na(p_numeric) && p_numeric < p_threshold) {
-                        is_significant <- TRUE
-                    }
-                }
-                if (is_significant) {
-                    df[[col]][i] <- paste0("\\textbf{", cell_value, 
-                                           "}")
-                }
-            }
-        }
-    }
-    return(df)
-}
-
-#' Format \emph{p}-values for exported tables (HTML)
-#' 
-#' Applies bold formatting to significant \emph{p}-values in HTML tables using
-#' the b tag.
-#' 
-#' @param df Data.table containing \emph{p}-value columns.
-#' @param p_threshold Numeric threshold for significance (default 0.05).
-#' @return Data.table with significant \emph{p}-values wrapped in HTML bold tags.
-#' @keywords internal
-format_pvalues_export_html <- function (df, p_threshold = 0.05) {
-    for (col in names(df)) {
-        if (col == "p-value" || col == "Uni p" || col == "Multi p" || 
-            grepl("p.value|pvalue", col, ignore.case = TRUE)) {
-            for (i in seq_len(nrow(df))) {
-                cell_value <- as.character(df[[col]][i])
-                if (is.na(cell_value) || cell_value == "" || 
-                    cell_value == "NA") {
-                    next
-                }
-                is_significant <- FALSE
-                if (grepl("^<\\s*0\\.001", cell_value)) {
-                    is_significant <- TRUE
-                }
-                else if (grepl("^[0-9]\\.[0-9]", cell_value) || 
-                         grepl("^0\\.[0-9]", cell_value)) {
-                    p_numeric <- suppressWarnings(as.numeric(gsub("[^0-9.]", 
-                                                                  "", cell_value)))
-                    if (!is.na(p_numeric) && p_numeric < p_threshold) {
-                        is_significant <- TRUE
-                    }
-                }
-                if (is_significant) {
-                    df[[col]][i] <- paste0("<b>", cell_value, "</b>")
-                }
-            }
-        }
-    }
-    return(df)
-}
-
-#' Get paper size for PDF/LaTeX export
-#' 
-#' Returns paper dimensions and margin settings for the specified paper size.
-#' 
-#' @param paper Character string: "letter", "a4", or "auto".
-#' @param margins Optional numeric vector of margins (length 1 or 4).
-#' @return List with latex_paper, width, height, and margins components.
-#' @keywords internal
-get_paper_settings <- function (paper, margins = NULL) {
-    paper <- match.arg(paper, c("letter", "a4", "auto"))
-    settings <- switch(paper,
-                       letter = list(latex_paper = "letterpaper", 
-                                     width = 8.5,
-                                     height = 11,
-                                     default_margins = c(1, 1, 1, 1)),
-                       a4 = list(latex_paper = "a4paper",
-                                 width = 8.27, 
-                                 height = 11.69,
-                                 default_margins = c(1, 1, 1, 1)),
-                       auto = list(latex_paper = "letterpaper", 
-                                   width = NULL, height = NULL, default_margins = c(0.5, 0.5, 0.5, 0.5)))
-    if (!is.null(margins)) {
-        if (length(margins) == 1) {
-            margins <- rep(margins, 4)
-        }
-        else if (length(margins) != 4) {
-            stop("margins must be length 1 or 4")
-        }
-        settings$margins <- margins
-    }
-    else {
-        settings$margins <- settings$default_margins
-    }
-    return(settings)
-}
-
-#' Sanitize certain symbols for LaTeX
-#' 
-#' Escapes special LaTeX characters (%, &, #, _, $, ^, ~, {, }) while
-#' preserving existing LaTeX commands. Uses negative lookbehind to avoid
-#' double-escaping already escaped characters.
-#' 
-#' @param x Character vector to sanitize.
-#' @return Character vector with special characters escaped for LaTeX.
-#' @keywords internal
-sanitize_for_latex <- function(x) {
-    if (is.null(x) || length(x) == 0) 
-        return(x)
-    
-    ## Process each element
-    result <- x
-    
-    for (i in seq_along(x)) {
-        if (is.na(x[i])) next
-        
-        val <- x[i]
-        
-        ## Check for already-formatted LaTeX commands
-        has_latex <- grepl("\\\\(text(bf|it|tt|sc|sl|rm)|hspace|vspace|rule|begin|end|[a-zA-Z]+\\{)", val)
-        
-        if (has_latex) {
-            ## String has LaTeX commands - only escape unescaped special chars
-            ## Escape % that is not already escaped (not preceded by \)
-            val <- gsub("(?<!\\\\)%", "\\\\%", val, perl = TRUE)
-            ## Escape & that is not already escaped
-            val <- gsub("(?<!\\\\)&", "\\\\&", val, perl = TRUE)
-            ## Escape # that is not already escaped
-            val <- gsub("(?<!\\\\)#", "\\\\#", val, perl = TRUE)
-            ## Escape _ that is not already escaped
-            val <- gsub("(?<!\\\\)_", "\\\\_", val, perl = TRUE)
-            ## Escape $ that is not already escaped
-            val <- gsub("(?<!\\\\)\\$", "\\\\$", val, perl = TRUE)
-        } else {
-            ## No LaTeX commands - check if already escaped
-            already_escaped <- grepl("\\\\[%&#_$]", val)
-            
-            if (!already_escaped) {
-                ## Full sanitization needed
-                val <- gsub("\\\\", "\\\\textbackslash{}", val)
-                val <- gsub("%", "\\\\%", val)
-                val <- gsub("&", "\\\\&", val)
-                val <- gsub("#", "\\\\#", val)
-                val <- gsub("_", "\\\\_", val)
-                val <- gsub("\\$", "\\\\$", val)
-                val <- gsub("\\^", "\\\\textasciicircum{}", val)
-                val <- gsub("~", "\\\\textasciitilde{}", val)
-                val <- gsub("\\{", "\\\\{", val)
-                val <- gsub("\\}", "\\\\}", val)
-            }
-        }
-        
-        result[i] <- val
-    }
-    
-    return(result)
-}
-
-#' Format column headers with n counts (TeX)
-#' 
-#' Creates LaTeX-formatted column headers with sample size counts displayed
-#' below the column name in a stacked format.
-#' 
-#' @param col_names Character vector of column names.
-#' @param n_row_data Named list or data.table row with n values for each column.
-#' @return Character vector with LaTeX-formatted headers including n counts.
-#' @keywords internal
-format_column_headers_with_n_tex <- function(col_names, n_row_data) {
-    new_names <- character(length(col_names))
-    
-    for (i in seq_along(col_names)) {
-        col <- col_names[i]
-        
-        ## Sanitize the column name first
-        col_sanitized <- sanitize_for_latex(col)
-        
-        has_n <- col %chin% names(n_row_data) && 
-            !is.na(n_row_data[[col]]) && 
-            n_row_data[[col]] != "" && 
-            n_row_data[[col]] != "0"
-        
-        if (col %chin% c("Variable", "Group")) {
-            new_names[i] <- format_column_headers(col_sanitized)
-        } else if (col %chin% c("p-value", "p value")) {
-            new_names[i] <- format_column_headers(col_sanitized)
-        } else if (has_n) {
-            n_value <- n_row_data[[col]]
-            ## Build the complex structure with already-sanitized name
-            new_names[i] <- paste0("\\begin{tabular}{@{}c@{}}\\rule{0pt}{2.5ex}", 
-                                   col_sanitized,  # Use sanitized version
-                                   "\\\\[-0ex] (\\textit{N} = ", 
-                                   n_value, 
-                                   ")\\rule[-1ex]{0pt}{0pt}\\end{tabular}")
-        } else {
-            new_names[i] <- format_column_headers(col_sanitized)
-        }
-    }
-    
-    return(new_names)
-}
-
-#' Format column headers with n counts (HTML)
-#' 
-#' Creates HTML-formatted column headers with sample size counts displayed
-#' below the column name using line breaks.
-#' 
-#' @param col_names Character vector of column names.
-#' @param n_row_data Named list or data.table row with n values for each column.
-#' @return Character vector with HTML-formatted headers including n counts.
-#' @keywords internal
-format_column_headers_with_n_html <- function(col_names, n_row_data) {
-    new_names <- col_names
-    for (i in seq_along(col_names)) {
-        col <- col_names[i]
-        
-        ## Skip Variable, Group, and p-value columns
-        if (col %chin% c("Variable", "Group", "p-value", "p value")) {
-            new_names[i] <- format_column_headers_html(col)
-            next
-        }
-        
-        ## Get n value from the N row
-        if (col %chin% names(n_row_data)) {
-            n_value <- n_row_data[[col]]
-            if (!is.na(n_value) && n_value != "" && n_value != "0") {
-                ## Format header with only N italicized
-                clean_col <- format_column_headers_html(col)
-                new_names[i] <- paste0(clean_col, "<br>(<i>N</i> = ", n_value, ")")
-            } else {
-                new_names[i] <- format_column_headers_html(col)
-            }
-        } else {
-            new_names[i] <- format_column_headers_html(col)
-        }
-    }
-    return(new_names)
 }
 
 #' Condense table rows for more compact display
@@ -780,6 +553,337 @@ condense_quantitative_rows <- function(df, indent_groups = TRUE) {
 }
 
 
+#' Identify variable groups before indentation
+#' 
+#' Detects variable group boundaries by finding rows where Variable column
+#' is non-empty. Returns row indices for each group for zebra stripe application.
+#' 
+#' @param df Data.table with Variable column.
+#' @return List of integer vectors, each containing row indices for one variable group.
+#' @keywords internal
+identify_variable_groups <- function(df) {
+    if (!"Variable" %in% names(df)) return(NULL)
+    
+    var_starts <- which(df$Variable != "" & !is.na(df$Variable))
+    if (length(var_starts) == 0) return(NULL)
+    
+    ## Vectorized group creation
+    var_ends <- c(var_starts[-1] - 1, nrow(df))
+    groups <- mapply(seq, var_starts, var_ends, SIMPLIFY = FALSE)
+    
+    return(groups)
+}
+
+
+#' Replace empty cells with "-"
+#' 
+#' Converts empty strings and NA values to "-" for consistent display
+#' in exported tables. Preserves Variable column values.
+#' 
+#' @param df Data.frame or data.table to process.
+#' @return Data.table with empty cells replaced by "-".
+#' @keywords internal
+replace_empty_cells <- function(df) {
+    ## Convert to data.table for efficient in-place modification
+    dt <- data.table::as.data.table(df)
+    
+    ## Get columns to process (excluding Variable)
+    cols_to_process <- setdiff(names(dt), "Variable")
+    
+    ## Vectorized replacement using data.table
+    for (col in cols_to_process) {
+        dt[is.na(get(col)) | get(col) == "", (col) := "-"]
+    }
+    
+    return(data.table::as.data.table(dt))
+}
+
+
+#' Calculate table width based on paper size and orientation
+#' 
+#' Computes usable table width in inches based on paper dimensions and
+#' orientation, accounting for standard 1-inch margins.
+#' 
+#' @param paper Character string paper size ("letter", "a4", "legal").
+#' @param orientation Character string page orientation ("portrait", "landscape").
+#' @return Numeric usable width in inches.
+#' @keywords internal
+calculate_table_width <- function(paper, orientation) {
+    ## Define paper sizes (in inches) with margins
+    paper_sizes <- list(
+        letter = c(width = 8.5, height = 11),
+        a4 = c(width = 8.27, height = 11.69),
+        legal = c(width = 8.5, height = 14)
+    )
+    
+    if (!paper %chin% names(paper_sizes)) {
+        paper <- "letter"
+    }
+    
+    dims <- paper_sizes[[paper]]
+    
+    ## Swap for landscape
+    if (orientation == "landscape") {
+        dims <- c(width = dims["height"], height = dims["width"])
+    }
+    
+    ## Subtract margins (1 inch on each side)
+    usable_width <- dims["width"] - 2
+    
+    return(as.numeric(usable_width))
+}
+
+
+### * TeX-specific functions
+
+#' Check LaTeX installation
+#' 
+#' Verifies that a LaTeX distribution (pdflatex or xelatex) is available
+#' on the system for PDF compilation.
+#' 
+#' @return Logical \code{TRUE} if LaTeX is available, \code{FALSE} otherwise.
+#' @keywords internal
+check_latex <- function () {
+    pdflatex_check <- Sys.which("pdflatex")
+    if (pdflatex_check != "") 
+        return(TRUE)
+    xelatex_check <- Sys.which("xelatex")
+    if (xelatex_check != "") 
+        return(TRUE)
+    return(FALSE)
+}
+
+#' Sanitize certain symbols for LaTeX
+#' 
+#' Escapes special LaTeX characters (%, &, #, _, $, ^, ~, {, }) while
+#' preserving existing LaTeX commands. Uses negative lookbehind to avoid
+#' double-escaping already escaped characters.
+#' 
+#' @param x Character vector to sanitize.
+#' @return Character vector with special characters escaped for LaTeX.
+#' @keywords internal
+sanitize_for_latex <- function(x) {
+    if (is.null(x) || length(x) == 0) 
+        return(x)
+    
+    ## Process each element
+    result <- x
+    
+    for (i in seq_along(x)) {
+        if (is.na(x[i])) next
+        
+        val <- x[i]
+        
+        ## Check for already-formatted LaTeX commands
+        has_latex <- grepl("\\\\(text(bf|it|tt|sc|sl|rm)|hspace|vspace|rule|begin|end|[a-zA-Z]+\\{)", val)
+        
+        if (has_latex) {
+            ## String has LaTeX commands - only escape unescaped special chars
+            ## Escape % that is not already escaped (not preceded by \)
+            val <- gsub("(?<!\\\\)%", "\\\\%", val, perl = TRUE)
+            ## Escape & that is not already escaped
+            val <- gsub("(?<!\\\\)&", "\\\\&", val, perl = TRUE)
+            ## Escape # that is not already escaped
+            val <- gsub("(?<!\\\\)#", "\\\\#", val, perl = TRUE)
+            ## Escape _ that is not already escaped
+            val <- gsub("(?<!\\\\)_", "\\\\_", val, perl = TRUE)
+            ## Escape $ that is not already escaped
+            val <- gsub("(?<!\\\\)\\$", "\\\\$", val, perl = TRUE)
+        } else {
+            ## No LaTeX commands - check if already escaped
+            already_escaped <- grepl("\\\\[%&#_$]", val)
+            
+            if (!already_escaped) {
+                ## Full sanitization needed
+                val <- gsub("\\\\", "\\\\textbackslash{}", val)
+                val <- gsub("%", "\\\\%", val)
+                val <- gsub("&", "\\\\&", val)
+                val <- gsub("#", "\\\\#", val)
+                val <- gsub("_", "\\\\_", val)
+                val <- gsub("\\$", "\\\\$", val)
+                val <- gsub("\\^", "\\\\textasciicircum{}", val)
+                val <- gsub("~", "\\\\textasciitilde{}", val)
+                val <- gsub("\\{", "\\\\{", val)
+                val <- gsub("\\}", "\\\\}", val)
+            }
+        }
+        
+        result[i] <- val
+    }
+    
+    return(result)
+}
+
+
+#' Format column headers with n counts (TeX)
+#' 
+#' Creates LaTeX-formatted column headers with sample size counts displayed
+#' below the column name in a stacked format.
+#' 
+#' @param col_names Character vector of column names.
+#' @param n_row_data Named list or data.table row with n values for each column.
+#' @return Character vector with LaTeX-formatted headers including n counts.
+#' @keywords internal
+format_column_headers_with_n_tex <- function(col_names, n_row_data) {
+    new_names <- character(length(col_names))
+    
+    for (i in seq_along(col_names)) {
+        col <- col_names[i]
+        
+        ## Sanitize the column name first
+        col_sanitized <- sanitize_for_latex(col)
+        
+        has_n <- col %chin% names(n_row_data) && 
+            !is.na(n_row_data[[col]]) && 
+            n_row_data[[col]] != "" && 
+            n_row_data[[col]] != "0"
+        
+        if (col %chin% c("Variable", "Group")) {
+            new_names[i] <- format_column_headers(col_sanitized)
+        } else if (col %chin% c("p-value", "p value")) {
+            new_names[i] <- format_column_headers(col_sanitized)
+        } else if (has_n) {
+            n_value <- n_row_data[[col]]
+            ## Build the complex structure with already-sanitized name
+            new_names[i] <- paste0("\\begin{tabular}{@{}c@{}}\\rule{0pt}{2.5ex}", 
+                                   col_sanitized,  # Use sanitized version
+                                   "\\\\[-0ex] (\\textit{N} = ", 
+                                   n_value, 
+                                   ")\\rule[-1ex]{0pt}{0pt}\\end{tabular}")
+        } else {
+            new_names[i] <- format_column_headers(col_sanitized)
+        }
+    }
+    
+    return(new_names)
+}
+
+
+#' Format \emph{p}-values for exported tables (TeX)
+#' 
+#' Applies bold formatting to significant \emph{p}-values in LaTeX tables using
+#' the textbf command.
+#' 
+#' @param df Data.table containing \emph{p}-value columns.
+#' @param p_threshold Numeric threshold for significance (default 0.05).
+#' @return Data.table with significant \emph{p}-values wrapped in LaTeX bold commands.
+#' @keywords internal
+format_pvalues_export_tex <- function (df, p_threshold = 0.05) {
+    for (col in names(df)) {
+        if (col == "p-value" || col == "Uni p" || col == "Multi p" || 
+            grepl("p.value|pvalue", col, ignore.case = TRUE)) {
+            for (i in seq_len(nrow(df))) {
+                cell_value <- as.character(df[[col]][i])
+                if (is.na(cell_value) || cell_value == "" || 
+                    cell_value == "NA" || grepl("\\\\textbf", cell_value)) {
+                    next
+                }
+                is_significant <- FALSE
+                if (grepl("^<\\s*0\\.001", cell_value)) {
+                    is_significant <- TRUE
+                }
+                else if (grepl("^[0-9]\\.[0-9]", cell_value) || 
+                         grepl("^0\\.[0-9]", cell_value)) {
+                    p_numeric <- suppressWarnings(as.numeric(gsub("[^0-9.]", 
+                                                                  "", cell_value)))
+                    if (!is.na(p_numeric) && p_numeric < p_threshold) {
+                        is_significant <- TRUE
+                    }
+                }
+                if (is_significant) {
+                    df[[col]][i] <- paste0("\\textbf{", cell_value, 
+                                           "}")
+                }
+            }
+        }
+    }
+    return(df)
+}
+
+
+### * HTML-specific functions
+
+#' Format column headers with n counts (HTML)
+#' 
+#' Creates HTML-formatted column headers with sample size counts displayed
+#' below the column name using line breaks.
+#' 
+#' @param col_names Character vector of column names.
+#' @param n_row_data Named list or data.table row with n values for each column.
+#' @return Character vector with HTML-formatted headers including n counts.
+#' @keywords internal
+format_column_headers_with_n_html <- function(col_names, n_row_data) {
+    new_names <- col_names
+    for (i in seq_along(col_names)) {
+        col <- col_names[i]
+        
+        ## Skip Variable, Group, and p-value columns
+        if (col %chin% c("Variable", "Group", "p-value", "p value")) {
+            new_names[i] <- format_column_headers_html(col)
+            next
+        }
+        
+        ## Get n value from the N row
+        if (col %chin% names(n_row_data)) {
+            n_value <- n_row_data[[col]]
+            if (!is.na(n_value) && n_value != "" && n_value != "0") {
+                ## Format header with only N italicized
+                clean_col <- format_column_headers_html(col)
+                new_names[i] <- paste0(clean_col, "<br>(<i>N</i> = ", n_value, ")")
+            } else {
+                new_names[i] <- format_column_headers_html(col)
+            }
+        } else {
+            new_names[i] <- format_column_headers_html(col)
+        }
+    }
+    return(new_names)
+}
+
+
+#' Format \emph{p}-values for exported tables (HTML)
+#' 
+#' Applies bold formatting to significant \emph{p}-values in HTML tables using
+#' the b tag.
+#' 
+#' @param df Data.table containing \emph{p}-value columns.
+#' @param p_threshold Numeric threshold for significance (default 0.05).
+#' @return Data.table with significant \emph{p}-values wrapped in HTML bold tags.
+#' @keywords internal
+format_pvalues_export_html <- function (df, p_threshold = 0.05) {
+    for (col in names(df)) {
+        if (col == "p-value" || col == "Uni p" || col == "Multi p" || 
+            grepl("p.value|pvalue", col, ignore.case = TRUE)) {
+            for (i in seq_len(nrow(df))) {
+                cell_value <- as.character(df[[col]][i])
+                if (is.na(cell_value) || cell_value == "" || 
+                    cell_value == "NA") {
+                    next
+                }
+                is_significant <- FALSE
+                if (grepl("^<\\s*0\\.001", cell_value)) {
+                    is_significant <- TRUE
+                }
+                else if (grepl("^[0-9]\\.[0-9]", cell_value) || 
+                         grepl("^0\\.[0-9]", cell_value)) {
+                    p_numeric <- suppressWarnings(as.numeric(gsub("[^0-9.]", 
+                                                                  "", cell_value)))
+                    if (!is.na(p_numeric) && p_numeric < p_threshold) {
+                        is_significant <- TRUE
+                    }
+                }
+                if (is_significant) {
+                    df[[col]][i] <- paste0("<b>", cell_value, "</b>")
+                }
+            }
+        }
+    }
+    return(df)
+}
+
+
+### * Flextable-specific functions
+
 #' Core flextable processing function
 #' 
 #' Central processing function for creating \pkg{flextable} objects from data tables.
@@ -955,49 +1059,98 @@ process_table_for_flextable <- function(table,
     return(list(ft = ft, caption = caption))
 }
 
-#' Identify variable groups before indentation
-#' 
-#' Detects variable group boundaries by finding rows where Variable column
-#' is non-empty. Returns row indices for each group for zebra stripe application.
-#' 
-#' @param df Data.table with Variable column.
-#' @return List of integer vectors, each containing row indices for one variable group.
-#' @keywords internal
-identify_variable_groups <- function(df) {
-    if (!"Variable" %in% names(df)) return(NULL)
-    
-    var_starts <- which(df$Variable != "" & !is.na(df$Variable))
-    if (length(var_starts) == 0) return(NULL)
-    
-    ## Vectorized group creation
-    var_ends <- c(var_starts[-1] - 1, nrow(df))
-    groups <- mapply(seq, var_starts, var_ends, SIMPLIFY = FALSE)
-    
-    return(groups)
-}
 
-#' Replace empty cells with "-"
+#' Format headers for flextable
 #' 
-#' Converts empty strings and NA values to "-" for consistent display
-#' in exported tables. Preserves Variable column values.
+#' Applies formatting to flextable headers including italicizing 'n',
+#' adding sample size counts from N row data, and bolding all headers.
 #' 
-#' @param df Data.frame or data.table to process.
-#' @return Data.table with empty cells replaced by "-".
+#' @param ft \pkg{flextable} object.
+#' @param has_n_row Logical whether source data had an N row.
+#' @param n_row_data Data from the N row for adding counts to headers.
+#' @return Formatted \pkg{flextable} object.
 #' @keywords internal
-replace_empty_cells <- function(df) {
-    ## Convert to data.table for efficient in-place modification
-    dt <- data.table::as.data.table(df)
+format_headers_ft <- function(ft, has_n_row, n_row_data) {
+    col_names <- names(ft$body$dataset)
     
-    ## Get columns to process (excluding Variable)
-    cols_to_process <- setdiff(names(dt), "Variable")
-    
-    ## Vectorized replacement using data.table
-    for (col in cols_to_process) {
-        dt[is.na(get(col)) | get(col) == "", (col) := "-"]
+    for (i in seq_along(col_names)) {
+        col <- col_names[i]
+        
+        ## Skip Variable column for N count addition
+        if (col == "Variable") {
+            ## Just keep the original label without adding (N = X)
+            next
+        }
+        
+        ## Italicize 'n' column header if present
+        if (col == "n") {
+            ft <- flextable::italic(ft, j = i, part = "header")
+        }
+        
+        ## Add N counts for data columns only (not Variable)
+        if (has_n_row && col %chin% names(n_row_data) && col != "Variable") {
+            n_val <- n_row_data[[col]]
+            if (!is.na(n_val) && n_val != "" && n_val != "0") {
+                ## Use compose to italicize just the N
+                ft <- flextable::compose(
+                                     ft, 
+                                     j = i, 
+                                     part = "header",
+                                     value = flextable::as_paragraph(
+                                                            col, "\n(", 
+                                                            flextable::as_i("N"), 
+                                                            " = ", n_val, ")"
+                                                        )
+                                 )
+            }
+        }
     }
     
-    return(data.table::as.data.table(dt))
+    ## Bold all headers
+    ft <- flextable::bold(ft, part = "header")
+    
+    return(ft)
 }
+
+
+#' Bold significant \emph{p}-values in flextable outputs
+#' 
+#' Applies bold formatting to significant \emph{p}-values in \pkg{flextable} objects
+#' by detecting values below threshold or "< 0.001" patterns.
+#' 
+#' @param ft \pkg{flextable} object.
+#' @param df The source data.table.
+#' @param p_threshold Numeric \emph{p}-value threshold for significance.
+#' @return Flextable object with significant \emph{p}-values bolded.
+#' @keywords internal
+bold_pvalues_ft <- function(ft, df, p_threshold = 0.05) {
+    p_cols <- grep("p-value|p value|Uni p|Multi p|pvalue", names(df), 
+                   ignore.case = TRUE, value = TRUE)
+    
+    if (length(p_cols) == 0) return(ft)
+    
+    for (p_col in p_cols) {
+        if (p_col %in% names(df)) {
+            vals <- df[[p_col]]
+            
+            ## Significance check
+            is_very_small <- grepl("^<\\s*0\\.001", vals)
+            p_numeric <- suppressWarnings(as.numeric(gsub("[^0-9.]", "", vals)))
+            is_small_numeric <- !is.na(p_numeric) & p_numeric < p_threshold
+            
+            sig_rows <- which((is_very_small | is_small_numeric) & 
+                              vals != "" & !is.na(vals))
+            
+            ## Bulk bold operation
+            if (length(sig_rows) > 0) {
+                ft <- flextable::bold(ft, i = sig_rows, j = p_col, part = "body")
+            }
+        }
+    }
+    
+    return(ft)
+}
+
 
 #' Apply zebra stripes with proper variable group detection for indented tables
 #' 
@@ -1053,130 +1206,6 @@ apply_zebra_stripes_ft <- function(ft, df, var_groups) {
         even_rows <- seq(2, nrow(df), 2)
         ft <- flextable::bg(ft, i = odd_rows, bg = "#EEEEEE", part = "body")
         ft <- flextable::bg(ft, i = even_rows, bg = "#FFFFFF", part = "body")
-    }
-    
-    return(ft)
-}
-
-#' Calculate table width based on paper size and orientation
-#' 
-#' Computes usable table width in inches based on paper dimensions and
-#' orientation, accounting for standard 1-inch margins.
-#' 
-#' @param paper Character string paper size ("letter", "a4", "legal").
-#' @param orientation Character string page orientation ("portrait", "landscape").
-#' @return Numeric usable width in inches.
-#' @keywords internal
-calculate_table_width <- function(paper, orientation) {
-    ## Define paper sizes (in inches) with margins
-    paper_sizes <- list(
-        letter = c(width = 8.5, height = 11),
-        a4 = c(width = 8.27, height = 11.69),
-        legal = c(width = 8.5, height = 14)
-    )
-    
-    if (!paper %chin% names(paper_sizes)) {
-        paper <- "letter"
-    }
-    
-    dims <- paper_sizes[[paper]]
-    
-    ## Swap for landscape
-    if (orientation == "landscape") {
-        dims <- c(width = dims["height"], height = dims["width"])
-    }
-    
-    ## Subtract margins (1 inch on each side)
-    usable_width <- dims["width"] - 2
-    
-    return(as.numeric(usable_width))
-}
-
-#' Format headers for flextable
-#' 
-#' Applies formatting to flextable headers including italicizing 'n',
-#' adding sample size counts from N row data, and bolding all headers.
-#' 
-#' @param ft \pkg{flextable} object.
-#' @param has_n_row Logical whether source data had an N row.
-#' @param n_row_data Data from the N row for adding counts to headers.
-#' @return Formatted \pkg{flextable} object.
-#' @keywords internal
-format_headers_ft <- function(ft, has_n_row, n_row_data) {
-    col_names <- names(ft$body$dataset)
-    
-    for (i in seq_along(col_names)) {
-        col <- col_names[i]
-        
-        ## Skip Variable column for N count addition
-        if (col == "Variable") {
-            ## Just keep the original label without adding (N = X)
-            next
-        }
-        
-        ## Italicize 'n' column header if present
-        if (col == "n") {
-            ft <- flextable::italic(ft, j = i, part = "header")
-        }
-        
-        ## Add N counts for data columns only (not Variable)
-        if (has_n_row && col %chin% names(n_row_data) && col != "Variable") {
-            n_val <- n_row_data[[col]]
-            if (!is.na(n_val) && n_val != "" && n_val != "0") {
-                ## Use compose to italicize just the N
-                ft <- flextable::compose(
-                    ft, 
-                    j = i, 
-                    part = "header",
-                    value = flextable::as_paragraph(
-                        col, "\n(", 
-                        flextable::as_i("N"), 
-                        " = ", n_val, ")"
-                    )
-                )
-            }
-        }
-    }
-    
-    ## Bold all headers
-    ft <- flextable::bold(ft, part = "header")
-    
-    return(ft)
-}
-
-#' Bold significant \emph{p}-values in DOCX
-#' 
-#' Applies bold formatting to significant \emph{p}-values in \pkg{flextable} objects
-#' by detecting values below threshold or "< 0.001" patterns.
-#' 
-#' @param ft \pkg{flextable} object.
-#' @param df The source data.table.
-#' @param p_threshold Numeric \emph{p}-value threshold for significance.
-#' @return Flextable object with significant \emph{p}-values bolded.
-#' @keywords internal
-bold_pvalues_ft <- function(ft, df, p_threshold = 0.05) {
-    p_cols <- grep("p-value|p value|Uni p|Multi p|pvalue", names(df), 
-                   ignore.case = TRUE, value = TRUE)
-    
-    if (length(p_cols) == 0) return(ft)
-    
-    for (p_col in p_cols) {
-        if (p_col %in% names(df)) {
-            vals <- df[[p_col]]
-            
-            ## Significance check
-            is_very_small <- grepl("^<\\s*0\\.001", vals)
-            p_numeric <- suppressWarnings(as.numeric(gsub("[^0-9.]", "", vals)))
-            is_small_numeric <- !is.na(p_numeric) & p_numeric < p_threshold
-            
-            sig_rows <- which((is_very_small | is_small_numeric) & 
-                              vals != "" & !is.na(vals))
-            
-            ## Bulk bold operation
-            if (length(sig_rows) > 0) {
-                ft <- flextable::bold(ft, i = sig_rows, j = p_col, part = "body")
-            }
-        }
     }
     
     return(ft)

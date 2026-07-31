@@ -1,9 +1,14 @@
-# Column name constants for Unicode superscripts
-# Defined here to ensure consistent column naming throughout
+### * Unicode conversions
+
+## Column name constants for Unicode superscripts
+## Defined here to ensure consistent column naming throughout
 .pseudo_r2_col <- "Pseudo-R\u00b2"
 .marginal_r2_col <- "Marginal R\u00b2"
 .conditional_r2_col <- "Conditional R\u00b2"
 .adjusted_r2_col <- "Adjusted R\u00b2"
+
+
+### * Validation functions
 
 #' Check model convergence
 #' 
@@ -83,6 +88,106 @@ check_convergence <- function(model) {
         
     }
 }
+
+#' Auto-detect model type based on outcome and random effects
+#' 
+#' Determines the appropriate model type based on outcome variable
+#' characteristics and presence of random effects.
+#' 
+#' @param data Data.frame or data.table containing the outcome variable.
+#' @param outcome Character string specifying the outcome variable or Surv() expression.
+#' @param has_random_effects Logical indicating if random effects are specified.
+#' @param family Character string for GLM family (default "binomial").
+#' @return Character string indicating detected model type.
+#' @keywords internal
+detect_model_type_auto <- function(data, outcome, has_random_effects, family = "binomial") {
+    
+    is_survival <- grepl("^Surv\\(", outcome)
+    
+    if (is_survival) {
+        if (has_random_effects) {
+            message("Auto-detected survival outcome with random effects, using coxme")
+            return("coxme")
+        } else {
+            message("Auto-detected survival outcome, using Cox regression")
+            return("coxph")
+        }
+    }
+    
+    ## Check outcome type
+    is_binary <- is.factor(data[[outcome]]) || 
+        (is.numeric(data[[outcome]]) && length(unique(data[[outcome]])) == 2)
+    is_continuous <- is.numeric(data[[outcome]]) && length(unique(data[[outcome]])) > 2
+    
+    if (is_binary) {
+        if (has_random_effects) {
+            message("Auto-detected binary outcome with random effects, using glmer")
+            return("glmer")
+        } else {
+            message("Auto-detected binary outcome, using logistic regression")
+            return("glm")
+        }
+    } else if (is_continuous) {
+        if (has_random_effects) {
+            message("Auto-detected continuous outcome with random effects, using lmer")
+            return("lmer")
+        } else {
+            message("Auto-detected continuous outcome, using linear regression")
+            return("lm")
+        }
+    } else {
+        stop("Cannot auto-detect model type for outcome: ", outcome)
+    }
+}
+
+#' Normalize model type names
+#' 
+#' Converts model class names to standardized model type strings.
+#' 
+#' @param model_type Character string of model type or class name.
+#' @return Normalized character string (\emph{e.g.,} "lmerMod" becomes "lmer").
+#' @keywords internal
+normalize_model_type <- function(model_type) {
+    switch(model_type,
+           "lmerMod" = "lmer",
+           "glmerMod" = "glmer",
+           model_type)
+}
+
+#' Check required packages for model type
+#' 
+#' Verifies that necessary packages are installed for the specified model type.
+#' Stops with informative error if required packages are missing.
+#' 
+#' @param model_type Character string indicating model type.
+#' @return \code{NULL} (invisibly). Stops execution if packages missing.
+#' @keywords internal
+check_required_packages <- function(model_type) {
+    
+    if (model_type %in% c("lmer", "glmer")) {
+        if (!requireNamespace("lme4", quietly = TRUE)) {
+            stop("Package 'lme4' is required for mixed-effects models. ",
+                 "Install with: install.packages('lme4')")
+        }
+    }
+    
+    if (model_type == "coxme") {
+        if (!requireNamespace("coxme", quietly = TRUE)) {
+            stop("Package 'coxme' is required for mixed-effects Cox models. ",
+                 "Install with: install.packages('coxme')")
+        }
+    }
+    
+    if (model_type %in% c("coxph", "clogit")) {
+        if (!requireNamespace("survival", quietly = TRUE)) {
+            stop("Package 'survival' is required for Cox models. ",
+                 "Install with: install.packages('survival')")
+        }
+    }
+}
+
+
+### * Extraction functions
 
 #' Extract comprehensive model metrics based on academic consensus
 #' 
@@ -555,6 +660,9 @@ extract_coxme_metrics <- function(model, raw_data, metrics) {
     return(metrics)
 }
 
+
+### * Formatting functions
+
 #' Format model comparison table
 #' 
 #' Rounds numeric columns to appropriate precision based on metric type.
@@ -581,6 +689,202 @@ format_model_comparison <- function(comparison) {
     return(comparison)
 }
 
+
+#' Combine coefficient tables from multiple models
+#' 
+#' Merges coefficient tables from multiple fitted models into a single
+#' data.table with a Model identifier column.
+#' 
+#' @param coef_list List of data.tables containing coefficient information.
+#' @param model_names Character vector of model names corresponding to coef_list.
+#' @return Combined data.table with Model column, or \code{NULL} if empty.
+#' @keywords internal
+combine_coefficient_tables <- function(coef_list, model_names) {
+    if (length(coef_list) == 0) return(NULL)
+    
+    ## Add model identifier to each table
+    for (i in seq_along(coef_list)) {
+        if (!is.null(coef_list[[i]])) {
+            coef_list[[i]]$Model <- model_names[i]
+        }
+    }
+    
+    ## Combine all tables
+    combined <- data.table::rbindlist(coef_list, fill = TRUE)
+    
+    ## Reorder columns to put Model first
+    if ("Model" %in% names(combined)) {
+        cols <- names(combined)
+        new_order <- c("Model", setdiff(cols, "Model"))
+        combined <- combined[, ..new_order]
+    }
+    
+    return(combined)
+}
+
+
+#' Build row for failed model
+#' 
+#' Creates a comparison table row with appropriate NA values for a model
+#' that failed to fit.
+#' 
+#' @param model_name Character string name of the model.
+#' @param n Integer sample size.
+#' @param n_predictors Integer number of predictors attempted.
+#' @param model_type Character string indicating model type.
+#' @return Data.table with single row of NA metrics and "Failed" convergence.
+#' @keywords internal
+build_failed_model_row <- function(model_name, n, n_predictors, model_type) {
+    
+    row <- data.table::data.table(
+                           Model = model_name,
+                           N = n,
+                           Events = NA_integer_,
+                           Predictors = n_predictors,
+                           Converged = "Failed",
+                           AIC = NA_real_,
+                           BIC = NA_real_,
+                           `Pseudo-R^2` = NA_real_,
+                           Concordance = NA_real_,
+                           `Global p` = NA_real_
+                       )
+    
+    ## Add model-type specific columns
+    if (model_type == "glm") {
+        row$`Brier Score` <- NA_real_
+    } else if (model_type %in% c("lmer", "glmer", "coxme")) {
+        row$Groups <- NA_integer_
+        row$`Marginal R^2` <- NA_real_
+        row$`Conditional R^2` <- NA_real_
+        row$ICC <- NA_real_
+        if (model_type == "glmer") {
+            row$`Brier Score` <- NA_real_
+        }
+        if (model_type == "lmer") {
+            row$RMSE <- NA_real_
+        }
+    }
+    
+    return(row)
+}
+
+
+#' Build comparison row for successfully fitted model
+#' 
+#' Creates a comparison table row with extracted metrics for a successfully
+#' fitted model.
+#' 
+#' @param model_name Character string name of the model.
+#' @param n_predictors Integer number of predictors in the model.
+#' @param converged Character string convergence status.
+#' @param metrics Named list of extracted model metrics.
+#' @param model_type Character string indicating model type.
+#' @return Data.table with single row of formatted metrics.
+#' @keywords internal
+build_model_row <- function(model_name, n_predictors, converged, metrics, model_type, marks = NULL) {
+    
+    ## Base columns for all models
+    row <- data.table::data.table(
+                           Model = model_name,
+                           N = metrics$n,
+                           Events = metrics$events,
+                           Predictors = n_predictors,
+                           Converged = converged,
+                           AIC = safe_round(metrics$aic, 1),
+                           BIC = safe_round(metrics$bic, 1),
+                           `Pseudo-R^2` = safe_round(metrics$pseudo_r2, 3),
+                           Concordance = safe_round(metrics$concordance, 3),
+                           `Global p` = if (!is.null(metrics$global_p) && !is.na(metrics$global_p)) {
+                                            format_pvalues_fit(metrics$global_p, 3, marks)
+                                        } else {
+                                            NA_character_
+                                        }
+                       )
+    
+    ## Add GLM-specific columns
+    if (model_type == "glm") {
+        row$`Brier Score` <- safe_round(metrics$brier_score, 3)
+    }
+    
+    ## Add mixed-effects specific columns
+    if (model_type %in% c("lmer", "glmer", "coxme")) {
+        row$Groups <- metrics$n_groups
+        row$`Marginal R^2` <- safe_round(metrics$marginal_r2, 3)
+        row$`Conditional R^2` <- safe_round(metrics$conditional_r2, 3)
+        row$ICC <- safe_round(metrics$icc, 3)
+        
+        if (model_type == "glmer") {
+            row$`Brier Score` <- safe_round(metrics$brier_score, 3)
+        }
+        if (model_type == "lmer") {
+            row$RMSE <- safe_round(metrics$rmse, 3)
+        }
+    }
+    
+    return(row)
+}
+
+
+#' Safe rounding that handles \code{NULL} and NA
+#' 
+#' Rounds numeric values while gracefully handling \code{NULL}, empty, and NA inputs.
+#' 
+#' @param x Numeric value to round.
+#' @param digits Integer number of decimal places.
+#' @return Rounded numeric value, or NA_real_ if input is \code{NULL}/NA/empty.
+#' @keywords internal
+safe_round <- function(x, digits) {
+    if (is.null(x) || length(x) == 0) return(NA_real_)
+    if (is.na(x)) return(NA_real_)
+    round(x, digits)
+}
+
+
+#' Order comparison columns based on model type
+#' 
+#' Reorders columns in the comparison table to follow a logical sequence
+#' appropriate for the model type.
+#' 
+#' @param comparison Data.table with comparison metrics.
+#' @param model_type Character string indicating model type.
+#' @return Data.table with reordered columns.
+#' @keywords internal
+order_comparison_columns <- function(comparison, model_type) {
+    
+    col_order <- switch(model_type,
+                        "glm" = c("Model", "N", "Events", "Predictors", "Converged",
+                                  "AIC", "BIC", "Pseudo-R\u00b2", "Concordance", "Brier Score",
+                                  "Global p", "CMS"),
+                        "coxph" = c("Model", "N", "Events", "Predictors", "Converged",
+                                    "AIC", "BIC", "Pseudo-R\u00b2", "Concordance",
+                                    "Global p", "CMS"),
+                        "lm" = c("Model", "N", "Predictors", "Converged",
+                                 "AIC", "BIC", "Pseudo-R\u00b2", "Global p", "CMS"),
+                        "lmer" = c("Model", "N", "Groups", "Predictors", "Converged",
+                                   "AIC", "BIC", "Marginal R\u00b2", "Conditional R\u00b2", "ICC",
+                                   "RMSE", "Global p", "CMS"),
+                        "glmer" = c("Model", "N", "Events", "Groups", "Predictors", "Converged",
+                                    "AIC", "BIC", "Concordance", "Marginal R\u00b2", "Conditional R\u00b2",
+                                    "ICC", "Brier Score", "Global p", "CMS"),
+                        "coxme" = c("Model", "N", "Events", "Groups", "Predictors", "Converged",
+                                    "AIC", "BIC", "Concordance", "Pseudo-R\u00b2", "ICC",
+                                    "Global p", "CMS"),
+                        ## Default fallback
+                        c("Model", "N", "Events", "Predictors", "Converged",
+                          "AIC", "BIC", "Pseudo-R\u00b2", "Concordance",
+                          "Global p", "CMS")
+                        )
+    
+    existing_cols <- intersect(col_order, names(comparison))
+    extra_cols <- setdiff(names(comparison), col_order)
+    
+    data.table::setcolorder(comparison, c(existing_cols, extra_cols))
+    
+    return(comparison)
+}
+
+
+### * Calculation/CMS functions
 
 #' Calculate Composite Mean Scores (CMS) for model comparison
 #' 
@@ -1014,298 +1318,4 @@ calculate_coxme_scores <- function(comparison, weights, scores, n_models) {
         scores$icc_score * weights$icc
     
     return(scores)
-}
-
-
-#' Combine coefficient tables from multiple models
-#' 
-#' Merges coefficient tables from multiple fitted models into a single
-#' data.table with a Model identifier column.
-#' 
-#' @param coef_list List of data.tables containing coefficient information.
-#' @param model_names Character vector of model names corresponding to coef_list.
-#' @return Combined data.table with Model column, or \code{NULL} if empty.
-#' @keywords internal
-combine_coefficient_tables <- function(coef_list, model_names) {
-    if (length(coef_list) == 0) return(NULL)
-    
-    ## Add model identifier to each table
-    for (i in seq_along(coef_list)) {
-        if (!is.null(coef_list[[i]])) {
-            coef_list[[i]]$Model <- model_names[i]
-        }
-    }
-    
-    ## Combine all tables
-    combined <- data.table::rbindlist(coef_list, fill = TRUE)
-    
-    ## Reorder columns to put Model first
-    if ("Model" %in% names(combined)) {
-        cols <- names(combined)
-        new_order <- c("Model", setdiff(cols, "Model"))
-        combined <- combined[, ..new_order]
-    }
-    
-    return(combined)
-}
-
-
-#' Auto-detect model type based on outcome and random effects
-#' 
-#' Determines the appropriate model type based on outcome variable
-#' characteristics and presence of random effects.
-#' 
-#' @param data Data.frame or data.table containing the outcome variable.
-#' @param outcome Character string specifying the outcome variable or Surv() expression.
-#' @param has_random_effects Logical indicating if random effects are specified.
-#' @param family Character string for GLM family (default "binomial").
-#' @return Character string indicating detected model type.
-#' @keywords internal
-detect_model_type_auto <- function(data, outcome, has_random_effects, family = "binomial") {
-    
-    is_survival <- grepl("^Surv\\(", outcome)
-    
-    if (is_survival) {
-        if (has_random_effects) {
-            message("Auto-detected survival outcome with random effects, using coxme")
-            return("coxme")
-        } else {
-            message("Auto-detected survival outcome, using Cox regression")
-            return("coxph")
-        }
-    }
-    
-    ## Check outcome type
-    is_binary <- is.factor(data[[outcome]]) || 
-        (is.numeric(data[[outcome]]) && length(unique(data[[outcome]])) == 2)
-    is_continuous <- is.numeric(data[[outcome]]) && length(unique(data[[outcome]])) > 2
-    
-    if (is_binary) {
-        if (has_random_effects) {
-            message("Auto-detected binary outcome with random effects, using glmer")
-            return("glmer")
-        } else {
-            message("Auto-detected binary outcome, using logistic regression")
-            return("glm")
-        }
-    } else if (is_continuous) {
-        if (has_random_effects) {
-            message("Auto-detected continuous outcome with random effects, using lmer")
-            return("lmer")
-        } else {
-            message("Auto-detected continuous outcome, using linear regression")
-            return("lm")
-        }
-    } else {
-        stop("Cannot auto-detect model type for outcome: ", outcome)
-    }
-}
-
-
-#' Normalize model type names
-#' 
-#' Converts model class names to standardized model type strings.
-#' 
-#' @param model_type Character string of model type or class name.
-#' @return Normalized character string (\emph{e.g.,} "lmerMod" becomes "lmer").
-#' @keywords internal
-normalize_model_type <- function(model_type) {
-    switch(model_type,
-           "lmerMod" = "lmer",
-           "glmerMod" = "glmer",
-           model_type)
-}
-
-
-#' Check required packages for model type
-#' 
-#' Verifies that necessary packages are installed for the specified model type.
-#' Stops with informative error if required packages are missing.
-#' 
-#' @param model_type Character string indicating model type.
-#' @return \code{NULL} (invisibly). Stops execution if packages missing.
-#' @keywords internal
-check_required_packages <- function(model_type) {
-    
-    if (model_type %in% c("lmer", "glmer")) {
-        if (!requireNamespace("lme4", quietly = TRUE)) {
-            stop("Package 'lme4' is required for mixed-effects models. ",
-                 "Install with: install.packages('lme4')")
-        }
-    }
-    
-    if (model_type == "coxme") {
-        if (!requireNamespace("coxme", quietly = TRUE)) {
-            stop("Package 'coxme' is required for mixed-effects Cox models. ",
-                 "Install with: install.packages('coxme')")
-        }
-    }
-    
-    if (model_type %in% c("coxph", "clogit")) {
-        if (!requireNamespace("survival", quietly = TRUE)) {
-            stop("Package 'survival' is required for Cox models. ",
-                 "Install with: install.packages('survival')")
-        }
-    }
-}
-
-
-#' Build row for failed model
-#' 
-#' Creates a comparison table row with appropriate NA values for a model
-#' that failed to fit.
-#' 
-#' @param model_name Character string name of the model.
-#' @param n Integer sample size.
-#' @param n_predictors Integer number of predictors attempted.
-#' @param model_type Character string indicating model type.
-#' @return Data.table with single row of NA metrics and "Failed" convergence.
-#' @keywords internal
-build_failed_model_row <- function(model_name, n, n_predictors, model_type) {
-    
-    row <- data.table::data.table(
-                           Model = model_name,
-                           N = n,
-                           Events = NA_integer_,
-                           Predictors = n_predictors,
-                           Converged = "Failed",
-                           AIC = NA_real_,
-                           BIC = NA_real_,
-                           `Pseudo-R^2` = NA_real_,
-                           Concordance = NA_real_,
-                           `Global p` = NA_real_
-                       )
-    
-    ## Add model-type specific columns
-    if (model_type == "glm") {
-        row$`Brier Score` <- NA_real_
-    } else if (model_type %in% c("lmer", "glmer", "coxme")) {
-        row$Groups <- NA_integer_
-        row$`Marginal R^2` <- NA_real_
-        row$`Conditional R^2` <- NA_real_
-        row$ICC <- NA_real_
-        if (model_type == "glmer") {
-            row$`Brier Score` <- NA_real_
-        }
-        if (model_type == "lmer") {
-            row$RMSE <- NA_real_
-        }
-    }
-    
-    return(row)
-}
-
-
-#' Build comparison row for successfully fitted model
-#' 
-#' Creates a comparison table row with extracted metrics for a successfully
-#' fitted model.
-#' 
-#' @param model_name Character string name of the model.
-#' @param n_predictors Integer number of predictors in the model.
-#' @param converged Character string convergence status.
-#' @param metrics Named list of extracted model metrics.
-#' @param model_type Character string indicating model type.
-#' @return Data.table with single row of formatted metrics.
-#' @keywords internal
-build_model_row <- function(model_name, n_predictors, converged, metrics, model_type, marks = NULL) {
-    
-    ## Base columns for all models
-    row <- data.table::data.table(
-                           Model = model_name,
-                           N = metrics$n,
-                           Events = metrics$events,
-                           Predictors = n_predictors,
-                           Converged = converged,
-                           AIC = safe_round(metrics$aic, 1),
-                           BIC = safe_round(metrics$bic, 1),
-                           `Pseudo-R^2` = safe_round(metrics$pseudo_r2, 3),
-                           Concordance = safe_round(metrics$concordance, 3),
-                           `Global p` = if (!is.null(metrics$global_p) && !is.na(metrics$global_p)) {
-                                            format_pvalues_fit(metrics$global_p, 3, marks)
-                                        } else {
-                                            NA_character_
-                                        }
-                       )
-    
-    ## Add GLM-specific columns
-    if (model_type == "glm") {
-        row$`Brier Score` <- safe_round(metrics$brier_score, 3)
-    }
-    
-    ## Add mixed-effects specific columns
-    if (model_type %in% c("lmer", "glmer", "coxme")) {
-        row$Groups <- metrics$n_groups
-        row$`Marginal R^2` <- safe_round(metrics$marginal_r2, 3)
-        row$`Conditional R^2` <- safe_round(metrics$conditional_r2, 3)
-        row$ICC <- safe_round(metrics$icc, 3)
-        
-        if (model_type == "glmer") {
-            row$`Brier Score` <- safe_round(metrics$brier_score, 3)
-        }
-        if (model_type == "lmer") {
-            row$RMSE <- safe_round(metrics$rmse, 3)
-        }
-    }
-    
-    return(row)
-}
-
-
-#' Safe rounding that handles \code{NULL} and NA
-#' 
-#' Rounds numeric values while gracefully handling \code{NULL}, empty, and NA inputs.
-#' 
-#' @param x Numeric value to round.
-#' @param digits Integer number of decimal places.
-#' @return Rounded numeric value, or NA_real_ if input is \code{NULL}/NA/empty.
-#' @keywords internal
-safe_round <- function(x, digits) {
-    if (is.null(x) || length(x) == 0) return(NA_real_)
-    if (is.na(x)) return(NA_real_)
-    round(x, digits)
-}
-
-
-#' Order comparison columns based on model type
-#' 
-#' Reorders columns in the comparison table to follow a logical sequence
-#' appropriate for the model type.
-#' 
-#' @param comparison Data.table with comparison metrics.
-#' @param model_type Character string indicating model type.
-#' @return Data.table with reordered columns.
-#' @keywords internal
-order_comparison_columns <- function(comparison, model_type) {
-    
-    col_order <- switch(model_type,
-                        "glm" = c("Model", "N", "Events", "Predictors", "Converged",
-                                  "AIC", "BIC", "Pseudo-R\u00b2", "Concordance", "Brier Score",
-                                  "Global p", "CMS"),
-                        "coxph" = c("Model", "N", "Events", "Predictors", "Converged",
-                                    "AIC", "BIC", "Pseudo-R\u00b2", "Concordance",
-                                    "Global p", "CMS"),
-                        "lm" = c("Model", "N", "Predictors", "Converged",
-                                 "AIC", "BIC", "Pseudo-R\u00b2", "Global p", "CMS"),
-                        "lmer" = c("Model", "N", "Groups", "Predictors", "Converged",
-                                   "AIC", "BIC", "Marginal R\u00b2", "Conditional R\u00b2", "ICC",
-                                   "RMSE", "Global p", "CMS"),
-                        "glmer" = c("Model", "N", "Events", "Groups", "Predictors", "Converged",
-                                    "AIC", "BIC", "Concordance", "Marginal R\u00b2", "Conditional R\u00b2",
-                                    "ICC", "Brier Score", "Global p", "CMS"),
-                        "coxme" = c("Model", "N", "Events", "Groups", "Predictors", "Converged",
-                                    "AIC", "BIC", "Concordance", "Pseudo-R\u00b2", "ICC",
-                                    "Global p", "CMS"),
-                        ## Default fallback
-                        c("Model", "N", "Events", "Predictors", "Converged",
-                          "AIC", "BIC", "Pseudo-R\u00b2", "Concordance",
-                          "Global p", "CMS")
-                        )
-    
-    existing_cols <- intersect(col_order, names(comparison))
-    extra_cols <- setdiff(names(comparison), col_order)
-    
-    data.table::setcolorder(comparison, c(existing_cols, extra_cols))
-    
-    return(comparison)
 }

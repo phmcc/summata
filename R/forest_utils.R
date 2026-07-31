@@ -1,132 +1,4 @@
-#' Convert between units
-#' 
-#' Converts measurements between different unit systems commonly used in
-#' graphics (inches, centimeters, millimeters, pixels, points).
-#' 
-#' @param value Numeric value to convert.
-#' @param from Character string specifying source unit ("in", "cm", "mm", "px", "pt").
-#' @param to Character string specifying target unit ("in", "cm", "mm", "px", "pt").
-#' @param dpi Integer dots per inch for pixel conversions (default 96).
-#' @return Numeric value in target units.
-#' @keywords internal
-convert_units <- function(value, from = "in", to = "in", dpi = 96) {
-    to_inches <- c(
-        "in" = 1,
-        "cm" = 1/2.54,    # 1 cm = 1/2.54 inches
-        "mm" = 1/25.4,    # 1 mm = 1/25.4 inches
-        "px" = 1/dpi,     # 1 px = 1/dpi inches
-        "pt" = 1/72       # 1 pt = 1/72 inches
-    )
-    
-    value_in_inches <- value * to_inches[[from]]
-    value_in_target <- value_in_inches / to_inches[[to]]
-    
-    return(value_in_target)
-}
-
-#' Detect available sans-serif font for plots
-#' 
-#' Checks for commonly available sans-serif fonts in order of preference
-#' (Helvetica, Arial, Helvetica Neue) and returns the first available one.
-#' Falls back to "sans" if none are found or if systemfonts is unavailable.
-#' 
-#' When ragg is being used as the graphics device (detected via options or
-#' knitr settings), font detection works in non-interactive sessions since
-#' ragg handles font rendering independently of the R graphics system.
-#' 
-#' @return Character string with the font family name to use.
-#' @keywords internal
-detect_plot_font <- function() {
-    
-    ## Check if ragg is being used - if so, can detect fonts even in
-    ## non-interactive sessions since ragg handles fonts via systemfonts
-    ragg_in_use <- isTRUE(getOption("summata.use_ragg")) ||
-        identical(knitr::opts_chunk$get("dev"), "ragg_png") ||
-        identical(knitr::opts_chunk$get("dev"), "agg_png")
-    
-    ## Only fall back to "sans" in non-interactive sessions when ragg is not in use
-    if (!interactive() && !ragg_in_use) {
-        return("sans")
-    }
-    
-    if (requireNamespace("systemfonts", quietly = TRUE)) {
-        available_fonts <- systemfonts::system_fonts()$family
-        ## Check fonts in order of preference
-        if ("Helvetica" %in% available_fonts) return("Helvetica")
-        if ("Nimbus Sans L" %in% available_fonts) return("Nimbus Sans L")
-        if ("Nimbus Sans" %in% available_fonts) return("Nimbus Sans")
-        if ("Liberation Sans" %in% available_fonts) return("Liberation Sans")
-        if ("Arial" %in% available_fonts) return("Arial")
-        if ("Helvetica Neue" %in% available_fonts) return("Helvetica Neue")
-    }
-    ## Fallback to generic sans-serif
-    return("sans")
-}
-
-#' Format numeric value with fixed decimal places
-#' 
-#' Formats a numeric value to a specified number of decimal places, removing
-#' leading/trailing whitespace and fixing negative zero display (\emph{e.g.,} "-0.00"
-#' becomes "0.00"). When \code{marks} is supplied, applies locale-appropriate
-#' decimal mark substitution.
-#' 
-#' @param x Numeric value to format.
-#' @param digits Integer number of decimal places.
-#' @param marks Optional list with \code{big.mark} and \code{decimal.mark} as
-#'   returned by \code{\link{resolve_number_marks}}.
-#' @return Character string with formatted value.
-#' @keywords internal
-format_number <- function(x, digits, marks = NULL) {
-    result <- trimws(format(round(x, digits), nsmall = digits))
-    if (!is.null(marks)) {
-        return(apply_decimal_mark(result, marks))
-    }
-    ## Fallback: fix negative zero only (US locale)
-    gsub("(?<![0-9])-0(\\.0+)(?![0-9])", "0\\1", result, perl = TRUE)
-}
-
-
-#' Determine CI separator for forest plot text annotations
-#'
-#' Returns the appropriate separator string between CI lower and upper bounds
-#' in forest plot annotations. Considers whether values may be negative and
-#' the current locale's decimal mark.
-#'
-#' @param has_negatives Logical indicating whether any CI bounds are negative.
-#' @param marks Optional list with \code{big.mark} and \code{decimal.mark} as
-#'   returned by \code{\link{resolve_number_marks}}.
-#' @return Character string separator.
-#' @keywords internal
-forest_ci_separator <- function(has_negatives, marks = NULL) {
-    if (has_negatives) return(", ")
-    if (!is.null(marks) && marks$decimal.mark == ",") return("\u2013")
-    "-"
-}
-
-
-#' Format a p-value for forest plot annotations
-#'
-#' Returns a formatted p-value string suitable for forest plot display,
-#' using locale-aware decimal marks when \code{marks} is provided.
-#'
-#' @param p Numeric p-value.
-#' @param p_digits Integer decimal places.
-#' @param marks Optional list with \code{big.mark} and \code{decimal.mark} as
-#'   returned by \code{\link{resolve_number_marks}}.
-#' @return Character string.
-#' @keywords internal
-format_p_forest <- function(p, p_digits, marks = NULL) {
-    threshold <- 10^(-p_digits)
-    if (p < threshold) {
-        if (!is.null(marks)) {
-            return(paste0("< 0", marks$decimal.mark,
-                          strrep("0", p_digits - 1), "1"))
-        }
-        return(paste0("< ", format(threshold, scientific = FALSE)))
-    }
-    format_number(p, p_digits, marks)
-}
-
+### * Table formatting
 
 #' Calculate table layout for forest plots
 #' 
@@ -483,6 +355,75 @@ should_condense_binary <- function(ref_category, non_ref_category, label = NULL)
 }
 
 
+### * Text formatting
+
+#' Format numeric value with fixed decimal places
+#' 
+#' Formats a numeric value to a specified number of decimal places, removing
+#' leading/trailing whitespace and fixing negative zero display (\emph{e.g.,} "-0.00"
+#' becomes "0.00"). When \code{marks} is supplied, applies locale-appropriate
+#' decimal mark substitution.
+#' 
+#' @param x Numeric value to format.
+#' @param digits Integer number of decimal places.
+#' @param marks Optional list with \code{big.mark} and \code{decimal.mark} as
+#'   returned by \code{\link{resolve_number_marks}}.
+#' @return Character string with formatted value.
+#' @keywords internal
+format_number <- function(x, digits, marks = NULL) {
+    result <- trimws(format(round(x, digits), nsmall = digits))
+    if (!is.null(marks)) {
+        return(apply_decimal_mark(result, marks))
+    }
+    ## Fallback: fix negative zero only (US locale)
+    gsub("(?<![0-9])-0(\\.0+)(?![0-9])", "0\\1", result, perl = TRUE)
+}
+
+
+#' Determine CI separator for forest plot text annotations
+#'
+#' Returns the appropriate separator string between CI lower and upper bounds
+#' in forest plot annotations. Considers whether values may be negative and
+#' the current locale's decimal mark.
+#'
+#' @param has_negatives Logical indicating whether any CI bounds are negative.
+#' @param marks Optional list with \code{big.mark} and \code{decimal.mark} as
+#'   returned by \code{\link{resolve_number_marks}}.
+#' @return Character string separator.
+#' @keywords internal
+forest_ci_separator <- function(has_negatives, marks = NULL) {
+    if (has_negatives) return(", ")
+    if (!is.null(marks) && marks$decimal.mark == ",") return("\u2013")
+    "-"
+}
+
+
+#' Format a p-value for forest plot annotations
+#'
+#' Returns a formatted p-value string suitable for forest plot display,
+#' using locale-aware decimal marks when \code{marks} is provided.
+#'
+#' @param p Numeric p-value.
+#' @param p_digits Integer decimal places.
+#' @param marks Optional list with \code{big.mark} and \code{decimal.mark} as
+#'   returned by \code{\link{resolve_number_marks}}.
+#' @return Character string.
+#' @keywords internal
+format_p_forest <- function(p, p_digits, marks = NULL) {
+    threshold <- 10^(-p_digits)
+    if (p < threshold) {
+        if (!is.null(marks)) {
+            return(paste0("< 0", marks$decimal.mark,
+                          strrep("0", p_digits - 1), "1"))
+        }
+        return(paste0("< ", format(threshold, scientific = FALSE)))
+    }
+    format_number(p, p_digits, marks)
+}
+
+
+### * CI caching
+
 #' Retrieve confidence intervals with cache support
 #'
 #' Returns confidence intervals for a fitted model, using a cached result
@@ -513,4 +454,75 @@ get_cached_confint <- function(model, conf_level = 0.95) {
     suppressMessages(suppressWarnings(
         stats::confint(model, level = conf_level)
     ))
+}
+
+
+### * Font selection
+
+#' Detect available sans-serif font for plots
+#' 
+#' Checks for commonly available sans-serif fonts in order of preference
+#' (Helvetica, Arial, Helvetica Neue) and returns the first available one.
+#' Falls back to "sans" if none are found or if systemfonts is unavailable.
+#' 
+#' When ragg is being used as the graphics device (detected via options or
+#' knitr settings), font detection works in non-interactive sessions since
+#' ragg handles font rendering independently of the R graphics system.
+#' 
+#' @return Character string with the font family name to use.
+#' @keywords internal
+detect_plot_font <- function() {
+    
+    ## Check if ragg is being used - if so, can detect fonts even in
+    ## non-interactive sessions since ragg handles fonts via systemfonts
+    ragg_in_use <- isTRUE(getOption("summata.use_ragg")) ||
+        identical(knitr::opts_chunk$get("dev"), "ragg_png") ||
+        identical(knitr::opts_chunk$get("dev"), "agg_png")
+    
+    ## Only fall back to "sans" in non-interactive sessions when ragg is not in use
+    if (!interactive() && !ragg_in_use) {
+        return("sans")
+    }
+    
+    if (requireNamespace("systemfonts", quietly = TRUE)) {
+        available_fonts <- systemfonts::system_fonts()$family
+        ## Check fonts in order of preference
+        if ("Helvetica" %in% available_fonts) return("Helvetica")
+        if ("Nimbus Sans L" %in% available_fonts) return("Nimbus Sans L")
+        if ("Nimbus Sans" %in% available_fonts) return("Nimbus Sans")
+        if ("Liberation Sans" %in% available_fonts) return("Liberation Sans")
+        if ("Arial" %in% available_fonts) return("Arial")
+        if ("Helvetica Neue" %in% available_fonts) return("Helvetica Neue")
+    }
+    ## Fallback to generic sans-serif
+    return("sans")
+}
+
+
+### * Unit conversion
+
+#' Convert between units
+#' 
+#' Converts measurements between different unit systems commonly used in
+#' graphics (inches, centimeters, millimeters, pixels, points).
+#' 
+#' @param value Numeric value to convert.
+#' @param from Character string specifying source unit ("in", "cm", "mm", "px", "pt").
+#' @param to Character string specifying target unit ("in", "cm", "mm", "px", "pt").
+#' @param dpi Integer dots per inch for pixel conversions (default 96).
+#' @return Numeric value in target units.
+#' @keywords internal
+convert_units <- function(value, from = "in", to = "in", dpi = 96) {
+    to_inches <- c(
+        "in" = 1,
+        "cm" = 1/2.54,    # 1 cm = 1/2.54 inches
+        "mm" = 1/25.4,    # 1 mm = 1/25.4 inches
+        "px" = 1/dpi,     # 1 px = 1/dpi inches
+        "pt" = 1/72       # 1 pt = 1/72 inches
+    )
+    
+    value_in_inches <- value * to_inches[[from]]
+    value_in_target <- value_in_inches / to_inches[[to]]
+    
+    return(value_in_target)
 }

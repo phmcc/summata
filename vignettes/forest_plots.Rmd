@@ -67,22 +67,28 @@ The `summata` package provides specialized forest plot functions for each model 
  
 | Function | Model Type | Effect Measure |
 |:---------|:-----------|:---------------|
+| `autoforest()` | Auto-detect | Auto-detect |
 | `lmforest()` | Linear regression | Coefficient (*β*) |
 | `glmforest()` | Logistic/Poisson | Odds ratio / Rate ratio |
 | `coxforest()` | Cox regression | Hazard ratio |
 | `uniforest()` | Univariable screening | Model-dependent |
 | `multiforest()` | Multi-outcome analysis | Model-dependent |
-| `autoforest()` | Auto-detect | Auto-detect |
 
 These functions follow a standard syntax when called:
 
-``` r
+```{r, eval = FALSE}
 forest_plot <- autoforest(x, data, ...)
 ```
 
 where `x` is either a model or a `summata` fitted output (e.g., from `uniscreen()`, `fit()`, `fullfit()`, or `multifit()`), and `data` is the name of the dataset used. The `data` argument is optional and is primarily used to derive *n* and Events counts for various groups/subgroups.
 
-All forest plot functions produce `ggplot2` objects that can be further customized. This vignette demonstrates the various capabilities of these functions using the included sample dataset.
+All forest plot functions produce `ggplot2` objects that can be further customized. As such, they can also be exported to various external formats such as PDF, PNG, TIFF, JPEG, SVG, EPS, and other file types supported by `ggplot2::ggsave()`. This export can be streamlined with `summata`-recommended default dimensions by using the `forestsave()` function:
+
+```{r, eval = FALSE}
+forestsave(forest_plot, "output.pdf")
+```
+
+This vignette demonstrates the various capabilities of these functions using the included sample dataset.
 
 ---
 
@@ -481,9 +487,9 @@ Forest plots include a `rec_dims` attribute recording the dimensions best suited
 
 ## **Example 17:** Recommended Dimensions
 
-`forestsave()` applies the recommended dimensions and reports the size it used:
+`recdims()` can be used to extract the recommended plot dimensions directly.
 
-```{r, eval = FALSE}
+```{r}
 p <- glmforest(
   x = attr(table_logistic, "model"),
   title = "Publication-Ready Plot",
@@ -492,18 +498,16 @@ p <- glmforest(
   zebra_stripes = TRUE
 )
 
-# Inspect the recommendation, which also records its units
-dims <- attr(p, "rec_dims")
-cat("Width:", dims$width, dims$units, "\n")
-cat("Height:", dims$height, dims$units, "\n")
+# The recommended dimensions, in the units in which the plot was created
+recdims(p)
 
-# Or simply let forestsave() apply them
-forestsave(p, "forest_plot.pdf")
+# Journals commonly specify figure widths in millimeters
+recdims(p, units = "mm")
 ```
 
 ## **Example 18:** Multiple Formats
 
-Export to different formats as needed:
+Export to different formats as needed using `forestsave()`:
 
 ```{r, eval = FALSE}
 p <- glmforest(

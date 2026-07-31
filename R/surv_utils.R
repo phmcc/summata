@@ -1,3 +1,154 @@
+### * Data extraction
+
+#' Process survival probability quantiles
+#'
+#' Extracts survival time quantiles from survfit objects.
+#'
+#' @param survfit_objects List of survfit objects.
+#' @param probs Numeric vector of probabilities.
+#' @param groups Character vector of group names.
+#' @param group_labels Character vector of group display labels.
+#' @param time_digits Integer decimal places for time values.
+#' @param total Logical or character controlling total column.
+#' @param total_label Character label for total column.
+#' @param median_label Character label for median row.
+#' @param by Character name of stratifying variable.
+#' @param data Data.table with the source data.
+#' @return List with formatted and raw data.tables.
+#' @keywords internal
+process_survival_probs <- function(survfit_objects,
+                                   probs,
+                                   groups,
+                                   group_labels,
+                                   time_digits,
+                                   total,
+                                   total_label,
+                                   median_label,
+                                   by,
+                                   data,
+                                   conf_level = 0.95,
+                                   marks = NULL) {
+
+    ## Build column headers for quantiles
+    ci_pct <- round(conf_level * 100)
+    quantile_cols <- ifelse(
+        probs == 0.5,
+        median_label,
+        sprintf("%d%% Survival Time (%d%% CI)", round((1 - probs) * 100), ci_pct)
+    )
+
+    n_probs <- length(probs)
+    fmt_str <- paste0("%.", time_digits, "f")
+
+    ## Extract all quantile data at once
+    if (!is.null(by) && !is.null(groups) && "stratified" %in% names(survfit_objects)) {
+        fit <- survfit_objects$stratified
+        quant <- stats::quantile(fit, probs = probs)
+
+        n_rows <- length(groups)
+        row_labels <- group_labels
+
+        ## quant$quantile is matrix: strata x probs
+        if (is.matrix(quant$quantile)) {
+            est_mat <- quant$quantile
+            lower_mat <- quant$lower
+            upper_mat <- quant$upper
+        } else {
+            ## Single prob, convert to matrix
+            est_mat <- matrix(quant$quantile, ncol = 1)
+            lower_mat <- matrix(quant$lower, ncol = 1)
+            upper_mat <- matrix(quant$upper, ncol = 1)
+        }
+    } else {
+        ## Overall only
+        fit <- survfit_objects$overall
+        quant <- stats::quantile(fit, probs = probs)
+
+        n_rows <- 1L
+        row_labels <- total_label
+
+        est_mat <- matrix(quant$quantile, nrow = 1)
+        lower_mat <- matrix(quant$lower, nrow = 1)
+        upper_mat <- matrix(quant$upper, nrow = 1)
+    }
+
+    ## Build formatted output
+    formatted_list <- vector("list", n_probs + 1L)
+    raw_list <- vector("list", n_probs * 3L + 1L)
+
+    formatted_list[[1L]] <- row_labels
+    raw_list[[1L]] <- row_labels
+    names(formatted_list)[1L] <- "Group"
+    names(raw_list)[1L] <- "Group"
+
+    ## Formatting for each quantile column
+    for (j in seq_len(n_probs)) {
+        col_name <- quantile_cols[j]
+
+        est_vec <- est_mat[, j]
+        lower_vec <- lower_mat[, j]
+        upper_vec <- upper_mat[, j]
+
+        ## Cell formatting
+        formatted_list[[j + 1L]] <- format_quantile_cells(
+            est_vec, lower_vec, upper_vec, fmt_str, marks
+        )
+        names(formatted_list)[j + 1L] <- col_name
+
+        ## Raw values
+        raw_idx <- (j - 1L) * 3L + 2L
+        raw_list[[raw_idx]] <- est_vec
+        raw_list[[raw_idx + 1L]] <- lower_vec
+        raw_list[[raw_idx + 2L]] <- upper_vec
+        names(raw_list)[raw_idx:(raw_idx + 2L)] <- paste0(col_name, c("_estimate", "_lower", "_upper"))
+    }
+
+    formatted <- data.table::as.data.table(formatted_list)
+    raw <- data.table::as.data.table(raw_list)
+
+    ## Add overall row if stratified and total requested
+    if (!is.null(by) && !isFALSE(total) && "overall" %in% names(survfit_objects)) {
+        fit_overall <- survfit_objects$overall
+        quant_overall <- stats::quantile(fit_overall, probs = probs)
+
+        est_overall <- as.numeric(quant_overall$quantile)
+        lower_overall <- as.numeric(quant_overall$lower)
+        upper_overall <- as.numeric(quant_overall$upper)
+
+        ## Build overall row
+        overall_formatted <- list(Group = total_label)
+        overall_raw <- list(Group = total_label)
+
+        for (j in seq_len(n_probs)) {
+            col_name <- quantile_cols[j]
+            overall_formatted[[col_name]] <- format_quantile_cells(
+                est_overall[j], lower_overall[j], upper_overall[j], fmt_str, marks
+            )
+
+            overall_raw[[paste0(col_name, "_estimate")]] <- est_overall[j]
+            overall_raw[[paste0(col_name, "_lower")]] <- lower_overall[j]
+            overall_raw[[paste0(col_name, "_upper")]] <- upper_overall[j]
+        }
+
+        overall_formatted <- data.table::as.data.table(overall_formatted)
+        overall_raw <- data.table::as.data.table(overall_raw)
+
+        ## Position total row
+        if (isTRUE(total) || identical(total, "first")) {
+            formatted <- rbind(overall_formatted, formatted, fill = TRUE)
+            raw <- rbind(overall_raw, raw, fill = TRUE)
+        } else if (identical(total, "last")) {
+            formatted <- rbind(formatted, overall_formatted, fill = TRUE)
+            raw <- rbind(raw, overall_raw, fill = TRUE)
+        }
+    }
+
+    list(formatted = formatted, raw = raw)
+}
+
+
+### * Statistical calculations
+
 #' Perform survival comparison test
 #'
 #' Performs statistical test comparing survival curves across groups.
@@ -38,10 +189,9 @@ perform_survival_test <- function(surv_obj, group_var, test_type) {
 }
 
 
-#' Process survival at specified time points (optimized)
+#' Process survival at specified time points
 #'
 #' Extracts survival probabilities at specified time points from survfit objects.
-#' Uses vectorized operations for efficiency.
 #'
 #' @param survfit_objects List of survfit objects.
 #' @param times Numeric vector of time points.
@@ -75,7 +225,7 @@ process_survival_times <- function(survfit_objects,
                                    data,
                                    marks = NULL) {
 
-    ## Build column headers for times (must use vapply since gsub doesn't vectorize replacement)
+    ## Build column headers for times
     time_cols <- vapply(times, function(t) {
         label <- gsub("\\{time\\}", t, time_label)
         if (!is.null(time_unit)) {
@@ -88,7 +238,7 @@ process_survival_times <- function(survfit_objects,
 
     n_times <- length(times)
 
-    ## Pre-compute format strings (separator handled inside formatter)
+    ## Pre-compute format strings
     if (percent) {
         fmt_est <- paste0("%.", digits, "f%%")
         fmt_ci_lower <- paste0("%.", digits, "f")
@@ -173,7 +323,7 @@ process_survival_times <- function(survfit_objects,
         }
     }
 
-    ## Build formatted output using vectorized operations
+    ## Build formatted output
     formatted_list <- vector("list", n_times + 1L)
     raw_list <- vector("list", n_times * 5L + 1L)
 
@@ -182,7 +332,7 @@ process_survival_times <- function(survfit_objects,
     names(formatted_list)[1L] <- "Group"
     names(raw_list)[1L] <- "Group"
 
-    ## Vectorized formatting for each time column
+    ## Formatting for each time column
     for (j in seq_len(n_times)) {
         col_name <- time_cols[j]
 
@@ -192,7 +342,7 @@ process_survival_times <- function(survfit_objects,
         n_risk_vec <- n_risk_mat[, j]
         n_event_vec <- n_event_mat[, j]
 
-        ## Vectorized cell formatting
+        ## Cell formatting
         formatted_list[[j + 1L]] <- format_survival_cells(
             est_vec, lower_vec, upper_vec, n_risk_vec, n_event_vec,
             stats, fmt_est, fmt_ci_lower, fmt_ci_upper, percent, marks
@@ -272,7 +422,9 @@ process_survival_times <- function(survfit_objects,
 }
 
 
-#' Vectorized survival cell formatting
+### * Table formatting
+
+#' Survival cell formatting
 #'
 #' Formats survival probability cells for multiple rows at once. Uses
 #' locale-aware decimal marks and safe CI separators that avoid ambiguity
@@ -379,155 +531,7 @@ format_survival_cells <- function(est, lower, upper, n_risk, n_event,
 }
 
 
-#' Process survival probability quantiles (optimized)
-#'
-#' Extracts survival time quantiles from survfit objects.
-#' Uses vectorized operations for efficiency.
-#'
-#' @param survfit_objects List of survfit objects.
-#' @param probs Numeric vector of probabilities.
-#' @param groups Character vector of group names.
-#' @param group_labels Character vector of group display labels.
-#' @param time_digits Integer decimal places for time values.
-#' @param total Logical or character controlling total column.
-#' @param total_label Character label for total column.
-#' @param median_label Character label for median row.
-#' @param by Character name of stratifying variable.
-#' @param data Data.table with the source data.
-#' @return List with formatted and raw data.tables.
-#' @keywords internal
-process_survival_probs <- function(survfit_objects,
-                                   probs,
-                                   groups,
-                                   group_labels,
-                                   time_digits,
-                                   total,
-                                   total_label,
-                                   median_label,
-                                   by,
-                                   data,
-                                   conf_level = 0.95,
-                                   marks = NULL) {
-
-    ## Build column headers for quantiles (vectorized)
-    ci_pct <- round(conf_level * 100)
-    quantile_cols <- ifelse(
-        probs == 0.5,
-        median_label,
-        sprintf("%d%% Survival Time (%d%% CI)", round((1 - probs) * 100), ci_pct)
-    )
-
-    n_probs <- length(probs)
-    fmt_str <- paste0("%.", time_digits, "f")
-
-    ## Extract all quantile data at once
-    if (!is.null(by) && !is.null(groups) && "stratified" %in% names(survfit_objects)) {
-        fit <- survfit_objects$stratified
-        quant <- stats::quantile(fit, probs = probs)
-
-        n_rows <- length(groups)
-        row_labels <- group_labels
-
-        ## quant$quantile is matrix: strata x probs
-        if (is.matrix(quant$quantile)) {
-            est_mat <- quant$quantile
-            lower_mat <- quant$lower
-            upper_mat <- quant$upper
-        } else {
-            ## Single prob, convert to matrix
-            est_mat <- matrix(quant$quantile, ncol = 1)
-            lower_mat <- matrix(quant$lower, ncol = 1)
-            upper_mat <- matrix(quant$upper, ncol = 1)
-        }
-    } else {
-        ## Overall only
-        fit <- survfit_objects$overall
-        quant <- stats::quantile(fit, probs = probs)
-
-        n_rows <- 1L
-        row_labels <- total_label
-
-        est_mat <- matrix(quant$quantile, nrow = 1)
-        lower_mat <- matrix(quant$lower, nrow = 1)
-        upper_mat <- matrix(quant$upper, nrow = 1)
-    }
-
-    ## Build formatted output using vectorized operations
-    formatted_list <- vector("list", n_probs + 1L)
-    raw_list <- vector("list", n_probs * 3L + 1L)
-
-    formatted_list[[1L]] <- row_labels
-    raw_list[[1L]] <- row_labels
-    names(formatted_list)[1L] <- "Group"
-    names(raw_list)[1L] <- "Group"
-
-    ## Vectorized formatting for each quantile column
-    for (j in seq_len(n_probs)) {
-        col_name <- quantile_cols[j]
-
-        est_vec <- est_mat[, j]
-        lower_vec <- lower_mat[, j]
-        upper_vec <- upper_mat[, j]
-
-        ## Vectorized cell formatting
-        formatted_list[[j + 1L]] <- format_quantile_cells(
-            est_vec, lower_vec, upper_vec, fmt_str, marks
-        )
-        names(formatted_list)[j + 1L] <- col_name
-
-        ## Raw values
-        raw_idx <- (j - 1L) * 3L + 2L
-        raw_list[[raw_idx]] <- est_vec
-        raw_list[[raw_idx + 1L]] <- lower_vec
-        raw_list[[raw_idx + 2L]] <- upper_vec
-        names(raw_list)[raw_idx:(raw_idx + 2L)] <- paste0(col_name, c("_estimate", "_lower", "_upper"))
-    }
-
-    formatted <- data.table::as.data.table(formatted_list)
-    raw <- data.table::as.data.table(raw_list)
-
-    ## Add overall row if stratified and total requested
-    if (!is.null(by) && !isFALSE(total) && "overall" %in% names(survfit_objects)) {
-        fit_overall <- survfit_objects$overall
-        quant_overall <- stats::quantile(fit_overall, probs = probs)
-
-        est_overall <- as.numeric(quant_overall$quantile)
-        lower_overall <- as.numeric(quant_overall$lower)
-        upper_overall <- as.numeric(quant_overall$upper)
-
-        ## Build overall row
-        overall_formatted <- list(Group = total_label)
-        overall_raw <- list(Group = total_label)
-
-        for (j in seq_len(n_probs)) {
-            col_name <- quantile_cols[j]
-            overall_formatted[[col_name]] <- format_quantile_cells(
-                est_overall[j], lower_overall[j], upper_overall[j], fmt_str, marks
-            )
-
-            overall_raw[[paste0(col_name, "_estimate")]] <- est_overall[j]
-            overall_raw[[paste0(col_name, "_lower")]] <- lower_overall[j]
-            overall_raw[[paste0(col_name, "_upper")]] <- upper_overall[j]
-        }
-
-        overall_formatted <- data.table::as.data.table(overall_formatted)
-        overall_raw <- data.table::as.data.table(overall_raw)
-
-        ## Position total row
-        if (isTRUE(total) || identical(total, "first")) {
-            formatted <- rbind(overall_formatted, formatted, fill = TRUE)
-            raw <- rbind(overall_raw, raw, fill = TRUE)
-        } else if (identical(total, "last")) {
-            formatted <- rbind(formatted, overall_formatted, fill = TRUE)
-            raw <- rbind(raw, overall_raw, fill = TRUE)
-        }
-    }
-
-    list(formatted = formatted, raw = raw)
-}
-
-
-#' Vectorized quantile cell formatting
+#' Quantile cell formatting
 #'
 #' Formats survival quantile cells for multiple rows at once.
 #'
@@ -566,7 +570,7 @@ format_quantile_cells <- function(est, lower, upper, fmt_str,
         upper_fmt <- ifelse(upper_fmt == "NR", "NR",
                             apply_decimal_mark(upper_fmt, marks))
 
-        ## Determine CI separator: per-element for vectorized context
+        ## Determine CI separator
         ## Use worst-case across all valid elements for consistency within a column
         any_negative <- any(lower[valid_idx] < 0, upper[valid_idx] < 0, na.rm = TRUE)
         if (any_negative) {

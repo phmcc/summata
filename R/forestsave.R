@@ -1,3 +1,5 @@
+### * Main function
+
 #' Save a Forest Plot at Its Recommended Dimensions
 #'
 #' Writes a forest plot to file, sized by default from the recommendations the
@@ -67,7 +69,7 @@
 #'     package is installed, whose text metrics match those used to render the
 #'     package vignettes. Falls back to the standard raster devices
 #'     otherwise.}
-#'   \item{Other formats}{Left to \code{ggplot2::ggsave()}.}
+#'   \item{Other formats}{Deferred to \code{ggplot2::ggsave()}.}
 #' }
 #'
 #' \strong{Font embedding.} R's PDF device draws on the standard fonts that every
@@ -90,8 +92,8 @@
 #' \code{quiet = TRUE}, so that a figure written at an unexpected size is
 #' apparent at the point it is written.
 #'
-#' @seealso \code{\link{autoforest}}, \code{\link{coxforest}},
-#'   \code{\link{glmforest}}, \code{\link{lmforest}}, \code{\link{uniforest}},
+#' @seealso \code{\link{autoforest}}, \code{\link{lmforest}},
+#'   \code{\link{glmforest}}, \code{\link{coxforest}}, \code{\link{uniforest}},
 #'   \code{\link{multiforest}} for producing the plots;
 #'   \code{\link{tablesave}} for the equivalent operation on tables
 #'
@@ -203,6 +205,19 @@ forestsave <- function(plot, file, width = NULL, height = NULL,
                     width = width, height = height, units = units,
                     dpi = dpi, device = device, ...)
 
+    ## A graphics device that cannot be opened may warn rather than raise an
+    ## error, leaving no file behind. Returning the path in that case would
+    ## report a success that did not occur.
+    if (!file.exists(file)) {
+        stop("The graphics device wrote no file to '", file, "'.",
+             if (!is.null(device)) {
+                 paste0(" The device supplied through 'device' may be ",
+                        "unavailable on this system.")
+             } else {
+                 ""
+             }, call. = FALSE)
+    }
+
     if (isTRUE(embed_fonts)) {
         embed_plot_fonts(file, quiet = quiet)
     }
@@ -210,6 +225,8 @@ forestsave <- function(plot, file, width = NULL, height = NULL,
     invisible(file)
 }
 
+
+### * Graphics device selection
 
 #' Select a graphics device for forest plot output
 #'
@@ -287,16 +304,14 @@ cairo_device <- function(file) {
 }
 
 
+### * Font embedding
+
 #' Embed fonts in a PDF after it is written
 #'
 #' Post-processes a PDF so that its fonts are embedded, through
 #' \code{grDevices::embedFonts()}. This is offered as an alternative to drawing
 #' with a Cairo device, which embeds fonts but selects its own italic face.
-#'
-#' Ghostscript performs the embedding and is not part of R, so its absence is
-#' reported rather than allowed to fail obscurely. A failure leaves the original
-#' file in place: the plot is already written by the time this runs, and an
-#' unembedded figure is more useful than none.
+#' Embedding is performed by Ghostscript (external).
 #'
 #' @param file Character string giving the path to the written file.
 #' @param quiet Logical. Suppress the confirmation message.

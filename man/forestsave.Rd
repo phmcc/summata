@@ -95,7 +95,7 @@ the spacing seen on screen or in the package documentation. Unless
     package is installed, whose text metrics match those used to render the
     package vignettes. Falls back to the standard raster devices
     otherwise.}
-  \item{Other formats}{Left to \code{ggplot2::ggsave()}.}
+  \item{Other formats}{Deferred to \code{ggplot2::ggsave()}.}
 }
 
 \strong{Font embedding.} R's PDF device draws on the standard fonts that every
@@ -151,8 +151,8 @@ forestsave(p, file.path(tempdir(), "forest_cairo.pdf"), device = "cairo")
 
 }
 \seealso{
-\code{\link{autoforest}}, \code{\link{coxforest}},
-  \code{\link{glmforest}}, \code{\link{lmforest}}, \code{\link{uniforest}},
+\code{\link{autoforest}}, \code{\link{lmforest}},
+  \code{\link{glmforest}}, \code{\link{coxforest}}, \code{\link{uniforest}},
   \code{\link{multiforest}} for producing the plots;
   \code{\link{tablesave}} for the equivalent operation on tables
 
@@ -162,6 +162,7 @@ Other visualization functions:
 \code{\link[=glmforest]{glmforest()}},
 \code{\link[=lmforest]{lmforest()}},
 \code{\link[=multiforest]{multiforest()}},
+\code{\link[=recdims]{recdims()}},
 \code{\link[=uniforest]{uniforest()}}
 }
 \concept{visualization functions}

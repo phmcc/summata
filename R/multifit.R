@@ -1,3 +1,5 @@
+### * Main function
+
 #' Multivariate Regression Analysis
 #'
 #' Performs regression analyses of a single predictor (exposure) across multiple 
@@ -1242,68 +1244,68 @@ multifit <- function(data,
 }
 
 
-#' Format interaction term for display
-#' 
-#' Converts R's internal interaction term format (\emph{e.g.,} "treatmentDrug A:stageII")
-#' to a more readable format (\emph{e.g.,} "Treatment (Drug A) × Stage (II)").
-#' 
-#' @param term Character string of the interaction term from model coefficients.
-#' @param labels Optional named vector of labels for variable names.
-#' @return Formatted interaction term string.
+#' Print method for multifit results
+#'
+#' @param x Object of class \code{multifit_result}.
+#' @param ... Additional arguments passed to print methods.
+#' @return Invisibly returns the input object \code{x}. Called for its
+#'   side effect of printing a formatted summary to the console.
 #' @keywords internal
-format_interaction_term <- function(term, labels = NULL) {
-    ## Split by colon
-    parts <- strsplit(term, ":", fixed = TRUE)[[1]]
+#' @family regression functions
+#' @export
+print.multifit_result <- function(x, ...) {
+    cat("\nMultivariate Regression Results\n\n")
+    cat("Predictor: ", attr(x, "predictor"), "\n", sep = "")
+    cat("Outcomes: ", length(attr(x, "outcomes")), "\n", sep = "")
+    cat("Model Type: ", attr(x, "model_type"), "\n", sep = "")
     
-    formatted_parts <- vapply(parts, function(part) {
-        ## Try to separate variable name from level
-        ## Common patterns: varLevel, var.Level, varLevel1Level2
-        
-        ## First, check if this looks like a factor level (contains uppercase after lowercase)
-        ## or ends with a number pattern
-        
-        ## Try to find where variable name ends and level begins
-        ## Look for transition from lowercase to uppercase, or number after letter
-        
-        ## Strategy: find the longest matching variable name prefix
-        ## "treatmentDrug A" yields "treatment" and "Drug A"
-        ## "stageII" yields "stage" and "II"
-        ## "age" (continuous in an interaction) yields "age" alone
-        
-        ## Check for common variable name patterns
-        ## Match: lowercase letters, possibly followed by underscore/lowercase
-        var_match <- regexpr("^[a-z][a-z0-9_]*", part, perl = TRUE)
-        
-        if (var_match > 0) {
-            var_len <- attr(var_match, "match.length")
-            var_name <- substr(part, 1, var_len)
-            level <- substr(part, var_len + 1, nchar(part))
-            
-            ## Apply label if available, otherwise use raw variable name
-            if (!is.null(labels) && var_name %in% names(labels)) {
-                var_display <- labels[[var_name]]
-            } else {
-                ## Use raw variable name (consistent with fit() and other functions)
-                var_display <- var_name
-            }
-            
-            if (nchar(level) > 0) {
-                ## Has a level - format as "Variable (Level)"
-                paste0(var_display, " (", level, ")")
-            } else {
-                ## Continuous variable - just the name
-                var_display
-            }
-        } else {
-            ## Fallback - return as-is
-            part
-        }
-    }, character(1))
+    covariates <- attr(x, "covariates")
+    if (!is.null(covariates)) {
+        cat("Covariates: ", paste(covariates, collapse = ", "), "\n", sep = "")
+    }
     
-    ## Join with multiplication sign (consistent with other fullfit functions)
-    paste(formatted_parts, collapse = " \u00d7 ")
+    interactions <- attr(x, "interactions")
+    if (!is.null(interactions)) {
+        cat("Interactions: ", paste(interactions, collapse = ", "), "\n", sep = "")
+    }
+    
+    random <- attr(x, "random")
+    if (!is.null(random)) {
+        cat("Random Effects: ", random, "\n", sep = "")
+    }
+    
+    strata <- attr(x, "strata")
+    if (!is.null(strata)) {
+        cat("Strata: ", strata, "\n", sep = "")
+    }
+    
+    cluster <- attr(x, "cluster")
+    if (!is.null(cluster)) {
+        cat("Cluster: ", cluster, "\n", sep = "")
+    }
+    
+    cat("Display: ", attr(x, "columns"), "\n", sep = "")
+    
+    ## Always reported, so that a complete sample is stated rather than left
+    ## to be distinguished from an absent disclosure. One model is fitted per
+    ## outcome, so the analyzed sample may be a range.
+    analyzed <- format_analysis_counts(attr(x, "analysis_counts"),
+                                       marks = attr(x, "number_marks"))
+    if (!is.null(analyzed)) {
+        cat(analyzed, "\n", sep = "")
+    }
+    
+    if (!is.null(attr(x, "models"))) {
+        cat("Models stored: Yes\n")
+    }
+    
+    cat("\n")
+    NextMethod("print", x)
+    invisible(x)
 }
 
+
+### * Predictor effect extraction
 
 #' Extract predictor effects from a fitted model
 #' 
@@ -1719,6 +1721,8 @@ extract_predictor_effects <- function(model, predictor, outcome,
 }
 
 
+### * Table formatting
+
 #' Combine multivariate results
 #' 
 #' Internal helper to combine unadjusted and/or adjusted results from 
@@ -2124,66 +2128,70 @@ format_pvalues_multifit <- function(p, digits = 3, marks = NULL) {
 }
 
 
-#' Print method for multifit results
-#'
-#' @param x Object of class \code{multifit_result}.
-#' @param ... Additional arguments passed to print methods.
-#' @return Invisibly returns the input object \code{x}. Called for its
-#'   side effect of printing a formatted summary to the console.
+#' Format interaction term for display
+#' 
+#' Converts R's internal interaction term format (\emph{e.g.,} "treatmentDrug A:stageII")
+#' to a more readable format (\emph{e.g.,} "Treatment (Drug A) × Stage (II)").
+#' 
+#' @param term Character string of the interaction term from model coefficients.
+#' @param labels Optional named vector of labels for variable names.
+#' @return Formatted interaction term string.
 #' @keywords internal
-#' @family regression functions
-#' @export
-print.multifit_result <- function(x, ...) {
-    cat("\nMultivariate Regression Results\n\n")
-    cat("Predictor: ", attr(x, "predictor"), "\n", sep = "")
-    cat("Outcomes: ", length(attr(x, "outcomes")), "\n", sep = "")
-    cat("Model Type: ", attr(x, "model_type"), "\n", sep = "")
+format_interaction_term <- function(term, labels = NULL) {
+    ## Split by colon
+    parts <- strsplit(term, ":", fixed = TRUE)[[1]]
     
-    covariates <- attr(x, "covariates")
-    if (!is.null(covariates)) {
-        cat("Covariates: ", paste(covariates, collapse = ", "), "\n", sep = "")
-    }
+    formatted_parts <- vapply(parts, function(part) {
+        ## Try to separate variable name from level
+        ## Common patterns: varLevel, var.Level, varLevel1Level2
+        
+        ## First, check if this looks like a factor level (contains uppercase after lowercase)
+        ## or ends with a number pattern
+        
+        ## Try to find where variable name ends and level begins
+        ## Look for transition from lowercase to uppercase, or number after letter
+        
+        ## Strategy: find the longest matching variable name prefix
+        ## "treatmentDrug A" yields "treatment" and "Drug A"
+        ## "stageII" yields "stage" and "II"
+        ## "age" (continuous in an interaction) yields "age" alone
+        
+        ## Check for common variable name patterns
+        ## Match: lowercase letters, possibly followed by underscore/lowercase
+        var_match <- regexpr("^[a-z][a-z0-9_]*", part, perl = TRUE)
+        
+        if (var_match > 0) {
+            var_len <- attr(var_match, "match.length")
+            var_name <- substr(part, 1, var_len)
+            level <- substr(part, var_len + 1, nchar(part))
+            
+            ## Apply label if available, otherwise use raw variable name
+            if (!is.null(labels) && var_name %in% names(labels)) {
+                var_display <- labels[[var_name]]
+            } else {
+                ## Use raw variable name (consistent with fit() and other functions)
+                var_display <- var_name
+            }
+            
+            if (nchar(level) > 0) {
+                ## Has a level - format as "Variable (Level)"
+                paste0(var_display, " (", level, ")")
+            } else {
+                ## Continuous variable - just the name
+                var_display
+            }
+        } else {
+            ## Fallback - return as-is
+            part
+        }
+    }, character(1))
     
-    interactions <- attr(x, "interactions")
-    if (!is.null(interactions)) {
-        cat("Interactions: ", paste(interactions, collapse = ", "), "\n", sep = "")
-    }
-    
-    random <- attr(x, "random")
-    if (!is.null(random)) {
-        cat("Random Effects: ", random, "\n", sep = "")
-    }
-    
-    strata <- attr(x, "strata")
-    if (!is.null(strata)) {
-        cat("Strata: ", strata, "\n", sep = "")
-    }
-    
-    cluster <- attr(x, "cluster")
-    if (!is.null(cluster)) {
-        cat("Cluster: ", cluster, "\n", sep = "")
-    }
-    
-    cat("Display: ", attr(x, "columns"), "\n", sep = "")
-    
-    ## Always reported, so that a complete sample is stated rather than left
-    ## to be distinguished from an absent disclosure. One model is fitted per
-    ## outcome, so the analyzed sample may be a range.
-    analyzed <- format_analysis_counts(attr(x, "analysis_counts"),
-                                       marks = attr(x, "number_marks"))
-    if (!is.null(analyzed)) {
-        cat(analyzed, "\n", sep = "")
-    }
-    
-    if (!is.null(attr(x, "models"))) {
-        cat("Models stored: Yes\n")
-    }
-    
-    cat("\n")
-    NextMethod("print", x)
-    invisible(x)
+    ## Join with multiplication sign (consistent with other fullfit functions)
+    paste(formatted_parts, collapse = " \u00d7 ")
 }
 
+
+### * Input validation
 
 #' Validate outcome homogeneity for multifit
 #' 

@@ -1,3 +1,5 @@
+### * Main function
+
 #' Convert Model to Data Table
 #'
 #' Extracts coefficients, confidence intervals, and comprehensive model statistics 

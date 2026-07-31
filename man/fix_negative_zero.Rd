@@ -22,8 +22,4 @@ negative zero strings. Works on character vectors, replacing patterns like
 "-0.00", "-0.000", \emph{etc.} with their positive equivalents, even when embedded
 within larger strings (\emph{e.g.,} "(-0.00, 1.23)" becomes "(0.00, 1.23)").
 }
-\details{
-When \code{marks} is supplied, also replaces the period decimal mark with
-the locale-appropriate decimal mark.
-}
 \keyword{internal}

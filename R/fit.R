@@ -1,3 +1,5 @@
+### * Main function
+
 #' Fit Regression Model with Publication-Ready Output
 #'
 #' Provides a unified interface for fitting various types of regression models 
@@ -1115,6 +1117,9 @@ fit <- function(data = NULL,
 
     return(formatted)
 }
+
+
+### * Print function
 
 #' Print method for fit results
 #' 

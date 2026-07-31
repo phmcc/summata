@@ -1,3 +1,5 @@
+### * Main function
+
 #' Export Table to Rich Text Format (RTF)
 #'
 #' Converts a data frame, data.table, or matrix to a Rich Text Format (\code{.rtf}) 
@@ -548,6 +550,9 @@ table2rtf <- function(table,
         return(invisible(result_obj))
     }
 }
+
+
+### * Print function
 
 #' Print method for table2rtf results
 #'

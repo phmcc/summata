@@ -1,3 +1,5 @@
+### * Main function
+
 #' Create Forest Plot for Multivariate Regression
 #'
 #' Generates a publication-ready forest plot from a \code{multifit()} output
@@ -1015,6 +1017,9 @@ multiforest <- function(x,
 
     return(p)
 }
+
+
+### * Layout formatting
 
 #' Calculate table layout for multiforest plots
 #' 

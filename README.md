@@ -121,6 +121,7 @@ Generation of publication-ready forest plot graphics to summarize regression mod
 | `uniforest()` | Univariable screening results |
 | `multiforest()` | Multivariate regression analysis results |
 | `forestsave()` | Save plots with recommended dimensions |
+| `recdims()` | Recommended figure dimensions |
 
 ### Supported Model Classes
 

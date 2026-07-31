@@ -1,3 +1,5 @@
+### * Main function
+
 #' Univariable Screening for Multiple Predictors
 #'
 #' Performs comprehensive univariable (unadjusted) regression analyses by fitting 
@@ -981,6 +983,8 @@ uniscreen <- function(data,
     return(formatted)
 }
 
+
+### * Print function
 
 #' Print method for uniscreen results
 #'

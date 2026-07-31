@@ -1,3 +1,5 @@
+### * Main function
+
 #' Compare Multiple Regression Models
 #'
 #' Fits multiple regression models and provides a comprehensive comparison table
@@ -607,6 +609,9 @@ compfit <- function(data,
 
     return(comparison)
 }
+
+
+### * Print function
 
 #' Print method showing scoring methodology
 #'

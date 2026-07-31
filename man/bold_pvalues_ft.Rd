@@ -2,7 +2,7 @@
 % Please edit documentation in R/table2_utils.R
 \name{bold_pvalues_ft}
 \alias{bold_pvalues_ft}
-\title{Bold significant \emph{p}-values in DOCX}
+\title{Bold significant \emph{p}-values in flextable outputs}
 \usage{
 bold_pvalues_ft(ft, df, p_threshold = 0.05)
 }

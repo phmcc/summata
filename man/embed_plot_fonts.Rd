@@ -19,11 +19,6 @@ Invisibly returns \code{TRUE} where the fonts were embedded and
 Post-processes a PDF so that its fonts are embedded, through
 \code{grDevices::embedFonts()}. This is offered as an alternative to drawing
 with a Cairo device, which embeds fonts but selects its own italic face.
-}
-\details{
-Ghostscript performs the embedding and is not part of R, so its absence is
-reported rather than allowed to fail obscurely. A failure leaves the original
-file in place: the plot is already written by the time this runs, and an
-unembedded figure is more useful than none.
+Embedding is performed by Ghostscript (external).
 }
 \keyword{internal}

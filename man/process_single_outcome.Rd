@@ -31,7 +31,65 @@ process_single_outcome(
   ...
 )
 }
+\arguments{
+\item{data}{Data.table with the source data.}
+
+\item{outcome}{Character string giving a Surv() expression.}
+
+\item{outcome_label}{Character label for the outcome, or NULL for a
+single-outcome table.}
+
+\item{by}{Character name of stratifying variable.}
+
+\item{times}{Numeric vector of time points.}
+
+\item{probs}{Numeric vector of probabilities.}
+
+\item{stats}{Character vector of statistics to include.}
+
+\item{type}{Character string specifying probability type.}
+
+\item{conf_level}{Numeric confidence level for interval estimates.}
+
+\item{conf_type}{Character string specifying confidence interval type.}
+
+\item{digits}{Integer decimal places for percentages.}
+
+\item{time_digits}{Integer decimal places for time values.}
+
+\item{percent}{Logical whether to display as percentages.}
+
+\item{test}{Logical whether to perform a group comparison test.}
+
+\item{test_type}{Character string specifying test type.}
+
+\item{total}{Logical or character controlling total column.}
+
+\item{total_label}{Character label for total column.}
+
+\item{time_unit}{Character time unit for column headers.}
+
+\item{time_label}{Character template for time column headers.}
+
+\item{median_label}{Character label for median row.}
+
+\item{labels}{Named character vector of display labels for group levels.}
+
+\item{na_rm}{Logical whether to drop rows with missing time, status, or
+stratifying values.}
+
+\item{marks}{List with \code{big.mark} and \code{decimal.mark} as returned
+by \code{\link{resolve_number_marks}}.}
+
+\item{...}{Additional arguments passed to \code{survival::survfit()}.}
+}
+\value{
+List with the formatted table, the raw table, the survfit objects,
+  and the test result.
+}
 \description{
-Process a single survival outcome
+Parses a Surv() expression, fits the survival models, performs the group
+comparison test where requested, and assembles the formatted and raw
+tables for one outcome. Called once per outcome by survtable().
 }
 \keyword{internal}

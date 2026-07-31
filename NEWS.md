@@ -1,4 +1,4 @@
-# *summata* 0.12.0 (2026-07-28)
+# *summata* 0.12.0 (2026-07-31)
 
 * Fix *n*/Events counts to report complete cases across all functions, so group sizes sum to the model *n*; empty factor levels now report zero, and `multifit()` adjusted columns match `fullfit()` (STROBE item 12)
 * Report the analyzed sample and events in `print()` methods and forest plot footers, with counts available via the `analysis_counts` attribute
@@ -8,6 +8,7 @@
 * Fix counts of 100,000 or greater displaying in exponential notation, and centralize count formatting in a vectorized `format_count()`
 * Carry variable labels from the regression functions through to the forest plot functions, so labels supplied once apply to both table and plot
 * Add `forestsave()` for saving forest plots at their recommended dimensions, with format-appropriate graphics devices and optional font embedding; `rec_dims` now records its units
+* Add `recdims()` function for directly retrieving the figure dimensions recommended for a forest plot
 * Rename `autotable()` to `tablesave()`, pairing it with `forestsave()` and distinguishing it from `autoforest()`, which detects model class rather than file format; `autotable()` is retained as a deprecated alias
 * Add `quiet` argument to `tablesave()` and the `table2*()` functions, and return the file path invisibly from `table2pdf()`, `table2html()`, and `table2tex()`
 * Add `table_data` attribute to the forest plot functions for access to the values drawn in the figure

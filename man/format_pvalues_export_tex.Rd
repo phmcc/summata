@@ -2,7 +2,7 @@
 % Please edit documentation in R/table2_utils.R
 \name{format_pvalues_export_tex}
 \alias{format_pvalues_export_tex}
-\title{Format \emph{p}-values for exported tables}
+\title{Format \emph{p}-values for exported tables (TeX)}
 \usage{
 format_pvalues_export_tex(df, p_threshold = 0.05)
 }

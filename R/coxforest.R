@@ -1,3 +1,5 @@
+### * Main function
+
 #' Create Forest Plot for Cox Proportional Hazards Models
 #'
 #' Generates a publication-ready forest plot that combines a formatted data table 

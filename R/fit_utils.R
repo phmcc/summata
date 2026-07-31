@@ -1,26 +1,4 @@
-#' Fix negative zero in formatted strings
-#' 
-#' Corrects floating-point rounding artifacts that produce "-0.00" or similar
-#' negative zero strings. Works on character vectors, replacing patterns like
-#' "-0.00", "-0.000", \emph{etc.} with their positive equivalents, even when embedded
-#' within larger strings (\emph{e.g.,} "(-0.00, 1.23)" becomes "(0.00, 1.23)").
-#' 
-#' When \code{marks} is supplied, also replaces the period decimal mark with
-#' the locale-appropriate decimal mark.
-#' 
-#' @param x Character vector of formatted numbers.
-#' @param marks Optional list with \code{big.mark} and \code{decimal.mark} as
-#'   returned by \code{\link{resolve_number_marks}}. When \code{NULL}, uses
-#'   the default US period decimal.
-#' @return Character vector with negative zeros corrected.
-#' @keywords internal
-fix_negative_zero <- function(x, marks = NULL) {
-    if (!is.null(marks)) {
-        return(apply_decimal_mark(x, marks))
-    }
-    ## Fallback: US locale (period decimal)
-    gsub("(?<![0-9])-0(\\.0+)(?![0-9])", "0\\1", x, perl = TRUE)
-}
+### * Table formatting
 
 #' Format model results for publication-ready display
 #' 
@@ -372,6 +350,31 @@ format_model_table <- function(data,
     return(formatted)
 }
 
+
+### * Ancillary formatters
+
+#' Fix negative zero in formatted strings
+#' 
+#' Corrects floating-point rounding artifacts that produce "-0.00" or similar
+#' negative zero strings. Works on character vectors, replacing patterns like
+#' "-0.00", "-0.000", \emph{etc.} with their positive equivalents, even when embedded
+#' within larger strings (\emph{e.g.,} "(-0.00, 1.23)" becomes "(0.00, 1.23)").
+#' 
+#' @param x Character vector of formatted numbers.
+#' @param marks Optional list with \code{big.mark} and \code{decimal.mark} as
+#'   returned by \code{\link{resolve_number_marks}}. When \code{NULL}, uses
+#'   the default US period decimal.
+#' @return Character vector with negative zeros corrected.
+#' @keywords internal
+fix_negative_zero <- function(x, marks = NULL) {
+    if (!is.null(marks)) {
+        return(apply_decimal_mark(x, marks))
+    }
+    ## Fallback: US locale (period decimal)
+    gsub("(?<![0-9])-0(\\.0+)(?![0-9])", "0\\1", x, perl = TRUE)
+}
+
+
 #' Format \emph{p}-values for display
 #' 
 #' Converts numeric \emph{p}-values to formatted character strings using vectorized
@@ -408,6 +411,9 @@ format_pvalues_fit <- function(p, digits = 3, marks = NULL) {
     
     result
 }
+
+
+### * Fit validation
 
 #' Check if outcome is a Surv() expression
 #' 
@@ -461,8 +467,6 @@ detect_outcome_type <- function(data, outcome) {
 #' and GLM family (if applicable). Detects common mismatches like using survival
 #' outcomes with non-survival models or binary outcomes with linear models.
 #' Can auto-correct fixable issues or raise informative errors.
-#'
-#' Checks for mismatches and auto-corrects or errors as appropriate.
 #'
 #' @param outcome Character string outcome specification (may include Surv()).
 #' @param model_type Character string specified model type.
@@ -685,6 +689,9 @@ validate_fit_inputs <- function(data, outcome, predictors, model_type,
     
     validation
 }
+
+
+### * Miscellaneous functions
 
 #' Fit a model with selective warning suppression
 #'

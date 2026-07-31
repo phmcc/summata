@@ -135,6 +135,7 @@ reference:
   - uniforest
   - multiforest
   - forestsave
+  - recdims
   
 - title: Utility Functions
   contents:

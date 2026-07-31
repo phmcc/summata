@@ -2,7 +2,7 @@
 % Please edit documentation in R/surv_utils.R
 \name{format_quantile_cells}
 \alias{format_quantile_cells}
-\title{Vectorized quantile cell formatting}
+\title{Quantile cell formatting}
 \usage{
 format_quantile_cells(est, lower, upper, fmt_str, marks = NULL)
 }

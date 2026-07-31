@@ -1,3 +1,5 @@
+### * Global setting
+
 #' Number Formatting Utilities
 #'
 #' Internal utilities for locale-aware number formatting across all summata
@@ -15,6 +17,49 @@
 #' @keywords internal
 NULL
 
+
+### * Format validation
+
+#' Validate number_format parameter
+#'
+#' Checks that a \code{number_format} value is valid before use. Called early
+#' in top-level functions to fail fast with a clear error message.
+#'
+#' @param number_format Value to validate.
+#' @return Invisibly returns \code{TRUE} if valid.
+#' @keywords internal
+validate_number_format <- function(number_format) {
+    if (is.null(number_format)) return(invisible(TRUE))
+
+    if (!is.character(number_format)) {
+        stop("'number_format' must be a character string or character vector.",
+             call. = FALSE)
+    }
+
+    if (length(number_format) == 1L) {
+        valid_presets <- c("us", "eu", "space", "none")
+        if (!number_format %in% valid_presets) {
+            stop("Unknown number_format preset: '", number_format,
+                 "'. Valid presets are: ",
+                 paste(paste0("'", valid_presets, "'"), collapse = ", "),
+                 ". Or use a two-element vector c(big.mark, decimal.mark).",
+                 call. = FALSE)
+        }
+    } else if (length(number_format) == 2L) {
+        if (number_format[1] == number_format[2] && nchar(number_format[1]) > 0) {
+            stop("big.mark and decimal.mark cannot be the same non-empty character.",
+                 call. = FALSE)
+        }
+    } else {
+        stop("Custom 'number_format' must be a two-element character vector ",
+             "c(big.mark, decimal.mark).", call. = FALSE)
+    }
+
+    invisible(TRUE)
+}
+
+
+### * Marks formatting
 
 #' Resolve number format marks
 #'
@@ -61,21 +106,76 @@ resolve_number_marks <- function(number_format = NULL) {
     ## Named presets (use thin space U+202F for SI style)
     if (is.character(number_format) && length(number_format) == 1L) {
         return(switch(number_format,
-            "us"    = list(big.mark = ",",      decimal.mark = "."),
-            "eu"  = list(big.mark = ".",      decimal.mark = ","),
-            "space" = list(big.mark = "\u202F", decimal.mark = "."),
-            "none"  = list(big.mark = "",       decimal.mark = "."),
-            stop("Unknown number_format preset: '", number_format,
-                 "'. Use 'us', 'eu', 'space', 'none', or a ",
-                 "two-element character vector c(big.mark, decimal.mark).",
-                 call. = FALSE)
-        ))
+                      "us"    = list(big.mark = ",",      decimal.mark = "."),
+                      "eu"  = list(big.mark = ".",      decimal.mark = ","),
+                      "space" = list(big.mark = "\u202F", decimal.mark = "."),
+                      "none"  = list(big.mark = "",       decimal.mark = "."),
+                      stop("Unknown number_format preset: '", number_format,
+                           "'. Use 'us', 'eu', 'space', 'none', or a ",
+                           "two-element character vector c(big.mark, decimal.mark).",
+                           call. = FALSE)
+                      ))
     }
 
     stop("'number_format' must be a character string preset or a ",
          "two-element character vector.", call. = FALSE)
 }
 
+
+#' Resolve the CI or range separator
+#'
+#' Determines the appropriate separator character between two numeric bounds
+#' (\emph{e.g.,} CI lower-upper, range min-max) based on whether either bound is
+#' negative and the current locale's decimal mark. This avoids ambiguous
+#' output like \code{"(-5--3)"} or \code{"(1,2-3,4)"} with European commas.
+#'
+#' Rules:
+#' \enumerate{
+#'   \item If either bound is negative, use \code{" to "} to avoid
+#'     double-hyphen ambiguity (\emph{e.g.,} \code{"-5 to -3"} not \code{"-5--3"}).
+#'   \item If the decimal mark is a comma (EU locale), use \code{"\u2013"}
+#'     (en-dash) to avoid confusion between decimal commas and separating
+#'     commas (\emph{e.g.,} \code{"1,2\u20133,4"} not \code{"1,2-3,4"}).
+#'   \item Otherwise, use a plain hyphen \code{"-"}.
+#' }
+#'
+#' @param lower Numeric value of the lower bound (or minimum).
+#' @param upper Numeric value of the upper bound (or maximum).
+#' @param marks List with \code{big.mark} and \code{decimal.mark} as returned
+#'   by \code{\link{resolve_number_marks}}.
+#' @return Character string separator.
+#' @keywords internal
+resolve_separator <- function(lower, upper, marks) {
+    has_negative <- (!is.na(lower) && lower < 0) ||
+        (!is.na(upper) && upper < 0)
+    if (has_negative) return(" to ")
+    if (marks$decimal.mark == ",") return("\u2013")
+    "-"
+}
+
+
+#' Apply locale decimal mark to a sprintf-formatted string
+#'
+#' Replaces the period decimal mark in a \code{sprintf}-formatted string with
+#' the locale-appropriate decimal mark, and fixes negative-zero artefacts.
+#'
+#' @param x Character string (already formatted with \code{sprintf}).
+#' @param marks List with \code{big.mark} and \code{decimal.mark} as returned
+#'   by \code{\link{resolve_number_marks}}.
+#' @return Character string with corrected decimal marks and no negative zeros.
+#' @keywords internal
+apply_decimal_mark <- function(x, marks) {
+    if (marks$decimal.mark != ".") {
+        x <- gsub(".", marks$decimal.mark, x, fixed = TRUE)
+    }
+    ## Fix negative zero
+    dec_esc <- gsub("([.|()\\^{}+$*?\\[\\]])", "\\\\\\1", marks$decimal.mark)
+    pattern <- paste0("(?<![0-9])-0(", dec_esc, "0+)(?![0-9])")
+    gsub(pattern, "0\\1", x, perl = TRUE)
+}
+
+
+### * Number formatting
 
 #' Format a numeric value with locale-aware separators
 #'
@@ -192,6 +292,30 @@ format_categorical_stat <- function(n, total, stat_type, marks) {
 }
 
 
+#' Format survival median with CI for display
+#'
+#' Formats a survival median estimate with confidence interval using
+#' locale-aware decimal marks and safe CI separators. Used by
+#' \code{process_survival} in descriptive tables.
+#'
+#' @param median Numeric median survival time.
+#' @param lower Numeric lower CI bound.
+#' @param upper Numeric upper CI bound.
+#' @param fmt_str Character string \code{sprintf} format specification.
+#' @param marks List with \code{big.mark} and \code{decimal.mark} as returned
+#'   by \code{\link{resolve_number_marks}}.
+#' @return Character string with formatted "median (lower-upper)".
+#' @keywords internal
+format_survival_ci <- function(median, lower, upper, fmt_str, marks) {
+    sep <- resolve_separator(lower, upper, marks)
+    fmt_one <- function(x) {
+        result <- sprintf(fmt_str, x)
+        apply_decimal_mark(result, marks)
+    }
+    paste0(fmt_one(median), " (", fmt_one(lower), sep, fmt_one(upper), ")")
+}
+
+
 #' Format a \emph{p}-value with locale-aware decimal mark
 #'
 #' Converts a numeric \emph{p}-value to a display string with the correct
@@ -219,120 +343,4 @@ format_pvalue <- function(p, digits, marks) {
         result <- sub(".", marks$decimal.mark, result, fixed = TRUE)
     }
     result
-}
-
-
-#' Validate number_format parameter
-#'
-#' Checks that a \code{number_format} value is valid before use. Called early
-#' in top-level functions to fail fast with a clear error message.
-#'
-#' @param number_format Value to validate.
-#' @return Invisibly returns \code{TRUE} if valid.
-#' @keywords internal
-validate_number_format <- function(number_format) {
-    if (is.null(number_format)) return(invisible(TRUE))
-
-    if (!is.character(number_format)) {
-        stop("'number_format' must be a character string or character vector.",
-             call. = FALSE)
-    }
-
-    if (length(number_format) == 1L) {
-        valid_presets <- c("us", "eu", "space", "none")
-        if (!number_format %in% valid_presets) {
-            stop("Unknown number_format preset: '", number_format,
-                 "'. Valid presets are: ",
-                 paste(paste0("'", valid_presets, "'"), collapse = ", "),
-                 ". Or use a two-element vector c(big.mark, decimal.mark).",
-                 call. = FALSE)
-        }
-    } else if (length(number_format) == 2L) {
-        if (number_format[1] == number_format[2] && nchar(number_format[1]) > 0) {
-            stop("big.mark and decimal.mark cannot be the same non-empty character.",
-                 call. = FALSE)
-        }
-    } else {
-        stop("Custom 'number_format' must be a two-element character vector ",
-             "c(big.mark, decimal.mark).", call. = FALSE)
-    }
-
-    invisible(TRUE)
-}
-
-
-#' Resolve the CI or range separator
-#'
-#' Determines the appropriate separator character between two numeric bounds
-#' (\emph{e.g.,} CI lower-upper, range min-max) based on whether either bound is
-#' negative and the current locale's decimal mark. This avoids ambiguous
-#' output like \code{"(-5--3)"} or \code{"(1,2-3,4)"} with European commas.
-#'
-#' Rules:
-#' \enumerate{
-#'   \item If either bound is negative, use \code{" to "} to avoid
-#'     double-hyphen ambiguity (\emph{e.g.,} \code{"-5 to -3"} not \code{"-5--3"}).
-#'   \item If the decimal mark is a comma (EU locale), use \code{"\u2013"}
-#'     (en-dash) to avoid confusion between decimal commas and separating
-#'     commas (\emph{e.g.,} \code{"1,2\u20133,4"} not \code{"1,2-3,4"}).
-#'   \item Otherwise, use a plain hyphen \code{"-"}.
-#' }
-#'
-#' @param lower Numeric value of the lower bound (or minimum).
-#' @param upper Numeric value of the upper bound (or maximum).
-#' @param marks List with \code{big.mark} and \code{decimal.mark} as returned
-#'   by \code{\link{resolve_number_marks}}.
-#' @return Character string separator.
-#' @keywords internal
-resolve_separator <- function(lower, upper, marks) {
-    has_negative <- (!is.na(lower) && lower < 0) ||
-                    (!is.na(upper) && upper < 0)
-    if (has_negative) return(" to ")
-    if (marks$decimal.mark == ",") return("\u2013")
-    "-"
-}
-
-
-#' Apply locale decimal mark to a sprintf-formatted string
-#'
-#' Replaces the period decimal mark in a \code{sprintf}-formatted string with
-#' the locale-appropriate decimal mark, and fixes negative-zero artefacts.
-#'
-#' @param x Character string (already formatted with \code{sprintf}).
-#' @param marks List with \code{big.mark} and \code{decimal.mark} as returned
-#'   by \code{\link{resolve_number_marks}}.
-#' @return Character string with corrected decimal marks and no negative zeros.
-#' @keywords internal
-apply_decimal_mark <- function(x, marks) {
-    if (marks$decimal.mark != ".") {
-        x <- gsub(".", marks$decimal.mark, x, fixed = TRUE)
-    }
-    ## Fix negative zero
-    dec_esc <- gsub("([.|()\\^{}+$*?\\[\\]])", "\\\\\\1", marks$decimal.mark)
-    pattern <- paste0("(?<![0-9])-0(", dec_esc, "0+)(?![0-9])")
-    gsub(pattern, "0\\1", x, perl = TRUE)
-}
-
-
-#' Format survival median with CI for display
-#'
-#' Formats a survival median estimate with confidence interval using
-#' locale-aware decimal marks and safe CI separators. Used by
-#' \code{process_survival} in descriptive tables.
-#'
-#' @param median Numeric median survival time.
-#' @param lower Numeric lower CI bound.
-#' @param upper Numeric upper CI bound.
-#' @param fmt_str Character string \code{sprintf} format specification.
-#' @param marks List with \code{big.mark} and \code{decimal.mark} as returned
-#'   by \code{\link{resolve_number_marks}}.
-#' @return Character string with formatted "median (lower-upper)".
-#' @keywords internal
-format_survival_ci <- function(median, lower, upper, fmt_str, marks) {
-    sep <- resolve_separator(lower, upper, marks)
-    fmt_one <- function(x) {
-        result <- sprintf(fmt_str, x)
-        apply_decimal_mark(result, marks)
-    }
-    paste0(fmt_one(median), " (", fmt_one(lower), sep, fmt_one(upper), ")")
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/surv_utils.R
 \name{format_survival_cells}
 \alias{format_survival_cells}
-\title{Vectorized survival cell formatting}
+\title{Survival cell formatting}
 \usage{
 format_survival_cells(
   est,

@@ -1,3 +1,5 @@
+### * Variable sorting
+
 #' Process variable wrapper
 #' 
 #' Routes variable processing to appropriate handler based on variable type
@@ -95,6 +97,9 @@ process_variable <- function(data, var, group_var = NULL,
         ))
     }
 }
+
+
+### * Continuous variables
 
 #' Process continuous variable
 #' 
@@ -338,6 +343,7 @@ add_raw_stats <- function(row, col, stats, stat_type) {
     row  # Return the modified row
 }
 
+
 #' Perform statistical tests for continuous variables
 #' 
 #' Conducts hypothesis tests comparing continuous variables across groups.
@@ -432,11 +438,6 @@ format_continuous_stat <- function(stats, stat_type, fmt_str, marks) {
 }
 
 
-# NOTE: format_num() and format_count() have been moved to number_format.R
-# as locale-aware versions that accept a 'marks' parameter.
-# See resolve_number_marks() for the locale resolution logic.
-
-
 #' Get display label for statistic type
 #' 
 #' Converts internal statistic type codes to formatted display labels for
@@ -457,6 +458,8 @@ get_stat_label <- function(stat_type) {
     )
 }
 
+
+### * Categorical variables
 
 #' Process categorical variable
 #' 
@@ -702,11 +705,9 @@ perform_categorical_test <- function(tab, test_type) {
 }
 
 
-# NOTE: format_categorical_stat() has been moved to number_format.R
-# as a locale-aware version that accepts a 'marks' parameter.
+### * Time-to-event variables
 
-
-#' Process survival variable
+#' Process time-to-event variable
 #' 
 #' Calculates survival statistics including median survival times with
 #' confidence intervals, with optional grouping and log-rank testing. Parses
@@ -865,6 +866,8 @@ process_survival <- function(data, var, var_label, group_var, digits,
     list(formatted = formatted_result, raw = raw_result)
 }
 
+
+### * Table formatting
 
 #' Format \emph{p}-values for descriptive tables
 #' 

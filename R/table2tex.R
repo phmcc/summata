@@ -1,3 +1,5 @@
+### * Main function
+
 #' Export Table to LaTeX Format
 #'
 #' Converts a data frame, data.table, or matrix to LaTeX source code suitable for 
