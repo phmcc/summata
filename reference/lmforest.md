@@ -425,6 +425,7 @@ Other visualization functions:
 [`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md),
 [`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md),
 [`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md),
+[`recdims()`](https://phmcc.codeberg.page/summata/reference/recdims.md),
 [`uniforest()`](https://phmcc.codeberg.page/summata/reference/uniforest.md)
 
 ## Examples
@@ -495,7 +496,7 @@ plot5 <- lmforest(
 
 # Example 6: Save with recommended dimensions
 forestsave(plot5, file.path(tempdir(), "linear_forest.pdf"))
-#> Forest plot saved to /tmp/RtmpVRC0ab/linear_forest.pdf (width = 16.0 in, height = 5.0 in)
+#> Forest plot saved to /tmp/Rtmp9CXk1j/linear_forest.pdf (width = 16.0 in, height = 5.0 in)
 
 options(old_width)
 

@@ -114,15 +114,6 @@ covariate is missing.</p>
     <p>Data.table restricted to the observations used in fitting. The input
   is returned unchanged when the analysis rows cannot be determined.</p>
     </div>
-    <div class="section level2">
-    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Complete cases are determined from the variables named in the model formula,
-reproducing the default <code>na.omit</code> behavior of the modeling functions.
-A complete-case restriction can only remove observations that the model
-itself could not have used, so the subset is retained even when it does not
-reproduce the fitted sample size exactly, as may happen when a fit used
-<code>subset</code> or case weights.</p>
-    </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

@@ -38,12 +38,3 @@ get_analysis_data(model, model_class, data)
 
 Data.table restricted to the observations used in fitting. The input is
 returned unchanged when the analysis rows cannot be determined.
-
-## Details
-
-Complete cases are determined from the variables named in the model
-formula, reproducing the default `na.omit` behavior of the modeling
-functions. A complete-case restriction can only remove observations that
-the model itself could not have used, so the subset is retained even
-when it does not reproduce the fitted sample size exactly, as may happen
-when a fit used `subset` or case weights.

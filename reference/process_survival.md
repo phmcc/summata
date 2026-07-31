@@ -1,4 +1,4 @@
-# Process survival variable
+# Process time-to-event variable
 
 Calculates survival statistics including median survival times with
 confidence intervals, with optional grouping and log-rank testing.

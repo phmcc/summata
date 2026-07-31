@@ -1,7 +1,6 @@
-# Process survival probability quantiles (optimized)
+# Process survival probability quantiles
 
-Extracts survival time quantiles from survfit objects. Uses vectorized
-operations for efficiency.
+Extracts survival time quantiles from survfit objects.
 
 ## Usage
 

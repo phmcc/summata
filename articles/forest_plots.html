@@ -112,34 +112,34 @@ functions for each model type, plus an automatic detection function:</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
+<td align="left"><code><a href="../reference/autoforest.html">autoforest()</a></code></td>
+<td align="left">Auto-detect</td>
+<td align="left">Auto-detect</td>
+</tr>
+<tr class="even">
 <td align="left"><code><a href="../reference/lmforest.html">lmforest()</a></code></td>
 <td align="left">Linear regression</td>
 <td align="left">Coefficient (<em>β</em>)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code><a href="../reference/glmforest.html">glmforest()</a></code></td>
 <td align="left">Logistic/Poisson</td>
 <td align="left">Odds ratio / Rate ratio</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><code><a href="../reference/coxforest.html">coxforest()</a></code></td>
 <td align="left">Cox regression</td>
 <td align="left">Hazard ratio</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code><a href="../reference/uniforest.html">uniforest()</a></code></td>
 <td align="left">Univariable screening</td>
 <td align="left">Model-dependent</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><code><a href="../reference/multiforest.html">multiforest()</a></code></td>
 <td align="left">Multi-outcome analysis</td>
 <td align="left">Model-dependent</td>
-</tr>
-<tr class="even">
-<td align="left"><code><a href="../reference/autoforest.html">autoforest()</a></code></td>
-<td align="left">Auto-detect</td>
-<td align="left">Auto-detect</td>
 </tr>
 </tbody>
 </table>
@@ -153,15 +153,22 @@ fitted output (e.g., from <code><a href="../reference/uniscreen.html">uniscreen(
 argument is optional and is primarily used to derive <em>n</em> and
 Events counts for various groups/subgroups.</p>
 <p>All forest plot functions produce <code>ggplot2</code> objects that
-can be further customized. This vignette demonstrates the various
-capabilities of these functions using the included sample dataset.</p>
+can be further customized. As such, they can also be exported to various
+external formats such as PDF, PNG, TIFF, JPEG, SVG, EPS, and other file
+types supported by <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggplot2::ggsave()</a></code>. This export can be
+streamlined with <code>summata</code>-recommended default dimensions by
+using the <code><a href="../reference/forestsave.html">forestsave()</a></code> function:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/forestsave.html">forestsave</a></span><span class="op">(</span><span class="va">forest_plot</span>, <span class="st">"output.pdf"</span><span class="op">)</span></span></code></pre></div>
+<p>This vignette demonstrates the various capabilities of these
+functions using the included sample dataset.</p>
 <hr>
 <div class="section level2">
 <h2 id="preliminaries">Preliminaries<a class="anchor" aria-label="anchor" href="#preliminaries"></a>
 </h2>
 <p>The examples in this vignette use the <code>clintrial</code> dataset
 included with <code>summata</code>:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://phmcc.codeberg.page/summata/">summata</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/therneau/survival" class="external-link">survival</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
@@ -176,7 +183,7 @@ correct font metrics. That sizing is applied behind the scenes and is
 not shown in the code. Writing a plot to file elsewhere is performed
 with <code><a href="../reference/forestsave.html">forestsave()</a></code>, which applies the same dimensions and
 selects a suitable graphics device:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glmforest.html">glmforest</a></span><span class="op">(</span><span class="va">model</span>, data <span class="op">=</span> <span class="va">mydata</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/forestsave.html">forestsave</a></span><span class="op">(</span><span class="va">p</span>, <span class="st">"forest_plot.png"</span><span class="op">)</span></span></code></pre></div>
 <p>This ensures that the figure size is always large enough to
@@ -196,7 +203,7 @@ preferred method for saving forest plot outputs in
 <strong>Example 1:</strong> Logistic Regression<a class="anchor" aria-label="anchor" href="#example-1-logistic-regression"></a>
 </h3>
 <p>Fit a model using base R, then create a forest plot:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">logistic_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span></span>
 <span>  <span class="va">surgery</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">stage</span> <span class="op">+</span> <span class="va">treatment</span> <span class="op">+</span> <span class="va">ecog</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
@@ -209,14 +216,14 @@ preferred method for saving forest plot outputs in
 <span>  title <span class="op">=</span> <span class="st">"Logistic Regression: Predictors of Outcome"</span>,</span>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="forest_plots_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-2-linear-regression">
 <strong>Example 2:</strong> Linear Regression<a class="anchor" aria-label="anchor" href="#example-2-linear-regression"></a>
 </h3>
 <p>For continuous outcomes, use <code><a href="../reference/lmforest.html">lmforest()</a></code>:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">linear_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span></span>
 <span>  <span class="va">los_days</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">stage</span> <span class="op">+</span> <span class="va">surgery</span> <span class="op">+</span> <span class="va">ecog</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span></span>
@@ -228,14 +235,14 @@ preferred method for saving forest plot outputs in
 <span>  title <span class="op">=</span> <span class="st">"Linear Regression: Length of Stay"</span>,</span>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="forest_plots_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-3-cox-regression">
 <strong>Example 3:</strong> Cox Regression<a class="anchor" aria-label="anchor" href="#example-3-cox-regression"></a>
 </h3>
 <p>For survival models, use <code><a href="../reference/coxforest.html">coxforest()</a></code>:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cox_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/survival/man/coxph.html" class="external-link">coxph</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html" class="external-link">Surv</a></span><span class="op">(</span><span class="va">os_months</span>, <span class="va">os_status</span><span class="op">)</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">stage</span> <span class="op">+</span> <span class="va">treatment</span> <span class="op">+</span> <span class="va">ecog</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span></span>
@@ -247,7 +254,7 @@ preferred method for saving forest plot outputs in
 <span>  title <span class="op">=</span> <span class="st">"Cox Regression: Survival Analysis"</span>,</span>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="forest_plots_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-4-automatic-model-detection">
@@ -255,13 +262,13 @@ preferred method for saving forest plot outputs in
 </h3>
 <p>The <code><a href="../reference/autoforest.html">autoforest()</a></code> function detects the model type
 automatically:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/autoforest.html">autoforest</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="va">cox_model</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="forest_plots_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" alt="" width="100%"></p>
 <hr>
 </div>
 </div>
@@ -278,7 +285,7 @@ object.</p>
 <p>Input a <code>summata</code> regression object (<em>i.e.</em>, from
 <code><a href="../reference/fit.html">fit()</a></code> or <code><a href="../reference/fullfit.html">fullfit()</a></code>) directly into a forest
 plot function:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">table_logistic</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcome <span class="op">=</span> <span class="st">"surgery"</span>,</span>
@@ -293,7 +300,7 @@ plot function:</p>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span>
 <span>  zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="forest_plots_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-14-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-6-model-attribute-from-fit-output">
@@ -301,7 +308,7 @@ plot function:</p>
 </h3>
 <p>Alternatively, input the attached model attribute from a
 <code>summata</code> regression object:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">table_cox</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcome <span class="op">=</span> <span class="st">"Surv(os_months, os_status)"</span>,</span>
@@ -316,7 +323,7 @@ plot function:</p>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span>
 <span>  zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="forest_plots_files/figure-html/unnamed-chunk-14-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-16-1.png" class="r-plt" alt="" width="100%"></p>
 <hr>
 </div>
 </div>
@@ -329,14 +336,14 @@ plot function:</p>
 </h3>
 <p>The <code>indent_groups</code> parameter creates hierarchical display
 for a more compact aesthetic:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example7</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glmforest.html">glmforest</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">table_logistic</span>, <span class="st">"model"</span><span class="op">)</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"Indented Factor Levels"</span>,</span>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span>
 <span>  indent_groups <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="forest_plots_files/figure-html/unnamed-chunk-16-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-18-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-8-condensing-binary-variables">
@@ -344,14 +351,14 @@ for a more compact aesthetic:</p>
 </h3>
 <p>The <code>condense_table</code> parameter displays binary variables
 on single rows. Group indenting is applied automatically:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example8</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glmforest.html">glmforest</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">table_logistic</span>, <span class="st">"model"</span><span class="op">)</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"Condensed Display"</span>,</span>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span>
 <span>  condense_table <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="forest_plots_files/figure-html/unnamed-chunk-18-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-20-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-9-toggle-zebra-striping">
@@ -359,7 +366,7 @@ on single rows. Group indenting is applied automatically:</p>
 </h3>
 <p>Zebra striping is enabled by default. It can be disabled via
 <code>zebra_stripes = FALSE</code>:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example9</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glmforest.html">glmforest</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">table_logistic</span>, <span class="st">"model"</span><span class="op">)</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"Without Zebra Striping"</span>,</span>
@@ -367,14 +374,14 @@ on single rows. Group indenting is applied automatically:</p>
 <span>  indent_groups <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  zebra_stripes <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="forest_plots_files/figure-html/unnamed-chunk-20-1.png" class="r-plt" alt="" width="90%"></p>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-22-1.png" class="r-plt" alt="" width="90%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-10-sample-size-and-event-columns">
 <strong>Example 10:</strong> Sample Size and Event Columns<a class="anchor" aria-label="anchor" href="#example-10-sample-size-and-event-columns"></a>
 </h3>
 <p>Control display of sample size (<em>n</em>) and event counts:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Show both n and events</span></span>
 <span><span class="va">example10a</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/coxforest.html">coxforest</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">table_cox</span>, <span class="st">"model"</span><span class="op">)</span>,</span>
@@ -385,8 +392,8 @@ on single rows. Group indenting is applied automatically:</p>
 <span>  indent_groups <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="forest_plots_files/figure-html/unnamed-chunk-22-1.png" class="r-plt" alt="" width="100%"></p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-24-1.png" class="r-plt" alt="" width="100%"></p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Minimal display</span></span>
 <span><span class="va">example10b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/coxforest.html">coxforest</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">table_cox</span>, <span class="st">"model"</span><span class="op">)</span>,</span>
@@ -396,7 +403,7 @@ on single rows. Group indenting is applied automatically:</p>
 <span>  show_events <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  indent_groups <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="forest_plots_files/figure-html/unnamed-chunk-24-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-26-1.png" class="r-plt" alt="" width="100%"></p>
 <hr>
 </div>
 </div>
@@ -409,7 +416,7 @@ on single rows. Group indenting is applied automatically:</p>
 </h3>
 <p>The <code>digits</code> parameter controls decimal places for effect
 estimates and confidence intervals:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example11</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glmforest.html">glmforest</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">table_logistic</span>, <span class="st">"model"</span><span class="op">)</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"Custom Precision (3 decimal places)"</span>,</span>
@@ -417,14 +424,14 @@ estimates and confidence intervals:</p>
 <span>  digits <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  indent_groups <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="forest_plots_files/figure-html/unnamed-chunk-26-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-28-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-12-custom-reference-label">
 <strong>Example 12:</strong> Custom Reference Label<a class="anchor" aria-label="anchor" href="#example-12-custom-reference-label"></a>
 </h3>
 <p>Customize the label shown for reference categories:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example12</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glmforest.html">glmforest</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">table_logistic</span>, <span class="st">"model"</span><span class="op">)</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"Custom Reference Label"</span>,</span>
@@ -432,14 +439,14 @@ estimates and confidence intervals:</p>
 <span>  ref_label <span class="op">=</span> <span class="st">"ref"</span>,</span>
 <span>  indent_groups <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="forest_plots_files/figure-html/unnamed-chunk-28-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-30-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-13-custom-effect-measure-label">
 <strong>Example 13:</strong> Custom Effect Measure Label<a class="anchor" aria-label="anchor" href="#example-13-custom-effect-measure-label"></a>
 </h3>
 <p>Change the column header for the effect measure:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example13</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/coxforest.html">coxforest</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">table_cox</span>, <span class="st">"model"</span><span class="op">)</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"Custom Effect Label"</span>,</span>
@@ -447,7 +454,7 @@ estimates and confidence intervals:</p>
 <span>  effect_label <span class="op">=</span> <span class="st">"Effect (95% CI)"</span>,</span>
 <span>  indent_groups <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="forest_plots_files/figure-html/unnamed-chunk-30-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-32-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-14-custom-colors">
@@ -455,7 +462,7 @@ estimates and confidence intervals:</p>
 </h3>
 <p>The <code>color</code> parameter changes the point and line
 color:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example14</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glmforest.html">glmforest</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">table_logistic</span>, <span class="st">"model"</span><span class="op">)</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"Custom Color"</span>,</span>
@@ -463,14 +470,14 @@ color:</p>
 <span>  color <span class="op">=</span> <span class="st">"#E41A1C"</span>,</span>
 <span>  indent_groups <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="forest_plots_files/figure-html/unnamed-chunk-32-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-34-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-15-change-font-sizes">
 <strong>Example 15:</strong> Change Font Sizes<a class="anchor" aria-label="anchor" href="#example-15-change-font-sizes"></a>
 </h3>
 <p>Adjust text size with the <code>font_size</code> multiplier:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example15</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glmforest.html">glmforest</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">table_logistic</span>, <span class="st">"model"</span><span class="op">)</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"Larger Font (1.5×)"</span>,</span>
@@ -479,7 +486,7 @@ color:</p>
 <span>  indent_groups <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  qc_footer <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="forest_plots_files/figure-html/unnamed-chunk-34-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-36-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-16-table-width">
@@ -487,7 +494,7 @@ color:</p>
 </h3>
 <p>The <code>table_width</code> parameter adjusts the proportion of
 space allocated to the table vs. the forest plot:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Wide table (for long variable names)</span></span>
 <span><span class="va">example16a</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glmforest.html">glmforest</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">table_logistic</span>, <span class="st">"model"</span><span class="op">)</span>,</span>
@@ -495,8 +502,8 @@ space allocated to the table vs. the forest plot:</p>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span>
 <span>  table_width <span class="op">=</span> <span class="fl">0.75</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="forest_plots_files/figure-html/unnamed-chunk-36-1.png" class="r-plt" alt="" width="100%"></p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-38-1.png" class="r-plt" alt="" width="100%"></p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Narrow table (emphasizes forest plot)</span></span>
 <span><span class="va">example16b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glmforest.html">glmforest</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">table_logistic</span>, <span class="st">"model"</span><span class="op">)</span>,</span>
@@ -504,7 +511,7 @@ space allocated to the table vs. the forest plot:</p>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span>,</span>
 <span>  table_width <span class="op">=</span> <span class="fl">0.50</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="forest_plots_files/figure-html/unnamed-chunk-38-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-40-1.png" class="r-plt" alt="" width="100%"></p>
 <hr>
 </div>
 </div>
@@ -518,9 +525,9 @@ it, so no manual sizing is required.</p>
 <h3 id="example-17-recommended-dimensions">
 <strong>Example 17:</strong> Recommended Dimensions<a class="anchor" aria-label="anchor" href="#example-17-recommended-dimensions"></a>
 </h3>
-<p><code><a href="../reference/forestsave.html">forestsave()</a></code> applies the recommended dimensions and
-reports the size it used:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<p><code><a href="../reference/recdims.html">recdims()</a></code> can be used to extract the recommended plot
+dimensions directly.</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glmforest.html">glmforest</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">table_logistic</span>, <span class="st">"model"</span><span class="op">)</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"Publication-Ready Plot"</span>,</span>
@@ -529,20 +536,27 @@ reports the size it used:</p>
 <span>  zebra_stripes <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Inspect the recommendation, which also records its units</span></span>
-<span><span class="va">dims</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">p</span>, <span class="st">"rec_dims"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Width:"</span>, <span class="va">dims</span><span class="op">$</span><span class="va">width</span>, <span class="va">dims</span><span class="op">$</span><span class="va">units</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Height:"</span>, <span class="va">dims</span><span class="op">$</span><span class="va">height</span>, <span class="va">dims</span><span class="op">$</span><span class="va">units</span>, <span class="st">"\n"</span><span class="op">)</span></span>
+<span><span class="co"># The recommended dimensions, in the units in which the plot was created</span></span>
+<span><span class="fu"><a href="../reference/recdims.html">recdims</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span></span>
+<span><span class="co">##&gt;  width height </span></span>
+<span><span class="co">##&gt;   13.4    7.5 </span></span>
+<span><span class="co">##&gt; attr(,"units")</span></span>
+<span><span class="co">##&gt; [1] "in"</span></span>
 <span></span>
-<span><span class="co"># Or simply let forestsave() apply them</span></span>
-<span><span class="fu"><a href="../reference/forestsave.html">forestsave</a></span><span class="op">(</span><span class="va">p</span>, <span class="st">"forest_plot.pdf"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># Journals commonly specify figure widths in millimeters</span></span>
+<span><span class="fu"><a href="../reference/recdims.html">recdims</a></span><span class="op">(</span><span class="va">p</span>, units <span class="op">=</span> <span class="st">"mm"</span><span class="op">)</span></span>
+<span><span class="co">##&gt;  width height </span></span>
+<span><span class="co">##&gt; 340.36 190.50 </span></span>
+<span><span class="co">##&gt; attr(,"units")</span></span>
+<span><span class="co">##&gt; [1] "mm"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="example-18-multiple-formats">
 <strong>Example 18:</strong> Multiple Formats<a class="anchor" aria-label="anchor" href="#example-18-multiple-formats"></a>
 </h3>
-<p>Export to different formats as needed:</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<p>Export to different formats as needed using
+<code><a href="../reference/forestsave.html">forestsave()</a></code>:</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glmforest.html">glmforest</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">table_logistic</span>, <span class="st">"model"</span><span class="op">)</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"Forest Plot"</span>,</span>
@@ -576,7 +590,7 @@ requirements.</p>
 <strong>Example 19:</strong> Combined Options<a class="anchor" aria-label="anchor" href="#example-19-combined-options"></a>
 </h3>
 <p>Combine multiple options for publication-ready output:</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example19</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/coxforest.html">coxforest</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">table_cox</span>, <span class="st">"model"</span><span class="op">)</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"Comprehensive Survival Analysis"</span>,</span>
@@ -593,7 +607,7 @@ requirements.</p>
 <span>  table_width <span class="op">=</span> <span class="fl">0.62</span>,</span>
 <span>  color <span class="op">=</span> <span class="st">"#B5394C"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="forest_plots_files/figure-html/unnamed-chunk-42-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-44-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-20-extensions-with-ggplot2">
@@ -601,7 +615,7 @@ requirements.</p>
 </h3>
 <p>Forest plots are <code>ggplot2</code> objects and can be modified
 further:</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">example20</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glmforest.html">glmforest</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">table_logistic</span>, <span class="st">"model"</span><span class="op">)</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"Extended with ggplot2"</span>,</span>
@@ -614,7 +628,7 @@ further:</p>
 <span>    plot.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>face <span class="op">=</span> <span class="st">"italic"</span>, color <span class="op">=</span> <span class="st">"#A72727"</span><span class="op">)</span>,</span>
 <span>    plot.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_rect</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"white"</span>, color <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
-<p><img src="forest_plots_files/figure-html/unnamed-chunk-44-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-46-1.png" class="r-plt" alt="" width="100%"></p>
 <hr>
 </div>
 </div>
@@ -631,7 +645,7 @@ list of supported model types.</p>
 </h3>
 <p>For equidispersed count outcomes (variance ≈ mean), use Poisson
 regression:</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">poisson_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span></span>
 <span>  <span class="va">fu_count</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">stage</span> <span class="op">+</span> <span class="va">treatment</span> <span class="op">+</span> <span class="va">surgery</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
@@ -644,7 +658,7 @@ regression:</p>
 <span>  title <span class="op">=</span> <span class="st">"Poisson Regression: Follow-Up Visits"</span>,</span>
 <span>  labels <span class="op">=</span> <span class="va">clintrial_labels</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="forest_plots_files/figure-html/unnamed-chunk-46-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-48-1.png" class="r-plt" alt="" width="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="example-22-negative-binomial-regression">
@@ -653,7 +667,7 @@ regression:</p>
 <p>For overdispersed count outcomes (variance &gt; mean), negative
 binomial regression is preferred. Using <code><a href="../reference/fit.html">fit()</a></code> ensures
 proper handling:</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nb_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit.html">fit</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">clintrial</span>,</span>
 <span>  outcome <span class="op">=</span> <span class="st">"ae_count"</span>,</span>
@@ -666,7 +680,7 @@ proper handling:</p>
 <span>  x <span class="op">=</span> <span class="va">nb_result</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"Negative Binomial: Adverse Events"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="forest_plots_files/figure-html/unnamed-chunk-48-1.png" class="r-plt" alt="" width="100%"></p>
+<p><img src="forest_plots_files/figure-html/unnamed-chunk-50-1.png" class="r-plt" alt="" width="100%"></p>
 <hr>
 </div>
 </div>
@@ -811,14 +825,14 @@ visible</li>
 </h3>
 <p>If variable names are truncated, increase
 <code>table_width</code>:</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glmforest.html">glmforest</a></span><span class="op">(</span><span class="va">model</span>, table_width <span class="op">=</span> <span class="fl">0.75</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="overlapping-text">Overlapping Text<a class="anchor" aria-label="anchor" href="#overlapping-text"></a>
 </h3>
 <p>Reduce font size or increase figure dimensions:</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/glmforest.html">glmforest</a></span><span class="op">(</span><span class="va">model</span>, font_size <span class="op">=</span> <span class="fl">0.9</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/forestsave.html">forestsave</a></span><span class="op">(</span><span class="va">p</span>, <span class="st">"plot.pdf"</span>, width <span class="op">=</span> <span class="fl">14</span>, height <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -826,7 +840,7 @@ visible</li>
 <h3 id="missing-labels">Missing Labels<a class="anchor" aria-label="anchor" href="#missing-labels"></a>
 </h3>
 <p>Ensure labels vector includes all variable names:</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">labels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  age <span class="op">=</span> <span class="st">"Age (years)"</span>,</span>
 <span>  sex <span class="op">=</span> <span class="st">"Sex"</span>,</span>

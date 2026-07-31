@@ -207,6 +207,7 @@ Other visualization functions:
 [`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md),
 [`lmforest()`](https://phmcc.codeberg.page/summata/reference/lmforest.md),
 [`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md),
+[`recdims()`](https://phmcc.codeberg.page/summata/reference/recdims.md),
 [`uniforest()`](https://phmcc.codeberg.page/summata/reference/uniforest.md)
 
 ## Examples
@@ -266,7 +267,7 @@ plot5 <- autoforest(fit_result)
 
 # Save with recommended dimensions
 forestsave(plot5, file.path(tempdir(), "forest.pdf"))
-#> Forest plot saved to /tmp/RtmpVRC0ab/forest.pdf (width = 15.3 in, height = 5.0 in)
+#> Forest plot saved to /tmp/Rtmp9CXk1j/forest.pdf (width = 15.3 in, height = 5.0 in)
 
 # }
 ```

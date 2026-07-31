@@ -140,6 +140,7 @@ regression models.
 | [`uniforest()`](https://phmcc.codeberg.page/summata/reference/uniforest.md) | Univariable screening results |
 | [`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md) | Multivariate regression analysis results |
 | [`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md) | Save plots with recommended dimensions |
+| [`recdims()`](https://phmcc.codeberg.page/summata/reference/recdims.md) | Recommended figure dimensions |
 
 ### Supported Model Classes
 

@@ -60,8 +60,8 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.12.0" id="summata-0120-2026-07-28">
-<em>summata</em> 0.12.0 (2026-07-28)<a class="anchor" aria-label="anchor" href="#summata-0120-2026-07-28"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.12.0" id="summata-0120-2026-07-31">
+<em>summata</em> 0.12.0 (2026-07-31)<a class="anchor" aria-label="anchor" href="#summata-0120-2026-07-31"></a></h2>
 <ul><li>Fix <em>n</em>/Events counts to report complete cases across all functions, so group sizes sum to the model <em>n</em>; empty factor levels now report zero, and <code><a href="../reference/multifit.html">multifit()</a></code> adjusted columns match <code><a href="../reference/fullfit.html">fullfit()</a></code> (STROBE item 12)</li>
 <li>Report the analyzed sample and events in <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> methods and forest plot footers, with counts available via the <code>analysis_counts</code> attribute</li>
 <li>Import <code><a href="https://rdrr.io/pkg/survival/man/Surv.html" class="external-link">Surv()</a></code>, <code><a href="https://rdrr.io/pkg/survival/man/strata.html" class="external-link">strata()</a></code>, <code><a href="https://rdrr.io/pkg/survival/man/cluster.html" class="external-link">cluster()</a></code>, and <code><a href="https://rdrr.io/pkg/survival/man/coxph.html" class="external-link">coxph()</a></code> from <code>survival</code> to fix <code>clogit</code> and <code>coxme</code> failures when the package is not attached by the user</li>
@@ -72,6 +72,7 @@
 </li>
 <li>Carry variable labels from the regression functions through to the forest plot functions, so labels supplied once apply to both table and plot</li>
 <li>Add <code><a href="../reference/forestsave.html">forestsave()</a></code> for saving forest plots at their recommended dimensions, with format-appropriate graphics devices and optional font embedding; <code>rec_dims</code> now records its units</li>
+<li>Add <code><a href="../reference/recdims.html">recdims()</a></code> function for directly retrieving the figure dimensions recommended for a forest plot</li>
 <li>Rename <code><a href="../reference/tablesave.html">autotable()</a></code> to <code><a href="../reference/tablesave.html">tablesave()</a></code>, pairing it with <code><a href="../reference/forestsave.html">forestsave()</a></code> and distinguishing it from <code><a href="../reference/autoforest.html">autoforest()</a></code>, which detects model class rather than file format; <code><a href="../reference/tablesave.html">autotable()</a></code> is retained as a deprecated alias</li>
 <li>Add <code>quiet</code> argument to <code><a href="../reference/tablesave.html">tablesave()</a></code> and the <code>table2*()</code> functions, and return the file path invisibly from <code><a href="../reference/table2pdf.html">table2pdf()</a></code>, <code><a href="../reference/table2html.html">table2html()</a></code>, and <code><a href="../reference/table2tex.html">table2tex()</a></code>
 </li>

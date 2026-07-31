@@ -328,6 +328,7 @@ Other visualization functions:
 [`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md),
 [`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md),
 [`lmforest()`](https://phmcc.codeberg.page/summata/reference/lmforest.md),
+[`recdims()`](https://phmcc.codeberg.page/summata/reference/recdims.md),
 [`uniforest()`](https://phmcc.codeberg.page/summata/reference/uniforest.md)
 
 ## Examples
@@ -373,7 +374,7 @@ plot3 <- multiforest(
 
 # Example 4: Save with recommended dimensions
 forestsave(plot3, file.path(tempdir(), "multioutcome_forest.pdf"))
-#> Forest plot saved to /tmp/RtmpVRC0ab/multioutcome_forest.pdf (width = 16.7 in, height = 5.0 in)
+#> Forest plot saved to /tmp/Rtmp9CXk1j/multioutcome_forest.pdf (width = 16.7 in, height = 5.0 in)
 
 options(old_width)
 

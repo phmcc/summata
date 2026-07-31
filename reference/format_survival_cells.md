@@ -1,4 +1,4 @@
-# Vectorized survival cell formatting
+# Survival cell formatting
 
 Formats survival probability cells for multiple rows at once. Uses
 locale-aware decimal marks and safe CI separators that avoid ambiguity

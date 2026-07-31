@@ -300,7 +300,8 @@ Other visualization functions:
 [`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md),
 [`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md),
 [`lmforest()`](https://phmcc.codeberg.page/summata/reference/lmforest.md),
-[`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md)
+[`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md),
+[`recdims()`](https://phmcc.codeberg.page/summata/reference/recdims.md)
 
 ## Examples
 
@@ -366,7 +367,7 @@ p4 <- uniforest(
 
 # Example 5: Save with recommended dimensions
 forestsave(p4, file.path(tempdir(), "univariable_forest.pdf"))
-#> Forest plot saved to /tmp/RtmpVRC0ab/univariable_forest.pdf (width = 10.7 in, height = 7.2 in)
+#> Forest plot saved to /tmp/Rtmp9CXk1j/univariable_forest.pdf (width = 10.7 in, height = 7.2 in)
 
 options(old_width)
 

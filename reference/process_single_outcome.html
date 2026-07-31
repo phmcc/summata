@@ -5,7 +5,11 @@
       fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
     }
   };
-</script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet"><link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet"><script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet"><meta property="og:title" content="Process a single survival outcome — process_single_outcome"><meta name="description" content="Process a single survival outcome"><meta property="og:description" content="Process a single survival outcome"></head><body>
+</script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet"><link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet"><script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet"><meta property="og:title" content="Process a single survival outcome — process_single_outcome"><meta name="description" content="Parses a Surv() expression, fits the survival models, performs the group
+comparison test where requested, and assembles the formatted and raw
+tables for one outcome. Called once per outcome by survtable()."><meta property="og:description" content="Parses a Surv() expression, fits the survival models, performs the group
+comparison test where requested, and assembles the formatted and raw
+tables for one outcome. Called once per outcome by survtable()."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -61,7 +65,9 @@
     </div>
 
     <div class="ref-description section level2">
-    <p>Process a single survival outcome</p>
+    <p>Parses a Surv() expression, fits the survival models, performs the group
+comparison test where requested, and assembles the formatted and raw
+tables for one outcome. Called once per outcome by survtable().</p>
     </div>
 
     <div class="section level2">
@@ -94,8 +100,117 @@
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
-  </main></div>
+
+<dl><dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
+<dd><p>Data.table with the source data.</p></dd>
+
+
+<dt id="arg-outcome">outcome<a class="anchor" aria-label="anchor" href="#arg-outcome"></a></dt>
+<dd><p>Character string giving a Surv() expression.</p></dd>
+
+
+<dt id="arg-outcome-label">outcome_label<a class="anchor" aria-label="anchor" href="#arg-outcome-label"></a></dt>
+<dd><p>Character label for the outcome, or NULL for a
+single-outcome table.</p></dd>
+
+
+<dt id="arg-by">by<a class="anchor" aria-label="anchor" href="#arg-by"></a></dt>
+<dd><p>Character name of stratifying variable.</p></dd>
+
+
+<dt id="arg-times">times<a class="anchor" aria-label="anchor" href="#arg-times"></a></dt>
+<dd><p>Numeric vector of time points.</p></dd>
+
+
+<dt id="arg-probs">probs<a class="anchor" aria-label="anchor" href="#arg-probs"></a></dt>
+<dd><p>Numeric vector of probabilities.</p></dd>
+
+
+<dt id="arg-stats">stats<a class="anchor" aria-label="anchor" href="#arg-stats"></a></dt>
+<dd><p>Character vector of statistics to include.</p></dd>
+
+
+<dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
+<dd><p>Character string specifying probability type.</p></dd>
+
+
+<dt id="arg-conf-level">conf_level<a class="anchor" aria-label="anchor" href="#arg-conf-level"></a></dt>
+<dd><p>Numeric confidence level for interval estimates.</p></dd>
+
+
+<dt id="arg-conf-type">conf_type<a class="anchor" aria-label="anchor" href="#arg-conf-type"></a></dt>
+<dd><p>Character string specifying confidence interval type.</p></dd>
+
+
+<dt id="arg-digits">digits<a class="anchor" aria-label="anchor" href="#arg-digits"></a></dt>
+<dd><p>Integer decimal places for percentages.</p></dd>
+
+
+<dt id="arg-time-digits">time_digits<a class="anchor" aria-label="anchor" href="#arg-time-digits"></a></dt>
+<dd><p>Integer decimal places for time values.</p></dd>
+
+
+<dt id="arg-percent">percent<a class="anchor" aria-label="anchor" href="#arg-percent"></a></dt>
+<dd><p>Logical whether to display as percentages.</p></dd>
+
+
+<dt id="arg-test">test<a class="anchor" aria-label="anchor" href="#arg-test"></a></dt>
+<dd><p>Logical whether to perform a group comparison test.</p></dd>
+
+
+<dt id="arg-test-type">test_type<a class="anchor" aria-label="anchor" href="#arg-test-type"></a></dt>
+<dd><p>Character string specifying test type.</p></dd>
+
+
+<dt id="arg-total">total<a class="anchor" aria-label="anchor" href="#arg-total"></a></dt>
+<dd><p>Logical or character controlling total column.</p></dd>
+
+
+<dt id="arg-total-label">total_label<a class="anchor" aria-label="anchor" href="#arg-total-label"></a></dt>
+<dd><p>Character label for total column.</p></dd>
+
+
+<dt id="arg-time-unit">time_unit<a class="anchor" aria-label="anchor" href="#arg-time-unit"></a></dt>
+<dd><p>Character time unit for column headers.</p></dd>
+
+
+<dt id="arg-time-label">time_label<a class="anchor" aria-label="anchor" href="#arg-time-label"></a></dt>
+<dd><p>Character template for time column headers.</p></dd>
+
+
+<dt id="arg-median-label">median_label<a class="anchor" aria-label="anchor" href="#arg-median-label"></a></dt>
+<dd><p>Character label for median row.</p></dd>
+
+
+<dt id="arg-labels">labels<a class="anchor" aria-label="anchor" href="#arg-labels"></a></dt>
+<dd><p>Named character vector of display labels for group levels.</p></dd>
+
+
+<dt id="arg-na-rm">na_rm<a class="anchor" aria-label="anchor" href="#arg-na-rm"></a></dt>
+<dd><p>Logical whether to drop rows with missing time, status, or
+stratifying values.</p></dd>
+
+
+<dt id="arg-marks">marks<a class="anchor" aria-label="anchor" href="#arg-marks"></a></dt>
+<dd><p>List with <code>big.mark</code> and <code>decimal.mark</code> as returned
+by <code><a href="resolve_number_marks.html">resolve_number_marks</a></code>.</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>Additional arguments passed to <code><a href="https://rdrr.io/pkg/survival/man/survfit.html" class="external-link">survival::survfit()</a></code>.</p></dd>
+
+</dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>List with the formatted table, the raw table, the survfit objects,
+  and the test result.</p>
+    </div>
+
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">

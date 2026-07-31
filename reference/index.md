@@ -54,6 +54,8 @@
   : Create Forest Plot for Multivariate Regression
 - [`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
   : Save a Forest Plot at Its Recommended Dimensions
+- [`recdims()`](https://phmcc.codeberg.page/summata/reference/recdims.md)
+  : Recommended Figure Dimensions
 
 ## Utility Functions
 

@@ -12,12 +12,12 @@ each model type, plus an automatic detection function:
 
 | Function | Model Type | Effect Measure |
 |:---|:---|:---|
+| [`autoforest()`](https://phmcc.codeberg.page/summata/reference/autoforest.md) | Auto-detect | Auto-detect |
 | [`lmforest()`](https://phmcc.codeberg.page/summata/reference/lmforest.md) | Linear regression | Coefficient (*β*) |
 | [`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md) | Logistic/Poisson | Odds ratio / Rate ratio |
 | [`coxforest()`](https://phmcc.codeberg.page/summata/reference/coxforest.md) | Cox regression | Hazard ratio |
 | [`uniforest()`](https://phmcc.codeberg.page/summata/reference/uniforest.md) | Univariable screening | Model-dependent |
 | [`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md) | Multi-outcome analysis | Model-dependent |
-| [`autoforest()`](https://phmcc.codeberg.page/summata/reference/autoforest.md) | Auto-detect | Auto-detect |
 
 These functions follow a standard syntax when called:
 
@@ -36,8 +36,21 @@ optional and is primarily used to derive *n* and Events counts for
 various groups/subgroups.
 
 All forest plot functions produce `ggplot2` objects that can be further
-customized. This vignette demonstrates the various capabilities of these
-functions using the included sample dataset.
+customized. As such, they can also be exported to various external
+formats such as PDF, PNG, TIFF, JPEG, SVG, EPS, and other file types
+supported by
+[`ggplot2::ggsave()`](https://ggplot2.tidyverse.org/reference/ggsave.html).
+This export can be streamlined with `summata`-recommended default
+dimensions by using the
+[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+function:
+
+``` r
+forestsave(forest_plot, "output.pdf")
+```
+
+This vignette demonstrates the various capabilities of these functions
+using the included sample dataset.
 
 ------------------------------------------------------------------------
 
@@ -100,7 +113,7 @@ example1 <- glmforest(
 )
 ```
 
-![](forest_plots_files/figure-html/unnamed-chunk-4-1.png)
+![](forest_plots_files/figure-html/unnamed-chunk-6-1.png)
 
 ### **Example 2:** Linear Regression
 
@@ -121,7 +134,7 @@ example2 <- lmforest(
 )
 ```
 
-![](forest_plots_files/figure-html/unnamed-chunk-6-1.png)
+![](forest_plots_files/figure-html/unnamed-chunk-8-1.png)
 
 ### **Example 3:** Cox Regression
 
@@ -142,7 +155,7 @@ example3 <- coxforest(
 )
 ```
 
-![](forest_plots_files/figure-html/unnamed-chunk-8-1.png)
+![](forest_plots_files/figure-html/unnamed-chunk-10-1.png)
 
 ### **Example 4:** Automatic Model Detection
 
@@ -158,7 +171,7 @@ example4 <- autoforest(
 )
 ```
 
-![](forest_plots_files/figure-html/unnamed-chunk-10-1.png)
+![](forest_plots_files/figure-html/unnamed-chunk-12-1.png)
 
 ------------------------------------------------------------------------
 
@@ -193,7 +206,7 @@ example5 <- glmforest(
 )
 ```
 
-![](forest_plots_files/figure-html/unnamed-chunk-12-1.png)
+![](forest_plots_files/figure-html/unnamed-chunk-14-1.png)
 
 ### **Example 6:** Model Attribute from Fit Output
 
@@ -217,7 +230,7 @@ example6 <- coxforest(
 )
 ```
 
-![](forest_plots_files/figure-html/unnamed-chunk-14-1.png)
+![](forest_plots_files/figure-html/unnamed-chunk-16-1.png)
 
 ------------------------------------------------------------------------
 
@@ -237,7 +250,7 @@ example7 <- glmforest(
 )
 ```
 
-![](forest_plots_files/figure-html/unnamed-chunk-16-1.png)
+![](forest_plots_files/figure-html/unnamed-chunk-18-1.png)
 
 ### **Example 8:** Condensing Binary Variables
 
@@ -253,7 +266,7 @@ example8 <- glmforest(
 )
 ```
 
-![](forest_plots_files/figure-html/unnamed-chunk-18-1.png)
+![](forest_plots_files/figure-html/unnamed-chunk-20-1.png)
 
 ### **Example 9:** Toggle Zebra Striping
 
@@ -270,7 +283,7 @@ example9 <- glmforest(
 )
 ```
 
-![](forest_plots_files/figure-html/unnamed-chunk-20-1.png)
+![](forest_plots_files/figure-html/unnamed-chunk-22-1.png)
 
 ### **Example 10:** Sample Size and Event Columns
 
@@ -289,7 +302,7 @@ example10a <- coxforest(
 )
 ```
 
-![](forest_plots_files/figure-html/unnamed-chunk-22-1.png)
+![](forest_plots_files/figure-html/unnamed-chunk-24-1.png)
 
 ``` r
 # Minimal display
@@ -303,7 +316,7 @@ example10b <- coxforest(
 )
 ```
 
-![](forest_plots_files/figure-html/unnamed-chunk-24-1.png)
+![](forest_plots_files/figure-html/unnamed-chunk-26-1.png)
 
 ------------------------------------------------------------------------
 
@@ -324,7 +337,7 @@ example11 <- glmforest(
 )
 ```
 
-![](forest_plots_files/figure-html/unnamed-chunk-26-1.png)
+![](forest_plots_files/figure-html/unnamed-chunk-28-1.png)
 
 ### **Example 12:** Custom Reference Label
 
@@ -340,7 +353,7 @@ example12 <- glmforest(
 )
 ```
 
-![](forest_plots_files/figure-html/unnamed-chunk-28-1.png)
+![](forest_plots_files/figure-html/unnamed-chunk-30-1.png)
 
 ### **Example 13:** Custom Effect Measure Label
 
@@ -356,7 +369,7 @@ example13 <- coxforest(
 )
 ```
 
-![](forest_plots_files/figure-html/unnamed-chunk-30-1.png)
+![](forest_plots_files/figure-html/unnamed-chunk-32-1.png)
 
 ### **Example 14:** Custom Colors
 
@@ -372,7 +385,7 @@ example14 <- glmforest(
 )
 ```
 
-![](forest_plots_files/figure-html/unnamed-chunk-32-1.png)
+![](forest_plots_files/figure-html/unnamed-chunk-34-1.png)
 
 ### **Example 15:** Change Font Sizes
 
@@ -389,7 +402,7 @@ example15 <- glmforest(
 )
 ```
 
-![](forest_plots_files/figure-html/unnamed-chunk-34-1.png)
+![](forest_plots_files/figure-html/unnamed-chunk-36-1.png)
 
 ### **Example 16:** Table Width
 
@@ -406,7 +419,7 @@ example16a <- glmforest(
 )
 ```
 
-![](forest_plots_files/figure-html/unnamed-chunk-36-1.png)
+![](forest_plots_files/figure-html/unnamed-chunk-38-1.png)
 
 ``` r
 # Narrow table (emphasizes forest plot)
@@ -418,7 +431,7 @@ example16b <- glmforest(
 )
 ```
 
-![](forest_plots_files/figure-html/unnamed-chunk-38-1.png)
+![](forest_plots_files/figure-html/unnamed-chunk-40-1.png)
 
 ------------------------------------------------------------------------
 
@@ -431,8 +444,8 @@ reads it, so no manual sizing is required.
 
 ### **Example 17:** Recommended Dimensions
 
-[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
-applies the recommended dimensions and reports the size it used:
+[`recdims()`](https://phmcc.codeberg.page/summata/reference/recdims.md)
+can be used to extract the recommended plot dimensions directly.
 
 ``` r
 p <- glmforest(
@@ -443,18 +456,25 @@ p <- glmforest(
   zebra_stripes = TRUE
 )
 
-# Inspect the recommendation, which also records its units
-dims <- attr(p, "rec_dims")
-cat("Width:", dims$width, dims$units, "\n")
-cat("Height:", dims$height, dims$units, "\n")
+# The recommended dimensions, in the units in which the plot was created
+recdims(p)
+##>  width height 
+##>   13.4    7.5 
+##> attr(,"units")
+##> [1] "in"
 
-# Or simply let forestsave() apply them
-forestsave(p, "forest_plot.pdf")
+# Journals commonly specify figure widths in millimeters
+recdims(p, units = "mm")
+##>  width height 
+##> 340.36 190.50 
+##> attr(,"units")
+##> [1] "mm"
 ```
 
 ### **Example 18:** Multiple Formats
 
-Export to different formats as needed:
+Export to different formats as needed using
+[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md):
 
 ``` r
 p <- glmforest(
@@ -509,7 +529,7 @@ example19 <- coxforest(
 )
 ```
 
-![](forest_plots_files/figure-html/unnamed-chunk-42-1.png)
+![](forest_plots_files/figure-html/unnamed-chunk-44-1.png)
 
 ### **Example 20:** Extensions with ggplot2
 
@@ -530,7 +550,7 @@ example20_modified <- example20 +
   )
 ```
 
-![](forest_plots_files/figure-html/unnamed-chunk-44-1.png)
+![](forest_plots_files/figure-html/unnamed-chunk-46-1.png)
 
 ------------------------------------------------------------------------
 
@@ -563,7 +583,7 @@ example21 <- glmforest(
 )
 ```
 
-![](forest_plots_files/figure-html/unnamed-chunk-46-1.png)
+![](forest_plots_files/figure-html/unnamed-chunk-48-1.png)
 
 ### **Example 22:** Negative Binomial Regression
 
@@ -587,7 +607,7 @@ example22 <- glmforest(
 )
 ```
 
-![](forest_plots_files/figure-html/unnamed-chunk-48-1.png)
+![](forest_plots_files/figure-html/unnamed-chunk-50-1.png)
 
 ------------------------------------------------------------------------
 

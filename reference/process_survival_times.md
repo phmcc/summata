@@ -1,7 +1,7 @@
-# Process survival at specified time points (optimized)
+# Process survival at specified time points
 
 Extracts survival probabilities at specified time points from survfit
-objects. Uses vectorized operations for efficiency.
+objects.
 
 ## Usage
 

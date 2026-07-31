@@ -43,7 +43,3 @@ validate_model_outcome(
 ## Value
 
 List with model_type, family, messages, auto_corrected flag.
-
-## Details
-
-Checks for mismatches and auto-corrects or errors as appropriate.

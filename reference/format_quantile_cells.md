@@ -1,4 +1,4 @@
-# Vectorized quantile cell formatting
+# Quantile cell formatting
 
 Formats survival quantile cells for multiple rows at once.
 

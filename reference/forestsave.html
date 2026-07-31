@@ -183,7 +183,7 @@ the spacing seen on screen or in the package documentation. Unless
     otherwise.</p></dd>
 
   <dt>Other formats</dt>
-<dd><p>Left to <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggplot2::ggsave()</a></code>.</p></dd>
+<dd><p>Deferred to <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggplot2::ggsave()</a></code>.</p></dd>
 
 
 </dl><p><strong>Font embedding.</strong> R's PDF device draws on the standard fonts that every
@@ -206,8 +206,8 @@ apparent at the point it is written.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="autoforest.html">autoforest</a></code>, <code><a href="coxforest.html">coxforest</a></code>,
-  <code><a href="glmforest.html">glmforest</a></code>, <code><a href="lmforest.html">lmforest</a></code>, <code><a href="uniforest.html">uniforest</a></code>,
+    <div class="dont-index"><p><code><a href="autoforest.html">autoforest</a></code>, <code><a href="lmforest.html">lmforest</a></code>,
+  <code><a href="glmforest.html">glmforest</a></code>, <code><a href="coxforest.html">coxforest</a></code>, <code><a href="uniforest.html">uniforest</a></code>,
   <code><a href="multiforest.html">multiforest</a></code> for producing the plots;
   <code><a href="tablesave.html">tablesave</a></code> for the equivalent operation on tables</p>
 <p>Other visualization functions:
@@ -216,6 +216,7 @@ apparent at the point it is written.</p>
 <code><a href="glmforest.html">glmforest()</a></code>,
 <code><a href="lmforest.html">lmforest()</a></code>,
 <code><a href="multiforest.html">multiforest()</a></code>,
+<code><a href="recdims.html">recdims()</a></code>,
 <code><a href="uniforest.html">uniforest()</a></code></p></div>
     </div>
 
@@ -235,27 +236,27 @@ apparent at the point it is written.</p>
 <span class="r-in"><span><span class="co"># Written under tempdir() so the example respects CRAN's no-write policy;</span></span></span>
 <span class="r-in"><span><span class="co"># in practice any desired path may be supplied.</span></span></span>
 <span class="r-in"><span><span class="fu">forestsave</span><span class="op">(</span><span class="va">p</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"forest.pdf"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/RtmpVRC0ab/forest.pdf (width = 13.9 in, height = 5.0 in)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/Rtmp9CXk1j/forest.pdf (width = 13.9 in, height = 5.0 in)</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 2: Raster output at publication resolution</span></span></span>
 <span class="r-in"><span><span class="fu">forestsave</span><span class="op">(</span><span class="va">p</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"forest.png"</span><span class="op">)</span>, dpi <span class="op">=</span> <span class="fl">600</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/RtmpVRC0ab/forest.png (width = 13.9 in, height = 5.0 in)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/Rtmp9CXk1j/forest.png (width = 13.9 in, height = 5.0 in)</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 3: Dimensions given explicitly, in any supported units</span></span></span>
 <span class="r-in"><span><span class="fu">forestsave</span><span class="op">(</span><span class="va">p</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"forest_sized.pdf"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>           width <span class="op">=</span> <span class="fl">24</span>, height <span class="op">=</span> <span class="fl">16</span>, units <span class="op">=</span> <span class="st">"cm"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/RtmpVRC0ab/forest_sized.pdf (width = 24.0 cm, height = 16.0 cm)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/Rtmp9CXk1j/forest_sized.pdf (width = 24.0 cm, height = 16.0 cm)</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 4: Embed fonts after writing, where Ghostscript is available</span></span></span>
 <span class="r-in"><span><span class="fu">forestsave</span><span class="op">(</span><span class="va">p</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"forest_embedded.pdf"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>           embed_fonts <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/RtmpVRC0ab/forest_embedded.pdf (width = 13.9 in, height = 5.0 in)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Fonts embedded in /tmp/RtmpVRC0ab/forest_embedded.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/Rtmp9CXk1j/forest_embedded.pdf (width = 13.9 in, height = 5.0 in)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Fonts embedded in /tmp/Rtmp9CXk1j/forest_embedded.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 5: Cairo embeds fonts as it draws, at the cost of its own</span></span></span>
 <span class="r-in"><span><span class="co"># italic face selection</span></span></span>
 <span class="r-in"><span><span class="fu">forestsave</span><span class="op">(</span><span class="va">p</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"forest_cairo.pdf"</span><span class="op">)</span>, device <span class="op">=</span> <span class="st">"cairo"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/RtmpVRC0ab/forest_cairo.pdf (width = 13.9 in, height = 5.0 in)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/Rtmp9CXk1j/forest_cairo.pdf (width = 13.9 in, height = 5.0 in)</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

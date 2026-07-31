@@ -1,6 +1,6 @@
 # Changelog
 
-## *summata* 0.12.0 (2026-07-28)
+## *summata* 0.12.0 (2026-07-31)
 
 - Fix *n*/Events counts to report complete cases across all functions,
   so group sizes sum to the model *n*; empty factor levels now report
@@ -35,6 +35,10 @@
   for saving forest plots at their recommended dimensions, with
   format-appropriate graphics devices and optional font embedding;
   `rec_dims` now records its units
+- Add
+  [`recdims()`](https://phmcc.codeberg.page/summata/reference/recdims.md)
+  function for directly retrieving the figure dimensions recommended for
+  a forest plot
 - Rename
   [`autotable()`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
   to

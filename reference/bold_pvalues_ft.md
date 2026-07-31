@@ -1,4 +1,4 @@
-# Bold significant *p*-values in DOCX
+# Bold significant *p*-values in flextable outputs
 
 Applies bold formatting to significant *p*-values in flextable objects
 by detecting values below threshold or "\< 0.001" patterns.

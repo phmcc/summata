@@ -27,8 +27,3 @@ fix_negative_zero(x, marks = NULL)
 ## Value
 
 Character vector with negative zeros corrected.
-
-## Details
-
-When `marks` is supplied, also replaces the period decimal mark with the
-locale-appropriate decimal mark.

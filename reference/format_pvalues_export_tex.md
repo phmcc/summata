@@ -1,4 +1,4 @@
-# Format *p*-values for exported tables
+# Format *p*-values for exported tables (TeX)
 
 Applies bold formatting to significant *p*-values in LaTeX tables using
 the textbf command.
