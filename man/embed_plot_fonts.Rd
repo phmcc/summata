@@ -18,7 +18,7 @@ Invisibly returns \code{TRUE} where the fonts were embedded and
 \description{
 Post-processes a PDF so that its fonts are embedded, through
 \code{grDevices::embedFonts()}. This is offered as an alternative to drawing
-with a Cairo device, which embeds fonts but selects its own italic face.
-Embedding is performed by Ghostscript (external).
+with a Cairo device, which embeds fonts but renders italics unreliably.
+If Cairo is not selected, embedding is performed by Ghostscript (external).
 }
 \keyword{internal}

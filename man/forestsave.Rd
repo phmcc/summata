@@ -2,7 +2,7 @@
 % Please edit documentation in R/forestsave.R
 \name{forestsave}
 \alias{forestsave}
-\title{Save a Forest Plot at Its Recommended Dimensions}
+\title{Save a Forest Plot to File}
 \usage{
 forestsave(
   plot,
@@ -95,7 +95,7 @@ the spacing seen on screen or in the package documentation. Unless
     package is installed, whose text metrics match those used to render the
     package vignettes. Falls back to the standard raster devices
     otherwise.}
-  \item{Other formats}{Deferred to \code{ggplot2::ggsave()}.}
+  \item{Other formats}{Left to \code{ggplot2::ggsave()}.}
 }
 
 \strong{Font embedding.} R's PDF device draws on the standard fonts that every
@@ -109,10 +109,16 @@ italic face.
 
 \code{device = "cairo"} is a shorthand of this package's own, resolving to
 \code{grDevices::cairo_pdf()}, \code{grDevices::cairo_ps()}, or
-\code{grDevices::svg()} according to the output format. It applies to vector
-formats only: raster output already uses the \pkg{ragg} devices, which
-supersede Cairo's raster backends. Any other value of \code{device} is
-passed to \code{ggplot2::ggsave()} unchanged.
+\code{grDevices::svg()} according to the output format:
+\preformatted{
+forestsave(p, "forest.pdf", device = "cairo")
+}
+It applies to vector formats only, since raster output already uses the
+\pkg{ragg} devices, which supersede Cairo's raster backends. Cairo is
+absent from some installations even where \code{capabilities("cairo")}
+reports otherwise, so the device is opened once before use and its
+unavailability reported. Any other value of \code{device} is passed to
+\code{ggplot2::ggsave()} unchanged.
 
 The dimensions used are reported through a \code{message()} unless
 \code{quiet = TRUE}, so that a figure written at an unexpected size is
@@ -127,11 +133,10 @@ model <- stats::glm(readmission_30d ~ age + sex + stage,
 
 p <- glmforest(model, data = clintrial, labels = clintrial_labels)
 
-\donttest{
 # Example 1: Save at the recommended dimensions
-# Written under tempdir() so the example respects CRAN's no-write policy;
-# in practice any desired path may be supplied.
 forestsave(p, file.path(tempdir(), "forest.pdf"))
+
+\donttest{
 
 # Example 2: Raster output at publication resolution
 forestsave(p, file.path(tempdir(), "forest.png"), dpi = 600)
@@ -144,17 +149,14 @@ forestsave(p, file.path(tempdir(), "forest_sized.pdf"),
 forestsave(p, file.path(tempdir(), "forest_embedded.pdf"),
            embed_fonts = TRUE)
 
-# Example 5: Cairo embeds fonts as it draws, at the cost of its own
-# italic face selection
-forestsave(p, file.path(tempdir(), "forest_cairo.pdf"), device = "cairo")
 }
 
 }
 \seealso{
-\code{\link{autoforest}}, \code{\link{lmforest}},
-  \code{\link{glmforest}}, \code{\link{coxforest}}, \code{\link{uniforest}},
-  \code{\link{multiforest}} for producing the plots;
-  \code{\link{tablesave}} for the equivalent operation on tables
+\code{\link{autoforest}}, \code{\link{coxforest}},
+  \code{\link{glmforest}}, \code{\link{lmforest}}, \code{\link{uniforest}},
+  \code{\link{multiforest}} for producing forest plots;
+  \code{\link{tablesave}} for exporting formatted tables
 
 Other visualization functions:
 \code{\link[=autoforest]{autoforest()}},

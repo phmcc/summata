@@ -96,7 +96,7 @@ tbl <- desctable(clintrial, by = "treatment",
 
 # Example 1: The format follows the file extension
 if (requireNamespace("xtable", quietly = TRUE)) {
-  tablesave(tbl, file.path(tempdir(), "example.html"))
+  tablesave(tbl, file.path(tempdir(), "example.pdf"))
 }
 
 # Example 2: Delimited output needs no additional packages
@@ -106,6 +106,7 @@ tablesave(tbl, file.path(tempdir(), "example.csv"))
 tablesave(tbl, file.path(tempdir(), "example.tsv"), quiet = TRUE)
 
 \donttest{
+
 # Load example data
 data(clintrial)
 data(clintrial_labels)

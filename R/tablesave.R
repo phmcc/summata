@@ -86,7 +86,7 @@
 #'
 #' # Example 1: The format follows the file extension
 #' if (requireNamespace("xtable", quietly = TRUE)) {
-#'   tablesave(tbl, file.path(tempdir(), "example.html"))
+#'   tablesave(tbl, file.path(tempdir(), "example.pdf"))
 #' }
 #'
 #' # Example 2: Delimited output needs no additional packages
@@ -96,6 +96,7 @@
 #' tablesave(tbl, file.path(tempdir(), "example.tsv"), quiet = TRUE)
 #'
 #' \donttest{
+#' 
 #' # Load example data
 #' data(clintrial)
 #' data(clintrial_labels)
@@ -221,7 +222,7 @@ tablesave <- function(table, file, quiet = FALSE, ...) {
 
     ## The delimited formats are written here rather than delegated, as the
     ## package has no table2csv() to dispatch to. data.table::fwrite() is used
-    ## for consistency with the export routes documented elsewhere.
+    ## for consistency with the export routes documented elsewhere
     write_delimited <- function(sep) {
         data.table::fwrite(table, file = file, sep = sep, ...)
         if (!quiet) message(sprintf("Table saved to %s", file))

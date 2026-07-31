@@ -1,6 +1,6 @@
 ### * Main function
 
-#' Save a Forest Plot at Its Recommended Dimensions
+#' Save a Forest Plot to File
 #'
 #' Writes a forest plot to file, sized by default from the recommendations the
 #' plotting function computed from the plot's own content, and rendered through
@@ -69,7 +69,7 @@
 #'     package is installed, whose text metrics match those used to render the
 #'     package vignettes. Falls back to the standard raster devices
 #'     otherwise.}
-#'   \item{Other formats}{Deferred to \code{ggplot2::ggsave()}.}
+#'   \item{Other formats}{Left to \code{ggplot2::ggsave()}.}
 #' }
 #'
 #' \strong{Font embedding.} R's PDF device draws on the standard fonts that every
@@ -83,19 +83,25 @@
 #'
 #' \code{device = "cairo"} is a shorthand of this package's own, resolving to
 #' \code{grDevices::cairo_pdf()}, \code{grDevices::cairo_ps()}, or
-#' \code{grDevices::svg()} according to the output format. It applies to vector
-#' formats only: raster output already uses the \pkg{ragg} devices, which
-#' supersede Cairo's raster backends. Any other value of \code{device} is
-#' passed to \code{ggplot2::ggsave()} unchanged.
+#' \code{grDevices::svg()} according to the output format:
+#' \preformatted{
+#' forestsave(p, "forest.pdf", device = "cairo")
+#' }
+#' It applies to vector formats only, since raster output already uses the
+#' \pkg{ragg} devices, which supersede Cairo's raster backends. Cairo is
+#' absent from some installations even where \code{capabilities("cairo")}
+#' reports otherwise, so the device is opened once before use and its
+#' unavailability reported. Any other value of \code{device} is passed to
+#' \code{ggplot2::ggsave()} unchanged.
 #'
 #' The dimensions used are reported through a \code{message()} unless
 #' \code{quiet = TRUE}, so that a figure written at an unexpected size is
 #' apparent at the point it is written.
 #'
-#' @seealso \code{\link{autoforest}}, \code{\link{lmforest}},
-#'   \code{\link{glmforest}}, \code{\link{coxforest}}, \code{\link{uniforest}},
-#'   \code{\link{multiforest}} for producing the plots;
-#'   \code{\link{tablesave}} for the equivalent operation on tables
+#' @seealso \code{\link{autoforest}}, \code{\link{coxforest}},
+#'   \code{\link{glmforest}}, \code{\link{lmforest}}, \code{\link{uniforest}},
+#'   \code{\link{multiforest}} for producing forest plots;
+#'   \code{\link{tablesave}} for exporting formatted tables
 #'
 #' @examples
 #' data(clintrial)
@@ -106,12 +112,11 @@
 #'
 #' p <- glmforest(model, data = clintrial, labels = clintrial_labels)
 #'
-#' \donttest{
 #' # Example 1: Save at the recommended dimensions
-#' # Written under tempdir() so the example respects CRAN's no-write policy;
-#' # in practice any desired path may be supplied.
 #' forestsave(p, file.path(tempdir(), "forest.pdf"))
 #'
+#' \donttest{
+#' 
 #' # Example 2: Raster output at publication resolution
 #' forestsave(p, file.path(tempdir(), "forest.png"), dpi = 600)
 #'
@@ -122,10 +127,7 @@
 #' # Example 4: Embed fonts after writing, where Ghostscript is available
 #' forestsave(p, file.path(tempdir(), "forest_embedded.pdf"),
 #'            embed_fonts = TRUE)
-#'
-#' # Example 5: Cairo embeds fonts as it draws, at the cost of its own
-#' # italic face selection
-#' forestsave(p, file.path(tempdir(), "forest_cairo.pdf"), device = "cairo")
+#' 
 #' }
 #'
 #' @family visualization functions
@@ -146,13 +148,10 @@ forestsave <- function(plot, file, width = NULL, height = NULL,
 
     dims <- attr(plot, "rec_dims")
 
-    ## The units the recommended dimensions are expressed in. Plots produced
-    ## before this element was recorded, and plots from other sources, are
-    ## treated as inches.
+    ## The units in which the recommended dimensions are expressed
     dims_units <- if (!is.null(dims$units)) dims$units else "in"
 
-    ## Output units default to those of the recommendation, so that the
-    ## dimensions pass through unconverted in the common case
+    ## Output units default to those of the recommendation
     if (is.null(units)) {
         units <- if (!is.null(dims)) dims_units else "in"
     }
@@ -165,8 +164,7 @@ forestsave <- function(plot, file, width = NULL, height = NULL,
              call. = FALSE)
     }
 
-    ## Fill either dimension from the recommendation, converting where the
-    ## requested units differ from those the recommendation was computed in
+    ## Fill either dimension from the recommendation
     if (is.null(width) && !is.null(dims$width)) {
         width <- convert_units(dims$width, from = dims_units, to = units)
     }
@@ -175,9 +173,7 @@ forestsave <- function(plot, file, width = NULL, height = NULL,
         height <- convert_units(dims$height, from = dims_units, to = units)
     }
 
-    ## A plot carrying no recommendation and given no dimensions would be
-    ## written at the device default, which is the mis-sizing this function
-    ## exists to prevent
+    ## Case for a plot carrying no recommendation and given no dimensions
     if (is.null(width) || is.null(height)) {
         stop("'plot' carries no recommended dimensions, so 'width' and ",
              "'height' must be supplied.", call. = FALSE)
@@ -186,8 +182,6 @@ forestsave <- function(plot, file, width = NULL, height = NULL,
     if (is.null(device)) {
         device <- select_forest_device(file)
     } else if (identical(device, "cairo")) {
-        ## A shorthand of this package's own, resolved here because
-        ## ggplot2::ggsave() does not recognize it
         device <- cairo_device(file)
     }
 
@@ -205,9 +199,7 @@ forestsave <- function(plot, file, width = NULL, height = NULL,
                     width = width, height = height, units = units,
                     dpi = dpi, device = device, ...)
 
-    ## A graphics device that cannot be opened may warn rather than raise an
-    ## error, leaving no file behind. Returning the path in that case would
-    ## report a success that did not occur.
+    ## Case when a graphics device cannot be opened
     if (!file.exists(file)) {
         stop("The graphics device wrote no file to '", file, "'.",
              if (!is.null(device)) {
@@ -246,9 +238,8 @@ select_forest_device <- function(file) {
 
     device <- switch(
         ext,
-        ## PDF defers to ggsave, and so to R's internal device. Cairo
-        ## embeds fonts but can substitute an incorrect italic face, which
-        ## the italic footer and statistical notation would expose.
+        ## PDF defers to ggsave(), and so to R's internal device
+        ## Cairo embeds fonts but does not always correctly render italics
         pdf  = NULL,
         png  = if (has_ragg) ragg::agg_png else NULL,
         tif  = ,
@@ -274,15 +265,6 @@ select_forest_device <- function(file) {
 #' @keywords internal
 cairo_device <- function(file) {
 
-    ## capabilities() reports whether the Cairo graphics library was compiled
-    ## in, which is not guaranteed on all platforms. Reporting that here is
-    ## clearer than the device failing when it is opened.
-    if (!isTRUE(unname(capabilities("cairo")))) {
-        stop("device = \"cairo\" requires an R installation built with Cairo ",
-             "support, which capabilities(\"cairo\") reports as unavailable.",
-             call. = FALSE)
-    }
-
     ext <- tolower(tools::file_ext(file))
 
     device <- switch(
@@ -300,6 +282,31 @@ cairo_device <- function(file) {
              "ragg devices where available.", call. = FALSE)
     }
 
+    probe <- tempfile(fileext = paste0(".", ext))
+    baseline <- grDevices::dev.cur()
+
+    opened <- tryCatch({
+        suppressWarnings(device(probe))
+        TRUE
+    }, error = function(e) FALSE)
+
+    ## Closed whether or not the probe succeeded, so that a partially opened
+    ## device is not left current
+    if (!identical(grDevices::dev.cur(), baseline)) {
+        grDevices::dev.off()
+    }
+
+    usable <- isTRUE(opened) && file.exists(probe) && file.size(probe) > 0
+    unlink(probe)
+
+    if (!usable) {
+        stop("device = \"cairo\" requires a working Cairo installation. The ",
+             "Cairo device could not be opened on this system, which happens ",
+             "where the supporting libraries are absent even though ",
+             "capabilities(\"cairo\") reports otherwise. Leaving 'device' ",
+             "unset uses the default device for the format.", call. = FALSE)
+    }
+
     return(device)
 }
 
@@ -310,8 +317,8 @@ cairo_device <- function(file) {
 #'
 #' Post-processes a PDF so that its fonts are embedded, through
 #' \code{grDevices::embedFonts()}. This is offered as an alternative to drawing
-#' with a Cairo device, which embeds fonts but selects its own italic face.
-#' Embedding is performed by Ghostscript (external).
+#' with a Cairo device, which embeds fonts but renders italics unreliably.
+#' If Cairo is not selected, embedding is performed by Ghostscript (external).
 #'
 #' @param file Character string giving the path to the written file.
 #' @param quiet Logical. Suppress the confirmation message.
@@ -326,9 +333,9 @@ embed_plot_fonts <- function(file, quiet = FALSE) {
         return(invisible(FALSE))
     }
 
-    ## embedFonts() calls Ghostscript, which ships separately from R.
+    ## embedFonts() calls Ghostscript (external)
     ## find_gs_cmd() consults R_GSCMD and the PATH, and returns an empty string
-    ## when nothing is found.
+    ## when nothing is found
     if (!nzchar(tools::find_gs_cmd())) {
         warning("Font embedding requires Ghostscript, which was not found. ",
                 "The file was written without embedded fonts.", call. = FALSE)
