@@ -236,24 +236,24 @@ apparent at the point it is written.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 1: Save at the recommended dimensions</span></span></span>
 <span class="r-in"><span><span class="fu">forestsave</span><span class="op">(</span><span class="va">p</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"forest.pdf"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/RtmpMMvyLw/forest.pdf (width = 13.9 in, height = 5.0 in)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/RtmpPQeTCd/forest.pdf (width = 13.9 in, height = 5.0 in)</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 2: Raster output at publication resolution</span></span></span>
 <span class="r-in"><span><span class="fu">forestsave</span><span class="op">(</span><span class="va">p</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"forest.png"</span><span class="op">)</span>, dpi <span class="op">=</span> <span class="fl">600</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/RtmpMMvyLw/forest.png (width = 13.9 in, height = 5.0 in)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/RtmpPQeTCd/forest.png (width = 13.9 in, height = 5.0 in)</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 3: Dimensions given explicitly, in any supported units</span></span></span>
 <span class="r-in"><span><span class="fu">forestsave</span><span class="op">(</span><span class="va">p</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"forest_sized.pdf"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>           width <span class="op">=</span> <span class="fl">24</span>, height <span class="op">=</span> <span class="fl">16</span>, units <span class="op">=</span> <span class="st">"cm"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/RtmpMMvyLw/forest_sized.pdf (width = 24.0 cm, height = 16.0 cm)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/RtmpPQeTCd/forest_sized.pdf (width = 24.0 cm, height = 16.0 cm)</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 4: Embed fonts after writing, where Ghostscript is available</span></span></span>
 <span class="r-in"><span><span class="fu">forestsave</span><span class="op">(</span><span class="va">p</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"forest_embedded.pdf"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>           embed_fonts <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/RtmpMMvyLw/forest_embedded.pdf (width = 13.9 in, height = 5.0 in)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Fonts embedded in /tmp/RtmpMMvyLw/forest_embedded.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/RtmpPQeTCd/forest_embedded.pdf (width = 13.9 in, height = 5.0 in)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Fonts embedded in /tmp/RtmpPQeTCd/forest_embedded.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
