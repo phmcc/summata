@@ -160,19 +160,36 @@ test_that("an explicit device overrides the automatic selection", {
 })
 
 
-test_that("the cairo shorthand resolves per format and rejects raster", {
+test_that("the cairo shorthand rejects raster formats", {
 
-    ## This test only inspects the returned device function, so the capability
-    ## flag is the correct guard; the device is never opened.
-    skip_if(!isTRUE(unname(capabilities("cairo"))), "Cairo not compiled in")
+    ## The format is checked before the device is probed, so this assertion
+    ## holds whether or not Cairo is usable here. ragg supersedes Cairo's
+    ## raster backends, so the shorthand does not silently fall through to
+    ## something else.
+    expect_error(summata:::cairo_device("x.png"), "vector formats")
+    expect_error(summata:::cairo_device("x.tiff"), "vector formats")
+})
+
+
+test_that("the cairo shorthand resolves per vector format", {
+
+    ## cairo_device() opens the device to confirm it is usable, so this needs
+    ## a working Cairo installation rather than merely a compiled-in one.
+    skip_if_not(cairo_pdf_works(), "Cairo PDF device is not usable here")
 
     expect_identical(summata:::cairo_device("x.pdf"), grDevices::cairo_pdf)
     expect_identical(summata:::cairo_device("x.eps"), grDevices::cairo_ps)
     expect_identical(summata:::cairo_device("x.svg"), grDevices::svg)
+})
 
-    ## ragg supersedes Cairo's raster backends, so the shorthand does not
-    ## silently fall through to something else
-    expect_error(summata:::cairo_device("x.png"), "vector formats")
+
+test_that("the cairo shorthand reports an unusable installation", {
+
+    skip_if(cairo_pdf_works(), "Cairo PDF device is usable here")
+
+    ## Where Cairo cannot be opened, the shorthand says so rather than
+    ## returning a device that fails when it is used
+    expect_error(summata:::cairo_device("x.pdf"), "working Cairo installation")
 })
 
 

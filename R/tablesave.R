@@ -86,7 +86,7 @@
 #'
 #' # Example 1: The format follows the file extension
 #' if (requireNamespace("xtable", quietly = TRUE)) {
-#'   tablesave(tbl, file.path(tempdir(), "example.pdf"))
+#'   tablesave(tbl, file.path(tempdir(), "example.html"))
 #' }
 #'
 #' # Example 2: Delimited output needs no additional packages
