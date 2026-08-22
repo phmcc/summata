@@ -2,6 +2,8 @@
 
 ## *summata* 0.12.0 (2026-07-31)
 
+CRAN release: 2026-08-21
+
 - Fix *n*/Events counts to report complete cases across all functions,
   so group sizes sum to the model *n*; empty factor levels now report
   zero, and

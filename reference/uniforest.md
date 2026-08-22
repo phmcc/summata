@@ -367,7 +367,7 @@ p4 <- uniforest(
 
 # Example 5: Save with recommended dimensions
 forestsave(p4, file.path(tempdir(), "univariable_forest.pdf"))
-#> Forest plot saved to /tmp/RtmpPQeTCd/univariable_forest.pdf (width = 10.7 in, height = 7.2 in)
+#> Forest plot saved to /tmp/Rtmp3J9jIQ/univariable_forest.pdf (width = 10.7 in, height = 7.2 in)
 
 options(old_width)
 

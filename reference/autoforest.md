@@ -267,7 +267,7 @@ plot5 <- autoforest(fit_result)
 
 # Save with recommended dimensions
 forestsave(plot5, file.path(tempdir(), "forest.pdf"))
-#> Forest plot saved to /tmp/RtmpPQeTCd/forest.pdf (width = 15.3 in, height = 5.0 in)
+#> Forest plot saved to /tmp/Rtmp3J9jIQ/forest.pdf (width = 15.3 in, height = 5.0 in)
 
 # }
 ```

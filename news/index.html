@@ -61,7 +61,7 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.12.0" id="summata-0120-2026-07-31">
-<em>summata</em> 0.12.0 (2026-07-31)<a class="anchor" aria-label="anchor" href="#summata-0120-2026-07-31"></a></h2>
+<em>summata</em> 0.12.0 (2026-07-31)<a class="anchor" aria-label="anchor" href="#summata-0120-2026-07-31"></a></h2><p class="text-muted">CRAN release: 2026-08-21</p>
 <ul><li>Fix <em>n</em>/Events counts to report complete cases across all functions, so group sizes sum to the model <em>n</em>; empty factor levels now report zero, and <code><a href="../reference/multifit.html">multifit()</a></code> adjusted columns match <code><a href="../reference/fullfit.html">fullfit()</a></code> (STROBE item 12)</li>
 <li>Report the analyzed sample and events in <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> methods and forest plot footers, with counts available via the <code>analysis_counts</code> attribute</li>
 <li>Import <code><a href="https://rdrr.io/pkg/survival/man/Surv.html" class="external-link">Surv()</a></code>, <code><a href="https://rdrr.io/pkg/survival/man/strata.html" class="external-link">strata()</a></code>, <code><a href="https://rdrr.io/pkg/survival/man/cluster.html" class="external-link">cluster()</a></code>, and <code><a href="https://rdrr.io/pkg/survival/man/coxph.html" class="external-link">coxph()</a></code> from <code>survival</code> to fix <code>clogit</code> and <code>coxme</code> failures when the package is not attached by the user</li>
