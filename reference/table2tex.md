@@ -366,7 +366,7 @@ results <- fit(
 if (requireNamespace("xtable", quietly = TRUE)) {
   table2tex(results, file.path(tempdir(), "basic.tex"))
 }
-#> Table saved to /tmp/Rtmp3J9jIQ/basic.tex
+#> Table saved to /tmp/RtmppNr8bf/basic.tex
 
 # \donttest{
 # Example 2: With booktabs for publication
@@ -374,7 +374,7 @@ table2tex(results, file.path(tempdir(), "publication.tex"),
        booktabs = TRUE,
        caption = "Multivariable logistic regression results",
        label = "tab:regression")
-#> Table saved to /tmp/Rtmp3J9jIQ/publication.tex
+#> Table saved to /tmp/RtmppNr8bf/publication.tex
 
 # Example 3: Multi-line caption with abbreviations
 table2tex(results, file.path(tempdir(), "detailed.tex"),
@@ -383,70 +383,70 @@ table2tex(results, file.path(tempdir(), "detailed.tex"),
                  aOR = adjusted odds ratio; CI = confidence interval\\\\
                  Model adjusted for age, sex, treatment, and disease stage",
        label = "tab:mortality")
-#> Table saved to /tmp/Rtmp3J9jIQ/detailed.tex
+#> Table saved to /tmp/RtmppNr8bf/detailed.tex
 
 # Example 4: Hierarchical display with indentation
 table2tex(results, file.path(tempdir(), "indented.tex"),
        indent_groups = TRUE,
        booktabs = TRUE)
-#> Table saved to /tmp/Rtmp3J9jIQ/indented.tex
+#> Table saved to /tmp/RtmppNr8bf/indented.tex
 
 # Example 5: Condensed table (reduced height)
 table2tex(results, file.path(tempdir(), "condensed.tex"),
        condense_table = TRUE,
        booktabs = TRUE)
-#> Table saved to /tmp/Rtmp3J9jIQ/condensed.tex
+#> Table saved to /tmp/RtmppNr8bf/condensed.tex
 
 # Example 6: With zebra stripes
 table2tex(results, file.path(tempdir(), "striped.tex"),
        zebra_stripes = TRUE,
        stripe_color = "gray!15",
        booktabs = TRUE)
-#> Table saved to /tmp/Rtmp3J9jIQ/striped.tex
+#> Table saved to /tmp/RtmppNr8bf/striped.tex
 # Remember to add \usepackage[table]{xcolor} to the LaTeX document
 
 # Example 7: Dark header style
 table2tex(results, file.path(tempdir(), "dark_header.tex"),
        dark_header = TRUE,
        booktabs = TRUE)
-#> Table saved to /tmp/Rtmp3J9jIQ/dark_header.tex
+#> Table saved to /tmp/RtmppNr8bf/dark_header.tex
 # Requires \usepackage[table]{xcolor}
 
 # Example 8: Custom cell padding
 table2tex(results, file.path(tempdir(), "relaxed.tex"),
        cell_padding = "relaxed",
        booktabs = TRUE)
-#> Table saved to /tmp/Rtmp3J9jIQ/relaxed.tex
+#> Table saved to /tmp/RtmppNr8bf/relaxed.tex
 
 # Example 9: Custom column alignment (auto-detected by default)
 table2tex(results, file.path(tempdir(), "custom_align.tex"),
        align = c("c", "c", "c", "c", "c", "c", "c"))
-#> Table saved to /tmp/Rtmp3J9jIQ/custom_align.tex
+#> Table saved to /tmp/RtmppNr8bf/custom_align.tex
 
 # Example 10: No header formatting (keep original names)
 table2tex(results, file.path(tempdir(), "raw_headers.tex"),
        format_headers = FALSE)
-#> Table saved to /tmp/Rtmp3J9jIQ/raw_headers.tex
+#> Table saved to /tmp/RtmppNr8bf/raw_headers.tex
 
 # Example 11: Disable significance bolding
 table2tex(results, file.path(tempdir(), "no_bold.tex"),
        bold_significant = FALSE,
        booktabs = TRUE)
-#> Table saved to /tmp/Rtmp3J9jIQ/no_bold.tex
+#> Table saved to /tmp/RtmppNr8bf/no_bold.tex
 
 # Example 12: Stricter significance threshold
 table2tex(results, file.path(tempdir(), "strict_sig.tex"),
        bold_significant = TRUE,
        p_threshold = 0.01,  # Bold only if p < 0.01
        booktabs = TRUE)
-#> Table saved to /tmp/Rtmp3J9jIQ/strict_sig.tex
+#> Table saved to /tmp/RtmppNr8bf/strict_sig.tex
 
 # Example 13: With caption size control
 table2tex(results, file.path(tempdir(), "caption_size.tex"),
        caption_size = 6,
        caption = "Table 1 - Results with Compact Caption\\\\
                  Smaller caption fits better on constrained pages")
-#> Table saved to /tmp/Rtmp3J9jIQ/caption_size.tex
+#> Table saved to /tmp/RtmppNr8bf/caption_size.tex
 
 # Example 14: Complete publication-ready table
 table2tex(results, file.path(tempdir(), "final_table1.tex"),
@@ -457,7 +457,7 @@ table2tex(results, file.path(tempdir(), "final_table1.tex"),
        zebra_stripes = FALSE,  # Many journals prefer no stripes
        bold_significant = TRUE,
        cell_padding = "normal")
-#> Table saved to /tmp/Rtmp3J9jIQ/final_table1.tex
+#> Table saved to /tmp/RtmppNr8bf/final_table1.tex
 
 # Example 15: Descriptive statistics table
 desc_table <- desctable(clintrial, by = "treatment",
@@ -467,7 +467,7 @@ table2tex(desc_table, file.path(tempdir(), "table1_descriptive.tex"),
        booktabs = TRUE,
        caption = "Table 1: Baseline Characteristics",
        label = "tab:baseline")
-#> Table saved to /tmp/Rtmp3J9jIQ/table1_descriptive.tex
+#> Table saved to /tmp/RtmppNr8bf/table1_descriptive.tex
 
 # Example 16: Model comparison table
 models <- list(
@@ -492,7 +492,7 @@ table2tex(comparison, file.path(tempdir(), "model_comparison.tex"),
        booktabs = TRUE,
        caption = "Model Comparison Statistics",
        label = "tab:models")
-#> Table saved to /tmp/Rtmp3J9jIQ/model_comparison.tex
+#> Table saved to /tmp/RtmppNr8bf/model_comparison.tex
 
 # }
 ```

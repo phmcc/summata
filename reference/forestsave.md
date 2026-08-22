@@ -197,24 +197,24 @@ p <- glmforest(model, data = clintrial, labels = clintrial_labels)
 
 # Example 1: Save at the recommended dimensions
 forestsave(p, file.path(tempdir(), "forest.pdf"))
-#> Forest plot saved to /tmp/Rtmp3J9jIQ/forest.pdf (width = 13.9 in, height = 5.0 in)
+#> Forest plot saved to /tmp/RtmppNr8bf/forest.pdf (width = 13.9 in, height = 5.0 in)
 
 # \donttest{
 
 # Example 2: Raster output at publication resolution
 forestsave(p, file.path(tempdir(), "forest.png"), dpi = 600)
-#> Forest plot saved to /tmp/Rtmp3J9jIQ/forest.png (width = 13.9 in, height = 5.0 in)
+#> Forest plot saved to /tmp/RtmppNr8bf/forest.png (width = 13.9 in, height = 5.0 in)
 
 # Example 3: Dimensions given explicitly, in any supported units
 forestsave(p, file.path(tempdir(), "forest_sized.pdf"),
            width = 24, height = 16, units = "cm")
-#> Forest plot saved to /tmp/Rtmp3J9jIQ/forest_sized.pdf (width = 24.0 cm, height = 16.0 cm)
+#> Forest plot saved to /tmp/RtmppNr8bf/forest_sized.pdf (width = 24.0 cm, height = 16.0 cm)
 
 # Example 4: Embed fonts after writing, where Ghostscript is available
 forestsave(p, file.path(tempdir(), "forest_embedded.pdf"),
            embed_fonts = TRUE)
-#> Forest plot saved to /tmp/Rtmp3J9jIQ/forest_embedded.pdf (width = 13.9 in, height = 5.0 in)
-#> Fonts embedded in /tmp/Rtmp3J9jIQ/forest_embedded.pdf
+#> Forest plot saved to /tmp/RtmppNr8bf/forest_embedded.pdf (width = 13.9 in, height = 5.0 in)
+#> Fonts embedded in /tmp/RtmppNr8bf/forest_embedded.pdf
 
 # }
 ```
