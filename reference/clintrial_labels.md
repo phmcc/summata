@@ -15,7 +15,7 @@ Named character vector with 24 elements
 
 ## See also
 
-[`clintrial`](https://phmcc.codeberg.page/summata/reference/clintrial.md)
+[`clintrial`](https://phmcc.codefloe.page/summata/reference/clintrial.md)
 
 Other sample data:
-[`clintrial`](https://phmcc.codeberg.page/summata/reference/clintrial.md)
+[`clintrial`](https://phmcc.codefloe.page/summata/reference/clintrial.md)

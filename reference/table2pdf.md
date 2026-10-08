@@ -44,12 +44,12 @@ table2pdf(
 - table:
 
   Data frame, data.table, or matrix to export. Can be output from
-  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md),
-  [`survtable()`](https://phmcc.codeberg.page/summata/reference/survtable.md),
-  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
-  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
-  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md),
-  [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md),
+  [`desctable()`](https://phmcc.codefloe.page/summata/reference/desctable.md),
+  [`survtable()`](https://phmcc.codefloe.page/summata/reference/survtable.md),
+  [`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md),
+  [`uniscreen()`](https://phmcc.codefloe.page/summata/reference/uniscreen.md),
+  [`fullfit()`](https://phmcc.codefloe.page/summata/reference/fullfit.md),
+  [`compfit()`](https://phmcc.codefloe.page/summata/reference/compfit.md),
   or any tabular data structure.
 
 - file:
@@ -188,7 +188,7 @@ table2pdf(
   Logical. If `TRUE`, condenses continuous and survival variables into
   single rows while preserving all categorical variable rows (including
   binary). Only applies to descriptive tables from
-  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md).
+  [`desctable()`](https://phmcc.codefloe.page/summata/reference/desctable.md).
   Automatically sets `indent_groups = TRUE`. Unlike `condense_table`,
   this does not collapse binary categorical variables. Default is
   `FALSE`.
@@ -232,9 +232,9 @@ table2pdf(
 ## Value
 
 Invisibly returns the file path, matching
-[`tablesave()`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+[`tablesave()`](https://phmcc.codefloe.page/summata/reference/tablesave.md)
 and
-[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md).
+[`forestsave()`](https://phmcc.codefloe.page/summata/reference/forestsave.md).
 Called for its side effect of creating a PDF file at the specified
 location. If compilation fails, check the `.log` file (if
 `show_logs = TRUE`) for error details.
@@ -336,30 +336,30 @@ If PDF compilation fails:
 
 ## See also
 
-[`tablesave`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+[`tablesave`](https://phmcc.codefloe.page/summata/reference/tablesave.md)
 for saving in the format given by the file extension,
-[`table2tex`](https://phmcc.codeberg.page/summata/reference/table2tex.md)
+[`table2tex`](https://phmcc.codefloe.page/summata/reference/table2tex.md)
 for LaTeX source files,
-[`table2html`](https://phmcc.codeberg.page/summata/reference/table2html.md)
+[`table2html`](https://phmcc.codefloe.page/summata/reference/table2html.md)
 for HTML output,
-[`table2docx`](https://phmcc.codeberg.page/summata/reference/table2docx.md)
+[`table2docx`](https://phmcc.codefloe.page/summata/reference/table2docx.md)
 for Microsoft Word,
-[`table2pptx`](https://phmcc.codeberg.page/summata/reference/table2pptx.md)
+[`table2pptx`](https://phmcc.codefloe.page/summata/reference/table2pptx.md)
 for PowerPoint,
-[`table2rtf`](https://phmcc.codeberg.page/summata/reference/table2rtf.md)
+[`table2rtf`](https://phmcc.codefloe.page/summata/reference/table2rtf.md)
 for Rich Text Format,
-[`desctable`](https://phmcc.codeberg.page/summata/reference/desctable.md)
+[`desctable`](https://phmcc.codefloe.page/summata/reference/desctable.md)
 for descriptive tables,
-[`fit`](https://phmcc.codeberg.page/summata/reference/fit.md) for
+[`fit`](https://phmcc.codefloe.page/summata/reference/fit.md) for
 regression tables
 
 Other export functions:
-[`table2docx()`](https://phmcc.codeberg.page/summata/reference/table2docx.md),
-[`table2html()`](https://phmcc.codeberg.page/summata/reference/table2html.md),
-[`table2pptx()`](https://phmcc.codeberg.page/summata/reference/table2pptx.md),
-[`table2rtf()`](https://phmcc.codeberg.page/summata/reference/table2rtf.md),
-[`table2tex()`](https://phmcc.codeberg.page/summata/reference/table2tex.md),
-[`tablesave()`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+[`table2docx()`](https://phmcc.codefloe.page/summata/reference/table2docx.md),
+[`table2html()`](https://phmcc.codefloe.page/summata/reference/table2html.md),
+[`table2pptx()`](https://phmcc.codefloe.page/summata/reference/table2pptx.md),
+[`table2rtf()`](https://phmcc.codefloe.page/summata/reference/table2rtf.md),
+[`table2tex()`](https://phmcc.codefloe.page/summata/reference/table2tex.md),
+[`tablesave()`](https://phmcc.codefloe.page/summata/reference/tablesave.md)
 
 ## Examples
 
@@ -393,7 +393,7 @@ if(has_latex){
   table2pdf(results, file.path(tempdir(), "basic_results.pdf"))
 }
 #> Compiling PDF...
-#> Table saved to /tmp/RtmppNr8bf/basic_results.pdf
+#> Table saved to /tmp/RtmpctNfZY/basic_results.pdf
 
 # \donttest{
 
@@ -403,7 +403,7 @@ if (has_latex) {
            orientation = "landscape")
 }
 #> Compiling PDF...
-#> Table saved to /tmp/RtmppNr8bf/wide_results.pdf
+#> Table saved to /tmp/RtmpctNfZY/wide_results.pdf
 
 # Example 3: With caption
 if (has_latex) {
@@ -411,7 +411,7 @@ if (has_latex) {
            caption = "Table 1: Multivariable logistic regression results")
 }
 #> Compiling PDF...
-#> Table saved to /tmp/RtmppNr8bf/captioned.pdf
+#> Table saved to /tmp/RtmpctNfZY/captioned.pdf
 
 # Example 4: Multi-line caption with formatting
 if (has_latex) {
@@ -420,7 +420,7 @@ if (has_latex) {
                      aOR = adjusted odds ratio; CI = confidence interval")
 }
 #> Compiling PDF...
-#> Table saved to /tmp/RtmppNr8bf/formatted_caption.pdf
+#> Table saved to /tmp/RtmpctNfZY/formatted_caption.pdf
 
 # Example 5: Auto-sized PDF (no fixed page dimensions)
 if (has_latex) {
@@ -429,7 +429,7 @@ if (has_latex) {
 }
 #> Using standalone class for auto-sized output
 #> Compiling PDF...
-#> Table saved to /tmp/RtmppNr8bf/autosize.pdf
+#> Table saved to /tmp/RtmpctNfZY/autosize.pdf
 
 # Example 6: A4 paper with custom margins
 if (has_latex) {
@@ -438,7 +438,7 @@ if (has_latex) {
            margins = c(0.75, 0.75, 0.75, 0.75))
 }
 #> Compiling PDF...
-#> Table saved to /tmp/RtmppNr8bf/a4_custom.pdf
+#> Table saved to /tmp/RtmpctNfZY/a4_custom.pdf
 
 # Example 7: Larger font for readability
 if (has_latex) {
@@ -446,7 +446,7 @@ if (has_latex) {
            font_size = 11)
 }
 #> Compiling PDF...
-#> Table saved to /tmp/RtmppNr8bf/large_font.pdf
+#> Table saved to /tmp/RtmpctNfZY/large_font.pdf
 
 # Example 8: Indented hierarchical display
 if (has_latex) {
@@ -454,7 +454,7 @@ if (has_latex) {
            indent_groups = TRUE)
 }
 #> Compiling PDF...
-#> Table saved to /tmp/RtmppNr8bf/indented.pdf
+#> Table saved to /tmp/RtmpctNfZY/indented.pdf
 
 # Example 9: Condensed table (reduced height)
 if (has_latex) {
@@ -462,7 +462,7 @@ if (has_latex) {
            condense_table = TRUE)
 }
 #> Compiling PDF...
-#> Table saved to /tmp/RtmppNr8bf/condensed.pdf
+#> Table saved to /tmp/RtmpctNfZY/condensed.pdf
 
 # Example 10: With zebra stripes
 if (has_latex) {
@@ -471,7 +471,7 @@ if (has_latex) {
            stripe_color = "gray!15")
 }
 #> Compiling PDF...
-#> Table saved to /tmp/RtmppNr8bf/striped.pdf
+#> Table saved to /tmp/RtmpctNfZY/striped.pdf
 
 # Example 11: Dark header style
 if (has_latex) {
@@ -479,7 +479,7 @@ if (has_latex) {
            dark_header = TRUE)
 }
 #> Compiling PDF...
-#> Table saved to /tmp/RtmppNr8bf/dark_header.pdf
+#> Table saved to /tmp/RtmpctNfZY/dark_header.pdf
 
 # Example 12: Combination of formatting options
 if (has_latex) {
@@ -495,7 +495,7 @@ if (has_latex) {
            p_threshold = 0.05)
 }
 #> Compiling PDF...
-#> Table saved to /tmp/RtmppNr8bf/publication_ready.pdf
+#> Table saved to /tmp/RtmpctNfZY/publication_ready.pdf
 
 # Example 13: Adjust cell padding
 if (has_latex) {
@@ -503,7 +503,7 @@ if (has_latex) {
            cell_padding = "relaxed")  # More spacious
 }
 #> Compiling PDF...
-#> Table saved to /tmp/RtmppNr8bf/relaxed_padding.pdf
+#> Table saved to /tmp/RtmpctNfZY/relaxed_padding.pdf
 
 # Example 14: No scaling (natural table width)
 if (has_latex) {
@@ -512,7 +512,7 @@ if (has_latex) {
            font_size = 10)
 }
 #> Compiling PDF...
-#> Table saved to /tmp/RtmppNr8bf/no_scale.pdf
+#> Table saved to /tmp/RtmpctNfZY/no_scale.pdf
 
 # Example 15: Hide significance bolding
 if (has_latex) {
@@ -520,7 +520,7 @@ if (has_latex) {
            bold_significant = FALSE)
 }
 #> Compiling PDF...
-#> Table saved to /tmp/RtmppNr8bf/no_bold.pdf
+#> Table saved to /tmp/RtmpctNfZY/no_bold.pdf
 
 # Example 16: Custom column alignment
 if (has_latex) {
@@ -528,7 +528,7 @@ if (has_latex) {
            align = c("c", "c", "c", "c", "c", "c", "c"))
 }
 #> Compiling PDF...
-#> Table saved to /tmp/RtmppNr8bf/custom_align.pdf
+#> Table saved to /tmp/RtmpctNfZY/custom_align.pdf
 
 # Example 17: Descriptive statistics table
 if (has_latex) {
@@ -540,7 +540,7 @@ if (has_latex) {
            orientation = "landscape")
 }
 #> Compiling PDF...
-#> Table saved to /tmp/RtmppNr8bf/descriptive.pdf
+#> Table saved to /tmp/RtmpctNfZY/descriptive.pdf
 
 # Example 18: Model comparison table
 if (has_latex) {
@@ -567,7 +567,7 @@ if (has_latex) {
 #> Fitting base with 2 predictors...
 #> Fitting full with 4 predictors...
 #> Compiling PDF...
-#> Table saved to /tmp/RtmppNr8bf/model_comparison.pdf
+#> Table saved to /tmp/RtmpctNfZY/model_comparison.pdf
 
 # Example 19: Very wide table with aggressive fitting
 if (has_latex) {
@@ -585,7 +585,7 @@ if (has_latex) {
            condense_table = TRUE)
 }
 #> Compiling PDF...
-#> Table saved to /tmp/RtmppNr8bf/very_wide.pdf
+#> Table saved to /tmp/RtmpctNfZY/very_wide.pdf
 
 # Example 20: With caption size control
 if (has_latex) {
@@ -596,7 +596,7 @@ if (has_latex) {
                      Smaller caption fits better on constrained pages")
 }
 #> Compiling PDF...
-#> Table saved to /tmp/RtmppNr8bf/caption_size.pdf
+#> Table saved to /tmp/RtmpctNfZY/caption_size.pdf
 
 # Example 21: Troubleshooting - keep logs
 if (has_latex) {
@@ -605,6 +605,6 @@ if (has_latex) {
   # If it fails, check debug.log for error messages
 }
 #> Compiling PDF...
-#> Table saved to /tmp/RtmppNr8bf/debug.pdf
+#> Table saved to /tmp/RtmpctNfZY/debug.pdf
 # }
 ```

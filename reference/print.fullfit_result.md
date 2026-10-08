@@ -28,12 +28,12 @@ printing a formatted summary to the console.
 ## See also
 
 Other regression functions:
-[`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md),
-[`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
-[`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md),
-[`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md),
-[`print.compfit_result()`](https://phmcc.codeberg.page/summata/reference/print.compfit_result.md),
-[`print.fit_result()`](https://phmcc.codeberg.page/summata/reference/print.fit_result.md),
-[`print.multifit_result()`](https://phmcc.codeberg.page/summata/reference/print.multifit_result.md),
-[`print.uniscreen_result()`](https://phmcc.codeberg.page/summata/reference/print.uniscreen_result.md),
-[`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md)
+[`compfit()`](https://phmcc.codefloe.page/summata/reference/compfit.md),
+[`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md),
+[`fullfit()`](https://phmcc.codefloe.page/summata/reference/fullfit.md),
+[`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md),
+[`print.compfit_result()`](https://phmcc.codefloe.page/summata/reference/print.compfit_result.md),
+[`print.fit_result()`](https://phmcc.codefloe.page/summata/reference/print.fit_result.md),
+[`print.multifit_result()`](https://phmcc.codefloe.page/summata/reference/print.multifit_result.md),
+[`print.uniscreen_result()`](https://phmcc.codefloe.page/summata/reference/print.uniscreen_result.md),
+[`uniscreen()`](https://phmcc.codefloe.page/summata/reference/uniscreen.md)

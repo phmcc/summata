@@ -4,7 +4,7 @@ Writes a table to file in the format indicated by the file extension,
 dispatching to the appropriate specialized export function. Provides a
 unified interface for table export across all supported formats, and is
 the counterpart to
-[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+[`forestsave()`](https://phmcc.codefloe.page/summata/reference/forestsave.md)
 for forest plots.
 
 ## Usage
@@ -20,14 +20,14 @@ autotable(table, file, quiet = FALSE, ...)
 - table:
 
   A table produced by
-  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md),
-  [`survtable()`](https://phmcc.codeberg.page/summata/reference/survtable.md),
-  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
-  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
-  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md),
-  [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md),
+  [`desctable()`](https://phmcc.codefloe.page/summata/reference/desctable.md),
+  [`survtable()`](https://phmcc.codefloe.page/summata/reference/survtable.md),
+  [`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md),
+  [`uniscreen()`](https://phmcc.codefloe.page/summata/reference/uniscreen.md),
+  [`fullfit()`](https://phmcc.codefloe.page/summata/reference/fullfit.md),
+  [`compfit()`](https://phmcc.codefloe.page/summata/reference/compfit.md),
   or
-  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md).
+  [`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md).
   Any data frame, data.table, or matrix is accepted.
 
 - file:
@@ -42,29 +42,29 @@ autotable(table, file, quiet = FALSE, ...)
     [`data.table::fwrite()`](https://rdrr.io/pkg/data.table/man/fwrite.html))
 
   - `.pdf` - PDF via LaTeX (uses
-    [`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md))
+    [`table2pdf()`](https://phmcc.codefloe.page/summata/reference/table2pdf.md))
 
   - `.docx` - Microsoft Word (uses
-    [`table2docx()`](https://phmcc.codeberg.page/summata/reference/table2docx.md))
+    [`table2docx()`](https://phmcc.codefloe.page/summata/reference/table2docx.md))
 
   - `.html` or `.htm` - HTML (uses
-    [`table2html()`](https://phmcc.codeberg.page/summata/reference/table2html.md))
+    [`table2html()`](https://phmcc.codefloe.page/summata/reference/table2html.md))
 
   - `.pptx` - Microsoft PowerPoint (uses
-    [`table2pptx()`](https://phmcc.codeberg.page/summata/reference/table2pptx.md))
+    [`table2pptx()`](https://phmcc.codefloe.page/summata/reference/table2pptx.md))
 
   - `.tex` - LaTeX source (uses
-    [`table2tex()`](https://phmcc.codeberg.page/summata/reference/table2tex.md))
+    [`table2tex()`](https://phmcc.codefloe.page/summata/reference/table2tex.md))
 
   - `.rtf` - Rich Text Format (uses
-    [`table2rtf()`](https://phmcc.codeberg.page/summata/reference/table2rtf.md))
+    [`table2rtf()`](https://phmcc.codefloe.page/summata/reference/table2rtf.md))
 
 - quiet:
 
   Logical. Suppress progress and confirmation messages. The setting is
   forwarded to the format-specific export function, so the LaTeX
   compilation notices from
-  [`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md)
+  [`table2pdf()`](https://phmcc.codefloe.page/summata/reference/table2pdf.md)
   are suppressed with it. Default is `FALSE`.
 
 - ...:
@@ -74,32 +74,32 @@ autotable(table, file, quiet = FALSE, ...)
 
   PDF
 
-  :   [`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md) -
+  :   [`table2pdf()`](https://phmcc.codefloe.page/summata/reference/table2pdf.md) -
       `orientation`, `paper`, `margins`, `fit_to_page`, *etc.*
 
   DOCX
 
-  :   [`table2docx()`](https://phmcc.codeberg.page/summata/reference/table2docx.md) -
+  :   [`table2docx()`](https://phmcc.codefloe.page/summata/reference/table2docx.md) -
       `font_size`, `font_family`, `caption`, *etc.*
 
   HTML
 
-  :   [`table2html()`](https://phmcc.codeberg.page/summata/reference/table2html.md) -
+  :   [`table2html()`](https://phmcc.codefloe.page/summata/reference/table2html.md) -
       `format_headers`, `zebra_stripes`, *etc.*
 
   PPTX
 
-  :   [`table2pptx()`](https://phmcc.codeberg.page/summata/reference/table2pptx.md) -
+  :   [`table2pptx()`](https://phmcc.codefloe.page/summata/reference/table2pptx.md) -
       `font_size`, `font_family`, `caption`, *etc.*
 
   TEX
 
-  :   [`table2tex()`](https://phmcc.codeberg.page/summata/reference/table2tex.md) -
+  :   [`table2tex()`](https://phmcc.codefloe.page/summata/reference/table2tex.md) -
       `caption`, `format_headers`, `align`, *etc.*
 
   RTF
 
-  :   [`table2rtf()`](https://phmcc.codeberg.page/summata/reference/table2rtf.md) -
+  :   [`table2rtf()`](https://phmcc.codefloe.page/summata/reference/table2rtf.md) -
       `font_size`, `font_family`, `caption`, *etc.*
 
   CSV, TSV
@@ -166,20 +166,20 @@ be called directly:
 
 ## See also
 
-[`table2pdf`](https://phmcc.codeberg.page/summata/reference/table2pdf.md),
-[`table2docx`](https://phmcc.codeberg.page/summata/reference/table2docx.md),
-[`table2pptx`](https://phmcc.codeberg.page/summata/reference/table2pptx.md),
-[`table2html`](https://phmcc.codeberg.page/summata/reference/table2html.md),
-[`table2rtf`](https://phmcc.codeberg.page/summata/reference/table2rtf.md),
-[`table2tex`](https://phmcc.codeberg.page/summata/reference/table2tex.md)
+[`table2pdf`](https://phmcc.codefloe.page/summata/reference/table2pdf.md),
+[`table2docx`](https://phmcc.codefloe.page/summata/reference/table2docx.md),
+[`table2pptx`](https://phmcc.codefloe.page/summata/reference/table2pptx.md),
+[`table2html`](https://phmcc.codefloe.page/summata/reference/table2html.md),
+[`table2rtf`](https://phmcc.codefloe.page/summata/reference/table2rtf.md),
+[`table2tex`](https://phmcc.codefloe.page/summata/reference/table2tex.md)
 
 Other export functions:
-[`table2docx()`](https://phmcc.codeberg.page/summata/reference/table2docx.md),
-[`table2html()`](https://phmcc.codeberg.page/summata/reference/table2html.md),
-[`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md),
-[`table2pptx()`](https://phmcc.codeberg.page/summata/reference/table2pptx.md),
-[`table2rtf()`](https://phmcc.codeberg.page/summata/reference/table2rtf.md),
-[`table2tex()`](https://phmcc.codeberg.page/summata/reference/table2tex.md)
+[`table2docx()`](https://phmcc.codefloe.page/summata/reference/table2docx.md),
+[`table2html()`](https://phmcc.codefloe.page/summata/reference/table2html.md),
+[`table2pdf()`](https://phmcc.codefloe.page/summata/reference/table2pdf.md),
+[`table2pptx()`](https://phmcc.codefloe.page/summata/reference/table2pptx.md),
+[`table2rtf()`](https://phmcc.codefloe.page/summata/reference/table2rtf.md),
+[`table2tex()`](https://phmcc.codefloe.page/summata/reference/table2tex.md)
 
 ## Examples
 
@@ -194,11 +194,11 @@ tbl <- desctable(clintrial, by = "treatment",
 if (requireNamespace("xtable", quietly = TRUE)) {
   tablesave(tbl, file.path(tempdir(), "example.html"))
 }
-#> Table saved to /tmp/RtmppNr8bf/example.html
+#> Table saved to /tmp/RtmpctNfZY/example.html
 
 # Example 2: Delimited output needs no additional packages
 tablesave(tbl, file.path(tempdir(), "example.csv"))
-#> Table saved to /tmp/RtmppNr8bf/example.csv
+#> Table saved to /tmp/RtmpctNfZY/example.csv
 
 # Example 3: Suppress the message reporting the file written
 tablesave(tbl, file.path(tempdir(), "example.tsv"), quiet = TRUE)
@@ -235,20 +235,20 @@ has_latex <- local({
 
 # Example 4: The format is taken from the file extension
 tablesave(results, file.path(tempdir(), "results.html"))  # Creates HTML file
-#> Table saved to /tmp/RtmppNr8bf/results.html
+#> Table saved to /tmp/RtmpctNfZY/results.html
 tablesave(results, file.path(tempdir(), "results.docx"))  # Creates Word document
-#> Table saved to /tmp/RtmppNr8bf/results.docx
+#> Table saved to /tmp/RtmpctNfZY/results.docx
 tablesave(results, file.path(tempdir(), "results.pptx"))  # Creates PowerPoint slide
-#> Table saved to /tmp/RtmppNr8bf/results.pptx
+#> Table saved to /tmp/RtmpctNfZY/results.pptx
 tablesave(results, file.path(tempdir(), "results.tex"))   # Creates LaTeX source
-#> Table saved to /tmp/RtmppNr8bf/results.tex
+#> Table saved to /tmp/RtmpctNfZY/results.tex
 tablesave(results, file.path(tempdir(), "results.rtf"))   # Creates RTF document
-#> Table saved to /tmp/RtmppNr8bf/results.rtf
+#> Table saved to /tmp/RtmpctNfZY/results.rtf
 if (has_latex) {
   tablesave(results, file.path(tempdir(), "results.pdf")) # Creates PDF
 }
 #> Compiling PDF...
-#> Table saved to /tmp/RtmppNr8bf/results.pdf
+#> Table saved to /tmp/RtmpctNfZY/results.pdf
 
 # Example 5: Format-specific parameters are passed through
 if (has_latex) {
@@ -258,19 +258,19 @@ if (has_latex) {
              font_size = 10)
 }
 #> Compiling PDF...
-#> Table saved to /tmp/RtmppNr8bf/results.pdf
+#> Table saved to /tmp/RtmpctNfZY/results.pdf
 
 tablesave(results, file.path(tempdir(), "results.docx"),
            caption = "Table 1: Logistic Regression Results",
            font_family = "Times New Roman",
            condense_table = TRUE)
-#> Table saved to /tmp/RtmppNr8bf/results.docx
+#> Table saved to /tmp/RtmpctNfZY/results.docx
 
 tablesave(results, file.path(tempdir(), "results.html"),
            zebra_stripes = TRUE,
            dark_header = TRUE,
            bold_significant = TRUE)
-#> Table saved to /tmp/RtmppNr8bf/results.html
+#> Table saved to /tmp/RtmpctNfZY/results.html
 
 # Example 6: Any summata table may be saved
 desc <- desctable(clintrial,
@@ -280,7 +280,7 @@ if (has_latex) {
   tablesave(desc, file.path(tempdir(), "demographics.pdf"))
 }
 #> Compiling PDF...
-#> Table saved to /tmp/RtmppNr8bf/demographics.pdf
+#> Table saved to /tmp/RtmpctNfZY/demographics.pdf
 
 # Example 7: Model comparison table
 # Information criteria assume a common sample, so the candidate
@@ -300,7 +300,7 @@ comparison <- compfit(
 #> Fitting base with 2 predictors...
 #> Fitting full with 4 predictors...
 tablesave(comparison, file.path(tempdir(), "model_comparison.docx"))
-#> Table saved to /tmp/RtmppNr8bf/model_comparison.docx
+#> Table saved to /tmp/RtmpctNfZY/model_comparison.docx
 
 # }
 ```

@@ -8,7 +8,7 @@ discrimination metrics (C-statistic), and hypothesis tests for nested
 models.
 
 The
-[`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
+[`compfit()`](https://phmcc.codefloe.page/summata/reference/compfit.md)
 function synthesizes these metrics into a weighted Composite Model Score
 (CMS) to facilitate systematic comparison between models. Like other
 functions in this package, it follows the standard `summata` input
@@ -43,7 +43,7 @@ data(clintrial_labels)
 ## Quality Metrics and the Composite Model Score
 
 The
-[`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
+[`compfit()`](https://phmcc.codefloe.page/summata/reference/compfit.md)
 function evaluates models using several quality metrics, then combines
 them into a single Composite Model Score (CMS) ranging from 0 to 100 for
 rapid comparison. The metrics available depend on the model type.
@@ -267,7 +267,7 @@ example4
 ## Interaction Testing
 
 A key application of
-[`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
+[`compfit()`](https://phmcc.codefloe.page/summata/reference/compfit.md)
 is testing whether interaction terms improve model fit.
 
 ### **Example 5:** Single Interaction
@@ -732,7 +732,7 @@ scenario3
 ## Exporting Results
 
 Comparison tables can be exported to various formats using the
-[`tablesave()`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+[`tablesave()`](https://phmcc.codefloe.page/summata/reference/tablesave.md)
 dispatcher or the various per-format export functions:
 
 ``` r
@@ -840,24 +840,24 @@ comparison[, .(Model, `Composite Model Score (CMS)`, AIC, Concordance)]
 ## Further Reading
 
 - [Descriptive
-  Tables](https://phmcc.codeberg.page/summata/articles/descriptive_tables.md):
-  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
+  Tables](https://phmcc.codefloe.page/summata/articles/descriptive_tables.md):
+  [`desctable()`](https://phmcc.codefloe.page/summata/reference/desctable.md)
   for baseline characteristics
 - [Regression
-  Modeling](https://phmcc.codeberg.page/summata/articles/regression_modeling.md):
-  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
-  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md), and
-  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
+  Modeling](https://phmcc.codefloe.page/summata/articles/regression_modeling.md):
+  [`uniscreen()`](https://phmcc.codefloe.page/summata/reference/uniscreen.md),
+  [`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md), and
+  [`fullfit()`](https://phmcc.codefloe.page/summata/reference/fullfit.md)
 - [Table
-  Export](https://phmcc.codeberg.page/summata/articles/table_export.md):
+  Export](https://phmcc.codefloe.page/summata/articles/table_export.md):
   Export to PDF, Word, and other formats
 - [Forest
-  Plots](https://phmcc.codeberg.page/summata/articles/forest_plots.md):
+  Plots](https://phmcc.codefloe.page/summata/articles/forest_plots.md):
   Visualization of regression results
 - [Multivariate
-  Regression](https://phmcc.codeberg.page/summata/articles/multivariate_regression.md):
-  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
+  Regression](https://phmcc.codefloe.page/summata/articles/multivariate_regression.md):
+  [`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md)
   for multi-outcome analysis
 - [Advanced
-  Workflows](https://phmcc.codeberg.page/summata/articles/advanced_workflows.md):
+  Workflows](https://phmcc.codefloe.page/summata/articles/advanced_workflows.md):
   Interactions and mixed-effects models

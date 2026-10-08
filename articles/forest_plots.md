@@ -12,12 +12,12 @@ each model type, plus an automatic detection function:
 
 | Function | Model Type | Effect Measure |
 |:---|:---|:---|
-| [`autoforest()`](https://phmcc.codeberg.page/summata/reference/autoforest.md) | Auto-detect | Auto-detect |
-| [`lmforest()`](https://phmcc.codeberg.page/summata/reference/lmforest.md) | Linear regression | Coefficient (*β*) |
-| [`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md) | Logistic/Poisson | Odds ratio / Rate ratio |
-| [`coxforest()`](https://phmcc.codeberg.page/summata/reference/coxforest.md) | Cox regression | Hazard ratio |
-| [`uniforest()`](https://phmcc.codeberg.page/summata/reference/uniforest.md) | Univariable screening | Model-dependent |
-| [`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md) | Multi-outcome analysis | Model-dependent |
+| [`autoforest()`](https://phmcc.codefloe.page/summata/reference/autoforest.md) | Auto-detect | Auto-detect |
+| [`lmforest()`](https://phmcc.codefloe.page/summata/reference/lmforest.md) | Linear regression | Coefficient (*β*) |
+| [`glmforest()`](https://phmcc.codefloe.page/summata/reference/glmforest.md) | Logistic/Poisson | Odds ratio / Rate ratio |
+| [`coxforest()`](https://phmcc.codefloe.page/summata/reference/coxforest.md) | Cox regression | Hazard ratio |
+| [`uniforest()`](https://phmcc.codefloe.page/summata/reference/uniforest.md) | Univariable screening | Model-dependent |
+| [`multiforest()`](https://phmcc.codefloe.page/summata/reference/multiforest.md) | Multi-outcome analysis | Model-dependent |
 
 These functions follow a standard syntax when called:
 
@@ -26,11 +26,11 @@ forest_plot <- autoforest(x, data, ...)
 ```
 
 where `x` is either a model or a `summata` fitted output (e.g., from
-[`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
-[`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
-[`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md),
+[`uniscreen()`](https://phmcc.codefloe.page/summata/reference/uniscreen.md),
+[`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md),
+[`fullfit()`](https://phmcc.codefloe.page/summata/reference/fullfit.md),
 or
-[`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)),
+[`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md)),
 and `data` is the name of the dataset used. The `data` argument is
 optional and is primarily used to derive *n* and Events counts for
 various groups/subgroups.
@@ -42,7 +42,7 @@ supported by
 [`ggplot2::ggsave()`](https://ggplot2.tidyverse.org/reference/ggsave.html).
 This export can be streamlined with `summata`-recommended default
 dimensions by using the
-[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+[`forestsave()`](https://phmcc.codefloe.page/summata/reference/forestsave.md)
 function:
 
 ``` r
@@ -74,7 +74,7 @@ data(clintrial_labels)
 > for correct font metrics. That sizing is applied behind the scenes and
 > is not shown in the code. Writing a plot to file elsewhere is
 > performed with
-> [`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md),
+> [`forestsave()`](https://phmcc.codefloe.page/summata/reference/forestsave.md),
 > which applies the same dimensions and selects a suitable graphics
 > device:
 >
@@ -118,7 +118,7 @@ example1 <- glmforest(
 ### **Example 2:** Linear Regression
 
 For continuous outcomes, use
-[`lmforest()`](https://phmcc.codeberg.page/summata/reference/lmforest.md):
+[`lmforest()`](https://phmcc.codefloe.page/summata/reference/lmforest.md):
 
 ``` r
 linear_model <- lm(
@@ -139,7 +139,7 @@ example2 <- lmforest(
 ### **Example 3:** Cox Regression
 
 For survival models, use
-[`coxforest()`](https://phmcc.codeberg.page/summata/reference/coxforest.md):
+[`coxforest()`](https://phmcc.codefloe.page/summata/reference/coxforest.md):
 
 ``` r
 cox_model <- coxph(
@@ -160,7 +160,7 @@ example3 <- coxforest(
 ### **Example 4:** Automatic Model Detection
 
 The
-[`autoforest()`](https://phmcc.codeberg.page/summata/reference/autoforest.md)
+[`autoforest()`](https://phmcc.codefloe.page/summata/reference/autoforest.md)
 function detects the model type automatically:
 
 ``` r
@@ -178,15 +178,15 @@ example4 <- autoforest(
 ## Creating Forest Plots from *summata* Output
 
 Forest plots integrate seamlessly with
-[`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md) and
-[`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
+[`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md) and
+[`fullfit()`](https://phmcc.codefloe.page/summata/reference/fullfit.md)
 output by extracting the attached model object.
 
 ### **Example 5:** Direct Extraction from Fit Output
 
 Input a `summata` regression object (*i.e.*, from
-[`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md) or
-[`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md))
+[`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md) or
+[`fullfit()`](https://phmcc.codefloe.page/summata/reference/fullfit.md))
 directly into a forest plot function:
 
 ``` r
@@ -439,12 +439,12 @@ example16b <- glmforest(
 
 Forest plots include a `rec_dims` attribute recording the dimensions
 best suited to their content.
-[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+[`forestsave()`](https://phmcc.codefloe.page/summata/reference/forestsave.md)
 reads it, so no manual sizing is required.
 
 ### **Example 17:** Recommended Dimensions
 
-[`recdims()`](https://phmcc.codeberg.page/summata/reference/recdims.md)
+[`recdims()`](https://phmcc.codefloe.page/summata/reference/recdims.md)
 can be used to extract the recommended plot dimensions directly.
 
 ``` r
@@ -474,7 +474,7 @@ recdims(p, units = "mm")
 ### **Example 18:** Multiple Formats
 
 Export to different formats as needed using
-[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md):
+[`forestsave()`](https://phmcc.codefloe.page/summata/reference/forestsave.md):
 
 ``` r
 p <- glmforest(
@@ -557,10 +557,10 @@ example20_modified <- example20 +
 ## Additional GLM Families
 
 The
-[`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md)
+[`glmforest()`](https://phmcc.codefloe.page/summata/reference/glmforest.md)
 function supports all GLM families. These can be plotted in a similar
 fashion to standard logistic regression forest plots. See [Regression
-Modeling](https://phmcc.codeberg.page/summata/articles/regression_modeling.md)
+Modeling](https://phmcc.codefloe.page/summata/articles/regression_modeling.md)
 for the full list of supported model types.
 
 ### **Example 21:** Poisson Regression
@@ -589,7 +589,7 @@ example21 <- glmforest(
 
 For overdispersed count outcomes (variance \> mean), negative binomial
 regression is preferred. Using
-[`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md) ensures
+[`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md) ensures
 proper handling:
 
 ``` r
@@ -615,7 +615,7 @@ example22 <- glmforest(
 
 | Parameter | Description | Default |
 |:---|:---|:---|
-| `x` | Model object or model from [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md) output | Required |
+| `x` | Model object or model from [`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md) output | Required |
 | `data` | Data frame (required for model objects) | `NULL` |
 | `title` | Plot title | `NULL` |
 | `labels` | Named vector for variable labels | `NULL` |
@@ -697,29 +697,29 @@ p <- glmforest(model, labels = labels)
 ## Further Reading
 
 - [Descriptive
-  Tables](https://phmcc.codeberg.page/summata/articles/descriptive_tables.md):
-  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
+  Tables](https://phmcc.codefloe.page/summata/articles/descriptive_tables.md):
+  [`desctable()`](https://phmcc.codefloe.page/summata/reference/desctable.md)
   for baseline characteristics
 - [Survival
-  Tables](https://phmcc.codeberg.page/summata/articles/survival_tables.md):
-  [`survtable()`](https://phmcc.codeberg.page/summata/reference/survtable.md)
+  Tables](https://phmcc.codefloe.page/summata/articles/survival_tables.md):
+  [`survtable()`](https://phmcc.codefloe.page/summata/reference/survtable.md)
   for time-to-event summaries
 - [Regression
-  Modeling](https://phmcc.codeberg.page/summata/articles/regression_modeling.md):
-  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
-  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md), and
-  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
+  Modeling](https://phmcc.codefloe.page/summata/articles/regression_modeling.md):
+  [`uniscreen()`](https://phmcc.codefloe.page/summata/reference/uniscreen.md),
+  [`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md), and
+  [`fullfit()`](https://phmcc.codefloe.page/summata/reference/fullfit.md)
 - [Model
-  Comparison](https://phmcc.codeberg.page/summata/articles/model_comparison.md):
-  [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
+  Comparison](https://phmcc.codefloe.page/summata/articles/model_comparison.md):
+  [`compfit()`](https://phmcc.codefloe.page/summata/reference/compfit.md)
   for comparing models
 - [Table
-  Export](https://phmcc.codeberg.page/summata/articles/table_export.md):
+  Export](https://phmcc.codefloe.page/summata/articles/table_export.md):
   Export to PDF, Word, and other formats
 - [Multivariate
-  Regression](https://phmcc.codeberg.page/summata/articles/multivariate_regression.md):
-  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
+  Regression](https://phmcc.codefloe.page/summata/articles/multivariate_regression.md):
+  [`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md)
   for multi-outcome analysis
 - [Advanced
-  Workflows](https://phmcc.codeberg.page/summata/articles/advanced_workflows.md):
+  Workflows](https://phmcc.codefloe.page/summata/articles/advanced_workflows.md):
   Interactions and mixed-effects models

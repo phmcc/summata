@@ -1,7 +1,7 @@
 # Create Forest Plot for Univariable Screening
 
 Generates a publication-ready forest plot from a
-[`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md)
+[`uniscreen()`](https://phmcc.codefloe.page/summata/reference/uniscreen.md)
 output object. The plot displays effect estimates (OR, HR, RR, or
 coefficients) with confidence intervals for each predictor tested in
 univariable analysis against a single outcome.
@@ -46,7 +46,7 @@ uniforest(
 
   Univariable screen result object (data.table with class attributes
   from
-  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md)).
+  [`uniscreen()`](https://phmcc.codefloe.page/summata/reference/uniscreen.md)).
 
 - title:
 
@@ -246,7 +246,7 @@ The returned object includes an attribute `"rec_dims"` accessible via
 These recommendations are automatically calculated based on the number
 of variables, text sizes, and layout parameters, and are printed to
 console if `plot_width` or `plot_height` are not specified.
-[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+[`forestsave()`](https://phmcc.codefloe.page/summata/reference/forestsave.md)
 reads all three and requires no further handling.
 
 The returned object also includes an attribute `"table_data"` accessible
@@ -281,27 +281,27 @@ The plot automatically handles:
 
 ## See also
 
-[`autoforest`](https://phmcc.codeberg.page/summata/reference/autoforest.md)
+[`autoforest`](https://phmcc.codefloe.page/summata/reference/autoforest.md)
 for automatic model detection,
-[`uniscreen`](https://phmcc.codeberg.page/summata/reference/uniscreen.md)
+[`uniscreen`](https://phmcc.codefloe.page/summata/reference/uniscreen.md)
 for generating univariable screening results,
-[`multiforest`](https://phmcc.codeberg.page/summata/reference/multiforest.md)
+[`multiforest`](https://phmcc.codefloe.page/summata/reference/multiforest.md)
 for multi-outcome forest plots,
-[`coxforest`](https://phmcc.codeberg.page/summata/reference/coxforest.md),
-[`glmforest`](https://phmcc.codeberg.page/summata/reference/glmforest.md),
-[`lmforest`](https://phmcc.codeberg.page/summata/reference/lmforest.md)
+[`coxforest`](https://phmcc.codefloe.page/summata/reference/coxforest.md),
+[`glmforest`](https://phmcc.codefloe.page/summata/reference/glmforest.md),
+[`lmforest`](https://phmcc.codefloe.page/summata/reference/lmforest.md)
 for single-model forest plots,
-[`forestsave`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+[`forestsave`](https://phmcc.codefloe.page/summata/reference/forestsave.md)
 for saving with recommended dimensions
 
 Other visualization functions:
-[`autoforest()`](https://phmcc.codeberg.page/summata/reference/autoforest.md),
-[`coxforest()`](https://phmcc.codeberg.page/summata/reference/coxforest.md),
-[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md),
-[`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md),
-[`lmforest()`](https://phmcc.codeberg.page/summata/reference/lmforest.md),
-[`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md),
-[`recdims()`](https://phmcc.codeberg.page/summata/reference/recdims.md)
+[`autoforest()`](https://phmcc.codefloe.page/summata/reference/autoforest.md),
+[`coxforest()`](https://phmcc.codefloe.page/summata/reference/coxforest.md),
+[`forestsave()`](https://phmcc.codefloe.page/summata/reference/forestsave.md),
+[`glmforest()`](https://phmcc.codefloe.page/summata/reference/glmforest.md),
+[`lmforest()`](https://phmcc.codefloe.page/summata/reference/lmforest.md),
+[`multiforest()`](https://phmcc.codefloe.page/summata/reference/multiforest.md),
+[`recdims()`](https://phmcc.codefloe.page/summata/reference/recdims.md)
 
 ## Examples
 
@@ -367,7 +367,7 @@ p4 <- uniforest(
 
 # Example 5: Save with recommended dimensions
 forestsave(p4, file.path(tempdir(), "univariable_forest.pdf"))
-#> Forest plot saved to /tmp/RtmppNr8bf/univariable_forest.pdf (width = 10.7 in, height = 7.2 in)
+#> Forest plot saved to /tmp/RtmpctNfZY/univariable_forest.pdf (width = 10.7 in, height = 7.2 in)
 
 options(old_width)
 

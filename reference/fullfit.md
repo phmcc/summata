@@ -574,31 +574,31 @@ not met.
 
 ## See also
 
-[`uniscreen`](https://phmcc.codeberg.page/summata/reference/uniscreen.md)
+[`uniscreen`](https://phmcc.codefloe.page/summata/reference/uniscreen.md)
 for univariable screening only,
-[`fit`](https://phmcc.codeberg.page/summata/reference/fit.md) for
+[`fit`](https://phmcc.codefloe.page/summata/reference/fit.md) for
 fitting a single multivariable model,
-[`compfit`](https://phmcc.codeberg.page/summata/reference/compfit.md)
+[`compfit`](https://phmcc.codefloe.page/summata/reference/compfit.md)
 for comparing multiple models,
-[`desctable`](https://phmcc.codeberg.page/summata/reference/desctable.md)
+[`desctable`](https://phmcc.codefloe.page/summata/reference/desctable.md)
 for descriptive statistics,
-[`autoforest`](https://phmcc.codeberg.page/summata/reference/autoforest.md)
+[`autoforest`](https://phmcc.codefloe.page/summata/reference/autoforest.md)
 for forest plots of the multivariable models,
-[`forestsave`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+[`forestsave`](https://phmcc.codefloe.page/summata/reference/forestsave.md)
 for exporting forest plots,
-[`tablesave`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+[`tablesave`](https://phmcc.codefloe.page/summata/reference/tablesave.md)
 for exporting tables
 
 Other regression functions:
-[`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md),
-[`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
-[`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md),
-[`print.compfit_result()`](https://phmcc.codeberg.page/summata/reference/print.compfit_result.md),
-[`print.fit_result()`](https://phmcc.codeberg.page/summata/reference/print.fit_result.md),
-[`print.fullfit_result()`](https://phmcc.codeberg.page/summata/reference/print.fullfit_result.md),
-[`print.multifit_result()`](https://phmcc.codeberg.page/summata/reference/print.multifit_result.md),
-[`print.uniscreen_result()`](https://phmcc.codeberg.page/summata/reference/print.uniscreen_result.md),
-[`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md)
+[`compfit()`](https://phmcc.codefloe.page/summata/reference/compfit.md),
+[`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md),
+[`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md),
+[`print.compfit_result()`](https://phmcc.codefloe.page/summata/reference/print.compfit_result.md),
+[`print.fit_result()`](https://phmcc.codefloe.page/summata/reference/print.fit_result.md),
+[`print.fullfit_result()`](https://phmcc.codefloe.page/summata/reference/print.fullfit_result.md),
+[`print.multifit_result()`](https://phmcc.codefloe.page/summata/reference/print.multifit_result.md),
+[`print.uniscreen_result()`](https://phmcc.codefloe.page/summata/reference/print.uniscreen_result.md),
+[`uniscreen()`](https://phmcc.codefloe.page/summata/reference/uniscreen.md)
 
 ## Examples
 

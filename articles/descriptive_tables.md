@@ -11,7 +11,7 @@ categorical variables, and tests for systematic differences between
 groups.
 
 The
-[`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
+[`desctable()`](https://phmcc.codefloe.page/summata/reference/desctable.md)
 function generates publication-ready descriptive tables with automatic
 detection of variable types, appropriate summary statistics, and
 optional hypothesis testing. It adheres to the to the standard `summata`
@@ -50,7 +50,7 @@ human-readable labels for display.
 ## Summary Statistics and Tests
 
 The
-[`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
+[`desctable()`](https://phmcc.codefloe.page/summata/reference/desctable.md)
 function automatically selects appropriate summary statistics and
 hypothesis tests based on variable type:
 
@@ -604,9 +604,9 @@ head(raw_data)
 
 For detailed survival analysis—including landmark survival estimates,
 survival quantiles, and multiple endpoints—see the dedicated [Survival
-Tables](https://phmcc.codeberg.page/summata/articles/survival_tables.md)
+Tables](https://phmcc.codefloe.page/summata/articles/survival_tables.md)
 vignette. The
-[`survtable()`](https://phmcc.codeberg.page/summata/reference/survtable.md)
+[`survtable()`](https://phmcc.codefloe.page/summata/reference/survtable.md)
 function provides comprehensive options for reporting time-to-event
 outcomes.
 
@@ -615,7 +615,7 @@ outcomes.
 ## Exporting Tables
 
 Descriptive tables can be exported to various formats. See the [Table
-Export](https://phmcc.codeberg.page/summata/articles/table_export.md)
+Export](https://phmcc.codefloe.page/summata/articles/table_export.md)
 vignette for comprehensive documentation.
 
 ``` r
@@ -704,28 +704,28 @@ table2pdf(table, "table1.pdf", orientation = "landscape", font_size = 8)
 ## Further Reading
 
 - [Survival
-  Tables](https://phmcc.codeberg.page/summata/articles/survival_tables.md):
-  [`survtable()`](https://phmcc.codeberg.page/summata/reference/survtable.md)
+  Tables](https://phmcc.codefloe.page/summata/articles/survival_tables.md):
+  [`survtable()`](https://phmcc.codefloe.page/summata/reference/survtable.md)
   for time-to-event summaries
 - [Regression
-  Modeling](https://phmcc.codeberg.page/summata/articles/regression_modeling.md):
-  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
-  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md), and
-  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
+  Modeling](https://phmcc.codefloe.page/summata/articles/regression_modeling.md):
+  [`uniscreen()`](https://phmcc.codefloe.page/summata/reference/uniscreen.md),
+  [`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md), and
+  [`fullfit()`](https://phmcc.codefloe.page/summata/reference/fullfit.md)
 - [Model
-  Comparison](https://phmcc.codeberg.page/summata/articles/model_comparison.md):
-  [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
+  Comparison](https://phmcc.codefloe.page/summata/articles/model_comparison.md):
+  [`compfit()`](https://phmcc.codefloe.page/summata/reference/compfit.md)
   for comparing models
 - [Table
-  Export](https://phmcc.codeberg.page/summata/articles/table_export.md):
+  Export](https://phmcc.codefloe.page/summata/articles/table_export.md):
   Export to PDF, Word, and other formats
 - [Forest
-  Plots](https://phmcc.codeberg.page/summata/articles/forest_plots.md):
+  Plots](https://phmcc.codefloe.page/summata/articles/forest_plots.md):
   Visualization of regression results
 - [Multivariate
-  Regression](https://phmcc.codeberg.page/summata/articles/multivariate_regression.md):
-  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
+  Regression](https://phmcc.codefloe.page/summata/articles/multivariate_regression.md):
+  [`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md)
   for multi-outcome analysis
 - [Advanced
-  Workflows](https://phmcc.codeberg.page/summata/articles/advanced_workflows.md):
+  Workflows](https://phmcc.codefloe.page/summata/articles/advanced_workflows.md):
   Interactions and mixed-effects models

@@ -1,7 +1,7 @@
 # Create Forest Plot for Multivariate Regression
 
 Generates a publication-ready forest plot from a
-[`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
+[`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md)
 output object. The plot displays effect estimates (OR, HR, RR, or
 coefficients) with confidence intervals across multiple outcomes,
 organized by outcome with the predictor levels shown for each.
@@ -46,7 +46,7 @@ multiforest(
 - x:
 
   Multifit result object (data.table with class attributes from
-  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)).
+  [`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md)).
 
 - title:
 
@@ -62,7 +62,7 @@ multiforest(
 - column:
 
   Character string specifying which results to plot when
-  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
+  [`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md)
   was called with `columns = "both"`. Options are `"adjusted"` (default)
   or `"unadjusted"`. Ignored when the `multifit` result contains only
   one column type.
@@ -140,7 +140,7 @@ multiforest(
   level of a factor predictor is being compared. If `FALSE`, omits the
   column (useful when predictor info is in the caption). Default is
   `NULL`, which uses the `include_predictor` setting from
-  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
+  [`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md)
   if available, otherwise `TRUE`.
 
 - covariates_footer:
@@ -195,7 +195,7 @@ multiforest(
   Named character vector providing custom display labels for outcomes
   and variables. Applied to outcome names in the plot. Default is
   `NULL`, in which case the labels attached by
-  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
+  [`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md)
   are used. Original names are used where neither is available.
 
 - units:
@@ -256,7 +256,7 @@ The returned object includes an attribute `"rec_dims"` accessible via
 These recommendations are automatically calculated based on the number
 of variables, text sizes, and layout parameters, and are printed to
 console if `plot_width` or `plot_height` are not specified.
-[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+[`forestsave()`](https://phmcc.codefloe.page/summata/reference/forestsave.md)
 reads all three and requires no further handling.
 
 The returned object also includes an attribute `"table_data"` accessible
@@ -307,29 +307,29 @@ the formatted table output.
 
 ## See also
 
-[`autoforest`](https://phmcc.codeberg.page/summata/reference/autoforest.md)
+[`autoforest`](https://phmcc.codefloe.page/summata/reference/autoforest.md)
 for automatic model detection,
-[`multifit`](https://phmcc.codeberg.page/summata/reference/multifit.md)
+[`multifit`](https://phmcc.codefloe.page/summata/reference/multifit.md)
 for multi-outcome regression analysis,
-[`glmforest`](https://phmcc.codeberg.page/summata/reference/glmforest.md)
+[`glmforest`](https://phmcc.codefloe.page/summata/reference/glmforest.md)
 for single GLM forest plots,
-[`coxforest`](https://phmcc.codeberg.page/summata/reference/coxforest.md)
+[`coxforest`](https://phmcc.codefloe.page/summata/reference/coxforest.md)
 for single Cox model forest plots,
-[`lmforest`](https://phmcc.codeberg.page/summata/reference/lmforest.md)
+[`lmforest`](https://phmcc.codefloe.page/summata/reference/lmforest.md)
 for single linear model forest plots,
-[`uniforest`](https://phmcc.codeberg.page/summata/reference/uniforest.md)
+[`uniforest`](https://phmcc.codefloe.page/summata/reference/uniforest.md)
 for univariable screening forest plots,
-[`forestsave`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+[`forestsave`](https://phmcc.codefloe.page/summata/reference/forestsave.md)
 for saving with recommended dimensions
 
 Other visualization functions:
-[`autoforest()`](https://phmcc.codeberg.page/summata/reference/autoforest.md),
-[`coxforest()`](https://phmcc.codeberg.page/summata/reference/coxforest.md),
-[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md),
-[`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md),
-[`lmforest()`](https://phmcc.codeberg.page/summata/reference/lmforest.md),
-[`recdims()`](https://phmcc.codeberg.page/summata/reference/recdims.md),
-[`uniforest()`](https://phmcc.codeberg.page/summata/reference/uniforest.md)
+[`autoforest()`](https://phmcc.codefloe.page/summata/reference/autoforest.md),
+[`coxforest()`](https://phmcc.codefloe.page/summata/reference/coxforest.md),
+[`forestsave()`](https://phmcc.codefloe.page/summata/reference/forestsave.md),
+[`glmforest()`](https://phmcc.codefloe.page/summata/reference/glmforest.md),
+[`lmforest()`](https://phmcc.codefloe.page/summata/reference/lmforest.md),
+[`recdims()`](https://phmcc.codefloe.page/summata/reference/recdims.md),
+[`uniforest()`](https://phmcc.codefloe.page/summata/reference/uniforest.md)
 
 ## Examples
 
@@ -374,7 +374,7 @@ plot3 <- multiforest(
 
 # Example 4: Save with recommended dimensions
 forestsave(plot3, file.path(tempdir(), "multioutcome_forest.pdf"))
-#> Forest plot saved to /tmp/RtmppNr8bf/multioutcome_forest.pdf (width = 16.7 in, height = 5.0 in)
+#> Forest plot saved to /tmp/RtmpctNfZY/multioutcome_forest.pdf (width = 16.7 in, height = 5.0 in)
 
 options(old_width)
 

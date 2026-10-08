@@ -49,7 +49,7 @@ a graphics device chosen to reproduce the fonts seen on screen."></head><body>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Functions</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://codeberg.org/phmcc/summata" aria-label="Codeberg"><span class="fa fa-code-branch"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://codefloe.com/phmcc/summata" aria-label="Codefloe"><span class="fa fa-code-branch"></span></a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/phmcc/summata" aria-label="GitHub"><span class="fa fa-github"></span></a></li>
       </ul></div>
 
@@ -60,7 +60,7 @@ a graphics device chosen to reproduce the fonts seen on screen."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Save a Forest Plot to File</h1>
-      <small class="dont-index">Source: <a href="https://codeberg.org/phmcc/summata/tree/main/R/forestsave.R" class="external-link"><code>R/forestsave.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://codefloe.com/phmcc/summata/tree/main/R/forestsave.R" class="external-link"><code>R/forestsave.R</code></a></small>
       <div class="d-none name"><code>forestsave.Rd</code></div>
     </div>
 
@@ -236,24 +236,24 @@ apparent at the point it is written.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 1: Save at the recommended dimensions</span></span></span>
 <span class="r-in"><span><span class="fu">forestsave</span><span class="op">(</span><span class="va">p</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"forest.pdf"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/RtmppNr8bf/forest.pdf (width = 13.9 in, height = 5.0 in)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/RtmpctNfZY/forest.pdf (width = 13.9 in, height = 5.0 in)</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 2: Raster output at publication resolution</span></span></span>
 <span class="r-in"><span><span class="fu">forestsave</span><span class="op">(</span><span class="va">p</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"forest.png"</span><span class="op">)</span>, dpi <span class="op">=</span> <span class="fl">600</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/RtmppNr8bf/forest.png (width = 13.9 in, height = 5.0 in)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/RtmpctNfZY/forest.png (width = 13.9 in, height = 5.0 in)</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 3: Dimensions given explicitly, in any supported units</span></span></span>
 <span class="r-in"><span><span class="fu">forestsave</span><span class="op">(</span><span class="va">p</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"forest_sized.pdf"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>           width <span class="op">=</span> <span class="fl">24</span>, height <span class="op">=</span> <span class="fl">16</span>, units <span class="op">=</span> <span class="st">"cm"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/RtmppNr8bf/forest_sized.pdf (width = 24.0 cm, height = 16.0 cm)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/RtmpctNfZY/forest_sized.pdf (width = 24.0 cm, height = 16.0 cm)</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 4: Embed fonts after writing, where Ghostscript is available</span></span></span>
 <span class="r-in"><span><span class="fu">forestsave</span><span class="op">(</span><span class="va">p</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"forest_embedded.pdf"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>           embed_fonts <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/RtmppNr8bf/forest_embedded.pdf (width = 13.9 in, height = 5.0 in)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Fonts embedded in /tmp/RtmppNr8bf/forest_embedded.pdf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/RtmpctNfZY/forest_embedded.pdf (width = 13.9 in, height = 5.0 in)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Fonts embedded in /tmp/RtmpctNfZY/forest_embedded.pdf</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
@@ -268,7 +268,7 @@ apparent at the point it is written.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1. <a href="https://phmcc.codeberg.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1. <a href="https://phmcc.codefloe.page/summata/LICENSE.html">GPLv3 License</a> | <a href="https://phmcc.codefloe.page/summata/CODE_OF_CONDUCT.html">Code of Conduct</a></p>
 </div>
 
     </footer></div>

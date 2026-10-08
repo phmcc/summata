@@ -19,7 +19,7 @@ format_count(n, marks = NULL, na = NA_character_)
 - marks:
 
   List with `big.mark` and `decimal.mark` as returned by
-  [`resolve_number_marks`](https://phmcc.codeberg.page/summata/reference/resolve_number_marks.md).
+  [`resolve_number_marks`](https://phmcc.codefloe.page/summata/reference/resolve_number_marks.md).
   Resolved from the global option when not supplied, so that callers
   without a locale of their own still produce output consistent with the
   rest of the package.

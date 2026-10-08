@@ -48,9 +48,9 @@ glmforest(
 
   Either a fitted GLM object (class `glm` or `glmerMod`), a `fit_result`
   object from
-  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md), or a
+  [`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md), or a
   `fullfit_result` object from
-  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md).
+  [`fullfit()`](https://phmcc.codefloe.page/summata/reference/fullfit.md).
   When a `fit_result` or `fullfit_result` is provided, the model, data,
   and labels are automatically extracted.
 
@@ -209,9 +209,9 @@ glmforest(
 
   Gaussian with log link), and `"#5A8F5A"` (green) for coefficients
   (Gaussian/identity link). This scheme matches
-  [`uniforest()`](https://phmcc.codeberg.page/summata/reference/uniforest.md)
+  [`uniforest()`](https://phmcc.codefloe.page/summata/reference/uniforest.md)
   and
-  [`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md).
+  [`multiforest()`](https://phmcc.codefloe.page/summata/reference/multiforest.md).
   Choose colors that contrast well with black error bars.
 
 - exponentiate:
@@ -283,7 +283,7 @@ of variables, text sizes, and layout parameters, and are printed to
 console if `plot_width` or `plot_height` are not specified. The list
 also carries a `units` element recording the units the dimensions are
 expressed in, matching the `units` argument.
-[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+[`forestsave()`](https://phmcc.codefloe.page/summata/reference/forestsave.md)
 reads all three and requires no further handling.
 
 The returned object also includes an attribute `"table_data"` accessible
@@ -422,7 +422,7 @@ displayed if available.
 **Saving Plots:**
 
 Use
-[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md),
+[`forestsave()`](https://phmcc.codefloe.page/summata/reference/forestsave.md),
 which applies the recommended dimensions and selects a graphics device
 suited to the format:
 
@@ -435,30 +435,30 @@ Or specify custom dimensions:
 
 ## See also
 
-[`autoforest`](https://phmcc.codeberg.page/summata/reference/autoforest.md)
+[`autoforest`](https://phmcc.codefloe.page/summata/reference/autoforest.md)
 for automatic model detection,
-[`coxforest`](https://phmcc.codeberg.page/summata/reference/coxforest.md)
+[`coxforest`](https://phmcc.codefloe.page/summata/reference/coxforest.md)
 for Cox proportional hazards forest plots,
-[`lmforest`](https://phmcc.codeberg.page/summata/reference/lmforest.md)
+[`lmforest`](https://phmcc.codefloe.page/summata/reference/lmforest.md)
 for linear model forest plots,
-[`uniforest`](https://phmcc.codeberg.page/summata/reference/uniforest.md)
+[`uniforest`](https://phmcc.codefloe.page/summata/reference/uniforest.md)
 for univariable screening forest plots,
-[`multiforest`](https://phmcc.codeberg.page/summata/reference/multiforest.md)
+[`multiforest`](https://phmcc.codefloe.page/summata/reference/multiforest.md)
 for multi-outcome forest plots,
 [`glm`](https://rdrr.io/r/stats/glm.html) for fitting GLMs,
-[`fit`](https://phmcc.codeberg.page/summata/reference/fit.md) for
+[`fit`](https://phmcc.codefloe.page/summata/reference/fit.md) for
 regression modeling,
-[`forestsave`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+[`forestsave`](https://phmcc.codefloe.page/summata/reference/forestsave.md)
 for saving with recommended dimensions
 
 Other visualization functions:
-[`autoforest()`](https://phmcc.codeberg.page/summata/reference/autoforest.md),
-[`coxforest()`](https://phmcc.codeberg.page/summata/reference/coxforest.md),
-[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md),
-[`lmforest()`](https://phmcc.codeberg.page/summata/reference/lmforest.md),
-[`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md),
-[`recdims()`](https://phmcc.codeberg.page/summata/reference/recdims.md),
-[`uniforest()`](https://phmcc.codeberg.page/summata/reference/uniforest.md)
+[`autoforest()`](https://phmcc.codefloe.page/summata/reference/autoforest.md),
+[`coxforest()`](https://phmcc.codefloe.page/summata/reference/coxforest.md),
+[`forestsave()`](https://phmcc.codefloe.page/summata/reference/forestsave.md),
+[`lmforest()`](https://phmcc.codefloe.page/summata/reference/lmforest.md),
+[`multiforest()`](https://phmcc.codefloe.page/summata/reference/multiforest.md),
+[`recdims()`](https://phmcc.codefloe.page/summata/reference/recdims.md),
+[`uniforest()`](https://phmcc.codefloe.page/summata/reference/uniforest.md)
 
 ## Examples
 
@@ -528,7 +528,7 @@ plot5 <- glmforest(
 
 # Example 6: Save with recommended dimensions
 forestsave(plot5, file.path(tempdir(), "forest.pdf"))
-#> Forest plot saved to /tmp/RtmppNr8bf/forest.pdf (width = 14.9 in, height = 5.0 in)
+#> Forest plot saved to /tmp/RtmpctNfZY/forest.pdf (width = 14.9 in, height = 5.0 in)
 
 options(old_width)
 

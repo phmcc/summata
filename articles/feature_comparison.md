@@ -72,9 +72,9 @@ The following features distinguish `summata` from comparable packages:
 ### Multivariate Regression
 
 The
-[`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
+[`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md)
 and
-[`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md)
+[`multiforest()`](https://phmcc.codefloe.page/summata/reference/multiforest.md)
 functions implement an inverted screening paradigm: testing a single
 predictor across multiple outcomes simultaneously. This workflow is
 common in epidemiological and clinical research but not directly
@@ -113,7 +113,7 @@ competitive performance across all benchmarked workflows. With
 regression tables and univariable screening. With the default profile
 likelihood CIs, performance is comparable to other packages that use the
 same CI method (`finalfit`, `broom`). See the
-[Benchmarks](https://phmcc.codeberg.page/summata/articles/benchmarks.md)
+[Benchmarks](https://phmcc.codefloe.page/summata/articles/benchmarks.md)
 article for detailed comparisons.
 
 ### Unified API
@@ -136,7 +136,7 @@ Full support for `coxme` (mixed-effects Cox models) alongside `lmer` and
 
 ## Additional Resources
 
-- [Benchmarks](https://phmcc.codeberg.page/summata/articles/benchmarks.md)
+- [Benchmarks](https://phmcc.codefloe.page/summata/articles/benchmarks.md)
   — Performance comparisons
 - [gtsummary documentation](https://www.danieldsjoberg.com/gtsummary/)
 - [finalfit documentation](https://finalfit.org/)

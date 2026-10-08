@@ -1,4 +1,4 @@
-# summata [![summata website](reference/figures/summata.png)](https://phmcc.codeberg.page/summata/)
+# summata [![summata website](reference/figures/summata.png)](https://phmcc.codefloe.page/summata/)
 
 > ***summata*** \| /suːˈmɑːtə/ \| *Latin, n. pl. of* summātum*, perfect
 > passive participle of* summāre*: those that have been summarized*
@@ -16,7 +16,7 @@ presentation-ready results.
 
 For a more comprehensive description of this package and its features,
 see the [full documentation and
-vignettes](https://phmcc.codeberg.page/summata/).
+vignettes](https://phmcc.codefloe.page/summata/).
 
 ![Cox regression forest plot](reference/figures/README_hero.png)
 
@@ -28,7 +28,7 @@ The stable release of this package can be installed from CRAN.
 install.packages("summata")
 ```
 
-Alternatively, install it directly from GitHub (stable) or Codeberg
+Alternatively, install it directly from GitHub (stable) or Codefloe
 (development):
 
 ``` r
@@ -36,7 +36,7 @@ Alternatively, install it directly from GitHub (stable) or Codeberg
 devtools::install_github("phmcc/summata")
 
 # Development version
-devtools::install_git("https://codeberg.org/phmcc/summata.git")
+devtools::install_git("https://codefloe.com/phmcc/summata.git")
 ```
 
 ## Package Composition
@@ -96,8 +96,8 @@ different groups.
 
 | Function | Purpose |
 |:---|:---|
-| [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md) | Descriptive statistics with stratification and hypothesis testing |
-| [`survtable()`](https://phmcc.codeberg.page/summata/reference/survtable.md) | Survival probability estimates at specified time points |
+| [`desctable()`](https://phmcc.codefloe.page/summata/reference/desctable.md) | Descriptive statistics with stratification and hypothesis testing |
+| [`survtable()`](https://phmcc.codefloe.page/summata/reference/survtable.md) | Survival probability estimates at specified time points |
 
 #### Predictive analysis
 
@@ -106,11 +106,11 @@ modeling.
 
 | Function | Purpose |
 |:---|:---|
-| [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md) | Systematic univariable analysis across multiple predictors |
-| [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md) | Single regression model with formatted coefficient extraction |
-| [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md) | Integrated univariable screening with multivariable regression |
-| [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md) | Nested model comparison with composite scoring |
-| [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md) | Multivariate regression analysis with a single predictor evaluated against multiple outcomes |
+| [`uniscreen()`](https://phmcc.codefloe.page/summata/reference/uniscreen.md) | Systematic univariable analysis across multiple predictors |
+| [`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md) | Single regression model with formatted coefficient extraction |
+| [`fullfit()`](https://phmcc.codefloe.page/summata/reference/fullfit.md) | Integrated univariable screening with multivariable regression |
+| [`compfit()`](https://phmcc.codefloe.page/summata/reference/compfit.md) | Nested model comparison with composite scoring |
+| [`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md) | Multivariate regression analysis with a single predictor evaluated against multiple outcomes |
 
 #### Table export
 
@@ -118,13 +118,13 @@ Export of finalized tables to various commonly used formats.
 
 | Function | Format | Dependencies |
 |:---|:---|:---|
-| [`tablesave()`](https://phmcc.codeberg.page/summata/reference/tablesave.md) | Format from file extension | Varies |
-| [`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md) | PDF | `xtable`, LaTeX distribution |
-| [`table2tex()`](https://phmcc.codeberg.page/summata/reference/table2tex.md) | LaTeX source | `xtable` |
-| [`table2html()`](https://phmcc.codeberg.page/summata/reference/table2html.md) | HTML | `xtable` |
-| [`table2docx()`](https://phmcc.codeberg.page/summata/reference/table2docx.md) | Microsoft Word | `flextable`, `officer` |
-| [`table2pptx()`](https://phmcc.codeberg.page/summata/reference/table2pptx.md) | Microsoft PowerPoint | `flextable`, `officer` |
-| [`table2rtf()`](https://phmcc.codeberg.page/summata/reference/table2rtf.md) | Rich Text Format | `flextable`, `officer` |
+| [`tablesave()`](https://phmcc.codefloe.page/summata/reference/tablesave.md) | Format from file extension | Varies |
+| [`table2pdf()`](https://phmcc.codefloe.page/summata/reference/table2pdf.md) | PDF | `xtable`, LaTeX distribution |
+| [`table2tex()`](https://phmcc.codefloe.page/summata/reference/table2tex.md) | LaTeX source | `xtable` |
+| [`table2html()`](https://phmcc.codefloe.page/summata/reference/table2html.md) | HTML | `xtable` |
+| [`table2docx()`](https://phmcc.codefloe.page/summata/reference/table2docx.md) | Microsoft Word | `flextable`, `officer` |
+| [`table2pptx()`](https://phmcc.codefloe.page/summata/reference/table2pptx.md) | Microsoft PowerPoint | `flextable`, `officer` |
+| [`table2rtf()`](https://phmcc.codefloe.page/summata/reference/table2rtf.md) | Rich Text Format | `flextable`, `officer` |
 
 #### Data visualization
 
@@ -133,26 +133,26 @@ regression models.
 
 | Function | Application |
 |:---|:---|
-| [`autoforest()`](https://phmcc.codeberg.page/summata/reference/autoforest.md) | Automatic model class detection |
-| [`lmforest()`](https://phmcc.codeberg.page/summata/reference/lmforest.md) | Linear models |
-| [`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md) | Generalized linear models |
-| [`coxforest()`](https://phmcc.codeberg.page/summata/reference/coxforest.md) | Proportional hazards models |
-| [`uniforest()`](https://phmcc.codeberg.page/summata/reference/uniforest.md) | Univariable screening results |
-| [`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md) | Multivariate regression analysis results |
-| [`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md) | Save plots with recommended dimensions |
-| [`recdims()`](https://phmcc.codeberg.page/summata/reference/recdims.md) | Recommended figure dimensions |
+| [`autoforest()`](https://phmcc.codefloe.page/summata/reference/autoforest.md) | Automatic model class detection |
+| [`lmforest()`](https://phmcc.codefloe.page/summata/reference/lmforest.md) | Linear models |
+| [`glmforest()`](https://phmcc.codefloe.page/summata/reference/glmforest.md) | Generalized linear models |
+| [`coxforest()`](https://phmcc.codefloe.page/summata/reference/coxforest.md) | Proportional hazards models |
+| [`uniforest()`](https://phmcc.codefloe.page/summata/reference/uniforest.md) | Univariable screening results |
+| [`multiforest()`](https://phmcc.codefloe.page/summata/reference/multiforest.md) | Multivariate regression analysis results |
+| [`forestsave()`](https://phmcc.codefloe.page/summata/reference/forestsave.md) | Save plots with recommended dimensions |
+| [`recdims()`](https://phmcc.codefloe.page/summata/reference/recdims.md) | Recommended figure dimensions |
 
 ### Supported Model Classes
 
 The following regression models are currently supported by `summata`.
 Specify the model using the `model_type` parameter in the appropriate
 regression function
-([`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
-[`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
-[`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md),
-[`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md),
+([`uniscreen()`](https://phmcc.codefloe.page/summata/reference/uniscreen.md),
+[`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md),
+[`fullfit()`](https://phmcc.codefloe.page/summata/reference/fullfit.md),
+[`compfit()`](https://phmcc.codefloe.page/summata/reference/compfit.md),
 or
-[`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)):
+[`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md)):
 
 | Model Class | `model_type` | Function | Effect Measure |
 |:---|:---|:---|:---|
@@ -194,7 +194,7 @@ and distinction:
 _(✓ Full support \| ◐ Partial support \| — Not available)
 
 A detailed feature comparison is available in the [package
-documentation](https://phmcc.codeberg.page/summata/articles/feature_comparison.html).
+documentation](https://phmcc.codefloe.page/summata/articles/feature_comparison.html).
 
 ## Illustrative Example
 
@@ -227,7 +227,7 @@ predictors <- c("age", "sex", "race", "ethnicity", "bmi", "smoking",
 ### **Step 1:** Descriptive Statistics
 
 Use the
-[`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
+[`desctable()`](https://phmcc.codefloe.page/summata/reference/desctable.md)
 function to generate summary statistics with stratification by a
 grouping variable (in this case, 30-day readmission):
 
@@ -254,7 +254,7 @@ tablesave(table1, "table1.pdf",
 
 Perform an integrated univariable-to-multivariable regression workflow
 using the
-[`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
+[`fullfit()`](https://phmcc.codefloe.page/summata/reference/fullfit.md)
 function:
 
 ``` r
@@ -283,7 +283,7 @@ tablesave(table2, "table2.pdf",
 
 Finally, generate a forest plot to provide a graphical representation of
 effect estimates using the
-[`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md)
+[`glmforest()`](https://phmcc.codefloe.page/summata/reference/glmforest.md)
 function:
 
 ``` r
@@ -303,14 +303,14 @@ forestsave(forest_30d, "forest_30d.pdf")
 ### Repository
 
 - **Primary development**:
-  [codeberg.org/phmcc/summata](https://codeberg.org/phmcc/summata)
+  [codefloe.com/phmcc/summata](https://codefloe.com/phmcc/summata)
 - **GitHub releases**:
   [github.com/phmcc/summata](https://github.com/phmcc/summata)
 
 ### Contributing
 
 Bug reports and feature requests may be submitted via the issue tracker
-([Codeberg](https://codeberg.org/phmcc/summata/issues) or
+([Codefloe](https://codefloe.com/phmcc/summata/issues) or
 [Github](https://github.com/phmcc/summata/issues)). Contributions are
 welcome; please consult the contributing guidelines prior to submitting
 pull requests.
@@ -336,7 +336,7 @@ citation("summata")
 
 To cite summata in publications, use:
 
-  McClelland PH (2026). _summata: Publication-Ready Summary Tables and Forest Plots_. R package version 0.11.5, <https://phmcc.codeberg.page/summata/>.
+  McClelland PH (2026). _summata: Publication-Ready Summary Tables and Forest Plots_. R package version 0.12.0, <https://phmcc.codefloe.page/summata/>.
 
 A BibTeX entry for LaTeX users is
 
@@ -345,18 +345,18 @@ A BibTeX entry for LaTeX users is
     author = {Paul Hsin-ti McClelland},
     year = {2026},
     note = {R package version 0.12.0},
-    url = {https://phmcc.codeberg.page/summata/},
+    url = {https://phmcc.codefloe.page/summata/},
   }
 ```
 
 ## Further Resources
 
 - **Function documentation**: `?function_name` or the [reference
-  index](https://phmcc.codeberg.page/summata/reference/index.html)
+  index](https://phmcc.codefloe.page/summata/reference/index.html)
 - **Vignettes**: `vignette("summata")` or [online
-  articles](https://phmcc.codeberg.page/summata/articles/index.html)
-- **Issue tracker**: [Codeberg
-  Issues](https://codeberg.org/phmcc/summata/issues), [GitHub
+  articles](https://phmcc.codefloe.page/summata/articles/index.html)
+- **Issue tracker**: [Codefloe
+  Issues](https://codefloe.com/phmcc/summata/issues), [GitHub
   Issues](https://github.com/phmcc/summata/issues)
 
 ------------------------------------------------------------------------

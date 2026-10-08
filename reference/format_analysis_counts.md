@@ -1,7 +1,7 @@
 # Describe the analyzed sample for console output
 
 Renders the counts produced by
-[`get_analysis_counts()`](https://phmcc.codeberg.page/summata/reference/get_analysis_counts.md)
+[`get_analysis_counts()`](https://phmcc.codefloe.page/summata/reference/get_analysis_counts.md)
 as a single line for the [`print()`](https://rdrr.io/r/base/print.html)
 methods. The line is produced whenever the counts are available,
 including when every supplied observation entered the analysis: a
@@ -20,7 +20,7 @@ format_analysis_counts(counts, label = "Observations analyzed", marks = NULL)
 - counts:
 
   List as returned by
-  [`get_analysis_counts()`](https://phmcc.codeberg.page/summata/reference/get_analysis_counts.md).
+  [`get_analysis_counts()`](https://phmcc.codefloe.page/summata/reference/get_analysis_counts.md).
 
 - label:
 
@@ -29,7 +29,7 @@ format_analysis_counts(counts, label = "Observations analyzed", marks = NULL)
 - marks:
 
   List of number marks as returned by
-  [`resolve_number_marks()`](https://phmcc.codeberg.page/summata/reference/resolve_number_marks.md).
+  [`resolve_number_marks()`](https://phmcc.codefloe.page/summata/reference/resolve_number_marks.md).
   Counts and percentages are separated as the accompanying table
   separates them, so that a locale setting applies to the whole of the
   output rather than to the table alone. Resolved from the global option

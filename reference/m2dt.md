@@ -216,7 +216,7 @@ standard columns:
 ## Details
 
 This function is the core extraction utility used by
-[`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md) and
+[`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md) and
 other regression functions. It handles the complexities of different
 model classes and provides a consistent output format suitable for
 tables and forest plots.
@@ -254,11 +254,11 @@ rather than predictor effects.
 
 ## See also
 
-[`fit`](https://phmcc.codeberg.page/summata/reference/fit.md) for the
+[`fit`](https://phmcc.codefloe.page/summata/reference/fit.md) for the
 main regression interface,
-[`glmforest`](https://phmcc.codeberg.page/summata/reference/glmforest.md),
-[`coxforest`](https://phmcc.codeberg.page/summata/reference/coxforest.md),
-[`lmforest`](https://phmcc.codeberg.page/summata/reference/lmforest.md)
+[`glmforest`](https://phmcc.codefloe.page/summata/reference/glmforest.md),
+[`coxforest`](https://phmcc.codefloe.page/summata/reference/coxforest.md),
+[`lmforest`](https://phmcc.codefloe.page/summata/reference/lmforest.md)
 for forest plot visualization
 
 ## Examples

@@ -337,22 +337,22 @@ ambiguity:
 
 ## See also
 
-[`survtable`](https://phmcc.codeberg.page/summata/reference/survtable.md)
+[`survtable`](https://phmcc.codefloe.page/summata/reference/survtable.md)
 for detailed survival summary tables,
-[`fit`](https://phmcc.codeberg.page/summata/reference/fit.md) for
+[`fit`](https://phmcc.codefloe.page/summata/reference/fit.md) for
 regression modeling,
-[`tablesave`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+[`tablesave`](https://phmcc.codefloe.page/summata/reference/tablesave.md)
 for export in any supported format,
-[`table2pdf`](https://phmcc.codeberg.page/summata/reference/table2pdf.md)
+[`table2pdf`](https://phmcc.codefloe.page/summata/reference/table2pdf.md)
 for PDF export,
-[`table2docx`](https://phmcc.codeberg.page/summata/reference/table2docx.md)
+[`table2docx`](https://phmcc.codefloe.page/summata/reference/table2docx.md)
 for Word export,
-[`table2html`](https://phmcc.codeberg.page/summata/reference/table2html.md)
+[`table2html`](https://phmcc.codefloe.page/summata/reference/table2html.md)
 for HTML export
 
 Other descriptive functions:
-[`print.survtable()`](https://phmcc.codeberg.page/summata/reference/print.survtable.md),
-[`survtable()`](https://phmcc.codeberg.page/summata/reference/survtable.md)
+[`print.survtable()`](https://phmcc.codefloe.page/summata/reference/print.survtable.md),
+[`survtable()`](https://phmcc.codefloe.page/summata/reference/survtable.md)
 
 ## Examples
 

@@ -14,13 +14,13 @@ recdims(x, units = NULL)
 - x:
 
   A forest plot produced by
-  [`lmforest()`](https://phmcc.codeberg.page/summata/reference/lmforest.md),
-  [`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md),
-  [`coxforest()`](https://phmcc.codeberg.page/summata/reference/coxforest.md),
-  [`uniforest()`](https://phmcc.codeberg.page/summata/reference/uniforest.md),
-  [`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md),
+  [`lmforest()`](https://phmcc.codefloe.page/summata/reference/lmforest.md),
+  [`glmforest()`](https://phmcc.codefloe.page/summata/reference/glmforest.md),
+  [`coxforest()`](https://phmcc.codefloe.page/summata/reference/coxforest.md),
+  [`uniforest()`](https://phmcc.codefloe.page/summata/reference/uniforest.md),
+  [`multiforest()`](https://phmcc.codefloe.page/summata/reference/multiforest.md),
   or
-  [`autoforest()`](https://phmcc.codeberg.page/summata/reference/autoforest.md).
+  [`autoforest()`](https://phmcc.codefloe.page/summata/reference/autoforest.md).
 
 - units:
 
@@ -43,10 +43,10 @@ larger canvas. Each plotting function computes a suitable size and
 attaches it to the object it returns, and `recdims()` reports it.
 
 The values returned are those
-[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+[`forestsave()`](https://phmcc.codefloe.page/summata/reference/forestsave.md)
 applies, and are reported exactly as computed rather than rounded, so
 that a figure written with
-[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+[`forestsave()`](https://phmcc.codefloe.page/summata/reference/forestsave.md)
 and one written with
 [`ggplot2::ggsave()`](https://ggplot2.tidyverse.org/reference/ggsave.html)
 at these dimensions are identical. Explicit use is therefore needed only
@@ -59,19 +59,19 @@ carries none, and is treated as having been created in inches.
 
 ## See also
 
-[`forestsave`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+[`forestsave`](https://phmcc.codefloe.page/summata/reference/forestsave.md)
 for saving at these dimensions,
-[`autoforest`](https://phmcc.codeberg.page/summata/reference/autoforest.md)
+[`autoforest`](https://phmcc.codefloe.page/summata/reference/autoforest.md)
 for producing the plot
 
 Other visualization functions:
-[`autoforest()`](https://phmcc.codeberg.page/summata/reference/autoforest.md),
-[`coxforest()`](https://phmcc.codeberg.page/summata/reference/coxforest.md),
-[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md),
-[`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md),
-[`lmforest()`](https://phmcc.codeberg.page/summata/reference/lmforest.md),
-[`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md),
-[`uniforest()`](https://phmcc.codeberg.page/summata/reference/uniforest.md)
+[`autoforest()`](https://phmcc.codefloe.page/summata/reference/autoforest.md),
+[`coxforest()`](https://phmcc.codefloe.page/summata/reference/coxforest.md),
+[`forestsave()`](https://phmcc.codefloe.page/summata/reference/forestsave.md),
+[`glmforest()`](https://phmcc.codefloe.page/summata/reference/glmforest.md),
+[`lmforest()`](https://phmcc.codefloe.page/summata/reference/lmforest.md),
+[`multiforest()`](https://phmcc.codefloe.page/summata/reference/multiforest.md),
+[`uniforest()`](https://phmcc.codefloe.page/summata/reference/uniforest.md)
 
 ## Examples
 

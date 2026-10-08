@@ -21,26 +21,26 @@ autoforest(x, data = NULL, title = NULL, ...)
   - A fitted model object: `glm`, `lm`, `coxph`, *etc.*
 
   - A `fit_result` object from
-    [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md)
+    [`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md)
 
   - A `fullfit_result` object from
-    [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
+    [`fullfit()`](https://phmcc.codefloe.page/summata/reference/fullfit.md)
 
   - A `uniscreen_result` object from
-    [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md)
+    [`uniscreen()`](https://phmcc.codefloe.page/summata/reference/uniscreen.md)
 
   - A `multifit_result` object from
-    [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
+    [`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md)
 
 - data:
 
   Data frame or data.table containing the original data. Required when
   `x` is a raw model object. Ignored when `x` is a result object from
-  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
-  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md),
-  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
+  [`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md),
+  [`fullfit()`](https://phmcc.codefloe.page/summata/reference/fullfit.md),
+  [`uniscreen()`](https://phmcc.codefloe.page/summata/reference/uniscreen.md),
   or
-  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
+  [`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md)
   since these contain embedded data.
 
 - title:
@@ -163,52 +163,52 @@ The function uses the following priority order for detection:
 1.  **uniscreen results**: Detected by class `"uniscreen_result"` or
     presence of attributes `outcome`, `predictors`, `model_type`, and
     `model_scope = "Univariable"`. Routes to
-    [`uniforest()`](https://phmcc.codeberg.page/summata/reference/uniforest.md).
+    [`uniforest()`](https://phmcc.codefloe.page/summata/reference/uniforest.md).
 
 2.  **multifit results**: Detected by presence of attributes
     `predictor`, `outcomes`, `model_type`, and `raw_data`. Routes to
-    [`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md).
+    [`multiforest()`](https://phmcc.codefloe.page/summata/reference/multiforest.md).
 
 3.  **Cox models**: Classes `coxph` or `clogit`. Routes to
-    [`coxforest()`](https://phmcc.codeberg.page/summata/reference/coxforest.md).
+    [`coxforest()`](https://phmcc.codefloe.page/summata/reference/coxforest.md).
 
 4.  **GLM models**: Class `glm`. Routes to
-    [`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md).
+    [`glmforest()`](https://phmcc.codefloe.page/summata/reference/glmforest.md).
 
 5.  **Linear models**: Class `lm` (but not `glm`). Routes to
-    [`lmforest()`](https://phmcc.codeberg.page/summata/reference/lmforest.md).
+    [`lmforest()`](https://phmcc.codefloe.page/summata/reference/lmforest.md).
 
 ## See also
 
-[`glmforest`](https://phmcc.codeberg.page/summata/reference/glmforest.md)
+[`glmforest`](https://phmcc.codefloe.page/summata/reference/glmforest.md)
 for GLM forest plots,
-[`coxforest`](https://phmcc.codeberg.page/summata/reference/coxforest.md)
+[`coxforest`](https://phmcc.codefloe.page/summata/reference/coxforest.md)
 for Cox model forest plots,
-[`lmforest`](https://phmcc.codeberg.page/summata/reference/lmforest.md)
+[`lmforest`](https://phmcc.codefloe.page/summata/reference/lmforest.md)
 for linear model forest plots,
-[`uniforest`](https://phmcc.codeberg.page/summata/reference/uniforest.md)
+[`uniforest`](https://phmcc.codefloe.page/summata/reference/uniforest.md)
 for univariable screening forest plots,
-[`multiforest`](https://phmcc.codeberg.page/summata/reference/multiforest.md)
+[`multiforest`](https://phmcc.codefloe.page/summata/reference/multiforest.md)
 for multi-outcome forest plots,
-[`fit`](https://phmcc.codeberg.page/summata/reference/fit.md) for
+[`fit`](https://phmcc.codefloe.page/summata/reference/fit.md) for
 single-model regression,
-[`fullfit`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
+[`fullfit`](https://phmcc.codefloe.page/summata/reference/fullfit.md)
 for combined univariable/multivariable regression,
-[`uniscreen`](https://phmcc.codeberg.page/summata/reference/uniscreen.md)
+[`uniscreen`](https://phmcc.codefloe.page/summata/reference/uniscreen.md)
 for univariable screening,
-[`multifit`](https://phmcc.codeberg.page/summata/reference/multifit.md)
+[`multifit`](https://phmcc.codefloe.page/summata/reference/multifit.md)
 for multi-outcome analysis,
-[`forestsave`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+[`forestsave`](https://phmcc.codefloe.page/summata/reference/forestsave.md)
 for saving with recommended dimensions
 
 Other visualization functions:
-[`coxforest()`](https://phmcc.codeberg.page/summata/reference/coxforest.md),
-[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md),
-[`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md),
-[`lmforest()`](https://phmcc.codeberg.page/summata/reference/lmforest.md),
-[`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md),
-[`recdims()`](https://phmcc.codeberg.page/summata/reference/recdims.md),
-[`uniforest()`](https://phmcc.codeberg.page/summata/reference/uniforest.md)
+[`coxforest()`](https://phmcc.codefloe.page/summata/reference/coxforest.md),
+[`forestsave()`](https://phmcc.codefloe.page/summata/reference/forestsave.md),
+[`glmforest()`](https://phmcc.codefloe.page/summata/reference/glmforest.md),
+[`lmforest()`](https://phmcc.codefloe.page/summata/reference/lmforest.md),
+[`multiforest()`](https://phmcc.codefloe.page/summata/reference/multiforest.md),
+[`recdims()`](https://phmcc.codefloe.page/summata/reference/recdims.md),
+[`uniforest()`](https://phmcc.codefloe.page/summata/reference/uniforest.md)
 
 ## Examples
 
@@ -267,7 +267,7 @@ plot5 <- autoforest(fit_result)
 
 # Save with recommended dimensions
 forestsave(plot5, file.path(tempdir(), "forest.pdf"))
-#> Forest plot saved to /tmp/RtmppNr8bf/forest.pdf (width = 15.3 in, height = 5.0 in)
+#> Forest plot saved to /tmp/RtmpctNfZY/forest.pdf (width = 15.3 in, height = 5.0 in)
 
 # }
 ```

@@ -4,9 +4,9 @@ Multivariate regression refers to the simultaneous examination of a
 single independent predictor across multiple dependent variables. This
 approach inverts the typical regression paradigm: rather than testing
 multiple predictors against one outcome (as in
-[`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
-[`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md), and
-[`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md)),
+[`uniscreen()`](https://phmcc.codefloe.page/summata/reference/uniscreen.md),
+[`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md), and
+[`fullfit()`](https://phmcc.codefloe.page/summata/reference/fullfit.md)),
 multivariate regression tests the predictive value of a individual
 factor against multiple outcomes, with or without multivariable
 adjustment for other independent factors. This design is particularly
@@ -14,11 +14,11 @@ useful when a key exposure or intervention must be evaluated against
 several endpoints simultaneously.
 
 The
-[`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
+[`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md)
 function implements this workflow, supporting all model types available
 in `summata` with optional covariate adjustment, interaction terms, and
 mixed-effects specifications. Results can be visualized using
-[`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md)
+[`multiforest()`](https://phmcc.codefloe.page/summata/reference/multiforest.md)
 and exported using standard table export functions.
 
 As with other `summata` functions, this function adheres to the standard
@@ -68,7 +68,7 @@ multivariate analysis:
 > for correct font metrics. That sizing is applied behind the scenes and
 > is not shown in the code. Writing a plot to file elsewhere is
 > performed with
-> [`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md),
+> [`forestsave()`](https://phmcc.codefloe.page/summata/reference/forestsave.md),
 > which applies the same dimensions and selects a suitable graphics
 > device:
 >
@@ -504,17 +504,17 @@ summary(models[["any_complication"]])
 ## Forest Plot Visualization
 
 The
-[`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md)
+[`multiforest()`](https://phmcc.codefloe.page/summata/reference/multiforest.md)
 function creates forest plots from
-[`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
+[`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md)
 results.
 
 ### **Example 12:** Forest Plot for Logistic (Binary) Outcomes
 
 Results from
-[`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
+[`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md)
 can be directly inserted into the
-[`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md)
+[`multiforest()`](https://phmcc.codefloe.page/summata/reference/multiforest.md)
 function to generate a forest plot:
 
 ``` r
@@ -585,11 +585,11 @@ example14 <- multiforest(
 ### **Example 15:** Forest Plot for Survival Outcomes
 
 The
-[`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md)
+[`multiforest()`](https://phmcc.codefloe.page/summata/reference/multiforest.md)
 function supports multiple `model_type` outputs from
-[`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md).
+[`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md).
 In addition, variable labels can be applied to
-[`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md)
+[`multiforest()`](https://phmcc.codefloe.page/summata/reference/multiforest.md)
 outputs similarly to other forest plot functions:
 
 ``` r
@@ -621,7 +621,7 @@ example15 <- multiforest(
 ### Tables
 
 Export tables using standard export functions, or
-[`tablesave()`](https://phmcc.codeberg.page/summata/reference/tablesave.md):
+[`tablesave()`](https://phmcc.codefloe.page/summata/reference/tablesave.md):
 
 ``` r
 table2docx(
@@ -640,9 +640,9 @@ table2pdf(
 ### Forest Plots
 
 Save forest plots using the dedicated
-[`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md)
+[`multiforest()`](https://phmcc.codefloe.page/summata/reference/multiforest.md)
 function, then
-[`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md):
+[`forestsave()`](https://phmcc.codefloe.page/summata/reference/forestsave.md):
 
 ``` r
 p <- multiforest(result, title = "Effect Estimates")
@@ -843,18 +843,18 @@ clintrial$treatment_binary <- ifelse(clintrial$treatment == "Control",
 ### Multivariate Regression vs. Univariable Screening
 
 The distinction between
-[`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
+[`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md)
 and
-[`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md)
+[`uniscreen()`](https://phmcc.codefloe.page/summata/reference/uniscreen.md)
 is important:
 
 | Function | Tests | Use Case |
 |:---|:---|:---|
-| [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md) | Multiple predictors → One outcome | Variable screening, risk factor identification |
-| [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md) | One predictor → Multiple outcomes | Exposure effects, intervention evaluation |
+| [`uniscreen()`](https://phmcc.codefloe.page/summata/reference/uniscreen.md) | Multiple predictors → One outcome | Variable screening, risk factor identification |
+| [`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md) | One predictor → Multiple outcomes | Exposure effects, intervention evaluation |
 
 All outcomes in a single
-[`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
+[`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md)
 call should be of the same type (all binary, all continuous, or all
 survival). Mixing outcome types produces tables with incompatible effect
 measures. The function validates outcome compatibility and issues a
@@ -862,7 +862,7 @@ warning when mixed types are detected.
 
 ### Categorical Outcomes with More Than Two Levels
 
-[`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
+[`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md)
 supports binary outcomes (via logistic regression) but not multinomial
 or ordinal outcomes. If a categorical outcome with three or more levels
 is included (e.g., treatment group with “Control”, “Drug A”, “Drug B”),
@@ -887,24 +887,24 @@ model <- polr(grade ~ age + sex + stage, data = clintrial, Hess = TRUE)
 ### Further Reading
 
 - [Descriptive
-  Tables](https://phmcc.codeberg.page/summata/articles/descriptive_tables.md):
-  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
+  Tables](https://phmcc.codefloe.page/summata/articles/descriptive_tables.md):
+  [`desctable()`](https://phmcc.codefloe.page/summata/reference/desctable.md)
   for baseline characteristics
 - [Regression
-  Modeling](https://phmcc.codeberg.page/summata/articles/regression_modeling.md):
-  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
-  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md), and
-  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
+  Modeling](https://phmcc.codefloe.page/summata/articles/regression_modeling.md):
+  [`uniscreen()`](https://phmcc.codefloe.page/summata/reference/uniscreen.md),
+  [`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md), and
+  [`fullfit()`](https://phmcc.codefloe.page/summata/reference/fullfit.md)
 - [Model
-  Comparison](https://phmcc.codeberg.page/summata/articles/model_comparison.md):
-  [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
+  Comparison](https://phmcc.codefloe.page/summata/articles/model_comparison.md):
+  [`compfit()`](https://phmcc.codefloe.page/summata/reference/compfit.md)
   for comparing models
 - [Table
-  Export](https://phmcc.codeberg.page/summata/articles/table_export.md):
+  Export](https://phmcc.codefloe.page/summata/articles/table_export.md):
   Export to PDF, Word, and other formats
 - [Forest
-  Plots](https://phmcc.codeberg.page/summata/articles/forest_plots.md):
+  Plots](https://phmcc.codefloe.page/summata/articles/forest_plots.md):
   Visualization of regression results
 - [Advanced
-  Workflows](https://phmcc.codeberg.page/summata/articles/advanced_workflows.md):
+  Workflows](https://phmcc.codefloe.page/summata/articles/advanced_workflows.md):
   Interactions and mixed-effects models

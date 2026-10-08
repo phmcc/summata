@@ -295,23 +295,23 @@ selection criteria rather than as a definitive model selection method.
 
 ## See also
 
-[`fit`](https://phmcc.codeberg.page/summata/reference/fit.md) for
+[`fit`](https://phmcc.codefloe.page/summata/reference/fit.md) for
 individual model fitting,
-[`fullfit`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
+[`fullfit`](https://phmcc.codefloe.page/summata/reference/fullfit.md)
 for automated variable selection,
-[`tablesave`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+[`tablesave`](https://phmcc.codefloe.page/summata/reference/tablesave.md)
 for exporting tables
 
 Other regression functions:
-[`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
-[`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md),
-[`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md),
-[`print.compfit_result()`](https://phmcc.codeberg.page/summata/reference/print.compfit_result.md),
-[`print.fit_result()`](https://phmcc.codeberg.page/summata/reference/print.fit_result.md),
-[`print.fullfit_result()`](https://phmcc.codeberg.page/summata/reference/print.fullfit_result.md),
-[`print.multifit_result()`](https://phmcc.codeberg.page/summata/reference/print.multifit_result.md),
-[`print.uniscreen_result()`](https://phmcc.codeberg.page/summata/reference/print.uniscreen_result.md),
-[`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md)
+[`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md),
+[`fullfit()`](https://phmcc.codefloe.page/summata/reference/fullfit.md),
+[`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md),
+[`print.compfit_result()`](https://phmcc.codefloe.page/summata/reference/print.compfit_result.md),
+[`print.fit_result()`](https://phmcc.codefloe.page/summata/reference/print.fit_result.md),
+[`print.fullfit_result()`](https://phmcc.codefloe.page/summata/reference/print.fullfit_result.md),
+[`print.multifit_result()`](https://phmcc.codefloe.page/summata/reference/print.multifit_result.md),
+[`print.uniscreen_result()`](https://phmcc.codefloe.page/summata/reference/print.uniscreen_result.md),
+[`uniscreen()`](https://phmcc.codefloe.page/summata/reference/uniscreen.md)
 
 ## Examples
 

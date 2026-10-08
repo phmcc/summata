@@ -38,7 +38,7 @@ clustering variable for hierarchical analysis.
 > for correct font metrics. That sizing is applied behind the scenes and
 > is not shown in the code. Writing a plot to file elsewhere is
 > performed with
-> [`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md),
+> [`forestsave()`](https://phmcc.codefloe.page/summata/reference/forestsave.md),
 > which applies the same dimensions and selects a suitable graphics
 > device:
 >
@@ -231,10 +231,10 @@ example4
 ### **Example 5:** Testing Interaction Significance
 
 Use
-[`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
+[`compfit()`](https://phmcc.codefloe.page/summata/reference/compfit.md)
 to formally evaluate whether interactions improve model fit (*see*
 [Model
-Comparison](https://phmcc.codeberg.page/summata/articles/model_comparison.md)):
+Comparison](https://phmcc.codefloe.page/summata/articles/model_comparison.md)):
 
 ``` r
 example5 <- compfit(
@@ -484,9 +484,9 @@ example11 <- glmforest(
 ### **Example 12:** Comparing Random-Effects Specifications
 
 Use
-[`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
+[`compfit()`](https://phmcc.codefloe.page/summata/reference/compfit.md)
 to compare different random-effects structures (*see* [Model
-Comparison](https://phmcc.codeberg.page/summata/articles/model_comparison.md)):
+Comparison](https://phmcc.codefloe.page/summata/articles/model_comparison.md)):
 
 ``` r
 example12 <- compfit(
@@ -659,7 +659,7 @@ example15
 ## Advanced Univariable Screening Features
 
 The
-[`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md)
+[`uniscreen()`](https://phmcc.codefloe.page/summata/reference/uniscreen.md)
 function supports advanced model specifications including random effects
 and stratification.
 
@@ -748,9 +748,9 @@ example17
 ### **Example 18:** Forest Plot from Univariable Screening
 
 The
-[`uniforest()`](https://phmcc.codeberg.page/summata/reference/uniforest.md)
+[`uniforest()`](https://phmcc.codefloe.page/summata/reference/uniforest.md)
 function visualizes univariable screening results. Labels supplied to
-[`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md)
+[`uniscreen()`](https://phmcc.codefloe.page/summata/reference/uniscreen.md)
 are carried through automatically, and may also be given directly:
 
 ``` r
@@ -778,7 +778,7 @@ example18 <- uniforest(
 ## Advanced Multivariate Regression Features
 
 The
-[`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
+[`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md)
 function supports interactions and mixed-effects models when testing a
 predictor across multiple outcomes.
 
@@ -1014,7 +1014,7 @@ forest_plot <- multiforest(
 2.  Start with random intercepts; add random slopes if justified
 3.  Monitor convergence; simplify if necessary
 4.  Compare to fixed-effects models using
-    [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
+    [`compfit()`](https://phmcc.codefloe.page/summata/reference/compfit.md)
 
 ### Method Selection
 
@@ -1069,25 +1069,25 @@ interaction patterns, consider stratified analyses or effect plots.
 ## Further Reading
 
 - [Descriptive
-  Tables](https://phmcc.codeberg.page/summata/articles/descriptive_tables.md):
-  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
+  Tables](https://phmcc.codefloe.page/summata/articles/descriptive_tables.md):
+  [`desctable()`](https://phmcc.codefloe.page/summata/reference/desctable.md)
   for baseline characteristics
 - [Regression
-  Modeling](https://phmcc.codeberg.page/summata/articles/regression_modeling.md):
-  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
-  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md), and
-  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
+  Modeling](https://phmcc.codefloe.page/summata/articles/regression_modeling.md):
+  [`uniscreen()`](https://phmcc.codefloe.page/summata/reference/uniscreen.md),
+  [`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md), and
+  [`fullfit()`](https://phmcc.codefloe.page/summata/reference/fullfit.md)
 - [Model
-  Comparison](https://phmcc.codeberg.page/summata/articles/model_comparison.md):
-  [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
+  Comparison](https://phmcc.codefloe.page/summata/articles/model_comparison.md):
+  [`compfit()`](https://phmcc.codefloe.page/summata/reference/compfit.md)
   for comparing models
 - [Table
-  Export](https://phmcc.codeberg.page/summata/articles/table_export.md):
+  Export](https://phmcc.codefloe.page/summata/articles/table_export.md):
   Export to PDF, Word, and other formats
 - [Forest
-  Plots](https://phmcc.codeberg.page/summata/articles/forest_plots.md):
+  Plots](https://phmcc.codefloe.page/summata/articles/forest_plots.md):
   Visualization of regression results
 - [Multivariate
-  Regression](https://phmcc.codeberg.page/summata/articles/multivariate_regression.md):
-  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
+  Regression](https://phmcc.codefloe.page/summata/articles/multivariate_regression.md):
+  [`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md)
   for multi-outcome analysis

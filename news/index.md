@@ -7,9 +7,9 @@ CRAN release: 2026-08-21
 - Fix *n*/Events counts to report complete cases across all functions,
   so group sizes sum to the model *n*; empty factor levels now report
   zero, and
-  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
+  [`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md)
   adjusted columns match
-  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
+  [`fullfit()`](https://phmcc.codefloe.page/summata/reference/fullfit.md)
   (STROBE item 12)
 - Report the analyzed sample and events in
   [`print()`](https://rdrr.io/r/base/print.html) methods and forest plot
@@ -23,46 +23,46 @@ CRAN release: 2026-08-21
 - Fix coefficient parsing for variable names that share a prefix or
   contain regular expression metacharacters
 - Fix
-  [`uniforest()`](https://phmcc.codeberg.page/summata/reference/uniforest.md)
+  [`uniforest()`](https://phmcc.codefloe.page/summata/reference/uniforest.md)
   to draw factor levels in their established order rather than
   alphabetically when `indent_groups = TRUE`
 - Fix counts of 100,000 or greater displaying in exponential notation,
   and centralize count formatting in a vectorized
-  [`format_count()`](https://phmcc.codeberg.page/summata/reference/format_count.md)
+  [`format_count()`](https://phmcc.codefloe.page/summata/reference/format_count.md)
 - Carry variable labels from the regression functions through to the
   forest plot functions, so labels supplied once apply to both table and
   plot
 - Add
-  [`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+  [`forestsave()`](https://phmcc.codefloe.page/summata/reference/forestsave.md)
   for saving forest plots at their recommended dimensions, with
   format-appropriate graphics devices and optional font embedding;
   `rec_dims` now records its units
 - Add
-  [`recdims()`](https://phmcc.codeberg.page/summata/reference/recdims.md)
+  [`recdims()`](https://phmcc.codefloe.page/summata/reference/recdims.md)
   function for directly retrieving the figure dimensions recommended for
   a forest plot
 - Rename
-  [`autotable()`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+  [`autotable()`](https://phmcc.codefloe.page/summata/reference/tablesave.md)
   to
-  [`tablesave()`](https://phmcc.codeberg.page/summata/reference/tablesave.md),
+  [`tablesave()`](https://phmcc.codefloe.page/summata/reference/tablesave.md),
   pairing it with
-  [`forestsave()`](https://phmcc.codeberg.page/summata/reference/forestsave.md)
+  [`forestsave()`](https://phmcc.codefloe.page/summata/reference/forestsave.md)
   and distinguishing it from
-  [`autoforest()`](https://phmcc.codeberg.page/summata/reference/autoforest.md),
+  [`autoforest()`](https://phmcc.codefloe.page/summata/reference/autoforest.md),
   which detects model class rather than file format;
-  [`autotable()`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+  [`autotable()`](https://phmcc.codefloe.page/summata/reference/tablesave.md)
   is retained as a deprecated alias
 - Add `quiet` argument to
-  [`tablesave()`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+  [`tablesave()`](https://phmcc.codefloe.page/summata/reference/tablesave.md)
   and the `table2*()` functions, and return the file path invisibly from
-  [`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md),
-  [`table2html()`](https://phmcc.codeberg.page/summata/reference/table2html.md),
+  [`table2pdf()`](https://phmcc.codefloe.page/summata/reference/table2pdf.md),
+  [`table2html()`](https://phmcc.codefloe.page/summata/reference/table2html.md),
   and
-  [`table2tex()`](https://phmcc.codeberg.page/summata/reference/table2tex.md)
+  [`table2tex()`](https://phmcc.codefloe.page/summata/reference/table2tex.md)
 - Add `table_data` attribute to the forest plot functions for access to
   the values drawn in the figure
 - Add
-  [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
+  [`compfit()`](https://phmcc.codefloe.page/summata/reference/compfit.md)
   warning when candidate models are fitted to different numbers of
   observations
 - Suppress spurious diagnostics: singular-fit messages from
@@ -79,7 +79,7 @@ CRAN release: 2026-08-21
 CRAN release: 2026-05-07
 
 - Explicitly define `%||%` operator for backward compatibility
-- Move main documentation to Codeberg Pages
+- Move main documentation to Codefloe Pages
 - Minor documentation edits
 
 ## *summata* 0.11.4 (2026-03-14)
@@ -89,17 +89,17 @@ CRAN release: 2026-03-20
 - Use profile likelihood CIs for GLM/negbin and exact *t*-distribution
   CIs for linear models, replacing Wald approximation
 - Add `conf_method` parameter (`"profile"` / `"wald"`) to
-  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md),
-  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md),
-  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md),
-  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md),
-  and [`m2dt()`](https://phmcc.codeberg.page/summata/reference/m2dt.md),
+  [`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md),
+  [`uniscreen()`](https://phmcc.codefloe.page/summata/reference/uniscreen.md),
+  [`fullfit()`](https://phmcc.codefloe.page/summata/reference/fullfit.md),
+  [`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md),
+  and [`m2dt()`](https://phmcc.codefloe.page/summata/reference/m2dt.md),
   with global option `summata.conf_method`
 - Report complete-case *n*/Events in
-  [`fullfit()`](https://phmcc.codeberg.page/summata/reference/fullfit.md)
+  [`fullfit()`](https://phmcc.codefloe.page/summata/reference/fullfit.md)
   multivariable rows (STROBE item 12)
 - Cache profile likelihood CIs from
-  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md) for
+  [`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md) for
   reuse in forest plot functions
 - Resolve `family = "Gamma"` string to `Gamma(link = "log")` for
   interpretable multiplicative effects
@@ -114,7 +114,7 @@ CRAN release: 2026-03-08
 
 - CRAN initial release re-submission
 - Fix
-  [`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md)
+  [`table2pdf()`](https://phmcc.codefloe.page/summata/reference/table2pdf.md)
   to specify output directory for files
 - Minor WORDLIST changes
 
@@ -176,18 +176,18 @@ CRAN release: 2026-03-08
   dataset
 - Fix color coding in forest plots
 - Fix
-  [`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md)
+  [`glmforest()`](https://phmcc.codefloe.page/summata/reference/glmforest.md)
   to correctly extract values from
   [`MASS::glm.nb()`](https://rdrr.io/pkg/MASS/man/glm.nb.html)
 - Fix regression functions to respect level order in categorical
   functions
 - Fix bug in
-  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md)
+  [`uniscreen()`](https://phmcc.codefloe.page/summata/reference/uniscreen.md)
   where specified `p_threshold` values were not generating screened
   outputs
 - Fixes to print outputs in regression functions
 - Multiple
-  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
+  [`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md)
   revisions, including improved “n” and “Events” column handling and
   interaction effect formatting
 
@@ -220,7 +220,7 @@ CRAN release: 2026-03-08
 - Fix formatting for negative coefficients in forest plots
 - Fix “negative zero” formatting issues
 - Add safeguards to avoid multiple model types in
-  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
+  [`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md)
   calls
 - Add intelligent handling of binary categorical variables for
   `condense_table`
@@ -228,12 +228,12 @@ CRAN release: 2026-03-08
 ## *summata* 0.9.4 (2026-01-02)
 
 - Add `show_logs` parameter to
-  [`table2tex()`](https://phmcc.codeberg.page/summata/reference/table2tex.md)
+  [`table2tex()`](https://phmcc.codefloe.page/summata/reference/table2tex.md)
 - Consistent Unicode formatting for files
 - Increased R version requirement to \>= 4.2.0 for better Unicode
   compatibility
 - Add
-  [`survtable()`](https://phmcc.codeberg.page/summata/reference/survtable.md)
+  [`survtable()`](https://phmcc.codefloe.page/summata/reference/survtable.md)
   function with utilities
 - Minor optimizations and function cleanup, with notation
   standardization
@@ -248,9 +248,9 @@ CRAN release: 2026-03-08
 - Expand “affirmative level” string criteria for binary categorical
   variables
 - Add option to remove “Predictors” column in
-  [`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
+  [`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md)
   and
-  [`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md)
+  [`multiforest()`](https://phmcc.codefloe.page/summata/reference/multiforest.md)
 - Update documentation
 
 ## *summata* 0.9.1 (2025-12-27)
@@ -259,39 +259,39 @@ CRAN release: 2026-03-08
   all regression and forest plot functions
 - Add parameter for toggling the footer in forest plot functions
 - Update
-  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md)
+  [`uniscreen()`](https://phmcc.codefloe.page/summata/reference/uniscreen.md)
   to accept mixed-effect models
 - Update
-  [`autoforest()`](https://phmcc.codeberg.page/summata/reference/autoforest.md)
+  [`autoforest()`](https://phmcc.codefloe.page/summata/reference/autoforest.md)
   to accept lmer and glmer objects
 
 ## *summata* 0.9.0 (2025-12-27)
 
 - Add multivariate analysis support
-  ([`multifit()`](https://phmcc.codeberg.page/summata/reference/multifit.md)
+  ([`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md)
   and
-  [`multiforest()`](https://phmcc.codeberg.page/summata/reference/multiforest.md))
+  [`multiforest()`](https://phmcc.codefloe.page/summata/reference/multiforest.md))
 - New vignette: “Multivariate Analysis”
 - Modify core forest plot functions
-  ([`lmforest()`](https://phmcc.codeberg.page/summata/reference/lmforest.md),
-  [`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md),
+  ([`lmforest()`](https://phmcc.codefloe.page/summata/reference/lmforest.md),
+  [`glmforest()`](https://phmcc.codefloe.page/summata/reference/glmforest.md),
   and
-  [`coxforest()`](https://phmcc.codeberg.page/summata/reference/coxforest.md))
+  [`coxforest()`](https://phmcc.codefloe.page/summata/reference/coxforest.md))
   to accept *Summata* objects or models
 - Add univariable screening forest plot
-  ([`uniforest()`](https://phmcc.codeberg.page/summata/reference/uniforest.md))
+  ([`uniforest()`](https://phmcc.codefloe.page/summata/reference/uniforest.md))
 - Rename `uscreen()` to
-  [`uniscreen()`](https://phmcc.codeberg.page/summata/reference/uniscreen.md)
+  [`uniscreen()`](https://phmcc.codefloe.page/summata/reference/uniscreen.md)
   for consistency
 - Update
-  [`autoforest()`](https://phmcc.codeberg.page/summata/reference/autoforest.md)
+  [`autoforest()`](https://phmcc.codefloe.page/summata/reference/autoforest.md)
   to handle new forest plot functions
 
 ## *summata* 0.8.3 (2025-12-24)
 
 - Add optimizations to descriptive statistics workflows
 - Add `p_per_stat` parameter to
-  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
+  [`desctable()`](https://phmcc.codefloe.page/summata/reference/desctable.md)
 - Change `add_reference_rows` parameter to just `reference_rows` in
   regression functions
 
@@ -315,7 +315,7 @@ CRAN release: 2026-03-08
 ## *summata* 0.7.14 (2025-12-20)
 
 - Add
-  [`autotable()`](https://phmcc.codeberg.page/summata/reference/tablesave.md)
+  [`autotable()`](https://phmcc.codefloe.page/summata/reference/tablesave.md)
   function
 
 ## *summata* 0.7.13 (2025-12-19)
@@ -328,9 +328,9 @@ CRAN release: 2026-03-08
 ## *summata* 0.7.12 (2025-12-15)
 
 - Add `condense_quantitative` parameter to table export functions
-- Modify [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md)
+- Modify [`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md)
   and
-  [`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md)
+  [`glmforest()`](https://phmcc.codefloe.page/summata/reference/glmforest.md)
   to correctly display Poisson model statistics
 - Fix LaTeX/PDF export bugs
 
@@ -343,32 +343,32 @@ CRAN release: 2026-03-08
 
 - Update MuMIn package dependency and QC statistics in lmer models
 - Ensure that lme4 and coxme models work with
-  [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
+  [`compfit()`](https://phmcc.codefloe.page/summata/reference/compfit.md)
 
 ## *summata* 0.7.9 (2025-12-06)
 
 - Fix “n” and “Events” columns for interaction effects
 - Fix lmerMod compatibility with
-  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md) and
-  [`m2dt()`](https://phmcc.codeberg.page/summata/reference/m2dt.md)
+  [`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md) and
+  [`m2dt()`](https://phmcc.codefloe.page/summata/reference/m2dt.md)
 - Fix lmer compatibility for
-  [`lmforest()`](https://phmcc.codeberg.page/summata/reference/lmforest.md)
+  [`lmforest()`](https://phmcc.codefloe.page/summata/reference/lmforest.md)
 - Get interaction effects to show on forest plots
 
 ## *summata* 0.7.8 (2025-11-24)
 
 - Add GLM and Cox mixed-effect compatibility with
-  [`m2dt()`](https://phmcc.codeberg.page/summata/reference/m2dt.md) and
-  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md)
+  [`m2dt()`](https://phmcc.codefloe.page/summata/reference/m2dt.md) and
+  [`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md)
 - Add GLM and Cox mixed-effect compatibility with
-  [`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md)
+  [`glmforest()`](https://phmcc.codefloe.page/summata/reference/glmforest.md)
   and
-  [`coxforest()`](https://phmcc.codeberg.page/summata/reference/coxforest.md)
+  [`coxforest()`](https://phmcc.codefloe.page/summata/reference/coxforest.md)
 
 ## *summata* 0.7.7 (2025-11-20)
 
 - Add data requirement to
-  [`m2dt()`](https://phmcc.codeberg.page/summata/reference/m2dt.md) to
+  [`m2dt()`](https://phmcc.codefloe.page/summata/reference/m2dt.md) to
   allow for accurate per-group “n” and “events” columns for all models
 - Multiple `R CMD check` fixes
 
@@ -387,7 +387,7 @@ CRAN release: 2026-03-08
 ## *summata* 0.7.3 (2025-11-03)
 
 - Add coefficient table combination function for
-  [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
+  [`compfit()`](https://phmcc.codefloe.page/summata/reference/compfit.md)
 - Global and imported variable fixes
 
 ## *summata* 0.7.2 (2025-11-03)
@@ -451,9 +451,9 @@ CRAN release: 2026-03-08
 ## *summata* 0.5.5 (2025-10-11)
 
 - Add
-  [`lmforest()`](https://phmcc.codeberg.page/summata/reference/lmforest.md)
+  [`lmforest()`](https://phmcc.codefloe.page/summata/reference/lmforest.md)
   and
-  [`autoforest()`](https://phmcc.codeberg.page/summata/reference/autoforest.md)
+  [`autoforest()`](https://phmcc.codefloe.page/summata/reference/autoforest.md)
   functions
 
 ## *summata* 0.5.4 (2025-10-11)
@@ -463,46 +463,46 @@ CRAN release: 2026-03-08
 ## *summata* 0.5.3 (2025-10-10)
 
 - Fix
-  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
+  [`desctable()`](https://phmcc.codefloe.page/summata/reference/desctable.md)
   ordering to follow variable levels
 - Add “events” columns in
-  [`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md)
+  [`glmforest()`](https://phmcc.codefloe.page/summata/reference/glmforest.md)
   and
-  [`coxforest()`](https://phmcc.codeberg.page/summata/reference/coxforest.md)
+  [`coxforest()`](https://phmcc.codefloe.page/summata/reference/coxforest.md)
 - Fix outcome factor handling in
-  [`glmforest()`](https://phmcc.codeberg.page/summata/reference/glmforest.md)
+  [`glmforest()`](https://phmcc.codefloe.page/summata/reference/glmforest.md)
   and
-  [`coxforest()`](https://phmcc.codeberg.page/summata/reference/coxforest.md)
+  [`coxforest()`](https://phmcc.codefloe.page/summata/reference/coxforest.md)
 - Implement exponentiation options for “fit” functions
 
 ## *summata* 0.5.2 (2025-10-09)
 
 - Fix “n” and “events” columns in `uscreen()`,
-  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md), and
+  [`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md), and
   `*summata*()`
 - Add hyphen space fillers for “p-value”, “Uni p”, and “Multi p” columns
 
 ## *summata* 0.5.1 (2025-10-08)
 
 - Add N rows to
-  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
+  [`desctable()`](https://phmcc.codefloe.page/summata/reference/desctable.md)
 - Fix errors with “rolling” p-values in
-  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
-- Fix [`m2dt()`](https://phmcc.codeberg.page/summata/reference/m2dt.md)
+  [`desctable()`](https://phmcc.codefloe.page/summata/reference/desctable.md)
+- Fix [`m2dt()`](https://phmcc.codefloe.page/summata/reference/m2dt.md)
   edge cases
 
 ## *summata* 0.5.0 (2025-10-06)
 
 - Add export functions
-  [`table2pdf()`](https://phmcc.codeberg.page/summata/reference/table2pdf.md),
-  [`table2tex()`](https://phmcc.codeberg.page/summata/reference/table2tex.md),
+  [`table2pdf()`](https://phmcc.codefloe.page/summata/reference/table2pdf.md),
+  [`table2tex()`](https://phmcc.codefloe.page/summata/reference/table2tex.md),
   and
-  [`table2html()`](https://phmcc.codeberg.page/summata/reference/table2html.md)
+  [`table2html()`](https://phmcc.codefloe.page/summata/reference/table2html.md)
 
 ## *summata* 0.4.1 (2025-10-06)
 
 - Added
-  [`compfit()`](https://phmcc.codeberg.page/summata/reference/compfit.md)
+  [`compfit()`](https://phmcc.codefloe.page/summata/reference/compfit.md)
   function
 - Reorganized helper functions
 - Function name cleanup
@@ -510,20 +510,20 @@ CRAN release: 2026-03-08
 ## *summata* 0.4.0 (2025-10-05)
 
 - Replacement of `mmodel()` function with
-  [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md)
+  [`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md)
 - Standardization of output formats
 
 ## *summata* 0.3.1 (2025-10-02)
 
 - Fixes for unknown/missing rows, reporting of ranges, and non-grouped
   tables in
-  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
+  [`desctable()`](https://phmcc.codefloe.page/summata/reference/desctable.md)
 
 ## *summata* 0.3.0 (2025-09-30)
 
 - Edits to
-  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
-  and [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md)
+  [`desctable()`](https://phmcc.codefloe.page/summata/reference/desctable.md)
+  and [`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md)
 - Addition of “raw data” outputs
 - Expand internal documentation
 
@@ -534,9 +534,9 @@ CRAN release: 2026-03-08
 ## *summata* 0.2.0 (2025-09-26)
 
 - Add
-  [`desctable()`](https://phmcc.codeberg.page/summata/reference/desctable.md)
+  [`desctable()`](https://phmcc.codefloe.page/summata/reference/desctable.md)
   function
-- Add [`fit()`](https://phmcc.codeberg.page/summata/reference/fit.md)
+- Add [`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md)
   function
 
 ## *summata* 0.1.0 (2025-09-23)
