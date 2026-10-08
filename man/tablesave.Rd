@@ -135,12 +135,18 @@ has_latex <- local({
   result == 0L
 })
 
+# Word, PowerPoint, and RTF export require flextable and officer
+has_office <- requireNamespace("flextable", quietly = TRUE) &&
+  requireNamespace("officer", quietly = TRUE)
+
 # Example 4: The format is taken from the file extension
 tablesave(results, file.path(tempdir(), "results.html"))  # Creates HTML file
-tablesave(results, file.path(tempdir(), "results.docx"))  # Creates Word document
-tablesave(results, file.path(tempdir(), "results.pptx"))  # Creates PowerPoint slide
 tablesave(results, file.path(tempdir(), "results.tex"))   # Creates LaTeX source
-tablesave(results, file.path(tempdir(), "results.rtf"))   # Creates RTF document
+if (has_office) {
+  tablesave(results, file.path(tempdir(), "results.docx"))  # Creates Word document
+  tablesave(results, file.path(tempdir(), "results.pptx"))  # Creates PowerPoint slide
+  tablesave(results, file.path(tempdir(), "results.rtf"))   # Creates RTF document
+}
 if (has_latex) {
   tablesave(results, file.path(tempdir(), "results.pdf")) # Creates PDF
 }
@@ -153,10 +159,12 @@ if (has_latex) {
              font_size = 10)
 }
 
-tablesave(results, file.path(tempdir(), "results.docx"),
-           caption = "Table 1: Logistic Regression Results",
-           font_family = "Times New Roman",
-           condense_table = TRUE)
+if (has_office) {
+  tablesave(results, file.path(tempdir(), "results.docx"),
+             caption = "Table 1: Logistic Regression Results",
+             font_family = "Times New Roman",
+             condense_table = TRUE)
+}
 
 tablesave(results, file.path(tempdir(), "results.html"),
            zebra_stripes = TRUE,
@@ -185,7 +193,9 @@ comparison <- compfit(
         full = c("age", "sex", "treatment", "stage")
     )
 )
-tablesave(comparison, file.path(tempdir(), "model_comparison.docx"))
+if (has_office) {
+  tablesave(comparison, file.path(tempdir(), "model_comparison.docx"))
+}
 
 }
 

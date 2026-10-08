@@ -270,6 +270,7 @@ The function applies professional typography:
 }
 }
 \examples{
+\dontshow{if (requireNamespace("flextable", quietly = TRUE) && requireNamespace("officer", quietly = TRUE)) withAutoprint(\{ # examplesIf}
 data(clintrial)
 data(clintrial_labels)
 
@@ -282,9 +283,7 @@ results <- fit(
 )
 
 # Example 1: Basic RTF export
-if (requireNamespace("flextable", quietly = TRUE)) {
-  table2rtf(results, file.path(tempdir(), "results.rtf"))
-}
+table2rtf(results, file.path(tempdir(), "results.rtf"))
 
 \donttest{
 old_width <- options(width = 180)
@@ -376,6 +375,7 @@ table2rtf(results, file.path(tempdir(), "efficacy.rtf"),
 
 options(old_width)
 }
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link{tablesave}} for saving in the format given by the file extension,

@@ -287,6 +287,7 @@ print(pres, target = "custom.pptx")
 }
 }
 \examples{
+\dontshow{if (requireNamespace("flextable", quietly = TRUE) && requireNamespace("officer", quietly = TRUE)) withAutoprint(\{ # examplesIf}
 # Create example data
 data(clintrial)
 data(clintrial_labels)
@@ -294,10 +295,7 @@ tbl <- desctable(clintrial, by = "treatment",
     variables = c("age", "sex"), labels = clintrial_labels)
 
 # Basic PowerPoint export
-if (requireNamespace("flextable", quietly = TRUE) &&
-    requireNamespace("officer", quietly = TRUE)) {
-  table2pptx(tbl, file.path(tempdir(), "example.pptx"))
-}
+table2pptx(tbl, file.path(tempdir(), "example.pptx"))
 
 \donttest{
 old_width <- options(width = 180)
@@ -383,6 +381,7 @@ table2pptx(results, file.path(tempdir(), "conference.pptx"),
 
 options(old_width)
 }
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link{tablesave}} for saving in the format given by the file extension,

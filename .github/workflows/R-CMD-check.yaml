@@ -51,6 +51,14 @@ jobs:
             any::lintr
           needs: check
 
+      - name: Diagnose flextable load (temporary)
+        if: runner.os == 'macOS'
+        continue-on-error: true
+        shell: Rscript {0}
+        run: |
+          print(getOption("repos"))
+          loadNamespace("flextable")
+
       - name: Setup LaTeX (for PDF vignettes and manual)
         if: runner.os == 'Linux'
         run: |

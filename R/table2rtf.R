@@ -250,7 +250,7 @@
 #' \code{\link[flextable]{flextable}} for the underlying table object,
 #' \code{\link[flextable]{save_as_rtf}} for direct RTF export
 #'
-#' @examples
+#' @examplesIf requireNamespace("flextable", quietly = TRUE) && requireNamespace("officer", quietly = TRUE)
 #' data(clintrial)
 #' data(clintrial_labels)
 #'
@@ -263,9 +263,7 @@
 #' )
 #'
 #' # Example 1: Basic RTF export
-#' if (requireNamespace("flextable", quietly = TRUE)) {
-#'   table2rtf(results, file.path(tempdir(), "results.rtf"))
-#' }
+#' table2rtf(results, file.path(tempdir(), "results.rtf"))
 #'
 #' \donttest{
 #' old_width <- options(width = 180)

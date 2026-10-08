@@ -264,7 +264,7 @@
 #' \code{\link[flextable]{flextable}} for table customization,
 #' \code{\link[officer]{read_pptx}} for PowerPoint manipulation
 #'
-#' @examples
+#' @examplesIf requireNamespace("flextable", quietly = TRUE) && requireNamespace("officer", quietly = TRUE)
 #' # Create example data
 #' data(clintrial)
 #' data(clintrial_labels)
@@ -272,10 +272,7 @@
 #'     variables = c("age", "sex"), labels = clintrial_labels)
 #'
 #' # Basic PowerPoint export
-#' if (requireNamespace("flextable", quietly = TRUE) &&
-#'     requireNamespace("officer", quietly = TRUE)) {
-#'   table2pptx(tbl, file.path(tempdir(), "example.pptx"))
-#' }
+#' table2pptx(tbl, file.path(tempdir(), "example.pptx"))
 #'
 #' \donttest{
 #' old_width <- options(width = 180)

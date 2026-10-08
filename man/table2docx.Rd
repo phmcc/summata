@@ -298,6 +298,7 @@ flextable::flextable(results)
 }
 }
 \examples{
+\dontshow{if (requireNamespace("flextable", quietly = TRUE) && requireNamespace("officer", quietly = TRUE)) withAutoprint(\{ # examplesIf}
 data(clintrial)
 data(clintrial_labels)
 
@@ -310,10 +311,7 @@ results <- fit(
 )
 
 # Example 1: Basic Word export
-if (requireNamespace("flextable", quietly = TRUE) &&
-    requireNamespace("officer", quietly = TRUE)) {
-  table2docx(results, file.path(tempdir(), "results.docx"))
-}
+table2docx(results, file.path(tempdir(), "results.docx"))
 
 \donttest{
 old_width <- options(width = 180)
@@ -386,6 +384,7 @@ table2docx(results, file.path(tempdir(), "strict.docx"),
 
 options(old_width)
 }
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link{tablesave}} for saving in the format given by the file extension,
