@@ -21,7 +21,7 @@ Description: A comprehensive framework for descriptive statistics and regression
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
-URL: https://phmcc.codeberg.page/summata/, https://codeberg.org/phmcc/summata, https://github.com/phmcc/summata
+URL: https://phmcc.codefloe.page/summata/, https://codefloe.com/phmcc/summata, https://github.com/phmcc/summata
 BugReports: https://github.com/phmcc/summata/issues
 Depends: 
     R (>= 4.2.0)

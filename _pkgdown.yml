@@ -1,16 +1,16 @@
 env:
   IN_PKGDOWN: "true"
 
-url: https://phmcc.codeberg.page/summata
+url: https://phmcc.codefloe.page/summata
 
 destination: docs
 
 repo:
   url:
-    home: https://codeberg.org/phmcc/summata/
-    source: https://codeberg.org/phmcc/summata/tree/main/
-    issue: https://codeberg.org/phmcc/summata/issues/
-    user: https://codeberg.org/phmcc/
+    home: https://codefloe.com/phmcc/summata/
+    source: https://codefloe.com/phmcc/summata/tree/main/
+    issue: https://codefloe.com/phmcc/summata/issues/
+    user: https://codefloe.com/phmcc/
 
 template:
   assets: pkgdown
@@ -47,7 +47,7 @@ home:
 navbar:
   structure:
     left: [home, intro, vignettes, articles, news, reference]
-    right: [search, codeberg, github]
+    right: [search, codefloe, github]
   components:
     home:
       icon: fa-home
@@ -93,10 +93,10 @@ navbar:
     reference:
       text: Functions
       href: reference/index.html
-    codeberg:
+    codefloe:
       icon: fa-code-branch
-      href: https://codeberg.org/phmcc/summata
-      aria-label: Codeberg
+      href: https://codefloe.com/phmcc/summata
+      aria-label: Codefloe
     github:
       icon: fa-github
       href: https://github.com/phmcc/summata
@@ -151,4 +151,4 @@ footer:
     left: developed_by
     right: [built_with, legal]
   components:
-    legal: "[GPLv3 License](https://phmcc.codeberg.page/summata/LICENSE.html) | [Code of Conduct](https://phmcc.codeberg.page/summata/CODE_OF_CONDUCT.html)"
+    legal: "[GPLv3 License](https://phmcc.codefloe.page/summata/LICENSE.html) | [Code of Conduct](https://phmcc.codefloe.page/summata/CODE_OF_CONDUCT.html)"

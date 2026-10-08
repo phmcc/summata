@@ -20,7 +20,7 @@
 # *summata* 0.11.5 (2026-05-06)
 
 * Explicitly define `%||%` operator for backward compatibility
-* Move main documentation to Codeberg Pages
+* Move main documentation to Codefloe Pages
 * Minor documentation edits
 
 # *summata* 0.11.4 (2026-03-14)

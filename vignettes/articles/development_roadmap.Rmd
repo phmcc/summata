@@ -55,15 +55,15 @@ Features under consideration for future releases:
 
 # Contributing
 
-Contributions to `summata` are welcome. If interested in implementing a roadmap feature or proposing a new one, please consult the contributing guidelines in the [package repository](https://codeberg.org/phmcc/summata).
+Contributions to `summata` are welcome. If interested in implementing a roadmap feature or proposing a new one, please consult the contributing guidelines in the [package repository](https://codefloe.com/phmcc/summata).
 
 ## Bug Reports
 
-Bug reports and feature requests may be submitted via the issue tracker, either on [Codeberg](https://codeberg.org/phmcc/summata/issues) or [GitHub](https://github.com/phmcc/summata/issues).
+Bug reports and feature requests may be submitted via the issue tracker, either on [Codefloe](https://codefloe.com/phmcc/summata/issues) or [GitHub](https://github.com/phmcc/summata/issues).
 
 ## Development Repository
 
-- **Primary development**: [codeberg.org/phmcc/summata](https://codeberg.org/phmcc/summata)
+- **Primary development**: [codefloe.com/phmcc/summata](https://codefloe.com/phmcc/summata)
 - **GitHub mirror**: [github.com/phmcc/summata](https://github.com/phmcc/summata)
 
 ---

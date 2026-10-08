@@ -36,10 +36,10 @@ install.packages("remotes")
 remotes::install_github("phmcc/summata")
 ```
 
-For experimental builds, the development version is available from Codeberg:
+For experimental builds, the development version is available from Codefloe:
 
 ```{r}
-remotes::install_git("https://codeberg.org/phmcc/summata.git")
+remotes::install_git("https://codefloe.com/phmcc/summata.git")
 ```
 
 ## Verification
