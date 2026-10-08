@@ -41,7 +41,7 @@ jobs:
         with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
-          use-public-rspm: true
+          use-public-rspm: ${{ runner.os != 'macOS' }}
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
@@ -50,14 +50,6 @@ jobs:
             any::covr
             any::lintr
           needs: check
-
-      - name: Diagnose flextable load (temporary)
-        if: runner.os == 'macOS'
-        continue-on-error: true
-        shell: Rscript {0}
-        run: |
-          print(getOption("repos"))
-          loadNamespace("flextable")
 
       - name: Setup LaTeX (for PDF vignettes and manual)
         if: runner.os == 'Linux'

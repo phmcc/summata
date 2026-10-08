@@ -75,7 +75,7 @@ test_that("table2docx validates orientation parameter", {
 
 
 ## ============================================================================
-## SECTION 9: table2pptx Input Validation
+## SECTION 2: table2pptx Input Validation
 ## ============================================================================
 
 test_that("table2pptx requires .pptx extension", {
@@ -91,12 +91,12 @@ test_that("table2pptx requires .pptx extension", {
 
 
 ## ============================================================================
-## SECTION 10: table2html Input Validation
+## SECTION 3: table2html Input Validation
 ## ============================================================================
 
 test_that("table2html requires .html extension", {
     
-    skip_if_not_installed("kableExtra")
+    skip_if_not_installed("xtable")
     
     expect_error(
         table2html(simple_table, "output.txt"),
@@ -106,7 +106,7 @@ test_that("table2html requires .html extension", {
 
 
 ## ============================================================================
-## SECTION 11: table2pdf Input Validation
+## SECTION 4: table2pdf Input Validation
 ## ============================================================================
 
 test_that("table2pdf requires .pdf extension", {
@@ -122,7 +122,7 @@ test_that("table2pdf requires .pdf extension", {
 
 
 ## ============================================================================
-## SECTION 12: table2tex Input Validation
+## SECTION 5: table2tex Input Validation
 ## ============================================================================
 
 test_that("table2tex requires .tex extension", {
@@ -137,7 +137,7 @@ test_that("table2tex requires .tex extension", {
 
 
 ## ============================================================================
-## SECTION 13: table2rtf Input Validation
+## SECTION 6: table2rtf Input Validation
 ## ============================================================================
 
 test_that("table2rtf requires .rtf extension", {
@@ -153,7 +153,7 @@ test_that("table2rtf requires .rtf extension", {
 
 
 ## ============================================================================
-## SECTION 14: File Creation Tests (Integration)
+## SECTION 7: File Creation Tests (Integration)
 ## ============================================================================
 
 test_that("table2docx creates file", {
@@ -225,7 +225,7 @@ test_that("table2pptx creates file", {
 
 test_that("table2html creates file", {
     
-    skip_if_not_installed("kableExtra")
+    skip_if_not_installed("xtable")
     skip_on_cran()
     
     temp_file <- tempfile(fileext = ".html")
@@ -252,7 +252,7 @@ test_that("table2tex creates file", {
 
 
 ## ============================================================================
-## SECTION 15: Package Requirement Tests
+## SECTION 8: Package Requirement Tests
 ## ============================================================================
 
 test_that("table2docx checks for flextable package", {
@@ -265,12 +265,6 @@ test_that("table2docx checks for flextable package", {
 })
 
 
-test_that("table2html checks for kableExtra package", {
-    
-    expect_true(is.function(table2html))
-})
-
-
 test_that("table2pdf checks for xtable package", {
     
     expect_true(is.function(table2pdf))
@@ -278,7 +272,7 @@ test_that("table2pdf checks for xtable package", {
 
 
 ## ============================================================================
-## SECTION 16: Option Processing Tests
+## SECTION 9: Option Processing Tests
 ## ============================================================================
 
 test_that("table2docx processes indent_groups option", {
@@ -364,7 +358,7 @@ test_that("table2docx processes font options", {
 
 
 ## ============================================================================
-## SECTION 17: Integration with summata Output
+## SECTION 10: Integration with summata Output
 ## ============================================================================
 
 test_that("table2docx works with fit() output", {
@@ -405,7 +399,7 @@ test_that("table2docx works with desctable() output", {
 
 test_that("table2html works with fit() output", {
     
-    skip_if_not_installed("kableExtra")
+    skip_if_not_installed("xtable")
     skip_on_cran()
     
     temp_file <- tempfile(fileext = ".html")
@@ -418,7 +412,7 @@ test_that("table2html works with fit() output", {
 
 
 ## ============================================================================
-## SECTION 18: Edge Cases
+## SECTION 11: Edge Cases
 ## ============================================================================
 
 test_that("table2docx handles empty table gracefully", {

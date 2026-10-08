@@ -1,4 +1,4 @@
-## Shared expectation helpers.
+## Shared expectation helpers
 ##
 ## Helpers used by more than one test file live here so that a single definition
 ## governs the contract. Helpers specific to one file remain in that file.
