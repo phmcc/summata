@@ -7,9 +7,15 @@
   };
 </script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet"><link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet"><script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet"><meta property="og:title" content="Detect available sans-serif font for plots — detect_plot_font"><meta name="description" content='Checks for commonly available sans-serif fonts in order of preference
 (Helvetica, Arial, Helvetica Neue) and returns the first available one.
-Falls back to "sans" if none are found or if systemfonts is unavailable.'><meta property="og:description" content='Checks for commonly available sans-serif fonts in order of preference
+Falls back to "sans" if none are found or if systemfonts is unavailable.
+When ragg is being used as the graphics device (detected via options or
+knitr settings), font detection works in non-interactive sessions since
+ragg handles font rendering independently of the R graphics system.'><meta property="og:description" content='Checks for commonly available sans-serif fonts in order of preference
 (Helvetica, Arial, Helvetica Neue) and returns the first available one.
-Falls back to "sans" if none are found or if systemfonts is unavailable.'></head><body>
+Falls back to "sans" if none are found or if systemfonts is unavailable.
+When ragg is being used as the graphics device (detected via options or
+knitr settings), font detection works in non-interactive sessions since
+ragg handles font rendering independently of the R graphics system.'></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -17,7 +23,7 @@ Falls back to "sans" if none are found or if systemfonts is unavailable.'></head
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.13.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,7 +73,10 @@ Falls back to "sans" if none are found or if systemfonts is unavailable.'></head
     <div class="ref-description section level2">
     <p>Checks for commonly available sans-serif fonts in order of preference
 (Helvetica, Arial, Helvetica Neue) and returns the first available one.
-Falls back to "sans" if none are found or if systemfonts is unavailable.</p>
+Falls back to "sans" if none are found or if systemfonts is unavailable.
+When ragg is being used as the graphics device (detected via options or
+knitr settings), font detection works in non-interactive sessions since
+ragg handles font rendering independently of the R graphics system.</p>
     </div>
 
     <div class="section level2">
@@ -78,12 +87,6 @@ Falls back to "sans" if none are found or if systemfonts is unavailable.</p>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>Character string with the font family name to use.</p>
-    </div>
-    <div class="section level2">
-    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>When ragg is being used as the graphics device (detected via options or
-knitr settings), font detection works in non-interactive sessions since
-ragg handles font rendering independently of the R graphics system.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

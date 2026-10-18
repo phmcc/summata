@@ -218,7 +218,11 @@ desctable(
 
   Additional arguments passed to the underlying statistical test
   functions (*e.g.*, `var.equal = TRUE` for *t*-tests,
-  `simulate.p.value = TRUE` for Fisher test).
+  `simulate.p.value = TRUE` for Fisher test, `rho = 1` for the
+  Fleming-Harrington \\G^1\\ test of survival curves). Each argument is
+  passed only to the tests that accept it, so arguments for different
+  tests may be combined in one call. Arguments that no test accepts are
+  ignored with a warning.
 
 ## Value
 
@@ -296,9 +300,19 @@ When `test = TRUE` and `by` is specified:
   for median-based statistics
 
 - **Categorical with "auto"**: Fisher exact test when any expected cell
-  frequency \< 5; \\\chi^2\\ test otherwise
+  frequency \< 5; \\\chi^2\\ test otherwise. Levels and groups without
+  observations, and observations with a missing group, are excluded from
+  the test. When
+  [`stats::fisher.test()`](https://rdrr.io/r/stats/fisher.test.html)
+  cannot complete the exact computation within its workspace, as is
+  common for tables larger than 2 \\\times\\ 2 with a few hundred
+  observations or more, the *p*-value is a Monte Carlo estimate from
+  10,000 simulated tables and a warning is issued
 
-- **Survival**: Log-rank test for comparing survival curves
+- **Survival**: Log-rank test for comparing survival curves, or another
+  test of the \\G^\rho\\ family of
+  [`survival::survdiff()`](https://rdrr.io/pkg/survival/man/survdiff.html)
+  when `rho` is supplied
 
 - **Range statistics**: No *p*-value computed (ranges are descriptive)
 
@@ -314,6 +328,28 @@ Missing values are handled differently by variable type:
   percentages are calculated with or without NAs in the denominator
 
 - **Survival**: NAs in time or event excluded from analysis
+
+**Order of Rows and Columns:**
+
+Rows and columns follow the order of the data rather than a sorted
+order:
+
+- Variables appear in the order of `variables`, and the statistics of
+  each continuous variable in the order of `stats_continuous`
+
+- The categories of a factor appear in the order of its levels,
+  including levels without observations; the categories of a character
+  or logical variable appear in order of first appearance in the data.
+  The category of missing values, when shown, appears last
+
+- The group columns follow the same rule for the grouping variable named
+  in `by`
+
+Regression models code a character variable as a factor with sorted
+levels, so the tables of
+[`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md) list its
+categories in sorted order. Converting the variable to a factor with its
+levels in the intended order gives the same order in both tables.
 
 **Formatting Conventions:**
 
@@ -597,8 +633,8 @@ desctable(clintrial,
 #>                     <char>       <char>           <char>           <char>           <char>           <char>           <char>  <char>
 #> 1:                       N                           850              211              263              241              132        
 #> 2:             Age (years) Median [IQR] 60.0 [52.0-67.0] 61.0 [53.0-67.0] 61.0 [51.0-70.0] 58.0 [51.0-67.0] 60.0 [53.0-66.0]   0.481
-#> 3:                     Sex       Female      449 (53.0%)      110 (52.1%)      131 (49.8%)      134 (55.6%)       74 (56.1%)   0.515
-#> 4:                                 Male      398 (47.0%)      101 (47.9%)      132 (50.2%)      107 (44.4%)       58 (43.9%)        
+#> 3:                     Sex       Female      450 (52.9%)      110 (52.1%)      131 (49.8%)      134 (55.6%)       74 (56.1%)   0.515
+#> 4:                                 Male      400 (47.1%)      101 (47.9%)      132 (50.2%)      107 (44.4%)       58 (43.9%)        
 #> 5: Body Mass Index (kg/m²) Median [IQR] 28.0 [24.7-31.5] 27.9 [24.8-30.9] 28.1 [24.2-31.5] 27.8 [24.7-31.5] 28.5 [25.1-32.1]   0.595
 # Automatically uses ANOVA/Kruskal-Wallis and chi-squared
 

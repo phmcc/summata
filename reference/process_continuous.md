@@ -23,6 +23,8 @@ process_continuous(
   total_label,
   p_per_stat = FALSE,
   marks = NULL,
+  groups = NULL,
+  group_index = NULL,
   ...
 )
 ```
@@ -83,6 +85,16 @@ process_continuous(
   type (*e.g.,* t-test for means, Wilcoxon for medians). If `FALSE`
   (default), calculate a single *p*-value based on the first statistic
   type.
+
+- groups:
+
+  Optional vector of groups (see
+  [`process_variable()`](https://phmcc.codefloe.page/summata/reference/process_variable.md)).
+
+- group_index:
+
+  Optional list of row positions for each group (see
+  [`process_variable()`](https://phmcc.codefloe.page/summata/reference/process_variable.md)).
 
 - ...:
 

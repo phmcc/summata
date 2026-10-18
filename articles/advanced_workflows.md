@@ -136,10 +136,10 @@ example2
 ##> 11:          Sex (Male) × Treatment Group (Drug A)       -    128     89 1.11 (0.72-1.72)   0.637
 ##> 12:          Sex (Male) × Treatment Group (Drug B)       -    175    142 0.98 (0.65-1.46)   0.903
 ##> 13:  Treatment Group (Drug A) × Disease Stage (II)       -     93     52 0.75 (0.42-1.35)   0.339
-##> 14: Treatment Group (Drug A) × Disease Stage (III)       -     75     50 0.65 (0.35-1.20)   0.171
-##> 15:  Treatment Group (Drug A) × Disease Stage (IV)       -     46     37 0.70 (0.37-1.34)   0.287
-##> 16:  Treatment Group (Drug B) × Disease Stage (II)       -    105     73 1.37 (0.78-2.42)   0.278
-##> 17: Treatment Group (Drug B) × Disease Stage (III)       -    127    103 1.30 (0.72-2.35)   0.375
+##> 14:  Treatment Group (Drug B) × Disease Stage (II)       -    105     73 1.37 (0.78-2.42)   0.278
+##> 15: Treatment Group (Drug A) × Disease Stage (III)       -     75     50 0.65 (0.35-1.20)   0.171
+##> 16: Treatment Group (Drug B) × Disease Stage (III)       -    127    103 1.30 (0.72-2.35)   0.375
+##> 17:  Treatment Group (Drug A) × Disease Stage (IV)       -     46     37 0.70 (0.37-1.34)   0.287
 ##> 18:  Treatment Group (Drug B) × Disease Stage (IV)       -     55     54 1.24 (0.66-2.31)   0.504
 ```
 
@@ -269,15 +269,15 @@ example5
 ##>   Pseudo-R²: 15%
 ##>   Brier score: 5%
 ##> 
-##> Recommended Model: Main Effects (CMS: 75.4)
+##> Recommended Model: Main Effects (CMS: 76.5)
 ##> 
 ##> Models ranked by selection score:
 ##>                Model   CMS     N Events Predictors Converged   AIC    BIC Pseudo-R² Concordance Brier Score Global p
 ##>               <char> <num> <int>  <num>      <int>    <char> <num>  <num>     <num>       <num>       <num>   <char>
-##> 1:      Main Effects  75.4   847    368          4       Yes 984.4 1022.4     0.165       0.765       0.195  < 0.001
-##> 2:   Sex × Treatment  68.6   847    368          4       Yes 987.9 1035.4     0.165       0.765       0.195  < 0.001
-##> 3: Stage × Treatment  57.2   847    368          4       Yes 993.8 1060.1     0.167       0.766       0.194  < 0.001
-##> 4: Both Interactions  50.6   847    368          4       Yes 997.2 1073.1     0.168       0.766       0.194  < 0.001
+##> 1:      Main Effects  76.5   847    368          4       Yes 984.4 1022.4     0.165       0.765       0.195  < 0.001
+##> 2:   Sex × Treatment  69.7   847    368          4       Yes 987.9 1035.4     0.165       0.765       0.195  < 0.001
+##> 3: Stage × Treatment  58.3   847    368          4       Yes 993.8 1060.1     0.167       0.766       0.194  < 0.001
+##> 4: Both Interactions  51.7   847    368          4       Yes 997.2 1073.1     0.168       0.766       0.194  < 0.001
 ##> 
 ##> CMS interpretation: 85+ Excellent, 75-84 Very Good, 65-74 Good, 55-64 Fair, < 55 Poor
 ```
@@ -448,17 +448,17 @@ example10
 ##> Multivariable Mixed Effects Cox Model
 ##> 
 ##> Formula: Surv(os_months, os_status) ~ age + sex + treatment + stage + (1|site)
-##> Observations analyzed: 847
-##> Events analyzed: 606
+##> Observations analyzed: 847 of 850 (99.6%)
+##> Events analyzed: 606 of 609 (99.5%)
 ##> 
 ##>            Variable   Group      n Events     aHR (95% CI) p-value
 ##>              <char>  <char> <char> <char>           <char>  <char>
 ##>  1:     Age (years)       -    847    606 1.04 (1.03-1.05) < 0.001
-##>  2:             Sex  Female    450    298        reference       -
-##>  3:                    Male    400    311 1.36 (1.16-1.60) < 0.001
-##>  4: Treatment Group Control    196    151        reference       -
+##>  2:             Sex  Female    449    297        reference       -
+##>  3:                    Male    398    309 1.36 (1.16-1.60) < 0.001
+##>  4: Treatment Group Control    194    149        reference       -
 ##>  5:                  Drug A    292    184 0.57 (0.46-0.72) < 0.001
-##>  6:                  Drug B    362    274 0.93 (0.76-1.14)   0.492
+##>  6:                  Drug B    361    273 0.93 (0.76-1.14)   0.492
 ##>  7:   Disease Stage       I    211    127        reference       -
 ##>  8:                      II    263    172 1.17 (0.93-1.48)   0.178
 ##>  9:                     III    241    186 2.04 (1.62-2.58) < 0.001
@@ -518,8 +518,8 @@ example12
 ##> Models ranked by selection score:
 ##>                Model   CMS     N Events Predictors Groups Converged    AIC    BIC Pseudo-R² Marginal R² Conditional R²   ICC Concordance Global p
 ##>               <char> <num> <int>  <num>      <int>  <int>    <char>  <num>  <num>     <num>       <num>          <num> <num>       <num>   <char>
-##> 1: Random Intercepts  74.0   827     NA          5     10       Yes 4679.8 4727.0     0.275       0.275          0.330 0.076          NA  < 0.001
-##> 2:     Random Slopes  49.1   827     NA          5     10       Yes 4688.5 4759.3     0.276       0.276          0.334 0.098          NA  < 0.001
+##> 1: Random Intercepts  74.0   827     NA          5     10       Yes 4670.5 4717.7     0.275       0.275          0.330 0.076          NA  < 0.001
+##> 2:     Random Slopes  49.1   827     NA          5     10       Yes 4679.5 4750.3     0.276       0.276          0.334 0.098          NA  < 0.001
 ##> 
 ##> CMS interpretation: 85+ Excellent, 75-84 Very Good, 65-74 Good, 55-64 Fair, < 55 Poor
 ```
@@ -892,10 +892,10 @@ example21
 ##> 
 ##>                               Outcome                Predictor      n Events     aHR (95% CI) p-value
 ##>                                <char>                   <char> <char> <char>           <char>  <char>
-##> 1: Progression-Free Survival (months) Treatment Group (Drug A)    723    723 0.63 (0.51-0.77) < 0.001
-##> 2: Progression-Free Survival (months) Treatment Group (Drug B)    723    723 1.00 (0.83-1.20)   0.989
-##> 3:          Overall Survival (months) Treatment Group (Drug A)    609    609 0.63 (0.50-0.78) < 0.001
-##> 4:          Overall Survival (months) Treatment Group (Drug B)    609    609 1.00 (0.82-1.23)   0.962
+##> 1: Progression-Free Survival (months) Treatment Group (Drug A)    850    723 0.63 (0.51-0.77) < 0.001
+##> 2: Progression-Free Survival (months) Treatment Group (Drug B)    850    723 1.00 (0.83-1.20)   0.989
+##> 3:          Overall Survival (months) Treatment Group (Drug A)    850    609 0.63 (0.50-0.78) < 0.001
+##> 4:          Overall Survival (months) Treatment Group (Drug B)    850    609 1.00 (0.82-1.23)   0.962
 ```
 
 ------------------------------------------------------------------------
@@ -978,12 +978,12 @@ effects
 ##> 
 ##>                       Outcome                Predictor      n Events      OR (95% CI)   Uni p     aOR (95% CI) Multi p
 ##>                        <char>                   <char> <char> <char>           <char>  <char>           <char>  <char>
-##> 1:                Death Event Treatment Group (Drug A)    292    184 0.51 (0.34-0.76)   0.001 0.44 (0.28-0.68) < 0.001
-##> 2:                Death Event Treatment Group (Drug B)    361    273 0.93 (0.61-1.39)   0.721 0.74 (0.47-1.16)   0.192
+##> 1:         Surgical Resection Treatment Group (Drug A)    292    173 1.58 (1.10-2.27)   0.014 1.84 (1.23-2.76)   0.003
+##> 2:         Surgical Resection Treatment Group (Drug B)    361    102 0.43 (0.30-0.62) < 0.001 0.45 (0.30-0.66) < 0.001
 ##> 3: Progression or Death Event Treatment Group (Drug A)    292    227 0.44 (0.26-0.73)   0.002 0.36 (0.20-0.62) < 0.001
 ##> 4: Progression or Death Event Treatment Group (Drug B)    361    321 1.02 (0.58-1.75)   0.950 0.77 (0.42-1.36)   0.374
-##> 5:         Surgical Resection Treatment Group (Drug A)    292    173 1.58 (1.10-2.27)   0.014 1.84 (1.23-2.76)   0.003
-##> 6:         Surgical Resection Treatment Group (Drug B)    361    102 0.43 (0.30-0.62) < 0.001 0.45 (0.30-0.66) < 0.001
+##> 5:                Death Event Treatment Group (Drug A)    292    184 0.51 (0.34-0.76)   0.001 0.44 (0.28-0.68) < 0.001
+##> 6:                Death Event Treatment Group (Drug B)    361    273 0.93 (0.61-1.39)   0.721 0.74 (0.47-1.16)   0.192
 
 # Step 3: Visualize effects
 forest_plot <- multiforest(

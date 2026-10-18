@@ -15,7 +15,7 @@ to a more readable format (e.g., &quot;Treatment (Drug A) × Stage (II)&quot;)."
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.13.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,7 +69,7 @@ to a more readable format (<em>e.g.,</em> "Treatment (Drug A) × Stage (II)").</
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">format_interaction_term</span><span class="op">(</span><span class="va">term</span>, labels <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">format_interaction_term</span><span class="op">(</span><span class="va">term</span>, labels <span class="op">=</span> <span class="cn">NULL</span>, var_names <span class="op">=</span> <span class="cn">NULL</span>, xlevels <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -82,6 +82,21 @@ to a more readable format (<em>e.g.,</em> "Treatment (Drug A) × Stage (II)").</
 
 <dt id="arg-labels">labels<a class="anchor" aria-label="anchor" href="#arg-labels"></a></dt>
 <dd><p>Optional named vector of labels for variable names.</p></dd>
+
+
+<dt id="arg-var-names">var_names<a class="anchor" aria-label="anchor" href="#arg-var-names"></a></dt>
+<dd><p>Optional character vector of the variables of the
+interaction. When given, each component is split into its variable and
+level by the longest variable name it begins with (see
+<code><a href="split_interaction_term.html">split_interaction_term()</a></code>), which holds for any variable name;
+otherwise the variable name is taken to be the leading run of lowercase
+letters, digits, and underscores.</p></dd>
+
+
+<dt id="arg-xlevels">xlevels<a class="anchor" aria-label="anchor" href="#arg-xlevels"></a></dt>
+<dd><p>Optional named list of the levels of the variables in
+<code>var_names</code>, which keeps a level that contains a colon in one
+component.</p></dd>
 
 </dl></div>
     <div class="section level2">

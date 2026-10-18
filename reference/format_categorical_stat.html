@@ -15,7 +15,7 @@ standard conventions (n, n (%), % only) with locale-aware decimal marks."></head
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.13.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -81,7 +81,9 @@ standard conventions (n, n (%), % only) with locale-aware decimal marks.</p>
 
 
 <dt id="arg-total">total<a class="anchor" aria-label="anchor" href="#arg-total"></a></dt>
-<dd><p>Integer total count for percentage calculation.</p></dd>
+<dd><p>Integer total count for percentage calculation. When zero,
+as for a group without observations, the percentage is undefined: the
+count alone is returned, or an empty string for <code>"percent"</code>.</p></dd>
 
 
 <dt id="arg-stat-type">stat_type<a class="anchor" aria-label="anchor" href="#arg-stat-type"></a></dt>

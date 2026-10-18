@@ -63,7 +63,8 @@ multifit(
 
   Character string specifying the predictor (exposure) variable name.
   This variable is tested against each outcome. Can be continuous or
-  categorical (factor).
+  categorical (factor). Non-syntactic names (*e.g.,* `"tumor stage"`)
+  are quoted in the model formula and need no backticks.
 
 - covariates:
 
@@ -446,6 +447,12 @@ The returned object includes the following attributes accessible via
 
   Character. Which columns were displayed
 
+- conf_level:
+
+  Numeric. The confidence level of the intervals, which
+  [`multiforest()`](https://phmcc.codefloe.page/summata/reference/multiforest.md)
+  uses to draw the same intervals
+
 - analysis_type:
 
   Character. `"multi_outcome"` to identify analysis type
@@ -752,12 +759,12 @@ print(result3)
 #> 
 #>                       Outcome                Predictor      n Events      OR (95% CI)   Uni p     aOR (95% CI) Multi p
 #>                        <char>                   <char> <char> <char>           <char>  <char>           <char>  <char>
-#> 1:                Death Event Treatment Group (Drug A)    292    184 0.51 (0.34-0.76)   0.001 0.44 (0.28-0.68) < 0.001
-#> 2:                Death Event Treatment Group (Drug B)    361    273 0.93 (0.61-1.39)   0.721 0.74 (0.47-1.16)   0.192
+#> 1:         Surgical Resection Treatment Group (Drug A)    292    173 1.58 (1.10-2.27)   0.014 1.84 (1.23-2.76)   0.003
+#> 2:         Surgical Resection Treatment Group (Drug B)    361    102 0.43 (0.30-0.62) < 0.001 0.45 (0.30-0.66) < 0.001
 #> 3: Progression or Death Event Treatment Group (Drug A)    292    227 0.44 (0.26-0.73)   0.002 0.36 (0.20-0.62) < 0.001
 #> 4: Progression or Death Event Treatment Group (Drug B)    361    321 1.02 (0.58-1.75)   0.950 0.77 (0.42-1.36)   0.374
-#> 5:         Surgical Resection Treatment Group (Drug A)    292    173 1.58 (1.10-2.27)   0.014 1.84 (1.23-2.76)   0.003
-#> 6:         Surgical Resection Treatment Group (Drug B)    361    102 0.43 (0.30-0.62) < 0.001 0.45 (0.30-0.66) < 0.001
+#> 5:                Death Event Treatment Group (Drug A)    292    184 0.51 (0.34-0.76)   0.001 0.44 (0.28-0.68) < 0.001
+#> 6:                Death Event Treatment Group (Drug B)    361    273 0.93 (0.61-1.39)   0.721 0.74 (0.47-1.16)   0.192
 
 # Example 4: Continuous predictor across outcomes
 result4 <- multifit(
@@ -1074,10 +1081,10 @@ result <- multifit(
 # Get unformatted results for custom analysis
 raw_data <- attr(result, "raw_data")
 print(raw_data)
-#>      outcome predictor  group     n events coefficient          se exp_coef  ci_lower  ci_upper statistic      p_value effect_type adjusted
-#>       <char>    <char> <char> <int>  <num>       <num>       <num>    <num>     <num>     <num>     <num>        <num>      <char>   <lgcl>
-#> 1:   surgery       age      -   850    370 -0.03608738 0.006211760 0.964556 0.9527194 0.9762269 -5.809525 6.265023e-09          OR    FALSE
-#> 2: os_status       age      -   850    609  0.04695122 0.006987363 1.048071 1.0340279 1.0627756  6.719447 1.824154e-11          OR    FALSE
+#>      outcome predictor  group     n events coefficient          se exp_coef  ci_lower  ci_upper statistic      p_value effect_type adjusted df_residual
+#>       <char>    <char> <char> <num>  <num>       <num>       <num>    <num>     <num>     <num>     <num>        <num>      <char>   <lgcl>       <num>
+#> 1:   surgery       age      -   850    370 -0.03608738 0.006211760 0.964556 0.9527194 0.9762269 -5.809525 6.265023e-09          OR    FALSE          NA
+#> 2: os_status       age      -   850    609  0.04695122 0.006987363 1.048071 1.0340279 1.0627756  6.719447 1.824154e-11          OR    FALSE          NA
 
 # Example 15: Hide sample size and event columns
 result_minimal <- multifit(
@@ -1179,12 +1186,12 @@ print(final_table)
 #> 
 #>                       Outcome                Predictor      n Events      OR (95% CI)   Uni p     aOR (95% CI) Multi p
 #>                        <char>                   <char> <char> <char>           <char>  <char>           <char>  <char>
-#> 1:                Death Event Treatment Group (Drug A)    289    182 0.51 (0.34-0.76)   0.001 0.41 (0.26-0.65) < 0.001
-#> 2:                Death Event Treatment Group (Drug B)    357    269 0.93 (0.61-1.39)   0.721 0.69 (0.43-1.08)   0.105
+#> 1:         Surgical Resection Treatment Group (Drug A)    289    170 1.58 (1.10-2.27)   0.014 1.78 (1.19-2.67)   0.005
+#> 2:         Surgical Resection Treatment Group (Drug B)    357    100 0.43 (0.30-0.62) < 0.001 0.43 (0.29-0.64) < 0.001
 #> 3: Progression or Death Event Treatment Group (Drug A)    289    224 0.44 (0.26-0.73)   0.002 0.34 (0.19-0.59) < 0.001
 #> 4: Progression or Death Event Treatment Group (Drug B)    357    317 1.02 (0.58-1.75)   0.950 0.73 (0.40-1.30)   0.291
-#> 5:         Surgical Resection Treatment Group (Drug A)    289    170 1.58 (1.10-2.27)   0.014 1.78 (1.19-2.67)   0.005
-#> 6:         Surgical Resection Treatment Group (Drug B)    357    100 0.43 (0.30-0.62) < 0.001 0.43 (0.29-0.64) < 0.001
+#> 5:                Death Event Treatment Group (Drug A)    289    182 0.51 (0.34-0.76)   0.001 0.41 (0.26-0.65) < 0.001
+#> 6:                Death Event Treatment Group (Drug B)    357    269 0.93 (0.61-1.39)   0.721 0.69 (0.43-1.08)   0.105
 
 # Example 19: Gamma regression for positive continuous outcomes
 gamma_result <- multifit(
@@ -1306,10 +1313,10 @@ if (requireNamespace("coxme", quietly = TRUE)) {
 #> 
 #>                               Outcome                Predictor      n Events     aHR (95% CI) p-value
 #>                                <char>                   <char> <char> <char>           <char>  <char>
-#> 1: Progression-Free Survival (months) Treatment Group (Drug A)    721    721 0.53 (0.44-0.66) < 0.001
-#> 2: Progression-Free Survival (months) Treatment Group (Drug B)    721    721 0.85 (0.71-1.03)   0.099
-#> 3:          Overall Survival (months) Treatment Group (Drug A)    606    606 0.57 (0.46-0.72) < 0.001
-#> 4:          Overall Survival (months) Treatment Group (Drug B)    606    606 0.93 (0.76-1.14)   0.492
+#> 1: Progression-Free Survival (months) Treatment Group (Drug A)    847    721 0.53 (0.44-0.66) < 0.001
+#> 2: Progression-Free Survival (months) Treatment Group (Drug B)    847    721 0.85 (0.71-1.03)   0.099
+#> 3:          Overall Survival (months) Treatment Group (Drug A)    847    606 0.57 (0.46-0.72) < 0.001
+#> 4:          Overall Survival (months) Treatment Group (Drug B)    847    606 0.93 (0.76-1.14)   0.492
 
 # Example 23: Multiple interactions across outcomes
 multi_int <- multifit(

@@ -93,7 +93,11 @@ glmforest(
   Numeric confidence level for confidence intervals. Must be between 0
   and 1. Default is 0.95 (95% confidence intervals). The CI percentage
   is automatically displayed in column headers (*e.g.,* "90% CI" when
-  `conf_level = 0.90`).
+  `conf_level = 0.90`). Intervals are computed by the method that
+  `getOption("summata.conf_method")` selects, as in
+  [`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md); those
+  of a [`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md)
+  result at the same level are reused.
 
 - font_size:
 
@@ -367,6 +371,14 @@ category:
 - When `condense_table = TRUE`, reference-only variables may be omitted
   entirely
 
+**Aliased Coefficients:**
+
+Coefficients that the model could not estimate because their columns of
+the model matrix are linear combinations of others are omitted, as in
+the tables of
+[`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md),
+together with any factor none of whose levels was estimated.
+
 **Layout Optimization:**
 
 The function automatically optimizes layout based on content:
@@ -528,7 +540,7 @@ plot5 <- glmforest(
 
 # Example 6: Save with recommended dimensions
 forestsave(plot5, file.path(tempdir(), "forest.pdf"))
-#> Forest plot saved to /tmp/Rtmphzv2jI/forest.pdf (width = 14.9 in, height = 5.0 in)
+#> Forest plot saved to /tmp/Rtmph50nhC/forest.pdf (width = 14.9 in, height = 5.0 in)
 
 options(old_width)
 

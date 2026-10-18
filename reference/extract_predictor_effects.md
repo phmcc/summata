@@ -15,7 +15,8 @@ extract_predictor_effects(
   conf_level = 0.95,
   adjusted = FALSE,
   terms_to_extract = NULL,
-  conf_method = NULL
+  conf_method = NULL,
+  predictor_levels = NULL
 )
 ```
 
@@ -45,6 +46,13 @@ extract_predictor_effects(
 
   Character vector of terms to extract (predictor and optionally
   interaction terms involving the predictor).
+
+- predictor_levels:
+
+  Character vector of the levels of the predictor, by which its
+  coefficients are named (`"FALSE"` and `"TRUE"` for a logical
+  predictor, none for a numeric one). When `NULL`, the levels recorded
+  by the model are used.
 
 ## Value
 

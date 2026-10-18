@@ -59,7 +59,9 @@ fit(
   All predictors are included simultaneously (multivariable model). For
   univariable models, provide a single predictor. Can include
   continuous, categorical (factor), or binary variables. Required for
-  formula-based workflow; ignored if `model` is provided.
+  formula-based workflow; ignored if `model` is provided. Non-syntactic
+  names (*e.g.,* `"tumor stage"`) are quoted in the model formula and
+  need no backticks.
 
 - model:
 
@@ -1126,10 +1128,10 @@ print(interaction_model)
 #>  7:                                                    III    241    186 1.86 (1.17-2.96)   0.009
 #>  8:                                                     IV    132    121 3.72 (2.30-6.02) < 0.001
 #>  9:  Treatment Group (Drug A) × Disease Stage (II)       -     93     52 0.79 (0.44-1.41)   0.416
-#> 10: Treatment Group (Drug A) × Disease Stage (III)       -     75     50 0.70 (0.38-1.29)   0.248
-#> 11:  Treatment Group (Drug A) × Disease Stage (IV)       -     46     37 0.68 (0.36-1.30)   0.248
-#> 12:  Treatment Group (Drug B) × Disease Stage (II)       -    105     73 1.33 (0.75-2.35)   0.327
-#> 13: Treatment Group (Drug B) × Disease Stage (III)       -    127    103 1.30 (0.73-2.34)   0.375
+#> 10:  Treatment Group (Drug B) × Disease Stage (II)       -    105     73 1.33 (0.75-2.35)   0.327
+#> 11: Treatment Group (Drug A) × Disease Stage (III)       -     75     50 0.70 (0.38-1.29)   0.248
+#> 12: Treatment Group (Drug B) × Disease Stage (III)       -    127    103 1.30 (0.73-2.34)   0.375
+#> 13:  Treatment Group (Drug A) × Disease Stage (IV)       -     46     37 0.68 (0.36-1.30)   0.248
 #> 14:  Treatment Group (Drug B) × Disease Stage (IV)       -     55     54 1.17 (0.63-2.18)   0.620
 # Shows main effects plus all treatment×stage interaction terms
 
@@ -1158,8 +1160,8 @@ print(multi_interaction)
 #> 5:                                              Yes    362    176  1.16 (0.83-1.61)   0.384
 #> 6:                                  Diabetes     No    637    301         reference       -
 #> 7:                                              Yes    197    116  1.99 (1.28-3.14)   0.003
-#> 8:                  Age (years) × Sex (Male)      -    390    210  0.99 (0.97-1.01)   0.376
-#> 9: Surgical Resection (Yes) × Diabetes (Yes)      -     88     48  0.69 (0.35-1.33)   0.267
+#> 8: Surgical Resection (Yes) × Diabetes (Yes)      -     88     48  0.69 (0.35-1.33)   0.267
+#> 9:                  Age (years) × Sex (Male)      -    390    210  0.99 (0.97-1.01)   0.376
 
 # Example 21: Quasipoisson for overdispersed count data
 # Alternative to negative binomial when MASS not available
@@ -1256,7 +1258,7 @@ inverse_gaussian <- fit(
 )
 print(inverse_gaussian)
 #> 
-#> Multivariable Inverse.gaussian GLM Model
+#> Multivariable Inverse Gaussian Model
 #> 
 #> Formula: recovery_days ~ age + surgery + pain_score
 #> Observations analyzed: 825 of 850 (97.1%)

@@ -83,7 +83,13 @@ multiforest(
   Numeric confidence level for confidence intervals. Must be between 0
   and 1. Default is 0.95 (95% confidence intervals). The CI percentage
   is automatically displayed in column headers (*e.g.,* "90% CI" when
-  `conf_level = 0.90`).
+  `conf_level = 0.90`). At the level of the
+  [`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md)
+  result, the intervals of its table are drawn; at another level, they
+  are computed from the coefficients and their standard errors, with the
+  *t* distribution on the residual degrees of freedom for linear models
+  whose table holds exact *t* intervals, and as Wald intervals
+  otherwise.
 
 - font_size:
 
@@ -374,7 +380,7 @@ plot3 <- multiforest(
 
 # Example 4: Save with recommended dimensions
 forestsave(plot3, file.path(tempdir(), "multioutcome_forest.pdf"))
-#> Forest plot saved to /tmp/Rtmphzv2jI/multioutcome_forest.pdf (width = 16.7 in, height = 5.0 in)
+#> Forest plot saved to /tmp/Rtmph50nhC/multioutcome_forest.pdf (width = 16.7 in, height = 5.0 in)
 
 options(old_width)
 

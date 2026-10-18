@@ -185,9 +185,9 @@ example3
 ##>                   Outcome          Predictor      n Events      OR (95% CI)   Uni p     aOR (95% CI) Multi p
 ##>                    <char>             <char> <char> <char>           <char>  <char>           <char>  <char>
 ##> 1:       Any Complication Surgical Resection    362    229 1.70 (1.29-2.25) < 0.001 1.82 (1.36-2.44) < 0.001
-##> 2: ICU Admission Required Surgical Resection    362    173 2.25 (1.70-2.99) < 0.001 2.57 (1.91-3.48) < 0.001
+##> 2:   Wound/Site Infection Surgical Resection    362    117 4.58 (3.18-6.72) < 0.001 4.98 (3.37-7.46) < 0.001
 ##> 3:     30-Day Readmission Surgical Resection    362    176 0.91 (0.69-1.19)   0.500 1.05 (0.79-1.40)   0.720
-##> 4:   Wound/Site Infection Surgical Resection    362    117 4.58 (3.18-6.72) < 0.001 4.98 (3.37-7.46) < 0.001
+##> 4: ICU Admission Required Surgical Resection    362    173 2.25 (1.70-2.99) < 0.001 2.57 (1.91-3.48) < 0.001
 ```
 
 Comparing columns reveals confounding (large differences) or robust
@@ -719,12 +719,12 @@ adjusted
 ##>                    <char>                   <char> <char> <char>           <char> <char>           <char>  <char>
 ##> 1:       Any Complication Treatment Group (Drug A)    288    139 0.73 (0.51-1.06)  0.097 0.62 (0.42-0.91)   0.016
 ##> 2:       Any Complication Treatment Group (Drug B)    355    221 1.27 (0.89-1.81)  0.182 1.44 (0.99-2.09)   0.057
-##> 3: ICU Admission Required Treatment Group (Drug A)    288    108 1.26 (0.87-1.86)  0.226 1.11 (0.75-1.67)   0.599
-##> 4: ICU Admission Required Treatment Group (Drug B)    355    143 1.38 (0.96-1.99)  0.085 1.75 (1.19-2.61)   0.005
+##> 3:   Wound/Site Infection Treatment Group (Drug A)    288     70 2.14 (1.32-3.55)  0.002 1.86 (1.11-3.19)   0.021
+##> 4:   Wound/Site Infection Treatment Group (Drug B)    355     66 1.54 (0.95-2.55)  0.084 2.22 (1.31-3.87)   0.004
 ##> 5:     30-Day Readmission Treatment Group (Drug A)    288    126 0.89 (0.62-1.28)  0.523 0.86 (0.59-1.25)   0.427
 ##> 6:     30-Day Readmission Treatment Group (Drug B)    355    203 1.58 (1.11-2.24)  0.011 1.56 (1.08-2.25)   0.018
-##> 7:   Wound/Site Infection Treatment Group (Drug A)    288     70 2.14 (1.32-3.55)  0.002 1.86 (1.11-3.19)   0.021
-##> 8:   Wound/Site Infection Treatment Group (Drug B)    355     66 1.54 (0.95-2.55)  0.084 2.22 (1.31-3.87)   0.004
+##> 7: ICU Admission Required Treatment Group (Drug A)    288    108 1.26 (0.87-1.86)  0.226 1.11 (0.75-1.67)   0.599
+##> 8: ICU Admission Required Treatment Group (Drug B)    355    143 1.38 (0.96-1.99)  0.085 1.75 (1.19-2.61)   0.005
 
 ## Forest plot visualization
 forest_plot <- multiforest(

@@ -3,7 +3,8 @@
 Checks that all specified predictor variables exist in the dataset.
 Handles interaction terms (splits on ":"), mixed-effects random effects
 (ignores "\|" syntax), and raises informative errors for missing
-variables.
+variables. A name that contains ":" but is the name of a column is a
+variable, not an interaction.
 
 ## Usage
 

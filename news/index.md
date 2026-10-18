@@ -1,5 +1,100 @@
 # Changelog
 
+## *summata* 0.13.0 (2026-10-18)
+
+- Speed up
+  [`desctable()`](https://phmcc.codefloe.page/summata/reference/desctable.md),
+  which now computes rank-test *p*-values from a single sort and derives
+  the grouping structure once per table
+- Pass the arguments in `...` of
+  [`desctable()`](https://phmcc.codefloe.page/summata/reference/desctable.md)
+  (*e.g.*, `var.equal = TRUE`) to the tests that accept them, with a
+  warning for arguments no test accepts; exclude missing and empty
+  categories from categorical tests, falling back to a Monte Carlo
+  *p*-value when Fisher’s exact test exceeds its workspace
+- Fix categorical totals, median survival intervals at nondefault
+  confidence levels, and the formatting of values of 1,000 or more in
+  [`desctable()`](https://phmcc.codefloe.page/summata/reference/desctable.md),
+  and show the second level of binary variables in condensed tables
+- Compute the Gehan-Breslow, Tarone-Ware, and Peto-Peto tests that
+  `survtable(test_type = )` names, honor `p_digits`, list groups in
+  order of first appearance as
+  [`desctable()`](https://phmcc.codefloe.page/summata/reference/desctable.md)
+  does, and match survival time quantiles to their groups when a factor
+  level is empty
+- Show logical predictors by level, with `FALSE` as the reference, in
+  regression tables and forest plots
+- Accept non-syntactic variable names (*e.g.*, `"tumor stage"`), with or
+  without backticks, in
+  [`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md),
+  [`uniscreen()`](https://phmcc.codefloe.page/summata/reference/uniscreen.md),
+  [`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md),
+  [`fullfit()`](https://phmcc.codefloe.page/summata/reference/fullfit.md),
+  and
+  [`survtable()`](https://phmcc.codefloe.page/summata/reference/survtable.md),
+  and read factor levels and variable names that contain a colon
+  correctly
+- Fix the matching, counts, and labels of interaction terms whose
+  variables have non-syntactic, overlapping, or logical names
+- Order the variables of the tables of models passed to `fit(model = )`
+  and [`m2dt()`](https://phmcc.codefloe.page/summata/reference/m2dt.md)
+  as the model formula does, and describe mixed models as univariable or
+  multivariable from their fixed-effect terms
+- Count the events of Cox models from the event argument of
+  [`Surv()`](https://rdrr.io/pkg/survival/man/Surv.html), coded as
+  [`Surv()`](https://rdrr.io/pkg/survival/man/Surv.html) codes it;
+  counts were wrong for status coded 1 and 2, counting-process
+  responses, [`clogit()`](https://rdrr.io/pkg/survival/man/clogit.html)
+  models, and events written as expressions
+- Omit aliased coefficients from forest plots and Cox regression tables,
+  show a factor whose first level is empty against its effective
+  reference level, and drop empty factor levels before fitting Cox
+  models
+- Compute forest plot intervals as the regression tables do, following
+  `summata.conf_method`, at the requested `conf_level` in
+  [`uniforest()`](https://phmcc.codefloe.page/summata/reference/uniforest.md),
+  and with the *t* quantile for linear models
+- Fix forest plot interaction rows under `indent_groups` and
+  `condense_table`,
+  [`coxforest()`](https://phmcc.codefloe.page/summata/reference/coxforest.md)
+  intervals and interactions for `coxme` models, and the fixed-effect
+  terms of mixed models (*e.g.*, `log(age)`) in
+  [`glmforest()`](https://phmcc.codefloe.page/summata/reference/glmforest.md)
+  and
+  [`lmforest()`](https://phmcc.codefloe.page/summata/reference/lmforest.md);
+  draw forest plots when `knitr` is not installed
+- Report only the predictor’s coefficients in
+  [`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md),
+  with observations rather than events as *n* for Cox models and the
+  given order of outcomes and levels under `columns = "both"`; fit Cox
+  models to [`Surv()`](https://rdrr.io/pkg/survival/man/Surv.html)
+  outcomes, as
+  [`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md) does;
+  draw the table’s estimates in
+  [`multiforest()`](https://phmcc.codefloe.page/summata/reference/multiforest.md)
+- Name the predictor or outcome of a failed fit in
+  [`uniscreen()`](https://phmcc.codefloe.page/summata/reference/uniscreen.md)
+  and
+  [`multifit()`](https://phmcc.codefloe.page/summata/reference/multifit.md),
+  and use one core when the number of cores cannot be determined
+- Compare linear mixed models in
+  [`compfit()`](https://phmcc.codefloe.page/summata/reference/compfit.md)
+  on maximum likelihood fits, include the Brier score in the composite
+  score of logistic models, score the Cox global *p*-value independently
+  of the number format, accept candidates with aliased coefficients, and
+  skip profile intervals that are not displayed; use model-level *N* and
+  Events in
+  [`compfit()`](https://phmcc.codefloe.page/summata/reference/compfit.md)
+  and the
+  [`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md) print
+  method
+- Bold significant *p*-values in exported tables under every number
+  format, and keep the *p*-values of factor levels in indented and
+  condensed exports
+- Compute the c-statistic without `pROC` and name GLM families without
+  `stringr`; both are removed from `Suggests`
+- Documentation and testing suite revisions
+
 ## *summata* 0.12.0 (2026-07-31)
 
 CRAN release: 2026-08-21

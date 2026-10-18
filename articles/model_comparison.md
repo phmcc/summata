@@ -126,14 +126,14 @@ example1
 #>   Pseudo-R²: 15%
 #>   Brier score: 5%
 #> 
-#> Recommended Model: Full Model (CMS: 81.2)
+#> Recommended Model: Full Model (CMS: 82.7)
 #> 
 #> Models ranked by selection score:
 #>           Model   CMS     N Events Predictors Converged    AIC    BIC Pseudo-R² Concordance Brier Score Global p
 #>          <char> <num> <int>  <num>      <int>    <char>  <num>  <num>     <num>       <num>       <num>   <char>
-#> 1:   Full Model  81.2   833    362          6       Yes  900.0  961.4     0.234       0.811       0.175  < 0.001
-#> 2:   Plus Stage  68.9   842    368          4       Yes  969.9 1012.5     0.175       0.773       0.192  < 0.001
-#> 3: Demographics  33.6   850    370          2       Yes 1132.9 1147.1     0.032       0.617       0.235  < 0.001
+#> 1:   Full Model  82.7   833    362          6       Yes  900.0  961.4     0.234       0.811       0.175  < 0.001
+#> 2:   Plus Stage  70.1   842    368          4       Yes  969.9 1012.5     0.175       0.773       0.192  < 0.001
+#> 3: Demographics  33.9   850    370          2       Yes 1132.9 1147.1     0.032       0.617       0.235  < 0.001
 #> 
 #> CMS interpretation: 85+ Excellent, 75-84 Very Good, 65-74 Good, 55-64 Fair, < 55 Poor
 ```
@@ -206,14 +206,14 @@ example3
 #>   Concordance: 40%
 #>   Global p-value: 15%
 #> 
-#> Recommended Model: Full (CMS: 75.8)
+#> Recommended Model: Full (CMS: 75.9)
 #> 
 #> Models ranked by selection score:
 #>           Model   CMS     N Events Predictors Converged    AIC    BIC Pseudo-R² Concordance Global p
 #>          <char> <num> <int>  <num>      <int>    <char>  <num>  <num>     <num>       <num>   <char>
-#> 1:         Full  75.8   194    149          5       Yes 7188.4 7232.4     0.283       0.699  < 0.001
-#> 2: Demographics  48.0   196    151          3       Yes 7438.4 7456.0     0.126       0.629  < 0.001
-#> 3:   Unadjusted  33.8   196    151          1       Yes 7527.1 7535.9     0.026       0.549  < 0.001
+#> 1:         Full  75.9   842    602          5       Yes 7188.4 7232.4     0.283       0.699  < 0.001
+#> 2: Demographics  48.2   850    609          3       Yes 7438.4 7456.0     0.126       0.629  < 0.001
+#> 3:   Unadjusted  33.9   850    609          1       Yes 7527.1 7535.9     0.026       0.549  < 0.001
 #> 
 #> CMS interpretation: 85+ Excellent, 75-84 Very Good, 65-74 Good, 55-64 Fair, < 55 Poor
 ```
@@ -250,14 +250,14 @@ example4
 #>   Pseudo-R²: 15%
 #>   Brier score: 5%
 #> 
-#> Recommended Model: Full (CMS: 67.5)
+#> Recommended Model: Full (CMS: 70)
 #> 
 #> Models ranked by selection score:
 #>       Model   CMS     N Events Predictors Converged    AIC    BIC Pseudo-R² Concordance Brier Score Global p
 #>      <char> <num> <int>  <num>      <int>    <char>  <num>  <num>     <num>       <num>       <num>   <char>
-#> 1:     Full  67.5   826   5410          6       Yes 3956.9 4013.5        NA          NA          NA     <NA>
-#> 2: Clinical  57.0   834   5482          4       Yes 4009.2 4056.4        NA          NA          NA     <NA>
-#> 3:  Minimal  42.5   842   5533          2       Yes 4081.4 4100.4        NA          NA          NA     <NA>
+#> 1:     Full  70.0   826   5410          6       Yes 3956.9 4013.5        NA          NA          NA     <NA>
+#> 2: Clinical  59.5   834   5482          4       Yes 4009.2 4056.4        NA          NA          NA     <NA>
+#> 3:  Minimal  45.0   842   5533          2       Yes 4081.4 4100.4        NA          NA          NA     <NA>
 #> 
 #> CMS interpretation: 85+ Excellent, 75-84 Very Good, 65-74 Good, 55-64 Fair, < 55 Poor
 ```
@@ -302,13 +302,13 @@ example5
 #>   Pseudo-R²: 15%
 #>   Brier score: 5%
 #> 
-#> Recommended Model: Main Effects (CMS: 67.1)
+#> Recommended Model: Main Effects (CMS: 67.7)
 #> 
 #> Models ranked by selection score:
 #>               Model   CMS     N Events Predictors Converged    AIC    BIC Pseudo-R² Concordance Brier Score Global p
 #>              <char> <num> <int>  <num>      <int>    <char>  <num>  <num>     <num>       <num>       <num>   <char>
-#> 1:     Main Effects  67.1   850    370          3       Yes 1071.7 1095.5     0.088       0.697       0.218  < 0.001
-#> 2: With Interaction  42.1   850    370          3       Yes 1075.6 1108.8     0.088       0.697       0.218  < 0.001
+#> 1:     Main Effects  67.7   850    370          3       Yes 1071.7 1095.5     0.088       0.697       0.218  < 0.001
+#> 2: With Interaction  42.7   850    370          3       Yes 1075.6 1108.8     0.088       0.697       0.218  < 0.001
 #> 
 #> CMS interpretation: 85+ Excellent, 75-84 Very Good, 65-74 Good, 55-64 Fair, < 55 Poor
 ```
@@ -348,15 +348,15 @@ example6
 #>   Concordance: 40%
 #>   Global p-value: 15%
 #> 
-#> Recommended Model: Main Effects (CMS: 74.2)
+#> Recommended Model: Main Effects (CMS: 74.4)
 #> 
 #> Models ranked by selection score:
 #>              Model   CMS     N Events Predictors Converged    AIC    BIC Pseudo-R² Concordance Global p
 #>             <char> <num> <int>  <num>      <int>    <char>  <num>  <num>     <num>       <num>   <char>
-#> 1:    Main Effects  74.2   847    606          4       Yes 7295.8 7326.7     0.232        0.68  < 0.001
-#> 2: Age × Treatment  60.2   847    606          4       Yes 7298.8 7338.4     0.232        0.68  < 0.001
-#> 3: Sex × Treatment  57.8   847    606          4       Yes 7299.3 7339.0     0.232        0.68  < 0.001
-#> 4:            Both  44.3   847    606          4       Yes 7302.2 7350.7     0.233        0.68  < 0.001
+#> 1:    Main Effects  74.4   847    606          4       Yes 7295.8 7326.7     0.232        0.68  < 0.001
+#> 2: Age × Treatment  60.3   847    606          4       Yes 7298.8 7338.4     0.232        0.68  < 0.001
+#> 3: Sex × Treatment  58.0   847    606          4       Yes 7299.3 7339.0     0.232        0.68  < 0.001
+#> 4:            Both  44.4   847    606          4       Yes 7302.2 7350.7     0.233        0.68  < 0.001
 #> 
 #> CMS interpretation: 85+ Excellent, 75-84 Very Good, 65-74 Good, 55-64 Fair, < 55 Poor
 ```
@@ -398,14 +398,14 @@ example7
 #>   Pseudo-R²: 15%
 #>   Brier score: 5%
 #> 
-#> Recommended Model: Model C (CMS: 75.4)
+#> Recommended Model: Model C (CMS: 76.5)
 #> 
 #> Models ranked by selection score:
 #>      Model   CMS     N Events Predictors Converged    AIC    BIC Pseudo-R² Concordance Brier Score Global p
 #>     <char> <num> <int>  <num>      <int>    <char>  <num>  <num>     <num>       <num>       <num>   <char>
-#> 1: Model C  75.4   847    368          4       Yes  984.4 1022.4     0.165       0.765       0.195  < 0.001
-#> 2: Model B  59.4   847    368          3       Yes 1045.0 1073.5     0.109       0.719       0.211  < 0.001
-#> 3: Model A  33.6   850    370          2       Yes 1132.9 1147.1     0.032       0.617       0.235  < 0.001
+#> 1: Model C  76.5   847    368          4       Yes  984.4 1022.4     0.165       0.765       0.195  < 0.001
+#> 2: Model B  60.2   847    368          3       Yes 1045.0 1073.5     0.109       0.719       0.211  < 0.001
+#> 3: Model A  33.9   850    370          2       Yes 1132.9 1147.1     0.032       0.617       0.235  < 0.001
 #> 
 #> CMS interpretation: 85+ Excellent, 75-84 Very Good, 65-74 Good, 55-64 Fair, < 55 Poor
 #> 
@@ -541,14 +541,14 @@ example10
 #>   Pseudo-R²: 10%
 #>   Brier score: 5%
 #> 
-#> Recommended Model: Full (CMS: 79.5)
+#> Recommended Model: Full (CMS: 81)
 #> 
 #> Models ranked by selection score:
 #>       Model   CMS     N Events Predictors Converged    AIC    BIC Pseudo-R² Concordance Brier Score Global p
 #>      <char> <num> <int>  <num>      <int>    <char>  <num>  <num>     <num>       <num>       <num>   <char>
-#> 1:     Full  79.5   842    368          5       Yes  904.8  956.9     0.235       0.811       0.175  < 0.001
-#> 2: Standard  53.7   847    368          3       Yes 1045.0 1073.5     0.109       0.719       0.211  < 0.001
-#> 3:   Simple  31.8   850    370          2       Yes 1132.9 1147.1     0.032       0.617       0.235  < 0.001
+#> 1:     Full  81.0   842    368          5       Yes  904.8  956.9     0.235       0.811       0.175  < 0.001
+#> 2: Standard  54.5   847    368          3       Yes 1045.0 1073.5     0.109       0.719       0.211  < 0.001
+#> 3:   Simple  32.1   850    370          2       Yes 1132.9 1147.1     0.032       0.617       0.235  < 0.001
 #> 
 #> CMS interpretation: 85+ Excellent, 75-84 Very Good, 65-74 Good, 55-64 Fair, < 55 Poor
 ```
@@ -587,14 +587,14 @@ scenario1
 #>   Concordance: 40%
 #>   Global p-value: 15%
 #> 
-#> Recommended Model: Fully Adjusted (CMS: 75.8)
+#> Recommended Model: Fully Adjusted (CMS: 75.9)
 #> 
 #> Models ranked by selection score:
 #>               Model   CMS     N Events Predictors Converged    AIC    BIC Pseudo-R² Concordance Global p
 #>              <char> <num> <int>  <num>      <int>    <char>  <num>  <num>     <num>       <num>   <char>
-#> 1:   Fully Adjusted  75.8   194    149          5       Yes 7188.4 7232.4     0.283       0.699  < 0.001
-#> 2: Age-Sex Adjusted  48.0   196    151          3       Yes 7438.4 7456.0     0.126       0.629  < 0.001
-#> 3:            Crude  33.8   196    151          1       Yes 7527.1 7535.9     0.026       0.549  < 0.001
+#> 1:   Fully Adjusted  75.9   842    602          5       Yes 7188.4 7232.4     0.283       0.699  < 0.001
+#> 2: Age-Sex Adjusted  48.2   850    609          3       Yes 7438.4 7456.0     0.126       0.629  < 0.001
+#> 3:            Crude  33.9   850    609          1       Yes 7527.1 7535.9     0.026       0.549  < 0.001
 #> 
 #> CMS interpretation: 85+ Excellent, 75-84 Very Good, 65-74 Good, 55-64 Fair, < 55 Poor
 #> 
@@ -673,14 +673,14 @@ scenario2
 #>   Pseudo-R²: 15%
 #>   Brier score: 5%
 #> 
-#> Recommended Model: Data-Driven (CMS: 81.3)
+#> Recommended Model: Data-Driven (CMS: 82.7)
 #> 
 #> Models ranked by selection score:
 #>            Model   CMS     N Events Predictors Converged   AIC    BIC Pseudo-R² Concordance Brier Score Global p
 #>           <char> <num> <int>  <num>      <int>    <char> <num>  <num>     <num>       <num>       <num>   <char>
-#> 1:   Data-Driven  81.3   842    368          4       Yes 903.2  950.5     0.235       0.811       0.176  < 0.001
-#> 2:      Combined  80.8   842    368          5       Yes 904.8  956.9     0.235       0.811       0.175  < 0.001
-#> 3: Theory-Driven  50.4   847    368          4       Yes 984.4 1022.4     0.165       0.765       0.195  < 0.001
+#> 1:   Data-Driven  82.7   842    368          4       Yes 903.2  950.5     0.235       0.811       0.176  < 0.001
+#> 2:      Combined  82.3   842    368          5       Yes 904.8  956.9     0.235       0.811       0.175  < 0.001
+#> 3: Theory-Driven  51.5   847    368          4       Yes 984.4 1022.4     0.165       0.765       0.195  < 0.001
 #> 
 #> CMS interpretation: 85+ Excellent, 75-84 Very Good, 65-74 Good, 55-64 Fair, < 55 Poor
 ```

@@ -55,7 +55,9 @@ uniscreen(
 
   Character vector of predictor variable names to screen. Each predictor
   is tested independently in its own univariable model. Can include
-  continuous, categorical (factor), or binary variables.
+  continuous, categorical (factor), or binary variables. Non-syntactic
+  names (*e.g.,* `"tumor stage"`) are quoted in the model formula and
+  need no backticks.
 
 - model_type:
 
@@ -387,6 +389,12 @@ The returned object includes the following attributes accessible via
 - model_type:
 
   Character. The regression model type used
+
+- conf_level:
+
+  Numeric. The confidence level of the intervals, which
+  [`uniforest()`](https://phmcc.codefloe.page/summata/reference/uniforest.md)
+  uses to draw the same intervals
 
 - model_scope:
 
@@ -1250,7 +1258,7 @@ print(invgauss_screen)
 #> Univariable Screening Results
 #> 
 #> Outcome: recovery_days
-#> Model Type: Inverse.gaussian GLM
+#> Model Type: Inverse Gaussian
 #> Predictors Screened: 4
 #> Significant (p < 0.05): 4
 #> Observations analyzed: 815-835 of 850 (95.9-98.2%)

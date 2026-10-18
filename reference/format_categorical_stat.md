@@ -17,7 +17,9 @@ format_categorical_stat(n, total, stat_type, marks)
 
 - total:
 
-  Integer total count for percentage calculation.
+  Integer total count for percentage calculation. When zero, as for a
+  group without observations, the percentage is undefined: the count
+  alone is returned, or an empty string for `"percent"`.
 
 - stat_type:
 

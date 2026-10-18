@@ -18,7 +18,10 @@ format_multifit_table(
   include_predictor = TRUE,
   exponentiate = NULL,
   conf_level = 0.95,
-  marks = NULL
+  marks = NULL,
+  interaction_vars = NULL,
+  predictor_levels = NULL,
+  interaction_levels = NULL
 )
 ```
 
@@ -63,6 +66,23 @@ format_multifit_table(
 - exponentiate:
 
   Logical or `NULL` for coefficient handling.
+
+- interaction_vars:
+
+  Character vector of the variables of the interaction terms, by which
+  their coefficients are labeled (see
+  [`format_interaction_term()`](https://phmcc.codefloe.page/summata/reference/format_interaction_term.md)).
+
+- predictor_levels:
+
+  Character vector of the levels of the predictor, which are told apart
+  from interaction terms when they contain a colon.
+
+- interaction_levels:
+
+  Named list of the levels of the variables in `interaction_vars`, which
+  keeps a level that contains a colon in one component of an interaction
+  term.
 
 ## Value
 

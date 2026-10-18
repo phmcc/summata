@@ -58,6 +58,9 @@ survtable(
   Character string specifying the column name of the stratifying
   variable for group comparisons (*e.g.,* treatment arm, risk group).
   When `NULL` (default), produces overall survival summaries only.
+  Groups appear in the order of the levels of a factor, including empty
+  levels, and otherwise in order of first appearance in the data, as in
+  [`desctable()`](https://phmcc.codefloe.page/summata/reference/desctable.md).
 
 - times:
 
@@ -151,11 +154,13 @@ survtable(
 
   - `"logrank"` - Log-rank test (default)
 
-  - `"wilcoxon"` - Wilcoxon (Breslow) test
+  - `"wilcoxon"` - Gehan-Breslow generalized Wilcoxon test
 
   - `"tarone"` - Tarone-Ware test
 
   - `"petopeto"` - Peto-Peto test
+
+  See Details for the weights that define each test.
 
 - total:
 
@@ -321,16 +326,29 @@ used and may perform better in the tails.
 **Statistical Testing:**
 
 The log-rank test (default) tests the null hypothesis that survival
-curves are identical across groups. Alternative tests weight different
-parts of the survival curve:
+curves are identical across groups. It compares the observed and
+expected numbers of events in each group at every event time; the
+alternative tests weight these comparisons, with \\n_j\\ subjects at
+risk and \\d_j\\ events at event time \\t_j\\:
 
 - Log-rank: Equal weights (best for proportional hazards)
 
-- Wilcoxon: Weights by number at risk (sensitive to early differences)
+- Gehan-Breslow (`"wilcoxon"`): Weights \\n_j\\, the number at risk,
+  which emphasize early differences
 
-- Tarone-Ware: Weights by square root of number at risk
+- Tarone-Ware: Weights \\\sqrt{n_j}\\, between the log-rank and
+  Gehan-Breslow weights
 
-- Peto-Peto: Modified Wilcoxon weights
+- Peto-Peto: Weights \\\tilde{S}(t_j) = \prod\_{t_i \le t_j} (1 - d_i /
+  (n_i + 1))\\, an estimate of the pooled survival function, which also
+  emphasize early differences but, unlike the number at risk, do not
+  depend on the censoring distribution
+
+The log-rank test is computed by
+[`survival::survdiff()`](https://rdrr.io/pkg/survival/man/survdiff.html).
+The weighted tests use the same statistic and variance with the weights
+above, the definitions of the SAS LIFETEST and Stata `sts test`
+procedures.
 
 **Formatting:**
 
@@ -390,7 +408,7 @@ survtable(
 #> Time points: 12, 24, 36 months
 #> Quantiles: 50%
 #> Statistic: Survival probability
-#> Test: Log-rank (p = < 0.001)
+#> Test: Log-rank (p < 0.001)
 #> 
 #>    Variable    12 months    24 months    36 months  Median (95% CI) p-value
 #>      <char>       <char>       <char>       <char>           <char>  <char>
@@ -416,7 +434,7 @@ survtable(
 #> Stratified by: treatment
 #> Quantiles: 50%
 #> Statistic: Survival probability
-#> Test: Log-rank (p = < 0.001)
+#> Test: Log-rank (p < 0.001)
 #> 
 #>    Variable  Median (95% CI) p-value
 #>      <char>           <char>  <char>
@@ -440,7 +458,7 @@ survtable(
 #> Stratified by: stage
 #> Quantiles: 25%, 50%, 75%
 #> Statistic: Survival probability
-#> Test: Log-rank (p = < 0.001)
+#> Test: Log-rank (p < 0.001)
 #> 
 #>    Variable 75% Survival Time (95% CI)  Median (95% CI) 25% Survival Time (95% CI) p-value
 #>      <char>                     <char>           <char>                     <char>  <char>
@@ -467,7 +485,7 @@ survtable(
 #> Time points: 12, 24 months
 #> Quantiles: 50%
 #> Statistic: Survival probability
-#> Test: Log-rank (p = < 0.001)
+#> Test: Log-rank (p < 0.001)
 #> 
 #>    Variable    12 months    24 months  Median (95% CI) p-value
 #>      <char>       <char>       <char>           <char>  <char>
@@ -492,7 +510,7 @@ survtable(
 #> Time points: 12, 24
 #> Quantiles: 50%
 #> Statistic: Cumulative incidence
-#> Test: Log-rank (p = < 0.001)
+#> Test: Log-rank (p < 0.001)
 #> 
 #>    Variable           12           24  Median (95% CI) p-value
 #>      <char>       <char>       <char>           <char>  <char>
@@ -517,7 +535,7 @@ survtable(
 #> Time points: 12, 24
 #> Quantiles: 50%
 #> Statistic: Survival probability
-#> Test: Log-rank (p = < 0.001)
+#> Test: Log-rank (p < 0.001)
 #> 
 #>    Variable                     12                     24  Median (95% CI) p-value
 #>      <char>                 <char>                 <char>           <char>  <char>
@@ -560,7 +578,7 @@ survtable(
 #> Time points: 12, 24
 #> Quantiles: 50%
 #> Statistic: Survival probability
-#> Test: Log-rank (p = < 0.001)
+#> Test: Log-rank (p < 0.001)
 #> 
 #>    Variable           12           24  Median (95% CI) p-value
 #>      <char>       <char>       <char>           <char>  <char>
@@ -584,7 +602,7 @@ survtable(
 #> Time points: 12, 24 months
 #> Quantiles: 50%
 #> Statistic: Survival probability
-#> Test: Log-rank (p = < 0.001)
+#> Test: Log-rank (p < 0.001)
 #> 
 #>       Variable    12 months    24 months  Median (95% CI) p-value
 #>         <char>       <char>       <char>           <char>  <char>
@@ -609,7 +627,7 @@ survtable(
 #> Time points: 12, 24
 #> Quantiles: 50%
 #> Statistic: Survival probability
-#> Test: Log-rank (p = < 0.001)
+#> Test: Log-rank (p < 0.001)
 #> 
 #>    Variable           12           24  Median (95% CI) p-value
 #>      <char>       <char>       <char>           <char>  <char>
@@ -618,7 +636,7 @@ survtable(
 #> 3:   Drug A 68% (63-73%) 56% (50-62%) 33.6 (24.4-40.9)        
 #> 4:   Drug B 54% (48-59%) 43% (38-48%) 14.7 (10.9-21.7)        
 
-# Example 11: Wilcoxon test instead of log-rank
+# Example 11: Gehan-Breslow generalized Wilcoxon test instead of log-rank
 survtable(
     data = clintrial,
     outcome = "Surv(os_months, os_status)",
@@ -634,7 +652,7 @@ survtable(
 #> Time points: 12, 24
 #> Quantiles: 50%
 #> Statistic: Survival probability
-#> Test: Wilcoxon (p = < 0.001)
+#> Test: Gehan-Breslow (p < 0.001)
 #> 
 #>    Variable           12           24  Median (95% CI) p-value
 #>      <char>       <char>       <char>           <char>  <char>
@@ -712,7 +730,7 @@ survtable(
 #> Time points: 12, 24
 #> Quantiles: 50%
 #> Statistic: Survival probability
-#> Test: Log-rank (p = < 0.001)
+#> Test: Log-rank (p < 0.001)
 #> 
 #>    Variable           12           24  Median (95% CI) p-value
 #>      <char>       <char>       <char>           <char>  <char>

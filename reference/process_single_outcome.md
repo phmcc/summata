@@ -20,6 +20,7 @@ process_single_outcome(
   conf_type,
   digits,
   time_digits,
+  p_digits = 3,
   percent,
   test,
   test_type,
@@ -84,6 +85,10 @@ process_single_outcome(
 - time_digits:
 
   Integer decimal places for time values.
+
+- p_digits:
+
+  Integer decimal places for *p*-values.
 
 - percent:
 

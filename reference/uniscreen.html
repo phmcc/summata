@@ -21,7 +21,7 @@ formatted results with optional p-value filtering."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.13.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -123,7 +123,9 @@ survival analysis, use <code><a href="https://rdrr.io/pkg/survival/man/Surv.html
 <dt id="arg-predictors">predictors<a class="anchor" aria-label="anchor" href="#arg-predictors"></a></dt>
 <dd><p>Character vector of predictor variable names to screen. Each
 predictor is tested independently in its own univariable model. Can include
-continuous, categorical (factor), or binary variables.</p></dd>
+continuous, categorical (factor), or binary variables.
+Non-syntactic names (<em>e.g.,</em> <code>"tumor stage"</code>) are quoted in
+the model formula and need no backticks.</p></dd>
 
 
 <dt id="arg-model-type">model_type<a class="anchor" aria-label="anchor" href="#arg-model-type"></a></dt>
@@ -383,6 +385,10 @@ preserved. When <code>NULL</code>, uses
 
     <dt>model_type</dt>
 <dd><p>Character. The regression model type used</p></dd>
+
+    <dt>conf_level</dt>
+<dd><p>Numeric. The confidence level of the intervals, which
+      <code><a href="uniforest.html">uniforest()</a></code> uses to draw the same intervals</p></dd>
 
     <dt>model_scope</dt>
 <dd><p>Character. Always "Univariable" for screening results</p></dd>
@@ -1204,7 +1210,7 @@ the following are needed:</p><ul><li><p>Model diagnostic plots</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Univariable Screening Results</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Outcome: recovery_days</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Model Type: Inverse.gaussian GLM</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Model Type: Inverse Gaussian</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Predictors Screened: 4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Significant (p &lt; 0.05): 4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 815-835 of 850 (95.9-98.2%)</span>

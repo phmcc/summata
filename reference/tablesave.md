@@ -194,11 +194,11 @@ tbl <- desctable(clintrial, by = "treatment",
 if (requireNamespace("xtable", quietly = TRUE)) {
   tablesave(tbl, file.path(tempdir(), "example.html"))
 }
-#> Table saved to /tmp/Rtmphzv2jI/example.html
+#> Table saved to /tmp/Rtmph50nhC/example.html
 
 # Example 2: Delimited output needs no additional packages
 tablesave(tbl, file.path(tempdir(), "example.csv"))
-#> Table saved to /tmp/Rtmphzv2jI/example.csv
+#> Table saved to /tmp/Rtmph50nhC/example.csv
 
 # Example 3: Suppress the message reporting the file written
 tablesave(tbl, file.path(tempdir(), "example.tsv"), quiet = TRUE)
@@ -233,22 +233,28 @@ has_latex <- local({
   result == 0L
 })
 
+# Word, PowerPoint, and RTF export require flextable and officer
+has_office <- requireNamespace("flextable", quietly = TRUE) &&
+  requireNamespace("officer", quietly = TRUE)
+
 # Example 4: The format is taken from the file extension
 tablesave(results, file.path(tempdir(), "results.html"))  # Creates HTML file
-#> Table saved to /tmp/Rtmphzv2jI/results.html
-tablesave(results, file.path(tempdir(), "results.docx"))  # Creates Word document
-#> Table saved to /tmp/Rtmphzv2jI/results.docx
-tablesave(results, file.path(tempdir(), "results.pptx"))  # Creates PowerPoint slide
-#> Table saved to /tmp/Rtmphzv2jI/results.pptx
+#> Table saved to /tmp/Rtmph50nhC/results.html
 tablesave(results, file.path(tempdir(), "results.tex"))   # Creates LaTeX source
-#> Table saved to /tmp/Rtmphzv2jI/results.tex
-tablesave(results, file.path(tempdir(), "results.rtf"))   # Creates RTF document
-#> Table saved to /tmp/Rtmphzv2jI/results.rtf
+#> Table saved to /tmp/Rtmph50nhC/results.tex
+if (has_office) {
+  tablesave(results, file.path(tempdir(), "results.docx"))  # Creates Word document
+  tablesave(results, file.path(tempdir(), "results.pptx"))  # Creates PowerPoint slide
+  tablesave(results, file.path(tempdir(), "results.rtf"))   # Creates RTF document
+}
+#> Table saved to /tmp/Rtmph50nhC/results.docx
+#> Table saved to /tmp/Rtmph50nhC/results.pptx
+#> Table saved to /tmp/Rtmph50nhC/results.rtf
 if (has_latex) {
   tablesave(results, file.path(tempdir(), "results.pdf")) # Creates PDF
 }
 #> Compiling PDF...
-#> Table saved to /tmp/Rtmphzv2jI/results.pdf
+#> Table saved to /tmp/Rtmph50nhC/results.pdf
 
 # Example 5: Format-specific parameters are passed through
 if (has_latex) {
@@ -258,19 +264,21 @@ if (has_latex) {
              font_size = 10)
 }
 #> Compiling PDF...
-#> Table saved to /tmp/Rtmphzv2jI/results.pdf
+#> Table saved to /tmp/Rtmph50nhC/results.pdf
 
-tablesave(results, file.path(tempdir(), "results.docx"),
-           caption = "Table 1: Logistic Regression Results",
-           font_family = "Times New Roman",
-           condense_table = TRUE)
-#> Table saved to /tmp/Rtmphzv2jI/results.docx
+if (has_office) {
+  tablesave(results, file.path(tempdir(), "results.docx"),
+             caption = "Table 1: Logistic Regression Results",
+             font_family = "Times New Roman",
+             condense_table = TRUE)
+}
+#> Table saved to /tmp/Rtmph50nhC/results.docx
 
 tablesave(results, file.path(tempdir(), "results.html"),
            zebra_stripes = TRUE,
            dark_header = TRUE,
            bold_significant = TRUE)
-#> Table saved to /tmp/Rtmphzv2jI/results.html
+#> Table saved to /tmp/Rtmph50nhC/results.html
 
 # Example 6: Any summata table may be saved
 desc <- desctable(clintrial,
@@ -280,7 +288,7 @@ if (has_latex) {
   tablesave(desc, file.path(tempdir(), "demographics.pdf"))
 }
 #> Compiling PDF...
-#> Table saved to /tmp/Rtmphzv2jI/demographics.pdf
+#> Table saved to /tmp/Rtmph50nhC/demographics.pdf
 
 # Example 7: Model comparison table
 # Information criteria assume a common sample, so the candidate
@@ -299,8 +307,10 @@ comparison <- compfit(
 #> Auto-detected binary outcome, using logistic regression
 #> Fitting base with 2 predictors...
 #> Fitting full with 4 predictors...
-tablesave(comparison, file.path(tempdir(), "model_comparison.docx"))
-#> Table saved to /tmp/Rtmphzv2jI/model_comparison.docx
+if (has_office) {
+  tablesave(comparison, file.path(tempdir(), "model_comparison.docx"))
+}
+#> Table saved to /tmp/Rtmph50nhC/model_comparison.docx
 
 # }
 ```

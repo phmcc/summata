@@ -17,7 +17,7 @@ statistics (mean \(\pm\) SD, median [IQR], range) and various hypothesis tests."
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.13.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -87,6 +87,8 @@ statistics (mean \(\pm\) SD, median [IQR], range) and various hypothesis tests.<
 <span>  <span class="va">total_label</span>,</span>
 <span>  p_per_stat <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  marks <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  groups <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  group_index <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -147,6 +149,15 @@ statistics (mean \(\pm\) SD, median [IQR], range) and various hypothesis tests.<
 <dd><p>Logical. If TRUE, calculate separate <em>p</em>-values for each
 statistic type (<em>e.g.,</em> t-test for means, Wilcoxon for medians). If <code>FALSE</code>
 (default), calculate a single <em>p</em>-value based on the first statistic type.</p></dd>
+
+
+<dt id="arg-groups">groups<a class="anchor" aria-label="anchor" href="#arg-groups"></a></dt>
+<dd><p>Optional vector of groups (see <code><a href="process_variable.html">process_variable()</a></code>).</p></dd>
+
+
+<dt id="arg-group-index">group_index<a class="anchor" aria-label="anchor" href="#arg-group-index"></a></dt>
+<dd><p>Optional list of row positions for each group (see
+<code><a href="process_variable.html">process_variable()</a></code>).</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

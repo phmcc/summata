@@ -21,7 +21,7 @@ categorical, and time-to-event variables.'></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.13.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -259,7 +259,11 @@ variable specified in <code>by</code>. Default is <code>NULL</code>.</p></dd>
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional arguments passed to the underlying statistical test
 functions (<em>e.g.</em>, <code>var.equal = TRUE</code> for <em>t</em>-tests,
-<code>simulate.p.value = TRUE</code> for Fisher test).</p></dd>
+<code>simulate.p.value = TRUE</code> for Fisher test, <code>rho = 1</code> for the
+Fleming-Harrington \(G^1\) test of survival curves). Each argument
+is passed only to the tests that accept it, so arguments for different
+tests may be combined in one call. Arguments that no test accepts are
+ignored with a warning.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -322,8 +326,16 @@ summaries:</p><ul><li><p><strong>Continuous</strong>: Numeric variables (integer
     for mean-based statistics; non-parametric tests (Wilcoxon,
     Kruskal-Wallis) for median-based statistics</p></li>
 <li><p><strong>Categorical with "auto"</strong>: Fisher exact test when any
-    expected cell frequency &lt; 5; \(\chi^2\) test otherwise</p></li>
-<li><p><strong>Survival</strong>: Log-rank test for comparing survival curves</p></li>
+    expected cell frequency &lt; 5; \(\chi^2\) test otherwise. Levels and
+    groups without observations, and observations with a missing group,
+    are excluded from the test. When <code><a href="https://rdrr.io/r/stats/fisher.test.html" class="external-link">stats::fisher.test()</a></code>
+    cannot complete the exact computation within its workspace, as is
+    common for tables larger than 2 \(\times\) 2 with a few hundred
+    observations or more, the <em>p</em>-value is a Monte Carlo estimate
+    from 10,000 simulated tables and a warning is issued</p></li>
+<li><p><strong>Survival</strong>: Log-rank test for comparing survival curves, or
+    another test of the \(G^\rho\) family of
+    <code><a href="https://rdrr.io/pkg/survival/man/survdiff.html" class="external-link">survival::survdiff()</a></code> when <code>rho</code> is supplied</p></li>
 <li><p><strong>Range statistics</strong>: No <em>p</em>-value computed (ranges
     are descriptive)</p></li>
 </ul><p><strong>Missing Data Handling:</strong></p>
@@ -334,7 +346,21 @@ summaries:</p><ul><li><p><strong>Continuous</strong>: Numeric variables (integer
     whether percentages are calculated with or without NAs in the
     denominator</p></li>
 <li><p><strong>Survival</strong>: NAs in time or event excluded from analysis</p></li>
-</ul><p><strong>Formatting Conventions:</strong></p>
+</ul><p><strong>Order of Rows and Columns:</strong></p>
+<p>Rows and columns follow the order of the data rather than a sorted order:</p><ul><li><p>Variables appear in the order of <code>variables</code>, and the
+    statistics of each continuous variable in the order of
+    <code>stats_continuous</code></p></li>
+<li><p>The categories of a factor appear in the order of its levels,
+    including levels without observations; the categories of a character
+    or logical variable appear in order of first appearance in the data.
+    The category of missing values, when shown, appears last</p></li>
+<li><p>The group columns follow the same rule for the grouping variable
+    named in <code>by</code></p></li>
+</ul><p>Regression models code a character variable as a factor with sorted
+levels, so the tables of <code><a href="fit.html">fit()</a></code> list its categories in sorted
+order. Converting the variable to a factor with its levels in the
+intended order gives the same order in both tables.</p>
+<p><strong>Formatting Conventions:</strong></p>
 <p>All numeric output respects the <code>number_format</code> parameter. Separators
 within ranges and confidence intervals adapt automatically to avoid
 ambiguity:</p><ul><li><p>Mean ± SD: <code>"45.2 ± 12.3"</code> (US) or
@@ -603,8 +629,8 @@ ambiguity:</p><ul><li><p>Mean ± SD: <code>"45.2 ± 12.3"</code> (US) or
 <span class="r-out co"><span class="r-pr">#&gt;</span>                     &lt;char&gt;       &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1:                       N                           850              211              263              241              132        </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2:             Age (years) Median [IQR] 60.0 [52.0-67.0] 61.0 [53.0-67.0] 61.0 [51.0-70.0] 58.0 [51.0-67.0] 60.0 [53.0-66.0]   0.481</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:                     Sex       Female      449 (53.0%)      110 (52.1%)      131 (49.8%)      134 (55.6%)       74 (56.1%)   0.515</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                                 Male      398 (47.0%)      101 (47.9%)      132 (50.2%)      107 (44.4%)       58 (43.9%)        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:                     Sex       Female      450 (52.9%)      110 (52.1%)      131 (49.8%)      134 (55.6%)       74 (56.1%)   0.515</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:                                 Male      400 (47.1%)      101 (47.9%)      132 (50.2%)      107 (44.4%)       58 (43.9%)        </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5: Body Mass Index (kg/m²) Median [IQR] 28.0 [24.7-31.5] 27.9 [24.8-30.9] 28.1 [24.2-31.5] 27.8 [24.7-31.5] 28.5 [25.1-32.1]   0.595</span>
 <span class="r-in"><span><span class="co"># Automatically uses ANOVA/Kruskal-Wallis and chi-squared</span></span></span>
 <span class="r-in"><span></span></span>

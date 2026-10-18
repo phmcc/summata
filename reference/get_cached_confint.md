@@ -8,7 +8,13 @@ to avoid redundant computation. This is particularly beneficial for GLM
 and negative binomial models where
 [`confint()`](https://rdrr.io/r/stats/confint.html) performs profile
 likelihood profiling, which can be expensive for models with many
-parameters.
+parameters. Otherwise the intervals are computed by
+[`coef_confint()`](https://phmcc.codefloe.page/summata/reference/coef_confint.md),
+as in [`m2dt()`](https://phmcc.codefloe.page/summata/reference/m2dt.md),
+by the method that `getOption("summata.conf_method")` selects. They are
+computed for the rows of the coefficient table, which omits aliased
+coefficients, except the intercept, which the forest plots do not show;
+its row holds `NA`.
 
 ## Usage
 
@@ -33,6 +39,5 @@ get_cached_confint(model, conf_level = 0.95)
 
 ## Value
 
-A matrix with one row per model coefficient and two columns (lower and
-upper bounds), as returned by
-[`stats::confint()`](https://rdrr.io/r/stats/confint.html).
+A matrix with one row per row of `summary(model)$coefficients` and two
+columns (lower and upper bounds).

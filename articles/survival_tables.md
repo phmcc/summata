@@ -73,7 +73,7 @@ example1
 #> Time points: 12, 24, 36 months
 #> Quantiles: 50%
 #> Statistic: Survival probability
-#> Test: Log-rank (p = < 0.001)
+#> Test: Log-rank (p < 0.001)
 #> 
 #>    Variable    12 months    24 months    36 months  Median (95% CI) p-value
 #>      <char>       <char>       <char>       <char>           <char>  <char>
@@ -106,7 +106,7 @@ example2
 #> Stratified by: treatment
 #> Time points: 12, 24 months
 #> Statistic: Survival probability
-#> Test: Log-rank (p = < 0.001)
+#> Test: Log-rank (p < 0.001)
 #> 
 #>    Variable    12 months    24 months p-value
 #>      <char>       <char>       <char>  <char>
@@ -154,7 +154,7 @@ example3
 #> Stratified by: stage
 #> Quantiles: 25%, 50%, 75%
 #> Statistic: Survival probability
-#> Test: Log-rank (p = < 0.001)
+#> Test: Log-rank (p < 0.001)
 #> 
 #>     Variable 75% Survival Time (95% CI)  Median (95% CI) 25% Survival Time (95% CI) p-value
 #>       <char>                     <char>           <char>                     <char>  <char>
@@ -241,7 +241,7 @@ example5
 #> Time points: 12, 24, 36 months
 #> Quantiles: 50%
 #> Statistic: Cumulative incidence
-#> Test: Log-rank (p = < 0.001)
+#> Test: Log-rank (p < 0.001)
 #> 
 #>    Variable    12 months    24 months    36 months  Median (95% CI) p-value
 #>      <char>       <char>       <char>       <char>           <char>  <char>
@@ -275,7 +275,7 @@ example6
 #> Time points: 12, 24 months
 #> Quantiles: 50%
 #> Statistic: Survival probability
-#> Test: Log-rank (p = < 0.001)
+#> Test: Log-rank (p < 0.001)
 #> 
 #>    Variable              12 months              24 months  Median (95% CI) p-value
 #>      <char>                 <char>                 <char>           <char>  <char>

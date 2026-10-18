@@ -22,8 +22,17 @@ parse_term(terms, xlevels = NULL, model = NULL)
 
 - model:
 
-  Optional model object for extracting factor info from coxme models.
+  Optional model object, from which the terms of the model are read and
+  the factor levels of coxme models are reconstructed.
 
 ## Value
 
 Data.table with 'variable' and 'group' columns.
+
+## Details
+
+A term that belongs to another variable of the model whose name begins
+with a factor's name, such as a continuous variable "smoking_years" or
+the coefficient "smokerTRUE" of a logical variable "smoker" beside a
+factor "smoking", is not taken for a level of that factor (see
+[`claimed_by_longer_term()`](https://phmcc.codefloe.page/summata/reference/claimed_by_longer_term.md)).

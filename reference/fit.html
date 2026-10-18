@@ -21,7 +21,7 @@ multivariable models automatically."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.13.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -128,7 +128,9 @@ Required for formula-based workflow; ignored if <code>model</code> is provided.<
 the model. All predictors are included simultaneously (multivariable model).
 For univariable models, provide a single predictor. Can include continuous,
 categorical (factor), or binary variables. Required for formula-based
-workflow; ignored if <code>model</code> is provided.</p></dd>
+workflow; ignored if <code>model</code> is provided.
+Non-syntactic names (<em>e.g.,</em> <code>"tumor stage"</code>) are quoted in
+the model formula and need no backticks.</p></dd>
 
 
 <dt id="arg-model">model<a class="anchor" aria-label="anchor" href="#arg-model"></a></dt>
@@ -1036,10 +1038,10 @@ intervals.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  7:                                                    III    241    186 1.86 (1.17-2.96)   0.009</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  8:                                                     IV    132    121 3.72 (2.30-6.02) &lt; 0.001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  9:  Treatment Group (Drug A) × Disease Stage (II)       -     93     52 0.79 (0.44-1.41)   0.416</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10: Treatment Group (Drug A) × Disease Stage (III)       -     75     50 0.70 (0.38-1.29)   0.248</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11:  Treatment Group (Drug A) × Disease Stage (IV)       -     46     37 0.68 (0.36-1.30)   0.248</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12:  Treatment Group (Drug B) × Disease Stage (II)       -    105     73 1.33 (0.75-2.35)   0.327</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13: Treatment Group (Drug B) × Disease Stage (III)       -    127    103 1.30 (0.73-2.34)   0.375</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:  Treatment Group (Drug B) × Disease Stage (II)       -    105     73 1.33 (0.75-2.35)   0.327</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11: Treatment Group (Drug A) × Disease Stage (III)       -     75     50 0.70 (0.38-1.29)   0.248</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12: Treatment Group (Drug B) × Disease Stage (III)       -    127    103 1.30 (0.73-2.34)   0.375</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13:  Treatment Group (Drug A) × Disease Stage (IV)       -     46     37 0.68 (0.36-1.30)   0.248</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 14:  Treatment Group (Drug B) × Disease Stage (IV)       -     55     54 1.17 (0.63-2.18)   0.620</span>
 <span class="r-in"><span><span class="co"># Shows main effects plus all treatment×stage interaction terms</span></span></span>
 <span class="r-in"><span></span></span>
@@ -1068,8 +1070,8 @@ intervals.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5:                                              Yes    362    176  1.16 (0.83-1.61)   0.384</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6:                                  Diabetes     No    637    301         reference       -</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 7:                                              Yes    197    116  1.99 (1.28-3.14)   0.003</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8:                  Age (years) × Sex (Male)      -    390    210  0.99 (0.97-1.01)   0.376</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9: Surgical Resection (Yes) × Diabetes (Yes)      -     88     48  0.69 (0.35-1.33)   0.267</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8: Surgical Resection (Yes) × Diabetes (Yes)      -     88     48  0.69 (0.35-1.33)   0.267</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9:                  Age (years) × Sex (Male)      -    390    210  0.99 (0.97-1.01)   0.376</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 21: Quasipoisson for overdispersed count data</span></span></span>
 <span class="r-in"><span><span class="co"># Alternative to negative binomial when MASS not available</span></span></span>
@@ -1166,7 +1168,7 @@ intervals.</p>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">inverse_gaussian</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Inverse.gaussian GLM Model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Multivariable Inverse Gaussian Model</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Formula: recovery_days ~ age + surgery + pain_score</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Observations analyzed: 825 of 850 (97.1%)</span>

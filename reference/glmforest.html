@@ -23,7 +23,7 @@ for manuscripts and presentations."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.13.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -163,7 +163,9 @@ as <code>"&lt; 0.001"</code> (for <code>p_digits = 3</code>), <code>"&lt; 0.0001
 <dd><p>Numeric confidence level for confidence intervals. Must be
 between 0 and 1. Default is 0.95 (95% confidence intervals). The CI
 percentage is automatically displayed in column headers (<em>e.g.,</em> "90% CI"
-when <code>conf_level = 0.90</code>).</p></dd>
+when <code>conf_level = 0.90</code>). Intervals are computed by the method that
+<code>getOption("summata.conf_method")</code> selects, as in <code><a href="fit.html">fit()</a></code>;
+those of a <code><a href="fit.html">fit()</a></code> result at the same level are reused.</p></dd>
 
 
 <dt id="arg-font-size">font_size<a class="anchor" aria-label="anchor" href="#arg-font-size"></a></dt>
@@ -386,7 +388,12 @@ alphabetically for character variables) serves as the reference category:</p><ul
 <li><p>Visually aligned with other categories</p></li>
 <li><p>When <code>condense_table = TRUE</code>, reference-only variables may be
     omitted entirely</p></li>
-</ul><p><strong>Layout Optimization:</strong></p>
+</ul><p><strong>Aliased Coefficients:</strong></p>
+<p>Coefficients that the model could not estimate because their columns of
+the model matrix are linear combinations of others are omitted, as in the
+tables of <code><a href="fit.html">fit()</a></code>, together with any factor none of whose levels was
+estimated.</p>
+<p><strong>Layout Optimization:</strong></p>
 <p>The function automatically optimizes layout based on content:</p><ul><li><p>Calculates appropriate axis ranges to accommodate all confidence intervals</p></li>
 <li><p>Selects meaningful tick marks on log or linear scales</p></li>
 <li><p>Sizes point markers proportional to sample size (larger = more data)</p></li>
@@ -512,7 +519,7 @@ selects a graphics device suited to the format:</p><div class="sourceCode"><pre>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 6: Save with recommended dimensions</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="forestsave.html">forestsave</a></span><span class="op">(</span><span class="va">plot5</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"forest.pdf"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/Rtmphzv2jI/forest.pdf (width = 14.9 in, height = 5.0 in)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Forest plot saved to /tmp/Rtmph50nhC/forest.pdf (width = 14.9 in, height = 5.0 in)</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="va">old_width</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>

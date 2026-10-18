@@ -75,9 +75,7 @@ Additional packages extend functionality for specific use-cases:
 | `tinytex` | R-integrated LaTeX distribution | PDF table export via [`table2pdf()`](https://phmcc.codefloe.page/summata/reference/table2pdf.md) |
 | `MASS` | Statistical methods | Model diagnostics and testing |
 | `MuMIn` | Multi-model inference | Model selection and averaging |
-| `pROC` | ROC curve analysis | Diagnostic performance evaluation |
 | `ResourceSelection` | Goodness-of-fit tests | Hosmer-Lemeshow tests for logistic models |
-| `stringr` | String manipulation | Text processing utilities |
 | `utils` | Utility functions | Data import/export helpers |
 | `withr` | Temporary state changes | Testing and safe state modifications |
 
@@ -94,7 +92,7 @@ install.packages(c("xtable", "flextable", "officer", "knitr", "tinytex"))
 install.packages(c("ragg", "systemfonts"))
 
 # For model diagnostics and selection
-install.packages(c("MASS", "MuMIn", "pROC", "ResourceSelection"))
+install.packages(c("MASS", "MuMIn", "ResourceSelection"))
 ```
 
 Or install all suggested packages at once:

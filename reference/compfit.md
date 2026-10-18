@@ -254,8 +254,13 @@ criteria), higher concordance (discrimination), and model convergence
 status.
 
 For GLMs, McFadden's pseudo-R-squared is calculated as 1 -
-(logLik/logLik_null). For survival models, the global *p*-value comes
-from the log-rank test.
+(logLik/logLik_null). For Cox models, the global *p*-value is that of
+the likelihood-ratio test of all coefficients. For linear mixed-effects
+models fitted by REML, AIC, BIC, and the global likelihood-ratio test
+are computed from maximum likelihood refits
+([`lme4::refitML()`](https://rdrr.io/pkg/lme4/man/refitML.html)),
+because REML likelihoods are not comparable between models with
+different fixed effects.
 
 Models that fail to converge are flagged and penalized in the composite
 score.
@@ -358,14 +363,14 @@ comparison
 #>   Pseudo-R²: 15%
 #>   Brier score: 5%
 #> 
-#> Recommended Model: Full (CMS: 66.9)
+#> Recommended Model: Full (CMS: 67.5)
 #> 
 #> Models ranked by selection score:
 #>       Model   CMS     N Events Predictors Converged    AIC    BIC Pseudo-R² Concordance Brier Score Global p
 #>      <char> <num> <int>  <num>      <int>    <char>  <num>  <num>     <num>       <num>       <num>   <char>
-#> 1:     Full  66.9   833    416          6       Yes 1069.1 1125.8     0.095       0.692       0.220  < 0.001
-#> 2: Clinical  49.3   833    416          4       Yes 1102.1 1130.4     0.056       0.656       0.231  < 0.001
-#> 3:     Base  32.1   833    416          2       Yes 1131.1 1145.3     0.026       0.602       0.241  < 0.001
+#> 1:     Full  67.5   833    416          6       Yes 1069.1 1125.8     0.095       0.692       0.220  < 0.001
+#> 2: Clinical  49.7   833    416          4       Yes 1102.1 1130.4     0.056       0.656       0.231  < 0.001
+#> 3:     Base  32.3   833    416          2       Yes 1131.1 1145.3     0.026       0.602       0.241  < 0.001
 #> 
 #> CMS interpretation: 85+ Excellent, 75-84 Very Good, 65-74 Good, 55-64 Fair, < 55 Poor
 
@@ -397,13 +402,13 @@ surv_comparison
 #>   Concordance: 40%
 #>   Global p-value: 15%
 #> 
-#> Recommended Model: clinical (CMS: 74.1)
+#> Recommended Model: clinical (CMS: 74.2)
 #> 
 #> Models ranked by selection score:
 #>       Model   CMS     N Events Predictors Converged    AIC    BIC Pseudo-R² Concordance Global p
 #>      <char> <num> <int>  <num>      <int>    <char>  <num>  <num>     <num>       <num>   <char>
-#> 1: clinical  74.1   833    594          4       Yes 7147.4 7178.1     0.218       0.678  < 0.001
-#> 2:   simple  38.8   833    594          2       Yes 7257.4 7266.2     0.097       0.612  < 0.001
+#> 1: clinical  74.2   833    594          4       Yes 7147.4 7178.1     0.218       0.678  < 0.001
+#> 2:   simple  39.0   833    594          2       Yes 7257.4 7266.2     0.097       0.612  < 0.001
 #> 
 #> CMS interpretation: 85+ Excellent, 75-84 Very Good, 65-74 Good, 55-64 Fair, < 55 Poor
 
@@ -440,13 +445,13 @@ interaction_comp
 #>   Concordance: 40%
 #>   Global p-value: 15%
 #> 
-#> Recommended Model: Main Effects (CMS: 73.9)
+#> Recommended Model: Main Effects (CMS: 74.1)
 #> 
 #> Models ranked by selection score:
 #>               Model   CMS     N Events Predictors Converged    AIC    BIC Pseudo-R² Concordance Global p
 #>              <char> <num> <int>  <num>      <int>    <char>  <num>  <num>     <num>       <num>   <char>
-#> 1:     Main Effects  73.9   833    594          3       Yes 7144.4 7170.7     0.219       0.676  < 0.001
-#> 2: With Interaction  44.3   833    594          3       Yes 7150.1 7202.7     0.225       0.680  < 0.001
+#> 1:     Main Effects  74.1   833    594          3       Yes 7144.4 7170.7     0.219       0.676  < 0.001
+#> 2: With Interaction  44.4   833    594          3       Yes 7150.1 7202.7     0.225       0.680  < 0.001
 #> 
 #> CMS interpretation: 85+ Excellent, 75-84 Very Good, 65-74 Good, 55-64 Fair, < 55 Poor
 

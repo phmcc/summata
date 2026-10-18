@@ -145,7 +145,8 @@ standard columns:
 - n:
 
   Integer. Number of observations used in fitting the model, that is
-  complete cases across the model variables
+  complete cases across the model variables; for the levels of a factor,
+  the number at that level, as in `n_group`
 
 - n_group:
 
@@ -155,7 +156,8 @@ standard columns:
 - events:
 
   Integer. Number of events among the observations used in fitting (for
-  survival and logistic models)
+  survival and logistic models); for the levels of a factor, the number
+  at that level, as in `events_group`
 
 - events_group:
 
@@ -213,6 +215,10 @@ standard columns:
   Character. Contains `reference_label` for reference category rows when
   `reference_rows = TRUE`, empty string otherwise
 
+The model-level sample size and number of events are also recorded in
+the attributes `"model_n"` and `"model_events"`, since the `n` and
+`events` columns of factor levels hold group counts.
+
 ## Details
 
 This function is the core extraction utility used by
@@ -251,6 +257,12 @@ Falls back to Wald on profiling failure.
 extracts fixed effects only. Random effects variance components are not
 included in the output table, as they represent clustering structure
 rather than predictor effects.
+
+**Aliased Coefficients:** Coefficients that the model could not estimate
+because their columns of the model matrix are linear combinations of
+others (*e.g.,* a predictor entered twice under different names) are
+omitted for every model class, as is the reference row of a factor none
+of whose levels was estimated.
 
 ## See also
 

@@ -17,7 +17,7 @@ Surv() expressions and uses survival package functions."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.13.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -85,6 +85,8 @@ Surv() expressions and uses <span class="pkg">survival</span> package functions.
 <span>  <span class="va">total</span>,</span>
 <span>  <span class="va">total_label</span>,</span>
 <span>  marks <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  groups <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  group_index <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -137,8 +139,18 @@ Surv() expressions and uses <span class="pkg">survival</span> package functions.
 <dd><p>Character string label for total column.</p></dd>
 
 
+<dt id="arg-groups">groups<a class="anchor" aria-label="anchor" href="#arg-groups"></a></dt>
+<dd><p>Optional vector of groups (see <code><a href="process_variable.html">process_variable()</a></code>).</p></dd>
+
+
+<dt id="arg-group-index">group_index<a class="anchor" aria-label="anchor" href="#arg-group-index"></a></dt>
+<dd><p>Optional list of row positions for each group (see
+<code><a href="process_variable.html">process_variable()</a></code>).</p></dd>
+
+
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Additional arguments (currently unused).</p></dd>
+<dd><p>Additional arguments; <code>rho</code> and <code>timefix</code> are passed
+to <code><a href="https://rdrr.io/pkg/survival/man/survdiff.html" class="external-link">survival::survdiff()</a></code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

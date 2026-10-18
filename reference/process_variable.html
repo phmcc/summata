@@ -17,7 +17,7 @@ strings and raw numeric values."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.13.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -91,6 +91,8 @@ strings and raw numeric values.</p>
 <span>  <span class="va">na_percent</span>,</span>
 <span>  p_per_stat <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  marks <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  groups <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  group_index <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -171,6 +173,17 @@ continuous variables. Default <code>FALSE</code> for better performance.</p></dd
 <dt id="arg-marks">marks<a class="anchor" aria-label="anchor" href="#arg-marks"></a></dt>
 <dd><p>List with <code>big.mark</code> and <code>decimal.mark</code> as returned
 by <code><a href="resolve_number_marks.html">resolve_number_marks</a></code>.</p></dd>
+
+
+<dt id="arg-groups">groups<a class="anchor" aria-label="anchor" href="#arg-groups"></a></dt>
+<dd><p>Optional vector of groups, as returned by
+<code><a href="derive_group_levels.html">derive_group_levels()</a></code>. Derived from the data when <code>NULL</code>.</p></dd>
+
+
+<dt id="arg-group-index">group_index<a class="anchor" aria-label="anchor" href="#arg-group-index"></a></dt>
+<dd><p>Optional list of row positions for each group, as
+returned by <code><a href="derive_group_index.html">derive_group_index()</a></code>. Derived from the data when
+<code>NULL</code>.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

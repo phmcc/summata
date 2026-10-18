@@ -13,7 +13,8 @@ get_analysis_counts(
   data,
   outcome_vars,
   predictor_vars = NULL,
-  event_var = NULL
+  event_var = NULL,
+  event_indicator = NULL
 )
 ```
 
@@ -37,6 +38,14 @@ get_analysis_counts(
   Character name of the event indicator, or `NULL` for models that carry
   no event count. Factors are coded as the modeling functions code them,
   with any level beyond the first counting as an event.
+
+- event_indicator:
+
+  Numeric vector of the events, one per row of `data`, coded 1 for an
+  event and 0 otherwise, which is used in place of `event_var` when
+  given. Survival models pass the events coded from their
+  [`Surv()`](https://rdrr.io/pkg/survival/man/Surv.html) response (see
+  [`get_event_indicator()`](https://phmcc.codefloe.page/summata/reference/get_event_indicator.md)).
 
 ## Value
 

@@ -21,7 +21,7 @@ publications."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.13.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -127,7 +127,10 @@ as row headers.</p></dd>
 <dt id="arg-by">by<a class="anchor" aria-label="anchor" href="#arg-by"></a></dt>
 <dd><p>Character string specifying the column name of the stratifying
 variable for group comparisons (<em>e.g.,</em> treatment arm, risk group). When
-<code>NULL</code> (default), produces overall survival summaries only.</p></dd>
+<code>NULL</code> (default), produces overall survival summaries only. Groups
+appear in the order of the levels of a factor, including empty levels,
+and otherwise in order of first appearance in the data, as in
+<code><a href="desctable.html">desctable()</a></code>.</p></dd>
 
 
 <dt id="arg-times">times<a class="anchor" aria-label="anchor" href="#arg-times"></a></dt>
@@ -208,10 +211,10 @@ to be specified.</p></dd>
 <dt id="arg-test-type">test_type<a class="anchor" aria-label="anchor" href="#arg-test-type"></a></dt>
 <dd><p>Character string specifying the statistical test for
 comparing survival curves:</p><ul><li><p><code>"logrank"</code> - Log-rank test (default)</p></li>
-<li><p><code>"wilcoxon"</code> - Wilcoxon (Breslow) test</p></li>
+<li><p><code>"wilcoxon"</code> - Gehan-Breslow generalized Wilcoxon test</p></li>
 <li><p><code>"tarone"</code> - Tarone-Ware test</p></li>
 <li><p><code>"petopeto"</code> - Peto-Peto test</p></li>
-</ul></dd>
+</ul><p>See Details for the weights that define each test.</p></dd>
 
 
 <dt id="arg-total">total<a class="anchor" aria-label="anchor" href="#arg-total"></a></dt>
@@ -353,13 +356,23 @@ statistical properties. The <code>"log-log"</code> transformation is also
 commonly used and may perform better in the tails.</p>
 <p><strong>Statistical Testing:</strong></p>
 <p>The log-rank test (default) tests the null hypothesis that survival curves
-are identical across groups. Alternative tests weight different parts of
-the survival curve:</p><ul><li><p>Log-rank: Equal weights (best for proportional hazards)</p></li>
-<li><p>Wilcoxon: Weights by number at risk (sensitive to early
-    differences)</p></li>
-<li><p>Tarone-Ware: Weights by square root of number at risk</p></li>
-<li><p>Peto-Peto: Modified Wilcoxon weights</p></li>
-</ul><p><strong>Formatting:</strong></p>
+are identical across groups. It compares the observed and expected numbers
+of events in each group at every event time; the alternative tests weight
+these comparisons, with \(n_j\) subjects at risk and \(d_j\) events at
+event time \(t_j\):</p><ul><li><p>Log-rank: Equal weights (best for proportional hazards)</p></li>
+<li><p>Gehan-Breslow (<code>"wilcoxon"</code>): Weights \(n_j\), the number at
+    risk, which emphasize early differences</p></li>
+<li><p>Tarone-Ware: Weights \(\sqrt{n_j}\), between the
+    log-rank and Gehan-Breslow weights</p></li>
+<li><p>Peto-Peto: Weights
+    \(\tilde{S}(t_j) = \prod_{t_i \le t_j} (1 - d_i / (n_i + 1))\),
+    an estimate of the pooled survival function, which also emphasize early
+    differences but, unlike the number at risk, do not depend on the
+    censoring distribution</p></li>
+</ul><p>The log-rank test is computed by <code><a href="https://rdrr.io/pkg/survival/man/survdiff.html" class="external-link">survival::survdiff()</a></code>. The weighted
+tests use the same statistic and variance with the weights above, the
+definitions of the SAS LIFETEST and Stata <code>sts test</code> procedures.</p>
+<p><strong>Formatting:</strong></p>
 <p>All numeric output respects the <code>number_format</code> parameter.
 Separators within confidence intervals adapt automatically to avoid
 ambiguity:</p><ul><li><p>Survival probabilities: <code>"85% (80%-89%)"</code> (US) or
@@ -406,7 +419,7 @@ ambiguity:</p><ul><li><p>Survival probabilities: <code>"85% (80%-89%)"</code> (U
 <span class="r-out co"><span class="r-pr">#&gt;</span> Time points: 12, 24, 36 months</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Quantiles: 50%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Statistic: Survival probability</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Test: Log-rank (p = &lt; 0.001)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Test: Log-rank (p &lt; 0.001)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Variable    12 months    24 months    36 months  Median (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;       &lt;char&gt;       &lt;char&gt;       &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
@@ -432,7 +445,7 @@ ambiguity:</p><ul><li><p>Survival probabilities: <code>"85% (80%-89%)"</code> (U
 <span class="r-out co"><span class="r-pr">#&gt;</span> Stratified by: treatment</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Quantiles: 50%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Statistic: Survival probability</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Test: Log-rank (p = &lt; 0.001)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Test: Log-rank (p &lt; 0.001)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Variable  Median (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
@@ -456,7 +469,7 @@ ambiguity:</p><ul><li><p>Survival probabilities: <code>"85% (80%-89%)"</code> (U
 <span class="r-out co"><span class="r-pr">#&gt;</span> Stratified by: stage</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Quantiles: 25%, 50%, 75%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Statistic: Survival probability</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Test: Log-rank (p = &lt; 0.001)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Test: Log-rank (p &lt; 0.001)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Variable 75% Survival Time (95% CI)  Median (95% CI) 25% Survival Time (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;                     &lt;char&gt;           &lt;char&gt;                     &lt;char&gt;  &lt;char&gt;</span>
@@ -483,7 +496,7 @@ ambiguity:</p><ul><li><p>Survival probabilities: <code>"85% (80%-89%)"</code> (U
 <span class="r-out co"><span class="r-pr">#&gt;</span> Time points: 12, 24 months</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Quantiles: 50%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Statistic: Survival probability</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Test: Log-rank (p = &lt; 0.001)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Test: Log-rank (p &lt; 0.001)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Variable    12 months    24 months  Median (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;       &lt;char&gt;       &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
@@ -508,7 +521,7 @@ ambiguity:</p><ul><li><p>Survival probabilities: <code>"85% (80%-89%)"</code> (U
 <span class="r-out co"><span class="r-pr">#&gt;</span> Time points: 12, 24</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Quantiles: 50%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Statistic: Cumulative incidence</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Test: Log-rank (p = &lt; 0.001)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Test: Log-rank (p &lt; 0.001)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Variable           12           24  Median (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;       &lt;char&gt;       &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
@@ -533,7 +546,7 @@ ambiguity:</p><ul><li><p>Survival probabilities: <code>"85% (80%-89%)"</code> (U
 <span class="r-out co"><span class="r-pr">#&gt;</span> Time points: 12, 24</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Quantiles: 50%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Statistic: Survival probability</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Test: Log-rank (p = &lt; 0.001)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Test: Log-rank (p &lt; 0.001)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Variable                     12                     24  Median (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;                 &lt;char&gt;                 &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
@@ -576,7 +589,7 @@ ambiguity:</p><ul><li><p>Survival probabilities: <code>"85% (80%-89%)"</code> (U
 <span class="r-out co"><span class="r-pr">#&gt;</span> Time points: 12, 24</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Quantiles: 50%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Statistic: Survival probability</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Test: Log-rank (p = &lt; 0.001)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Test: Log-rank (p &lt; 0.001)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Variable           12           24  Median (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;       &lt;char&gt;       &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
@@ -600,7 +613,7 @@ ambiguity:</p><ul><li><p>Survival probabilities: <code>"85% (80%-89%)"</code> (U
 <span class="r-out co"><span class="r-pr">#&gt;</span> Time points: 12, 24 months</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Quantiles: 50%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Statistic: Survival probability</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Test: Log-rank (p = &lt; 0.001)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Test: Log-rank (p &lt; 0.001)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       Variable    12 months    24 months  Median (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         &lt;char&gt;       &lt;char&gt;       &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
@@ -625,7 +638,7 @@ ambiguity:</p><ul><li><p>Survival probabilities: <code>"85% (80%-89%)"</code> (U
 <span class="r-out co"><span class="r-pr">#&gt;</span> Time points: 12, 24</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Quantiles: 50%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Statistic: Survival probability</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Test: Log-rank (p = &lt; 0.001)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Test: Log-rank (p &lt; 0.001)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Variable           12           24  Median (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;       &lt;char&gt;       &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
@@ -634,7 +647,7 @@ ambiguity:</p><ul><li><p>Survival probabilities: <code>"85% (80%-89%)"</code> (U
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3:   Drug A 68% (63-73%) 56% (50-62%) 33.6 (24.4-40.9)        </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4:   Drug B 54% (48-59%) 43% (38-48%) 14.7 (10.9-21.7)        </span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Example 11: Wilcoxon test instead of log-rank</span></span></span>
+<span class="r-in"><span><span class="co"># Example 11: Gehan-Breslow generalized Wilcoxon test instead of log-rank</span></span></span>
 <span class="r-in"><span><span class="fu">survtable</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    data <span class="op">=</span> <span class="va">clintrial</span>,</span></span>
 <span class="r-in"><span>    outcome <span class="op">=</span> <span class="st">"Surv(os_months, os_status)"</span>,</span></span>
@@ -650,7 +663,7 @@ ambiguity:</p><ul><li><p>Survival probabilities: <code>"85% (80%-89%)"</code> (U
 <span class="r-out co"><span class="r-pr">#&gt;</span> Time points: 12, 24</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Quantiles: 50%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Statistic: Survival probability</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Test: Wilcoxon (p = &lt; 0.001)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Test: Gehan-Breslow (p &lt; 0.001)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Variable           12           24  Median (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;       &lt;char&gt;       &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>
@@ -728,7 +741,7 @@ ambiguity:</p><ul><li><p>Survival probabilities: <code>"85% (80%-89%)"</code> (U
 <span class="r-out co"><span class="r-pr">#&gt;</span> Time points: 12, 24</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Quantiles: 50%</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Statistic: Survival probability</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Test: Log-rank (p = &lt; 0.001)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Test: Log-rank (p &lt; 0.001)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Variable           12           24  Median (95% CI) p-value</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;       &lt;char&gt;       &lt;char&gt;           &lt;char&gt;  &lt;char&gt;</span>

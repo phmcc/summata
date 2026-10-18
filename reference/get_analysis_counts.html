@@ -21,7 +21,7 @@ appropriate."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.13.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -82,7 +82,8 @@ appropriate.</p>
 <span>  <span class="va">data</span>,</span>
 <span>  <span class="va">outcome_vars</span>,</span>
 <span>  predictor_vars <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  event_var <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  event_var <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  event_indicator <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -107,6 +108,13 @@ of such vectors when several models are described.</p></dd>
 <dd><p>Character name of the event indicator, or <code>NULL</code> for
 models that carry no event count. Factors are coded as the modeling
 functions code them, with any level beyond the first counting as an event.</p></dd>
+
+
+<dt id="arg-event-indicator">event_indicator<a class="anchor" aria-label="anchor" href="#arg-event-indicator"></a></dt>
+<dd><p>Numeric vector of the events, one per row of
+<code>data</code>, coded 1 for an event and 0 otherwise, which is used in place
+of <code>event_var</code> when given. Survival models pass the events coded
+from their <code><a href="https://rdrr.io/pkg/survival/man/Surv.html" class="external-link">Surv()</a></code> response (see <code><a href="get_event_indicator.html">get_event_indicator()</a></code>).</p></dd>
 
 </dl></div>
     <div class="section level2">

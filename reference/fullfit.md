@@ -62,6 +62,8 @@ fullfit(
   Character vector of predictor variable names to analyze. All
   predictors are tested in univariable models. The subset included in
   the multivariable model depends on the `method` parameter.
+  Non-syntactic names (*e.g.,* `"tumor stage"`) are quoted in the model
+  formula and need no backticks.
 
 - method:
 

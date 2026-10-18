@@ -15,7 +15,7 @@ publication-ready table format."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.13.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -81,7 +81,10 @@ publication-ready table format.</p>
 <span>  include_predictor <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  exponentiate <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  conf_level <span class="op">=</span> <span class="fl">0.95</span>,</span>
-<span>  marks <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  marks <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  interaction_vars <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  predictor_levels <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  interaction_levels <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -127,6 +130,23 @@ publication-ready table format.</p>
 
 <dt id="arg-exponentiate">exponentiate<a class="anchor" aria-label="anchor" href="#arg-exponentiate"></a></dt>
 <dd><p>Logical or <code>NULL</code> for coefficient handling.</p></dd>
+
+
+<dt id="arg-interaction-vars">interaction_vars<a class="anchor" aria-label="anchor" href="#arg-interaction-vars"></a></dt>
+<dd><p>Character vector of the variables of the
+interaction terms, by which their coefficients are labeled (see
+<code><a href="format_interaction_term.html">format_interaction_term()</a></code>).</p></dd>
+
+
+<dt id="arg-predictor-levels">predictor_levels<a class="anchor" aria-label="anchor" href="#arg-predictor-levels"></a></dt>
+<dd><p>Character vector of the levels of the predictor,
+which are told apart from interaction terms when they contain a colon.</p></dd>
+
+
+<dt id="arg-interaction-levels">interaction_levels<a class="anchor" aria-label="anchor" href="#arg-interaction-levels"></a></dt>
+<dd><p>Named list of the levels of the variables in
+<code>interaction_vars</code>, which keeps a level that contains a colon in
+one component of an interaction term.</p></dd>
 
 </dl></div>
     <div class="section level2">

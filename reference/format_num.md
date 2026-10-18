@@ -19,7 +19,7 @@ format_num(x, fmt_str, marks)
 - fmt_str:
 
   Character string `sprintf` format specification (*e.g.,* `"%.1f"`).
-  Used only for \|x\| \< 1000.
+  Its number of decimal places applies at every magnitude.
 
 - marks:
 

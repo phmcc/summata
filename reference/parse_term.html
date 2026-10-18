@@ -17,7 +17,7 @@ Handles interaction terms and continuous variables appropriately.'></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.13.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -88,12 +88,21 @@ Handles interaction terms and continuous variables appropriately.</p>
 
 
 <dt id="arg-model">model<a class="anchor" aria-label="anchor" href="#arg-model"></a></dt>
-<dd><p>Optional model object for extracting factor info from coxme models.</p></dd>
+<dd><p>Optional model object, from which the terms of the model are
+read and the factor levels of coxme models are reconstructed.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>Data.table with 'variable' and 'group' columns.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>A term that belongs to another variable of the model whose name begins
+with a factor's name, such as a continuous variable "smoking_years" or the
+coefficient "smokerTRUE" of a logical variable "smoker" beside a factor
+"smoking", is not taken for a level of that factor (see
+<code><a href="claimed_by_longer_term.html">claimed_by_longer_term()</a></code>).</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

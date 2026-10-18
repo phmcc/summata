@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.13.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,6 +59,30 @@
       <small>Source: <a href="https://codefloe.com/phmcc/summata/tree/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.13.0" id="summata-0130-2026-10-18">
+<em>summata</em> 0.13.0 (2026-10-18)<a class="anchor" aria-label="anchor" href="#summata-0130-2026-10-18"></a></h2>
+<ul><li>Speed up <code><a href="../reference/desctable.html">desctable()</a></code>, which now computes rank-test <em>p</em>-values from a single sort and derives the grouping structure once per table</li>
+<li>Pass the arguments in <code>...</code> of <code><a href="../reference/desctable.html">desctable()</a></code> (<em>e.g.</em>, <code>var.equal = TRUE</code>) to the tests that accept them, with a warning for arguments no test accepts; exclude missing and empty categories from categorical tests, falling back to a Monte Carlo <em>p</em>-value when Fisher’s exact test exceeds its workspace</li>
+<li>Fix categorical totals, median survival intervals at nondefault confidence levels, and the formatting of values of 1,000 or more in <code><a href="../reference/desctable.html">desctable()</a></code>, and show the second level of binary variables in condensed tables</li>
+<li>Compute the Gehan-Breslow, Tarone-Ware, and Peto-Peto tests that <code>survtable(test_type = )</code> names, honor <code>p_digits</code>, list groups in order of first appearance as <code><a href="../reference/desctable.html">desctable()</a></code> does, and match survival time quantiles to their groups when a factor level is empty</li>
+<li>Show logical predictors by level, with <code>FALSE</code> as the reference, in regression tables and forest plots</li>
+<li>Accept non-syntactic variable names (<em>e.g.</em>, <code>"tumor stage"</code>), with or without backticks, in <code><a href="../reference/fit.html">fit()</a></code>, <code><a href="../reference/uniscreen.html">uniscreen()</a></code>, <code><a href="../reference/multifit.html">multifit()</a></code>, <code><a href="../reference/fullfit.html">fullfit()</a></code>, and <code><a href="../reference/survtable.html">survtable()</a></code>, and read factor levels and variable names that contain a colon correctly</li>
+<li>Fix the matching, counts, and labels of interaction terms whose variables have non-syntactic, overlapping, or logical names</li>
+<li>Order the variables of the tables of models passed to <code>fit(model = )</code> and <code><a href="../reference/m2dt.html">m2dt()</a></code> as the model formula does, and describe mixed models as univariable or multivariable from their fixed-effect terms</li>
+<li>Count the events of Cox models from the event argument of <code><a href="https://rdrr.io/pkg/survival/man/Surv.html" class="external-link">Surv()</a></code>, coded as <code><a href="https://rdrr.io/pkg/survival/man/Surv.html" class="external-link">Surv()</a></code> codes it; counts were wrong for status coded 1 and 2, counting-process responses, <code><a href="https://rdrr.io/pkg/survival/man/clogit.html" class="external-link">clogit()</a></code> models, and events written as expressions</li>
+<li>Omit aliased coefficients from forest plots and Cox regression tables, show a factor whose first level is empty against its effective reference level, and drop empty factor levels before fitting Cox models</li>
+<li>Compute forest plot intervals as the regression tables do, following <code>summata.conf_method</code>, at the requested <code>conf_level</code> in <code><a href="../reference/uniforest.html">uniforest()</a></code>, and with the <em>t</em> quantile for linear models</li>
+<li>Fix forest plot interaction rows under <code>indent_groups</code> and <code>condense_table</code>, <code><a href="../reference/coxforest.html">coxforest()</a></code> intervals and interactions for <code>coxme</code> models, and the fixed-effect terms of mixed models (<em>e.g.</em>, <code>log(age)</code>) in <code><a href="../reference/glmforest.html">glmforest()</a></code> and <code><a href="../reference/lmforest.html">lmforest()</a></code>; draw forest plots when <code>knitr</code> is not installed</li>
+<li>Report only the predictor’s coefficients in <code><a href="../reference/multifit.html">multifit()</a></code>, with observations rather than events as <em>n</em> for Cox models and the given order of outcomes and levels under <code>columns = "both"</code>; fit Cox models to <code><a href="https://rdrr.io/pkg/survival/man/Surv.html" class="external-link">Surv()</a></code> outcomes, as <code><a href="../reference/fit.html">fit()</a></code> does; draw the table’s estimates in <code><a href="../reference/multiforest.html">multiforest()</a></code>
+</li>
+<li>Name the predictor or outcome of a failed fit in <code><a href="../reference/uniscreen.html">uniscreen()</a></code> and <code><a href="../reference/multifit.html">multifit()</a></code>, and use one core when the number of cores cannot be determined</li>
+<li>Compare linear mixed models in <code><a href="../reference/compfit.html">compfit()</a></code> on maximum likelihood fits, include the Brier score in the composite score of logistic models, score the Cox global <em>p</em>-value independently of the number format, accept candidates with aliased coefficients, and skip profile intervals that are not displayed; use model-level <em>N</em> and Events in <code><a href="../reference/compfit.html">compfit()</a></code> and the <code><a href="../reference/fit.html">fit()</a></code> print method</li>
+<li>Bold significant <em>p</em>-values in exported tables under every number format, and keep the <em>p</em>-values of factor levels in indented and condensed exports</li>
+<li>Compute the c-statistic without <code>pROC</code> and name GLM families without <code>stringr</code>; both are removed from <code>Suggests</code>
+</li>
+<li>Documentation and testing suite revisions</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.12.0" id="summata-0120-2026-07-31">
 <em>summata</em> 0.12.0 (2026-07-31)<a class="anchor" aria-label="anchor" href="#summata-0120-2026-07-31"></a></h2><p class="text-muted">CRAN release: 2026-08-21</p>

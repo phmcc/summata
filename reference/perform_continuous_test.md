@@ -7,7 +7,13 @@ automatic selection based on number of groups.
 ## Usage
 
 ``` r
-perform_continuous_test(var_vec, grp_vec, test_type, stat_type)
+perform_continuous_test(
+  var_vec,
+  grp_vec,
+  test_type,
+  stat_type,
+  test_args = list()
+)
 ```
 
 ## Arguments
@@ -27,6 +33,12 @@ perform_continuous_test(var_vec, grp_vec, test_type, stat_type)
 - stat_type:
 
   Character string indicating primary statistic being tested.
+
+- test_args:
+
+  Named list of additional test arguments from `...`; each test receives
+  only the arguments it accepts (see
+  [`filter_test_args()`](https://phmcc.codefloe.page/summata/reference/filter_test_args.md)).
 
 ## Value
 

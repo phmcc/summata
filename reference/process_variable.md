@@ -26,6 +26,8 @@ process_variable(
   na_percent,
   p_per_stat = FALSE,
   marks = NULL,
+  groups = NULL,
+  group_index = NULL,
   ...
 )
 ```
@@ -105,6 +107,18 @@ process_variable(
 
   List with `big.mark` and `decimal.mark` as returned by
   [`resolve_number_marks`](https://phmcc.codefloe.page/summata/reference/resolve_number_marks.md).
+
+- groups:
+
+  Optional vector of groups, as returned by
+  [`derive_group_levels()`](https://phmcc.codefloe.page/summata/reference/derive_group_levels.md).
+  Derived from the data when `NULL`.
+
+- group_index:
+
+  Optional list of row positions for each group, as returned by
+  [`derive_group_index()`](https://phmcc.codefloe.page/summata/reference/derive_group_index.md).
+  Derived from the data when `NULL`.
 
 - ...:
 

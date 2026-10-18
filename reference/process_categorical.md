@@ -21,6 +21,7 @@ process_categorical(
   total_label,
   na_percent,
   marks = NULL,
+  groups = NULL,
   ...
 )
 ```
@@ -74,6 +75,11 @@ process_categorical(
 - na_percent:
 
   Logical whether to include NA in percentage denominators.
+
+- groups:
+
+  Optional vector of groups (see
+  [`process_variable()`](https://phmcc.codefloe.page/summata/reference/process_variable.md)).
 
 - ...:
 

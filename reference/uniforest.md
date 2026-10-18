@@ -75,8 +75,13 @@ uniforest(
   Numeric confidence level for confidence intervals. Must be between 0
   and 1. Default is 0.95 (95% confidence intervals). The CI percentage
   is automatically displayed in column headers (*e.g.,* "90% CI" when
-  `conf_level = 0.90`). Note: This parameter affects display only; the
-  underlying CIs come from the uniscreen result.
+  `conf_level = 0.90`). At the level of the
+  [`uniscreen()`](https://phmcc.codefloe.page/summata/reference/uniscreen.md)
+  result, the intervals of its table are drawn; at another level, they
+  are computed from the coefficients and their standard errors, with the
+  *t* distribution on the residual degrees of freedom for linear models
+  whose table holds exact *t* intervals, and as Wald intervals
+  otherwise.
 
 - font_size:
 
@@ -367,7 +372,7 @@ p4 <- uniforest(
 
 # Example 5: Save with recommended dimensions
 forestsave(p4, file.path(tempdir(), "univariable_forest.pdf"))
-#> Forest plot saved to /tmp/Rtmphzv2jI/univariable_forest.pdf (width = 10.7 in, height = 7.2 in)
+#> Forest plot saved to /tmp/Rtmph50nhC/univariable_forest.pdf (width = 10.7 in, height = 7.2 in)
 
 options(old_width)
 

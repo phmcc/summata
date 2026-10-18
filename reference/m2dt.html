@@ -21,7 +21,7 @@ although it can be used as a standalone function as well."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.13.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -194,7 +194,8 @@ throughout a session.</p></dd>
 
     <dt>n</dt>
 <dd><p>Integer. Number of observations used in fitting the model, that
-      is complete cases across the model variables</p></dd>
+      is complete cases across the model variables; for the levels of a
+      factor, the number at that level, as in <code>n_group</code></p></dd>
 
     <dt>n_group</dt>
 <dd><p>Integer. Number of those observations at this variable
@@ -203,7 +204,8 @@ throughout a session.</p></dd>
 
     <dt>events</dt>
 <dd><p>Integer. Number of events among the observations used in
-      fitting (for survival and logistic models)</p></dd>
+      fitting (for survival and logistic models); for the levels of a
+      factor, the number at that level, as in <code>events_group</code></p></dd>
 
     <dt>events_group</dt>
 <dd><p>Integer. Number of events at this variable level
@@ -250,7 +252,10 @@ throughout a session.</p></dd>
       category rows when <code>reference_rows = TRUE</code>, empty string otherwise</p></dd>
 
 
-</dl></div>
+</dl><p>The model-level sample size and number of events are also recorded in
+  the attributes <code>"model_n"</code> and <code>"model_events"</code>, since the
+  <code>n</code> and <code>events</code> columns of factor levels hold group counts.</p>
+    </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>This function is the core extraction utility used by <code><a href="fit.html">fit()</a></code> and other
@@ -274,6 +279,12 @@ dispatch:</p><ul><li><p><strong>GLM/negative binomial</strong>: Profile likeliho
 For <span class="pkg">lme4</span> models (glmer, lmer), the function extracts fixed effects
 only. Random effects variance components are not included in the output
 table, as they represent clustering structure rather than predictor effects.</p>
+<p><strong>Aliased Coefficients:</strong>
+Coefficients that the model could not estimate because their columns of
+the model matrix are linear combinations of others (<em>e.g.,</em> a
+predictor entered twice under different names) are omitted for every
+model class, as is the reference row of a factor none of whose levels was
+estimated.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

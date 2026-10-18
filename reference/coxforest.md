@@ -380,6 +380,14 @@ clustering
 
 - Both are handled automatically by the function
 
+**Aliased Coefficients:**
+
+Coefficients that the model could not estimate because their columns of
+the model matrix are linear combinations of others are omitted, as in
+the tables of
+[`fit()`](https://phmcc.codefloe.page/summata/reference/fit.md),
+together with any factor none of whose levels was estimated.
+
 **Proportional Hazards Assumption:**
 
 The forest plot assumes proportional hazards (constant HR over time).
@@ -494,7 +502,7 @@ plot5 <- coxforest(
 
 # Example 6: Save with recommended dimensions
 forestsave(plot5, file.path(tempdir(), "survival_forest.pdf"))
-#> Forest plot saved to /tmp/Rtmphzv2jI/survival_forest.pdf (width = 13.7 in, height = 5.0 in)
+#> Forest plot saved to /tmp/Rtmph50nhC/survival_forest.pdf (width = 13.7 in, height = 5.0 in)
 
 options(old_width)
 

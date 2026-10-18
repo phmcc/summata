@@ -23,7 +23,7 @@ results side-by-side if desired."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.13.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -131,7 +131,9 @@ time-to-event analysis, use <code><a href="https://rdrr.io/pkg/survival/man/Surv
 <dt id="arg-predictors">predictors<a class="anchor" aria-label="anchor" href="#arg-predictors"></a></dt>
 <dd><p>Character vector of predictor variable names to analyze.
 All predictors are tested in univariable models. The subset included in
-the multivariable model depends on the <code>method</code> parameter.</p></dd>
+the multivariable model depends on the <code>method</code> parameter.
+Non-syntactic names (<em>e.g.,</em> <code>"tumor stage"</code>) are quoted in
+the model formula and need no backticks.</p></dd>
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>

@@ -19,7 +19,7 @@ Supports standard models (glm, lm, coxph) and mixed effects models
 
     <a class="navbar-brand me-2" href="../index.html">summata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.12.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.13.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -82,7 +82,8 @@ Supports standard models (glm, lm, coxph) and mixed effects models
 <span>  conf_level <span class="op">=</span> <span class="fl">0.95</span>,</span>
 <span>  adjusted <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  terms_to_extract <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  conf_method <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  conf_method <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  predictor_levels <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -113,6 +114,13 @@ Supports standard models (glm, lm, coxph) and mixed effects models
 <dt id="arg-terms-to-extract">terms_to_extract<a class="anchor" aria-label="anchor" href="#arg-terms-to-extract"></a></dt>
 <dd><p>Character vector of terms to extract (predictor and
 optionally interaction terms involving the predictor).</p></dd>
+
+
+<dt id="arg-predictor-levels">predictor_levels<a class="anchor" aria-label="anchor" href="#arg-predictor-levels"></a></dt>
+<dd><p>Character vector of the levels of the predictor,
+by which its coefficients are named (<code>"FALSE"</code> and <code>"TRUE"</code>
+for a logical predictor, none for a numeric one). When <code>NULL</code>, the
+levels recorded by the model are used.</p></dd>
 
 </dl></div>
     <div class="section level2">

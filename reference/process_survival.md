@@ -20,6 +20,8 @@ process_survival(
   total,
   total_label,
   marks = NULL,
+  groups = NULL,
+  group_index = NULL,
   ...
 )
 ```
@@ -71,9 +73,20 @@ process_survival(
 
   Character string label for total column.
 
+- groups:
+
+  Optional vector of groups (see
+  [`process_variable()`](https://phmcc.codefloe.page/summata/reference/process_variable.md)).
+
+- group_index:
+
+  Optional list of row positions for each group (see
+  [`process_variable()`](https://phmcc.codefloe.page/summata/reference/process_variable.md)).
+
 - ...:
 
-  Additional arguments (currently unused).
+  Additional arguments; `rho` and `timefix` are passed to
+  [`survival::survdiff()`](https://rdrr.io/pkg/survival/man/survdiff.html).
 
 ## Value
 
