@@ -6,14 +6,12 @@
 #' section uses \code{:::} for edge cases that are difficult to trigger
 #' through exported functions alone.
 #'
-#' @details Run with testthat::test_file("tests/testthat/test_number_format.R")
+#' @details Run with testthat::test_file("tests/testthat/test-number-format.R")
 
 library(data.table)
 
-## ============================================================================
-## Setup: Create test data
-## ============================================================================
 
+### * Setup: Create test data
 
 ## Small dataset for fast regression tests
 set.seed(42)
@@ -30,9 +28,7 @@ test_dt <- data.table(
 )
 
 
-## ============================================================================
-## Section 1: Validation — invalid number_format rejected everywhere
-## ============================================================================
+### * Validation — invalid number_format rejected everywhere
 
 test_that("desctable rejects invalid number_format", {
     expect_error(desctable(clintrial, variables = "age",
@@ -65,9 +61,7 @@ test_that("multifit rejects invalid number_format", {
 })
 
 
-## ============================================================================
-## Section 2: desctable() with number_format
-## ============================================================================
+### * desctable() with number_format
 
 test_that("desctable number_format=NULL runs without error", {
     result <- desctable(clintrial, variables = "age", number_format = NULL)
@@ -160,9 +154,7 @@ test_that("desctable US and eu produce same structure", {
 })
 
 
-## ============================================================================
-## Section 3: desctable() — negative values and range separators
-## ============================================================================
+### * desctable() — negative values and range separators
 
 test_that("desctable negative range uses 'to' separator", {
     dt_neg <- data.table(
@@ -210,9 +202,7 @@ test_that("desctable median_iqr with negatives avoids ambiguous output", {
 })
 
 
-## ============================================================================
-## Section 4: survtable() with number_format
-## ============================================================================
+### * survtable() with number_format
 
 test_that("survtable works with eu number_format", {
     result <- survtable(clintrial,
@@ -229,9 +219,7 @@ test_that("survtable works with space number_format", {
 })
 
 
-## ============================================================================
-## Section 5: fit() with number_format
-## ============================================================================
+### * fit() with number_format
 
 test_that("fit eu effect column uses comma decimal", {
     result <- fit(test_dt, outcome = "outcome",
@@ -301,9 +289,7 @@ test_that("fit US and eu produce same structure", {
 })
 
 
-## ============================================================================
-## Section 6: uniscreen() with number_format
-## ============================================================================
+### * uniscreen() with number_format
 
 test_that("uniscreen eu runs without error", {
     result <- uniscreen(test_dt, outcome = "outcome",
@@ -328,9 +314,7 @@ test_that("uniscreen eu effect column uses comma", {
 })
 
 
-## ============================================================================
-## Section 7: fullfit() with number_format
-## ============================================================================
+### * fullfit() with number_format
 
 test_that("fullfit eu runs without error", {
     result <- fullfit(test_dt, outcome = "outcome",
@@ -354,9 +338,7 @@ test_that("fullfit eu output contains comma decimals", {
 })
 
 
-## ============================================================================
-## Section 8: compfit() with number_format
-## ============================================================================
+### * compfit() with number_format
 
 test_that("compfit eu runs without error", {
     result <- compfit(test_dt, outcome = "outcome",
@@ -382,9 +364,7 @@ test_that("compfit eu Global p uses comma decimal", {
 })
 
 
-## ============================================================================
-## Section 9: multifit() with number_format
-## ============================================================================
+### * multifit() with number_format
 
 test_that("multifit eu runs without error", {
     result <- multifit(test_dt, outcomes = "outcome",
@@ -411,9 +391,7 @@ test_that("multifit eu effect column uses comma", {
 })
 
 
-## ============================================================================
-## Section 10: Forest plots with number_format
-## ============================================================================
+### * Forest plots with number_format
 
 test_that("glmforest eu runs without error", {
     skip_if_not_installed("ggplot2")
@@ -463,9 +441,7 @@ test_that("multiforest eu runs without error", {
 })
 
 
-## ============================================================================
-## Section 11: Edge cases via ::: (hard to trigger through public API)
-## ============================================================================
+### * Edge cases via ::: (hard to trigger through public API)
 
 ## These internal functions have tricky logic that is difficult to exercise
 ## reliably through the public API with controlled inputs.

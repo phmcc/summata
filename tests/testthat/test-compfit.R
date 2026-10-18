@@ -7,10 +7,8 @@
 
 library(data.table)
 
-## ============================================================================
-## Setup: Create test data and helper functions
-## ============================================================================
 
+### * Setup: Create test data and helper functions
 
 ## Create a complete-case subset for tests requiring no missing data
 clintrial_complete <- na.omit(clintrial)
@@ -52,9 +50,7 @@ expect_valid_scores <- function(result) {
 }
 
 
-## ============================================================================
-## SECTION 1: Basic Functionality Tests
-## ============================================================================
+### * Basic functionality tests
 
 test_that("compfit works with basic GLM models", {
     
@@ -165,9 +161,7 @@ test_that("compfit auto-detects model type correctly", {
 })
 
 
-## ============================================================================
-## SECTION 2: Mixed-Effects Model Tests
-## ============================================================================
+### * Mixed-effects model tests
 
 ## Note: lme4 can cause segfaults when models are fitted within certain 
 ## evaluation contexts (testthat, tryCatch, etc.) due to C++ memory management
@@ -340,9 +334,7 @@ test_that("compfit handles different random effects structures", {
 })
 
 
-## ============================================================================
-## SECTION 3: Interaction Term Tests
-## ============================================================================
+### * Interaction term tests
 
 test_that("compfit works with interactions_list parameter", {
     
@@ -419,9 +411,7 @@ test_that("compfit validates interactions_list length matches model_list", {
 })
 
 
-## ============================================================================
-## SECTION 4: Model Naming Tests
-## ============================================================================
+### * Model naming tests
 
 test_that("compfit uses provided model_names", {
     
@@ -503,9 +493,7 @@ test_that("compfit passes labels to underlying fit function", {
 })
 
 
-## ============================================================================
-## SECTION 5: Scoring and Ranking Tests
-## ============================================================================
+### * Scoring and ranking tests
 
 test_that("compfit ranks models by CMS in descending order", {
     
@@ -575,9 +563,7 @@ test_that("compfit accepts custom scoring weights", {
 })
 
 
-## ============================================================================
-## SECTION 6: Coefficient Table Tests
-## ============================================================================
+### * Coefficient table tests
 
 test_that("compfit returns coefficient table when requested", {
     
@@ -623,9 +609,7 @@ test_that("compfit returns NULL coefficients when not requested", {
 })
 
 
-## ============================================================================
-## SECTION 7: Edge Cases and Error Handling
-## ============================================================================
+### * Edge cases and error handling
 
 test_that("compfit handles single model", {
     
@@ -740,9 +724,7 @@ test_that("compfit handles invalid model_type gracefully", {
 })
 
 
-## ============================================================================
-## SECTION 8: Output Format Tests
-## ============================================================================
+### * Output format tests
 
 test_that("CMS is always the second column", {
     
@@ -873,9 +855,7 @@ test_that("print.compfit_result works without error", {
 })
 
 
-## ============================================================================
-## SECTION 9: Convergence Detection Tests
-## ============================================================================
+### * Convergence detection tests
 
 test_that("compfit detects convergence status", {
     
@@ -930,9 +910,7 @@ test_that("compfit detects singular fits in mixed models", {
 })
 
 
-## ============================================================================
-## SECTION 10: Attribute Preservation Tests
-## ============================================================================
+### * Attribute preservation tests
 
 test_that("compfit preserves fitted models in attributes", {
     
@@ -981,9 +959,7 @@ test_that("compfit stores weights in attributes", {
 })
 
 
-## ============================================================================
-## SECTION 11: Integration Tests (Complex Workflows)
-## ============================================================================
+### * Integration tests (complex workflows)
 
 test_that("compfit supports full clinical trial analysis workflow", {
     
@@ -1069,9 +1045,7 @@ test_that("compfit works with PFS outcome", {
 })
 
 
-## ============================================================================
-## SECTION 12: Performance and Scalability Tests
-## ============================================================================
+### * Performance and scalability tests
 
 test_that("compfit handles many models efficiently", {
     

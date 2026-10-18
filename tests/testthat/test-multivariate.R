@@ -3,14 +3,12 @@
 #' Comprehensive tests covering all model types, output formatting,
 #' interactions, mixed effects, and visualization functions.
 #' 
-#' @details Run with testthat::test_file("tests/testthat/test_multivariate.R")
+#' @details Run with testthat::test_file("tests/testthat/test-multivariate.R")
 
 library(data.table)
 
-## ============================================================================
-## Setup: Load test data and define helper functions
-## ============================================================================
 
+### * Setup: Load test data and define helper functions
 
 ## Create a complete-case subset for tests requiring no missing data
 clintrial_complete <- na.omit(clintrial)
@@ -30,9 +28,8 @@ standard_predictors <- c("age", "sex", "treatment", "stage")
 surgery_covariates <- c("age", "sex", "ecog", "smoking_status")
 
 
-## ----------------------------------------------------------------------------
-## Helper: Check uniscreen result structure
-## ----------------------------------------------------------------------------
+### ** Helper: Check uniscreen result structure
+
 expect_uniscreen_result <- function(result) {
     expect_s3_class(result, "uniscreen_result")
     expect_s3_class(result, "data.table")
@@ -49,9 +46,8 @@ expect_uniscreen_result <- function(result) {
 }
 
 
-## ----------------------------------------------------------------------------
-## Helper: Check multifit result structure
-## ----------------------------------------------------------------------------
+### ** Helper: Check multifit result structure
+
 expect_multifit_result <- function(result) {
     expect_s3_class(result, "multifit_result")
     expect_s3_class(result, "data.table")
@@ -68,15 +64,8 @@ expect_multifit_result <- function(result) {
 }
 
 
-## ----------------------------------------------------------------------------
+### ** Helper: Check raw_data attribute structure for uniscreen
 
-
-## ----------------------------------------------------------------------------
-
-
-## ----------------------------------------------------------------------------
-## Helper: Check raw_data attribute structure for uniscreen
-## ----------------------------------------------------------------------------
 expect_uniscreen_raw_data <- function(result) {
     raw <- attr(result, "raw_data")
     expect_s3_class(raw, "data.table")
@@ -91,9 +80,8 @@ expect_uniscreen_raw_data <- function(result) {
 }
 
 
-## ----------------------------------------------------------------------------
-## Helper: Check raw_data attribute structure for multifit
-## ----------------------------------------------------------------------------
+### ** Helper: Check raw_data attribute structure for multifit
+
 expect_multifit_raw_data <- function(result, columns = "adjusted") {
     raw <- attr(result, "raw_data")
     expect_s3_class(raw, "data.table")
@@ -109,9 +97,7 @@ expect_multifit_raw_data <- function(result, columns = "adjusted") {
 }
 
 
-## ============================================================================
-## SECTION 1: uniscreen() Basic Functionality Tests
-## ============================================================================
+### * uniscreen() basic functionality tests
 
 test_that("uniscreen works with basic logistic regression", {
     
@@ -314,13 +300,9 @@ test_that("uniscreen respects digits parameter", {
 })
 
 
-## ============================================================================
-## SECTION 1A: uniscreen() Additional GLM Family Tests
-## ============================================================================
+### * uniscreen() additional GLM family tests
 
-## ----------------------------------------------------------------------------
-## Gaussian Family Tests
-## ----------------------------------------------------------------------------
+### ** Gaussian family tests
 
 test_that("uniscreen works with gaussian family", {
     
@@ -342,9 +324,7 @@ test_that("uniscreen works with gaussian family", {
 })
 
 
-## ----------------------------------------------------------------------------
-## Quasibinomial Family Tests
-## ----------------------------------------------------------------------------
+### ** Quasibinomial family tests
 
 test_that("uniscreen works with quasibinomial family", {
     
@@ -394,9 +374,7 @@ test_that("uniscreen quasibinomial point estimates match binomial", {
 })
 
 
-## ----------------------------------------------------------------------------
-## Quasipoisson Family Tests
-## ----------------------------------------------------------------------------
+### ** Quasipoisson family tests
 
 test_that("uniscreen works with quasipoisson family", {
     
@@ -446,9 +424,7 @@ test_that("uniscreen quasipoisson point estimates match poisson", {
 })
 
 
-## ----------------------------------------------------------------------------
-## Gamma Family Tests
-## ----------------------------------------------------------------------------
+### ** Gamma family tests
 
 test_that("uniscreen works with Gamma family", {
     
@@ -468,9 +444,7 @@ test_that("uniscreen works with Gamma family", {
 })
 
 
-## ----------------------------------------------------------------------------
-## Inverse Gaussian Family Tests
-## ----------------------------------------------------------------------------
+### ** Inverse Gaussian family tests
 
 test_that("uniscreen works with inverse.gaussian family", {
     
@@ -490,9 +464,7 @@ test_that("uniscreen works with inverse.gaussian family", {
 })
 
 
-## ----------------------------------------------------------------------------
-## Negative Binomial (negbin) Tests
-## ----------------------------------------------------------------------------
+### ** Negative binomial (negbin) tests
 
 test_that("uniscreen works with negative binomial regression (negbin)", {
     
@@ -611,9 +583,7 @@ test_that("uniscreen negbin coefficients match direct model", {
 })
 
 
-## ============================================================================
-## SECTION 1B: uniscreen() Input Validation Tests
-## ============================================================================
+### * uniscreen() input validation tests
 
 test_that("uniscreen errors or auto-corrects Surv outcome with GLM model_type", {
     
@@ -747,9 +717,7 @@ test_that("uniscreen handles binary outcome with lm model_type", {
 })
 
 
-## ============================================================================
-## SECTION 2: multifit() Basic Functionality Tests
-## ============================================================================
+### * multifit() basic functionality tests
 
 test_that("multifit works with basic logistic regression - unadjusted", {
     
@@ -886,9 +854,7 @@ test_that("multifit respects digits and p_digits parameters", {
 })
 
 
-## ============================================================================
-## SECTION 3: Cox Proportional Hazards Tests
-## ============================================================================
+### * Cox proportional hazards tests
 
 test_that("uniscreen works with Cox model", {
     
@@ -917,6 +883,28 @@ test_that("multifit works with Cox model", {
     
     expect_multifit_result(result)
     expect_effect_column(result, "HR")
+})
+
+
+test_that("multifit fits Cox models to survival outcomes by default", {
+
+    ## fit() and uniscreen() switch to a Cox model, with a message; under the
+    ## default model type, every model failed with a warning and the table
+    ## was empty
+    expect_message(
+        result <- multifit(clintrial, outcomes = surv_outcomes,
+                           predictor = "treatment", covariates = c("age", "sex"),
+                           parallel = FALSE),
+        "Switching to 'coxph'"
+    )
+    cox <- multifit(clintrial, outcomes = surv_outcomes, predictor = "treatment",
+                    covariates = c("age", "sex"), model_type = "coxph",
+                    parallel = FALSE)
+
+    expect_effect_column(result, "HR")
+    expect_identical(result$Predictor, cox$Predictor)
+    expect_equal(attr(result, "raw_data")$coefficient,
+                 attr(cox, "raw_data")$coefficient)
 })
 
 
@@ -974,9 +962,7 @@ test_that("cluster parameter validation for non-Cox models", {
 })
 
 
-## ============================================================================
-## SECTION 4: Linear Model Tests
-## ============================================================================
+### * Linear model tests
 
 test_that("uniscreen works with linear model", {
     
@@ -1011,9 +997,7 @@ test_that("multifit works with linear model", {
 })
 
 
-## ============================================================================
-## SECTION 5: Poisson Regression Tests
-## ============================================================================
+### * Poisson regression tests
 
 test_that("multifit works with Poisson regression", {
     
@@ -1034,9 +1018,9 @@ test_that("multifit works with Poisson regression", {
 })
 
 
-## ----------------------------------------------------------------------------
-## Gaussian Family Tests
-## ----------------------------------------------------------------------------
+### * multifit() additional GLM family tests
+
+### ** Gaussian family tests
 
 test_that("multifit works with gaussian family", {
     
@@ -1059,9 +1043,7 @@ test_that("multifit works with gaussian family", {
 })
 
 
-## ----------------------------------------------------------------------------
-## Quasibinomial Family Tests
-## ----------------------------------------------------------------------------
+### ** Quasibinomial family tests
 
 test_that("multifit works with quasibinomial family", {
     
@@ -1104,9 +1086,7 @@ test_that("multifit quasibinomial with columns='both' works", {
 })
 
 
-## ----------------------------------------------------------------------------
-## Quasipoisson Family Tests
-## ----------------------------------------------------------------------------
+### ** Quasipoisson family tests
 
 test_that("multifit works with quasipoisson family", {
     
@@ -1149,9 +1129,7 @@ test_that("multifit quasipoisson with columns='both' works", {
 })
 
 
-## ----------------------------------------------------------------------------
-## Gamma Family Tests
-## ----------------------------------------------------------------------------
+### ** Gamma family tests
 
 test_that("multifit works with Gamma family", {
     
@@ -1172,9 +1150,7 @@ test_that("multifit works with Gamma family", {
 })
 
 
-## ----------------------------------------------------------------------------
-## Inverse Gaussian Family Tests
-## ----------------------------------------------------------------------------
+### ** Inverse Gaussian family tests
 
 test_that("multifit works with inverse.gaussian family", {
     
@@ -1195,9 +1171,7 @@ test_that("multifit works with inverse.gaussian family", {
 })
 
 
-## ----------------------------------------------------------------------------
-## Negative Binomial (negbin) Tests
-## ----------------------------------------------------------------------------
+### ** Negative binomial (negbin) tests
 
 test_that("multifit works with negative binomial regression (negbin)", {
     
@@ -1334,9 +1308,7 @@ test_that("multifit negbin keep_models stores negbin objects", {
 })
 
 
-## ============================================================================
-## SECTION 6: Interaction Terms Tests
-## ============================================================================
+### * Interaction terms tests
 
 test_that("multifit works with factor * factor interaction", {
     
@@ -1406,9 +1378,7 @@ test_that("Cox model with interaction works", {
 })
 
 
-## ============================================================================
-## SECTION 7: Mixed Effects Models Tests
-## ============================================================================
+### * Mixed effects models tests
 
 test_that("multifit works with glmer", {
     skip_if_not_installed("lme4")
@@ -1496,9 +1466,7 @@ test_that("glmer with interaction and random effects works", {
 })
 
 
-## ============================================================================
-## SECTION 8: Labels Tests
-## ============================================================================
+### * Labels tests
 
 test_that("uniscreen applies labels to Variable column", {
     
@@ -1552,9 +1520,7 @@ test_that("multifit predictor_label parameter works", {
 })
 
 
-## ============================================================================
-## SECTION 9: P-value Filtering Tests
-## ============================================================================
+### * P-value filtering tests
 
 test_that("multifit p_threshold filtering works", {
     
@@ -1580,9 +1546,7 @@ test_that("multifit p_threshold filtering works", {
 })
 
 
-## ============================================================================
-## SECTION 10: Keep Models Tests
-## ============================================================================
+### * Keep models tests
 
 test_that("uniscreen keep_models stores all models", {
     
@@ -1637,9 +1601,7 @@ test_that("stored models can be used for predictions", {
 })
 
 
-## ============================================================================
-## SECTION 11: Raw Data Attribute Tests
-## ============================================================================
+### * Raw data attribute tests
 
 test_that("uniscreen raw_data contains expected columns", {
     
@@ -1693,9 +1655,7 @@ test_that("multifit raw_data has correct structure for 'both' columns", {
 })
 
 
-## ============================================================================
-## SECTION 12: uniforest() Tests
-## ============================================================================
+### * uniforest() tests
 
 test_that("uniforest creates forest plot from uniscreen result", {
     skip_if_not_installed("ggplot2")
@@ -1850,9 +1810,7 @@ test_that("uniforest labels parameter works", {
 })
 
 
-## ============================================================================
-## SECTION 13: multiforest() Tests
-## ============================================================================
+### * multiforest() tests
 
 test_that("multiforest creates forest plot from multifit result", {
     skip_if_not_installed("ggplot2")
@@ -2028,9 +1986,7 @@ test_that("multiforest with mixed-effects model results works", {
 })
 
 
-## ============================================================================
-## SECTION 14: Input Validation Tests
-## ============================================================================
+### * Input validation tests
 
 test_that("uniscreen validates required inputs", {
     
@@ -2128,9 +2084,7 @@ test_that("multiforest errors on non-multifit input", {
 })
 
 
-## ============================================================================
-## SECTION 15: Edge Cases
-## ============================================================================
+### * Edge cases
 
 test_that("uniscreen handles single predictor with labels", {
     
@@ -2176,9 +2130,7 @@ test_that("uniscreen handles missing data appropriately", {
 })
 
 
-## ============================================================================
-## SECTION 16: Integration Tests
-## ============================================================================
+### * Integration tests
 
 test_that("full pipeline: uniscreen -> uniforest", {
     skip_if_not_installed("ggplot2")
@@ -2290,9 +2242,7 @@ test_that("full pipeline: multifit with mixed effects -> multiforest", {
 })
 
 
-## ============================================================================
-## SECTION 17: Parallel Processing Tests
-## ============================================================================
+### * Parallel processing tests
 
 ## test_that("parallel processing produces same results as sequential", {
 ##     skip_on_cran()
@@ -2322,9 +2272,7 @@ test_that("full pipeline: multifit with mixed effects -> multiforest", {
 ## })
 
 
-## ============================================================================
-## SECTION 18: Attribute Preservation Tests
-## ============================================================================
+### * Attribute preservation tests
 
 test_that("uniscreen preserves all expected attributes", {
     
@@ -2399,9 +2347,7 @@ test_that("multiforest rec_dims attribute present", {
 })
 
 
-## ============================================================================
-## SECTION 19: Print Method Tests
-## ============================================================================
+### * Print method tests
 
 test_that("uniscreen print method displays correctly", {
     
@@ -2451,9 +2397,7 @@ test_that("multifit print method shows interactions when present", {
 })
 
 
-## ============================================================================
-## SECTION 20: Coefficient Accuracy Tests
-## ============================================================================
+### * Coefficient accuracy tests
 
 test_that("multifit coefficients match direct model fitting", {
     
@@ -2504,9 +2448,7 @@ test_that("uniscreen coefficients match direct model fitting", {
 })
 
 
-## ============================================================================
-## SECTION 23: Profile Likelihood CIs in Multifit
-## ============================================================================
+### * Profile likelihood CIs in multifit
 
 test_that("multifit GLM CIs use profile likelihood", {
     

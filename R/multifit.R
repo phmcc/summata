@@ -20,7 +20,8 @@
 #'   
 #' @param predictor Character string specifying the predictor (exposure) variable 
 #'   name. This variable is tested against each outcome. Can be continuous or 
-#'   categorical (factor).
+#'   categorical (factor). Non-syntactic names (\emph{e.g.,} \code{"tumor stage"})
+#'   are quoted in the model formula and need no backticks.
 #'   
 #' @param covariates Optional character vector of covariate variable names to 
 #'   include in adjusted models. When specified, models are fit as 
@@ -271,6 +272,8 @@
 #'     \item{cluster}{Character or \code{NULL}. The clustering variable}
 #'     \item{model_type}{Character. The regression model type used}
 #'     \item{columns}{Character. Which columns were displayed}
+#'     \item{conf_level}{Numeric. The confidence level of the intervals, which
+#'       \code{multiforest()} uses to draw the same intervals}
 #'     \item{analysis_type}{Character. \code{"multi_outcome"} to identify analysis type}
 #'     \item{significant}{Character vector. Names of outcomes with \emph{p} < 0.05
 #'       for the predictor (uses adjusted \emph{p}-values when available)}
@@ -787,6 +790,13 @@ multifit <- function(data,
     ## Validate columns parameter
     columns <- match.arg(columns, c("adjusted", "unadjusted", "both"))
     
+    ## Survival outcomes are fitted with a Cox model, to which fit() and
+    ## uniscreen() also switch, with a message, when a model type for other
+    ## outcomes is given (see validate_model_outcome())
+    if (all(is_surv_outcome(outcomes))) {
+        model_type <- validate_model_outcome(outcomes[1L], model_type, family)$model_type
+    }
+
     ## Resolve verbose setting
     verbose <- if (is.null(verbose)) getOption("summata.verbose", FALSE) else verbose
     
@@ -854,6 +864,16 @@ multifit <- function(data,
                  data.table::as.data.table(data)
              }
     
+    ## Variables are column names, which may be given with backticks; the
+    ## formulas of the models quote the names that require it
+    var_names <- names(.data)
+    outcomes <- formula_names(outcomes, var_names, quote = FALSE)
+    predictor <- formula_names(predictor, var_names, quote = FALSE)
+    covariates <- formula_names(covariates, var_names, quote = FALSE)
+    interactions <- formula_names(interactions, var_names, quote = FALSE)
+    strata <- formula_names(strata, var_names, quote = FALSE)
+    cluster <- formula_names(cluster, var_names, quote = FALSE)
+
     ## Validate outcome homogeneity
     validate_outcome_homogeneity(.data, outcomes, model_type, family)
     
@@ -861,13 +881,29 @@ multifit <- function(data,
     is_factor_predictor <- is.factor(.data[[predictor]]) || 
         is.character(.data[[predictor]])
     
+    ## Levels by which the coefficients of a variable are named
+    variable_levels <- function(x) {
+        if (is.factor(x)) {
+            levels(x)
+        } else if (is.logical(x)) {
+            c("FALSE", "TRUE")
+        } else if (is.character(x)) {
+            unique(x[!is.na(x)])
+        } else {
+            character(0)
+        }
+    }
+    predictor_levels <- variable_levels(.data[[predictor]])
+
     ## Build the terms to extract from models
-    ## Interactions involving the predictor are extracted as well
+    ## Interactions involving the predictor are extracted as well: those of
+    ## which it is a component, rather than any whose text contains its name
     terms_to_extract <- predictor
     if (!is.null(interactions)) {
-        ## Find interactions that involve the predictor
-        predictor_interactions <- interactions[grepl(predictor, interactions, fixed = TRUE)]
-        terms_to_extract <- c(terms_to_extract, predictor_interactions)
+        involves_predictor <- vapply(strsplit(interactions, ":", fixed = TRUE),
+                                     function(parts) predictor %in% trimws(parts),
+                                     logical(1))
+        terms_to_extract <- c(terms_to_extract, interactions[involves_predictor])
     }
     
     ## Define model fitting function for a single outcome
@@ -876,16 +912,36 @@ multifit <- function(data,
         results_list <- list()
         models_list <- list()
         
+        ## Names as the formulas read them, with backticks around
+        ## non-syntactic names
+        outcome_term <- formula_names(outcome, var_names)
+        predictor_term <- formula_names(predictor, var_names)
+        strata_term <- formula_names(strata, var_names)
+        cluster_term <- formula_names(cluster, var_names)
+
         ## Build unadjusted formula (predictor only, no interactions in univariable)
-        unadj_formula_str <- paste(outcome, "~", predictor)
+        unadj_formula_str <- paste(outcome_term, "~", predictor_term)
         
         ## Add strata for Cox models in unadjusted
         if (!is.null(strata) && model_type %in% c("coxph", "clogit")) {
-            unadj_formula_str <- paste(unadj_formula_str, "+ strata(", strata, ")")
+            unadj_formula_str <- paste(unadj_formula_str, "+ strata(", strata_term, ")")
         }
         
         unadj_formula <- stats::as.formula(unadj_formula_str)
         
+        ## Cox models keep factor levels without observations, which the
+        ## other models drop; they are dropped from the data of each model,
+        ## so that every model takes the first level with observations as its
+        ## reference
+        cox_types <- c("coxph", "clogit", "coxme")
+        unadj_data <- if (model_type %in% cox_types) {
+                          drop_empty_levels(.data, c(outcome_term, predictor_term,
+                                                     strata_term, cluster_term,
+                                                     random))
+                      } else {
+                          .data
+                      }
+
         ## Fit unadjusted model if needed
         if (columns %in% c("unadjusted", "both")) {
             unadj_model <- tryCatch({
@@ -905,18 +961,18 @@ multifit <- function(data,
                                if (!requireNamespace("survival", quietly = TRUE)) 
                                    stop("Package 'survival' required for Cox models")
                                if (!is.null(cluster)) {
-                                   survival::coxph(unadj_formula, data = .data, 
-                                                   cluster = .data[[cluster]],
+                                   survival::coxph(unadj_formula, data = unadj_data,
+                                                   cluster = unadj_data[[cluster]],
                                                    model = keep_models, x = FALSE, y = TRUE, ...)
                                } else {
-                                   survival::coxph(unadj_formula, data = .data,
+                                   survival::coxph(unadj_formula, data = unadj_data,
                                                    model = keep_models, x = FALSE, y = TRUE, ...)
                                }
                            },
                            "clogit" = {
                                if (!requireNamespace("survival", quietly = TRUE))
                                    stop("Package 'survival' required for conditional logistic regression")
-                               survival::clogit(unadj_formula, data = .data, ...)
+                               survival::clogit(unadj_formula, data = unadj_data, ...)
                            },
                            ## Mixed effects models - univariable still includes random effects
                            "glmer" = {
@@ -924,7 +980,7 @@ multifit <- function(data,
                                    stop("Package 'lme4' required for mixed effects models")
                                if (is.null(random)) stop("'random' is required for glmer models")
                                unadj_me_formula <- stats::as.formula(
-                                                              paste(outcome, "~", predictor, "+", random)
+                                                              paste(outcome_term, "~", predictor_term, "+", random)
                                                           )
                                lme4::glmer(unadj_me_formula, data = .data, family = family, ...)
                            },
@@ -933,7 +989,7 @@ multifit <- function(data,
                                    stop("Package 'lme4' required for mixed effects models")
                                if (is.null(random)) stop("'random' is required for lmer models")
                                unadj_me_formula <- stats::as.formula(
-                                                              paste(outcome, "~", predictor, "+", random)
+                                                              paste(outcome_term, "~", predictor_term, "+", random)
                                                           )
                                lme4::lmer(unadj_me_formula, data = .data, ...)
                            },
@@ -942,9 +998,9 @@ multifit <- function(data,
                                    stop("Package 'coxme' required for mixed effects Cox models")
                                if (is.null(random)) stop("'random' is required for coxme models")
                                unadj_me_formula <- stats::as.formula(
-                                                              paste(outcome, "~", predictor, "+", random)
+                                                              paste(outcome_term, "~", predictor_term, "+", random)
                                                           )
-                               coxme::coxme(unadj_me_formula, data = .data, ...)
+                               coxme::coxme(unadj_me_formula, data = unadj_data, ...)
                            },
                            stop("Unsupported model type: ", model_type)
                            )
@@ -963,7 +1019,8 @@ multifit <- function(data,
                     conf_level = conf_level,
                     adjusted = FALSE,
                     terms_to_extract = predictor,
-                    conf_method = conf_method
+                    conf_method = conf_method,
+                    predictor_levels = predictor_levels
                 )
                 results_list$unadjusted <- unadj_raw
                 
@@ -984,7 +1041,8 @@ multifit <- function(data,
                 adj_terms <- c(adj_terms, interactions)
             }
             
-            adj_formula_str <- paste(outcome, "~", paste(adj_terms, collapse = " + "))
+            adj_terms <- formula_names(adj_terms, var_names)
+            adj_formula_str <- paste(outcome_term, "~", paste(adj_terms, collapse = " + "))
             
             ## Add random effects for mixed models
             if (!is.null(random) && model_type %in% mixed_types) {
@@ -993,11 +1051,19 @@ multifit <- function(data,
             
             ## Add strata for Cox models
             if (!is.null(strata) && model_type %in% c("coxph", "clogit")) {
-                adj_formula_str <- paste(adj_formula_str, "+ strata(", strata, ")")
+                adj_formula_str <- paste(adj_formula_str, "+ strata(", strata_term, ")")
             }
             
             adj_formula <- stats::as.formula(adj_formula_str)
             
+            adj_data <- if (model_type %in% cox_types) {
+                            drop_empty_levels(.data, c(outcome_term, adj_terms,
+                                                       strata_term, cluster_term,
+                                                       random))
+                        } else {
+                            .data
+                        }
+
             adj_model <- tryCatch({
                 quiet_fit(quote(
                     switch(model_type,
@@ -1015,18 +1081,18 @@ multifit <- function(data,
                                if (!requireNamespace("survival", quietly = TRUE)) 
                                    stop("Package 'survival' required for Cox models")
                                if (!is.null(cluster)) {
-                                   survival::coxph(adj_formula, data = .data, 
-                                                   cluster = .data[[cluster]],
+                                   survival::coxph(adj_formula, data = adj_data,
+                                                   cluster = adj_data[[cluster]],
                                                    model = keep_models, x = FALSE, y = TRUE, ...)
                                } else {
-                                   survival::coxph(adj_formula, data = .data,
+                                   survival::coxph(adj_formula, data = adj_data,
                                                    model = keep_models, x = FALSE, y = TRUE, ...)
                                }
                            },
                            "clogit" = {
                                if (!requireNamespace("survival", quietly = TRUE))
                                    stop("Package 'survival' required for conditional logistic regression")
-                               survival::clogit(adj_formula, data = .data, ...)
+                               survival::clogit(adj_formula, data = adj_data, ...)
                            },
                            "glmer" = {
                                if (!requireNamespace("lme4", quietly = TRUE))
@@ -1041,7 +1107,7 @@ multifit <- function(data,
                            "coxme" = {
                                if (!requireNamespace("coxme", quietly = TRUE))
                                    stop("Package 'coxme' required for mixed effects Cox models")
-                               coxme::coxme(adj_formula, data = .data, ...)
+                               coxme::coxme(adj_formula, data = adj_data, ...)
                            },
                            stop("Unsupported model type: ", model_type)
                            )
@@ -1059,7 +1125,8 @@ multifit <- function(data,
                     conf_level = conf_level,
                     adjusted = TRUE,
                     terms_to_extract = terms_to_extract,
-                    conf_method = conf_method
+                    conf_method = conf_method,
+                    predictor_levels = predictor_levels
                 )
                 results_list$adjusted <- adj_raw
                 
@@ -1084,17 +1151,13 @@ multifit <- function(data,
         length(outcomes) > 1 && 
         (.Platform$OS.type != "windows" || can_use_windows_parallel)
     
+    ## A failure is returned as a value, so that the sequential and parallel
+    ## paths both report every failed outcome by name
+    fit_or_error <- capture_fit_error(fit_one_outcome)
+
     if (use_parallel) {
-        ## Determine number of cores
-        ## Respect CRAN's 2-core limit during R CMD check
-        if (is.null(n_cores)) {
-            n_cores <- max(1L, parallel::detectCores() - 1L)
-        }
-        ## CRAN policy: respect _R_CHECK_LIMIT_CORES_ environment variable
-        chk <- tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_", ""))
-        if (nzchar(chk) && chk == "true") {
-            n_cores <- min(n_cores, 2L)
-        }
+        ## Determine number of cores (respects _R_CHECK_LIMIT_CORES_)
+        n_cores <- resolve_core_count(n_cores)
         
         if (.Platform$OS.type == "windows") {
             ## Windows: use parLapply with PSOCK cluster
@@ -1104,10 +1167,11 @@ multifit <- function(data,
             
             ## Export required objects to workers
             parallel::clusterExport(cl, 
-                                    varlist = c(".data", "predictor", "covariates", "interactions",
+                                    varlist = c(".data", "var_names", "predictor", "covariates", "interactions",
                                                 "random", "strata", "cluster", "model_type", 
                                                 "family", "conf_level", "columns", "keep_models",
                                                 "has_adjustment", "mixed_types", "terms_to_extract",
+                                                "predictor_levels",
                                                 "extract_predictor_effects", "conf_method"),
                                     envir = environment()
                                     )
@@ -1128,22 +1192,23 @@ multifit <- function(data,
                 parallel::clusterEvalQ(cl, library(coxme))
             }
             
-            all_results <- parallel::parLapply(cl, outcomes, fit_one_outcome)
+            all_results <- parallel::parLapply(cl, outcomes, fit_or_error)
             
         } else {
             ## Unix/Mac: use mclapply (fork-based, shares memory)
             all_results <- parallel::mclapply(
                                          outcomes, 
-                                         fit_one_outcome,
+                                         fit_or_error,
                                          mc.cores = n_cores
                                      )
         }
     } else {
         ## Sequential processing
         ## Used when: parallel=FALSE, single outcome, or Windows in non-interactive context
-        all_results <- lapply(outcomes, fit_one_outcome)
+        all_results <- lapply(outcomes, fit_or_error)
     }
     
+    stop_on_failed_fits(all_results, outcomes, "outcome")
     names(all_results) <- outcomes
     
     ## Combine results based on columns parameter
@@ -1166,6 +1231,13 @@ multifit <- function(data,
     validate_number_format(number_format)
     marks <- resolve_number_marks(number_format)
     
+    ## The variables of the interactions, by which their coefficients are
+    ## labeled, and their levels, which may contain a colon
+    interaction_vars <- if (!is.null(interactions)) {
+                            unique(trimws(unlist(strsplit(interactions, ":",
+                                                          fixed = TRUE))))
+                        }
+
     formatted <- format_multifit_table(
         combined_raw,
         columns = columns,
@@ -1178,7 +1250,12 @@ multifit <- function(data,
         include_predictor = include_predictor,
         exponentiate = exponentiate,
         conf_level = conf_level,
-        marks = marks
+        marks = marks,
+        interaction_vars = interaction_vars,
+        predictor_levels = predictor_levels,
+        interaction_levels = lapply(
+            stats::setNames(nm = intersect(interaction_vars, names(.data))),
+            function(v) variable_levels(.data[[v]]))
     )
     
     ## Attach attributes
@@ -1186,12 +1263,14 @@ multifit <- function(data,
 
     ## One adjusted model is fitted per outcome, so the analyzed sample is
     ## recorded per outcome and reported as a range where it varies.
-    mf_adjusted_vars <- unique(c(predictor, covariates, random, strata, cluster))
+    mf_adjusted_vars <- unique(c(formula_names(c(predictor, covariates), var_names),
+                                 random,
+                                 formula_names(c(strata, cluster), var_names)))
     mf_adjusted_vars <- mf_adjusted_vars[!is.na(mf_adjusted_vars)]
     mf_counts <- lapply(outcomes, function(out) {
         get_analysis_counts(
             data,
-            all.vars(stats::as.formula(paste("~", out))),
+            all.vars(stats::as.formula(paste("~", formula_names(out, var_names)))),
             all.vars(stats::as.formula(paste("~", paste(mf_adjusted_vars,
                                                         collapse = "+"))))
         )
@@ -1224,6 +1303,7 @@ multifit <- function(data,
     data.table::setattr(formatted, "cluster", cluster)
     data.table::setattr(formatted, "model_type", model_type)
     data.table::setattr(formatted, "columns", columns)
+    data.table::setattr(formatted, "conf_level", conf_level)
     data.table::setattr(formatted, "include_predictor", include_predictor)
     data.table::setattr(formatted, "analysis_type", "multi_outcome")
     
@@ -1321,12 +1401,17 @@ print.multifit_result <- function(x, ...) {
 #' @param adjusted Logical indicating if this is an adjusted model.
 #' @param terms_to_extract Character vector of terms to extract (predictor and 
 #'   optionally interaction terms involving the predictor).
+#' @param predictor_levels Character vector of the levels of the predictor,
+#'   by which its coefficients are named (\code{"FALSE"} and \code{"TRUE"}
+#'   for a logical predictor, none for a numeric one). When \code{NULL}, the
+#'   levels recorded by the model are used.
 #' @return data.table with predictor effect information.
 #' @keywords internal
 extract_predictor_effects <- function(model, predictor, outcome, 
                                       conf_level = 0.95, adjusted = FALSE,
                                       terms_to_extract = NULL,
-                                      conf_method = NULL) {
+                                      conf_method = NULL,
+                                      predictor_levels = NULL) {
     
     if (is.null(terms_to_extract)) {
         terms_to_extract <- predictor
@@ -1366,30 +1451,35 @@ extract_predictor_effects <- function(model, predictor, outcome,
         coef_names <- rownames(coef_summary)
     }
     
-    ## Find which coefficients belong to the terms being extracted
-    ## Build pattern to match predictor and any interaction terms
-    predictor_rows <- integer(0)
-    for (term in terms_to_extract) {
-        if (grepl(":", term, fixed = TRUE)) {
-            ## Interaction term - match exactly or with factor level suffixes
-            ## Split interaction components
-            components <- strsplit(term, ":", fixed = TRUE)[[1]]
-            ## Build regex that matches the interaction in either order
-            ## e.g., "age:sexMale" or "sexMale:age"
-            pattern <- paste0("(^|:)", components[1], ".*:", components[2], "|",
-                              "(^|:)", components[2], ".*:", components[1])
-            matches <- grep(pattern, coef_names)
-        } else {
-            ## Main effect - match term at start of coefficient name
-            pattern <- paste0("^", term)
-            matches <- grep(pattern, coef_names)
-            ## Exclude matches that are actually interaction terms (contain ":")
-            ## unless interactions are specifically sought
-            matches <- matches[!grepl(":", coef_names[matches], fixed = TRUE)]
-        }
-        predictor_rows <- c(predictor_rows, matches)
+    ## Find which coefficients belong to the terms being extracted: those of
+    ## the predictor, named by the predictor alone or followed by one of its
+    ## levels, and those of the interactions that involve it. Names are
+    ## compared exactly, so that a covariate whose name begins with the
+    ## predictor's (age_group beside age) is not taken for a level of the
+    ## predictor, and without the backticks that R adds to non-syntactic
+    ## names.
+    if (is.null(predictor_levels)) {
+        model_xlevels <- tryCatch(model$xlevels, error = function(e) NULL)
+        predictor_levels <- c(model_xlevels[[predictor]], "FALSE", "TRUE")
     }
-    predictor_rows <- unique(predictor_rows)
+    plain_names <- gsub("`", "", coef_names, fixed = TRUE)
+    names_predictor <- function(x) {
+        x == predictor |
+            (startsWith(x, predictor) &
+             substring(x, nchar(predictor) + 1L) %in% predictor_levels)
+    }
+    is_main <- names_predictor(plain_names)
+    ## The components of an interaction are read with the predictor's levels,
+    ## so that a level that contains a colon ("08:00") stays in one component
+    predictor_xlevels <- stats::setNames(list(predictor_levels), predictor)
+    in_interaction <- !is_main & grepl(":", plain_names, fixed = TRUE) &
+        vapply(plain_names, function(name) {
+            components <- split_interaction_term(name, predictor, predictor_xlevels)
+            any(names_predictor(vapply(components, `[[`, character(1), "part")))
+        }, logical(1), USE.NAMES = FALSE)
+    extract_interactions <- any(grepl(":", setdiff(terms_to_extract, predictor),
+                                      fixed = TRUE))
+    predictor_rows <- which(is_main | (extract_interactions & in_interaction))
     
     if (length(predictor_rows) == 0) {
         warning("Predictor '", predictor, "' not found in model for outcome '", outcome, "'")
@@ -1399,13 +1489,13 @@ extract_predictor_effects <- function(model, predictor, outcome,
     ## Extract predictor coefficients
     pred_coefs <- coef_summary[predictor_rows, , drop = FALSE]
     
-    ## Get total sample size and events (will be replaced with group-specific values for factors)
+    ## Get total sample size and events (will be replaced with group-specific values for factors).
+    ## For Cox models, stats::nobs() and model$n[1] of a coxme fit return the
+    ## number of events; get_model_nobs() returns the number of observations.
     if (is_merMod) {
         n_obs <- nrow(model@frame)
-    } else if (is_coxme) {
-        n_obs <- model$n[1]
     } else {
-        n_obs <- stats::nobs(model)
+        n_obs <- get_model_nobs(model, if (is_coxme) "coxme" else model_class)
     }
     
     total_events <- NA_integer_
@@ -1441,28 +1531,23 @@ extract_predictor_effects <- function(model, predictor, outcome,
         }
     }
     
-    ## Build coefficient names (handle factor levels and interactions)
-    term_names <- rownames(pred_coefs)
-    group_names <- character(length(term_names))
-    
-    for (i in seq_along(term_names)) {
-        term <- term_names[i]
-        if (grepl(":", term, fixed = TRUE)) {
-            ## Interaction term - store raw term, will be formatted later with labels
-            group_names[i] <- term
-        } else {
-            ## Main effect - extract level name
-            group_names[i] <- sub(paste0("^", predictor), "", term)
-            if (group_names[i] == "") group_names[i] <- "-"  # Continuous predictor
-        }
-    }
+    ## Build coefficient names (handle factor levels and interactions):
+    ## the level that follows the predictor's name, "-" for a continuous
+    ## predictor, and the whole term, formatted later with labels, for an
+    ## interaction
+    row_is_main <- is_main[predictor_rows]
+    group_names <- ifelse(row_is_main,
+                          substring(plain_names[predictor_rows],
+                                    nchar(predictor) + 1L),
+                          plain_names[predictor_rows])
+    group_names[group_names == ""] <- "-"
     
     ## Calculate group-specific n and events for factor predictors
     n_values <- rep(n_obs, length(group_names))
     events_values <- rep(total_events, length(group_names))
     
-    ## Check if this is a factor predictor (has non-"-" group names that aren't interaction terms)
-    is_factor_predictor <- any(group_names != "-" & !grepl(":", group_names, fixed = TRUE))
+    ## Check if this is a factor predictor (has levels among its own terms)
+    is_factor_predictor <- any(row_is_main & group_names != "-")
     
     if (is_factor_predictor) {
         ## Get model data to calculate group-specific counts
@@ -1542,7 +1627,7 @@ extract_predictor_effects <- function(model, predictor, outcome,
             
             for (i in seq_along(group_names)) {
                 grp <- group_names[i]
-                if (grepl(":", grp, fixed = TRUE)) {
+                if (!row_is_main[i]) {
                     ## This is an interaction term - set n/Events to NA
                     ## (group-specific counts don't make sense for interactions)
                     n_values[i] <- NA_integer_
@@ -1597,6 +1682,11 @@ extract_predictor_effects <- function(model, predictor, outcome,
     coefficients <- pred_coefs[, coef_col]
     se_values <- pred_coefs[, se_col]
 
+    ## The residual degrees of freedom of the exact t intervals of a linear
+    ## model, from which multiforest() computes t intervals at another
+    ## confidence level; missing for intervals of other kinds
+    df_residual <- NA_real_
+
     use_confint <- FALSE
     if (conf_method_resolved == "profile") {
         if (inherits(model, c("glm", "negbin"))) {
@@ -1608,13 +1698,20 @@ extract_predictor_effects <- function(model, predictor, outcome,
     }
 
     if (use_confint) {
-        ## Profile likelihood CIs (GLM/negbin) or exact t CIs (lm)
+        ## Profile likelihood CIs (GLM/negbin) or exact t CIs (lm), for the
+        ## predictor's terms only: profiling the intercept and the covariates,
+        ## whose intervals are not reported, costs one profile per coefficient
         better_ci <- tryCatch(
             suppressMessages(suppressWarnings(
-                stats::confint(model, level = conf_level)
+                stats::confint(model, parm = rownames(pred_coefs), level = conf_level)
             )),
             error = function(e) NULL
         )
+        ## confint() returns a named vector for a single parameter
+        if (!is.null(better_ci) && is.null(dim(better_ci))) {
+            better_ci <- matrix(better_ci, nrow = 1,
+                                dimnames = list(rownames(pred_coefs), names(better_ci)))
+        }
         if (!is.null(better_ci)) {
             ## Remove intercept if present
             if ("(Intercept)" %in% rownames(better_ci)) {
@@ -1626,6 +1723,9 @@ extract_predictor_effects <- function(model, predictor, outcome,
             if (all(!is.na(term_match))) {
                 ci_lower <- better_ci[term_match, 1L]
                 ci_upper <- better_ci[term_match, 2L]
+                if (identical(model_class, "lm")) {
+                    df_residual <- stats::df.residual(model)
+                }
             } else {
                 ## Partial match: use confint where available, Wald otherwise
                 z_score <- stats::qnorm((1 + conf_level) / 2)
@@ -1714,7 +1814,8 @@ extract_predictor_effects <- function(model, predictor, outcome,
                           statistic = stat_values,
                           p_value = p_values,
                           effect_type = effect_type,
-                          adjusted = adjusted
+                          adjusted = adjusted,
+                          df_residual = df_residual
                       )
     
     return(dt)
@@ -1778,16 +1879,20 @@ combine_multifit_results <- function(all_results, columns) {
         ## Rename columns for merging
         if (nrow(unadj_combined) > 0) {
             data.table::setnames(unadj_combined, 
-                                 c("exp_coef", "ci_lower", "ci_upper", "p_value"),
-                                 c("exp_coef_unadj", "ci_lower_unadj", "ci_upper_unadj", "p_unadj"),
+                                 c("exp_coef", "ci_lower", "ci_upper", "p_value",
+                                   "coefficient", "se", "df_residual"),
+                                 c("exp_coef_unadj", "ci_lower_unadj", "ci_upper_unadj", "p_unadj",
+                                   "coefficient_unadj", "se_unadj", "df_residual_unadj"),
                                  skip_absent = TRUE
                                  )
         }
         
         if (nrow(adj_combined) > 0) {
             data.table::setnames(adj_combined,
-                                 c("exp_coef", "ci_lower", "ci_upper", "p_value"),
-                                 c("exp_coef_adj", "ci_lower_adj", "ci_upper_adj", "p_adj"),
+                                 c("exp_coef", "ci_lower", "ci_upper", "p_value",
+                                   "coefficient", "se", "df_residual"),
+                                 c("exp_coef_adj", "ci_lower_adj", "ci_upper_adj", "p_adj",
+                                   "coefficient_adj", "se_adj", "df_residual_adj"),
                                  skip_absent = TRUE
                                  )
         }
@@ -1796,21 +1901,45 @@ combine_multifit_results <- function(all_results, columns) {
         if (nrow(unadj_combined) > 0 && nrow(adj_combined) > 0) {
             merge_cols <- c("outcome", "predictor", "group")
             keep_from_unadj <- c(merge_cols, "n", "events", "effect_type",
-                                 "exp_coef_unadj", "ci_lower_unadj", "ci_upper_unadj", "p_unadj")
-            keep_from_adj <- c(merge_cols, "n", "events",
-                               "exp_coef_adj", "ci_lower_adj", "ci_upper_adj", "p_adj")
+                                 "exp_coef_unadj", "ci_lower_unadj", "ci_upper_unadj", "p_unadj",
+                                 "coefficient_unadj", "se_unadj", "df_residual_unadj")
+            keep_from_adj <- c(merge_cols, "n", "events", "effect_type",
+                               "exp_coef_adj", "ci_lower_adj", "ci_upper_adj", "p_adj",
+                               "coefficient_adj", "se_adj", "df_residual_adj")
             
             unadj_subset <- unadj_combined[, intersect(keep_from_unadj, names(unadj_combined)), with = FALSE]
             adj_subset <- adj_combined[, intersect(keep_from_adj, names(adj_combined)), with = FALSE]
             
-            ## Carry the adjusted counts under separate names so that they can
-            ## replace the unadjusted ones after the merge
+            ## Carry the adjusted counts and effect type under separate names
+            ## so that they can fill in for the unadjusted ones after the merge
             data.table::setnames(adj_subset,
-                                 c("n", "events"),
-                                 c(".n_adj", ".events_adj"),
+                                 c("n", "events", "effect_type"),
+                                 c(".n_adj", ".events_adj", ".effect_type_adj"),
                                  skip_absent = TRUE)
             
-            combined <- merge(unadj_subset, adj_subset, by = merge_cols, all = TRUE)
+            ## Rows are ordered as in the single-column results: outcomes in
+            ## the order given, and the terms of each outcome in model order,
+            ## so that factor levels keep their defined order. merge() would
+            ## otherwise sort all three keys alphabetically.
+            unadj_subset[, .row_unadj := .I]
+            adj_subset[, .row_adj := .I]
+            combined <- merge(unadj_subset, adj_subset, by = merge_cols, all = TRUE,
+                              sort = FALSE)
+            outcome_order <- unique(c(names(all_results), unadj_subset$outcome,
+                                      adj_subset$outcome))
+            combined[, .outcome_rank := match(outcome, outcome_order)]
+            data.table::setorderv(combined, c(".outcome_rank", ".row_adj", ".row_unadj"),
+                                  na.last = TRUE)
+            combined[, c(".outcome_rank", ".row_adj", ".row_unadj") := NULL]
+
+            if (".effect_type_adj" %in% names(combined)) {
+                if (!"effect_type" %in% names(combined)) {
+                    data.table::setnames(combined, ".effect_type_adj", "effect_type")
+                } else {
+                    combined[is.na(effect_type), effect_type := .effect_type_adj]
+                    combined[, .effect_type_adj := NULL]
+                }
+            }
             
             ## A row carrying an adjusted estimate is described by the adjusted
             ## model's complete cases. The unadjusted sample is larger whenever a
@@ -1860,6 +1989,14 @@ combine_multifit_results <- function(all_results, columns) {
 #' @param predictor_label Label for predictor variable.
 #' @param include_predictor Logical for including predictor column.
 #' @param exponentiate Logical or \code{NULL} for coefficient handling.
+#' @param interaction_vars Character vector of the variables of the
+#'   interaction terms, by which their coefficients are labeled (see
+#'   \code{format_interaction_term()}).
+#' @param predictor_levels Character vector of the levels of the predictor,
+#'   which are told apart from interaction terms when they contain a colon.
+#' @param interaction_levels Named list of the levels of the variables in
+#'   \code{interaction_vars}, which keeps a level that contains a colon in
+#'   one component of an interaction term.
 #' @return Formatted data.table.
 #' @keywords internal
 format_multifit_table <- function(data, 
@@ -1873,7 +2010,10 @@ format_multifit_table <- function(data,
                                   include_predictor = TRUE,
                                   exponentiate = NULL,
                                   conf_level = 0.95,
-                                  marks = NULL) {
+                                  marks = NULL,
+                                  interaction_vars = NULL,
+                                  predictor_levels = NULL,
+                                  interaction_levels = NULL) {
     
     if (nrow(data) == 0) {
         return(data.table::data.table())
@@ -1917,12 +2057,16 @@ format_multifit_table <- function(data,
         is_binary_affirmative <- length(unique_levels) == 1 && 
             unique_levels[1] %in% affirmative_values
         
-        ## Format predictor values as "Variable (Level)" or just "Variable" for binary
+        ## Format predictor values as "Variable (Level)" or just "Variable" for
+        ## binary. A level of the predictor may contain a colon ("08:00"), as
+        ## may the levels of the components of an interaction.
         for (i in seq_len(nrow(result))) {
             pred_val <- result$Predictor[i]
-            if (grepl(":", pred_val, fixed = TRUE)) {
+            if (grepl(":", pred_val, fixed = TRUE) && !pred_val %in% predictor_levels) {
                 ## This is an interaction term - format nicely
-                result[i, Predictor := format_interaction_term(pred_val, labels)]
+                result[i, Predictor := format_interaction_term(pred_val, labels,
+                                                                interaction_vars,
+                                                                interaction_levels)]
             } else if (pred_val != "-") {
                 if (is_binary_affirmative) {
                     ## Binary variable with affirmative level - just show variable name
@@ -2135,9 +2279,39 @@ format_pvalues_multifit <- function(p, digits = 3, marks = NULL) {
 #' 
 #' @param term Character string of the interaction term from model coefficients.
 #' @param labels Optional named vector of labels for variable names.
+#' @param var_names Optional character vector of the variables of the
+#'   interaction. When given, each component is split into its variable and
+#'   level by the longest variable name it begins with (see
+#'   \code{split_interaction_term()}), which holds for any variable name;
+#'   otherwise the variable name is taken to be the leading run of lowercase
+#'   letters, digits, and underscores.
+#' @param xlevels Optional named list of the levels of the variables in
+#'   \code{var_names}, which keeps a level that contains a colon in one
+#'   component.
 #' @return Formatted interaction term string.
 #' @keywords internal
-format_interaction_term <- function(term, labels = NULL) {
+format_interaction_term <- function(term, labels = NULL, var_names = NULL,
+                                    xlevels = NULL) {
+    if (length(var_names) > 0) {
+        components <- split_interaction_term(term, var_names, xlevels)
+        formatted_parts <- vapply(components, function(component) {
+            if (is.na(component$var)) {
+                return(component$part)
+            }
+            var_display <- if (!is.null(labels) && component$var %in% names(labels)) {
+                               labels[[component$var]]
+                           } else {
+                               component$var
+                           }
+            if (is.na(component$level)) {
+                var_display
+            } else {
+                paste0(var_display, " (", component$level, ")")
+            }
+        }, character(1))
+        return(paste(formatted_parts, collapse = " \u00d7 "))
+    }
+
     ## Split by colon
     parts <- strsplit(term, ":", fixed = TRUE)[[1]]
     

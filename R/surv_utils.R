@@ -48,17 +48,15 @@ process_survival_probs <- function(survfit_objects,
         n_rows <- length(groups)
         row_labels <- group_labels
 
-        ## quant$quantile is matrix: strata x probs
-        if (is.matrix(quant$quantile)) {
-            est_mat <- quant$quantile
-            lower_mat <- quant$lower
-            upper_mat <- quant$upper
-        } else {
-            ## Single prob, convert to matrix
-            est_mat <- matrix(quant$quantile, ncol = 1)
-            lower_mat <- matrix(quant$lower, ncol = 1)
-            upper_mat <- matrix(quant$upper, ncol = 1)
-        }
+        ## quant$quantile is a matrix of strata by probabilities. Its rows are
+        ## matched to the groups by stratum name, as in
+        ## process_survival_times(): survfit() orders the strata itself and
+        ## omits groups without observations, which keep missing values
+        strata_rows <- match(paste0(by, "=", groups), names(fit$strata))
+        est_mat <- matrix(quant$quantile, ncol = n_probs)[strata_rows, , drop = FALSE]
+        lower_mat <- matrix(quant$lower, ncol = n_probs)[strata_rows, , drop = FALSE]
+        upper_mat <- matrix(quant$upper, ncol = n_probs)[strata_rows, , drop = FALSE]
+        no_stratum <- is.na(strata_rows)
     } else {
         ## Overall only
         fit <- survfit_objects$overall
@@ -70,6 +68,7 @@ process_survival_probs <- function(survfit_objects,
         est_mat <- matrix(quant$quantile, nrow = 1)
         lower_mat <- matrix(quant$lower, nrow = 1)
         upper_mat <- matrix(quant$upper, nrow = 1)
+        no_stratum <- FALSE
     }
 
     ## Build formatted output
@@ -89,10 +88,14 @@ process_survival_probs <- function(survfit_objects,
         lower_vec <- lower_mat[, j]
         upper_vec <- upper_mat[, j]
 
-        ## Cell formatting
-        formatted_list[[j + 1L]] <- format_quantile_cells(
+        ## Cell formatting. A missing quantile is one the survival curve
+        ## did not reach, except in groups without observations, which have
+        ## no curve
+        cells <- format_quantile_cells(
             est_vec, lower_vec, upper_vec, fmt_str, marks
         )
+        cells[no_stratum] <- "-"
+        formatted_list[[j + 1L]] <- cells
         names(formatted_list)[j + 1L] <- col_name
 
         ## Raw values
@@ -151,28 +154,59 @@ process_survival_probs <- function(survfit_objects,
 
 #' Perform survival comparison test
 #'
-#' Performs statistical test comparing survival curves across groups.
+#' Performs statistical test comparing survival curves across groups. The
+#' log-rank test is computed by \code{survival::survdiff()}. The Gehan-Breslow
+#' (\code{"wilcoxon"}), Tarone-Ware (\code{"tarone"}), and Peto-Peto
+#' (\code{"petopeto"}) tests weight each event time by the number at risk, its
+#' square root, and the Peto-Peto estimate of the pooled survival function,
+#' respectively (see \code{weighted_logrank_test()}). \code{survdiff()} offers
+#' only the weights \eqn{\hat{S}(t-)^\rho}{S(t-)^rho} of the Fleming-Harrington
+#' tests, of which \eqn{\rho = 1}{rho = 1} approximates the Peto-Peto test and
+#' none gives the other two. Groups without expected events, such as a group
+#' whose observations are all censored before the first event, are left out of
+#' the test, as \code{survdiff()} leaves them out, and the degrees of freedom
+#' count the groups that remain.
 #'
 #' @param surv_obj Survival object created by Surv().
 #' @param group_var Vector of group assignments.
 #' @param test_type Character string specifying test type.
-#' @return List with test statistic, \emph{p}-value, and test type.
+#' @return List with test statistic, degrees of freedom, \emph{p}-value, and
+#'   test type. The statistic, degrees of freedom, and \emph{p}-value are
+#'   \code{NA} when fewer than two groups have expected events.
 #' @keywords internal
 perform_survival_test <- function(surv_obj, group_var, test_type) {
-    ## Map test type to survdiff rho parameter
-    rho <- switch(test_type,
-                  "logrank" = 0,
-                  "wilcoxon" = 1,
-                  "petopeto" = 1,
-                  "tarone" = 0.5,
-                  0)
-
     tryCatch({
-        test_obj <- survival::survdiff(surv_obj ~ group_var, rho = rho)
+        if (identical(test_type, "logrank")) {
+            test_obj <- survival::survdiff(surv_obj ~ group_var)
+            statistic <- test_obj$chisq
+            ## Groups without expected events are left out of the test, so
+            ## the degrees of freedom are counted as survdiff() counts them
+            df <- sum(test_obj$exp > 0) - 1L
+            p_value <- test_obj$pvalue
+        } else {
+            weights <- switch(test_type,
+                              "wilcoxon" = function(n_risk, n_event) n_risk,
+                              "tarone" = function(n_risk, n_event) sqrt(n_risk),
+                              "petopeto" = function(n_risk, n_event) {
+                                  cumprod(1 - n_event / (n_risk + 1))
+                              },
+                              stop("unknown test type: ", test_type))
+            test_obj <- weighted_logrank_test(surv_obj, group_var, weights)
+            statistic <- test_obj$chisq
+            df <- test_obj$df
+            p_value <- test_obj$pvalue
+        }
+
+        ## Fewer than two groups with expected events leave nothing to test
+        if (df < 1L) {
+            statistic <- NA_real_
+            df <- NA_integer_
+            p_value <- NA_real_
+        }
         list(
-            statistic = test_obj$chisq,
-            df = length(test_obj$n) - 1L,
-            p_value = test_obj$pvalue,
+            statistic = statistic,
+            df = df,
+            p_value = p_value,
             test_type = test_type,
             test_object = test_obj
         )
@@ -186,6 +220,95 @@ perform_survival_test <- function(surv_obj, group_var, test_type) {
             error = e$message
         )
     })
+}
+
+
+#' Weighted log-rank test
+#'
+#' Compares survival curves across groups with a weighted log-rank statistic.
+#' At each distinct event time \eqn{t_j}, with \eqn{n_j} subjects at risk and
+#' \eqn{d_j} events in the pooled sample, the observed and expected numbers of
+#' events in each group are compared with weight, with hypergeometric
+#' covariance. The statistic \eqn{v' V^{-1} v}, computed after removing one
+#' group, has a \eqn{\chi^2} distribution with one degree of freedom fewer than
+#' the number of groups. These are the definitions of the SAS LIFETEST and Stata
+#' \code{sts test} procedures; with unit weights the statistic equals that of
+#' \code{survival::survdiff()}, and times are aligned with
+#' \code{survival::aeqSurv()} as \code{survdiff()} aligns them. Groups with no
+#' subjects at risk at any event time are excluded, as in \code{survdiff()};
+#' when fewer than two groups remain, the statistic and \emph{p}-value are
+#' \code{NA}.
+#'
+#' @param surv_obj Survival object created by \code{survival::Surv()}, with
+#'   right-censored data.
+#' @param group_var Vector of group assignments of the same length.
+#' @param weights Function of the numbers at risk and of events at the
+#'   ordered distinct event times of the pooled sample, returning the weight
+#'   of each event time.
+#' @return List with the components of a \code{survdiff} object: the number of
+#'   subjects in each group (\code{n}), the weighted observed and expected
+#'   numbers of events in each group (\code{obs}, \code{exp}), their
+#'   covariance matrix (\code{var}), the test statistic (\code{chisq}), and
+#'   the \emph{p}-value (\code{pvalue}), with its degrees of freedom
+#'   (\code{df}).
+#' @keywords internal
+weighted_logrank_test <- function(surv_obj, group_var, weights) {
+    surv_obj <- survival::aeqSurv(surv_obj)
+    time <- surv_obj[, "time"]
+    status <- surv_obj[, "status"]
+    keep <- !is.na(time) & !is.na(status) & !is.na(group_var)
+    time <- time[keep]
+    status <- status[keep]
+    group <- droplevels(as.factor(group_var[keep]))
+    n_groups <- nlevels(group)
+    if (n_groups < 2L) {
+        stop("There is only 1 group")
+    }
+    group_sizes <- table(group, dnn = NULL)
+    group <- as.integer(group)
+
+    ## Numbers at risk and events in each group at the distinct event times
+    event_times <- sort(unique(time[status == 1]))
+    n_times <- length(event_times)
+    at_risk <- matrix(0, n_times, n_groups)
+    events <- matrix(0, n_times, n_groups)
+    for (k in seq_len(n_groups)) {
+        group_times <- sort(time[group == k])
+        at_risk[, k] <- length(group_times) -
+            findInterval(event_times, group_times, left.open = TRUE)
+        events[, k] <- tabulate(match(time[group == k & status == 1], event_times),
+                                nbins = n_times)
+    }
+    n_risk <- rowSums(at_risk)
+    n_event <- rowSums(events)
+    w <- weights(n_risk, n_event)
+
+    share <- at_risk / n_risk
+    observed <- colSums(w * events)
+    expected <- colSums(w * n_event * share)
+    ## With a single subject at risk the hypergeometric variance is zero
+    var_weight <- ifelse(n_risk > 1, w^2 * n_event * (n_risk - n_event) / (n_risk - 1), 0)
+    v <- diag(colSums(var_weight * share), n_groups) - crossprod(share, var_weight * share)
+
+    tested <- expected > 0
+    df <- sum(tested) - 1L
+    if (df < 1L) {
+        chisq <- NA_real_
+        p_value <- NA_real_
+    } else {
+        u <- (observed - expected)[tested][-1L]
+        v_tested <- v[tested, tested, drop = FALSE][-1L, -1L, drop = FALSE]
+        chisq <- sum(solve(v_tested, u) * u)
+        p_value <- stats::pchisq(chisq, df, lower.tail = FALSE)
+    }
+
+    list(n = group_sizes,
+         obs = observed,
+         exp = expected,
+         var = v,
+         chisq = chisq,
+         pvalue = p_value,
+         df = df)
 }
 
 

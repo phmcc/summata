@@ -45,7 +45,9 @@ time-to-event analysis, use \code{Surv()} syntax for the outcome variable
 
 \item{predictors}{Character vector of predictor variable names to analyze. 
 All predictors are tested in univariable models. The subset included in 
-the multivariable model depends on the \code{method} parameter.}
+the multivariable model depends on the \code{method} parameter.
+Non-syntactic names (\emph{e.g.,} \code{"tumor stage"}) are quoted in
+the model formula and need no backticks.}
 
 \item{method}{Character string specifying the variable selection strategy:
 \itemize{

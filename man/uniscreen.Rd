@@ -40,7 +40,9 @@ survival analysis, use \code{Surv()} syntax from the \pkg{survival} package
 
 \item{predictors}{Character vector of predictor variable names to screen. Each 
 predictor is tested independently in its own univariable model. Can include 
-continuous, categorical (factor), or binary variables.}
+continuous, categorical (factor), or binary variables.
+Non-syntactic names (\emph{e.g.,} \code{"tumor stage"}) are quoted in
+the model formula and need no backticks.}
 
 \item{model_type}{Character string specifying the type of regression model to 
 fit. Options include:
@@ -268,6 +270,8 @@ A data.table with S3 class \code{"uniscreen_result"} containing formatted
       via \code{attr(result, "models")[["predictor_name"]]}}
     \item{outcome}{Character. The outcome variable name used}
     \item{model_type}{Character. The regression model type used}
+    \item{conf_level}{Numeric. The confidence level of the intervals, which
+      \code{uniforest()} uses to draw the same intervals}
     \item{model_scope}{Character. Always "Univariable" for screening results}
     \item{screening_type}{Character. Always "univariable" to identify the 
       analysis type}

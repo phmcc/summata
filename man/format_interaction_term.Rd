@@ -4,12 +4,23 @@
 \alias{format_interaction_term}
 \title{Format interaction term for display}
 \usage{
-format_interaction_term(term, labels = NULL)
+format_interaction_term(term, labels = NULL, var_names = NULL, xlevels = NULL)
 }
 \arguments{
 \item{term}{Character string of the interaction term from model coefficients.}
 
 \item{labels}{Optional named vector of labels for variable names.}
+
+\item{var_names}{Optional character vector of the variables of the
+interaction. When given, each component is split into its variable and
+level by the longest variable name it begins with (see
+\code{split_interaction_term()}), which holds for any variable name;
+otherwise the variable name is taken to be the leading run of lowercase
+letters, digits, and underscores.}
+
+\item{xlevels}{Optional named list of the levels of the variables in
+\code{var_names}, which keeps a level that contains a colon in one
+component.}
 }
 \value{
 Formatted interaction term string.

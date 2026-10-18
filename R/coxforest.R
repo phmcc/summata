@@ -258,7 +258,14 @@
 #'   \item Clustering affects standard errors but not point estimates
 #'   \item Both are handled automatically by the function
 #' }
-#' 
+#'
+#' \strong{Aliased Coefficients:}
+#'
+#' Coefficients that the model could not estimate because their columns of
+#' the model matrix are linear combinations of others are omitted, as in the
+#' tables of \code{fit()}, together with any factor none of whose levels was
+#' estimated.
+#'
 #' \strong{Proportional Hazards Assumption:}
 #' 
 #' The forest plot assumes proportional hazards (constant HR over time). Users 
@@ -490,14 +497,22 @@ Received class: ", paste(class(x), collapse = ", "))
     ## The restriction is deliberately not applied to 'data', which remains the
     ## denominator for the "percentage analyzed" figures reported below.
     model_data <- get_analysis_data(model, class(model)[1], data)
+
+    ## Observations whose event Surv() codes as missing, such as a status of 9
+    ## among statuses of 0 and 1, did not enter the model either
+    analysis_events <- get_event_indicator(model, model_data)
+    if (!is.null(analysis_events) && anyNA(analysis_events)) {
+        model_data <- model_data[!is.na(analysis_events)]
+    }
     
     terms <- attr(model$terms, "dataClasses")[-1]
 
     ## Filter out strata() and cluster() terms - these are not predictors to plot
     terms <- terms[!grepl("strata|cluster", names(terms))]
     
-    ## Filter out interaction terms (contain ":"), which are handled separately via coefficients
-    terms <- terms[!grepl(":", names(terms), fixed = TRUE)]
+    ## The variables of the model are its main effects; interactions are
+    ## handled separately via their coefficients. A variable whose name
+    ## contains ":" is a main effect like any other.
 
     ## Extract coefficients based on model type
     model_class <- class(model)[1]
@@ -518,9 +533,10 @@ Received class: ", paste(class(x), collapse = ", "))
         ## Extract fixed effects coefficients
         fixed_effects <- coxme::fixef(model)
         
-        ## Extract standard errors from variance matrix
-        n_fixed <- length(fixed_effects)
-        se_values <- sqrt(diag(as.matrix(model$variance))[1:n_fixed])
+        ## Extract standard errors of the fixed effects. model$variance holds
+        ## the random effects first and the fixed effects last; vcov() returns
+        ## the fixed-effect block.
+        se_values <- sqrt(diag(as.matrix(stats::vcov(model))))
         
         ## Calculate z-statistics and \emph{p}-values
         z_values <- fixed_effects / se_values
@@ -550,16 +566,15 @@ Received class: ", paste(class(x), collapse = ", "))
         ## Also need to set nevent and create xlevels as before
         model$nevent <- model$n[1]
 
-        ## For coxme, systematically extract from formula
-        ## Parse formula to get predictor variables
-        formula_chr <- as.character(model$formulaList$fixed)
-        rhs_formula <- formula_chr[3]
-
-        ## Split by + to get individual terms
-        predictor_terms <- trimws(strsplit(rhs_formula, "\\+")[[1]])
+        ## The predictors are the main-effect terms of the fixed-effects
+        ## formula, without the backticks of non-syntactic names. Splitting
+        ## the formula at "+" kept an interaction written as a * b as a single
+        ## term, so that its main effects were not drawn and the term itself
+        ## was drawn as a continuous variable with the reference label.
+        predictor_vars <- main_effect_labels(model)
 
         ## Remove random effects terms like (1|site)
-        predictor_vars <- predictor_terms[!grepl("\\(.*\\|.*\\)", predictor_terms)]
+        predictor_vars <- predictor_vars[!grepl("|", predictor_vars, fixed = TRUE)]
 
         ## Create terms
         terms <- sapply(predictor_vars, function(v) {
@@ -572,9 +587,6 @@ Received class: ", paste(class(x), collapse = ", "))
             }
         })
         
-        ## Filter out interaction terms (contain ":")
-        terms <- terms[!grepl(":", names(terms), fixed = TRUE)]
-
         ## Construct xlevels for the model
         if (is.null(model$xlevels)) {
             model$xlevels <- list()
@@ -645,23 +657,11 @@ Received class: ", paste(class(x), collapse = ", "))
     ## information, and a figure is read without the console output beside it.
     gmodel$nobs <- get_model_nobs(model, class(model)[1])
 
-    ## Calculate total events in original data and percentage analyzed
-    formula_terms <- all.vars(model$formula)
-    if (length(formula_terms) >= 2) {
-        event_var <- formula_terms[2]
-        event_data <- data[[event_var]]
-        
-        ## Handle factor event indicators (rare but possible)
-        if (is.factor(event_data)) {
-            event_binary <- as.numeric(event_data) == 2
-        } else {
-            event_binary <- event_data
-        }
-        
-        total_events <- sum(event_binary, na.rm = TRUE)
-    } else {
-        total_events <- NA
-    }
+    ## Calculate total events in original data and percentage analyzed, with
+    ## the events coded from the model's Surv() response as the model coded
+    ## them (see get_event_indicator())
+    supplied_events <- get_event_indicator(model, data)
+    total_events <- if (is.null(supplied_events)) NA else sum(supplied_events, na.rm = TRUE)
     
     ## Both lines are rendered by the formatter the print methods use, so that
     ## a figure and the table it accompanies disclose in identical terms
@@ -720,11 +720,21 @@ Received class: ", paste(class(x), collapse = ", "))
                               "Concordance Index: Not available"
                           }
 
+    ## Logical predictors are drawn by level, FALSE being the reference, as
+    ## factors are (see add_logical_levels()). Expressions such as
+    ## I(age > 65), which are not columns of the data, are drawn by their
+    ## coefficients as before.
+    logical_vars <- intersect(names(model_data),
+                              get_model_variables(model, class(model)[1]))
+    model$xlevels <- add_logical_levels(model$xlevels,
+                                        terms[names(terms) %in% logical_vars])
+
     ## Extract statistics for every variable - preserving order
     all_terms <- lapply(seq_along(terms), function(i){
         var <- names(terms)[i]
 
-        if (terms[i] %in% c("factor", "character")) {
+        if (terms[i] %in% c("factor", "character") ||
+            (terms[i] %in% "logical" && var %in% names(model$xlevels))) {
             ## Get the factor levels from the model's xlevels (proper order)
             if(var %in% names(model$xlevels)) {
                 factor_levels <- model$xlevels[[var]]
@@ -732,6 +742,7 @@ Received class: ", paste(class(x), collapse = ", "))
                 ## Create data table with proper levels
                 level_counts <- model_data[!is.na(get(var)), .N, by = var]
                 data.table::setnames(level_counts, c("level", "Freq"))
+                level_counts[, level := as.character(level)]
                 
                 ## Ensure all levels are present
                 all_levels_dt <- data.table::data.table(
@@ -759,7 +770,19 @@ Received class: ", paste(class(x), collapse = ", "))
             data.table::data.table(var = var, level = "-", Freq = nrow(model_data), pos = 1, var_order = i)
         }
         else {
-            vars = grep(paste0("^", var, "*."), coef$term, value=TRUE)
+            ## The coefficients of a matrix-valued term (poly(age, 2)1): those
+            ## whose names begin with the term, compared literally and without
+            ## the backticks of non-syntactic names, other than interactions
+            ## and the coefficients of variables whose longer names begin with
+            ## it, which have rows of their own. The pattern formerly used
+            ## matched both, which were then drawn twice.
+            coef_terms <- gsub("`", "", coef$term, fixed = TRUE)
+            own <- startsWith(coef_terms, var) & !grepl(":", coef_terms, fixed = TRUE)
+            for (longer in names(terms)[nchar(names(terms)) > nchar(var) &
+                                        startsWith(names(terms), var)]) {
+                own <- own & !startsWith(coef_terms, longer)
+            }
+            vars <- coef_terms[own]
             data.table::data.table(var = vars, level = "-", Freq = nrow(model_data),
                                    pos = seq_along(vars), var_order = i)
         }
@@ -769,27 +792,14 @@ Received class: ", paste(class(x), collapse = ", "))
 
     data.table::setnames(all_terms_df, c("var", "level", "N", "pos", "var_order"))
 
-    ## Add events
-    if (model_class == "coxme") {
-        formula_terms <- all.vars(model$formulaList$fixed)
-    } else {
-        formula_terms <- all.vars(model$formula)
-    }
+    ## Add events, coded from the event argument of the model's Surv()
+    ## response on the analysis rows. The second variable of the formula was
+    ## taken for the event before: the stop time of a counting-process
+    ## response, the first predictor of a clogit() model, and a status coded
+    ## 1 and 2 summed as it stands.
+    event_binary <- get_event_indicator(model, model_data)
     
-    if (length(formula_terms) >= 2) {
-        ## Assuming standard Surv(time, status) format
-        event_var <- formula_terms[2]
-        event_data <- model_data[[event_var]]
-        
-        ## Handle factor event indicators (rare but possible)
-        if (is.factor(event_data)) {
-            ## Convert to binary (assuming second level is the event)
-            event_binary <- as.numeric(event_data) == 2
-        } else {
-            ## Already numeric
-            event_binary <- event_data
-        }
-        
+    if (!is.null(event_binary)) {
         ## Calculate events for each row
         all_terms_df[, Events := {
             if (level == "-") {
@@ -812,76 +822,59 @@ Received class: ", paste(class(x), collapse = ", "))
     ## ----- INTERACTION TERMS HANDLING -----
     ## Detect and add interaction terms that aren't in all_terms_df
     ## Interaction terms have ":" in their names
-    interaction_terms <- coef$term[grepl(":", coef$term, fixed = TRUE)]
+    interaction_terms <- coef$term[is_interaction_term(gsub("`", "", coef$term, fixed = TRUE),
+                                                       model$xlevels, main_effect_labels(model))]
     
     if (length(interaction_terms) > 0) {
         ## Get the next var_order value
         next_var_order <- max(all_terms_df$var_order) + 1L
         
-        ## Get event variable for calculating events in interactions
-        event_var <- if (length(formula_terms) >= 2) formula_terms[2] else NULL
-        
         ## Process each interaction term
         interaction_rows <- lapply(seq_along(interaction_terms), function(idx) {
-            int_term <- interaction_terms[idx]
+            ## The coefficient table is keyed without the backticks that
+            ## enclose non-syntactic variable names
+            int_term <- gsub("`", "", interaction_terms[idx], fixed = TRUE)
             
-            ## Parse the interaction term to create a readable label
+            ## Match each component of the interaction to the variable it
+            ## names. Taking the first variable whose name the component began
+            ## with left a component such as "`high bp`Yes" unmatched and
+            ## assigned "sexualityHetero" to "sex" when "sex" came first.
+            components <- split_interaction_term(int_term, names(terms), model$xlevels)
+            
+            ## Build a readable label from the components
             ## \emph{e.g.,}, "treatmentDrug A:stageII" -> "Treatment Group (Drug A) × Disease Stage (II)"
-            int_parts <- strsplit(int_term, ":", fixed = TRUE)[[1]]
-            
-            ## Build readable variable name from parts
-            display_parts <- sapply(int_parts, function(part) {
-                ## Try to match against known factor variables to extract var and level
-                matched_result <- NULL
-                for (var_name in names(terms)) {
-                    if (startsWith(part, var_name)) {
-                        level_str <- sub(paste0("^", var_name), "", part)
-                        if (nchar(level_str) > 0) {
-                            ## Apply label if available
-                            var_label <- if (!is.null(labels) && var_name %in% names(labels)) {
-                                             labels[[var_name]]
-                                         } else {
-                                             var_name
-                                         }
-                            matched_result <- paste0(var_label, " (", level_str, ")")
-                            break
-                        }
-                    }
+            display_parts <- sapply(components, function(component) {
+                var_name <- if (is.na(component$var)) component$part else component$var
+                var_label <- if (!is.null(labels) && var_name %in% names(labels)) {
+                                 labels[[var_name]]
+                             } else {
+                                 var_name
+                             }
+                if (is.na(component$level)) {
+                    var_label
+                } else {
+                    paste0(var_label, " (", component$level, ")")
                 }
-                ## If no match found (continuous variable in interaction or exact match)
-                if (is.null(matched_result)) {
-                    var_label <- if (!is.null(labels) && part %in% names(labels)) {
-                                     labels[[part]]
-                                 } else {
-                                     part
-                                 }
-                    matched_result <- var_label
-                }
-                matched_result
             })
             
             display_name <- paste(display_parts, collapse = " \u00d7 ")
             
+            ## The observations of the interaction are those in each of its
+            ## factor levels
+            conditions <- list()
+            for (component in components) {
+                if (!is.na(component$level) &&
+                    terms[component$var] %in% c("factor", "character", "logical") &&
+                    component$var %in% names(data)) {
+                    conditions[[component$var]] <- component$level
+                }
+            }
+
             ## Calculate N and Events for this interaction
             int_n <- NA_integer_
             int_events <- NA_integer_
             
             tryCatch({
-                ## For each part of the interaction, build conditions
-                conditions <- list()
-                for (j in seq_along(int_parts)) {
-                    part <- int_parts[j]
-                    for (var_name in names(terms)) {
-                        if (startsWith(part, var_name) && terms[var_name] %in% c("factor", "character")) {
-                            level_str <- sub(paste0("^", var_name), "", part)
-                            if (nchar(level_str) > 0 && var_name %in% names(data)) {
-                                conditions[[var_name]] <- level_str
-                            }
-                            break
-                        }
-                    }
-                }
-                
                 ## Where conditions were found, count matching rows and events
                 if (length(conditions) > 0) {
                     ## Build subset indices
@@ -891,14 +884,8 @@ Received class: ", paste(class(x), collapse = ", "))
                     }
                     int_n <- sum(subset_indices, na.rm = TRUE)
                     
-                    ## Calculate events if event variable is available
-                    if (!is.null(event_var) && event_var %in% names(model_data)) {
-                        event_data <- model_data[[event_var]]
-                        if (is.factor(event_data)) {
-                            event_binary <- as.numeric(event_data) == 2
-                        } else {
-                            event_binary <- event_data
-                        }
+                    ## Calculate events if they could be coded
+                    if (!is.null(event_binary)) {
                         int_events <- sum(event_binary[subset_indices], na.rm = TRUE)
                     }
                 }
@@ -913,7 +900,7 @@ Received class: ", paste(class(x), collapse = ", "))
                             pos = 1L,
                             var_order = next_var_order + idx - 1L,
                             Events = int_events,
-                            .int_term = int_term  # Store raw term for later inds assignment
+                            .int_term = int_term  # Store term for later inds assignment
                         )
         })
         
@@ -923,6 +910,13 @@ Received class: ", paste(class(x), collapse = ", "))
         all_terms_df <- data.table::rbindlist(list(all_terms_df, interaction_df), 
                                               use.names = TRUE, fill = TRUE)
     }
+
+    ## Coefficients that the model could not estimate because of collinearity
+    ## are omitted, as the regression tables omit them. Having no estimate,
+    ## such a row was drawn as a reference category.
+    all_terms_df <- drop_aliased_rows(all_terms_df, aliased_coefficients(model),
+                                      coef$term, model)
+    stop_if_no_estimates(all_terms_df)
 
     ## Apply condensing and indenting if requested
     if (condense_table || indent_groups) {
@@ -940,7 +934,6 @@ Received class: ", paste(class(x), collapse = ", "))
         } else {
             all_terms_df[, inds := data.table::fifelse(level == "-", var, paste0(var, level))]
         }
-        orig_inds_map <- data.table::copy(all_terms_df[, .(var, level, inds, N, Events)])
         
         processed_rows <- list()
         row_counter <- 1
@@ -1026,18 +1019,14 @@ Received class: ", paste(class(x), collapse = ", "))
                         processed_rows[[row_counter]] <- header_row
                         row_counter <- row_counter + 1
                         
-                        for (i in seq_len(nrow(var_rows))) {
-                            group_row <- data.table::copy(var_rows[i])
-                            group_row[, var := paste0("    ", level)]
-                            group_row[, level := "-"]
-                            processed_rows[[row_counter]] <- group_row
-                            row_counter <- row_counter + 1
-                        }
+                        group_rows <- data.table::copy(var_rows)
+                        group_rows[, var := paste0("    ", level)]
+                        group_rows[, level := "-"]
+                        processed_rows[[row_counter]] <- group_rows
+                        row_counter <- row_counter + 1
                     } else {
-                        for (i in seq_len(nrow(var_rows))) {
-                            processed_rows[[row_counter]] <- var_rows[i]
-                            row_counter <- row_counter + 1
-                        }
+                        processed_rows[[row_counter]] <- var_rows
+                        row_counter <- row_counter + 1
                     }
                 }
             }
@@ -1045,45 +1034,12 @@ Received class: ", paste(class(x), collapse = ", "))
         
         all_terms_df <- data.table::rbindlist(processed_rows, fill = TRUE)
         
-        for (i in seq_len(nrow(all_terms_df))) {
-            current_var <- all_terms_df$var[i]
-            
-            if (is.na(all_terms_df$inds[i]) && !grepl("^    ", current_var) && !grepl("\\(", current_var)) {
-                next
-            }
-            
-            if (grepl("\\(", current_var)) {
-                orig_var <- gsub(" \\(.*\\)", "", current_var)
-                orig_level <- gsub(".*\\((.*)\\)", "\\1", current_var)
-                
-                matching <- orig_inds_map[var == orig_var & level == orig_level]
-                if (nrow(matching) > 0) {
-                    all_terms_df[i, `:=`(inds = matching$inds[1],
-                                         N = matching$N[1],
-                                         Events = matching$Events[1])]
-                }
-            }
-            else if (grepl("^    ", current_var)) {
-                clean_level <- gsub("^    ", "", current_var)
-                
-                parent_var <- NA_character_
-                for (j in (i-1):1) {
-                    if (!grepl("^    ", all_terms_df$var[j]) && all_terms_df$var[j] != "") {
-                        parent_var <- gsub(" \\(.*\\)", "", all_terms_df$var[j])
-                        break
-                    }
-                }
-                
-                if (!is.na(parent_var)) {
-                    matching <- orig_inds_map[var == parent_var & level == clean_level]
-                    if (nrow(matching) > 0) {
-                        all_terms_df[i, `:=`(inds = matching$inds[1],
-                                             N = matching$N[1],
-                                             Events = matching$Events[1])]
-                    }
-                }
-            }
-        }
+        ## Every row already carries the inds, N and Events of the term it
+        ## displays: rows are copied from all_terms_df, and header rows have
+        ## none. The pass that looked them up again by parsing the displayed
+        ## label was redundant, and for an interaction label such as
+        ## "a (Yes) \u00d7 b (Yes)" it matched level Yes of a, replacing the
+        ## interaction estimate and counts with those of the main effect.
     } else {
         ## For non-condensed/non-indented display, set inds for coefficient matching
         ## For interaction rows, use the stored raw term; for others use var+level pattern
@@ -1104,7 +1060,7 @@ Received class: ", paste(class(x), collapse = ", "))
     }
     
     ## Process coefficients
-    coef[, term := gsub(term, pattern = "`", replacement = "-")]
+    coef[, term := gsub(term, pattern = "`", replacement = "")]
     coef[, inds := term]
     
     ## Merge data

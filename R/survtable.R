@@ -19,7 +19,10 @@
 #'
 #' @param by Character string specifying the column name of the stratifying
 #'   variable for group comparisons (\emph{e.g.,} treatment arm, risk group). When
-#'   \code{NULL} (default), produces overall survival summaries only.
+#'   \code{NULL} (default), produces overall survival summaries only. Groups
+#'   appear in the order of the levels of a factor, including empty levels,
+#'   and otherwise in order of first appearance in the data, as in
+#'   \code{desctable()}.
 #'
 #' @param times Numeric vector of time points at which to estimate survival
 #'   probabilities. For example, \code{c(12, 24, 36)} for 1-, 2-, and 3-year
@@ -85,10 +88,11 @@
 #'   comparing survival curves:
 #'   \itemize{
 #'     \item \code{"logrank"} - Log-rank test (default)
-#'     \item \code{"wilcoxon"} - Wilcoxon (Breslow) test
+#'     \item \code{"wilcoxon"} - Gehan-Breslow generalized Wilcoxon test
 #'     \item \code{"tarone"} - Tarone-Ware test
 #'     \item \code{"petopeto"} - Peto-Peto test
 #'   }
+#'   See Details for the weights that define each test.
 #'
 #' @param total Logical or character string controlling the total/overall
 #'   column:
@@ -204,15 +208,25 @@
 #' \strong{Statistical Testing:}
 #'
 #' The log-rank test (default) tests the null hypothesis that survival curves
-#' are identical across groups. Alternative tests weight different parts of
-#' the survival curve:
+#' are identical across groups. It compares the observed and expected numbers
+#' of events in each group at every event time; the alternative tests weight
+#' these comparisons, with \eqn{n_j} subjects at risk and \eqn{d_j} events at
+#' event time \eqn{t_j}:
 #' \itemize{
 #'   \item Log-rank: Equal weights (best for proportional hazards)
-#'   \item Wilcoxon: Weights by number at risk (sensitive to early
-#'     differences)
-#'   \item Tarone-Ware: Weights by square root of number at risk
-#'   \item Peto-Peto: Modified Wilcoxon weights
+#'   \item Gehan-Breslow (\code{"wilcoxon"}): Weights \eqn{n_j}, the number at
+#'     risk, which emphasize early differences
+#'   \item Tarone-Ware: Weights \eqn{\sqrt{n_j}}{sqrt(n_j)}, between the
+#'     log-rank and Gehan-Breslow weights
+#'   \item Peto-Peto: Weights
+#'     \eqn{\tilde{S}(t_j) = \prod_{t_i \le t_j} (1 - d_i / (n_i + 1))}{S(t_j) = prod over t_i <= t_j of (1 - d_i / (n_i + 1))},
+#'     an estimate of the pooled survival function, which also emphasize early
+#'     differences but, unlike the number at risk, do not depend on the
+#'     censoring distribution
 #' }
+#' The log-rank test is computed by \code{survival::survdiff()}. The weighted
+#' tests use the same statistic and variance with the weights above, the
+#' definitions of the SAS LIFETEST and Stata \code{sts test} procedures.
 #'
 #' \strong{Formatting:}
 #'
@@ -344,7 +358,7 @@
 #'     labels = clintrial_labels
 #' )
 #'
-#' # Example 11: Wilcoxon test instead of log-rank
+#' # Example 11: Gehan-Breslow generalized Wilcoxon test instead of log-rank
 #' survtable(
 #'     data = clintrial,
 #'     outcome = "Surv(os_months, os_status)",
@@ -428,6 +442,10 @@ survtable <- function(data,
         data <- data.table::as.data.table(data)
     }
 
+    ## The grouping variable is a column name, which may be given with
+    ## backticks; the formula of the stratified fit quotes it where needed
+    by <- formula_names(by, names(data), quote = FALSE)
+
     ## Resolve number formatting marks
     validate_number_format(number_format)
     marks <- resolve_number_marks(number_format)
@@ -496,6 +514,7 @@ survtable <- function(data,
                 conf_type = conf_type,
                 digits = digits,
                 time_digits = time_digits,
+                p_digits = p_digits,
                 percent = percent,
                 test = test,
                 test_type = test_type,
@@ -530,6 +549,7 @@ survtable <- function(data,
         data.table::setattr(result, "probs", probs)
         data.table::setattr(result, "time_unit", time_unit)
         data.table::setattr(result, "test_result", all_tests)
+        data.table::setattr(result, "p_digits", p_digits)
         data.table::setattr(result, "type", type)
 
         class(result) <- c("survtable", class(result))
@@ -550,6 +570,7 @@ survtable <- function(data,
         conf_type = conf_type,
         digits = digits,
         time_digits = time_digits,
+        p_digits = p_digits,
         percent = percent,
         test = test,
         test_type = test_type,
@@ -584,6 +605,7 @@ survtable <- function(data,
     data.table::setattr(result, "probs", probs)
     data.table::setattr(result, "time_unit", time_unit)
     data.table::setattr(result, "test_result", single_result$test_result)
+    data.table::setattr(result, "p_digits", p_digits)
     data.table::setattr(result, "type", type)
 
     class(result) <- c("survtable", class(result))
@@ -651,17 +673,19 @@ print.survtable <- function(x, ...) {
             ## Single test result
             test_name <- switch(test_result$test_type,
                                 "logrank" = "Log-rank",
-                                "wilcoxon" = "Wilcoxon",
+                                "wilcoxon" = "Gehan-Breslow",
                                 "tarone" = "Tarone-Ware",
                                 "petopeto" = "Peto-Peto")
-            cat("Test: ", test_name, " (p = ", format_pvalue_survtable(test_result$p_value, 3), ")\n", sep = "")
+            p_text <- format_pvalue_survtable(test_result$p_value, attr(x, "p_digits") %||% 3)
+            p_text <- if (startsWith(p_text, "<")) paste("p", p_text) else paste("p =", p_text)
+            cat("Test: ", test_name, " (", p_text, ")\n", sep = "")
         } else if (is.list(test_result) && length(test_result) > 0) {
             ## Multiple test results - show first one's type
             first_test <- test_result[[1]]
             if (!is.null(first_test)) {
                 test_name <- switch(first_test$test_type,
                                     "logrank" = "Log-rank",
-                                    "wilcoxon" = "Wilcoxon",
+                                    "wilcoxon" = "Gehan-Breslow",
                                     "tarone" = "Tarone-Ware",
                                     "petopeto" = "Peto-Peto")
                 cat("Test: ", test_name, "\n", sep = "")
@@ -696,6 +720,7 @@ print.survtable <- function(x, ...) {
 #' @param conf_type Character string specifying confidence interval type.
 #' @param digits Integer decimal places for percentages.
 #' @param time_digits Integer decimal places for time values.
+#' @param p_digits Integer decimal places for \emph{p}-values.
 #' @param percent Logical whether to display as percentages.
 #' @param test Logical whether to perform a group comparison test.
 #' @param test_type Character string specifying test type.
@@ -725,6 +750,7 @@ process_single_outcome <- function(data,
                                    conf_type,
                                    digits,
                                    time_digits,
+                                   p_digits = 3,
                                    percent,
                                    test,
                                    test_type,
@@ -747,8 +773,9 @@ process_single_outcome <- function(data,
              "\nExpected format: Surv(time_var, status_var)")
     }
 
-    time <- trimws(surv_parts[2])
-    status <- trimws(surv_parts[3])
+    ## A non-syntactic name may be quoted with backticks
+    time <- gsub("^`(.*)`$", "\\1", trimws(surv_parts[2]))
+    status <- gsub("^`(.*)`$", "\\1", trimws(surv_parts[3]))
 
     if (!time %in% names(data)) {
         stop("Time variable '", time, "' not found in data")
@@ -778,12 +805,19 @@ process_single_outcome <- function(data,
     groups <- NULL
     group_labels <- NULL
     if (!is.null(by)) {
+        ## Groups follow the data, as in desctable(): the levels of a factor
+        ## as given, and the values of other variables in order of first
+        ## appearance
         grp_vec <- data[[by]]
-        if (is.factor(grp_vec)) {
-            groups <- levels(grp_vec)
-        } else {
-            groups <- sort(unique(grp_vec))
-            groups <- groups[!is.na(groups)]
+        groups <- derive_group_levels(grp_vec)
+        if (!is.factor(grp_vec)) {
+            ## survfit() orders the strata of other variables by sorted value.
+            ## Coding the groups as a factor keeps the strata of the stored
+            ## fit in the order of the table. The complete-case subset above
+            ## is already a copy; otherwise the data are copied so that the
+            ## caller's table is not modified by reference.
+            if (!na_rm) data <- data.table::copy(data)
+            data.table::set(data, j = by, value = factor(grp_vec, levels = groups))
         }
 
         ## Apply labels to groups
@@ -801,10 +835,19 @@ process_single_outcome <- function(data,
     ## Fit survival models
     if (!is.null(by)) {
         ## Stratified analysis
-        fit_formula <- stats::as.formula(paste("surv_obj ~", by))
+        fit_formula <- stats::as.formula(paste("surv_obj ~",
+                                               formula_names(by, names(data))))
         fit_stratified <- survival::survfit(fit_formula, data = data,
                                             conf.int = conf_level,
                                             conf.type = conf_type, ...)
+
+        ## survfit() returns no strata when a single group has observations.
+        ## Naming that group's stratum lets the table find its estimates.
+        if (is.null(fit_stratified$strata)) {
+            observed <- data[[by]][!is.na(surv_obj) & !is.na(data[[by]])]
+            fit_stratified$strata <- stats::setNames(length(fit_stratified$time),
+                                                     paste0(by, "=", observed[1L]))
+        }
         survfit_objects$stratified <- fit_stratified
 
         ## Also fit overall
@@ -911,7 +954,7 @@ process_single_outcome <- function(data,
 
     ## Add p-value column if test performed
     if (!is.null(p_value)) {
-        result <- add_pvalue_column(result, p_value, 3, marks)  # p_digits handled in main
+        result <- add_pvalue_column(result, p_value, p_digits, marks)
     }
 
     ## Rename Group to match desctable pattern when stacking multiple outcomes

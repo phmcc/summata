@@ -33,7 +33,12 @@
 #' @param conf_level Numeric confidence level for confidence intervals. Must be
 #'   between 0 and 1. Default is 0.95 (95\% confidence intervals). The CI
 #'   percentage is automatically displayed in column headers (\emph{e.g.,} "90\% CI"
-#'   when \code{conf_level = 0.90}).
+#'   when \code{conf_level = 0.90}). At the level of the \code{multifit()}
+#'   result, the intervals of its table are drawn; at another level, they are
+#'   computed from the coefficients and their standard errors, with the
+#'   \emph{t} distribution on the residual degrees of freedom for linear
+#'   models whose table holds exact \emph{t} intervals, and as Wald
+#'   intervals otherwise.
 #'   
 #' @param font_size Numeric multiplier controlling the base font size for all 
 #'   text elements. Default is 1.0.
@@ -411,6 +416,12 @@ multiforest <- function(x,
                 ci_upper = ci_upper_adj,
                 p_value = p_adj
             )]
+            if (all(c("coefficient_adj", "se_adj") %in% names(dt))) {
+                dt[, `:=`(coefficient = coefficient_adj, se = se_adj)]
+            }
+            if ("df_residual_adj" %in% names(dt)) {
+                dt[, df_residual := df_residual_adj]
+            }
         } else {
             dt[, `:=`(
                 exp_coef = exp_coef_unadj,
@@ -418,6 +429,12 @@ multiforest <- function(x,
                 ci_upper = ci_upper_unadj,
                 p_value = p_unadj
             )]
+            if (all(c("coefficient_unadj", "se_unadj") %in% names(dt))) {
+                dt[, `:=`(coefficient = coefficient_unadj, se = se_unadj)]
+            }
+            if ("df_residual_unadj" %in% names(dt)) {
+                dt[, df_residual := df_residual_unadj]
+            }
         }
     }
     
@@ -428,21 +445,34 @@ multiforest <- function(x,
         }
     }
     
-    ## Convert to log scale using conf_level for CI calculation
-    if ("coefficient" %in% names(dt)) {
-        dt[, estimate := coefficient]
-        if ("se" %in% names(dt)) {
-            z_crit <- qnorm((1 + conf_level) / 2)
-            dt[, conf_low := coefficient - z_crit * se]
-            dt[, conf_high := coefficient + z_crit * se]
+    ## Draw the estimates and intervals of the table: profile likelihood or
+    ## exact t intervals where multifit() computed them, on the log scale for
+    ## ratio measures and as they are for coefficients. Intervals from the
+    ## coefficient and its standard error are drawn only when a different
+    ## confidence level is requested than the table was computed at: with the
+    ## t quantile on the residual degrees of freedom where the table holds
+    ## the exact t intervals of a linear model, and as Wald intervals
+    ## otherwise.
+    ratio_effect <- effect_type %in% c("OR", "HR", "RR")
+    table_level <- attr(x, "conf_level")
+    can_recompute <- all(c("coefficient", "se") %in% names(dt))
+    use_table_ci <- !can_recompute ||
+        (!is.null(table_level) && isTRUE(all.equal(table_level, conf_level)))
+    if (use_table_ci) {
+        if (ratio_effect) {
+            dt[, `:=`(estimate = log(exp_coef),
+                      conf_low = log(ci_lower),
+                      conf_high = log(ci_upper))]
         } else {
-            dt[, conf_low := log(ci_lower)]
-            dt[, conf_high := log(ci_upper)]
+            dt[, `:=`(estimate = exp_coef,
+                      conf_low = ci_lower,
+                      conf_high = ci_upper)]
         }
     } else {
-        dt[, estimate := log(exp_coef)]
-        dt[, conf_low := log(ci_lower)]
-        dt[, conf_high := log(ci_upper)]
+        z_crit <- interval_quantile(conf_level, dt[["df_residual"]])
+        dt[, `:=`(estimate = coefficient,
+                  conf_low = coefficient - z_crit * se,
+                  conf_high = coefficient + z_crit * se)]
     }
     
     ## Rename columns to match glmforest format

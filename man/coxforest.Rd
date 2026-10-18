@@ -295,6 +295,13 @@ If the model includes stratification (\code{strata()}) or clustering
   \item Both are handled automatically by the function
 }
 
+\strong{Aliased Coefficients:}
+
+Coefficients that the model could not estimate because their columns of
+the model matrix are linear combinations of others are omitted, as in the
+tables of \code{fit()}, together with any factor none of whose levels was
+estimated.
+
 \strong{Proportional Hazards Assumption:}
 
 The forest plot assumes proportional hazards (constant HR over time). Users 

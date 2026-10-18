@@ -45,7 +45,9 @@ Required for formula-based workflow; ignored if \code{model} is provided.}
 the model. All predictors are included simultaneously (multivariable model). 
 For univariable models, provide a single predictor. Can include continuous, 
 categorical (factor), or binary variables. Required for formula-based
-workflow; ignored if \code{model} is provided.}
+workflow; ignored if \code{model} is provided.
+Non-syntactic names (\emph{e.g.,} \code{"tumor stage"}) are quoted in
+the model formula and need no backticks.}
 
 \item{model}{Optional pre-fitted model object to format. When provided,
 \code{outcome} and \code{predictors} are ignored and the model is formatted

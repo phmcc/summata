@@ -69,7 +69,9 @@ as \code{"< 0.001"} (for \code{p_digits = 3}), \code{"< 0.0001"} (for
 \item{conf_level}{Numeric confidence level for confidence intervals. Must be
 between 0 and 1. Default is 0.95 (95\% confidence intervals). The CI
 percentage is automatically displayed in column headers (\emph{e.g.,} "90\% CI"
-when \code{conf_level = 0.90}).}
+when \code{conf_level = 0.90}). Intervals are computed by the method that
+\code{getOption("summata.conf_method")} selects, as in \code{fit()};
+those of a \code{fit()} result at the same level are reused.}
 
 \item{font_size}{Numeric multiplier controlling the base font size for all 
 text elements. Values > 1 increase all fonts proportionally, values < 1 
@@ -282,9 +284,16 @@ alphabetically for character variables) serves as the reference category:
   \item Displayed with the \code{ref_label} instead of an estimate
   \item No confidence interval or \emph{p}-value shown
   \item Visually aligned with other categories
-  \item When \code{condense_table = TRUE}, reference-only variables may be 
+  \item When \code{condense_table = TRUE}, reference-only variables may be
     omitted entirely
 }
+
+\strong{Aliased Coefficients:}
+
+Coefficients that the model could not estimate because their columns of
+the model matrix are linear combinations of others are omitted, as in the
+tables of \code{fit()}, together with any factor none of whose levels was
+estimated.
 
 \strong{Layout Optimization:}
 

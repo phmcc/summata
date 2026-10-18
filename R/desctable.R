@@ -141,7 +141,11 @@
 #'
 #' @param ... Additional arguments passed to the underlying statistical test
 #'   functions (\emph{e.g.}, \code{var.equal = TRUE} for \emph{t}-tests,
-#'   \code{simulate.p.value = TRUE} for Fisher test).
+#'   \code{simulate.p.value = TRUE} for Fisher test, \code{rho = 1} for the
+#'   Fleming-Harrington \eqn{G^1}{G1} test of survival curves). Each argument
+#'   is passed only to the tests that accept it, so arguments for different
+#'   tests may be combined in one call. Arguments that no test accepts are
+#'   ignored with a warning.
 #'
 #' @return A data.table with S3 class \code{"desctable"} containing formatted
 #'   descriptive statistics. The table structure includes:
@@ -198,8 +202,16 @@
 #'     for mean-based statistics; non-parametric tests (Wilcoxon,
 #'     Kruskal-Wallis) for median-based statistics
 #'   \item \strong{Categorical with "auto"}: Fisher exact test when any
-#'     expected cell frequency < 5; \eqn{\chi^2} test otherwise
-#'   \item \strong{Survival}: Log-rank test for comparing survival curves
+#'     expected cell frequency < 5; \eqn{\chi^2} test otherwise. Levels and
+#'     groups without observations, and observations with a missing group,
+#'     are excluded from the test. When \code{stats::fisher.test()}
+#'     cannot complete the exact computation within its workspace, as is
+#'     common for tables larger than 2 \eqn{\times}{x} 2 with a few hundred
+#'     observations or more, the \emph{p}-value is a Monte Carlo estimate
+#'     from 10,000 simulated tables and a warning is issued
+#'   \item \strong{Survival}: Log-rank test for comparing survival curves, or
+#'     another test of the \eqn{G^\rho}{G-rho} family of
+#'     \code{survival::survdiff()} when \code{rho} is supplied
 #'   \item \strong{Range statistics}: No \emph{p}-value computed (ranges
 #'     are descriptive)
 #' }
@@ -216,6 +228,25 @@
 #'     denominator
 #'   \item \strong{Survival}: NAs in time or event excluded from analysis
 #' }
+#'
+#' \strong{Order of Rows and Columns:}
+#'
+#' Rows and columns follow the order of the data rather than a sorted order:
+#' \itemize{
+#'   \item Variables appear in the order of \code{variables}, and the
+#'     statistics of each continuous variable in the order of
+#'     \code{stats_continuous}
+#'   \item The categories of a factor appear in the order of its levels,
+#'     including levels without observations; the categories of a character
+#'     or logical variable appear in order of first appearance in the data.
+#'     The category of missing values, when shown, appears last
+#'   \item The group columns follow the same rule for the grouping variable
+#'     named in \code{by}
+#' }
+#' Regression models code a character variable as a factor with sorted
+#' levels, so the tables of \code{fit()} list its categories in sorted
+#' order. Converting the variable to a factor with its levels in the
+#' intended order gives the same order in both tables.
 #'
 #' \strong{Formatting Conventions:}
 #'
@@ -466,6 +497,19 @@ desctable <- function(data,
     validate_number_format(number_format)
     marks <- resolve_number_marks(number_format)
     
+    ## Arguments in ... are forwarded by name to the tests that accept them;
+    ## report any argument that no test accepts rather than dropping it silently
+    dot_args <- list(...)
+    if (length(dot_args) > 0L) {
+        dot_names <- names(dot_args) %||% rep("", length(dot_args))
+        unused <- dot_names == "" | !dot_names %chin% test_arg_names()
+        if (any(unused)) {
+            shown <- ifelse(dot_names[unused] == "", "<unnamed>", dot_names[unused])
+            warning("Arguments not accepted by any test in desctable() were ignored: ",
+                    paste(shown, collapse = ", "), call. = FALSE)
+        }
+    }
+
     ## Set group_var from 'by' parameter
     group_var <- by
     group_var_label <- NULL
@@ -480,6 +524,14 @@ desctable <- function(data,
     ## Variables are already provided as a vector
     vars <- variables
     
+    ## Group structure, derived once and shared by every variable
+    groups <- NULL
+    group_index <- NULL
+    if (!is.null(group_var)) {
+        groups <- derive_group_levels(data[[group_var]])
+        group_index <- derive_group_index(data[[group_var]], groups)
+    }
+
     ## Pre-allocate result lists
     n_vars <- length(vars)
     result_list <- vector("list", n_vars)
@@ -507,6 +559,8 @@ desctable <- function(data,
             total_label = total_label,
             labels = labels,
             marks = marks,
+            groups = groups,
+            group_index = group_index,
             ...
         )
         
@@ -534,16 +588,6 @@ desctable <- function(data,
 
     ## Add N row as first row (for both grouped and ungrouped tables)
     if (!is.null(group_var)) {
-        ## Get the group values in the correct order
-        if (is.factor(data[[group_var]])) {
-            ## Use factor levels for proper ordering
-            groups <- levels(data[[group_var]])
-        } else {
-            ## Fall back to unique values for non-factors
-            groups <- unique(data[[group_var]])
-            groups <- groups[!is.na(groups)]
-        }
-        
         ## Create N row
         n_row <- data.table::data.table(
                                  Variable = "N",
@@ -557,11 +601,10 @@ desctable <- function(data,
         }
         
         ## Calculate for each group in the correct order
-        for (grp in groups) {
-            grp_col <- as.character(grp)
+        for (j in seq_along(groups)) {
+            grp_col <- as.character(groups[j])
             if (grp_col %chin% names(result)) {
-                n_group <- sum(data[[group_var]] == grp, na.rm = TRUE)
-                n_row[[grp_col]] <- format_count(n_group, marks)
+                n_row[[grp_col]] <- format_count(length(group_index[[j]]), marks)
             }
         }
         

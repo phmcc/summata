@@ -19,6 +19,8 @@ process_continuous(
   total_label,
   p_per_stat = FALSE,
   marks = NULL,
+  groups = NULL,
+  group_index = NULL,
   ...
 )
 }
@@ -50,6 +52,11 @@ process_continuous(
 \item{p_per_stat}{Logical. If TRUE, calculate separate \emph{p}-values for each 
 statistic type (\emph{e.g.,} t-test for means, Wilcoxon for medians). If \code{FALSE}
 (default), calculate a single \emph{p}-value based on the first statistic type.}
+
+\item{groups}{Optional vector of groups (see \code{process_variable()}).}
+
+\item{group_index}{Optional list of row positions for each group (see
+\code{process_variable()}).}
 
 \item{...}{Additional arguments passed to test functions.}
 }

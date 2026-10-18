@@ -139,7 +139,11 @@
 #' concordance (discrimination), and model convergence status.
 #' 
 #' For GLMs, McFadden's pseudo-R-squared is calculated as 1 - (logLik/logLik_null).
-#' For survival models, the global \emph{p}-value comes from the log-rank test.
+#' For Cox models, the global \emph{p}-value is that of the likelihood-ratio
+#' test of all coefficients. For linear mixed-effects models fitted by REML,
+#' AIC, BIC, and the global likelihood-ratio test are computed from maximum
+#' likelihood refits (\code{lme4::refitML()}), because REML likelihoods are not
+#' comparable between models with different fixed effects.
 #' 
 #' Models that fail to converge are flagged and penalized in the composite score.
 #' 
@@ -374,6 +378,17 @@ compfit <- function(data,
         }
     }
 
+    ## Confidence intervals reach the output only with include_coefficients =
+    ## TRUE. Otherwise Wald intervals stand in for the profile likelihood
+    ## intervals of generalized linear models, which account for most of the
+    ## fitting time and are not displayed. A conf_method passed through ...
+    ## is honored.
+    use_wald <- !include_coefficients && !"conf_method" %in% names(list(...))
+    if (use_wald) {
+        op <- options(summata.conf_method = "wald")
+        on.exit(options(op), add = TRUE)
+    }
+
     ## Initialize results storage
     n_models <- length(model_list)
     comparison_list <- vector("list", n_models)
@@ -430,7 +445,8 @@ compfit <- function(data,
                                    BIC = NA_real_,
                                    `Pseudo-R^2` = NA_real_,
                                    Concordance = NA_real_,
-                                   `Global p` = NA_real_
+                                   `Global p` = NA_real_,
+                                   .global_p = NA_real_
                                )
             ## Add model-type specific columns for failed models
             if (model_type %in% c("glm", "negbin")) {
@@ -449,6 +465,12 @@ compfit <- function(data,
             ## Extract model and raw data
             model <- attr(model_result, "model")
             raw_data <- attr(model_result, "raw_data")
+            if (use_wald) {
+                ## Intervals computed only for speed are not cached on the
+                ## returned model, so a later forest plot computes its own
+                attr(model, "cached_confint") <- NULL
+                attr(model, "cached_confint_level") <- NULL
+            }
             models[[model_names[i]]] <- model
             
             ## Store coefficients if requested
@@ -473,7 +495,8 @@ compfit <- function(data,
                                    BIC = if (!is.null(metrics$bic) && !is.na(metrics$bic)) round(metrics$bic, 1) else NA_real_,
                                    `Pseudo-R^2` = if (!is.null(metrics$pseudo_r2) && !is.na(metrics$pseudo_r2)) round(metrics$pseudo_r2, 3) else NA_real_,
                                    Concordance = if (!is.null(metrics$concordance) && !is.na(metrics$concordance)) round(metrics$concordance, 3) else NA_real_,
-                                   `Global p` = if (!is.null(metrics$global_p) && !is.na(metrics$global_p)) format_pvalues_fit(metrics$global_p, p_digits, marks) else NA_character_
+                                   `Global p` = if (!is.null(metrics$global_p) && !is.na(metrics$global_p)) format_pvalues_fit(metrics$global_p, p_digits, marks) else NA_character_,
+                                   .global_p = if (!is.null(metrics$global_p)) as.numeric(metrics$global_p) else NA_real_
                                )
             
             ## Add model-type specific columns
@@ -533,6 +556,9 @@ compfit <- function(data,
 
     ## Calculate scores and sort
     comparison <- calculate_model_scores(comparison, model_type, scoring_weights)
+
+    ## The unformatted global p-value is used only for scoring
+    comparison[, .global_p := NULL]
 
     ## Rename columns from ASCII to Unicode superscripts for display
     col_renames <- c(

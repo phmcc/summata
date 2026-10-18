@@ -169,6 +169,23 @@ format_column_headers_html <- function (col_names) {
     return(col_names)
 }
 
+#' Find the effect columns of a regression table
+#'
+#' Regression tables name each effect column after its measure and the
+#' confidence level of its intervals: "OR (95\% CI)", "aHR (90\% CI)",
+#' "Adj. Coefficient (95\% CI)", "Exp(Coef) (99\% CI)". Descriptive and
+#' survival tables have no such column; their interval columns, such as
+#' "Median (95\% CI)" in \code{survtable()}, name a statistic rather than an
+#' effect measure.
+#'
+#' @param col_names Character vector of column names.
+#' @return Character vector of the names that denote effect columns.
+#' @keywords internal
+effect_ci_columns <- function(col_names) {
+    grep("(OR|HR|RR|Coefficient|Estimate|Exp\\(Coef\\)) \\([0-9]+% CI\\)$",
+         col_names, value = TRUE)
+}
+
 #' Apply formatting to indented groups
 #' 
 #' Transforms tables with Variable/Group columns into indented format where
@@ -186,14 +203,10 @@ format_indented_groups <- function (df, indent_string = "    ") {
     
     var_rows <- which(df$Variable != "")
     p_cols <- grep("p-value|Uni p|Multi p", names(df), value = TRUE)
-    effect_cols <- c("OR (95% CI)", "HR (95% CI)", "RR (95% CI)", "Estimate (95% CI)",
-                     "Coefficient (95% CI)",  # ADD THIS
-                     "Univariable OR (95% CI)", "Multivariable aOR (95% CI)", 
-                     "Univariable HR (95% CI)", "Multivariable aHR (95% CI)",
-                     "Univariable RR (95% CI)", "Multivariable aRR (95% CI)",
-                     "Univariable Estimate (95% CI)", "Multivariable Estimate (95% CI)",
-                     "Univariable Coefficient (95% CI)", "Multivariable Coefficient (95% CI)")
-    is_regression_table <- any(effect_cols %chin% names(df))
+    ## Effect columns are named "<measure> (<level>% CI)" at any confidence
+    ## level: "OR (95% CI)", "aOR (95% CI)", "Adj. Coefficient (90% CI)", ...
+    effect_cols <- effect_ci_columns(names(df))
+    is_regression_table <- length(effect_cols) > 0
     is_fullfit_table <- any(c("Uni p", "Multi p") %chin% names(df))
     new_df <- data.table()
     
@@ -310,8 +323,9 @@ condense_table_rows <- function(df, indent_groups = TRUE) {
     ## Work with a copy
     result <- data.table::copy(as.data.table(df))
     
-    ## Detect table type
-    is_descriptive <- !any(grepl("(OR|HR|RR|Coefficient|Estimate).*\\(95% CI\\)", names(result)))
+    ## Detect table type: regression tables have an effect column named
+    ## "<measure> (<level>% CI)"
+    is_descriptive <- length(effect_ci_columns(names(result))) == 0L
     
     ## Track rows to delete
     rows_to_delete <- integer()
@@ -352,12 +366,12 @@ condense_table_rows <- function(df, indent_groups = TRUE) {
                     stat_type <- gsub("\\s*\\(.*\\)", "", groups[1])
                     stat_type <- gsub("\\s*\\+/-.*", "", stat_type)
                     if (stat_type != "" && !is.na(stat_type) && stat_type != "-") {
-                        if (grepl("Mean \\+/- SD", groups[1])) {
-                            result[var_start, Variable := paste0(var_name, ", mean +/- SD")]
+                        if (grepl("^Mean (\\+/-|\u00B1) SD$", groups[1])) {
+                            result[var_start, Variable := paste0(var_name, ", ", sub("^Mean", "mean", groups[1]))]
                         } else if (grepl("Median", groups[1]) && grepl("IQR", groups[1])) {
                             result[var_start, Variable := paste0(var_name, ", median [IQR]")]
                         } else if (grepl("Median", groups[1]) && is_survival) {
-                            result[var_start, Variable := paste0(var_name, ", median (95% CI)")]
+                            result[var_start, Variable := paste0(var_name, ", ", sub("^Median", "median", groups[1]))]
                         } else {
                             result[var_start, Variable := paste0(var_name, ", ", tolower(stat_type))]
                         }
@@ -391,8 +405,24 @@ condense_table_rows <- function(df, indent_groups = TRUE) {
                     ## Use effect column if found, otherwise fall back to first data column
                     check_col <- if (!is.null(effect_col)) effect_col else data_cols[1]
                     
-                    ## Find non-reference row by checking for actual data (not "-", "reference", etc.)
-                    non_ref_idx <- which(!var_rows[[check_col]] %chin% c("-", "reference", "Reference", ""))
+                    ## Find the level to display. A regression table marks its
+                    ## reference level ("reference" or "-") in the effect column.
+                    ## A descriptive table reports counts on every level, so its
+                    ## second level is displayed and the first, as in a
+                    ## regression model, serves as the reference, unless only
+                    ## the second is a negative category such as "No" (levels
+                    ## of a character variable appear in order of occurrence).
+                    non_ref_idx <- if (is_descriptive) {
+                                       levels_idx <- which(groups != "" & !is.na(groups))
+                                       if (is_reference_category(groups[levels_idx[2]]) &&
+                                           !is_reference_category(groups[levels_idx[1]])) {
+                                           levels_idx[1]
+                                       } else {
+                                           levels_idx[2]
+                                       }
+                                   } else {
+                                       which(!var_rows[[check_col]] %chin% c("-", "reference", "Reference", ""))
+                                   }
                     
                     if (length(non_ref_idx) > 1) {
                         ## Multiple non-ref rows - take the first one
@@ -427,12 +457,17 @@ condense_table_rows <- function(df, indent_groups = TRUE) {
                             }
                         }
                         
-                        ## Copy p-value
+                        ## Copy p-value: a regression table reports it on the
+                        ## displayed level, a descriptive table on the first row
                         if ("p-value" %chin% names(result)) {
-                            pval <- result[var_start:var_end, `p-value`]
-                            pval <- pval[!is.na(pval) & pval != ""]
-                            if (length(pval) > 0) {
-                                result[var_start, `p-value` := pval[1]]
+                            if (is_descriptive) {
+                                pval <- result[var_start:var_end, `p-value`]
+                                pval <- pval[!is.na(pval) & pval != ""]
+                                if (length(pval) > 0) {
+                                    result[var_start, `p-value` := pval[1]]
+                                }
+                            } else {
+                                result[var_start, `p-value` := result[non_ref_row, `p-value`]]
                             }
                         }
                         
@@ -475,8 +510,9 @@ condense_quantitative_rows <- function(df, indent_groups = TRUE) {
     ## Work with a copy
     result <- data.table::copy(as.data.table(df))
     
-    ## Detect table type - only apply to descriptive tables
-    is_descriptive <- !any(grepl("(OR|HR|RR|Coefficient|Estimate).*\\(95% CI\\)", names(result)))
+    ## Detect table type - only apply to descriptive tables, which have no
+    ## effect column named "<measure> (<level>% CI)"
+    is_descriptive <- length(effect_ci_columns(names(result))) == 0L
     
     if (!is_descriptive) {
         warning("condense_quantitative only applies to descriptive tables. Returning unchanged.")
@@ -518,12 +554,12 @@ condense_quantitative_rows <- function(df, indent_groups = TRUE) {
                 stat_type <- gsub("\\s*\\(.*\\)", "", groups[1])
                 stat_type <- gsub("\\s*\\+/-.*", "", stat_type)
                 if (stat_type != "" && !is.na(stat_type) && stat_type != "-") {
-                    if (grepl("Mean \\+/- SD", groups[1])) {
-                        result[var_start, Variable := paste0(var_name, ", mean +/- SD")]
+                    if (grepl("^Mean (\\+/-|\u00B1) SD$", groups[1])) {
+                        result[var_start, Variable := paste0(var_name, ", ", sub("^Mean", "mean", groups[1]))]
                     } else if (grepl("Median", groups[1]) && grepl("IQR", groups[1])) {
                         result[var_start, Variable := paste0(var_name, ", median [IQR]")]
                     } else if (grepl("Median", groups[1]) && is_survival) {
-                        result[var_start, Variable := paste0(var_name, ", median (95% CI)")]
+                        result[var_start, Variable := paste0(var_name, ", ", sub("^Median", "median", groups[1]))]
                     } else {
                         result[var_start, Variable := paste0(var_name, ", ", tolower(stat_type))]
                     }
@@ -759,6 +795,32 @@ format_column_headers_with_n_tex <- function(col_names, n_row_data) {
 }
 
 
+#' Identify significant formatted \emph{p}-values
+#'
+#' Reads \emph{p}-values as they appear in formatted tables, with the decimal
+#' mark of any locale and with or without a threshold prefix (\code{"0.023"},
+#' \code{"0,023"}, \code{"< 0.001"}, \code{"< 0,0001"}). A value given as
+#' below a threshold is significant when that threshold does not exceed
+#' \code{p_threshold}; any other value is significant when it is below
+#' \code{p_threshold}. Empty cells, placeholders such as \code{"-"}, and
+#' other text are not significant.
+#'
+#' @param x Character vector of formatted \emph{p}-values.
+#' @param p_threshold Numeric threshold for significance.
+#' @return Logical vector of the same length as \code{x}.
+#' @keywords internal
+is_significant_pvalue <- function(x, p_threshold = 0.05) {
+    x <- trimws(as.character(x))
+    below <- grepl("^<", x)
+    num <- gsub("\\s", "", sub("^<", "", x))
+    ## p-values have no thousands mark, so any single character between the
+    ## integer and fractional digits is the decimal mark
+    num <- sub("^([0-9]+)[^0-9]([0-9]+)$", "\\1.\\2", num)
+    value <- suppressWarnings(as.numeric(num))
+    !is.na(value) & ifelse(below, value <= p_threshold, value < p_threshold)
+}
+
+
 #' Format \emph{p}-values for exported tables (TeX)
 #' 
 #' Applies bold formatting to significant \emph{p}-values in LaTeX tables using
@@ -772,29 +834,10 @@ format_pvalues_export_tex <- function (df, p_threshold = 0.05) {
     for (col in names(df)) {
         if (col == "p-value" || col == "Uni p" || col == "Multi p" || 
             grepl("p.value|pvalue", col, ignore.case = TRUE)) {
-            for (i in seq_len(nrow(df))) {
-                cell_value <- as.character(df[[col]][i])
-                if (is.na(cell_value) || cell_value == "" || 
-                    cell_value == "NA" || grepl("\\\\textbf", cell_value)) {
-                    next
-                }
-                is_significant <- FALSE
-                if (grepl("^<\\s*0\\.001", cell_value)) {
-                    is_significant <- TRUE
-                }
-                else if (grepl("^[0-9]\\.[0-9]", cell_value) || 
-                         grepl("^0\\.[0-9]", cell_value)) {
-                    p_numeric <- suppressWarnings(as.numeric(gsub("[^0-9.]", 
-                                                                  "", cell_value)))
-                    if (!is.na(p_numeric) && p_numeric < p_threshold) {
-                        is_significant <- TRUE
-                    }
-                }
-                if (is_significant) {
-                    df[[col]][i] <- paste0("\\textbf{", cell_value, 
-                                           "}")
-                }
-            }
+            vals <- as.character(df[[col]])
+            bold <- is_significant_pvalue(vals, p_threshold) &
+                !grepl("\\\\textbf", vals)
+            df[[col]][bold] <- paste0("\\textbf{", vals[bold], "}")
         }
     }
     return(df)
@@ -854,28 +897,9 @@ format_pvalues_export_html <- function (df, p_threshold = 0.05) {
     for (col in names(df)) {
         if (col == "p-value" || col == "Uni p" || col == "Multi p" || 
             grepl("p.value|pvalue", col, ignore.case = TRUE)) {
-            for (i in seq_len(nrow(df))) {
-                cell_value <- as.character(df[[col]][i])
-                if (is.na(cell_value) || cell_value == "" || 
-                    cell_value == "NA") {
-                    next
-                }
-                is_significant <- FALSE
-                if (grepl("^<\\s*0\\.001", cell_value)) {
-                    is_significant <- TRUE
-                }
-                else if (grepl("^[0-9]\\.[0-9]", cell_value) || 
-                         grepl("^0\\.[0-9]", cell_value)) {
-                    p_numeric <- suppressWarnings(as.numeric(gsub("[^0-9.]", 
-                                                                  "", cell_value)))
-                    if (!is.na(p_numeric) && p_numeric < p_threshold) {
-                        is_significant <- TRUE
-                    }
-                }
-                if (is_significant) {
-                    df[[col]][i] <- paste0("<b>", cell_value, "</b>")
-                }
-            }
+            vals <- as.character(df[[col]])
+            bold <- is_significant_pvalue(vals, p_threshold)
+            df[[col]][bold] <- paste0("<b>", vals[bold], "</b>")
         }
     }
     return(df)
@@ -1134,12 +1158,7 @@ bold_pvalues_ft <- function(ft, df, p_threshold = 0.05) {
             vals <- df[[p_col]]
             
             ## Significance check
-            is_very_small <- grepl("^<\\s*0\\.001", vals)
-            p_numeric <- suppressWarnings(as.numeric(gsub("[^0-9.]", "", vals)))
-            is_small_numeric <- !is.na(p_numeric) & p_numeric < p_threshold
-            
-            sig_rows <- which((is_very_small | is_small_numeric) & 
-                              vals != "" & !is.na(vals))
+            sig_rows <- which(is_significant_pvalue(vals, p_threshold))
             
             ## Bulk bold operation
             if (length(sig_rows) > 0) {

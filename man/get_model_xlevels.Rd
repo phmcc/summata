@@ -15,6 +15,7 @@ Named list of factor levels, or \code{NULL} if no factors present.
 \description{
 Extracts factor level information from fitted model objects. Handles both
 S3 models (glm, lm, coxph) via xlevels slot and S4 models (lme4) via
-the model frame.
+the model frame. Logical predictors are included with the levels
+\code{"FALSE"} and \code{"TRUE"} (see \code{add_logical_levels()}).
 }
 \keyword{internal}

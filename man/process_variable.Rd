@@ -23,6 +23,8 @@ process_variable(
   na_percent,
   p_per_stat = FALSE,
   marks = NULL,
+  groups = NULL,
+  group_index = NULL,
   ...
 )
 }
@@ -64,6 +66,13 @@ continuous variables. Default \code{FALSE} for better performance.}
 
 \item{marks}{List with \code{big.mark} and \code{decimal.mark} as returned
 by \code{\link{resolve_number_marks}}.}
+
+\item{groups}{Optional vector of groups, as returned by
+\code{derive_group_levels()}. Derived from the data when \code{NULL}.}
+
+\item{group_index}{Optional list of row positions for each group, as
+returned by \code{derive_group_index()}. Derived from the data when
+\code{NULL}.}
 
 \item{...}{Additional arguments passed to test functions.}
 }

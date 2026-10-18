@@ -4,7 +4,8 @@
 #' 
 #' Extracts factor level information from fitted model objects. Handles both
 #' S3 models (glm, lm, coxph) via xlevels slot and S4 models (lme4) via
-#' the model frame.
+#' the model frame. Logical predictors are included with the levels
+#' \code{"FALSE"} and \code{"TRUE"} (see \code{add_logical_levels()}).
 #' 
 #' @param model Fitted model object (S3 or S4).
 #' @return Named list of factor levels, or \code{NULL} if no factors present.
@@ -17,7 +18,7 @@ get_model_xlevels <- function(model) {
         if (inherits(model, "coxme")) {
             return(NULL)  # Will be handled separately
         }
-        return(model$xlevels)
+        return(add_logical_levels(model$xlevels, predictor_classes(model$terms)))
     }
     
     ## For S4 lme4 models (glmer, lmer)
@@ -32,11 +33,75 @@ get_model_xlevels <- function(model) {
             }
         }
         
+        ## The first column of the frame is the response; expressions such
+        ## as I(age > 65) are not variables of the data
+        frame_classes <- vapply(frame_data[-1L], function(x) class(x)[1L],
+                                character(1))
+        frame_vars <- tryCatch(all.vars(stats::formula(model)),
+                               error = function(e) character(0))
+        xlevels <- add_logical_levels(
+            xlevels, frame_classes[names(frame_classes) %in% frame_vars]
+        )
+
         return(if (length(xlevels) > 0) xlevels else NULL)
     }
     
     ## Default: return NULL
     return(NULL)
+}
+
+
+#' Add the levels of logical predictors to the factor levels of a model
+#'
+#' R codes a logical predictor as a factor with the levels \code{FALSE} and
+#' \code{TRUE}, naming its coefficient by the second (\code{olderTRUE}) with
+#' \code{FALSE} as the reference, but records levels only for factors and
+#' character variables (\code{xlevels}). With the two levels added, tables
+#' and forest plots show a logical predictor by level, with a reference row
+#' for \code{FALSE}, as they show a factor, rather than as a single term named
+#' by its coefficient.
+#'
+#' @param xlevels Named list of factor levels, or \code{NULL}.
+#' @param classes Named character vector of the classes of the predictors,
+#'   as in the \code{"dataClasses"} attribute of a terms object.
+#' @return \code{xlevels} with the levels \code{"FALSE"} and \code{"TRUE"}
+#'   for each logical predictor it does not already contain.
+#' @keywords internal
+add_logical_levels <- function(xlevels, classes) {
+    logical_vars <- setdiff(names(classes)[classes %in% "logical"], names(xlevels))
+    if (length(logical_vars) == 0L) {
+        return(xlevels)
+    }
+    if (is.null(xlevels)) {
+        xlevels <- list()
+    }
+    for (var in logical_vars) {
+        xlevels[[var]] <- c("FALSE", "TRUE")
+    }
+    xlevels
+}
+
+
+#' Read the classes of the predictors of a terms object
+#'
+#' Returns the classes of the variables of the model other than the
+#' response, leaving out expressions such as \code{I(age > 65)}, which are
+#' not variables of the data and whose levels cannot be counted there.
+#'
+#' @param model_terms Terms object of a fitted model, or \code{NULL}.
+#' @return Named character vector of the \code{"dataClasses"} of those
+#'   variables, or \code{NULL}.
+#' @keywords internal
+predictor_classes <- function(model_terms) {
+    classes <- attr(model_terms, "dataClasses")
+    if (is.null(classes)) {
+        return(NULL)
+    }
+    response <- attr(model_terms, "response")
+    if (isTRUE(response > 0L)) {
+        classes <- classes[-response]
+    }
+    classes[names(classes) %in% all.vars(model_terms)]
 }
 
 
@@ -76,6 +141,28 @@ get_model_data <- function(model) {
 }
 
 
+#' Term labels of the fixed effects of a model
+#'
+#' Returns the labels of the fixed-effect terms of a model as R writes them
+#' in coefficient names, with non-syntactic variable names enclosed in
+#' backticks (\emph{e.g.,} "`high bp`") and calls written out (\emph{e.g.,}
+#' "factor(stage)").
+#'
+#' @param model Fitted model object.
+#' @return Character vector of term labels, or \code{character(0)} when the
+#'   terms cannot be recovered.
+#' @keywords internal
+model_term_labels <- function(model) {
+    model_terms <- if (inherits(model, "coxme")) {
+                       tryCatch(stats::terms(model$formulaList$fixed),
+                                error = function(e) NULL)
+                   } else {
+                       tryCatch(stats::terms(model), error = function(e) NULL)
+                   }
+    as.character(attr(model_terms, "term.labels"))
+}
+
+
 #' Identify the variables required by a fitted model
 #'
 #' Returns the names of every variable referenced by a model formula, including
@@ -95,6 +182,17 @@ get_model_variables <- function(model, model_class) {
     ## also be non-missing for an observation to enter the fit. The formula is
     ## therefore preferred over the terms object for these classes, because the
     ## terms object describes the fixed effects only.
+    ##
+    ## A coxme model records its call, whose formula is the name of a variable
+    ## when the model is fitted inside a function (fit() fits it from a
+    ## formula named "formula"). Its fixed and random parts are read from the
+    ## formula list that the model keeps instead.
+    if (identical(model_class, "coxme") && !is.null(model$formulaList)) {
+        vars <- tryCatch(c(all.vars(model$formulaList$fixed),
+                           unlist(lapply(model$formulaList$random, all.vars))),
+                         error = function(e) character(0))
+        return(unique(vars))
+    }
     if (identical(model_class, "coxme") || inherits(model, "merMod")) {
         return(unique(tryCatch(all.vars(stats::formula(model)),
                                error = function(e) character(0))))
@@ -197,6 +295,81 @@ get_analysis_data <- function(model, model_class, data) {
 }
 
 
+#' C-statistic of predictions for a binary outcome
+#'
+#' Computes the area under the empirical ROC curve as the Mann-Whitney
+#' statistic, with tied predictions counted as one half, from a single sort
+#' (see \code{average_ranks()}). The orientation matches that of
+#' \code{pROC::roc()} with \code{direction = "auto"}, which this function
+#' replaces: higher predictions indicate events unless the median prediction
+#' of the events is below that of the non-events. The result therefore no
+#' longer depends on whether the suggested package is installed.
+#'
+#' @param y Binary outcome coded 0 and 1, or logical.
+#' @param p Numeric vector of predictions of the same length.
+#' @return Numeric scalar; \code{NA} when either outcome is absent.
+#' @keywords internal
+c_statistic <- function(y, p) {
+    ok <- !is.na(y) & !is.na(p)
+    event <- as.numeric(y[ok]) == 1
+    p <- p[ok]
+    n_1 <- sum(event)
+    n_0 <- length(event) - n_1
+    if (n_1 == 0 || n_0 == 0) {
+        return(NA_real_)
+    }
+    ranks <- average_ranks(p)
+    auc <- (sum(ranks[event]) - n_1 * (n_1 + 1) / 2) / (as.double(n_1) * n_0)
+    if (stats::median(p[!event]) > stats::median(p[event])) 1 - auc else auc
+}
+
+
+#' Confidence intervals for model coefficients
+#'
+#' Computes confidence intervals for the named coefficients by the method that
+#' \code{conf_method} selects. With \code{"profile"}, \code{stats::confint()}
+#' gives profile likelihood intervals for GLM and negative binomial models,
+#' exact \emph{t} intervals for linear models, and the model's own intervals
+#' for other classes (Wald intervals for Cox models); if it fails, as
+#' profiling can under separation, Wald intervals are returned instead. With
+#' \code{"wald"}, and for quasi-likelihood families, which have no likelihood
+#' to profile, Wald intervals are returned. \code{m2dt()} and the forest
+#' plot functions share this function so that a table and a plot of the same
+#' model show the same intervals.
+#'
+#' @param model Fitted model object.
+#' @param parm Character vector of coefficient names.
+#' @param conf_level Numeric confidence level.
+#' @param conf_method Character string, \code{"profile"} or \code{"wald"}.
+#' @return A matrix with one row per element of \code{parm} and two columns
+#'   (lower and upper bounds).
+#' @keywords internal
+coef_confint <- function(model, parm, conf_level, conf_method) {
+    is_quasi <- inherits(model, "glm") &&
+        grepl("^quasi", model$family$family)
+
+    conf_int <- if (identical(conf_method, "wald") || is_quasi) {
+        stats::confint.default(model, parm = parm, level = conf_level)
+    } else {
+        tryCatch(
+            suppressMessages(suppressWarnings(
+                stats::confint(model, parm = parm, level = conf_level)
+            )),
+            error = function(e) {
+                stats::confint.default(model, parm = parm, level = conf_level)
+            }
+        )
+    }
+
+    ## confint() returns a named vector when parm names a single coefficient
+    if (is.null(dim(conf_int))) {
+        conf_int <- matrix(conf_int, nrow = 1,
+                           dimnames = list(parm, names(conf_int)))
+    }
+    conf_int
+}
+
+
 #' Detect if model is univariable or multivariable
 #' 
 #' Determines whether a model contains one predictor (univariable) or multiple
@@ -207,42 +380,29 @@ get_analysis_data <- function(model, model_class, data) {
 #' @return Character string: "Univariable" or "Multivariable".
 #' @keywords internal
 detect_model_type <- function(model) {
-    ## For glmer/glmerMod/lmer/lmerMod models, handle random effects specially
-    if (inherits(model, c("glmerMod", "lmerMod", "merMod"))) {
-        ## Get the fixed effects formula (excluding random effects)
-        if (!is.null(model@call$formula)) {
-            formula_str <- as.character(model@call$formula)[3]  # RHS of formula
-            ## Remove random effects terms (anything with |)
-            formula_str <- gsub("\\([^|]*\\|[^)]*\\)", "", formula_str)
-            ## Clean up extra spaces and plus signs
-            formula_str <- gsub("\\s*\\+\\s*\\+", " +", formula_str)
-            formula_str <- gsub("^\\s*\\+\\s*", "", formula_str)
-            formula_str <- gsub("\\s*\\+\\s*$", "", formula_str)
-            
-            ## Split by + to get terms
-            terms <- trimws(strsplit(formula_str, "\\+")[[1]])
-            terms <- terms[terms != ""]
-            
-            ## Count unique base variables (handle interactions)
-            unique_vars <- character()
-            for (term in terms) {
-                if (grepl(":", term)) {
-                    ## Interaction term - split and add components
-                    components <- trimws(strsplit(term, ":")[[1]])
-                    unique_vars <- c(unique_vars, components)
-                } else {
-                    unique_vars <- c(unique_vars, term)
-                }
-            }
-            unique_vars <- unique(unique_vars)
-            
+    
+    ## For glmer/glmerMod/lmer/lmerMod models, the variables of the fixed-effect
+    ## terms are counted, the components of an interaction among them. The
+    ## terms were formerly read by splitting the formula text at "+", which
+    ## kept "hypertension * diabetes" as a single term, and after removing the
+    ## random effects with a pattern that spanned parentheses, which reduced
+    ## "log(age) + sex + (1 | site)" to "log"; both models were described as
+    ## univariable. The terms of coxme models are read in the same way, from
+    ## the formula list they keep: the formula of their call is only a name
+    ## when they are fitted inside a function, so that the levels of each
+    ## factor were counted as variables.
+    if (inherits(model, c("glmerMod", "lmerMod", "merMod", "coxme"))) {
+        term_labels <- model_term_labels(model)
+        if (length(term_labels) > 0L) {
+            unique_vars <- unique(unlist(strsplit(term_labels, ":", fixed = TRUE)))
             return(data.table::fifelse(length(unique_vars) == 1, "Univariable", "Multivariable"))
         }
     }
     
     ## Original code for other model types
-    ## Get coefficient names once
-    coef_names <- names(stats::coef(model))
+    ## Get coefficient names once, without the backticks of non-syntactic
+    ## variable names, which the names in xlevels do not carry
+    coef_names <- gsub("`", "", names(stats::coef(model)), fixed = TRUE)
     
     ## Remove intercept from count
     if ("(Intercept)" %in% coef_names) {
@@ -250,11 +410,6 @@ detect_model_type <- function(model) {
     } else {
         term_names <- coef_names
     }
-    
-    ## Identify interaction terms (contain ":")
-    is_interaction <- grepl(":", term_names, fixed = TRUE)
-    interaction_terms <- term_names[is_interaction]
-    main_terms <- term_names[!is_interaction]
     
     ## For models without factor variables, count unique base variables from main effects
     xlevels <- get_model_xlevels(model)
@@ -272,6 +427,9 @@ detect_model_type <- function(model) {
                 for (var in predictor_vars) {
                     if (var %in% names(data_source) && is.factor(data_source[[var]])) {
                         xlevels[[var]] <- levels(data_source[[var]])
+                    } else if (var %in% names(data_source) &&
+                               is.logical(data_source[[var]])) {
+                        xlevels[[var]] <- c("FALSE", "TRUE")
                     }
                 }
             }
@@ -279,6 +437,13 @@ detect_model_type <- function(model) {
         }
     }
     
+    ## Identify interaction terms, those containing ":" other than the
+    ## coefficients of levels and the names of variables that contain one
+    is_interaction <- is_interaction_term(term_names, xlevels,
+                                          main_effect_labels(model))
+    interaction_terms <- term_names[is_interaction]
+    main_terms <- term_names[!is_interaction]
+
     if (is.null(xlevels) || length(xlevels) == 0) {
         ## Count main effect terms
         n_terms <- length(main_terms)
@@ -306,8 +471,17 @@ detect_model_type <- function(model) {
     xlevel_names <- names(xlevels)
     xlevel_names <- xlevel_names[order(nchar(xlevel_names), decreasing = TRUE)]
     
+    ## A coefficient of another variable whose name begins with a factor's
+    ## name (the continuous "smoking_years", or "smokerTRUE" of a logical
+    ## "smoker", beside the factor "smoking") is not a level of that factor
+    other_labels <- setdiff(gsub("`", "", model_term_labels(model), fixed = TRUE),
+                            xlevel_names)
+
     matched_var <- vapply(main_terms, function(term) {
         hits <- xlevel_names[startsWith(term, xlevel_names)]
+        hits <- hits[!vapply(hits, function(hit) {
+            claimed_by_longer_term(term, hit, xlevels[[hit]], other_labels)
+        }, logical(1))]
         if (length(hits) == 0L) NA_character_ else hits[1]
     }, character(1), USE.NAMES = FALSE)
     
@@ -352,9 +526,10 @@ get_model_type_name <- function(model) {
                       poisson = "Poisson",
                       gaussian = "Linear (GLM)",
                       Gamma = "Gamma",
+                      inverse.gaussian = "Inverse Gaussian",
                       quasibinomial = "Quasi-Binomial",
                       quasipoisson = "Quasi-Poisson",
-                      paste0(stringr::str_to_title(family), " GLM")
+                      paste0(toupper(substring(family, 1, 1)), substring(family, 2), " GLM")
                       ))
     }
     
@@ -374,15 +549,49 @@ get_model_type_name <- function(model) {
 }
 
 
+#' Coefficients that belong to a variable whose name extends a factor's name
+#'
+#' Identifies the coefficients whose names begin with the name of a factor
+#' but belong to another variable of the model whose name begins with it as
+#' well, such as the continuous "smoking_years" or the coefficient
+#' "smokerTRUE" of a logical variable "smoker" beside a factor "smoking". A
+#' coefficient whose remainder after the factor's name is one of the
+#' factor's levels is kept for the factor.
+#'
+#' @param terms Character vector of coefficient names, without backticks.
+#' @param var Character string. Name of the factor.
+#' @param var_levels Character vector of the levels of the factor.
+#' @param labels Character vector of the term labels of the other
+#'   variables of the model, without backticks.
+#' @return Logical vector, \code{TRUE} for the coefficients that belong to a
+#'   variable with a longer name.
+#' @keywords internal
+claimed_by_longer_term <- function(terms, var, var_levels, labels) {
+    longer <- labels[nchar(labels) > nchar(var) & startsWith(labels, var)]
+    if (length(longer) == 0L) {
+        return(rep(FALSE, length(terms)))
+    }
+    claimed <- Reduce(`|`, lapply(longer, function(label) startsWith(terms, label)))
+    claimed & !(substring(terms, nchar(var) + 1L) %in% var_levels)
+}
+
+
 #' Parse term into variable and group
 #' 
 #' Splits coefficient term names into base variable names and factor levels.
 #' For example, "sexMale" becomes variable="sex" and group="Male".
 #' Handles interaction terms and continuous variables appropriately.
 #' 
+#' A term that belongs to another variable of the model whose name begins
+#' with a factor's name, such as a continuous variable "smoking_years" or the
+#' coefficient "smokerTRUE" of a logical variable "smoker" beside a factor
+#' "smoking", is not taken for a level of that factor (see
+#' \code{claimed_by_longer_term()}).
+#'
 #' @param terms Character vector of coefficient term names.
 #' @param xlevels Named list of factor levels from the model.
-#' @param model Optional model object for extracting factor info from coxme models.
+#' @param model Optional model object, from which the terms of the model are
+#'   read and the factor levels of coxme models are reconstructed.
 #' @return Data.table with 'variable' and 'group' columns.
 #' @keywords internal
 parse_term <- function(terms, xlevels = NULL, model = NULL) {
@@ -392,9 +601,6 @@ parse_term <- function(terms, xlevels = NULL, model = NULL) {
     variable <- character(n_terms)
     group <- character(n_terms)
     
-    ## Interactions should not be parsed as factor variables
-    is_interaction <- grepl(":", terms, fixed = TRUE)
-
     ## Special handling for coxme models - reconstruct xlevels if needed
     if (!is.null(model) && inherits(model, "coxme") && is.null(xlevels)) {
         data_source <- attr(model, "data")
@@ -405,18 +611,22 @@ parse_term <- function(terms, xlevels = NULL, model = NULL) {
         if (!is.null(data_source)) {
             xlevels <- list()
             
-            ## Extract factor structure from coefficient names
-            coef_names <- names(coxme::fixef(model))
+            ## Extract factor structure from coefficient names, without the
+            ## backticks of non-syntactic variable names
+            coef_names <- gsub("`", "", names(coxme::fixef(model)), fixed = TRUE)
             
             ## Check each column in the data
             for (col_name in names(data_source)) {
-                ## Check if any coefficient starts with this column name
-                if (any(grepl(paste0("^", col_name), coef_names))) {
+                ## Check if any coefficient starts with this column name,
+                ## compared literally rather than as a regular expression
+                if (any(startsWith(coef_names, col_name))) {
                     ## This is a factor variable - get its levels
                     if (is.factor(data_source[[col_name]])) {
                         xlevels[[col_name]] <- levels(data_source[[col_name]])
                     } else if (is.character(data_source[[col_name]])) {
                         xlevels[[col_name]] <- sort(unique(data_source[[col_name]]))
+                    } else if (is.logical(data_source[[col_name]])) {
+                        xlevels[[col_name]] <- c("FALSE", "TRUE")
                     }
                 }
             }
@@ -425,6 +635,12 @@ parse_term <- function(terms, xlevels = NULL, model = NULL) {
         }
     }
     
+    ## Interactions should not be parsed as factor variables. A level that
+    ## contains a colon ("shift08:00"), or the name of a variable that does,
+    ## is not an interaction.
+    is_interaction <- is_interaction_term(
+        terms, xlevels, if (!is.null(model)) main_effect_labels(model))
+
     if (!is.null(xlevels) && length(xlevels) > 0) {
         ## Match each coefficient to the factor name it begins with.
         ##
@@ -440,10 +656,22 @@ parse_term <- function(terms, xlevels = NULL, model = NULL) {
         xlevel_names <- names(xlevels)
         xlevel_names <- xlevel_names[order(nchar(xlevel_names))]
         
+        ## A coefficient of another variable whose name begins with a
+        ## factor's name (the continuous "smoking_years", or "smokerTRUE" of a
+        ## logical "smoker", beside the factor "smoking") is not a level of
+        ## that factor
+        other_labels <- if (is.null(model)) {
+                            character(0)
+                        } else {
+                            setdiff(gsub("`", "", model_term_labels(model), fixed = TRUE),
+                                    xlevel_names)
+                        }
+
         ## For each factor variable, find all matching terms at once, skip interaction terms
         for (var in xlevel_names) {
             ## Find which terms start with this variable name
-            matches <- startsWith(terms, var) & !is_interaction  # Skip interactions
+            matches <- startsWith(terms, var) & !is_interaction &  # Skip interactions
+                !claimed_by_longer_term(terms, var, xlevels[[var]], other_labels)
             
             if (any(matches)) {
                 ## Extract levels for all matching terms at once
@@ -468,54 +696,283 @@ parse_term <- function(terms, xlevels = NULL, model = NULL) {
 }
 
 
-#' Extract event variable from survival model
-#' 
-#' Parses the Surv() expression in survival model formulas to extract
-#' the event/status variable name. Works with coxph, clogit, and coxme models.
-#' 
-#' @param model Fitted survival model object.
-#' @param model_class Character string of the model class.
-#' @return Character string naming the event variable, or \code{NULL} if not found.
+#' Name the coefficients of the levels of a model's factors
+#'
+#' The coefficient of a factor level is named by the variable followed by
+#' the level (\emph{e.g.,} "sexMale").
+#'
+#' @param xlevels Named list of factor levels, or \code{NULL}.
+#' @return Character vector of the names that the coefficients of the
+#'   levels in \code{xlevels} take.
 #' @keywords internal
-get_event_variable <- function(model, model_class) {
-    event_var <- NULL
-    
-    if (model_class %in% c("coxph", "clogit", "coxme")) {
-        
-        ## Get the formula string differently for each model type
-        outcome_str <- NULL
-        
-        if (model_class == "coxme") {
-            ## For coxme, use formulaList$fixed
-            if (!is.null(model$formulaList$fixed)) {
-                outcome_str <- tryCatch({
-                    as.character(model$formulaList$fixed)[2]
-                }, error = function(e) NULL)
-            }
-        } else {
-            ## For coxph and clogit, use standard formula
-            outcome_str <- tryCatch({
-                as.character(stats::formula(model))[2]
-            }, error = function(e) NULL)
-        }
-        
-        ## Extract event variable from Surv()
-        if (!is.null(outcome_str) && !is.na(outcome_str)) {
-            if (grepl("Surv\\(", outcome_str)) {
-                ## Remove "Surv(" from beginning and ")" from end
-                surv_expr <- gsub("^Surv\\(", "", outcome_str)
-                surv_expr <- gsub("\\)$", "", surv_expr)
-                
-                ## Split by comma to get time and event
-                surv_parts <- trimws(strsplit(surv_expr, ",")[[1]])
-                if (length(surv_parts) >= 2) {
-                    event_var <- surv_parts[2]
+level_terms <- function(xlevels) {
+    if (length(xlevels) == 0L) {
+        return(character(0))
+    }
+    unlist(lapply(names(xlevels), function(var) paste0(var, xlevels[[var]])),
+           use.names = FALSE)
+}
+
+
+#' Identify the coefficients of interactions
+#'
+#' R joins the components of an interaction coefficient with colons
+#' (\emph{e.g.,} "treatmentDrug A:stageII"), but a factor level may contain
+#' a colon as well (\emph{e.g.,} the level "08:00" of a factor \code{shift},
+#' whose coefficient is "shift08:00"), as may the name of a variable. A name
+#' with a colon is therefore taken for an interaction unless it is the
+#' coefficient of a level in \code{xlevels} or the name of a main-effect
+#' term of the model.
+#'
+#' @param terms Character vector of coefficient names, without the
+#'   backticks of non-syntactic variable names.
+#' @param xlevels Named list of factor levels, or \code{NULL}.
+#' @param main_terms Character vector of the main-effect terms of the model,
+#'   as returned by \code{main_effect_labels()}, or \code{NULL}.
+#' @return Logical vector, \code{TRUE} for the coefficients of interactions.
+#' @keywords internal
+is_interaction_term <- function(terms, xlevels = NULL, main_terms = NULL) {
+    grepl(":", terms, fixed = TRUE) &
+        !terms %in% c(level_terms(xlevels), main_terms)
+}
+
+
+#' Name the main-effect terms of a model
+#'
+#' @param model Fitted model object.
+#' @return Character vector of the labels of the terms of order one (the
+#'   main effects), without the backticks of non-syntactic variable names.
+#' @keywords internal
+main_effect_labels <- function(model) {
+    model_terms <- if (inherits(model, "coxme")) {
+                       tryCatch(stats::terms(model$formulaList$fixed),
+                                error = function(e) NULL)
+                   } else {
+                       tryCatch(stats::terms(model), error = function(e) NULL)
+                   }
+    labels <- attr(model_terms, "term.labels")
+    term_order <- attr(model_terms, "order")
+    if (is.null(labels) || length(term_order) != length(labels)) {
+        return(character(0))
+    }
+    gsub("`", "", labels[term_order == 1L], fixed = TRUE)
+}
+
+
+#' Split an interaction coefficient into variables and levels
+#'
+#' Splits the name of an interaction coefficient (\emph{e.g.,}
+#' "treatmentDrug A:stageII") at each colon and matches each component to
+#' the variable it names. A component of a factor is the variable name
+#' followed by one of its levels; a component of a continuous variable is
+#' the variable name alone.
+#'
+#' The backticks that enclose non-syntactic variable names in coefficient
+#' names (\emph{e.g.,} "`high bp`Yes") are removed first. Names are compared
+#' literally, longest first, and a variable is preferred whose levels
+#' include the remainder of the component, so that "sexualityHetero" is
+#' assigned to \code{sexuality} rather than to \code{sex}. A level that
+#' contains a colon (\emph{e.g.,} "08:00") is kept in one component when
+#' it is among the levels in \code{xlevels}.
+#'
+#' @param term Character string. Name of an interaction coefficient.
+#' @param var_names Character vector. Names of the variables to match.
+#' @param xlevels Named list of factor levels, or \code{NULL}.
+#' @return List with one element per component, each a list with elements
+#'   \code{part} (the component), \code{var} (the matched variable, or
+#'   \code{NA}) and \code{level} (the level, or \code{NA} for a continuous
+#'   variable or an unmatched component).
+#' @keywords internal
+split_interaction_term <- function(term, var_names, xlevels = NULL) {
+    parts <- strsplit(gsub("`", "", term, fixed = TRUE), ":", fixed = TRUE)[[1]]
+    var_names <- as.character(var_names)
+    var_names <- var_names[order(nchar(var_names), decreasing = TRUE)]
+
+    ## Parts that a colon within a declared level split apart are joined
+    ## again, the longest run that names a variable and one of its levels
+    ## first
+    declared_terms <- level_terms(xlevels)
+    if (any(grepl(":", declared_terms, fixed = TRUE)) && length(parts) > 1L) {
+        joined <- character(0)
+        i <- 1L
+        while (i <= length(parts)) {
+            j <- i
+            if (i < length(parts)) {
+                for (end in seq.int(length(parts), i + 1L)) {
+                    if (paste(parts[i:end], collapse = ":") %in% declared_terms) {
+                        j <- end
+                        break
+                    }
                 }
             }
+            joined <- c(joined, paste(parts[i:j], collapse = ":"))
+            i <- j + 1L
         }
+        parts <- joined
     }
-    
-    return(event_var)
+
+    lapply(parts, function(part) {
+        if (part %in% var_names) {
+            return(list(part = part, var = part, level = NA_character_))
+        }
+
+        candidates <- var_names[startsWith(part, var_names) &
+                                nchar(part) > nchar(var_names)]
+        if (length(candidates) == 0L) {
+            return(list(part = part, var = NA_character_, level = NA_character_))
+        }
+
+        levels <- substring(part, nchar(candidates) + 1L)
+        declared <- vapply(seq_along(candidates), function(k) {
+            levels[k] %in% xlevels[[candidates[k]]]
+        }, logical(1))
+        k <- if (any(declared)) which(declared)[1L] else 1L
+
+        list(part = part, var = candidates[k], level = levels[k])
+    })
+}
+
+
+#' Read the event argument of a \code{Surv()} response
+#'
+#' The event of a \code{Surv()} response is its event argument: the second
+#' argument of \code{Surv(time, event)}, the third of
+#' \code{Surv(time, time2, event)}, or the argument named \code{event}.
+#' \code{survival::clogit()} writes its response as
+#' \code{Surv(rep(1, N), case)}, whose event is \code{case}. The argument
+#' may be an expression, such as \code{status == 2}.
+#'
+#' @param response Left-hand side of a model formula, as a call, or a
+#'   character string such as \code{"Surv(os_months, os_status)"}.
+#' @return The expression of the event argument, or \code{NULL} when the
+#'   response is not a call to \code{Surv()} with an event.
+#' @keywords internal
+surv_event_expression <- function(response) {
+    if (is.character(response)) {
+        response <- tryCatch(str2lang(response), error = function(e) NULL)
+    }
+    if (!is.call(response)) {
+        return(NULL)
+    }
+    fn <- response[[1L]]
+    is_surv <- identical(fn, as.name("Surv")) ||
+        (is.call(fn) && identical(fn[[1L]], as.name("::")) &&
+         identical(fn[[3L]], as.name("Surv")))
+    if (!is_surv) {
+        return(NULL)
+    }
+    args <- tryCatch(as.list(match.call(survival::Surv, response))[-1L],
+                     error = function(e) NULL)
+    if (!is.null(args$event)) args$event else args$time2
+}
+
+
+#' Code the events of a survival model
+#'
+#' Evaluates the event argument of the model's \code{Surv()} response (see
+#' \code{surv_event_expression()}) on the rows of \code{data} and codes it
+#' as \code{Surv()} codes it: 1 for an event and 0 for a censored
+#' observation, whether the status is coded 0 and 1, \code{FALSE} and
+#' \code{TRUE}, or 1 and 2, or is given as an expression such as
+#' \code{status == 2}. A factor is coded by its second level. Summing the
+#' variable named in the response instead counted a status coded 1 and 2
+#' twice for each event and once for each censored observation, and
+#' reading the second variable of the formula took the stop time of a
+#' counting-process response and the first predictor of a
+#' \code{clogit()} model.
+#'
+#' @param model Fitted \code{coxph}, \code{clogit}, or \code{coxme} model.
+#' @param data Data frame in which the event argument is evaluated, such as
+#'   the observations analyzed or the observations supplied.
+#' @return Numeric vector of 0 and 1 (missing where the event is), one per
+#'   row of \code{data}, or \code{NULL} when the events cannot be read.
+#' @keywords internal
+get_event_indicator <- function(model, data) {
+    model_formula <- if (inherits(model, "coxme")) {
+                         model$formulaList$fixed
+                     } else {
+                         tryCatch(stats::formula(model), error = function(e) NULL)
+                     }
+    if (is.null(model_formula) || length(model_formula) < 3L) {
+        return(NULL)
+    }
+    surv_event_indicator(model_formula[[2L]], data, environment(model_formula))
+}
+
+
+#' Add the coded events of a survival model to its analysis rows
+#'
+#' The group counts of \code{m2dt()} sum an event column by group. The
+#' events are coded from the model's \code{Surv()} response (see
+#' \code{get_event_indicator()}) into a column of a copy of the model's
+#' variables, so that the data supplied are not modified. Observations
+#' whose event \code{Surv()} codes as missing, such as a status of 9 among
+#' statuses of 0 and 1, did not enter the model and are not counted.
+#'
+#' @param model Fitted survival model.
+#' @param model_class Character string of the model class.
+#' @param data Data table of the analysis rows.
+#' @return List with \code{data}, the data with an event column where the
+#'   events could be coded, and \code{event_var}, the name of that column or
+#'   \code{NULL}.
+#' @keywords internal
+add_event_column <- function(model, model_class, data) {
+    event_var <- ".summata_event"
+    if (is.null(data) || event_var %in% names(data)) {
+        return(list(data = data,
+                    event_var = if (!is.null(data)) event_var))
+    }
+    events <- get_event_indicator(model, data)
+    if (is.null(events)) {
+        return(list(data = data, event_var = NULL))
+    }
+    cols <- intersect(get_model_variables(model, model_class), names(data))
+    keep <- !is.na(events)
+    data <- data[keep, cols, with = FALSE]
+    data.table::set(data, j = event_var, value = events[keep])
+    list(data = data, event_var = event_var)
+}
+
+
+#' Code the events of a \code{Surv()} response
+#'
+#' @param response Left-hand side of a model formula, as a call, or a
+#'   character string such as \code{"Surv(os_months, os_status)"}.
+#' @param data Data frame in which the event argument is evaluated.
+#' @param env Environment in which variables not in \code{data} are found.
+#' @return See \code{get_event_indicator()}.
+#' @keywords internal
+surv_event_indicator <- function(response, data, env = parent.frame()) {
+    event_expr <- surv_event_expression(response)
+    if (is.null(event_expr) || is.null(data) || !inherits(data, "data.frame")) {
+        return(NULL)
+    }
+    if (is.null(env)) {
+        env <- parent.frame()
+    }
+
+    event <- tryCatch(eval(event_expr, data, env), error = function(e) NULL)
+    if (is.null(event) || length(event) != nrow(data)) {
+        return(NULL)
+    }
+
+    if (is.factor(event)) {
+        return(as.numeric(as.integer(event) == 2L))
+    }
+    if (!is.numeric(event) && !is.logical(event)) {
+        return(NULL)
+    }
+
+    ## Coded by Surv() itself, which converts values it does not accept to
+    ## missing, as the model did when it was fitted
+    status <- tryCatch(
+        suppressWarnings(unclass(survival::Surv(rep(1, length(event)), event))[, "status"]),
+        error = function(e) NULL
+    )
+    if (is.null(status)) {
+        return(NULL)
+    }
+    as.numeric(status)
 }
 
 
@@ -530,7 +987,13 @@ get_event_variable <- function(model, model_class) {
 #' @keywords internal
 get_outcome_variables <- function(model) {
 
-    fml <- tryCatch(stats::formula(model), error = function(e) NULL)
+    ## The call of a coxme model fitted inside a function names a variable
+    ## rather than the formula, which its formula list keeps
+    fml <- if (inherits(model, "coxme") && !is.null(model$formulaList$fixed)) {
+               model$formulaList$fixed
+           } else {
+               tryCatch(stats::formula(model), error = function(e) NULL)
+           }
 
     if (is.null(fml) || length(fml) < 3L) {
         return(character(0))
@@ -559,13 +1022,17 @@ get_outcome_variables <- function(model) {
 #' @param event_var Character name of the event indicator, or \code{NULL} for
 #'   models that carry no event count. Factors are coded as the modeling
 #'   functions code them, with any level beyond the first counting as an event.
+#' @param event_indicator Numeric vector of the events, one per row of
+#'   \code{data}, coded 1 for an event and 0 otherwise, which is used in place
+#'   of \code{event_var} when given. Survival models pass the events coded
+#'   from their \code{Surv()} response (see \code{get_event_indicator()}).
 #' @return Named list with \code{n_supplied}, \code{n_analyzed},
 #'   \code{n_missing_outcome} and \code{n_missing_predictor}, and, where an
 #'   event indicator was supplied, \code{events_supplied} and
 #'   \code{events_analyzed}. \code{NULL} when the counts cannot be determined.
 #' @keywords internal
 get_analysis_counts <- function(data, outcome_vars, predictor_vars = NULL,
-                                event_var = NULL) {
+                                event_var = NULL, event_indicator = NULL) {
 
     if (is.null(data) || !inherits(data, "data.frame") || nrow(data) == 0) {
         return(NULL)
@@ -592,8 +1059,14 @@ get_analysis_counts <- function(data, outcome_vars, predictor_vars = NULL,
     ## response contributes its counts rather than a binary flag, which
     ## mirrors the total that m2dt() reports for Poisson and negative
     ## binomial models.
-    event_indicator <- NULL
-    if (!is.null(event_var) && length(event_var) == 1 &&
+    if (!is.null(event_indicator) && length(event_indicator) != n_supplied) {
+        event_indicator <- NULL
+    }
+    ## An event that Surv() codes as missing leaves the response missing
+    if (!is.null(event_indicator)) {
+        outcome_ok <- outcome_ok & !is.na(event_indicator)
+    }
+    if (is.null(event_indicator) && !is.null(event_var) && length(event_var) == 1 &&
         event_var %in% names(data)) {
         y <- data[[event_var]]
         event_indicator <- if (is.factor(y)) {
@@ -667,7 +1140,13 @@ get_model_analysis_counts <- function(model, model_class, data) {
     family_name <- tryCatch(stats::family(model)$family, error = function(e) NULL)
     event_var <- get_event_variable_for_counts(outcome_vars, model_class, family_name)
 
-    return(get_analysis_counts(data, outcome_vars, predictor_vars, event_var))
+    ## The events of a survival model are coded from its Surv() response
+    event_indicator <- if (model_class %in% c("coxph", "clogit", "coxme")) {
+                           get_event_indicator(model, data)
+                       }
+
+    return(get_analysis_counts(data, outcome_vars, predictor_vars, event_var,
+                               event_indicator))
 }
 
 

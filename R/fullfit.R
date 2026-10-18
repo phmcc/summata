@@ -20,6 +20,8 @@
 #' @param predictors Character vector of predictor variable names to analyze. 
 #'   All predictors are tested in univariable models. The subset included in 
 #'   the multivariable model depends on the \code{method} parameter.
+#'   Non-syntactic names (\emph{e.g.,} \code{"tumor stage"}) are quoted in
+#'   the model formula and need no backticks.
 #'   
 #' @param method Character string specifying the variable selection strategy:
 #'   \itemize{
@@ -568,6 +570,12 @@ fullfit <- function(data,
     ## Resolve verbose setting
     verbose <- if (is.null(verbose)) getOption("summata.verbose", FALSE) else verbose
     
+    ## Variables are column names, which may be given with backticks; the
+    ## formulas of the models quote the names that require it
+    outcome <- formula_names(outcome, names(data), quote = FALSE)
+    predictors <- formula_names(predictors, names(data), quote = FALSE)
+    multi_predictors <- formula_names(multi_predictors, names(data), quote = FALSE)
+
     ## Validate inputs and auto-correct model type if needed
     validation <- validate_fit_inputs(
         data = data,
@@ -765,20 +773,26 @@ fullfit <- function(data,
     ## and the two rest on different samples whenever a predictor carries
     ## missing values. The range therefore spans the screening models and
     ## the multivariable model together.
-    ff_outcome_vars <- all.vars(stats::as.formula(paste("~", outcome)))
+    ff_outcome_vars <- all.vars(stats::as.formula(
+        paste("~", formula_names(outcome, names(data)))))
     ff_predictor_sets <- lapply(predictors, function(p) {
-        all.vars(stats::as.formula(paste("~", p)))
+        all.vars(stats::as.formula(paste("~", formula_names(p, names(data)))))
     })
     if (!is.null(multi_vars) && length(multi_vars) > 0) {
         ff_predictor_sets <- c(ff_predictor_sets,
                                list(all.vars(stats::as.formula(
-                                   paste("~", paste(multi_vars, collapse = "+"))))))
+                                   paste("~", paste(formula_names(multi_vars, names(data)),
+                                                    collapse = "+"))))))
     }
     data.table::setattr(
         result, "analysis_counts",
         get_analysis_counts(data, ff_outcome_vars, ff_predictor_sets,
                             get_event_variable_for_counts(ff_outcome_vars,
-                                                          model_type, family))
+                                                          model_type, family),
+                            ## The events of a survival outcome are coded
+                            ## from its Surv() call
+                            surv_event_indicator(formula_names(outcome, names(data)),
+                                                 data))
     )
     data.table::setattr(result, "number_marks",
                         resolve_number_marks(number_format))

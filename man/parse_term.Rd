@@ -11,7 +11,8 @@ parse_term(terms, xlevels = NULL, model = NULL)
 
 \item{xlevels}{Named list of factor levels from the model.}
 
-\item{model}{Optional model object for extracting factor info from coxme models.}
+\item{model}{Optional model object, from which the terms of the model are
+read and the factor levels of coxme models are reconstructed.}
 }
 \value{
 Data.table with 'variable' and 'group' columns.
@@ -20,5 +21,12 @@ Data.table with 'variable' and 'group' columns.
 Splits coefficient term names into base variable names and factor levels.
 For example, "sexMale" becomes variable="sex" and group="Male".
 Handles interaction terms and continuous variables appropriately.
+}
+\details{
+A term that belongs to another variable of the model whose name begins
+with a factor's name, such as a continuous variable "smoking_years" or the
+coefficient "smokerTRUE" of a logical variable "smoker" beside a factor
+"smoking", is not taken for a level of that factor (see
+\code{claimed_by_longer_term()}).
 }
 \keyword{internal}

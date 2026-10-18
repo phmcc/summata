@@ -28,8 +28,12 @@
 #' @param conf_level Numeric confidence level for confidence intervals. Must be
 #'   between 0 and 1. Default is 0.95 (95\% confidence intervals). The CI
 #'   percentage is automatically displayed in column headers (\emph{e.g.,} "90\% CI"
-#'   when \code{conf_level = 0.90}). Note: This parameter affects display only;
-#'   the underlying CIs come from the uniscreen result.
+#'   when \code{conf_level = 0.90}). At the level of the \code{uniscreen()}
+#'   result, the intervals of its table are drawn; at another level, they are
+#'   computed from the coefficients and their standard errors, with the
+#'   \emph{t} distribution on the residual degrees of freedom for linear
+#'   models whose table holds exact \emph{t} intervals, and as Wald
+#'   intervals otherwise.
 #'   
 #' @param font_size Numeric multiplier controlling the base font size for all 
 #'   text elements. Default is 1.0.
@@ -426,6 +430,23 @@ uniforest <- function(x,
         }
     }
     
+    ## The intervals of the table are drawn at the confidence level at which
+    ## uniscreen() computed them 
+    table_level <- attr(x, "conf_level")
+    if (is.null(table_level)) {
+        effect_header <- effect_ci_columns(names(x))
+        if (length(effect_header) > 0L) {
+            table_level <- as.numeric(sub(".*\\(([0-9]+)% CI\\)$", "\\1",
+                                          effect_header[1])) / 100
+        }
+    }
+    if (all(c("coefficient", "se") %in% names(to_show)) &&
+        !(!is.null(table_level) && isTRUE(all.equal(table_level, conf_level)))) {
+        z_crit <- interval_quantile(conf_level, to_show[["df_residual"]])
+        to_show[, `:=`(conf_low = coefficient - z_crit * se,
+                       conf_high = coefficient + z_crit * se)]
+    }
+
     ## Handle level column - m2dt might use 'group' instead
     if ("group" %in% names(to_show) && !"level" %in% names(to_show)) {
         to_show[, level := group]

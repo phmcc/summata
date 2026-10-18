@@ -16,14 +16,19 @@ the cached result is returned directly.}
 for the cache to be used.}
 }
 \value{
-A matrix with one row per model coefficient and two columns
-  (lower and upper bounds), as returned by \code{stats::confint()}.
+A matrix with one row per row of \code{summary(model)$coefficients}
+  and two columns (lower and upper bounds).
 }
 \description{
 Returns confidence intervals for a fitted model, using a cached result
 when available from upstream \code{fit()} or \code{m2dt()} calls to avoid
 redundant computation. This is particularly beneficial for GLM and negative
 binomial models where \code{confint()} performs profile likelihood profiling,
-which can be expensive for models with many parameters.
+which can be expensive for models with many parameters.  Otherwise the
+intervals are computed by \code{coef_confint()}, as in \code{m2dt()}, by the
+method that \code{getOption("summata.conf_method")} selects. They are
+computed for the rows of the coefficient table, which omits aliased
+coefficients, except the intercept, which the forest plots do not show; its
+row holds \code{NA}.
 }
 \keyword{internal}

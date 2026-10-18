@@ -76,3 +76,31 @@ with_missing_outcome <- function(outcome, n_missing = 100L) {
     df[[outcome]][seq_len(n_missing)] <- NA
     data.table::as.data.table(df)
 }
+
+
+## Return the p-values of a result's raw data, without the missing values of
+## the rows that carry no test.
+raw_p <- function(result) {
+    p <- attr(result, "raw_data")$p_value
+    p[!is.na(p)]
+}
+
+
+## Count the observations and events at each level of a variable.
+##
+## Only the complete cases of vars enter, as only they enter a model. An event
+## is coded as the modeling functions code it: the second level of a factor,
+## and otherwise the value itself (0 and 1, or FALSE and TRUE). Levels follow
+## those of a factor, empty levels included, or the sorted values otherwise.
+counts_by_level <- function(data, var, event, vars = c(var, event)) {
+    df <- as.data.frame(data)
+    df <- df[stats::complete.cases(df[vars]), , drop = FALSE]
+    events <- df[[event]]
+    if (is.factor(events)) {
+        events <- as.integer(events) == 2L
+    }
+    groups <- if (is.factor(df[[var]])) df[[var]] else factor(df[[var]])
+    list(n = as.vector(table(groups)),
+         events = vapply(split(as.numeric(events), groups), sum, numeric(1),
+                         USE.NAMES = FALSE))
+}
