@@ -8,7 +8,8 @@ get_analysis_counts(
   data,
   outcome_vars,
   predictor_vars = NULL,
-  event_var = NULL
+  event_var = NULL,
+  event_indicator = NULL
 )
 }
 \arguments{
@@ -22,6 +23,11 @@ of such vectors when several models are described.}
 \item{event_var}{Character name of the event indicator, or \code{NULL} for
 models that carry no event count. Factors are coded as the modeling
 functions code them, with any level beyond the first counting as an event.}
+
+\item{event_indicator}{Numeric vector of the events, one per row of
+\code{data}, coded 1 for an event and 0 otherwise, which is used in place
+of \code{event_var} when given. Survival models pass the events coded
+from their \code{Surv()} response (see \code{get_event_indicator()}).}
 }
 \value{
 Named list with \code{n_supplied}, \code{n_analyzed},

@@ -4,15 +4,13 @@
 #' uniforest, and multiforest. Tests output structure, parameters, visual
 #' elements, mixed-effects models, and interaction terms.
 #' 
-#' @details Run with testthat::test_file("tests/testthat/test_forest.R")
+#' @details Run with testthat::test_file("tests/testthat/test-forest.R")
 
 library(data.table)
 library(ggplot2)
 
-## ============================================================================
-## Setup: Create test data and helper functions
-## ============================================================================
 
+### * Setup: Create test data and helper functions
 
 ## Create complete-case subset for mixed-effects tests
 clintrial_complete <- na.omit(clintrial)
@@ -22,9 +20,8 @@ clintrial$response <- as.integer(clintrial$os_status == 1 & clintrial$os_months 
 clintrial_complete$response <- as.integer(clintrial_complete$os_status == 1 & 
                                           clintrial_complete$os_months < 24)
 
-## ============================================================================
-## Helper Functions
-## ============================================================================
+
+### * Helper functions
 
 ## Helper to check forest plot output structure
 expect_forest_plot <- function(p, has_dims = TRUE) {
@@ -51,9 +48,8 @@ expect_has_layers <- function(p, min_layers = 5) {
                 info = paste("Expected at least", min_layers, "layers, got", n_layers))
 }
 
-## ============================================================================
-## SECTION 1: glmforest() Basic Tests
-## ============================================================================
+
+### * glmforest() basic tests
 
 test_that("glmforest works with basic GLM", {
     
@@ -260,9 +256,7 @@ test_that("glmforest handles interaction terms", {
 })
 
 
-## ============================================================================
-## SECTION 2: lmforest() Basic Tests
-## ============================================================================
+### * lmforest() basic tests
 
 test_that("lmforest works with basic LM", {
     
@@ -322,9 +316,7 @@ test_that("lmforest handles interaction terms", {
 })
 
 
-## ============================================================================
-## SECTION 3: coxforest() Basic Tests
-## ============================================================================
+### * coxforest() basic tests
 
 test_that("coxforest works with basic coxph", {
     
@@ -385,9 +377,7 @@ test_that("coxforest handles interaction terms", {
 })
 
 
-## ============================================================================
-## SECTION 4: autoforest() Tests
-## ============================================================================
+### * autoforest() tests
 
 test_that("autoforest correctly routes GLM", {
     
@@ -452,9 +442,7 @@ test_that("autoforest passes through parameters", {
 })
 
 
-## ============================================================================
-## SECTION 5: uniforest() Tests
-## ============================================================================
+### * uniforest() tests
 
 test_that("uniforest works with uniscreen result", {
     
@@ -531,9 +519,7 @@ test_that("uniforest works with LM uniscreen", {
 })
 
 
-## ============================================================================
-## SECTION 6: multiforest() Tests
-## ============================================================================
+### * multiforest() tests
 
 test_that("multiforest works with multifit result", {
     
@@ -579,9 +565,7 @@ test_that("multiforest respects key parameters", {
 })
 
 
-## ============================================================================
-## SECTION 7: Mixed-Effects Model Tests
-## ============================================================================
+### * Mixed-effects model tests
 
 test_that("glmforest works with glmer models", {
     
@@ -650,9 +634,40 @@ test_that("coxforest works with coxme models", {
 })
 
 
-## ============================================================================
-## SECTION 8: Edge Cases and Error Handling
-## ============================================================================
+test_that("mixed-model forest plots draw the fixed-effect terms", {
+
+    skip_if_not_installed("lme4")
+
+    ## The names within the terms were drawn in place of the terms, "age"
+    ## for log(age) and "grade" for factor(grade), without estimates or
+    ## counts
+    glmer_model <- suppressMessages(suppressWarnings(
+        lme4::glmer(os_status ~ log(age) + sex + (1|site),
+                    data = clintrial_complete, family = binomial)
+    ))
+    lmer_model <- lme4::lmer(los_days ~ log(age) + factor(grade) + (1|site),
+                             data = clintrial_complete)
+
+    glm_rows <- attr(suppressMessages(glmforest(glmer_model,
+                                                data = clintrial_complete)),
+                     "table_data")
+    expect_identical(glm_rows$var, c("log(age)", "sex", "sex"))
+    expect_equal(glm_rows$estimate[1],
+                 unname(lme4::fixef(glmer_model)["log(age)"]))
+    expect_equal(glm_rows$N[1], nrow(glmer_model@frame))
+
+    lm_rows <- attr(suppressMessages(lmforest(lmer_model,
+                                              data = clintrial_complete)),
+                    "table_data")
+    expect_identical(unique(lm_rows$var), c("log(age)", "factor(grade)"))
+    expect_identical(lm_rows$level[lm_rows$var == "factor(grade)"],
+                     levels(clintrial_complete$grade))
+    expect_equal(lm_rows$estimate[1],
+                 unname(lme4::fixef(lmer_model)["log(age)"]))
+})
+
+
+### * Edge cases and error handling
 
 test_that("glmforest handles single predictor", {
     
@@ -742,9 +757,7 @@ test_that("forest functions handle unit conversions", {
 })
 
 
-## ============================================================================
-## SECTION 9: Plot Dimension Tests
-## ============================================================================
+### * Plot dimension tests
 
 test_that("forest plots provide reasonable dimension recommendations", {
     
@@ -782,9 +795,7 @@ test_that("forest plots respect explicit dimensions", {
 })
 
 
-## ============================================================================
-## SECTION 10: table_width Parameter Tests
-## ============================================================================
+### * table_width parameter tests
 
 test_that("forest plots respect table_width parameter", {
     
@@ -805,9 +816,7 @@ test_that("forest plots respect table_width parameter", {
 })
 
 
-## ============================================================================
-## SECTION 11: Integration with fit() workflow
-## ============================================================================
+### * Integration with fit() workflow
 
 test_that("complete fit() to forest workflow works for GLM", {
     
@@ -866,9 +875,7 @@ test_that("complete fit() to forest workflow works for LM", {
 })
 
 
-## ============================================================================
-## SECTION 12: Font Size Parameter Tests
-## ============================================================================
+### * font_size parameter tests
 
 test_that("forest plots respect font_size parameter", {
     
@@ -897,9 +904,7 @@ test_that("forest plots respect annot_size and header_size", {
 })
 
 
-## ============================================================================
-## SECTION 13: exponentiate Parameter Tests
-## ============================================================================
+### * exponentiate parameter tests
 
 test_that("glmforest respects exponentiate = FALSE", {
     
@@ -913,9 +918,7 @@ test_that("glmforest respects exponentiate = FALSE", {
 })
 
 
-## ============================================================================
-## SECTION 14: Consistency Tests
-## ============================================================================
+### * Consistency tests
 
 test_that("autoforest produces same result as direct function call", {
     

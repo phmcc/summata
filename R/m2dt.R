@@ -82,12 +82,14 @@
 #'     \item{group}{Character. Group/level name for factor variables; empty string 
 #'       for continuous variables}
 #'     \item{n}{Integer. Number of observations used in fitting the model, that
-#'       is complete cases across the model variables}
+#'       is complete cases across the model variables; for the levels of a
+#'       factor, the number at that level, as in \code{n_group}}
 #'     \item{n_group}{Integer. Number of those observations at this variable
 #'       level (factor variables only). Group sizes sum to \code{n} within
 #'       each variable}
 #'     \item{events}{Integer. Number of events among the observations used in
-#'       fitting (for survival and logistic models)}
+#'       fitting (for survival and logistic models); for the levels of a
+#'       factor, the number at that level, as in \code{events_group}}
 #'     \item{events_group}{Integer. Number of events at this variable level
 #'       (for survival and logistic models with factor variables). Group counts
 #'       sum to \code{events} within each variable}
@@ -113,6 +115,10 @@
 #'     \item{reference}{Character. Contains \code{reference_label} for reference 
 #'       category rows when \code{reference_rows = TRUE}, empty string otherwise}
 #'   }
+#'
+#'   The model-level sample size and number of events are also recorded in
+#'   the attributes \code{"model_n"} and \code{"model_events"}, since the
+#'   \code{n} and \code{events} columns of factor levels hold group counts.
 #'
 #' @details
 #' This function is the core extraction utility used by \code{fit()} and other
@@ -145,6 +151,13 @@
 #' For \pkg{lme4} models (glmer, lmer), the function extracts fixed effects
 #' only. Random effects variance components are not included in the output
 #' table, as they represent clustering structure rather than predictor effects.
+#'
+#' \strong{Aliased Coefficients:}
+#' Coefficients that the model could not estimate because their columns of
+#' the model matrix are linear combinations of others (\emph{e.g.,} a
+#' predictor entered twice under different names) are omitted for every
+#' model class, as is the reference row of a factor none of whose levels was
+#' estimated.
 #'
 #' @seealso
 #' \code{\link{fit}} for the main regression interface,
@@ -276,13 +289,12 @@ m2dt <- function(data,
         
         coef_summary <- summary(model)$coefficients
 
-        ## Compute confidence intervals.
+        ## Compute confidence intervals with coef_confint(), which the forest
+        ## plots share.
         ## conf_method = "profile": profile likelihood for GLM/negbin, exact t
         ##   for lm, Wald for quasi-families. Falls back to Wald on failure.
         ## conf_method = "wald": Wald (normal approximation) for all models.
         ##   Faster but less accurate near boundary conditions.
-        is_quasi <- inherits(model, "glm") &&
-            grepl("^quasi", model$family$family)
 
         ## Skip profiling the intercept when it will be excluded from output.
         all_terms <- rownames(coef_summary)
@@ -295,27 +307,7 @@ m2dt <- function(data,
             all_terms
         }
 
-        use_wald <- conf_method == "wald" || is_quasi
-
-        conf_int_raw <- if (use_wald) {
-            stats::confint.default(model, parm = parm, level = conf_level)
-        } else {
-            tryCatch(
-                suppressMessages(suppressWarnings(
-                    stats::confint(model, parm = parm, level = conf_level)
-                )),
-                error = function(e) {
-                    stats::confint.default(model, parm = parm, level = conf_level)
-                }
-            )
-        }
-
-        ## Ensure result is always a matrix (confint may return a named
-        ## vector when parm specifies a single parameter)
-        if (is.null(dim(conf_int_raw))) {
-            conf_int_raw <- matrix(conf_int_raw, nrow = 1,
-                                   dimnames = list(parm, names(conf_int_raw)))
-        }
+        conf_int_raw <- coef_confint(model, parm, conf_level, conf_method)
 
         ## Reconstruct full matrix aligned with coef_summary rows
         ## (intercept row gets NA if it was skipped)
@@ -464,12 +456,9 @@ m2dt <- function(data,
                 
                 ## For binomial, add discrimination/calibration metrics
                 if (is_logistic && keep_qc_stats) {
-                    ## C-statistic (if pROC available)
-                    if (requireNamespace("pROC", quietly = TRUE)) {
-                        if (!isS4(model) && !is.null(model$y)) {
-                            roc_obj <- pROC::roc(model$y, stats::fitted(model), quiet = TRUE)
-                            dt[, c_statistic := as.numeric(pROC::auc(roc_obj))]
-                        }
+                    ## C-statistic
+                    if (!isS4(model) && !is.null(model$y)) {
+                        dt[, c_statistic := c_statistic(model$y, stats::fitted(model))]
                     }
                     
                     ## Hosmer-Lemeshow test (if ResourceSelection available)
@@ -559,6 +548,14 @@ m2dt <- function(data,
                               statistic = coef_summary[, "z"],
                               p_value = coef_summary[, "Pr(>|z|)"]
                           )
+
+        ## Coefficients that the model could not estimate because of
+        ## collinearity are NA here, where summary() omits them for linear and
+        ## generalized linear models and lme4 drops them before fitting. They
+        ## are omitted in the same way rather than shown as empty rows, so
+        ## that a factor none of whose levels was estimated has no rows, and
+        ## no reference row is added for it.
+        dt <- dt[!is.na(coefficient)]
 
         ## Add QC stats
         if (keep_qc_stats) {
@@ -818,17 +815,12 @@ m2dt <- function(data,
                     dt[, c_statistic := NA_real_]
                     
                     if (summ$family == "binomial") {
-                        if (requireNamespace("pROC", quietly = TRUE)) {
-                            c_stat <- tryCatch({
-                                fitted_vals <- stats::fitted(model)
-                                response_vals <- model@resp$y
-                                roc_obj <- pROC::roc(response_vals, fitted_vals, quiet = TRUE)
-                                as.numeric(pROC::auc(roc_obj))
-                            }, error = function(e) NA_real_)
+                        c_stat <- tryCatch(
+                            c_statistic(model@resp$y, stats::fitted(model)),
+                            error = function(e) NA_real_)
                             
-                            if (!is.na(c_stat)) {
-                                dt[, c_statistic := c_stat]
-                            }
+                        if (!is.na(c_stat)) {
+                            dt[, c_statistic := c_stat]
                         }
                     }
                 }
@@ -839,11 +831,19 @@ m2dt <- function(data,
         stop("Unsupported model class: ", model_class)
     }
     
+    ## Model-level sample size and events, recorded before the rows of factor
+    ## levels receive their group counts below
+    model_n <- if (nrow(dt) > 0L) dt$n[1] else NA_real_
+    model_events <- if (nrow(dt) > 0L && "events" %in% names(dt)) dt$events[1] else NA_real_
+
     ## Parse terms into variable and group AFTER creating dt
     xlevels <- get_model_xlevels(model)
     
-    ## Parse terms - pass model for coxme special handling
-    parsed <- parse_term(dt$term, xlevels, model)
+    ## Parse terms - pass model for coxme special handling. The coefficients
+    ## of non-syntactic variable names carry backticks ("`high bp`Yes") that
+    ## the names in xlevels and in the data do not, so they are parsed
+    ## without them.
+    parsed <- parse_term(gsub("`", "", dt$term, fixed = TRUE), xlevels, model)
     dt[, `:=`(variable = parsed$variable, group = parsed$group)]
     
     ## Initialize n_group and events_group columns if absent
@@ -922,6 +922,9 @@ m2dt <- function(data,
                 for (var_name in term_vars) {
                     if (var_name %in% names(data_dt) && is.factor(data_dt[[var_name]])) {
                         xlevels[[var_name]] <- levels(data_dt[[var_name]])
+                    } else if (var_name %in% names(data_dt) &&
+                               is.logical(data_dt[[var_name]])) {
+                        xlevels[[var_name]] <- c("FALSE", "TRUE")
                     }
                 }
             }
@@ -962,8 +965,10 @@ m2dt <- function(data,
                     }
                 }
             } else if (model_class %in% c("coxph", "clogit", "coxme")) {
-                ## For all survival models, use the unified helper function
-                event_var <- get_event_variable(model, model_class)
+                ## Survival models: the events coded from the Surv() response
+                coded <- add_event_column(model, model_class, data_dt)
+                data_dt <- coded$data
+                event_var <- coded$event_var
             }
             
             ## Calculate n_group and events_group for all factor variables at once
@@ -983,9 +988,21 @@ m2dt <- function(data,
                         cols_needed <- c(cols_needed, outcome_var)
                     }
                     
+                    ## Logical predictors are counted by level, as factors
+                    ## are. melt() coerces them with a warning when they are
+                    ## melted together with factors, so they are melted as the
+                    ## character values of their levels.
+                    count_dt <- data_dt[, ..cols_needed]
+                    for (col in factor_vars) {
+                        if (is.logical(count_dt[[col]])) {
+                            data.table::set(count_dt, j = col,
+                                            value = as.character(count_dt[[col]]))
+                        }
+                    }
+
                     ## Melt to long format - much faster than lapply for multiple variables
                     long_dt <- data.table::melt(
-                                               data_dt[, ..cols_needed],
+                                               count_dt,
                                                measure.vars = factor_vars,
                                                variable.name = "variable",
                                                value.name = "group",
@@ -1074,9 +1091,12 @@ m2dt <- function(data,
             }
         }
         
-        ## Calculate n_group and events_group for interaction terms
-        ## Interactions are identified by ":" in the variable name
-        interaction_rows <- grep(":", dt$variable, fixed = TRUE)
+        ## Calculate n_group and events_group for interaction terms, the
+        ## coefficients with ":" other than those of levels and variables
+        ## whose names contain one (see is_interaction_term())
+        interaction_rows <- which(is_interaction_term(
+            gsub("`", "", dt$term, fixed = TRUE), xlevels,
+            main_effect_labels(model)))
         
         if (length(interaction_rows) > 0 && !is.null(model_data)) {
             ## data_dt is populated above whenever the model contains factor
@@ -1104,7 +1124,10 @@ m2dt <- function(data,
             event_families <- c("binomial", "quasibinomial", "poisson", "quasipoisson")
             
             if (model_class %in% c("coxph", "clogit", "coxme")) {
-                event_var <- get_event_variable(model, model_class)
+                ## Survival models: the events coded from the Surv() response
+                coded <- add_event_column(model, model_class, data_dt)
+                data_dt <- coded$data
+                event_var <- coded$event_var
             } else if (model_class == "negbin" && !isS4(model)) {
                 ## Negative binomial always has events (count data)
                 if (!is.null(model$formula)) {
@@ -1135,44 +1158,35 @@ m2dt <- function(data,
             
             ## Calculate counts for each interaction term
             for (row_idx in interaction_rows) {
-                term_name <- dt$term[row_idx]
-                
-                ## Split interaction term into components (\emph{e.g.,} "treatmentDrug A:stageII" -> c("treatmentDrug A", "stageII"))
-                components <- strsplit(term_name, ":", fixed = TRUE)[[1]]
+                ## Split the interaction into its components and match each to
+                ## the variable it names (\emph{e.g.,} "treatmentDrug A:stageII"
+                ## -> level "Drug A" of treatment and level "II" of stage).
+                ## Taking the first factor whose name a component began with
+                ## left the component of a non-syntactic name ("`high bp`Yes")
+                ## unmatched, and assigned "sexualityHetero" to "sex" when
+                ## "sex" came first. Every variable of the model is a
+                ## candidate, so that a continuous component ("smoking_years")
+                ## is matched in full rather than taken for a level of a factor
+                ## whose name begins it ("smoking"); other columns of the data
+                ## are not, as a column named like a coefficient ("sexMale")
+                ## would otherwise claim the component of a factor level.
+                components <- split_interaction_term(
+                    dt$term[row_idx],
+                    union(names(xlevels), get_model_variables(model, model_class)),
+                    xlevels)
                 
                 ## Parse each component into variable and level
                 conditions <- list()
                 valid_interaction <- TRUE
                 
-                for (comp in components) {
-                    ## Try to match against xlevels to find variable name and level
-                    found <- FALSE
-                    
-                    if (!is.null(xlevels)) {
-                        for (var_name in names(xlevels)) {
-                            if (startsWith(comp, var_name)) {
-                                level_val <- substring(comp, nchar(var_name) + 1)
-                                if (nchar(level_val) > 0 && var_name %in% names(data_dt)) {
-                                    conditions[[length(conditions) + 1]] <- list(var = var_name, level = level_val)
-                                    found <- TRUE
-                                    break
-                                }
-                            }
-                        }
-                    }
-                    
-                    ## If not found in xlevels, treat as continuous variable
-                    if (!found) {
-                        ## Check if the component is a known variable name (continuous)
-                        if (comp %in% names(data_dt)) {
-                            ## For continuous variables, cannot filter by level
-                            ## Just mark it as continuous (no filtering needed for count)
-                            conditions[[length(conditions) + 1]] <- list(var = comp, level = NULL, continuous = TRUE)
-                            found <- TRUE
-                        }
-                    }
-                    
-                    if (!found) {
+                for (component in components) {
+                    if (!is.na(component$level) && component$var %in% names(data_dt)) {
+                        conditions[[length(conditions) + 1]] <- list(var = component$var, level = component$level)
+                    } else if (component$part %in% names(data_dt)) {
+                        ## For continuous variables, cannot filter by level
+                        ## Just mark it as continuous (no filtering needed for count)
+                        conditions[[length(conditions) + 1]] <- list(var = component$part, level = NULL, continuous = TRUE)
+                    } else {
                         valid_interaction <- FALSE
                         break
                     }
@@ -1238,6 +1252,34 @@ m2dt <- function(data,
     ## Create all reference rows at once (vectorized approach)
     xlevels_ref <- xlevels
     
+    ## A factor whose first level has no observations, which a Cox model
+    ## keeps, is estimated against one of its aliased levels rather than
+    ## against the empty first level (see effective_reference_level()). That
+    ## level becomes the reference row, and the empty level is not shown.
+    ## Where no single level serves (see factor_reference()), the factor is
+    ## shown without a reference row.
+    aliased_terms <- aliased_coefficients(model)
+    if (length(aliased_terms) > 0L && length(xlevels_ref) > 0L) {
+        counting_dt <- if (!is.null(data_dt)) {
+                           data_dt
+                       } else {
+                           get_analysis_data(model, model_class, model_data)
+                       }
+        for (var in intersect(names(xlevels_ref), names(counting_dt))) {
+            lvls <- xlevels_ref[[var]]
+            counts <- tabulate(match(as.character(counting_dt[[var]]), lvls),
+                               nbins = length(lvls))
+            found <- factor_reference(model, var, lvls, counts,
+                                      paste0(var, lvls) %in% aliased_terms)
+            if (!is.na(found$reference)) {
+                xlevels_ref[[var]] <- c(found$reference,
+                                        setdiff(lvls[-1L], found$reference))
+            } else if (found$ambiguous) {
+                xlevels_ref[[var]] <- NULL
+            }
+        }
+    }
+
     if (!is.null(xlevels_ref) && reference_rows && length(xlevels_ref) > 0) {
 
         ## Add reference column to existing data
@@ -1342,11 +1384,19 @@ m2dt <- function(data,
             ## Get template values from first matching row of each variable
             template_dt <- dt[, .SD[1], by = variable][variable %in% vars_in_dt]
             
+            ## Reference terms are named as R names coefficients, with the
+            ## term label of the variable as written in the model, so that a
+            ## non-syntactic name keeps its backticks ("`high bp`No")
+            term_labels <- model_term_labels(model)
+            ref_prefix <- term_labels[match(vars_in_dt,
+                                            gsub("`", "", term_labels, fixed = TRUE))]
+            ref_prefix[is.na(ref_prefix)] <- vars_in_dt[is.na(ref_prefix)]
+
             ## Build reference rows data.table directly
             ref_rows_dt <- data.table::data.table(
                                            variable = vars_in_dt,
                                            group = ref_levels[match(vars_in_dt, ref_vars)],
-                                           term = paste0(vars_in_dt, ref_levels[match(vars_in_dt, ref_vars)]),
+                                           term = paste0(ref_prefix, ref_levels[match(vars_in_dt, ref_vars)]),
                                            coefficient = 0,
                                            se = NA_real_,
                                            coef = 0,
@@ -1415,11 +1465,17 @@ m2dt <- function(data,
                 }
             }
             
+            ## Variables keep the order in which the model lists their
+            ## coefficients: the order of the formula, with interactions after
+            ## the main effects
+            var_order <- unique(dt$variable)
+
             ## Combine main dt and reference rows
             dt <- data.table::rbindlist(list(dt, ref_rows_dt), use.names = TRUE, fill = TRUE)
-            
+
             ## Sort to put reference rows in correct positions
             ## Within each variable, reference row comes first, then levels in original order
+            dt[, .var_order := match(variable, var_order)]
             dt[, .is_ref := reference == reference_label]
             
             ## Create group order based on original factor levels from xlevels
@@ -1438,8 +1494,8 @@ m2dt <- function(data,
                 order_val
             }]
             
-            data.table::setorder(dt, variable, -.is_ref, .group_order)
-            dt[, c(".is_ref", ".group_order") := NULL]
+            data.table::setorder(dt, .var_order, -.is_ref, .group_order)
+            dt[, c(".var_order", ".is_ref", ".group_order") := NULL]
         }
     }
 
@@ -1477,8 +1533,10 @@ m2dt <- function(data,
         ## Get unique variables in dt
         dt_vars <- unique(dt$variable)
         
-        ## Separate interaction terms from main effects
-        interaction_vars <- dt_vars[grepl(":", dt_vars, fixed = TRUE)]
+        ## Separate interaction terms from main effects, whose names may
+        ## contain ":" as well
+        interaction_vars <- dt_vars[grepl(":", dt_vars, fixed = TRUE) &
+                                    !dt_vars %in% main_effect_labels(model)]
         main_effect_vars <- setdiff(dt_vars, interaction_vars)
         
         ## Build ordered_vars using vectorized matching
@@ -1543,6 +1601,11 @@ m2dt <- function(data,
     ## Add attributes
     data.table::setattr(dt, "model_class", model_class)
     data.table::setattr(dt, "formula_str", deparse(stats::formula(model)))
+    data.table::setattr(dt, "model_n", model_n)
+    data.table::setattr(dt, "model_events", model_events)
+    ## The main-effect terms, so that a table can tell a variable whose name
+    ## contains ":" from an interaction term
+    data.table::setattr(dt, "main_terms", main_effect_labels(model))
     
     if (model_class == "glm") {
         data.table::setattr(dt, "model_family", model$family$family)

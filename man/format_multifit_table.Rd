@@ -16,7 +16,10 @@ format_multifit_table(
   include_predictor = TRUE,
   exponentiate = NULL,
   conf_level = 0.95,
-  marks = NULL
+  marks = NULL,
+  interaction_vars = NULL,
+  predictor_levels = NULL,
+  interaction_levels = NULL
 )
 }
 \arguments{
@@ -39,6 +42,17 @@ format_multifit_table(
 \item{include_predictor}{Logical for including predictor column.}
 
 \item{exponentiate}{Logical or \code{NULL} for coefficient handling.}
+
+\item{interaction_vars}{Character vector of the variables of the
+interaction terms, by which their coefficients are labeled (see
+\code{format_interaction_term()}).}
+
+\item{predictor_levels}{Character vector of the levels of the predictor,
+which are told apart from interaction terms when they contain a colon.}
+
+\item{interaction_levels}{Named list of the levels of the variables in
+\code{interaction_vars}, which keeps a level that contains a colon in
+one component of an interaction term.}
 }
 \value{
 Formatted data.table.

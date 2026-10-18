@@ -8,10 +8,8 @@
 
 library(data.table)
 
-## ============================================================================
-## Setup: Create test data and helper functions
-## ============================================================================
 
+### * Setup: Create test data and helper functions
 
 ## Create a complete-case subset for tests requiring no missing data
 clintrial_complete <- na.omit(clintrial)
@@ -38,10 +36,7 @@ expect_total_column <- function(result, label = "Total") {
 }
 
 
-
-## ============================================================================
-## SECTION 1: Basic Functionality - No Grouping
-## ============================================================================
+### * Basic functionality - no grouping
 
 test_that("desctable works without grouping variable", {
     
@@ -73,9 +68,7 @@ test_that("desctable ungrouped shows correct N", {
 })
 
 
-## ============================================================================
-## SECTION 2: Basic Functionality - With Grouping
-## ============================================================================
+### * Basic functionality - with grouping
 
 test_that("desctable works with grouping variable", {
     
@@ -130,9 +123,7 @@ test_that("desctable group N values are correct", {
 })
 
 
-## ============================================================================
-## SECTION 3: Continuous Variables
-## ============================================================================
+### * Continuous variables
 
 test_that("desctable handles continuous variables correctly", {
     
@@ -216,9 +207,7 @@ test_that("desctable multiple stats_continuous creates multiple rows", {
 })
 
 
-## ============================================================================
-## SECTION 4: Categorical Variables
-## ============================================================================
+### * Categorical variables
 
 test_that("desctable handles categorical variables correctly", {
     
@@ -283,9 +272,7 @@ test_that("desctable stats_categorical='percent' shows percent only", {
 })
 
 
-## ============================================================================
-## SECTION 5: Survival Variables
-## ============================================================================
+### * Survival variables
 
 test_that("desctable handles survival variables", {
     
@@ -325,9 +312,7 @@ test_that("desctable survival with grouping shows log-rank test", {
 })
 
 
-## ============================================================================
-## SECTION 6: Statistical Tests
-## ============================================================================
+### * Statistical tests
 
 test_that("desctable test=TRUE adds p-value column", {
     
@@ -488,9 +473,7 @@ test_that("desctable range stat does not show p-value", {
 })
 
 
-## ============================================================================
-## SECTION 7: Total Column Options
-## ============================================================================
+### * Total column options
 
 test_that("desctable total=TRUE includes Total column first", {
     
@@ -564,9 +547,7 @@ test_that("desctable total_label customizes column name", {
 })
 
 
-## ============================================================================
-## SECTION 8: Missing Data Handling
-## ============================================================================
+### * Missing data handling
 
 test_that("desctable na_include=FALSE excludes missing data", {
     
@@ -632,9 +613,7 @@ test_that("desctable na_include shows missing count for continuous", {
 })
 
 
-## ============================================================================
-## SECTION 9: Formatting Options
-## ============================================================================
+### * Formatting options
 
 test_that("desctable respects digits parameter", {
     
@@ -685,17 +664,17 @@ test_that("desctable formats large numbers with commas", {
 })
 
 
-test_that("desctable respects digits_p parameter", {
+test_that("desctable respects p_digits parameter", {
     
     result <- desctable(
         data = clintrial,
         by = "sex",
         variables = c("age"),
         test = TRUE,
-        digits_p = 4
+        p_digits = 4
     )
     
-    ## P-values should have up to 4 decimal places
+    ## P-values should have 4 decimal places
     if ("p-value" %in% names(result)) {
         pvals <- result$`p-value`
         numeric_pvals <- pvals[grepl("^0\\.", pvals)]
@@ -705,15 +684,13 @@ test_that("desctable respects digits_p parameter", {
             decimals <- sapply(numeric_pvals, function(p) {
                 nchar(sub("0\\.", "", p))
             })
-            expect_true(all(decimals <= 4))
+            expect_true(all(decimals == 4))
         }
     }
 })
 
 
-## ============================================================================
-## SECTION 10: Custom Labels
-## ============================================================================
+### * Custom labels
 
 test_that("desctable applies custom labels to variables", {
     
@@ -767,9 +744,7 @@ test_that("desctable labels work for grouping variable", {
 })
 
 
-## ============================================================================
-## SECTION 11: Raw Data Attribute
-## ============================================================================
+### * Raw data attribute
 
 test_that("desctable raw_data attribute has correct structure", {
     
@@ -805,9 +780,7 @@ test_that("desctable raw_data contains numeric values", {
 })
 
 
-## ============================================================================
-## SECTION 12: Edge Cases
-## ============================================================================
+### * Edge cases
 
 test_that("desctable handles single variable", {
     
@@ -900,9 +873,7 @@ test_that("desctable handles groups with different factor levels", {
 })
 
 
-## ============================================================================
-## SECTION 13: Variable Order Preservation
-## ============================================================================
+### * Variable order preservation
 
 test_that("desctable preserves variable order", {
     
@@ -932,9 +903,7 @@ test_that("desctable preserves variable order", {
 })
 
 
-## ============================================================================
-## SECTION 14: Factor Level Ordering
-## ============================================================================
+### * Factor level ordering
 
 test_that("desctable respects factor level ordering in categorical variables", {
     
@@ -974,9 +943,7 @@ test_that("desctable respects factor level ordering in grouping variable", {
 })
 
 
-## ============================================================================
-## SECTION 15: Consistency Tests
-## ============================================================================
+### * Consistency tests
 
 test_that("desctable produces consistent results across runs", {
     
@@ -1018,9 +985,7 @@ test_that("desctable N values are consistent with data", {
 })
 
 
-## ============================================================================
-## SECTION 16: Integration with Export Functions
-## ============================================================================
+### * Integration with export functions
 
 test_that("desctable output is suitable for export", {
     
@@ -1041,9 +1006,7 @@ test_that("desctable output is suitable for export", {
 })
 
 
-## ============================================================================
-## SECTION 17: Complete Table 1 Workflow
-## ============================================================================
+### * Complete Table 1 workflow
 
 test_that("desctable creates complete Table 1", {
     
@@ -1072,9 +1035,7 @@ test_that("desctable creates complete Table 1", {
 })
 
 
-## ============================================================================
-## SECTION 18: Two-group vs Multi-group Tests
-## ============================================================================
+### * Two-group vs multi-group tests
 
 test_that("desctable uses appropriate test for two groups", {
     

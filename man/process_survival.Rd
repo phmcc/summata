@@ -17,6 +17,8 @@ process_survival(
   total,
   total_label,
   marks = NULL,
+  groups = NULL,
+  group_index = NULL,
   ...
 )
 }
@@ -43,7 +45,13 @@ process_survival(
 
 \item{total_label}{Character string label for total column.}
 
-\item{...}{Additional arguments (currently unused).}
+\item{groups}{Optional vector of groups (see \code{process_variable()}).}
+
+\item{group_index}{Optional list of row positions for each group (see
+\code{process_variable()}).}
+
+\item{...}{Additional arguments; \code{rho} and \code{timefix} are passed
+to \code{survival::survdiff()}.}
 }
 \value{
 List with 'formatted' and 'raw' data.table components.

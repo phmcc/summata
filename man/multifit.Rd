@@ -47,7 +47,8 @@ analysis, use \code{Surv()} syntax for the outcome variable
 
 \item{predictor}{Character string specifying the predictor (exposure) variable 
 name. This variable is tested against each outcome. Can be continuous or 
-categorical (factor).}
+categorical (factor). Non-syntactic names (\emph{e.g.,} \code{"tumor stage"})
+are quoted in the model formula and need no backticks.}
 
 \item{covariates}{Optional character vector of covariate variable names to 
 include in adjusted models. When specified, models are fit as 
@@ -299,6 +300,8 @@ A data.table with S3 class \code{"multifit_result"} containing formatted
     \item{cluster}{Character or \code{NULL}. The clustering variable}
     \item{model_type}{Character. The regression model type used}
     \item{columns}{Character. Which columns were displayed}
+    \item{conf_level}{Numeric. The confidence level of the intervals, which
+      \code{multiforest()} uses to draw the same intervals}
     \item{analysis_type}{Character. \code{"multi_outcome"} to identify analysis type}
     \item{significant}{Character vector. Names of outcomes with \emph{p} < 0.05
       for the predictor (uses adjusted \emph{p}-values when available)}

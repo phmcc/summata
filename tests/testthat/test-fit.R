@@ -7,10 +7,8 @@
 
 library(data.table)
 
-## ============================================================================
-## Setup: Create test data and helper functions
-## ============================================================================
 
+### * Setup: Create test data and helper functions
 
 ## Create a complete-case subset for tests requiring no missing data
 clintrial_complete <- na.omit(clintrial)
@@ -67,9 +65,7 @@ expect_reference_rows <- function(result, vars_with_refs) {
 }
 
 
-## ============================================================================
-## SECTION 1: Basic GLM (Logistic Regression) Tests
-## ============================================================================
+### * Basic GLM (logistic regression) tests
 
 test_that("fit works with basic logistic regression - univariable", {
     
@@ -276,9 +272,7 @@ test_that("fit respects p_digits parameter", {
 })
 
 
-## ============================================================================
-## SECTION 2: Linear Model Tests
-## ============================================================================
+### * Linear model tests
 
 test_that("fit works with linear regression - univariable", {
     
@@ -349,9 +343,7 @@ test_that("fit linear model QC stats are captured", {
 })
 
 
-## ============================================================================
-## SECTION 3: Cox Proportional Hazards Tests
-## ============================================================================
+### * Cox proportional hazards tests
 
 test_that("fit works with Cox regression - univariable", {
     
@@ -458,9 +450,7 @@ test_that("fit Cox model with both strata and cluster", {
 })
 
 
-## ============================================================================
-## SECTION 4: Poisson Regression Tests
-## ============================================================================
+### * Poisson regression tests
 
 test_that("fit works with Poisson regression", {
     
@@ -484,9 +474,7 @@ test_that("fit works with Poisson regression", {
 })
 
 
-## ============================================================================
-## SECTION 5: Interaction Terms Tests
-## ============================================================================
+### * Interaction terms tests
 
 test_that("fit handles basic interaction terms", {
     
@@ -531,9 +519,8 @@ test_that("fit handles multiple interaction terms", {
     expect_true(grepl("age:treatment", formula_str))
 })
 
-## ============================================================================
-## SECTION 6: Weighted Regression Tests
-## ============================================================================
+
+### * Weighted regression tests
 
 test_that("fit handles weights in GLM", {
     
@@ -597,9 +584,7 @@ test_that("weighted vs unweighted models produce different results", {
 })
 
 
-## ============================================================================
-## SECTION 7: Custom Labels Tests
-## ============================================================================
+### * Custom labels tests
 
 test_that("fit applies custom labels to variables", {
     
@@ -672,9 +657,7 @@ test_that("fit labels work with clintrial_labels dataset", {
 })
 
 
-## ============================================================================
-## SECTION 8: Confidence Level Tests
-## ============================================================================
+### * Confidence level tests
 
 test_that("fit respects conf_level parameter", {
     
@@ -724,9 +707,7 @@ test_that("fit works with 99% confidence interval", {
 })
 
 
-## ============================================================================
-## SECTION 9: Exponentiate Parameter Tests
-## ============================================================================
+### * exponentiate parameter tests
 
 test_that("fit auto-exponentiates for logistic regression", {
     
@@ -780,9 +761,7 @@ test_that("fit exponentiate = TRUE forces OR even for linear model", {
 })
 
 
-## ============================================================================
-## SECTION 10: Mixed Effects Models Tests
-## ============================================================================
+### * Mixed effects models tests
 
 test_that("fit works with lmer (linear mixed effects)", {
     
@@ -859,9 +838,7 @@ test_that("fit works with coxme (mixed effects Cox)", {
 })
 
 
-## ============================================================================
-## SECTION 11: Conditional Logistic Regression Tests
-## ============================================================================
+### * Conditional logistic regression tests
 
 test_that("fit works with conditional logistic regression", {
     
@@ -891,9 +868,7 @@ test_that("fit works with conditional logistic regression", {
 })
 
 
-## ============================================================================
-## SECTION 12: QC Stats and Raw Data Tests
-## ============================================================================
+### * QC stats and raw data tests
 
 test_that("fit keeps QC stats when requested", {
     
@@ -957,9 +932,7 @@ test_that("fit model object is accessible and valid", {
 })
 
 
-## ============================================================================
-## SECTION 13: Edge Cases and Error Handling
-## ============================================================================
+### * Edge cases and error handling
 
 test_that("fit handles missing data appropriately", {
     
@@ -1047,9 +1020,7 @@ test_that("fit handles empty predictors appropriately", {
 })
 
 
-## ============================================================================
-## SECTION 13B: Input Validation Tests
-## ============================================================================
+### * Input validation tests
 
 test_that("fit auto-corrects Surv outcome with GLM model_type", {
     
@@ -1283,9 +1254,7 @@ test_that("fit handles very long predictor lists", {
 })
 
 
-## ============================================================================
-## SECTION 14: Print Method Tests
-## ============================================================================
+### * Print method tests
 
 test_that("print.fit_result produces output", {
     
@@ -1324,9 +1293,7 @@ test_that("print.fit_result shows events for survival models", {
 })
 
 
-## ============================================================================
-## SECTION 15: Integration and Consistency Tests
-## ============================================================================
+### * Integration and consistency tests
 
 test_that("fit produces consistent results across runs", {
     
@@ -1417,13 +1384,9 @@ test_that("fit preserves factor level ordering", {
 })
 
 
-## ============================================================================
-## SECTION 16: Different GLM Families Tests
-## ============================================================================
+### * Different GLM families tests
 
-## ----------------------------------------------------------------------------
-## 16a: Gaussian Family Tests
-## ----------------------------------------------------------------------------
+### ** Gaussian family tests
 
 test_that("fit works with gaussian family", {
     
@@ -1491,9 +1454,7 @@ test_that("fit gaussian matches lm results", {
 })
 
 
-## ----------------------------------------------------------------------------
-## 16b: Quasibinomial Family Tests (overdispersed binary)
-## ----------------------------------------------------------------------------
+### ** Quasibinomial family tests (overdispersed binary)
 
 test_that("fit works with quasibinomial family", {
     
@@ -1581,9 +1542,7 @@ test_that("fit quasibinomial handles overdispersion", {
 })
 
 
-## ----------------------------------------------------------------------------
-## 16c: Quasipoisson Family Tests (overdispersed counts)
-## ----------------------------------------------------------------------------
+### ** Quasipoisson family tests (overdispersed counts)
 
 test_that("fit works with quasipoisson family", {
     
@@ -1671,9 +1630,7 @@ test_that("fit quasipoisson handles overdispersion", {
 })
 
 
-## ----------------------------------------------------------------------------
-## 16d: Gamma Family Tests (positive continuous)
-## ----------------------------------------------------------------------------
+### ** Gamma family tests (positive continuous)
 
 test_that("fit works with Gamma family (log link)", {
     
@@ -1766,9 +1723,7 @@ test_that("fit Gamma handles factor variables", {
 })
 
 
-## ----------------------------------------------------------------------------
-## 16e: Inverse Gaussian Family Tests (positive, right-skewed)
-## ----------------------------------------------------------------------------
+### ** Inverse Gaussian family tests (positive, right-skewed)
 
 test_that("fit works with inverse.gaussian family", {
     
@@ -1838,9 +1793,7 @@ test_that("fit inverse.gaussian coefficients match direct glm", {
 })
 
 
-## ----------------------------------------------------------------------------
-## 16f: Negative Binomial (negbin) Tests
-## ----------------------------------------------------------------------------
+### ** Negative binomial (negbin) tests
 
 test_that("fit works with negative binomial regression (negbin)", {
     
@@ -2025,9 +1978,7 @@ test_that("fit with pre-fitted model works for negbin", {
 })
 
 
-## ============================================================================
-## SECTION 17: Model Attribute Preservation Tests
-## ============================================================================
+### * Model attribute preservation tests
 
 test_that("fit preserves all specified attributes", {
     
@@ -2072,9 +2023,7 @@ test_that("fit stores data in model object", {
 })
 
 
-## ============================================================================
-## SECTION 18: Performance and Large Data Tests
-## ============================================================================
+### * Performance and large data tests
 
 test_that("fit handles moderately large datasets", {
     
@@ -2097,9 +2046,7 @@ test_that("fit handles moderately large datasets", {
 })
 
 
-## ============================================================================
-## SECTION 19: Numeric Precision Tests
-## ============================================================================
+### * Numeric precision tests
 
 test_that("fit handles extreme coefficient values", {
     
@@ -2147,9 +2094,7 @@ test_that("fit handles perfect separation gracefully", {
 })
 
 
-## ============================================================================
-## SECTION 20: Formula String Validation Tests
-## ============================================================================
+### * Formula string validation tests
 
 test_that("fit formula_str is valid R formula", {
     
@@ -2189,9 +2134,7 @@ test_that("fit formula includes all components correctly", {
 })
 
 
-## ============================================================================
-## SECTION 22: Profile Likelihood CI and Caching
-## ============================================================================
+### * Profile likelihood CI and caching
 
 test_that("fit propagates cached confint to model attribute", {
     

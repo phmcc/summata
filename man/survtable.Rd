@@ -44,7 +44,10 @@ as row headers.}
 
 \item{by}{Character string specifying the column name of the stratifying
 variable for group comparisons (\emph{e.g.,} treatment arm, risk group). When
-\code{NULL} (default), produces overall survival summaries only.}
+\code{NULL} (default), produces overall survival summaries only. Groups
+appear in the order of the levels of a factor, including empty levels,
+and otherwise in order of first appearance in the data, as in
+\code{desctable()}.}
 
 \item{times}{Numeric vector of time points at which to estimate survival
 probabilities. For example, \code{c(12, 24, 36)} for 1-, 2-, and 3-year
@@ -110,10 +113,11 @@ to be specified.}
 comparing survival curves:
 \itemize{
   \item \code{"logrank"} - Log-rank test (default)
-  \item \code{"wilcoxon"} - Wilcoxon (Breslow) test
+  \item \code{"wilcoxon"} - Gehan-Breslow generalized Wilcoxon test
   \item \code{"tarone"} - Tarone-Ware test
   \item \code{"petopeto"} - Peto-Peto test
-}}
+}
+See Details for the weights that define each test.}
 
 \item{total}{Logical or character string controlling the total/overall
 column:
@@ -237,15 +241,25 @@ commonly used and may perform better in the tails.
 \strong{Statistical Testing:}
 
 The log-rank test (default) tests the null hypothesis that survival curves
-are identical across groups. Alternative tests weight different parts of
-the survival curve:
+are identical across groups. It compares the observed and expected numbers
+of events in each group at every event time; the alternative tests weight
+these comparisons, with \eqn{n_j} subjects at risk and \eqn{d_j} events at
+event time \eqn{t_j}:
 \itemize{
   \item Log-rank: Equal weights (best for proportional hazards)
-  \item Wilcoxon: Weights by number at risk (sensitive to early
-    differences)
-  \item Tarone-Ware: Weights by square root of number at risk
-  \item Peto-Peto: Modified Wilcoxon weights
+  \item Gehan-Breslow (\code{"wilcoxon"}): Weights \eqn{n_j}, the number at
+    risk, which emphasize early differences
+  \item Tarone-Ware: Weights \eqn{\sqrt{n_j}}{sqrt(n_j)}, between the
+    log-rank and Gehan-Breslow weights
+  \item Peto-Peto: Weights
+    \eqn{\tilde{S}(t_j) = \prod_{t_i \le t_j} (1 - d_i / (n_i + 1))}{S(t_j) = prod over t_i <= t_j of (1 - d_i / (n_i + 1))},
+    an estimate of the pooled survival function, which also emphasize early
+    differences but, unlike the number at risk, do not depend on the
+    censoring distribution
 }
+The log-rank test is computed by \code{survival::survdiff()}. The weighted
+tests use the same statistic and variance with the weights above, the
+definitions of the SAS LIFETEST and Stata \code{sts test} procedures.
 
 \strong{Formatting:}
 
@@ -368,7 +382,7 @@ survtable(
     labels = clintrial_labels
 )
 
-# Example 11: Wilcoxon test instead of log-rank
+# Example 11: Gehan-Breslow generalized Wilcoxon test instead of log-rank
 survtable(
     data = clintrial,
     outcome = "Surv(os_months, os_status)",

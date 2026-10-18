@@ -4,13 +4,19 @@
 \alias{perform_categorical_test}
 \title{Perform statistical tests for categorical variables}
 \usage{
-perform_categorical_test(tab, test_type)
+perform_categorical_test(tab, test_type, test_args = list(), var_name = NULL)
 }
 \arguments{
 \item{tab}{Contingency table (matrix or table object).}
 
 \item{test_type}{Character string: "chisq" for chi-square, "fisher" for
 Fisher's exact, or "auto" for automatic selection.}
+
+\item{test_args}{Named list of additional test arguments from \code{...};
+each test receives only the arguments it accepts (see
+\code{filter_test_args()}).}
+
+\item{var_name}{Character string naming the variable, used in warnings.}
 }
 \value{
 Numeric \emph{p}-value from the hypothesis test.
@@ -18,6 +24,11 @@ Numeric \emph{p}-value from the hypothesis test.
 \description{
 Conducts chi-square or Fisher's exact tests for categorical variables
 across groups. Automatically selects Fisher's exact test for small
-expected frequencies.
+expected frequencies. The test compares the observed levels of the variable
+across the defined groups. The missing-value row and column that
+\code{table(useNA = "ifany")} adds are removed, as are levels and groups
+ithout observations: an empty row or column contributes nothing to either
+test, but its zero expected counts would otherwise select the exact test
+under \code{"auto"} and make the chi-square statistic undefined.
 }
 \keyword{internal}

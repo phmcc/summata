@@ -11,7 +11,8 @@ extract_predictor_effects(
   conf_level = 0.95,
   adjusted = FALSE,
   terms_to_extract = NULL,
-  conf_method = NULL
+  conf_method = NULL,
+  predictor_levels = NULL
 )
 }
 \arguments{
@@ -27,6 +28,11 @@ extract_predictor_effects(
 
 \item{terms_to_extract}{Character vector of terms to extract (predictor and 
 optionally interaction terms involving the predictor).}
+
+\item{predictor_levels}{Character vector of the levels of the predictor,
+by which its coefficients are named (\code{"FALSE"} and \code{"TRUE"}
+for a logical predictor, none for a numeric one). When \code{NULL}, the
+levels recorded by the model are used.}
 }
 \value{
 data.table with predictor effect information.

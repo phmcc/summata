@@ -62,7 +62,12 @@ as \code{"< 0.001"} (for \code{p_digits = 3}), \code{"< 0.0001"} (for
 \item{conf_level}{Numeric confidence level for confidence intervals. Must be
 between 0 and 1. Default is 0.95 (95\% confidence intervals). The CI
 percentage is automatically displayed in column headers (\emph{e.g.,} "90\% CI"
-when \code{conf_level = 0.90}).}
+when \code{conf_level = 0.90}). At the level of the \code{multifit()}
+result, the intervals of its table are drawn; at another level, they are
+computed from the coefficients and their standard errors, with the
+\emph{t} distribution on the residual degrees of freedom for linear
+models whose table holds exact \emph{t} intervals, and as Wald
+intervals otherwise.}
 
 \item{font_size}{Numeric multiplier controlling the base font size for all 
 text elements. Default is 1.0.}

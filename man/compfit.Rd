@@ -163,7 +163,11 @@ combines multiple metrics: lower AIC/BIC (information criteria), higher
 concordance (discrimination), and model convergence status.
 
 For GLMs, McFadden's pseudo-R-squared is calculated as 1 - (logLik/logLik_null).
-For survival models, the global \emph{p}-value comes from the log-rank test.
+For Cox models, the global \emph{p}-value is that of the likelihood-ratio
+test of all coefficients. For linear mixed-effects models fitted by REML,
+AIC, BIC, and the global likelihood-ratio test are computed from maximum
+likelihood refits (\code{lme4::refitML()}), because REML likelihoods are not
+comparable between models with different fixed effects.
 
 Models that fail to converge are flagged and penalized in the composite score.
 

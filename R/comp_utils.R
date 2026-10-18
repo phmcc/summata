@@ -22,7 +22,8 @@ check_convergence <- function(model) {
     
     if (inherits(model, "glm")) {
         if (!model$converged) return("No")
-        if (any(abs(coef(model)) > 10)) return("Suspect")
+        ## Aliased coefficients are NA and are ignored, as in the other branches
+        if (any(abs(coef(model)) > 10, na.rm = TRUE)) return("Suspect")
         return("Yes")
         
     } else if (inherits(model, c("coxph", "coxme"))) {
@@ -201,9 +202,12 @@ check_required_packages <- function(model_type) {
 #' @keywords internal
 extract_model_metrics <- function(model, raw_data, model_type) {
     
+    ## Model-level counts: the n and events columns of the first row describe
+    ## a single level when the first predictor is a factor
     metrics <- list(
-        n = raw_data$n[1],
-        events = if ("events" %chin% names(raw_data)) raw_data$events[1] else NA_integer_,
+        n = attr(raw_data, "model_n") %||% raw_data$n[1],
+        events = attr(raw_data, "model_events") %||%
+            (if ("events" %chin% names(raw_data)) raw_data$events[1] else NA_integer_),
         predictors = length(coef(model)),
         aic = if ("AIC" %chin% names(raw_data)) raw_data$AIC[1] else AIC(model),
         bic = if ("BIC" %chin% names(raw_data)) raw_data$BIC[1] else BIC(model),
@@ -253,17 +257,8 @@ extract_model_metrics <- function(model, raw_data, model_type) {
             metrics$tjur_r2 <- mean(pred_probs[model$y == 1]) - mean(pred_probs[model$y == 0])
             
             ## C-statistic (concordance)
-            if (requireNamespace("pROC", quietly = TRUE)) {
-                roc_obj <- pROC::roc(model$y, fitted(model), quiet = TRUE)
-                metrics$c_statistic <- as.numeric(pROC::auc(roc_obj))
-                metrics$concordance <- metrics$c_statistic  # Set generic concordance
-                
-                ## Optimal threshold metrics
-                coords <- pROC::coords(roc_obj, "best", ret = c("threshold", "sensitivity", "specificity"))
-                metrics$optimal_threshold <- coords$threshold
-                metrics$sensitivity <- coords$sensitivity
-                metrics$specificity <- coords$specificity
-            }
+            metrics$c_statistic <- c_statistic(model$y, fitted(model))
+            metrics$concordance <- metrics$c_statistic  # Set generic concordance
             
             ## Brier score
             metrics$brier_score <- mean((fitted(model) - model$y)^2)
@@ -416,12 +411,23 @@ extract_lmer_metrics <- function(model, raw_data, metrics) {
         metrics$icc <- random_var / (random_var + residual_var)
     }
     
-    ## Global test using likelihood ratio test
-    ## Compare to null model (intercept + random effects only)
-    null_formula <- stats::update(stats::formula(model), . ~ 1 + (1 | .))
+    ## Candidate models differ in their fixed effects, and REML likelihoods
+    ## are not comparable between models with different fixed effects, so the
+    ## information criteria and the likelihood-ratio test use maximum
+    ## likelihood fits, as anova() does for merMod objects
+    model_ml <- if (lme4::isREML(model)) {
+                    tryCatch(suppressWarnings(lme4::refitML(model)),
+                             error = function(e) NULL)
+                } else {
+                    model
+                }
+    metrics$aic <- if (!is.null(model_ml)) stats::AIC(model_ml) else NA_real_
+    metrics$bic <- if (!is.null(model_ml)) stats::BIC(model_ml) else NA_real_
     
-    ## Try to fit null model and compute LR test
-    tryCatch({
+    ## Global test using likelihood ratio test
+    ## Compare to null model (intercept + random effects only). The global
+    ## p-value is left missing when the null model cannot be fitted.
+    if (!is.null(model_ml)) tryCatch({
         ## Get random effects structure
         ## lme4 has moved findbars() to the reformulas package and warns when
         ## called through the old location. Prefer reformulas where it is
@@ -435,28 +441,17 @@ extract_lmer_metrics <- function(model, raw_data, metrics) {
             ## Build null formula with random effects
             re_string <- paste(sapply(re_terms, deparse), collapse = " + ")
             null_form <- stats::as.formula(paste(". ~ 1 +", re_string))
-            null_model <- stats::update(model, formula = null_form)
+            null_model <- suppressWarnings(stats::update(model, formula = null_form,
+                                                         REML = FALSE))
             
             ## LR test
-            lr_stat <- as.numeric(-2 * (logLik(null_model) - logLik(model)))
-            df_diff <- attr(logLik(model), "df") - attr(logLik(null_model), "df")
+            lr_stat <- as.numeric(-2 * (logLik(null_model) - logLik(model_ml)))
+            df_diff <- attr(logLik(model_ml), "df") - attr(logLik(null_model), "df")
             if (df_diff > 0) {
                 metrics$global_p <- pchisq(lr_stat, df_diff, lower.tail = FALSE)
             }
         }
-    }, error = function(e) {
-        ## If null model fails, use Wald test approximation
-        summ <- summary(model)
-        coef_tab <- coef(summ)
-        if (nrow(coef_tab) > 1) {
-            ## Use minimum p-value as conservative estimate
-            ## (excluding intercept)
-            if (ncol(coef_tab) >= 5) {
-                p_vals <- coef_tab[-1, ncol(coef_tab)]
-                metrics$global_p <- min(p_vals, na.rm = TRUE)
-            }
-        }
-    })
+    }, error = function(e) NULL)
     
     return(metrics)
 }
@@ -512,18 +507,12 @@ extract_glmer_metrics <- function(model, raw_data, metrics) {
     
     ## C-statistic for binomial models
     if (summ$family == "binomial") {
-        if (requireNamespace("pROC", quietly = TRUE)) {
-            c_stat <- tryCatch({
-                fitted_vals <- fitted(model)
-                response_vals <- model@resp$y
-                roc_obj <- pROC::roc(response_vals, fitted_vals, quiet = TRUE)
-                as.numeric(pROC::auc(roc_obj))
-            }, error = function(e) NA_real_)
+        c_stat <- tryCatch(c_statistic(model@resp$y, fitted(model)),
+                           error = function(e) NA_real_)
             
-            if (!is.na(c_stat)) {
-                metrics$c_statistic <- c_stat
-                metrics$concordance <- c_stat
-            }
+        if (!is.na(c_stat)) {
+            metrics$c_statistic <- c_stat
+            metrics$concordance <- c_stat
         }
         
         ## Brier score
@@ -1034,7 +1023,8 @@ calculate_model_scores <- function(comparison, model_type, scoring_weights = NUL
         scores$total <- scores$conv_score * weights$convergence +
             scores$aic_score * weights$aic +
             scores$concordance_score * weights$concordance +
-            scores$pseudo_r2_score * weights$pseudo_r2
+            scores$pseudo_r2_score * weights$pseudo_r2 +
+            scores$brier_score * weights$brier
         
     } else if (model_type == "coxph") {
         ## Similar adjustments for Cox models
@@ -1048,9 +1038,14 @@ calculate_model_scores <- function(comparison, model_type, scoring_weights = NUL
             scores$concordance_score <- rep(50, n_models)
         }
         
-        ## Global p-value score
-        if ("Global p" %chin% names(comparison)) {
-            global_numeric <- suppressWarnings(as.numeric(gsub("< ", "", comparison$`Global p`)))
+        ## Global p-value score, from the unformatted p-values where available:
+        ## the formatted column depends on p_digits and on the decimal mark
+        if (".global_p" %chin% names(comparison) || "Global p" %chin% names(comparison)) {
+            global_numeric <- if (".global_p" %chin% names(comparison)) {
+                                  comparison$.global_p
+                              } else {
+                                  suppressWarnings(as.numeric(gsub("< ", "", comparison$`Global p`)))
+                              }
             scores$global_score <- data.table::fcase(
                                                    is.na(global_numeric), 50,
                                                    global_numeric > 0.05, 50,

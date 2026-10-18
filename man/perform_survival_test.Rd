@@ -14,9 +14,22 @@ perform_survival_test(surv_obj, group_var, test_type)
 \item{test_type}{Character string specifying test type.}
 }
 \value{
-List with test statistic, \emph{p}-value, and test type.
+List with test statistic, degrees of freedom, \emph{p}-value, and
+  test type. The statistic, degrees of freedom, and \emph{p}-value are
+  \code{NA} when fewer than two groups have expected events.
 }
 \description{
-Performs statistical test comparing survival curves across groups.
+Performs statistical test comparing survival curves across groups. The
+log-rank test is computed by \code{survival::survdiff()}. The Gehan-Breslow
+(\code{"wilcoxon"}), Tarone-Ware (\code{"tarone"}), and Peto-Peto
+(\code{"petopeto"}) tests weight each event time by the number at risk, its
+square root, and the Peto-Peto estimate of the pooled survival function,
+respectively (see \code{weighted_logrank_test()}). \code{survdiff()} offers
+only the weights \eqn{\hat{S}(t-)^\rho}{S(t-)^rho} of the Fleming-Harrington
+tests, of which \eqn{\rho = 1}{rho = 1} approximates the Peto-Peto test and
+none gives the other two. Groups without expected events, such as a group
+whose observations are all censored before the first event, are left out of
+the test, as \code{survdiff()} leaves them out, and the degrees of freedom
+count the groups that remain.
 }
 \keyword{internal}

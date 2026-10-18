@@ -19,6 +19,8 @@
 #' @param predictors Character vector of predictor variable names to screen. Each 
 #'   predictor is tested independently in its own univariable model. Can include 
 #'   continuous, categorical (factor), or binary variables.
+#'   Non-syntactic names (\emph{e.g.,} \code{"tumor stage"}) are quoted in
+#'   the model formula and need no backticks.
 #'   
 #' @param model_type Character string specifying the type of regression model to 
 #'   fit. Options include:
@@ -246,6 +248,8 @@
 #'       via \code{attr(result, "models")[["predictor_name"]]}}
 #'     \item{outcome}{Character. The outcome variable name used}
 #'     \item{model_type}{Character. The regression model type used}
+#'     \item{conf_level}{Numeric. The confidence level of the intervals, which
+#'       \code{uniforest()} uses to draw the same intervals}
 #'     \item{model_scope}{Character. Always "Univariable" for screening results}
 #'     \item{screening_type}{Character. Always "univariable" to identify the 
 #'       analysis type}
@@ -684,6 +688,11 @@ uniscreen <- function(data,
     ## Resolve verbose setting
     verbose <- if (is.null(verbose)) getOption("summata.verbose", FALSE) else verbose
     
+    ## Variables are column names, which may be given with backticks; the
+    ## formula of each model quotes the names that require it
+    outcome <- formula_names(outcome, names(data), quote = FALSE)
+    predictors <- formula_names(predictors, names(data), quote = FALSE)
+
     ## Validate inputs and auto-correct model type if needed
     validation <- validate_fit_inputs(
         data = data,
@@ -756,13 +765,26 @@ uniscreen <- function(data,
     
     ## Define model fitting function (used by lapply/mclapply)
     fit_one_predictor <- function(pred) {
-        ## Build formula - for mixed-effects, append random effects
-        formula_str <- paste(outcome, "~", pred)
+        ## Build formula, with backticks around non-syntactic names - for
+        ## mixed-effects, append random effects
+        outcome_term <- formula_names(outcome, names(data))
+        pred_term <- formula_names(pred, names(data))
+        formula_str <- paste(outcome_term, "~", pred_term)
         if (model_type %in% c("glmer", "lmer")) {
             formula_str <- paste(formula_str, "+", random)
         }
         formula <- stats::as.formula(formula_str)
         
+        ## Cox models keep factor levels without observations, which the
+        ## other models drop; they are dropped from the data of each model,
+        ## so that every model takes the first level with observations as its
+        ## reference
+        fit_data <- if (model_type %in% c("coxph", "clogit", "coxme")) {
+                        drop_empty_levels(data, c(outcome_term, pred_term, random))
+                    } else {
+                        data
+                    }
+
         ## Fit model based on type
         ## Use model=FALSE for glm/lm when not keeping models to save memory
         model <- quiet_fit(quote(
@@ -780,13 +802,13 @@ uniscreen <- function(data,
                    "coxph" = {
                        if (!requireNamespace("survival", quietly = TRUE)) 
                            stop("Package 'survival' required for Cox models")
-                       survival::coxph(formula, data = data, 
+                       survival::coxph(formula, data = fit_data,
                                        model = keep_models, x = FALSE, y = TRUE, ...)
                    },
                    "clogit" = {
                        if (!requireNamespace("survival", quietly = TRUE))
                            stop("Package 'survival' required for conditional logistic regression")
-                       survival::clogit(formula, data = data, ...)
+                       survival::clogit(formula, data = fit_data, ...)
                    },
                    "glmer" = {
                        if (!requireNamespace("lme4", quietly = TRUE))
@@ -804,15 +826,15 @@ uniscreen <- function(data,
                        if (!requireNamespace("survival", quietly = TRUE))
                            stop("Package 'survival' required for coxme models")
                        ## coxme uses different formula syntax - random in formula
-                       coxme_formula <- stats::as.formula(paste(outcome, "~", pred, "+", random))
-                       coxme::coxme(coxme_formula, data = data, ...)
+                       coxme_formula <- stats::as.formula(paste(outcome_term, "~", pred_term, "+", random))
+                       coxme::coxme(coxme_formula, data = fit_data, ...)
                    },
                    stop("Unsupported model type: ", model_type)
                    )
         ), verbose = verbose)
         
         raw_result <- m2dt(
-            data = data,
+            data = fit_data,
             model = model,
             conf_level = conf_level,
             keep_qc_stats = FALSE,
@@ -825,6 +847,18 @@ uniscreen <- function(data,
         ## Add predictor name for tracking
         raw_result[, predictor := pred]
         
+        ## The intervals of a linear model are exact t intervals unless Wald
+        ## intervals were requested. Its residual degrees of freedom let
+        ## uniforest() compute t intervals at another confidence level.
+        resolved_method <- if (is.null(conf_method)) {
+                               getOption("summata.conf_method", "profile")
+                           } else {
+                               match.arg(conf_method, c("profile", "wald"))
+                           }
+        if (identical(class(model)[1L], "lm") && resolved_method != "wald") {
+            raw_result[, df_residual := stats::df.residual(model)]
+        }
+
         ## Return both raw result and optionally the model
         list(
             raw = raw_result,
@@ -841,16 +875,13 @@ uniscreen <- function(data,
         length(predictors) > 1 && 
         (.Platform$OS.type != "windows" || can_use_windows_parallel)
     
+    ## A failure is returned as a value, so that the sequential and parallel
+    ## paths both report every failed predictor by name
+    fit_or_error <- capture_fit_error(fit_one_predictor)
+
     if (use_parallel) {
-        ## Determine number of cores
-        if (is.null(n_cores)) {
-            n_cores <- max(1L, parallel::detectCores() - 1L)
-        }
-        ## CRAN policy: respect _R_CHECK_LIMIT_CORES_ environment variable
-        chk <- tolower(Sys.getenv("_R_CHECK_LIMIT_CORES_", ""))
-        if (nzchar(chk) && chk == "true") {
-            n_cores <- min(n_cores, 2L)
-        }
+        ## Determine number of cores (respects _R_CHECK_LIMIT_CORES_)
+        n_cores <- resolve_core_count(n_cores)
         
         if (.Platform$OS.type == "windows") {
             ## Windows: use parLapply() with PSOCK cluster
@@ -892,25 +923,31 @@ uniscreen <- function(data,
                 parallel::clusterEvalQ(cl, library(coxme))
             }
             
-            results <- parallel::parLapply(cl, predictors, fit_one_predictor)
+            results <- parallel::parLapply(cl, predictors, fit_or_error)
             
         } else {
             ## Unix/Mac: use mclapply (fork-based, shares memory so no export needed)
             results <- parallel::mclapply(
                                      predictors, 
-                                     fit_one_predictor,
+                                     fit_or_error,
                                      mc.cores = n_cores
                                  )
         }
     } else {
         ## Sequential processing with lapply()
         ## Used when: parallel = FALSE, single predictor, or Windows in non-interactive context
-        results <- lapply(predictors, fit_one_predictor)
+        results <- lapply(predictors, fit_or_error)
     }
     
+    stop_on_failed_fits(results, predictors, "predictor")
+
     ## Extract raw results and combine
     raw_results <- lapply(results, `[[`, "raw")
     combined_raw <- data.table::rbindlist(raw_results, fill = TRUE)
+    ## The main-effect terms of the models, which the combined table no
+    ## longer carries (see format_model_table())
+    data.table::setattr(combined_raw, "main_terms",
+                        unique(unlist(lapply(raw_results, attr, "main_terms"))))
     
     ## Extract models if kept
     if (keep_models) {
@@ -942,16 +979,19 @@ uniscreen <- function(data,
 
     ## Each predictor is screened in its own model, so the analyzed sample
     ## is recorded per predictor and reported as a range where it varies.
-    us_outcome_vars <- all.vars(stats::as.formula(paste("~", outcome)))
+    us_outcome_vars <- all.vars(stats::as.formula(
+        paste("~", formula_names(outcome, names(data)))))
     data.table::setattr(
         formatted, "analysis_counts",
         get_analysis_counts(
             data,
             us_outcome_vars,
             lapply(predictors, function(p) {
-                all.vars(stats::as.formula(paste("~", p)))
+                all.vars(stats::as.formula(paste("~", formula_names(p, names(data)))))
             }),
-            get_event_variable_for_counts(us_outcome_vars, model_type, family)
+            get_event_variable_for_counts(us_outcome_vars, model_type, family),
+            ## The events of a survival outcome are coded from its Surv() call
+            surv_event_indicator(formula_names(outcome, names(data)), data)
         )
     )
     data.table::setattr(formatted, "number_marks", marks)
@@ -966,6 +1006,7 @@ uniscreen <- function(data,
     
     data.table::setattr(formatted, "outcome", outcome)
     data.table::setattr(formatted, "model_type", unique(combined_raw$model_type)[1])
+    data.table::setattr(formatted, "conf_level", conf_level)
     data.table::setattr(formatted, "model_scope", "Univariable")
     data.table::setattr(formatted, "screening_type", "univariable")
     data.table::setattr(formatted, "p_threshold", p_threshold)

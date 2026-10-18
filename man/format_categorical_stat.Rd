@@ -9,7 +9,9 @@ format_categorical_stat(n, total, stat_type, marks)
 \arguments{
 \item{n}{Integer count for the category.}
 
-\item{total}{Integer total count for percentage calculation.}
+\item{total}{Integer total count for percentage calculation. When zero,
+as for a group without observations, the percentage is undefined: the
+count alone is returned, or an empty string for \code{"percent"}.}
 
 \item{stat_type}{Character string: \code{"n"}, \code{"n_percent"}, or
 \code{"percent"}.}

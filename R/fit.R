@@ -22,6 +22,8 @@
 #'   For univariable models, provide a single predictor. Can include continuous, 
 #'   categorical (factor), or binary variables. Required for formula-based
 #'   workflow; ignored if \code{model} is provided.
+#'   Non-syntactic names (\emph{e.g.,} \code{"tumor stage"}) are quoted in
+#'   the model formula and need no backticks.
 #'
 #' @param model Optional pre-fitted model object to format. When provided,
 #'   \code{outcome} and \code{predictors} are ignored and the model is formatted
@@ -798,6 +800,7 @@ fit <- function(data = NULL,
                          reference_rows = reference_rows,
                          skip_counts = (!show_n && !show_events),
                          conf_method = conf_method)
+        stop_if_no_estimates(raw_data)
 
         ## Propagate cached confint from m2dt to model for downstream reuse
         cached_ci <- attr(raw_data, "cached_confint")
@@ -867,6 +870,15 @@ fit <- function(data = NULL,
         data <- data.table::as.data.table(data)
     }
     
+    ## Variables are column names, which may be given with backticks; the
+    ## formula below quotes the names that require it
+    outcome <- formula_names(outcome, names(data), quote = FALSE)
+    predictors <- formula_names(predictors, names(data), quote = FALSE)
+    interactions <- formula_names(interactions, names(data), quote = FALSE)
+    strata <- formula_names(strata, names(data), quote = FALSE)
+    cluster <- formula_names(cluster, names(data), quote = FALSE)
+    weights <- formula_names(weights, names(data), quote = FALSE)
+
     ## Validate inputs and auto-correct model type if needed
     validation <- validate_fit_inputs(
         data = data,
@@ -930,13 +942,10 @@ fit <- function(data = NULL,
         predictors <- fixed_predictors
     }
     
-    ## Build formula string
-    if (!is.null(interactions)) {
-        formula_str <- paste(outcome, "~", 
-                             paste(c(predictors, interactions), collapse = " + "))
-    } else {
-        formula_str <- paste(outcome, "~", paste(predictors, collapse = " + "))
-    }
+    ## Build formula string, with backticks around non-syntactic names
+    formula_str <- paste(formula_names(outcome, names(data)), "~",
+                         paste(formula_names(c(predictors, interactions), names(data)),
+                               collapse = " + "))
     
     ## Add random effects if provided (for lmer/glmer - coxme uses same formula syntax)
     if (!is.null(random) && model_type %in% c("glmer", "lmer", "coxme")) {
@@ -945,11 +954,19 @@ fit <- function(data = NULL,
     
     ## Add strata if provided (for Cox models)
     if (!is.null(strata) && model_type %in% c("coxph", "clogit")) {
-        formula_str <- paste(formula_str, "+ strata(", strata, ")")
+        formula_str <- paste(formula_str, "+ strata(",
+                             formula_names(strata, names(data)), ")")
     }
     
     formula <- stats::as.formula(formula_str)
     
+    ## Cox models keep factor levels without observations, which the other
+    ## models drop; they are dropped first, so that every model takes the
+    ## first level with observations as its reference
+    if (model_type %in% c("coxph", "clogit", "coxme")) {
+        data <- drop_empty_levels(data, c(all.vars(formula), cluster))
+    }
+
     ## Fit model based on type - use 'data' directly
     model <- quiet_fit(quote({
         if (model_type == "glm") {
@@ -1052,6 +1069,7 @@ fit <- function(data = NULL,
                      reference_rows = reference_rows,
                      skip_counts = (!show_n && !show_events),
                      conf_method = conf_method)
+    stop_if_no_estimates(raw_data)
 
     ## Propagate cached confint from m2dt to model for downstream reuse
     ## (avoids redundant profiling in forest plot functions)
@@ -1158,7 +1176,8 @@ print.fit_result <- function(x, ...) {
         cat(analyzed, "\n", sep = "")
     } else if (!is.null(raw)) {
         ## Counts unavailable, as when a model is supplied without its data
-        cat("Observations analyzed: ", bare_count(raw$n[1]), "\n", sep = "")
+        cat("Observations analyzed: ",
+            bare_count(attr(raw, "model_n") %||% raw$n[1]), "\n", sep = "")
     }
     
     ## Events are reported on the same footing, against the events present in
@@ -1167,9 +1186,12 @@ print.fit_result <- function(x, ...) {
     events_line <- format_event_counts(attr(x, "analysis_counts"), marks = marks)
     if (!is.null(events_line)) {
         cat(events_line, "\n", sep = "")
-    } else if (!is.null(raw) && !is.na(raw$events[1])) {
+    } else if (!is.null(raw)) {
         ## Counts unavailable, as when a model is supplied without its data
-        cat("Events analyzed: ", bare_count(raw$events[1]), "\n", sep = "")
+        model_events <- attr(raw, "model_events") %||% raw$events[1]
+        if (!is.null(model_events) && !is.na(model_events)) {
+            cat("Events analyzed: ", bare_count(model_events), "\n", sep = "")
+        }
     }
     
     cat("\n")

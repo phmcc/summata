@@ -7,10 +7,8 @@
 
 library(data.table)
 
-## ============================================================================
-## Setup: Create test data and helper functions
-## ============================================================================
 
+### * Setup: Create test data and helper functions
 
 ## Create a complete-case subset for tests requiring no missing data
 clintrial_complete <- na.omit(clintrial)
@@ -80,9 +78,7 @@ expect_multi_columns <- function(result, metrics = c("effect", "p")) {
 }
 
 
-## ============================================================================
-## SECTION 1: Basic Functionality - Method = "screen"
-## ============================================================================
+### * Basic functionality - method = "screen"
 
 test_that("fullfit works with method='screen' (default)", {
     
@@ -164,9 +160,7 @@ test_that("fullfit screen with very strict threshold handles edge cases", {
 })
 
 
-## ============================================================================
-## SECTION 2: Method = "all"
-## ============================================================================
+### * Method = "all"
 
 test_that("fullfit works with method='all'", {
     
@@ -214,9 +208,7 @@ test_that("fullfit method='all' includes all variables in multi columns", {
 })
 
 
-## ============================================================================
-## SECTION 3: Method = "custom"
-## ============================================================================
+### * Method = "custom"
 
 test_that("fullfit works with method='custom'", {
     
@@ -286,9 +278,7 @@ test_that("fullfit method='custom' shows uni for all, multi for selected", {
 })
 
 
-## ============================================================================
-## SECTION 4: Columns Parameter
-## ============================================================================
+### * columns parameter
 
 test_that("fullfit columns='both' shows uni and multi", {
     
@@ -349,9 +339,7 @@ test_that("fullfit columns='multi' shows only multivariable", {
 })
 
 
-## ============================================================================
-## SECTION 5: Metrics Parameter
-## ============================================================================
+### * metrics parameter
 
 test_that("fullfit metrics='both' shows effect and p-value", {
     
@@ -436,9 +424,7 @@ test_that("fullfit metrics as vector works", {
 })
 
 
-## ============================================================================
-## SECTION 6: Return Type Parameter
-## ============================================================================
+### * return_type parameter
 
 test_that("fullfit return_type='table' returns fullfit_result", {
     
@@ -499,9 +485,7 @@ test_that("fullfit return_type='both' returns list with table and model", {
 })
 
 
-## ============================================================================
-## SECTION 7: Model Types
-## ============================================================================
+### * Model types
 
 test_that("fullfit works with GLM (logistic)", {
     
@@ -586,9 +570,7 @@ test_that("fullfit works with Poisson regression", {
 })
 
 
-## ============================================================================
-## SECTION 8: Display Options
-## ============================================================================
+### * Display options
 
 test_that("fullfit respects show_n parameter", {
     
@@ -710,9 +692,7 @@ test_that("fullfit respects reference_rows parameter", {
 })
 
 
-## ============================================================================
-## SECTION 9: Labels Parameter
-## ============================================================================
+### * labels parameter
 
 test_that("fullfit applies custom labels", {
     
@@ -755,9 +735,7 @@ test_that("fullfit works with clintrial_labels", {
 })
 
 
-## ============================================================================
-## SECTION 10: keep_models Parameter
-## ============================================================================
+### * keep_models parameter
 
 test_that("fullfit keep_models=FALSE does not store uni models", {
     
@@ -797,9 +775,7 @@ test_that("fullfit keep_models=TRUE stores uni models", {
 })
 
 
-## ============================================================================
-## SECTION 11: Confidence Level
-## ============================================================================
+### * Confidence level
 
 test_that("fullfit respects conf_level parameter", {
     
@@ -830,9 +806,7 @@ test_that("fullfit respects conf_level parameter", {
 })
 
 
-## ============================================================================
-## SECTION 12: Exponentiate Parameter
-## ============================================================================
+### * exponentiate parameter
 
 test_that("fullfit auto-exponentiates for logistic", {
     
@@ -869,9 +843,7 @@ test_that("fullfit exponentiate=FALSE shows coefficients", {
 })
 
 
-## ============================================================================
-## SECTION 13: Factor Variables
-## ============================================================================
+### * Factor variables
 
 test_that("fullfit handles factor variables correctly", {
     
@@ -916,9 +888,7 @@ test_that("fullfit handles multiple factor variables", {
 })
 
 
-## ============================================================================
-## SECTION 14: Attributes Preservation
-## ============================================================================
+### * Attributes preservation
 
 test_that("fullfit preserves all expected attributes", {
     
@@ -983,9 +953,7 @@ test_that("fullfit n_multi attribute is correct", {
 })
 
 
-## ============================================================================
-## SECTION 15: Print Method
-## ============================================================================
+### * Print method
 
 test_that("print.fullfit_result produces output", {
     
@@ -1007,9 +975,7 @@ test_that("print.fullfit_result produces output", {
 })
 
 
-## ============================================================================
-## SECTION 16: Edge Cases
-## ============================================================================
+### * Edge cases
 
 test_that("fullfit handles single predictor", {
     
@@ -1073,9 +1039,7 @@ test_that("fullfit works with data.frame input", {
 })
 
 
-## ============================================================================
-## SECTION 16B: Input Validation Tests
-## ============================================================================
+### * Input validation tests
 
 test_that("fullfit errors or auto-corrects Surv outcome with GLM model_type", {
     
@@ -1200,9 +1164,7 @@ test_that("fullfit errors with empty data", {
 })
 
 
-## ============================================================================
-## SECTION 17: Integration with Other Functions
-## ============================================================================
+### * Integration with other functions
 
 test_that("fullfit model output works with summary()", {
     
@@ -1261,9 +1223,7 @@ test_that("fullfit produces consistent results", {
 })
 
 
-## ============================================================================
-## SECTION 18: Cox Regression Specific Tests
-## ============================================================================
+### * Cox regression specific tests
 
 test_that("fullfit Cox shows Events column", {
     
@@ -1299,9 +1259,7 @@ test_that("fullfit Cox screening works correctly", {
 })
 
 
-## ============================================================================
-## SECTION 19: Linear Model Specific Tests
-## ============================================================================
+### * Linear model specific tests
 
 test_that("fullfit linear model doesn't show Events", {
     
@@ -1334,13 +1292,9 @@ test_that("fullfit linear model screening works", {
 })
 
 
-## ============================================================================
-## SECTION 19b: Additional GLM Family Tests
-## ============================================================================
+### * Additional GLM family tests
 
-## ----------------------------------------------------------------------------
-## Gaussian Family Tests
-## ----------------------------------------------------------------------------
+### ** Gaussian family tests
 
 test_that("fullfit works with gaussian family via glm", {
     
@@ -1379,9 +1333,7 @@ test_that("fullfit gaussian screening works", {
 })
 
 
-## ----------------------------------------------------------------------------
-## Quasibinomial Family Tests
-## ----------------------------------------------------------------------------
+### ** Quasibinomial family tests
 
 test_that("fullfit works with quasibinomial family", {
     
@@ -1420,9 +1372,7 @@ test_that("fullfit quasibinomial screening works", {
 })
 
 
-## ----------------------------------------------------------------------------
-## Quasipoisson Family Tests
-## ----------------------------------------------------------------------------
+### ** Quasipoisson family tests
 
 test_that("fullfit works with quasipoisson family", {
     
@@ -1461,9 +1411,7 @@ test_that("fullfit quasipoisson screening works", {
 })
 
 
-## ----------------------------------------------------------------------------
-## Gamma Family Tests
-## ----------------------------------------------------------------------------
+### ** Gamma family tests
 
 test_that("fullfit works with Gamma family (log link)", {
     
@@ -1504,9 +1452,7 @@ test_that("fullfit Gamma screening works", {
 })
 
 
-## ----------------------------------------------------------------------------
-## Inverse Gaussian Family Tests
-## ----------------------------------------------------------------------------
+### ** Inverse Gaussian family tests
 
 test_that("fullfit works with inverse.gaussian family", {
     
@@ -1527,9 +1473,7 @@ test_that("fullfit works with inverse.gaussian family", {
 })
 
 
-## ----------------------------------------------------------------------------
-## Negative Binomial (negbin) Tests
-## ----------------------------------------------------------------------------
+### ** Negative binomial (negbin) tests
 
 test_that("fullfit works with negative binomial regression (negbin)", {
     
@@ -1647,9 +1591,7 @@ test_that("fullfit negbin return_type='both' works", {
 })
 
 
-## ============================================================================
-## SECTION 20: Complex Combinations
-## ============================================================================
+### * Complex combinations
 
 test_that("fullfit handles complex parameter combinations", {
     
@@ -1729,9 +1671,7 @@ test_that("fullfit with return_type='both' and method='screen'", {
 })
 
 
-## ============================================================================
-## SECTION 21: Complete-Case N/Events in Multivariable Rows
-## ============================================================================
+### * Complete-case N/events in multivariable rows
 
 test_that("fullfit multivariable n matches model nobs", {
     

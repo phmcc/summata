@@ -17,6 +17,7 @@ process_single_outcome(
   conf_type,
   digits,
   time_digits,
+  p_digits = 3,
   percent,
   test,
   test_type,
@@ -56,6 +57,8 @@ single-outcome table.}
 \item{digits}{Integer decimal places for percentages.}
 
 \item{time_digits}{Integer decimal places for time values.}
+
+\item{p_digits}{Integer decimal places for \emph{p}-values.}
 
 \item{percent}{Logical whether to display as percentages.}
 

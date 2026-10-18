@@ -26,6 +26,11 @@
 #'   continuous variables. Default \code{FALSE} for better performance.
 #' @param marks List with \code{big.mark} and \code{decimal.mark} as returned
 #'   by \code{\link{resolve_number_marks}}.
+#' @param groups Optional vector of groups, as returned by
+#'   \code{derive_group_levels()}. Derived from the data when \code{NULL}.
+#' @param group_index Optional list of row positions for each group, as
+#'   returned by \code{derive_group_index()}. Derived from the data when
+#'   \code{NULL}.
 #' @param ... Additional arguments passed to test functions.
 #' @return List with 'formatted' and 'raw' data.table components.
 #' @keywords internal
@@ -34,7 +39,8 @@ process_variable <- function(data, var, group_var = NULL,
                              digits, conf_level = 0.95, na_include, na_label,
                              test, test_continuous, test_categorical,
                              total, total_label, labels, na_percent, 
-                             p_per_stat = FALSE, marks = NULL, ...) {
+                             p_per_stat = FALSE, marks = NULL,
+                             groups = NULL, group_index = NULL, ...) {
     
     ## Get variable label
     var_label <- if (!is.null(labels) && var %chin% names(labels)) {
@@ -58,6 +64,8 @@ process_variable <- function(data, var, group_var = NULL,
             total = total,
             total_label = total_label,
             marks = marks,
+            groups = groups,
+            group_index = group_index,
             ...
         ))
     } else if (is.numeric(data[[var]])) {
@@ -76,6 +84,8 @@ process_variable <- function(data, var, group_var = NULL,
             total_label = total_label,
             p_per_stat = p_per_stat,
             marks = marks,
+            groups = groups,
+            group_index = group_index,
             ...
         ))
     } else {
@@ -93,9 +103,109 @@ process_variable <- function(data, var, group_var = NULL,
             total_label = total_label,
             na_percent = na_percent,
             marks = marks,
+            groups = groups,
             ...
         ))
     }
+}
+
+
+### * Group structure
+
+#' Derive the groups of a grouping variable
+#'
+#' Returns the groups in display order: the levels of a factor, including
+#' levels without observations, or otherwise the distinct non-missing values
+#' in order of first appearance.
+#'
+#' @param grp_vec Grouping vector.
+#' @return Vector of groups.
+#' @keywords internal
+derive_group_levels <- function(grp_vec) {
+    if (is.factor(grp_vec)) {
+        levels(grp_vec)
+    } else {
+        groups <- unique(grp_vec)
+        groups[!is.na(groups)]
+    }
+}
+
+
+#' Locate the observations of each group
+#'
+#' Finds the row positions of each group once, so that the summaries of
+#' every variable can subset them instead of comparing the full grouping
+#' vector with each group again.
+#'
+#' @param grp_vec Grouping vector.
+#' @param groups Vector of groups, as returned by
+#'   \code{derive_group_levels()}.
+#' @return List with one integer vector of row positions per group, in the
+#'   order of \code{groups}. Observations with a missing group appear in none.
+#' @keywords internal
+derive_group_index <- function(grp_vec, groups) {
+    lapply(groups, function(g) which(grp_vec == g))
+}
+
+
+### * Test arguments
+
+#' Name the arguments that each descriptive test accepts
+#'
+#' Returns the names of the arguments that \code{desctable()} forwards
+#' from \code{...} to a given statistical test. A single call can summarize
+#' continuous, categorical, and time-to-event variables, so an argument
+#' intended for one test (\emph{e.g.,} \code{var.equal} for the
+#' \emph{t}-test) must not reach a test that does not accept it. The lists are
+#' explicit because the test functions are S3 generics whose formal arguments
+#' do not include the arguments of their methods.
+#'
+#' @param test_type Character string naming the test: \code{"t"},
+#'   \code{"wrs"}, \code{"aov"}, \code{"kwt"}, \code{"chisq"},
+#'   \code{"fisher"}, or \code{"survival"}. When \code{NULL}, the names
+#'   accepted by any of the tests are returned.
+#' @return Character vector of argument names.
+#' @keywords internal
+test_arg_names <- function(test_type = NULL) {
+    accepted <- list(
+        t = c("alternative", "mu", "var.equal", "conf.level"),
+        wrs = c("alternative", "mu", "exact", "correct", "conf.int",
+                "conf.level", "tol.root", "digits.rank"),
+        aov = character(0),
+        kwt = character(0),
+        chisq = c("correct", "simulate.p.value", "B"),
+        fisher = c("workspace", "hybrid", "hybridPars", "control", "or",
+                   "alternative", "conf.int", "conf.level",
+                   "simulate.p.value", "B"),
+        survival = c("rho", "timefix")
+    )
+    if (is.null(test_type)) {
+        return(unique(unlist(accepted, use.names = FALSE)))
+    }
+    test_type <- switch(test_type,
+                        "fisher.test" = "fisher",
+                        "chisq.test" = "chisq",
+                        test_type)
+    accepted[[test_type]] %||% character(0)
+}
+
+
+#' Select the test arguments that a given test accepts
+#'
+#' Subsets the arguments collected from \code{...} in \code{desctable()}
+#' to those accepted by one statistical test, as listed by
+#' \code{test_arg_names()}.
+#'
+#' @param test_args Named list of arguments collected from \code{...}.
+#' @param test_type Character string naming the test, as in
+#'   \code{test_arg_names()}.
+#' @return Named list of the arguments accepted by the test (possibly empty).
+#' @keywords internal
+filter_test_args <- function(test_args, test_type) {
+    if (length(test_args) == 0L || is.null(names(test_args))) {
+        return(list())
+    }
+    test_args[names(test_args) %chin% test_arg_names(test_type)]
 }
 
 
@@ -122,13 +232,17 @@ process_variable <- function(data, var, group_var = NULL,
 #' @param p_per_stat Logical. If TRUE, calculate separate \emph{p}-values for each 
 #'   statistic type (\emph{e.g.,} t-test for means, Wilcoxon for medians). If \code{FALSE}
 #'   (default), calculate a single \emph{p}-value based on the first statistic type.
+#' @param groups Optional vector of groups (see \code{process_variable()}).
+#' @param group_index Optional list of row positions for each group (see
+#'   \code{process_variable()}).
 #' @param ... Additional arguments passed to test functions.
 #' @return List with 'formatted' and 'raw' data.table components.
 #' @keywords internal
 process_continuous <- function(data, var, var_label, group_var, stats, digits,
                                na_include, na_label, test, test_type,
                                total, total_label, p_per_stat = FALSE,
-                               marks = NULL, ...) {
+                               marks = NULL, groups = NULL, group_index = NULL,
+                               ...) {
     
     ## Pre-extract the variable column
     var_vec <- data[[var]]
@@ -138,10 +252,10 @@ process_continuous <- function(data, var, var_label, group_var, stats, digits,
     
     ## Calculate total statistics
     if (total_n > 0) {
-        total_fivenum <- fivenum(total_vals)
+        total_fivenum <- stats::fivenum(total_vals)
         total_stats <- list(
             mean = mean(total_vals),
-            sd = sd(total_vals),
+            sd = stats::sd(total_vals),
             median = total_fivenum[3],
             q1 = total_fivenum[2],
             q3 = total_fivenum[4],
@@ -157,30 +271,25 @@ process_continuous <- function(data, var, var_label, group_var, stats, digits,
     
     ## Calculate group statistics (if grouped)
     group_stats_list <- NULL
-    groups <- NULL
     
     if (!is.null(group_var)) {
         grp_vec <- data[[group_var]]
-        if (is.factor(grp_vec)) {
-            groups <- levels(grp_vec)
-        } else {
-            groups <- unique(grp_vec)
-            groups <- groups[!is.na(groups)]
-        }
+        if (is.null(groups)) groups <- derive_group_levels(grp_vec)
+        if (is.null(group_index)) group_index <- derive_group_index(grp_vec, groups)
         
         ## Compute statistics for each group
-        group_stats_list <- lapply(groups, function(g) {
-            idx <- which(grp_vec == g & not_na)
+        group_stats_list <- lapply(group_index, function(idx) {
+            idx <- idx[not_na[idx]]
             if (length(idx) == 0) {
                 return(list(mean = NA_real_, sd = NA_real_, median = NA_real_,
                            q1 = NA_real_, q3 = NA_real_, min = NA_real_, 
                            max = NA_real_, n = 0L))
             }
             vals <- var_vec[idx]
-            fn <- fivenum(vals)
+            fn <- stats::fivenum(vals)
             list(
                 mean = mean(vals),
-                sd = sd(vals),
+                sd = stats::sd(vals),
                 median = fn[3],
                 q1 = fn[2],
                 q3 = fn[4],
@@ -197,6 +306,7 @@ process_continuous <- function(data, var, var_label, group_var, stats, digits,
     p_value_single <- NULL
     if (test && !is.null(group_var) && length(groups) >= 2) {
         grp_vec <- data[[group_var]]
+        test_args <- list(...)
         
         if (p_per_stat) {
             ## Calculate separate p-value for each statistic type
@@ -205,7 +315,7 @@ process_continuous <- function(data, var, var_label, group_var, stats, digits,
                     p_values[[stat_type]] <- NULL
                 } else {
                     p_values[[stat_type]] <- perform_continuous_test(
-                        var_vec, grp_vec, test_type, stat_type)
+                        var_vec, grp_vec, test_type, stat_type, test_args)
                 }
             }
         } else {
@@ -213,7 +323,7 @@ process_continuous <- function(data, var, var_label, group_var, stats, digits,
             first_stat <- stats[stats != "range"][1]
             if (is.na(first_stat)) first_stat <- "median_iqr"
             p_value_single <- perform_continuous_test(
-                var_vec, grp_vec, test_type, first_stat)
+                var_vec, grp_vec, test_type, first_stat, test_args)
         }
     }
     
@@ -289,10 +399,9 @@ process_continuous <- function(data, var, var_label, group_var, stats, digits,
         }
         
         if (!is.null(group_var)) {
-            grp_vec <- data[[group_var]]
-            for (g in groups) {
-                grp_col <- as.character(g)
-                n_miss <- sum(!not_na & grp_vec == g, na.rm = TRUE)
+            for (j in seq_along(groups)) {
+                grp_col <- as.character(groups[j])
+                n_miss <- sum(!not_na[group_index[[j]]])
                 miss_formatted[[grp_col]] <- format_count(n_miss, marks)
                 miss_raw[[grp_col]] <- n_miss
             }
@@ -354,9 +463,13 @@ add_raw_stats <- function(row, col, stats, stat_type) {
 #' @param grp_vec Factor or character vector defining groups.
 #' @param test_type Character string: "parametric", "nonparametric", or "auto".
 #' @param stat_type Character string indicating primary statistic being tested.
+#' @param test_args Named list of additional test arguments from \code{...};
+#'   each test receives only the arguments it accepts (see
+#'   \code{filter_test_args()}).
 #' @return Numeric \emph{p}-value from the hypothesis test.
 #' @keywords internal
-perform_continuous_test <- function(var_vec, grp_vec, test_type, stat_type) {
+perform_continuous_test <- function(var_vec, grp_vec, test_type, stat_type,
+                                    test_args = list()) {
     ## Remove NAs
     valid <- !is.na(var_vec) & !is.na(grp_vec)
     if (sum(valid) < 3) return(NA_real_)
@@ -377,18 +490,124 @@ perform_continuous_test <- function(var_vec, grp_vec, test_type, stat_type) {
         }
     }
     
+    args <- filter_test_args(test_args, test_type)
+
     tryCatch({
         switch(test_type,
-            "t" = t.test(x ~ g)$p.value,
-            "wrs" = wilcox.test(x ~ g)$p.value,
+            "t" = do.call(stats::t.test, c(list(x ~ g), args))$p.value,
+            "wrs" = rank_sum_pvalue(x, g, args),
             "aov" = {
-                fit <- aov(x ~ g)
+                fit <- stats::aov(x ~ g)
                 summary(fit)[[1]][["Pr(>F)"]][1]
             },
-            "kwt" = kruskal.test(x ~ g)$p.value,
+            "kwt" = kruskal_wallis_pvalue(x, g),
             NA_real_
         )
     }, error = function(e) NA_real_)
+}
+
+
+#' Average ranks with tie counts
+#'
+#' Ranks a numeric vector with ties assigned their average rank, as
+#' \code{rank()} does by default, from a single sort with
+#' \code{data.table::frank()}. The \eqn{j}th smallest distinct value, shared
+#' by \eqn{t_j} observations, occupies sorted positions
+#' \eqn{c_{j-1} + 1, \dots, c_j}{c[j-1] + 1, ..., c[j]}, where \eqn{c} is the
+#' cumulative sum of the tie counts, so its average rank is
+#' \eqn{c_j - (t_j - 1)/2}{c[j] - (t[j] - 1)/2}. Every quantity is an integer
+#' or half-integer, so the ranks are exact.
+#'
+#' @param x Numeric vector without missing values.
+#' @return Numeric vector of ranks, with attribute \code{"ties"} holding the
+#'   number of observations at each distinct value in increasing order.
+#' @keywords internal
+average_ranks <- function(x) {
+    dense <- data.table::frank(x, ties.method = "dense")
+    ties <- tabulate(dense)
+    ranks <- (cumsum(ties) - (ties - 1) / 2)[dense]
+    attr(ranks, "ties") <- ties
+    ranks
+}
+
+
+#' Kruskal-Wallis rank sum test p-value
+#'
+#' Computes the \emph{p}-value of the Kruskal-Wallis rank sum test with the
+#' statistic, tie correction, and degrees of freedom of
+#' \code{stats::kruskal.test()}, using ranks and tie counts from
+#' \code{average_ranks()}. \code{kruskal.test()} ranks with \code{rank()}
+#' and counts ties with \code{table()}, which converts every value to a
+#' character string; on large samples these two steps account for nearly all
+#' of its running time.
+#'
+#' @param x Numeric vector without missing values.
+#' @param g Grouping vector of the same length without missing values.
+#' @return Numeric \emph{p}-value.
+#' @keywords internal
+kruskal_wallis_pvalue <- function(x, g) {
+    ## Integer group codes; groups without observations are dropped, as
+    ## kruskal.test() does through factor()
+    g <- if (is.factor(g)) as.integer(g) else as.integer(factor(g))
+    n_i <- tabulate(g)
+    n_i <- n_i[n_i > 0L]
+    k <- length(n_i)
+    n <- length(x)
+    if (k < 2L) stop("all observations are in the same group")
+    if (n < 2L) stop("not enough observations")
+
+    ranks <- average_ranks(x)
+    ties <- attr(ranks, "ties")
+
+    statistic <- sum(rowsum(as.vector(ranks), g)^2 / n_i)
+    statistic <- (12 * statistic / (n * (n + 1)) - 3 * (n + 1)) /
+        (1 - sum(ties^3 - ties) / (n^3 - n))
+    stats::pchisq(statistic, k - 1L, lower.tail = FALSE)
+}
+
+
+#' Wilcoxon rank sum test p-value
+#'
+#' Computes the two-sided \emph{p}-value of the Wilcoxon rank sum test for
+#' two groups. When either group has 50 or more observations,
+#' \code{stats::wilcox.test()} uses the normal approximation with
+#' continuity correction and tie correction by default; that computation is
+#' reproduced here with ranks and tie counts from \code{average_ranks()},
+#' because \code{wilcox.test()} ranks with \code{rank()} and counts ties with
+#' \code{table()}, which converts every rank to a character string; on large
+#' samples these two steps dominate its running time. Smaller samples, for
+#' which \code{wilcox.test()} computes the exact distribution by default, and
+#' calls with additional test arguments are passed to \code{wilcox.test()}
+#' itself.
+#'
+#' @param x Numeric vector without missing values.
+#' @param g Grouping vector of the same length without missing values, with
+#'   exactly two groups.
+#' @param test_args Named list of additional arguments for
+#'   \code{wilcox.test()}.
+#' @return Numeric \emph{p}-value.
+#' @keywords internal
+rank_sum_pvalue <- function(x, g, test_args = list()) {
+    g <- factor(g)
+    if (nlevels(g) != 2L) stop("grouping factor must have exactly 2 levels")
+    first <- g == levels(g)[1L]
+    n_x <- as.double(sum(first))
+    n_y <- as.double(length(x)) - n_x
+
+    if (length(test_args) > 0L || (n_x < 50 && n_y < 50)) {
+        return(do.call(stats::wilcox.test,
+                       c(list(x = x[first], y = x[!first]), test_args))$p.value)
+    }
+
+    ranks <- average_ranks(x)
+    ties <- attr(ranks, "ties")
+
+    z <- sum(ranks[first]) - n_x * (n_x + 1) / 2 - n_x * n_y / 2
+    sigma <- sqrt((n_x * n_y / 12) *
+                  ((n_x + n_y + 1) -
+                   sum(ties^3 - ties) / ((n_x + n_y) * (n_x + n_y - 1))))
+    z <- (z - sign(z) * 0.5) / sigma
+    2 * min(stats::pnorm(z), stats::pnorm(z, lower.tail = FALSE))
 }
 
 
@@ -479,13 +698,14 @@ get_stat_label <- function(stat_type) {
 #' @param total Logical or character controlling total column display.
 #' @param total_label Character string label for total column.
 #' @param na_percent Logical whether to include NA in percentage denominators.
+#' @param groups Optional vector of groups (see \code{process_variable()}).
 #' @param ... Additional arguments passed to test functions.
 #' @return List with 'formatted' and 'raw' data.table components.
 #' @keywords internal
 process_categorical <- function(data, var, var_label, group_var, stats,
                                 na_include, na_label, test, test_type,
                                 total, total_label, na_percent,
-                                marks = NULL, ...) {
+                                marks = NULL, groups = NULL, ...) {
     
     ## Pre-extract vectors
     var_vec <- data[[var]]
@@ -511,33 +731,33 @@ process_categorical <- function(data, var, var_label, group_var, stats,
     
     if (!is.null(group_var)) {
         grp_vec <- data[[group_var]]
-        
-        if (is.factor(grp_vec)) {
-            groups <- levels(grp_vec)
-        } else {
-            groups <- unique(grp_vec)
-            groups <- groups[!is.na(groups)]
-        }
+        if (is.null(groups)) groups <- derive_group_levels(grp_vec)
         
         ## Single table call for cross-tabulation
         tab <- table(var_vec, grp_vec, useNA = use_na)
-        total_tab <- rowSums(tab)
         grp_totals <- colSums(tab)
         
+        ## The total column counts every observation, as the N row and the
+        ## continuous and survival summaries do, including observations whose
+        ## group is missing (which the cross-tabulation omits unless
+        ## na_include = TRUE)
+        total_tab <- table(var_vec, useNA = use_na)
+        total_na <- is.na(names(total_tab))
+
         ## Calculate denominators
         if (na_percent) {
-            total_denom <- sum(tab)
+            total_denom <- sum(total_tab)
             grp_denoms <- grp_totals
         } else {
             ## Exclude NA row from denominators
             non_na_rows <- !is.na(rownames(tab))
-            total_denom <- sum(tab[non_na_rows, , drop = FALSE])
+            total_denom <- sum(total_tab[!total_na])
             grp_denoms <- colSums(tab[non_na_rows, , drop = FALSE])
         }
         
         ## Calculate p-value once
         p_value <- if (test) {
-            perform_categorical_test(tab, test_type)
+            perform_categorical_test(tab, test_type, list(...), var_name = var)
                    } else {
             NULL
         }
@@ -564,8 +784,7 @@ process_categorical <- function(data, var, var_label, group_var, stats,
             
             ## Get row from table
             if (is.na(lvl)) {
-                tab_row <- tab[is.na(rownames(tab)), , drop = FALSE]
-                n_total <- sum(tab_row)
+                n_total <- sum(total_tab[total_na])
             } else {
                 n_total <- total_tab[lvl_char]
                 if (is.na(n_total)) n_total <- 0L
@@ -575,7 +794,7 @@ process_categorical <- function(data, var, var_label, group_var, stats,
             if (!isFALSE(total)) {
                 ## NA row: use total denom if na_percent, otherwise count only
                 if (is.na(lvl)) {
-                    denom <- if (na_percent) total_denom else sum(tab)
+                    denom <- if (na_percent) total_denom else sum(total_tab)
                     na_stat <- if (na_percent) stats else "n"
                 } else {
                     denom <- total_denom
@@ -673,35 +892,97 @@ process_categorical <- function(data, var, var_label, group_var, stats,
 #' 
 #' Conducts chi-square or Fisher's exact tests for categorical variables
 #' across groups. Automatically selects Fisher's exact test for small
-#' expected frequencies.
-#' 
+#' expected frequencies. The test compares the observed levels of the variable
+#' across the defined groups. The missing-value row and column that
+#' \code{table(useNA = "ifany")} adds are removed, as are levels and groups
+#' ithout observations: an empty row or column contributes nothing to either
+#' test, but its zero expected counts would otherwise select the exact test
+#' under \code{"auto"} and make the chi-square statistic undefined.
+#'
 #' @param tab Contingency table (matrix or table object).
 #' @param test_type Character string: "chisq" for chi-square, "fisher" for
 #'   Fisher's exact, or "auto" for automatic selection.
+#' @param test_args Named list of additional test arguments from \code{...};
+#'   each test receives only the arguments it accepts (see
+#'   \code{filter_test_args()}).
+#' @param var_name Character string naming the variable, used in warnings.
 #' @return Numeric \emph{p}-value from the hypothesis test.
 #' @keywords internal
-perform_categorical_test <- function(tab, test_type) {
-    ## Remove NA rows for testing
-    non_na_rows <- !is.na(rownames(tab))
-    tab_test <- tab[non_na_rows, , drop = FALSE]
+perform_categorical_test <- function(tab, test_type, test_args = list(),
+                                     var_name = NULL) {
+    ## Keep the observed levels of the variable and the defined groups only
+    tab_test <- tab[!is.na(rownames(tab)), !is.na(colnames(tab)), drop = FALSE]
+    tab_test <- tab_test[rowSums(tab_test) > 0, colSums(tab_test) > 0, drop = FALSE]
     
     if (any(dim(tab_test) < 2)) return(NA_real_)
     
-    ## Auto-select test
+    ## Auto-select test. When the chi-square test is selected, the fit used for
+    ## the selection also supplies its p-value; no warning is suppressed then,
+    ## because every expected count is at least 5.
+    chisq_fit <- NULL
     if (test_type == "auto") {
-        expected <- suppressWarnings(chisq.test(tab_test)$expected)
-        test_type <- if (any(expected < 5)) "fisher" else "chisq"
+        chisq_fit <- suppressWarnings(stats::chisq.test(tab_test))
+        test_type <- if (any(chisq_fit$expected < 5)) "fisher" else "chisq"
     }
     
+    args <- filter_test_args(test_args, test_type)
+
     tryCatch({
         switch(test_type,
             "fisher" = ,
-            "fisher.test" = fisher.test(tab_test, workspace = 2e5)$p.value,
+            "fisher.test" = fisher_test_pvalue(tab_test, args, var_name),
             "chisq" = ,
-            "chisq.test" = chisq.test(tab_test)$p.value,
+            "chisq.test" = if (!is.null(chisq_fit) && length(args) == 0L) {
+                               chisq_fit$p.value
+                           } else {
+                               do.call(stats::chisq.test, c(list(tab_test), args))$p.value
+                           },
             NA_real_
         )
     }, error = function(e) NA_real_)
+}
+
+
+#' Fisher's exact test with a Monte Carlo fallback
+#'
+#' Computes the \emph{p}-value of Fisher's exact test. For tables larger than
+#' 2 \eqn{\times}{x} 2, \code{stats::fisher.test()} uses a network
+#' algorithm with a bounded workspace (\code{workspace = 200000} by default),
+#' which is exhausted by many tables with a few hundred observations or more.
+#' A larger workspace is not a practical remedy, because computation time
+#' grows steeply and the algorithm still fails for many such tables. When the
+#' exact computation fails, the \emph{p}-value is estimated by Monte Carlo
+#' simulation conditional on the margins, as \code{fisher.test()} itself
+#' recommends, and a warning reports the substitution.
+#'
+#' @param tab Contingency table without missing-value rows or columns.
+#' @param args Named list of arguments for \code{fisher.test()}. With
+#'   \code{simulate.p.value = TRUE}, the simulation is used directly. A
+#'   supplied \code{B} sets the number of simulated tables for the fallback,
+#'   which otherwise uses 10,000.
+#' @param var_name Character string naming the variable, used in the warning.
+#' @return Numeric \emph{p}-value.
+#' @keywords internal
+fisher_test_pvalue <- function(tab, args = list(), var_name = NULL) {
+    args <- utils::modifyList(list(workspace = 2e5), args)
+    tryCatch(
+        do.call(stats::fisher.test, c(list(tab), args))$p.value,
+        error = function(e) {
+            if (isTRUE(args$simulate.p.value)) stop(e)
+            reason <- sub("\\..*$", "",
+                          strsplit(conditionMessage(e), "\n", fixed = TRUE)[[1L]][1L])
+            args$simulate.p.value <- TRUE
+            args$B <- args$B %||% 10000
+            warning("Fisher's exact test",
+                    if (!is.null(var_name)) paste0(" for '", var_name, "'"),
+                    " could not be computed exactly (", reason, "); the p-value ",
+                    "is a Monte Carlo estimate from ",
+                    format(args$B, big.mark = ",", scientific = FALSE),
+                    " simulated tables. Set a seed for a reproducible value, or ",
+                    "pass a larger 'workspace' through '...' to attempt the ",
+                    "exact computation.", call. = FALSE)
+            do.call(stats::fisher.test, c(list(tab), args))$p.value
+        })
 }
 
 
@@ -724,12 +1005,17 @@ perform_categorical_test <- function(tab, test_type) {
 #' @param test Logical whether to perform log-rank test.
 #' @param total Logical or character controlling total column display.
 #' @param total_label Character string label for total column.
-#' @param ... Additional arguments (currently unused).
+#' @param groups Optional vector of groups (see \code{process_variable()}).
+#' @param group_index Optional list of row positions for each group (see
+#'   \code{process_variable()}).
+#' @param ... Additional arguments; \code{rho} and \code{timefix} are passed
+#'   to \code{survival::survdiff()}.
 #' @return List with 'formatted' and 'raw' data.table components.
 #' @keywords internal
 process_survival <- function(data, var, var_label, group_var, digits,
                              conf_level = 0.95, na_include, na_label, 
-                             test, total, total_label, marks = NULL, ...) {
+                             test, total, total_label, marks = NULL,
+                             groups = NULL, group_index = NULL, ...) {
     
     ## Parse Surv() expression
     surv_match <- regexec("Surv\\(([^,]+),\\s*([^)]+)\\)", var)
@@ -750,27 +1036,27 @@ process_survival <- function(data, var, var_label, group_var, digits,
     ci_pct <- round(conf_level * 100)
     ci_label <- paste0("Median (", ci_pct, "% CI)")
     
-    ## Build CI column name suffixes for extracting from survfit summary
-    ## survfit names CI columns as e.g. "0.95LCL" and "0.95UCL" using conf.int value
-    ci_lower_name <- paste0(format(conf_level, nsmall = 2), "LCL")
-    ci_upper_name <- paste0(format(conf_level, nsmall = 2), "UCL")
+    ## Build CI column name suffixes for extracting from survfit summary.
+    ## survfit names the CI columns paste(conf.int, "LCL", sep = ""), e.g.
+    ## "0.95LCL" or "0.9LCL", so the same coercion is used here; formatting
+    ## with nsmall = 2 gave "0.90LCL", which matches no column.
+    ci_lower_name <- paste0(conf_level, "LCL")
+    ci_upper_name <- paste0(conf_level, "UCL")
     
     fmt_str <- paste0("%.", digits, "f")
     
     if (!is.null(group_var)) {
         grp_vec <- data[[group_var]]
-        if (is.factor(grp_vec)) {
-            groups <- levels(grp_vec)
-        } else {
-            groups <- unique(grp_vec)
-            groups <- groups[!is.na(groups)]
-        }
+        if (is.null(groups)) groups <- derive_group_levels(grp_vec)
+        if (is.null(group_index)) group_index <- derive_group_index(grp_vec, groups)
         
-        ## Calculate p-value (log-rank test)
+        ## Calculate p-value (log-rank test, or another member of the
+        ## G-rho family when rho is supplied through ...)
         p_value <- if (test) {
+            args <- filter_test_args(list(...), "survival")
             tryCatch({
                 surv_obj <- survival::Surv(data[[time_var]], data[[status_var]])
-                survival::survdiff(surv_obj ~ grp_vec)$pvalue
+                do.call(survival::survdiff, c(list(surv_obj ~ grp_vec), args))$pvalue
             }, error = function(e) NA_real_)
         } else {
             NULL
@@ -804,9 +1090,9 @@ process_survival <- function(data, var, var_label, group_var, digits,
         }
         
         ## Add group columns
-        for (g in groups) {
-            grp_col <- as.character(g)
-            grp_idx <- which(grp_vec == g)
+        for (j in seq_along(groups)) {
+            grp_col <- as.character(groups[j])
+            grp_idx <- group_index[[j]]
             grp_time <- data[[time_var]][grp_idx]
             grp_status <- data[[status_var]][grp_idx]
             

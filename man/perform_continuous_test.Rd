@@ -4,7 +4,13 @@
 \alias{perform_continuous_test}
 \title{Perform statistical tests for continuous variables}
 \usage{
-perform_continuous_test(var_vec, grp_vec, test_type, stat_type)
+perform_continuous_test(
+  var_vec,
+  grp_vec,
+  test_type,
+  stat_type,
+  test_args = list()
+)
 }
 \arguments{
 \item{var_vec}{Numeric vector of the continuous variable.}
@@ -14,6 +20,10 @@ perform_continuous_test(var_vec, grp_vec, test_type, stat_type)
 \item{test_type}{Character string: "parametric", "nonparametric", or "auto".}
 
 \item{stat_type}{Character string indicating primary statistic being tested.}
+
+\item{test_args}{Named list of additional test arguments from \code{...};
+each test receives only the arguments it accepts (see
+\code{filter_test_args()}).}
 }
 \value{
 Numeric \emph{p}-value from the hypothesis test.

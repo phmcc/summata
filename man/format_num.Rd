@@ -10,7 +10,8 @@ format_num(x, fmt_str, marks)
 \item{x}{Numeric value to format.}
 
 \item{fmt_str}{Character string \code{sprintf} format specification
-(\emph{e.g.,} \code{"\%.1f"}). Used only for |x| < 1000.}
+(\emph{e.g.,} \code{"\%.1f"}). Its number of decimal places applies at
+every magnitude.}
 
 \item{marks}{List with \code{big.mark} and \code{decimal.mark} as returned
 by \code{\link{resolve_number_marks}}.}

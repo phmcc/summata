@@ -93,12 +93,14 @@ A \code{data.table} containing extracted model information with the
     \item{group}{Character. Group/level name for factor variables; empty string 
       for continuous variables}
     \item{n}{Integer. Number of observations used in fitting the model, that
-      is complete cases across the model variables}
+      is complete cases across the model variables; for the levels of a
+      factor, the number at that level, as in \code{n_group}}
     \item{n_group}{Integer. Number of those observations at this variable
       level (factor variables only). Group sizes sum to \code{n} within
       each variable}
     \item{events}{Integer. Number of events among the observations used in
-      fitting (for survival and logistic models)}
+      fitting (for survival and logistic models); for the levels of a
+      factor, the number at that level, as in \code{events_group}}
     \item{events_group}{Integer. Number of events at this variable level
       (for survival and logistic models with factor variables). Group counts
       sum to \code{events} within each variable}
@@ -124,6 +126,10 @@ A \code{data.table} containing extracted model information with the
     \item{reference}{Character. Contains \code{reference_label} for reference 
       category rows when \code{reference_rows = TRUE}, empty string otherwise}
   }
+
+  The model-level sample size and number of events are also recorded in
+  the attributes \code{"model_n"} and \code{"model_events"}, since the
+  \code{n} and \code{events} columns of factor levels hold group counts.
 }
 \description{
 Extracts coefficients, confidence intervals, and comprehensive model statistics 
@@ -163,6 +169,13 @@ Falls back to Wald on profiling failure.
 For \pkg{lme4} models (glmer, lmer), the function extracts fixed effects
 only. Random effects variance components are not included in the output
 table, as they represent clustering structure rather than predictor effects.
+
+\strong{Aliased Coefficients:}
+Coefficients that the model could not estimate because their columns of
+the model matrix are linear combinations of others (\emph{e.g.,} a
+predictor entered twice under different names) are omitted for every
+model class, as is the reference row of a factor none of whose levels was
+estimated.
 }
 \examples{
 # Load example data

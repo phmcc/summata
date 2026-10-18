@@ -8,10 +8,8 @@
 
 library(data.table)
 
-## ============================================================================
-## Setup: Create test data and helper functions
-## ============================================================================
 
+### * Setup: Create test data and helper functions
 
 ## Create a complete-case subset for tests requiring no missing data
 clintrial_complete <- na.omit(clintrial)
@@ -54,9 +52,7 @@ expect_qc_stats <- function(result, stats) {
 }
 
 
-## ============================================================================
-## SECTION 1: Basic GLM - Logistic Regression
-## ============================================================================
+### * Basic GLM - logistic regression
 
 test_that("m2dt works with logistic regression", {
     
@@ -105,9 +101,7 @@ test_that("m2dt logistic includes events count", {
 })
 
 
-## ============================================================================
-## SECTION 2: Linear Model
-## ============================================================================
+### * Linear model
 
 test_that("m2dt works with linear model", {
     
@@ -142,9 +136,7 @@ test_that("m2dt linear does not exponentiate", {
 })
 
 
-## ============================================================================
-## SECTION 3: Poisson Regression
-## ============================================================================
+### * Poisson regression
 
 test_that("m2dt works with Poisson regression", {
     
@@ -178,9 +170,7 @@ test_that("m2dt Poisson shows correct model type", {
 })
 
 
-## ============================================================================
-## SECTION 4: Cox Proportional Hazards
-## ============================================================================
+### * Cox proportional hazards
 
 test_that("m2dt works with Cox regression", {
     
@@ -224,9 +214,7 @@ test_that("m2dt Cox includes events count", {
 })
 
 
-## ============================================================================
-## SECTION 5: Conditional Logistic Regression
-## ============================================================================
+### * Conditional logistic regression
 
 test_that("m2dt works with conditional logistic regression", {
     
@@ -247,9 +235,7 @@ test_that("m2dt works with conditional logistic regression", {
 })
 
 
-## ============================================================================
-## SECTION 6: Mixed Effects Models - lmer
-## ============================================================================
+### * Mixed effects models - lmer
 
 test_that("m2dt works with lmer", {
     
@@ -277,9 +263,7 @@ test_that("m2dt lmer shows correct model type", {
 })
 
 
-## ============================================================================
-## SECTION 7: Mixed Effects Models - glmer
-## ============================================================================
+### * Mixed effects models - glmer
 
 test_that("m2dt works with glmer (binomial)", {
     
@@ -298,9 +282,7 @@ test_that("m2dt works with glmer (binomial)", {
 })
 
 
-## ============================================================================
-## SECTION 8: Mixed Effects Cox - coxme
-## ============================================================================
+### * Mixed effects Cox - coxme
 
 test_that("m2dt works with coxme", {
     
@@ -318,9 +300,7 @@ test_that("m2dt works with coxme", {
 })
 
 
-## ============================================================================
-## SECTION 9: QC Statistics - keep_qc_stats Parameter
-## ============================================================================
+### * QC statistics - keep_qc_stats parameter
 
 test_that("m2dt keep_qc_stats=TRUE includes QC statistics for GLM", {
     
@@ -366,9 +346,7 @@ test_that("m2dt includes QC stats for Cox model", {
 })
 
 
-## ============================================================================
-## SECTION 10: Intercept Handling
-## ============================================================================
+### * Intercept handling
 
 test_that("m2dt include_intercept=TRUE includes intercept", {
     
@@ -390,9 +368,7 @@ test_that("m2dt include_intercept=FALSE excludes intercept", {
 })
 
 
-## ============================================================================
-## SECTION 11: Reference Rows for Factors
-## ============================================================================
+### * Reference rows for factors
 
 test_that("m2dt reference_rows=TRUE adds reference rows", {
     
@@ -453,9 +429,7 @@ test_that("m2dt reference_label customizes reference label", {
 })
 
 
-## ============================================================================
-## SECTION 12: Term Exclusion
-## ============================================================================
+### * Term exclusion
 
 test_that("m2dt terms_to_exclude removes specified terms", {
     
@@ -480,9 +454,7 @@ test_that("m2dt terms_to_exclude with multiple terms", {
 })
 
 
-## ============================================================================
-## SECTION 13: Confidence Level
-## ============================================================================
+### * Confidence level
 
 test_that("m2dt respects conf_level parameter", {
     
@@ -500,9 +472,7 @@ test_that("m2dt respects conf_level parameter", {
 })
 
 
-## ============================================================================
-## SECTION 14: Significance Indicators
-## ============================================================================
+### * Significance indicators
 
 test_that("m2dt adds significance indicators", {
     
@@ -555,9 +525,7 @@ test_that("m2dt sig markers are correct", {
 })
 
 
-## ============================================================================
-## SECTION 15: Variable and Group Parsing
-## ============================================================================
+### * Variable and group parsing
 
 test_that("m2dt parses factor variables correctly", {
     
@@ -589,9 +557,7 @@ test_that("m2dt parses continuous variables correctly", {
 })
 
 
-## ============================================================================
-## SECTION 16: n and Events Columns
-## ============================================================================
+### * n and events columns
 
 test_that("m2dt includes n column", {
     
@@ -627,9 +593,7 @@ test_that("m2dt events_group for factor variables in survival model", {
 })
 
 
-## ============================================================================
-## SECTION 17: Edge Cases
-## ============================================================================
+### * Edge cases
 
 test_that("m2dt handles single predictor", {
     
@@ -698,9 +662,7 @@ test_that("m2dt works with data.frame input", {
 })
 
 
-## ============================================================================
-## SECTION 18: Attributes
-## ============================================================================
+### * Attributes
 
 test_that("m2dt sets model_class attribute", {
     
@@ -735,9 +697,7 @@ test_that("m2dt sets family attributes for GLM", {
 })
 
 
-## ============================================================================
-## SECTION 19: Coefficient and CI Columns
-## ============================================================================
+### * Coefficient and CI columns
 
 test_that("m2dt includes both raw and exponentiated coefficients", {
     
@@ -781,9 +741,7 @@ test_that("m2dt HR equals exp(coefficient) for Cox", {
 })
 
 
-## ============================================================================
-## SECTION 20: Consistency Tests
-## ============================================================================
+### * Consistency tests
 
 test_that("m2dt produces consistent results across runs", {
     
@@ -833,9 +791,7 @@ test_that("m2dt p-values match summary(model)", {
 })
 
 
-## ============================================================================
-## SECTION 21: Confidence Interval Methods
-## ============================================================================
+### * Confidence interval methods
 
 test_that("m2dt GLM CIs use profile likelihood (differ from Wald)", {
     

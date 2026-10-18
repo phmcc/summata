@@ -83,3 +83,29 @@ test_that("recdims validates its arguments", {
         ggplot2::geom_point()
     expect_error(recdims(plain), "no recommended dimensions")
 })
+
+
+test_that("recdims counts the rows the plot draws", {
+
+    ## An aliased coefficient is not drawn, so that it adds no row, and a
+    ## logical predictor is drawn by level, as a factor of its two levels is
+    dt <- data.table::as.data.table(fresh_clintrial())
+    dt[, age2 := 2 * age]
+    dt[, older := age > 65]
+    dt[, older_f := factor(older, levels = c(FALSE, TRUE))]
+
+    height_of <- function(terms) {
+        model <- stats::glm(
+            stats::reformulate(c(terms, "sex", "stage", "treatment", "grade",
+                                 "smoking"), "readmission_30d"),
+            data = dt, family = stats::binomial)
+        p <- suppressMessages(suppressWarnings(glmforest(model, data = dt)))
+        unname(recdims(p)[["height"]])
+    }
+
+    ## Enough rows that the height exceeds its minimum
+    expect_gt(height_of("age"), 5)
+
+    expect_equal(height_of(c("age", "age2")), height_of("age"))
+    expect_equal(height_of("older"), height_of("older_f"))
+})

@@ -18,6 +18,7 @@ process_categorical(
   total_label,
   na_percent,
   marks = NULL,
+  groups = NULL,
   ...
 )
 }
@@ -45,6 +46,8 @@ process_categorical(
 \item{total_label}{Character string label for total column.}
 
 \item{na_percent}{Logical whether to include NA in percentage denominators.}
+
+\item{groups}{Optional vector of groups (see \code{process_variable()}).}
 
 \item{...}{Additional arguments passed to test functions.}
 }

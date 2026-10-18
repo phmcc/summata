@@ -42,7 +42,9 @@
 #' @param conf_level Numeric confidence level for confidence intervals. Must be
 #'   between 0 and 1. Default is 0.95 (95\% confidence intervals). The CI
 #'   percentage is automatically displayed in column headers (\emph{e.g.,} "90\% CI"
-#'   when \code{conf_level = 0.90}).
+#'   when \code{conf_level = 0.90}). Intervals are computed by the method that
+#'   \code{getOption("summata.conf_method")} selects, as in \code{fit()};
+#'   those of a \code{fit()} result at the same level are reused.
 #'   
 #' @param font_size Numeric multiplier controlling the base font size for all 
 #'   text elements. Values > 1 increase all fonts proportionally, values < 1 
@@ -245,10 +247,17 @@
 #'   \item Displayed with the \code{ref_label} instead of an estimate
 #'   \item No confidence interval or \emph{p}-value shown
 #'   \item Visually aligned with other categories
-#'   \item When \code{condense_table = TRUE}, reference-only variables may be 
+#'   \item When \code{condense_table = TRUE}, reference-only variables may be
 #'     omitted entirely
 #' }
-#' 
+#'
+#' \strong{Aliased Coefficients:}
+#'
+#' Coefficients that the model could not estimate because their columns of
+#' the model matrix are linear combinations of others are omitted, as in the
+#' tables of \code{fit()}, together with any factor none of whose levels was
+#' estimated.
+#'
 #' \strong{Layout Optimization:}
 #' 
 #' The function automatically optimizes layout based on content:
@@ -600,35 +609,20 @@ Received class: ", paste(class(x), collapse = ", "))
     
     ## Extract terms based on model type
     if (is_lme4) {
-        ## Get the fixed effects formula for lme4 models
-        fixed_formula <- lme4::nobars(stats::formula(model))
-        
-        ## Get variable names from the fixed formula (excluding outcome)
-        var_names <- all.vars(fixed_formula)[-1]  # Remove outcome variable
-        
-        ## Get the model frame for determining variable types
-        model_frame <- model@frame
-        
-        ## Create terms object similar to GLM structure
-        terms <- sapply(var_names, function(v) {
-            if (v %in% names(model_frame)) {
-                if (is.factor(model_frame[[v]])) "factor"
-                else if (is.character(model_frame[[v]])) "character"
-                else "numeric"
-            } else if (v %in% names(data)) {
-                if (is.factor(data[[v]])) "factor"
-                else if (is.character(data[[v]])) "character"
-                else "numeric"
-            } else "numeric"
-        }, USE.NAMES = TRUE)
+        ## The variables of the fixed-effect terms, classed as the dataClasses
+        ## of a GLM class them (see fixed_effect_classes()). Reading the names
+        ## within the terms gave "age" for a term log(age), which was then
+        ## drawn without its estimate or count.
+        terms <- fixed_effect_classes(model)
         
     } else {
         ## For regular GLMs
         terms <- attr(model$terms, "dataClasses")[-1]
     }
     
-    ## Filter out interaction terms (contain ":"), which are handled separately via coefficients
-    terms <- terms[!grepl(":", names(terms), fixed = TRUE)]
+    ## The variables of the model are its main effects; interactions are
+    ## handled separately via their coefficients. A variable whose name
+    ## contains ":" is a main effect like any other.
     
     ## Extract coefficients and confidence intervals
     if (is_lme4) {
@@ -810,11 +804,20 @@ Received class: ", paste(class(x), collapse = ", "))
         xlevels <- model$xlevels
     }
     
+    ## Logical predictors are drawn by level, FALSE being the reference, as
+    ## factors are (see add_logical_levels()). Expressions such as
+    ## I(age > 65), which are not columns of the data, are drawn by their
+    ## coefficients as before.
+    logical_vars <- intersect(names(model_data),
+                              get_model_variables(model, class(model)[1]))
+    xlevels <- add_logical_levels(xlevels, terms[names(terms) %in% logical_vars])
+
     ## Extract statistics for every variable, preserving order
     all_terms <- lapply(seq_along(terms), function(i){
         var <- names(terms)[i]
         
-        if (terms[i] %in% c("factor", "character")) {
+        if (terms[i] %in% c("factor", "character") ||
+            (terms[i] %in% "logical" && var %in% names(xlevels))) {
             ## Get the factor levels from xlevels (proper order)
             if(!is.null(xlevels) && var %in% names(xlevels)) {
                 factor_levels <- xlevels[[var]]
@@ -822,6 +825,7 @@ Received class: ", paste(class(x), collapse = ", "))
                 ## Create data table with proper levels FROM MODEL DATA
                 level_counts <- model_data[!is.na(get(var)), .N, by = var]
                 data.table::setnames(level_counts, c("level", "Freq"))
+                level_counts[, level := as.character(level)]
                 
                 ## Ensure all levels are present
                 all_levels_dt <- data.table::data.table(
@@ -857,7 +861,19 @@ Received class: ", paste(class(x), collapse = ", "))
         }
         else {
             ## Other cases
-            vars = grep(paste0("^", var, "*."), coef$term, value=TRUE)
+            ## The coefficients of a matrix-valued term (poly(age, 2)1): those
+            ## whose names begin with the term, compared literally and without
+            ## the backticks of non-syntactic names, other than interactions
+            ## and the coefficients of variables whose longer names begin with
+            ## it, which have rows of their own. The pattern formerly used
+            ## matched both, which were then drawn twice.
+            coef_terms <- gsub("`", "", coef$term, fixed = TRUE)
+            own <- startsWith(coef_terms, var) & !grepl(":", coef_terms, fixed = TRUE)
+            for (longer in names(terms)[nchar(names(terms)) > nchar(var) &
+                                        startsWith(names(terms), var)]) {
+                own <- own & !startsWith(coef_terms, longer)
+            }
+            vars <- coef_terms[own]
             return(data.table::data.table(
                                    var = vars, 
                                    level = "", 
@@ -932,7 +948,8 @@ Received class: ", paste(class(x), collapse = ", "))
     }
 
     ## Interaction terms - use ":" as identifier
-    interaction_terms <- coef$term[grepl(":", coef$term, fixed = TRUE)]
+    interaction_terms <- coef$term[is_interaction_term(gsub("`", "", coef$term, fixed = TRUE),
+                                                       xlevels, main_effect_labels(model))]
     
     if (length(interaction_terms) > 0) {
         ## Get the next var_order value
@@ -940,64 +957,48 @@ Received class: ", paste(class(x), collapse = ", "))
         
         ## Process each interaction term
         interaction_rows <- lapply(seq_along(interaction_terms), function(idx) {
-            int_term <- interaction_terms[idx]
+            ## The coefficient table is keyed without the backticks that
+            ## enclose non-syntactic variable names
+            int_term <- gsub("`", "", interaction_terms[idx], fixed = TRUE)
             
-            ## Parse the interaction term to create a readable label
+            ## Match each component of the interaction to the variable it
+            ## names. Taking the first variable whose name the component began
+            ## with left a component such as "`high bp`Yes" unmatched and
+            ## assigned "sexualityHetero" to "sex" when "sex" came first.
+            components <- split_interaction_term(int_term, names(terms), xlevels)
+            
+            ## Build a readable label from the components
             ## \emph{e.g.,}, "treatmentDrug A:stageII" -> "Treatment Group (Drug A) × Disease Stage (II)"
-            int_parts <- strsplit(int_term, ":", fixed = TRUE)[[1]]
-            
-            ## Build readable variable name from parts
-            display_parts <- sapply(int_parts, function(part) {
-                ## Try to match against known factor variables to extract var and level
-                matched_result <- NULL
-                for (var_name in names(terms)) {
-                    if (startsWith(part, var_name)) {
-                        level_str <- sub(paste0("^", var_name), "", part)
-                        if (nchar(level_str) > 0) {
-                            ## Apply label if available
-                            var_label <- if (!is.null(labels) && var_name %in% names(labels)) {
-                                             labels[[var_name]]
-                                         } else {
-                                             var_name
-                                         }
-                            matched_result <- paste0(var_label, " (", level_str, ")")
-                            break
-                        }
-                    }
+            display_parts <- sapply(components, function(component) {
+                var_name <- if (is.na(component$var)) component$part else component$var
+                var_label <- if (!is.null(labels) && var_name %in% names(labels)) {
+                                 labels[[var_name]]
+                             } else {
+                                 var_name
+                             }
+                if (is.na(component$level)) {
+                    var_label
+                } else {
+                    paste0(var_label, " (", component$level, ")")
                 }
-                ## If no match found (continuous variable in interaction or exact match)
-                if (is.null(matched_result)) {
-                    var_label <- if (!is.null(labels) && part %in% names(labels)) {
-                                     labels[[part]]
-                                 } else {
-                                     part
-                                 }
-                    matched_result <- var_label
-                }
-                matched_result
             })
             
             display_name <- paste(display_parts, collapse = " \u00d7 ")
             
+            ## The observations of the interaction are those in each of its
+            ## factor levels
+            conditions <- list()
+            for (component in components) {
+                if (!is.na(component$level) &&
+                    terms[component$var] %in% c("factor", "character", "logical") &&
+                    component$var %in% names(model_data)) {
+                    conditions[[component$var]] <- component$level
+                }
+            }
+
             ## Calculate N for this interaction (observations where both conditions are met)
             int_n <- tryCatch({
                 n_count <- NA_integer_
-                
-                ## Try to extract the subset count from the model data
-                ## For each part of the interaction, build a condition
-                conditions <- list()
-                for (j in seq_along(int_parts)) {
-                    part <- int_parts[j]
-                    for (var_name in names(terms)) {
-                        if (startsWith(part, var_name) && terms[var_name] %in% c("factor", "character")) {
-                            level_str <- sub(paste0("^", var_name), "", part)
-                            if (nchar(level_str) > 0 && var_name %in% names(model_data)) {
-                                conditions[[var_name]] <- level_str
-                            }
-                            break
-                        }
-                    }
-                }
                 
                 ## Where conditions were found, count matching rows
                 if (length(conditions) > 0) {
@@ -1035,7 +1036,7 @@ Received class: ", paste(class(x), collapse = ", "))
                             pos = 1L,
                             var_order = next_var_order + idx - 1L,
                             Events = int_events,
-                            .int_term = int_term  # Store raw term for later inds assignment
+                            .int_term = int_term  # Store term for later inds assignment
                         )
         })
         
@@ -1045,6 +1046,13 @@ Received class: ", paste(class(x), collapse = ", "))
         all_terms_df <- data.table::rbindlist(list(all_terms_df, interaction_df), 
                                               use.names = TRUE, fill = TRUE)
     }
+
+    ## Coefficients that the model could not estimate because of collinearity
+    ## are omitted, as the regression tables omit them. Having no estimate,
+    ## such a row was drawn as a reference category.
+    all_terms_df <- drop_aliased_rows(all_terms_df, aliased_coefficients(model),
+                                      coef$term, model)
+    stop_if_no_estimates(all_terms_df)
 
     ## Apply condensing and indenting if requested
     if (condense_table || indent_groups) {
@@ -1062,7 +1070,6 @@ Received class: ", paste(class(x), collapse = ", "))
         } else {
             all_terms_df[, inds := data.table::fifelse(level == "-", var, paste0(var, level))]
         }
-        orig_inds_map <- data.table::copy(all_terms_df[, .(var, level, inds, N, Events)])
         
         processed_rows <- list()
         row_counter <- 1
@@ -1149,18 +1156,14 @@ Received class: ", paste(class(x), collapse = ", "))
                         row_counter <- row_counter + 1
                         
 
-                        for (i in seq_len(nrow(var_rows))) {
-                            group_row <- data.table::copy(var_rows[i])
-                            group_row[, var := paste0("    ", level)]
-                            group_row[, level := "-"]
-                            processed_rows[[row_counter]] <- group_row
-                            row_counter <- row_counter + 1
-                        }
+                        group_rows <- data.table::copy(var_rows)
+                        group_rows[, var := paste0("    ", level)]
+                        group_rows[, level := "-"]
+                        processed_rows[[row_counter]] <- group_rows
+                        row_counter <- row_counter + 1
                     } else {
-                        for (i in seq_len(nrow(var_rows))) {
-                            processed_rows[[row_counter]] <- var_rows[i]
-                            row_counter <- row_counter + 1
-                        }
+                        processed_rows[[row_counter]] <- var_rows
+                        row_counter <- row_counter + 1
                     }
                 }
             }
@@ -1168,47 +1171,12 @@ Received class: ", paste(class(x), collapse = ", "))
         
         all_terms_df <- data.table::rbindlist(processed_rows, fill = TRUE)
         
-        ## Restore inds, N, and Events values for condensed/indented rows
-
-        for (i in seq_len(nrow(all_terms_df))) {
-            current_var <- all_terms_df$var[i]
-            
-            if (is.na(all_terms_df$inds[i]) && !grepl("^    ", current_var) && !grepl("\\(", current_var)) {
-                next
-            }
-            
-            if (grepl("\\(", current_var)) {
-                orig_var <- gsub(" \\(.*\\)", "", current_var)
-                orig_level <- gsub(".*\\((.*)\\)", "\\1", current_var)
-                
-                matching <- orig_inds_map[var == orig_var & level == orig_level]
-                if (nrow(matching) > 0) {
-                    all_terms_df[i, `:=`(inds = matching$inds[1],
-                                         N = matching$N[1],
-                                         Events = matching$Events[1])]
-                }
-            }
-            else if (grepl("^    ", current_var)) {
-                clean_level <- gsub("^    ", "", current_var)
-                
-                parent_var <- NA_character_
-                for (j in (i-1):1) {
-                    if (!grepl("^    ", all_terms_df$var[j]) && all_terms_df$var[j] != "") {
-                        parent_var <- gsub(" \\(.*\\)", "", all_terms_df$var[j])
-                        break
-                    }
-                }
-                
-                if (!is.na(parent_var)) {
-                    matching <- orig_inds_map[var == parent_var & level == clean_level]
-                    if (nrow(matching) > 0) {
-                        all_terms_df[i, `:=`(inds = matching$inds[1],
-                                             N = matching$N[1],
-                                             Events = matching$Events[1])]
-                    }
-                }
-            }
-        }
+        ## Every row already carries the inds, N and Events of the term it
+        ## displays: rows are copied from all_terms_df, and header rows have
+        ## none. The pass that looked them up again by parsing the displayed
+        ## label was redundant, and for an interaction label such as
+        ## "a (Yes) \u00d7 b (Yes)" it matched level Yes of a, replacing the
+        ## interaction estimate and counts with those of the main effect.
     } else {
         ## For non-condensed/non-indented display, set inds for coefficient matching
         ## For interaction rows, use the stored raw term; for others use var+level pattern

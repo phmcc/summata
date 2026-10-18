@@ -7,10 +7,8 @@
 
 library(data.table)
 
-## ============================================================================
-## Setup: Create test data and helper functions
-## ============================================================================
 
+### * Setup: Create test data and helper functions
 
 ## Create a complete-case subset for tests requiring no missing data
 clintrial_complete <- na.omit(clintrial)
@@ -42,9 +40,7 @@ expect_time_column <- function(result, time, unit = NULL) {
 }
 
 
-## ============================================================================
-## SECTION 1: Basic Functionality - No Grouping
-## ============================================================================
+### * Basic functionality - no grouping
 
 test_that("survtable works without grouping variable", {
     
@@ -87,9 +83,7 @@ test_that("survtable outcome attribute is set", {
 })
 
 
-## ============================================================================
-## SECTION 2: Basic Functionality - With Grouping
-## ============================================================================
+### * Basic functionality - with grouping
 
 test_that("survtable works with grouping variable", {
     
@@ -140,9 +134,7 @@ test_that("survtable includes all group levels", {
 })
 
 
-## ============================================================================
-## SECTION 3: Time Points
-## ============================================================================
+### * Time points
 
 test_that("survtable handles single time point", {
     
@@ -202,9 +194,7 @@ test_that("survtable times attribute is stored", {
 })
 
 
-## ============================================================================
-## SECTION 4: Probability Quantiles (Median, etc.)
-## ============================================================================
+### * Probability quantiles (median, etc.)
 
 test_that("survtable handles median (probs = 0.5)", {
     
@@ -266,9 +256,7 @@ test_that("survtable combining times and probs works", {
 })
 
 
-## ============================================================================
-## SECTION 5: Type Parameter (survival, risk, cumhaz)
-## ============================================================================
+### * type parameter (survival, risk, cumhaz)
 
 test_that("survtable type='survival' works (default)", {
     
@@ -339,9 +327,7 @@ test_that("survtable risk values are 1 - survival", {
 })
 
 
-## ============================================================================
-## SECTION 6: Statistical Tests
-## ============================================================================
+### * Statistical tests
 
 test_that("survtable test=TRUE adds p-value column", {
     
@@ -462,9 +448,7 @@ test_that("survtable test_result attribute contains valid data", {
 })
 
 
-## ============================================================================
-## SECTION 7: Total Row
-## ============================================================================
+### * Total row
 
 test_that("survtable total=TRUE includes total row first", {
     
@@ -543,9 +527,7 @@ test_that("survtable total_label parameter works", {
 })
 
 
-## ============================================================================
-## SECTION 8: Formatting Options
-## ============================================================================
+### * Formatting options
 
 test_that("survtable percent=TRUE displays percentages", {
     
@@ -629,9 +611,7 @@ test_that("survtable p_digits parameter affects p-value precision", {
 })
 
 
-## ============================================================================
-## SECTION 9: Stats Parameter
-## ============================================================================
+### * stats parameter
 
 test_that("survtable stats='survival' shows survival only", {
     
@@ -695,9 +675,7 @@ test_that("survtable stats includes 'n_event' adds event count", {
 })
 
 
-## ============================================================================
-## SECTION 10: Confidence Interval Options
-## ============================================================================
+### * Confidence interval options
 
 test_that("survtable conf_level=0.95 works (default)", {
     
@@ -764,9 +742,7 @@ test_that("survtable conf_type='plain' works", {
 })
 
 
-## ============================================================================
-## SECTION 11: Multiple Outcomes
-## ============================================================================
+### * Multiple outcomes
 
 test_that("survtable handles multiple outcomes", {
     
@@ -845,9 +821,7 @@ test_that("survtable multiple outcomes each have test results", {
 })
 
 
-## ============================================================================
-## SECTION 12: Labels Parameter
-## ============================================================================
+### * labels parameter
 
 test_that("survtable labels parameter works for by variable", {
     
@@ -863,9 +837,7 @@ test_that("survtable labels parameter works for by variable", {
 })
 
 
-## ============================================================================
-## SECTION 13: Missing Data
-## ============================================================================
+### * Missing data
 
 test_that("survtable handles missing values with na_rm=TRUE", {
     
@@ -910,9 +882,7 @@ test_that("survtable handles missing values with na_rm=FALSE", {
 })
 
 
-## ============================================================================
-## SECTION 14: Edge Cases
-## ============================================================================
+### * Edge cases
 
 test_that("survtable handles times=NULL with probs only", {
     
@@ -1022,9 +992,7 @@ test_that("survtable handles short follow-up times", {
 })
 
 
-## ============================================================================
-## SECTION 15: Raw Data Attribute
-## ============================================================================
+### * Raw data attribute
 
 test_that("survtable raw_data attribute contains numeric values", {
     
@@ -1063,9 +1031,7 @@ test_that("survtable survfit_objects attribute is stored", {
 })
 
 
-## ============================================================================
-## SECTION 16: Data Input Types
-## ============================================================================
+### * Data input types
 
 test_that("survtable works with data.frame input", {
     
@@ -1093,9 +1059,7 @@ test_that("survtable works with data.table input", {
 })
 
 
-## ============================================================================
-## SECTION 17: Consistency Tests
-## ============================================================================
+### * Consistency tests
 
 test_that("survtable produces consistent results across runs", {
     
@@ -1146,9 +1110,7 @@ test_that("survtable survival probabilities are in valid range", {
 })
 
 
-## ============================================================================
-## SECTION 18: Print Method
-## ============================================================================
+### * Print method
 
 test_that("survtable print method works", {
     
@@ -1183,9 +1145,7 @@ test_that("survtable print method shows correct header info", {
 })
 
 
-## ============================================================================
-## SECTION 19: Integration with Export Functions
-## ============================================================================
+### * Integration with export functions
 
 test_that("survtable output is suitable for export", {
     
@@ -1207,9 +1167,7 @@ test_that("survtable output is suitable for export", {
 })
 
 
-## ============================================================================
-## SECTION 20: Error Handling
-## ============================================================================
+### * Error handling
 
 test_that("survtable errors on invalid Surv() syntax", {
     
@@ -1277,9 +1235,7 @@ test_that("survtable errors when both times and probs are NULL", {
 })
 
 
-## ============================================================================
-## SECTION 21: Complete Workflow
-## ============================================================================
+### * Complete workflow
 
 test_that("survtable creates complete survival summary", {
     

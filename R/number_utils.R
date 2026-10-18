@@ -185,23 +185,24 @@ apply_decimal_mark <- function(x, marks) {
 #'
 #' @param x Numeric value to format.
 #' @param fmt_str Character string \code{sprintf} format specification
-#'   (\emph{e.g.,} \code{"\%.1f"}). Used only for |x| < 1000.
+#'   (\emph{e.g.,} \code{"\%.1f"}). Its number of decimal places applies at
+#'   every magnitude.
 #' @param marks List with \code{big.mark} and \code{decimal.mark} as returned
 #'   by \code{\link{resolve_number_marks}}.
 #' @return Character string with the formatted number.
 #' @keywords internal
 format_num <- function(x, fmt_str, marks) {
     if (is.na(x)) return("")
-    if (abs(x) >= 1000) {
-        formatted <- format(round(x, 1), big.mark = marks$big.mark,
-                            scientific = FALSE)
-        ## Replace decimal mark if non-standard
-        if (marks$decimal.mark != ".") {
-            formatted <- sub(".", marks$decimal.mark, formatted, fixed = TRUE)
-        }
-        trimws(formatted)
+    plain <- sprintf(fmt_str, x)
+    digits <- suppressWarnings(as.integer(sub("^%\\.([0-9]+)f$", "\\1", fmt_str)))
+    ## The thousands mark applies once the rounded value has four integer digits
+    if (!is.na(digits) && grepl("[0-9]{4}", sub("\\..*$", "", plain))) {
+        ## formatC() rounds as sprintf() does and inserts both marks, which
+        ## format() with big.mark alone cannot do for a decimal comma
+        formatC(x, format = "f", digits = digits, big.mark = marks$big.mark,
+                decimal.mark = marks$decimal.mark)
     } else {
-        apply_decimal_mark(sprintf(fmt_str, x), marks)
+        apply_decimal_mark(plain, marks)
     }
 }
 
@@ -258,7 +259,9 @@ format_count <- function(n, marks = NULL, na = NA_character_) {
 #' standard conventions (n, n (\%), \% only) with locale-aware decimal marks.
 #'
 #' @param n Integer count for the category.
-#' @param total Integer total count for percentage calculation.
+#' @param total Integer total count for percentage calculation. When zero,
+#'   as for a group without observations, the percentage is undefined: the
+#'   count alone is returned, or an empty string for \code{"percent"}.
 #' @param stat_type Character string: \code{"n"}, \code{"n_percent"}, or
 #'   \code{"percent"}.
 #' @param marks List with \code{big.mark} and \code{decimal.mark} as returned
@@ -269,6 +272,13 @@ format_categorical_stat <- function(n, total, stat_type, marks) {
     if (length(stat_type) > 1) stat_type <- stat_type[1]
 
     n_formatted <- format_count(n, marks)
+
+    ## A group without observations has no percentage: report the count alone
+    ## rather than "NaN%"
+    if (is.na(total) || total == 0) {
+        return(if (identical(stat_type, "percent")) "" else n_formatted)
+    }
+
     pct <- 100 * n / total
 
     switch(stat_type,

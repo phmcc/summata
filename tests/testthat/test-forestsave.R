@@ -193,7 +193,28 @@ test_that("the cairo shorthand reports an unusable installation", {
 })
 
 
+## forestsave() writes PNG output with ragg where it is installed and
+## otherwise with the png() device, which needs X11 or Cairo. A headless
+## build of R may have neither, so the device is probed, as for Cairo above.
+png_device_works <- function() {
+    if (requireNamespace("ragg", quietly = TRUE)) {
+        return(TRUE)
+    }
+    probe <- tempfile(fileext = ".png")
+    ok <- tryCatch({
+        grDevices::png(filename = probe)
+        graphics::plot.new()
+        grDevices::dev.off()
+        file.exists(probe) && file.size(probe) > 0
+    }, error = function(e) FALSE, warning = function(w) FALSE)
+    unlink(probe)
+    return(isTRUE(ok))
+}
+
+
 test_that("embed_fonts is rejected for non-PDF output", {
+
+    skip_if_not(png_device_works(), "No PNG device is usable here")
 
     p <- forest_fixture()
     out <- tempfile(fileext = ".png")
