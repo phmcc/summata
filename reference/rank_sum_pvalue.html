@@ -15,7 +15,8 @@ table(), which converts every rank to a character string; on large
 samples these two steps dominate its running time. Smaller samples, for
 which wilcox.test() computes the exact distribution by default, and
 calls with additional test arguments are passed to wilcox.test()
-itself."><meta property="og:description" content="Computes the two-sided p-value of the Wilcoxon rank sum test for
+itself, as are data without variation, whose p-value differs
+between versions of R."><meta property="og:description" content="Computes the two-sided p-value of the Wilcoxon rank sum test for
 two groups. When either group has 50 or more observations,
 stats::wilcox.test() uses the normal approximation with
 continuity correction and tie correction by default; that computation is
@@ -25,7 +26,8 @@ table(), which converts every rank to a character string; on large
 samples these two steps dominate its running time. Smaller samples, for
 which wilcox.test() computes the exact distribution by default, and
 calls with additional test arguments are passed to wilcox.test()
-itself."></head><body>
+itself, as are data without variation, whose p-value differs
+between versions of R."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -91,7 +93,8 @@ because <code><a href="https://rdrr.io/r/stats/wilcox.test.html" class="external
 samples these two steps dominate its running time. Smaller samples, for
 which <code><a href="https://rdrr.io/r/stats/wilcox.test.html" class="external-link">wilcox.test()</a></code> computes the exact distribution by default, and
 calls with additional test arguments are passed to <code><a href="https://rdrr.io/r/stats/wilcox.test.html" class="external-link">wilcox.test()</a></code>
-itself.</p>
+itself, as are data without variation, whose <em>p</em>-value differs
+between versions of <span style="R">R</span>.</p>
     </div>
 
     <div class="section level2">
@@ -120,6 +123,14 @@ exactly two groups.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>Numeric <em>p</em>-value.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p><code><a href="https://rdrr.io/r/stats/wilcox.test.html" class="external-link">wilcox.test()</a></code> ranks the values rounded to the significant digits of
+its argument <code>digits.rank</code>, which defaults to 7 in recent versions of
+<span style="R">R</span> and is absent from earlier ones, which do not round. The values are
+rounded as the installed <code><a href="https://rdrr.io/r/stats/wilcox.test.html" class="external-link">wilcox.test()</a></code> rounds them by default, so
+that the ties, and the <em>p</em>-value, are those it finds.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
