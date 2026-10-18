@@ -835,11 +835,26 @@ process_single_outcome <- function(data,
     ## Fit survival models
     if (!is.null(by)) {
         ## Stratified analysis
-        fit_formula <- stats::as.formula(paste("surv_obj ~",
-                                               formula_names(by, names(data))))
-        fit_stratified <- survival::survfit(fit_formula, data = data,
+        ## survfit() selects the strata from the model frame by the term
+        ## labels of its formula, which keep the backticks of a non-syntactic
+        ## name, so that versions of survival that do not remove them stop
+        ## with "undefined columns selected". Such a grouping variable is
+        ## passed under a syntactic name, and the strata are named after it.
+        by_column <- by
+        fit_data <- data
+        if (!identical(make.names(by), by)) {
+            by_column <- ".summata_by"
+            fit_data <- data.table::copy(data)
+            data.table::set(fit_data, j = by_column, value = data[[by]])
+        }
+        fit_formula <- stats::as.formula(paste("surv_obj ~", by_column))
+        fit_stratified <- survival::survfit(fit_formula, data = fit_data,
                                             conf.int = conf_level,
                                             conf.type = conf_type, ...)
+        if (!identical(by_column, by) && !is.null(fit_stratified$strata)) {
+            names(fit_stratified$strata) <- paste0(
+                by, substring(names(fit_stratified$strata), nchar(by_column) + 1L))
+        }
 
         ## survfit() returns no strata when a single group has observations.
         ## Naming that group's stratum lets the table find its estimates.

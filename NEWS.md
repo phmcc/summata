@@ -1,4 +1,4 @@
-# *summata* 0.13.0 (2026-10-18)
+# *summata* 0.13.0 (2026-10-17)
 
 * Speed up `desctable()`, which now computes rank-test *p*-values from a single sort and derives the grouping structure once per table
 * Pass the arguments in `...` of `desctable()` (*e.g.*, `var.equal = TRUE`) to the tests that accept them, with a warning for arguments no test accepts; exclude missing and empty categories from categorical tests, falling back to a Monte Carlo *p*-value when Fisher's exact test exceeds its workspace
