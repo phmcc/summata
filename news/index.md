@@ -1,6 +1,6 @@
 # Changelog
 
-## *summata* 0.13.0 (2026-10-17)
+## *summata* 0.13.0 (2026-10-18)
 
 - Speed up
   [`desctable()`](https://phmcc.codefloe.page/summata/reference/desctable.md),
