@@ -502,7 +502,7 @@ plot5 <- coxforest(
 
 # Example 6: Save with recommended dimensions
 forestsave(plot5, file.path(tempdir(), "survival_forest.pdf"))
-#> Forest plot saved to /tmp/Rtmph50nhC/survival_forest.pdf (width = 13.7 in, height = 5.0 in)
+#> Forest plot saved to /tmp/RtmpDFfFwh/survival_forest.pdf (width = 13.7 in, height = 5.0 in)
 
 options(old_width)
 

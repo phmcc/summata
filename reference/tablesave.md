@@ -194,11 +194,11 @@ tbl <- desctable(clintrial, by = "treatment",
 if (requireNamespace("xtable", quietly = TRUE)) {
   tablesave(tbl, file.path(tempdir(), "example.html"))
 }
-#> Table saved to /tmp/Rtmph50nhC/example.html
+#> Table saved to /tmp/RtmpDFfFwh/example.html
 
 # Example 2: Delimited output needs no additional packages
 tablesave(tbl, file.path(tempdir(), "example.csv"))
-#> Table saved to /tmp/Rtmph50nhC/example.csv
+#> Table saved to /tmp/RtmpDFfFwh/example.csv
 
 # Example 3: Suppress the message reporting the file written
 tablesave(tbl, file.path(tempdir(), "example.tsv"), quiet = TRUE)
@@ -239,22 +239,22 @@ has_office <- requireNamespace("flextable", quietly = TRUE) &&
 
 # Example 4: The format is taken from the file extension
 tablesave(results, file.path(tempdir(), "results.html"))  # Creates HTML file
-#> Table saved to /tmp/Rtmph50nhC/results.html
+#> Table saved to /tmp/RtmpDFfFwh/results.html
 tablesave(results, file.path(tempdir(), "results.tex"))   # Creates LaTeX source
-#> Table saved to /tmp/Rtmph50nhC/results.tex
+#> Table saved to /tmp/RtmpDFfFwh/results.tex
 if (has_office) {
   tablesave(results, file.path(tempdir(), "results.docx"))  # Creates Word document
   tablesave(results, file.path(tempdir(), "results.pptx"))  # Creates PowerPoint slide
   tablesave(results, file.path(tempdir(), "results.rtf"))   # Creates RTF document
 }
-#> Table saved to /tmp/Rtmph50nhC/results.docx
-#> Table saved to /tmp/Rtmph50nhC/results.pptx
-#> Table saved to /tmp/Rtmph50nhC/results.rtf
+#> Table saved to /tmp/RtmpDFfFwh/results.docx
+#> Table saved to /tmp/RtmpDFfFwh/results.pptx
+#> Table saved to /tmp/RtmpDFfFwh/results.rtf
 if (has_latex) {
   tablesave(results, file.path(tempdir(), "results.pdf")) # Creates PDF
 }
 #> Compiling PDF...
-#> Table saved to /tmp/Rtmph50nhC/results.pdf
+#> Table saved to /tmp/RtmpDFfFwh/results.pdf
 
 # Example 5: Format-specific parameters are passed through
 if (has_latex) {
@@ -264,7 +264,7 @@ if (has_latex) {
              font_size = 10)
 }
 #> Compiling PDF...
-#> Table saved to /tmp/Rtmph50nhC/results.pdf
+#> Table saved to /tmp/RtmpDFfFwh/results.pdf
 
 if (has_office) {
   tablesave(results, file.path(tempdir(), "results.docx"),
@@ -272,13 +272,13 @@ if (has_office) {
              font_family = "Times New Roman",
              condense_table = TRUE)
 }
-#> Table saved to /tmp/Rtmph50nhC/results.docx
+#> Table saved to /tmp/RtmpDFfFwh/results.docx
 
 tablesave(results, file.path(tempdir(), "results.html"),
            zebra_stripes = TRUE,
            dark_header = TRUE,
            bold_significant = TRUE)
-#> Table saved to /tmp/Rtmph50nhC/results.html
+#> Table saved to /tmp/RtmpDFfFwh/results.html
 
 # Example 6: Any summata table may be saved
 desc <- desctable(clintrial,
@@ -288,7 +288,7 @@ if (has_latex) {
   tablesave(desc, file.path(tempdir(), "demographics.pdf"))
 }
 #> Compiling PDF...
-#> Table saved to /tmp/Rtmph50nhC/demographics.pdf
+#> Table saved to /tmp/RtmpDFfFwh/demographics.pdf
 
 # Example 7: Model comparison table
 # Information criteria assume a common sample, so the candidate
@@ -310,7 +310,7 @@ comparison <- compfit(
 if (has_office) {
   tablesave(comparison, file.path(tempdir(), "model_comparison.docx"))
 }
-#> Table saved to /tmp/Rtmph50nhC/model_comparison.docx
+#> Table saved to /tmp/RtmpDFfFwh/model_comparison.docx
 
 # }
 ```
