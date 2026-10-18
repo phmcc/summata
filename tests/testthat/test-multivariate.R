@@ -7,6 +7,11 @@
 
 library(data.table)
 
+## The comprehensive tests of this file take a large share of the check
+## time and are skipped on CRAN, whose check time is limited; they run
+## wherever NOT_CRAN is "true", as in development and continuous integration.
+skip_on_cran()
+
 
 ### * Setup: Load test data and define helper functions
 
