@@ -578,7 +578,14 @@ kruskal_wallis_pvalue <- function(x, g) {
 #' samples these two steps dominate its running time. Smaller samples, for
 #' which \code{wilcox.test()} computes the exact distribution by default, and
 #' calls with additional test arguments are passed to \code{wilcox.test()}
-#' itself.
+#' itself, as are data without variation, whose \emph{p}-value differs
+#' between versions of \R.
+#'
+#' \code{wilcox.test()} ranks the values rounded to the significant digits of
+#' its argument \code{digits.rank}, which defaults to 7 in recent versions of
+#' \R and is absent from earlier ones, which do not round. The values are
+#' rounded as the installed \code{wilcox.test()} rounds them by default, so
+#' that the ties, and the \emph{p}-value, are those it finds.
 #'
 #' @param x Numeric vector without missing values.
 #' @param g Grouping vector of the same length without missing values, with
@@ -599,20 +606,37 @@ rank_sum_pvalue <- function(x, g, test_args = list()) {
                        c(list(x = x[first], y = x[!first]), test_args))$p.value)
     }
 
-    ranks <- average_ranks(x)
+    ## Rounded as wilcox.test() rounds before ranking
+    digits_rank <- wilcox_digits_rank()
+    ranks <- average_ranks(if (is.finite(digits_rank)) signif(x, digits_rank) else x)
     ties <- attr(ranks, "ties")
 
     z <- sum(ranks[first]) - n_x * (n_x + 1) / 2 - n_x * n_y / 2
     sigma <- sqrt((n_x * n_y / 12) *
                   ((n_x + n_y + 1) -
                    sum(ties^3 - ties) / ((n_x + n_y) * (n_x + n_y - 1))))
+    if (!is.finite(sigma) || sigma == 0) {
+        return(stats::wilcox.test(x = x[first], y = x[!first])$p.value)
+    }
     z <- (z - sign(z) * 0.5) / sigma
     2 * min(stats::pnorm(z), stats::pnorm(z, lower.tail = FALSE))
 }
 
 
+#' Significant digits to which wilcox.test() rounds before ranking
+#'
+#' @return The default of the \code{digits.rank} argument of
+#'   \code{stats::wilcox.test()}, or \code{Inf} where it has none.
+#' @keywords internal
+wilcox_digits_rank <- function() {
+    default <- formals(utils::getS3method("wilcox.test", "default"))$digits.rank
+    value <- tryCatch(eval(default, baseenv()), error = function(e) NULL)
+    if (is.numeric(value) && length(value) == 1L && !is.na(value)) value else Inf
+}
+
+
 #' Format continuous statistic for display
-#' 
+#'
 #' Converts numeric summary statistics into formatted display strings following
 #' standard conventions (mean \eqn{\pm} SD, median [IQR], range, \emph{etc.}).
 #' 

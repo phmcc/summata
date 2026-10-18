@@ -29,6 +29,14 @@ because \code{wilcox.test()} ranks with \code{rank()} and counts ties with
 samples these two steps dominate its running time. Smaller samples, for
 which \code{wilcox.test()} computes the exact distribution by default, and
 calls with additional test arguments are passed to \code{wilcox.test()}
-itself.
+itself, as are data without variation, whose \emph{p}-value differs
+between versions of \R.
+}
+\details{
+\code{wilcox.test()} ranks the values rounded to the significant digits of
+its argument \code{digits.rank}, which defaults to 7 in recent versions of
+\R and is absent from earlier ones, which do not round. The values are
+rounded as the installed \code{wilcox.test()} rounds them by default, so
+that the ties, and the \emph{p}-value, are those it finds.
 }
 \keyword{internal}
